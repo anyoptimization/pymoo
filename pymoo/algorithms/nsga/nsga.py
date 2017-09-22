@@ -14,7 +14,7 @@ class NSGA(Algorithm):
                  factory=RandomFactory(),  # factory for the initiation population
                  crossover=SimulatedBinaryCrossover(),  # crossover to be used
                  mutation=PolynomialMutation(),  # mutation to be used
-                 survival=RankAndCrowdingSurvival()  # determine which individuals survive
+                 survival=RankAndCrowdingSurvival()  # determine which individuals survive,
                  ):
         self.pop_size = pop_size
         self.factory = factory
@@ -27,7 +27,6 @@ class NSGA(Algorithm):
         # create the population according to the factoring strategy
         pop = [Individual(x) for x in self.factory.sample(self.pop_size, problem.xl, problem.xu)]
         NSGA.evaluate(evaluator, problem, pop)
-
         pop = self.survival.survive(pop, self.pop_size)
 
         # for each generation
@@ -38,6 +37,7 @@ class NSGA(Algorithm):
         while evaluator.has_next():
             n_gen += 1
             print 'gen = %d' % (n_gen + 1)
+            evaluator.notify(pop)
 
             # create the offspring generation
             offsprings = self.get_offsprings(problem, evaluator, pop)
@@ -48,6 +48,7 @@ class NSGA(Algorithm):
             # keep only the individuals that survive
             pop = self.survival.survive(pop, self.pop_size)
 
+        evaluator.notify(pop)
         return pop
 
     def get_offsprings(self, problem, evaluator, pop):

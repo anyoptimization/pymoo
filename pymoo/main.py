@@ -22,7 +22,7 @@ if __name__ == '__main__':
     sys.path.extend('/Users/julesy/workspace/moo-python')
 
     problem = DTLZ1()
-    pop = NSGA(pop_size=100).solve(problem, n_eval=30000)
+    pop = NSGA(pop_size=100).solve(problem, evaluator=30000)
 
     x = [pop[i].f[0] for i in range(len(pop))]
     y = [pop[i].f[1] for i in range(len(pop))]
