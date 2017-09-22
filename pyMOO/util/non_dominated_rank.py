@@ -1,6 +1,6 @@
 import numpy as np
-
-from moo.util.dominator import Dominator
+import pygmo as pg
+from pyMOO.util.dominator import Dominator
 
 
 class NonDominatedRank:
@@ -10,7 +10,7 @@ class NonDominatedRank:
     @staticmethod
     def calc(pop):
         fronts = NonDominatedRank.calc_as_fronts(pop)
-        return Dominator.calc_from_fronts(fronts)
+        return NonDominatedRank.calc_from_fronts(fronts)
 
     @staticmethod
     def calc_from_fronts(fronts):
@@ -20,6 +20,24 @@ class NonDominatedRank:
             for idx in fronts[i]:
                 rank[idx] = i
         return rank
+
+    @staticmethod
+    def calc_as_fronts_pygmo(pop):
+
+        n = len(pop)
+        if n == 0:
+            return np.array()
+        m = len(pop[0].f)
+
+        objectives = [pop[i].f for i in range(n)]
+        constr = np.array([Dominator.get_constraint_violation(pop[i]) for i in range(n)])
+        f_max = np.array([max([objectives[i][j] for i in range(n)]) for j in range(m)])
+
+        for i in range(len(constr)):
+            if constr[i] > 0:
+                objectives[i] = f_max + constr[i]
+
+        return pg.fast_non_dominated_sorting(objectives)[0]
 
     @staticmethod
     def calc_as_fronts(pop):
@@ -41,11 +59,13 @@ class NonDominatedRank:
 
         for i in range(n):
 
-            for j in range(n):
+            for j in range(i+1, n):
                 rel = Dominator.get_relation(pop[i], pop[j])
                 if rel == 1:
                     is_dominating[i].append(j)
+                    n_dominated[j] += 1
                 elif rel == -1:
+                    is_dominating[j].append(i)
                     n_dominated[i] += 1
 
             if n_dominated[i] == 0:

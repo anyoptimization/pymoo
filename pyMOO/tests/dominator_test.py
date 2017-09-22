@@ -2,8 +2,8 @@ import unittest
 
 import numpy as np
 
-from moo.tests.test_util import make_individual
-from moo.util.dominator import Dominator
+from pyMOO.tests.test_util import make_individual
+from pyMOO.util.dominator import Dominator
 
 
 class DominationTest(unittest.TestCase):

@@ -1,6 +1,6 @@
 import numpy as np
 
-from moo.problems.problem import Problem
+from pyMOO.model.problem import Problem
 
 
 class ZDT(Problem):

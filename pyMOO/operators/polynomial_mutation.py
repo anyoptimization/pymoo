@@ -1,25 +1,25 @@
-import random
-
 import numpy as np
 
 
 class PolynomialMutation:
-    def __init__(self, xl, xu, eta_mut=50, p_mut=None):
+    def __init__(self, eta_mut=20, p_mut=None):
         self.eta_mut = eta_mut
-        self.p_mut = 1.0 / len(xl) if p_mut is None else p_mut
-        self.xl = xl
-        self.xu = xu
+        self.p_mut = p_mut
 
-    def mutate(self, x):
+    def mutate(self, x, xl, xu):
+
+        if self.p_mut is None:
+            self.p_mut = 1.0 / len(x)
+
         res = np.zeros(len(x))
         for j in range(len(x)):
-            if random.random() < self.p_mut:
+            if np.random.random() < self.p_mut:
                 y = x[j]
-                yl = self.xl[j]
-                yu = self.xu[j]
+                yl = xl[j]
+                yu = xu[j]
                 delta1 = (y - yl) / (yu - yl)
                 delta2 = (yu - y) / (yu - yl)
-                rnd = random.random()
+                rnd = np.random.random()
                 mut_pow = 1.0 / (self.eta_mut + 1.0)
                 if rnd <= 0.5:
                     xy = 1.0 - delta1

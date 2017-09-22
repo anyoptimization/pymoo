@@ -2,43 +2,47 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="22012428-ce67-4e25-a95c-74178c20b498" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/julesy.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/configuration.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/main.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/nsga/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/nsga/nsga.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/operators/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/operators/polynomial_mutation.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/operators/random_factory.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/operators/simulated_binary_crossover.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/problems/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/problems/kursawe.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/problems/problem.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/problems/zdt.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/tests/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/tests/dominator_test.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/tests/non_dominated_rank_test.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/tests/suite.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/tests/test_util.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/util/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/util/crowding_distance.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/util/dominator.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/util/individual.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moo/util/non_dominated_rank.py" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/das_dennis.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/global_vars.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/nsga2_classes.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/nsga2_main.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/nsga3_funcs.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/nsga3_main.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/nsga_funcs.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/parameter_inputs.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test_problems.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/trial_code.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/trial_functs.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/trial_params.py" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pyMOO/main.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pyMOO/model/evaluator.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pyMOO/model/problem.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pyMOO/problems/__init__.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pyMOO/problems/ackley.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pyMOO/problems/dtlz.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pyMOO/problems/rastrigin.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pyMOO/run_meta_model.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pyMOO/run_pygmo.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pyMOO/tests/__init__.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pyMOO/tests/non_dominated_rank_test.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pyMOO/util/__init__.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/setup.py" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/moo/main.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/moo/nsga/nsga.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/moo/problems/problem.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/moo/tests/non_dominated_rank_test.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/moo/util/crowding_distance.py" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/__init__.py" afterPath="$PROJECT_DIR$/pyMOO/__init__.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/configuration.py" afterPath="$PROJECT_DIR$/pyMOO/configuration.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/nsga/__init__.py" afterPath="$PROJECT_DIR$/pyMOO/algorithms/__init__.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/operators/__init__.py" afterPath="$PROJECT_DIR$/pyMOO/algorithms/nsga/rank_and_crowding.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/operators/polynomial_mutation.py" afterPath="$PROJECT_DIR$/pyMOO/operators/polynomial_mutation.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/operators/random_factory.py" afterPath="$PROJECT_DIR$/pyMOO/operators/random_factory.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/operators/simulated_binary_crossover.py" afterPath="$PROJECT_DIR$/pyMOO/operators/simulated_binary_crossover.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/problems/__init__.py" afterPath="$PROJECT_DIR$/pyMOO/model/__init__.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/problems/kursawe.py" afterPath="$PROJECT_DIR$/pyMOO/problems/kursawe.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/problems/zdt.py" afterPath="$PROJECT_DIR$/pyMOO/problems/zdt.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/tests/__init__.py" afterPath="$PROJECT_DIR$/pyMOO/model/algorithm.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/tests/dominator_test.py" afterPath="$PROJECT_DIR$/pyMOO/tests/dominator_test.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/tests/suite.py" afterPath="$PROJECT_DIR$/pyMOO/tests/suite.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/tests/test_util.py" afterPath="$PROJECT_DIR$/pyMOO/tests/test_util.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/util/__init__.py" afterPath="$PROJECT_DIR$/pyMOO/operators/__init__.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/util/dominator.py" afterPath="$PROJECT_DIR$/pyMOO/util/dominator.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/util/individual.py" afterPath="$PROJECT_DIR$/pyMOO/model/individual.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/moo/util/non_dominated_rank.py" afterPath="$PROJECT_DIR$/pyMOO/util/non_dominated_rank.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/moo-python.iml" afterPath="$PROJECT_DIR$/.idea/moo-python.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/results/ZDT3_RUN1.out" afterPath="$PROJECT_DIR$/results/ZDT3_RUN1.out" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -48,38 +52,22 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/moo_python$meta_model.coverage" NAME="meta_model Coverage Results" MODIFIED="1506033077301" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/moo" />
+    <SUITE FILE_PATH="coverage/moo_python$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1506086430957" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pyMOO" />
+    <SUITE FILE_PATH="coverage/moo_python$Unittests_for_non_dominated_rank_test_NonDominatedRankTest_test_one_dimensional_rank.coverage" NAME="Unittests for non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank Coverage Results" MODIFIED="1506020772679" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/moo/tests" />
     <SUITE FILE_PATH="coverage/moo_python$Unittests_in_non_dominated_rank_test_py.coverage" NAME="Unittests in non_dominated_rank_test.py Coverage Results" MODIFIED="1505922659491" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/moo/tests" />
     <SUITE FILE_PATH="coverage/moo_python$suite.coverage" NAME="suite Coverage Results" MODIFIED="1505870785743" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/moo-python/tests" />
     <SUITE FILE_PATH="coverage/moo_python$Unittests_in_domination_test_py.coverage" NAME="Unittests in dominator_test.py Coverage Results" MODIFIED="1505916584989" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/moo/tests" />
-    <SUITE FILE_PATH="coverage/moo_python$main.coverage" NAME="main Coverage Results" MODIFIED="1505935904031" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/moo" />
+    <SUITE FILE_PATH="coverage/moo_python$main.coverage" NAME="main Coverage Results" MODIFIED="1506020849271" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/moo" />
+    <SUITE FILE_PATH="coverage/moo_python$pygmo.coverage" NAME="pygmo Coverage Results" MODIFIED="1506018231920" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/moo" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="individual.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/moo/util/individual.py">
+      <file leaf-file-name="nsga.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pyMOO/algorithms/nsga/nsga.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="dominator.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/moo/util/dominator.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" column="38" lean-forward="false" selection-start-line="14" selection-start-column="38" selection-end-line="14" selection-end-column="38" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="crowding_distance.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/moo/util/crowding_distance.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="298">
-              <caret line="32" column="33" lean-forward="false" selection-start-line="32" selection-start-column="33" selection-end-line="32" selection-end-column="33" />
+            <state relative-caret-position="558">
+              <caret line="45" column="34" lean-forward="true" selection-start-line="45" selection-start-column="34" selection-end-line="45" selection-end-column="34" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -87,50 +75,54 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NSGA-II_Python_ZDT1.out" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/results/wilcoxon_test/NSGA-II_Python_ZDT1.out">
+      <file leaf-file-name="dtlz.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pyMOO/problems/dtlz.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="calculate_statistics.m" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/results/calculate_statistics.m">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="299">
-              <caret line="29" column="53" lean-forward="true" selection-start-line="29" selection-start-column="53" selection-end-line="29" selection-end-column="53" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/moo/main.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="314">
-              <caret line="24" column="5" lean-forward="false" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
+            <state relative-caret-position="128">
+              <caret line="13" column="34" lean-forward="true" selection-start-line="13" selection-start-column="34" selection-end-line="13" selection-end-column="34" />
               <folding>
-                <element signature="e#0#31#0" expanded="true" />
+                <element signature="e#0#16#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ZDT3_RUN1.out" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/results/ZDT3_RUN1.out">
+      <file leaf-file-name="zdt.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pyMOO/problems/zdt.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="15">
+              <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="plot_pareto.m" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/results/plot_pareto.m">
+      <file leaf-file-name="rank_and_crowding.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pyMOO/algorithms/nsga/rank_and_crowding.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="225">
+              <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#58#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="algorithm.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pyMOO/model/algorithm.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="165">
+              <caret line="11" column="46" lean-forward="false" selection-start-line="11" selection-start-column="46" selection-end-line="11" selection-end-column="46" />
+              <folding>
+                <element signature="e#1#19#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="evaluator.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pyMOO/model/evaluator.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="195">
               <caret line="13" column="0" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
@@ -139,21 +131,43 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NSGA-II_ZDT1.out" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/results/wilcoxon_test/NSGA-II_MEMO_Journal/NSGA-II_ZDT1.out">
+      <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pyMOO/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="151">
+              <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="rastrigin.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pyMOO/problems/rastrigin.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="195">
+              <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NSGA-II_Python_ZDT3.out" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/results/wilcoxon_test/NSGA-II_Python_ZDT3.out">
+      <file leaf-file-name="problem.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pyMOO/model/problem.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="256">
+              <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="random_factory.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pyMOO/operators/random_factory.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="45">
+              <caret line="3" column="8" lean-forward="true" selection-start-line="3" selection-start-column="8" selection-end-line="3" selection-end-column="8" />
               <folding />
             </state>
           </provider>
@@ -172,10 +186,17 @@
     <findStrings>
       <find>math.</find>
       <find>parent1.xreal</find>
+      <find>random.random()</find>
+      <find>name</find>
+      <find>self.xu</find>
+      <find>self.xl</find>
+      <find>self.cr</find>
     </findStrings>
     <replaceStrings>
       <replace>np.math.</replace>
       <replace>parent1</replace>
+      <replace>xl</replace>
+      <replace>xu</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -184,27 +205,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/nsga2_main.py" />
-        <option value="$PROJECT_DIR$/problems/Individual.py" />
-        <option value="$PROJECT_DIR$/problems/problem.py" />
-        <option value="$PROJECT_DIR$/problems/Problem.py" />
-        <option value="$PROJECT_DIR$/nsga2_classes.py" />
-        <option value="$PROJECT_DIR$/nsga_funcs.py" />
-        <option value="$PROJECT_DIR$/nsga/sbx.py" />
-        <option value="$PROJECT_DIR$/operator/SBX.py" />
-        <option value="$PROJECT_DIR$/Configuration.py" />
-        <option value="$PROJECT_DIR$/operator/PolynomialMutation.py" />
-        <option value="$PROJECT_DIR$/operator/SimulatedBinaryCrossover.py" />
-        <option value="$PROJECT_DIR$/nsga/NSGA.py" />
-        <option value="$PROJECT_DIR$/operator/RandomFactory.py" />
-        <option value="$PROJECT_DIR$/nsga/Individual.py" />
-        <option value="$PROJECT_DIR$/nsga/NonDominatedSort.py" />
-        <option value="$PROJECT_DIR$/setup.py" />
-        <option value="$PROJECT_DIR$/moo-python/tests/suite.py" />
-        <option value="$PROJECT_DIR$/moo-python/nsga/Individual.py" />
-        <option value="$PROJECT_DIR$/moo-python/nsga/NonDominatedSort.py" />
-        <option value="$PROJECT_DIR$/moo-python/operators/simulated_binary_crossover.py" />
-        <option value="$PROJECT_DIR$/moo-python/nsga/util.py" />
         <option value="$PROJECT_DIR$/moo-python/nsga/NSGA.py" />
         <option value="$PROJECT_DIR$/moo-python/tests/domination_test.py" />
         <option value="$PROJECT_DIR$/moo-python/nsga/nsga.py" />
@@ -213,24 +213,49 @@
         <option value="$PROJECT_DIR$/moo/tests/domination_test.py" />
         <option value="$PROJECT_DIR$/moo/nsga/dominator.py" />
         <option value="$PROJECT_DIR$/moo/tests/test_util.py" />
-        <option value="$PROJECT_DIR$/moo/tests/non_dominated_rank_test.py" />
         <option value="$PROJECT_DIR$/moo/nsga/crowding_distance.py" />
-        <option value="$PROJECT_DIR$/moo/util/non_dominated_rank.py" />
         <option value="$PROJECT_DIR$/moo/operators/random_factory.py" />
         <option value="$PROJECT_DIR$/moo/tests/dominator_test.py" />
         <option value="$PROJECT_DIR$/moo/util/dominator.py" />
         <option value="$PROJECT_DIR$/moo/nsga/individual.py" />
         <option value="$PROJECT_DIR$/moo/util/individual.py" />
-        <option value="$PROJECT_DIR$/moo/nsga/nsga.py" />
-        <option value="$PROJECT_DIR$/moo/operators/simulated_binary_crossover.py" />
-        <option value="$PROJECT_DIR$/moo/operators/polynomial_mutation.py" />
         <option value="$PROJECT_DIR$/moo/problems/test_problems.py" />
-        <option value="$PROJECT_DIR$/moo/problems/problem.py" />
         <option value="$PROJECT_DIR$/moo/problems/ZDT.py" />
         <option value="$PROJECT_DIR$/moo/problems/Kursawe.py" />
         <option value="$PROJECT_DIR$/moo/util/crowding_distance.py" />
         <option value="$PROJECT_DIR$/moo/problems/kursawe.py" />
+        <option value="$PROJECT_DIR$/moo/operators/polynomial_mutation.py" />
+        <option value="$PROJECT_DIR$/moo/operators/simulated_binary_crossover.py" />
+        <option value="$PROJECT_DIR$/moo/nsga/nsga_builder.py" />
         <option value="$PROJECT_DIR$/moo/main.py" />
+        <option value="$PROJECT_DIR$/moo/meta_model.py" />
+        <option value="$PROJECT_DIR$/moo/pygmo.py" />
+        <option value="$PROJECT_DIR$/moo/run_pygmo.py" />
+        <option value="$PROJECT_DIR$/moo/util/non_dominated_rank.py" />
+        <option value="$PROJECT_DIR$/moo/tests/non_dominated_rank_test.py" />
+        <option value="$PROJECT_DIR$/moo/nsga/nsga.py" />
+        <option value="$USER_HOME$/miniconda2/envs/moo-python/lib/python2.7/site-packages/pyKriging/matrixops.py" />
+        <option value="$PROJECT_DIR$/moo/problems/problem.py" />
+        <option value="$PROJECT_DIR$/moo/problems/rastrigin.py" />
+        <option value="$PROJECT_DIR$/moo/run_meta_model.py" />
+        <option value="$PROJECT_DIR$/pyMOO/nsga/nsga_builder.py" />
+        <option value="$PROJECT_DIR$/setup.py" />
+        <option value="$PROJECT_DIR$/pyMOO/algorithms/nsga/nsga_builder.py" />
+        <option value="$PROJECT_DIR$/pyMOO/run_pygmo.py" />
+        <option value="$PROJECT_DIR$/pyMOO/operators/polynomial_mutation.py" />
+        <option value="$PROJECT_DIR$/pyMOO/operators/simulated_binary_crossover.py" />
+        <option value="$PROJECT_DIR$/pyMOO/problems/zdt.py" />
+        <option value="$PROJECT_DIR$/pyMOO/problems/problem.py" />
+        <option value="$PROJECT_DIR$/pyMOO/problems/ackley.py" />
+        <option value="$PROJECT_DIR$/pyMOO/operators/random_factory.py" />
+        <option value="$PROJECT_DIR$/pyMOO/model/evaluator.py" />
+        <option value="$PROJECT_DIR$/pyMOO/model/algorithm.py" />
+        <option value="$PROJECT_DIR$/pyMOO/util/crowding_distance.py" />
+        <option value="$PROJECT_DIR$/pyMOO/algorithms/nsga/rank_and_crowding.py" />
+        <option value="$PROJECT_DIR$/pyMOO/algorithms/nsga/nsga.py" />
+        <option value="$PROJECT_DIR$/pyMOO/problems/DTLZ.py" />
+        <option value="$PROJECT_DIR$/pyMOO/problems/dtlz.py" />
+        <option value="$PROJECT_DIR$/pyMOO/main.py" />
       </list>
     </option>
   </component>
@@ -240,7 +265,7 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="39" />
     <option name="y" value="23" />
     <option name="width" value="1401" />
@@ -274,32 +299,80 @@
             <path>
               <item name="moo-python" type="b2602c69:ProjectViewProjectNode" />
               <item name="moo-python" type="462c0819:PsiDirectoryNode" />
-              <item name="moo" type="462c0819:PsiDirectoryNode" />
+              <item name="pyMOO" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="moo-python" type="b2602c69:ProjectViewProjectNode" />
+              <item name="moo-python" type="462c0819:PsiDirectoryNode" />
+              <item name="pyMOO" type="462c0819:PsiDirectoryNode" />
+              <item name="algorithms" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="moo-python" type="b2602c69:ProjectViewProjectNode" />
+              <item name="moo-python" type="462c0819:PsiDirectoryNode" />
+              <item name="pyMOO" type="462c0819:PsiDirectoryNode" />
+              <item name="algorithms" type="462c0819:PsiDirectoryNode" />
+              <item name="nsga" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="moo-python" type="b2602c69:ProjectViewProjectNode" />
+              <item name="moo-python" type="462c0819:PsiDirectoryNode" />
+              <item name="pyMOO" type="462c0819:PsiDirectoryNode" />
+              <item name="model" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="moo-python" type="b2602c69:ProjectViewProjectNode" />
+              <item name="moo-python" type="462c0819:PsiDirectoryNode" />
+              <item name="pyMOO" type="462c0819:PsiDirectoryNode" />
+              <item name="operators" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="moo-python" type="b2602c69:ProjectViewProjectNode" />
+              <item name="moo-python" type="462c0819:PsiDirectoryNode" />
+              <item name="pyMOO" type="462c0819:PsiDirectoryNode" />
+              <item name="problems" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="moo-python" type="b2602c69:ProjectViewProjectNode" />
+              <item name="moo-python" type="462c0819:PsiDirectoryNode" />
+              <item name="pyMOO" type="462c0819:PsiDirectoryNode" />
+              <item name="util" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="SearchEverywhereHistoryKey" value="rast&#9;FILE&#9;file:///Users/julesy/workspace/moo-python/moo/problems/rastrigin.py" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="moo-python" is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="moo-python" />
+      </console-settings>
+    </option>
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/moo/problems" />
-      <recent name="$PROJECT_DIR$/moo/tests" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/pyMOO/model" />
+      <recent name="$PROJECT_DIR$/pyMOO/algorithms" />
       <recent name="$PROJECT_DIR$/moo/util" />
       <recent name="$PROJECT_DIR$/moo-python/tests" />
       <recent name="$PROJECT_DIR$/moo-python/tests/dir" />
-      <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/moo-python" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/pyMOO/model" />
+      <recent name="$PROJECT_DIR$/pyMOO/problems" />
+      <recent name="$PROJECT_DIR$/moo/problems" />
+      <recent name="$PROJECT_DIR$/moo/tests" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -314,39 +387,59 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.main">
-    <configuration name="Unittests in dominator_test.py" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs />
-      <option name="SDK_HOME" value="/usr/bin/python" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/moo/tests" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="moo-python" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="_new_pattern" value="&quot;&quot;" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;$PROJECT_DIR$/moo/tests/dominator_test.py&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
-    </configuration>
-    <configuration name="Unittests in non_dominated_rank_test.py" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.main (1)">
+    <configuration name="Unittests for pyMOO.tests.non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs />
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/moo/tests" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pyMOO/tests" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="moo-python" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;$PROJECT_DIR$/moo/tests/non_dominated_rank_test.py&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <option name="_new_target" value="&quot;pyMOO.tests.non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+    </configuration>
+    <configuration name="main (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pyMOO" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="moo-python" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pyMOO/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/miniconda2/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/moo" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="moo-python" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/moo/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
+    <configuration name="meta_model" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -359,46 +452,51 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="moo-python" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/moo/main.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/moo/run_meta_model.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
-    <configuration name="suite" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="pygmo" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/moo-python/tests" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/moo" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="moo-python" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/moo-python/tests/suite.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/moo/run_pygmo.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
-    <list size="4">
-      <item index="0" class="java.lang.String" itemvalue="Python.suite" />
-      <item index="1" class="java.lang.String" itemvalue="Python tests.Unittests in dominator_test.py" />
-      <item index="2" class="java.lang.String" itemvalue="Python tests.Unittests in non_dominated_rank_test.py" />
-      <item index="3" class="java.lang.String" itemvalue="Python.main" />
+    <list size="5">
+      <item index="0" class="java.lang.String" itemvalue="Python.main" />
+      <item index="1" class="java.lang.String" itemvalue="Python.meta_model" />
+      <item index="2" class="java.lang.String" itemvalue="Python.pygmo" />
+      <item index="3" class="java.lang.String" itemvalue="Python tests.Unittests for pyMOO.tests.non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank" />
+      <item index="4" class="java.lang.String" itemvalue="Python.main (1)" />
     </list>
     <recent_temporary>
-      <list size="4">
-        <item index="0" class="java.lang.String" itemvalue="Python.main" />
-        <item index="1" class="java.lang.String" itemvalue="Python tests.Unittests in non_dominated_rank_test.py" />
-        <item index="2" class="java.lang.String" itemvalue="Python tests.Unittests in dominator_test.py" />
-        <item index="3" class="java.lang.String" itemvalue="Python.suite" />
+      <list size="5">
+        <item index="0" class="java.lang.String" itemvalue="Python.main (1)" />
+        <item index="1" class="java.lang.String" itemvalue="Python.meta_model" />
+        <item index="2" class="java.lang.String" itemvalue="Python.main" />
+        <item index="3" class="java.lang.String" itemvalue="Python tests.Unittests for pyMOO.tests.non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank" />
+        <item index="4" class="java.lang.String" itemvalue="Python.pygmo" />
       </list>
     </recent_temporary>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -411,35 +509,35 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Unittests_in_non_dominated_rank_test_py - 2017.09.20 at 10h 16m 37s.xml">
-      <configuration name="Unittests in non_dominated_rank_test.py" configurationId="tests" />
+    <history-entry file="Unittests_for_non_dominated_rank_test_NonDominatedRankTest_test_one_dimensional_rank - 2017.09.21 at 14h 58m 52s.xml">
+      <configuration name="Unittests for non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_non_dominated_rank_test_py - 2017.09.20 at 10h 16m 49s.xml">
-      <configuration name="Unittests in non_dominated_rank_test.py" configurationId="tests" />
+    <history-entry file="Unittests_for_non_dominated_rank_test_NonDominatedRankTest_test_one_dimensional_rank - 2017.09.21 at 15h 02m 08s.xml">
+      <configuration name="Unittests for non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_non_dominated_rank_test_py - 2017.09.20 at 10h 17m 16s.xml">
-      <configuration name="Unittests in non_dominated_rank_test.py" configurationId="tests" />
+    <history-entry file="Unittests_for_non_dominated_rank_test_NonDominatedRankTest_test_one_dimensional_rank - 2017.09.21 at 15h 02m 12s.xml">
+      <configuration name="Unittests for non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_non_dominated_rank_test_py - 2017.09.20 at 10h 17m 21s.xml">
-      <configuration name="Unittests in non_dominated_rank_test.py" configurationId="tests" />
+    <history-entry file="Unittests_for_non_dominated_rank_test_NonDominatedRankTest_test_one_dimensional_rank - 2017.09.21 at 15h 03m 40s.xml">
+      <configuration name="Unittests for non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_non_dominated_rank_test_py - 2017.09.20 at 10h 17m 25s.xml">
-      <configuration name="Unittests in non_dominated_rank_test.py" configurationId="tests" />
+    <history-entry file="Unittests_for_non_dominated_rank_test_NonDominatedRankTest_test_one_dimensional_rank - 2017.09.21 at 15h 03m 44s.xml">
+      <configuration name="Unittests for non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_non_dominated_rank_test_py - 2017.09.20 at 10h 17m 40s.xml">
-      <configuration name="Unittests in non_dominated_rank_test.py" configurationId="tests" />
+    <history-entry file="Unittests_for_non_dominated_rank_test_NonDominatedRankTest_test_one_dimensional_rank - 2017.09.21 at 15h 04m 24s.xml">
+      <configuration name="Unittests for non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_non_dominated_rank_test_py - 2017.09.20 at 10h 18m 13s.xml">
-      <configuration name="Unittests in non_dominated_rank_test.py" configurationId="tests" />
+    <history-entry file="Unittests_for_non_dominated_rank_test_NonDominatedRankTest_test_one_dimensional_rank - 2017.09.21 at 15h 04m 39s.xml">
+      <configuration name="Unittests for non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_non_dominated_rank_test_py - 2017.09.20 at 10h 19m 11s.xml">
-      <configuration name="Unittests in non_dominated_rank_test.py" configurationId="tests" />
+    <history-entry file="Unittests_for_non_dominated_rank_test_NonDominatedRankTest_test_one_dimensional_rank - 2017.09.21 at 15h 04m 56s.xml">
+      <configuration name="Unittests for non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_non_dominated_rank_test_py - 2017.09.20 at 10h 19m 12s.xml">
-      <configuration name="Unittests in non_dominated_rank_test.py" configurationId="tests" />
+    <history-entry file="Unittests_for_non_dominated_rank_test_NonDominatedRankTest_test_one_dimensional_rank - 2017.09.21 at 15h 05m 47s.xml">
+      <configuration name="Unittests for non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_non_dominated_rank_test_py - 2017.09.20 at 11h 50m 59s.xml">
-      <configuration name="Unittests in non_dominated_rank_test.py" configurationId="tests" />
+    <history-entry file="Unittests_for_non_dominated_rank_test_NonDominatedRankTest_test_one_dimensional_rank - 2017.09.21 at 15h 06m 13s.xml">
+      <configuration name="Unittests for non_dominated_rank_test.NonDominatedRankTest.test_one_dimensional_rank" configurationId="tests" />
     </history-entry>
   </component>
   <component name="TodoView">
@@ -452,19 +550,20 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="39" y="23" width="1401" height="877" extended-state="0" />
+    <frame x="40" y="23" width="1400" height="877" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32919255" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5024982" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32919255" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4" sideWeight="0.50785714" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24625267" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32919255" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32919255" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24571429" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32919255" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.4975018" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4" sideWeight="0.49214286" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -485,9 +584,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/moo/nsga/nsga.py</url>
-          <line>67</line>
-          <option name="timeStamp" value="46" />
+          <url>file://$PROJECT_DIR$/pyMOO/run_meta_model.py</url>
+          <line>18</line>
+          <option name="timeStamp" value="90" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pyMOO/problems/zdt.py</url>
+          <line>34</line>
+          <option name="timeStamp" value="94" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -497,348 +601,27 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="53" />
+      <option name="time" value="95" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/moo/util/individual.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="0" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/util/non_dominated_rank.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="555">
-          <caret line="37" column="18" lean-forward="false" selection-start-line="37" selection-start-column="18" selection-end-line="37" selection-end-column="18" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="1" lean-forward="true" selection-start-line="5" selection-start-column="1" selection-end-line="5" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/tests/dominator_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/operators/simulated_binary_crossover.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/operators/polynomial_mutation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="24" column="37" lean-forward="false" selection-start-line="24" selection-start-column="37" selection-end-line="24" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#13#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/operators/random_factory.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/nsga/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/util/dominator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" column="0" lean-forward="true" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/trial_code.py" />
-    <entry file="file://$PROJECT_DIR$/trial_functs.py" />
-    <entry file="file://$PROJECT_DIR$/trial_params.py" />
-    <entry file="file://$PROJECT_DIR$/nsga2_classes.py" />
-    <entry file="file://$PROJECT_DIR$/moo/problems/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nsga_funcs.py" />
-    <entry file="file:///System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy/core/numeric.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="364" column="0" lean-forward="false" selection-start-line="364" selection-start-column="0" selection-end-line="364" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/nsga/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="1" lean-forward="true" selection-start-line="5" selection-start-column="1" selection-end-line="5" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/tests/suite.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="44" lean-forward="true" selection-start-line="4" selection-start-column="44" selection-end-line="4" selection-end-column="44" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/tests/test_util.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="24" lean-forward="false" selection-start-line="3" selection-start-column="24" selection-end-line="3" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/unittest/case.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
-          <caret line="421" column="0" lean-forward="false" selection-start-line="421" selection-start-column="0" selection-end-line="421" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Library/Caches/PyCharm2017.2/python_stubs/348993582/__builtin__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="527" column="4" lean-forward="false" selection-start-line="527" selection-start-column="4" selection-end-line="527" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/tests/non_dominated_rank_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="0" lean-forward="true" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#15#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/tests/dominator_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="45" column="0" lean-forward="false" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/nsga2_main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="253">
-          <caret line="31" column="26" lean-forward="true" selection-start-line="31" selection-start-column="8" selection-end-line="31" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/nsga3_funcs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/nsga3_main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-227">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/operators/random_factory.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/problems/test_problems.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/problems/problem.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" column="29" lean-forward="false" selection-start-line="17" selection-start-column="29" selection-end-line="17" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/das_dennis.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-32">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/global_vars.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/parameter_inputs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="335">
-          <caret line="27" column="17" lean-forward="true" selection-start-line="27" selection-start-column="17" selection-end-line="27" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/problems/zdt.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="704">
-          <caret line="48" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/problems/kursawe.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="41" lean-forward="true" selection-start-line="12" selection-start-column="41" selection-end-line="12" selection-end-column="41" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/operators/simulated_binary_crossover.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="9" column="53" lean-forward="false" selection-start-line="9" selection-start-column="44" selection-end-line="9" selection-end-column="53" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/operators/polynomial_mutation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="56">
-          <caret line="8" column="20" lean-forward="false" selection-start-line="8" selection-start-column="20" selection-end-line="8" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/nsga/nsga.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="39" column="16" lean-forward="true" selection-start-line="39" selection-start-column="16" selection-end-line="39" selection-end-column="16" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/configuration.py">
+    <entry file="file://$PROJECT_DIR$/moo/problems/test_problems.py" />
+    <entry file="file://$PROJECT_DIR$/moo/das_dennis.py" />
+    <entry file="file://$PROJECT_DIR$/moo/global_vars.py" />
+    <entry file="file://$PROJECT_DIR$/moo/parameter_inputs.py" />
+    <entry file="file://$PROJECT_DIR$/pyMOO/configuration.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
           <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/moo/__init__.py">
+    <entry file="file://$PROJECT_DIR$/pyMOO/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/util/non_dominated_rank.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="15" column="33" lean-forward="true" selection-start-line="15" selection-start-column="33" selection-end-line="15" selection-end-column="33" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/util/individual.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/util/dominator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="38" lean-forward="false" selection-start-line="14" selection-start-column="38" selection-end-line="14" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/util/crowding_distance.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="298">
-          <caret line="32" column="33" lean-forward="false" selection-start-line="32" selection-start-column="33" selection-end-line="32" selection-end-column="33" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -846,7 +629,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -854,7 +636,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -862,17 +643,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moo/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="314">
-          <caret line="24" column="5" lean-forward="false" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -880,7 +650,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -888,15 +657,343 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
           <caret line="13" column="0" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/results/calculate_statistics.m">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="29" column="53" lean-forward="true" selection-start-line="29" selection-start-column="53" selection-end-line="29" selection-end-column="53" />
+        <state relative-caret-position="112">
+          <caret line="29" column="53" lean-forward="false" selection-start-line="29" selection-start-column="53" selection-end-line="29" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Library/Caches/PyCharm2017.2/python_stubs/-145394460/pygmo/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Library/Caches/PyCharm2017.2/python_stubs/-145394460/pygmo/core/zdt.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="600">
+          <caret line="43" column="8" lean-forward="false" selection-start-line="43" selection-start-column="8" selection-end-line="43" selection-end-column="8" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Library/Caches/PyCharm2017.2/python_stubs/-145394460/pygmo/core/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4590">
+          <caret line="309" column="4" lean-forward="false" selection-start-line="309" selection-start-column="4" selection-end-line="309" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/miniconda2/envs/moo-python/lib/python2.7/unittest/case.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="421" column="0" lean-forward="false" selection-start-line="421" selection-start-column="0" selection-end-line="421" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/miniconda2/envs/moo-python/lib/python2.7/site-packages/pyKriging/surrogateModel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="24" column="26" lean-forward="true" selection-start-line="24" selection-start-column="26" selection-end-line="24" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/miniconda2/envs/moo-python/lib/python2.7/site-packages/pyKriging/krige.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="18" column="0" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/miniconda2/envs/moo-python/lib/python2.7/site-packages/pyKriging/matrixops.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1005">
+          <caret line="70" column="0" lean-forward="false" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyKriging/matrixops.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1020">
+          <caret line="70" column="0" lean-forward="false" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyKriging/samplingplan.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="600">
+          <caret line="44" column="8" lean-forward="false" selection-start-line="44" selection-start-column="8" selection-end-line="44" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/run_meta_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="344">
+          <caret line="25" column="0" lean-forward="false" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/problems/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/tests/dominator_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#15#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/tests/non_dominated_rank_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="16" column="34" lean-forward="true" selection-start-line="16" selection-start-column="34" selection-end-line="16" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/tests/suite.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="44" lean-forward="true" selection-start-line="4" selection-start-column="44" selection-end-line="4" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/tests/test_util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="24" lean-forward="false" selection-start-line="3" selection-start-column="24" selection-end-line="3" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/util/dominator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/util/non_dominated_rank.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="17" lean-forward="true" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/setup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" column="18" lean-forward="true" selection-start-line="17" selection-start-column="18" selection-end-line="17" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Library/Caches/PyCharm2017.2/python_stubs/-145394460/pygmo/core/problem.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-115">
+          <caret line="834" column="8" lean-forward="false" selection-start-line="834" selection-start-column="8" selection-end-line="834" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/miniconda2/envs/moo-python/lib/python2.7/site-packages/pygmo/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-157">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/algorithms/nsga/nsga_builder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/run_pygmo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="10" lean-forward="false" selection-start-line="1" selection-start-column="10" selection-end-line="1" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Library/Caches/PyCharm2017.2/python_stubs/-145394460/numpy/core/multiarray.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="2228" column="4" lean-forward="false" selection-start-line="2228" selection-start-column="4" selection-end-line="2228" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/problems/ackley.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="7" column="25" lean-forward="true" selection-start-line="7" selection-start-column="25" selection-end-line="7" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/problems/kursawe.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="18" column="0" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/operators/simulated_binary_crossover.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" column="44" lean-forward="true" selection-start-line="22" selection-start-column="44" selection-end-line="22" selection-end-column="44" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/operators/polynomial_mutation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="8" column="19" lean-forward="true" selection-start-line="8" selection-start-column="19" selection-end-line="8" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/model/individual.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="8" lean-forward="false" selection-start-line="5" selection-start-column="8" selection-end-line="5" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/operators/random_factory.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="8" lean-forward="true" selection-start-line="3" selection-start-column="8" selection-end-line="3" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/model/algorithm.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="46" lean-forward="false" selection-start-line="11" selection-start-column="46" selection-end-line="11" selection-end-column="46" />
+          <folding>
+            <element signature="e#1#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/model/evaluator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="0" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/util/crowding_distance.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="0" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/algorithms/nsga/rank_and_crowding.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#58#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/model/problem.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="256">
+          <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/problems/rastrigin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/problems/zdt.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/algorithms/nsga/nsga.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="558">
+          <caret line="45" column="34" lean-forward="true" selection-start-line="45" selection-start-column="34" selection-end-line="45" selection-end-column="34" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/problems/dtlz.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="128">
+          <caret line="13" column="34" lean-forward="true" selection-start-line="13" selection-start-column="34" selection-end-line="13" selection-end-column="34" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyMOO/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="151">
+          <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

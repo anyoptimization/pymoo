@@ -1,30 +1,26 @@
-import random
-
 import numpy as np
 
-from moo.configuration import Configuration
+from pyMOO.configuration import Configuration
 
 
 class SimulatedBinaryCrossover:
 
-    def __init__(self, xl, xu, p_xover=0.9, eta_xover=30):
+    def __init__(self, eta_xover=15, p_xover=0.9):
         self.x_xover = p_xover
         self.eta_xover = eta_xover
-        self.xl = xl
-        self.xu = xu
 
-    def crossover(self, parent1, parent2):
+    def crossover(self, parent1, parent2, xl, xu):
 
-        n = len(self.xl)
+        n = len(xl)
 
         child1 = np.zeros(n)
         child2 = np.zeros(n)
 
-        if random.random() < self.x_xover:
+        if np.random.random() < self.x_xover:
 
             for i in range(n):
 
-                if random.random() < 0.5:
+                if np.random.random() < 0.5:
                     if abs(parent1[i] - parent2[i]) > Configuration.EPS:
 
                         if parent1[i] < parent2[i]:
@@ -34,10 +30,10 @@ class SimulatedBinaryCrossover:
                             y1 = parent2[i]
                             y2 = parent1[i]
 
-                        yl = self.xl[i]
-                        yu = self.xu[i]
+                        yl = xl[i]
+                        yu = xu[i]
 
-                        rand = random.random()
+                        rand = np.random.random()
                         beta = 1.0 + (2.0 * (y1 - yl) / (y2 - yl))
                         alpha = 2.0 - np.math.pow(beta, -(self.eta_xover + 1))
                         if rand <= (1.0 / alpha):
@@ -66,7 +62,7 @@ class SimulatedBinaryCrossover:
                         if c2 > yu:
                             c2 = yu
 
-                        if random.random() <= 0.5:
+                        if np.random.random() <= 0.5:
                             child1[i] = c2
                             child2[i] = c1
                         else:
