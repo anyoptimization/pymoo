@@ -1,11 +1,11 @@
 import numpy as np
 
-from pyMOO.algorithms.nsga.rank_and_crowding import RankAndCrowdingSurvival
-from pyMOO.model.algorithm import Algorithm
-from pyMOO.model.individual import Individual
-from pyMOO.operators.polynomial_mutation import PolynomialMutation
-from pyMOO.operators.random_factory import RandomFactory
-from pyMOO.operators.simulated_binary_crossover import SimulatedBinaryCrossover
+from algorithms.nsga.rank_and_crowding import RankAndCrowdingSurvival
+from model.algorithm import Algorithm
+from model.individual import Individual
+from operators.polynomial_mutation import PolynomialMutation
+from operators.random_factory import RandomFactory
+from operators.simulated_binary_crossover import SimulatedBinaryCrossover
 
 
 class NSGA(Algorithm):

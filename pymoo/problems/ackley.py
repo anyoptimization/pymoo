@@ -1,6 +1,6 @@
 import numpy as np
 
-from pyMOO.model.problem import Problem
+from model.problem import Problem
 
 
 class Ackley(Problem):

@@ -1,6 +1,6 @@
 import numpy as np
 import pygmo as pg
-from pyMOO.util.dominator import Dominator
+from util.dominator import Dominator
 
 
 class NonDominatedRank:

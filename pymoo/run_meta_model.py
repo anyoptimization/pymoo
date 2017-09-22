@@ -1,10 +1,10 @@
 import numpy as np
 
-from pyMOO.problems.zdt import ZDT1
+from problems.zdt import ZDT1
 from pyKriging.krige import kriging
 from pyKriging.samplingplan import samplingplan
 
-from pyMOO.problems.rastrigin import Rastrigin
+from problems.rastrigin import Rastrigin
 
 if __name__ == '__main__':
 

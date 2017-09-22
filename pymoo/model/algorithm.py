@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from pyMOO.model.evaluator import Evaluator
+from model.evaluator import Evaluator
 
 
 class Algorithm:

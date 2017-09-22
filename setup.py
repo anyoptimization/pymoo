@@ -11,13 +11,13 @@ def read(fname):
 
 
 setup(
-    name="pyMOO",
+    name="pymoo",
     version="0.0.1",
     author="Yashes Dhebar, Julian Blank",
     description=("Multi-Objective Optimization in Python"),
     license='MIT',
     keywords="moo,nsga",
-    packages=['pyMOO', 'tests'],
+    packages=['pymoo', 'tests'],
     long_description=read('README'),
     install_requires=['numpy', 'pygmo']
 )

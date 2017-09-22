@@ -1,10 +1,11 @@
 import os
 
 import matplotlib.pyplot as plt
+import sys
 
-from pyMOO.algorithms.nsga.nsga import NSGA
-from pyMOO.problems.dtlz import DTLZ1
-from pyMOO.problems.zdt import ZDT1
+from algorithms.nsga.nsga import NSGA
+from problems.dtlz import DTLZ1
+from problems.zdt import ZDT1
 
 
 def write_final_pop_obj(pop, run):
@@ -16,6 +17,9 @@ def write_final_pop_obj(pop, run):
 
 
 if __name__ == '__main__':
+    print os.path.dirname(os.path.abspath(__file__))
+
+    sys.path.extend('/Users/julesy/workspace/moo-python')
 
     problem = DTLZ1()
     pop = NSGA(pop_size=100).solve(problem, n_eval=30000)

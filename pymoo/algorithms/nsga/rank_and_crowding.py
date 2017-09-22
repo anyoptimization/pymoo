@@ -1,4 +1,4 @@
-from pyMOO.util.non_dominated_rank import NonDominatedRank
+from util.non_dominated_rank import NonDominatedRank
 import numpy as np
 
 

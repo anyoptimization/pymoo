@@ -2,8 +2,8 @@ import unittest
 
 import numpy as np
 import pygmo as pg
-from pyMOO.tests.test_util import make_individual
-from pyMOO.util.non_dominated_rank import NonDominatedRank
+from tests.test_util import make_individual
+from util.non_dominated_rank import NonDominatedRank
 
 
 class NonDominatedRankTest(unittest.TestCase):

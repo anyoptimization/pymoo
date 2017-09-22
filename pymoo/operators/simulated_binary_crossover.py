@@ -1,6 +1,6 @@
 import numpy as np
 
-from pyMOO.configuration import Configuration
+from configuration import Configuration
 
 
 class SimulatedBinaryCrossover:

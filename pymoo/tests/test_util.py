@@ -1,4 +1,4 @@
-from pyMOO.model.individual import Individual
+from model.individual import Individual
 
 
 def make_individual(f, g):
