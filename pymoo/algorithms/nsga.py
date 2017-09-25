@@ -1,6 +1,8 @@
+import random
+
 import numpy as np
 
-from algorithms.nsga.rank_and_crowding import RankAndCrowdingSurvival
+from algorithms.rank_and_crowding import RankAndCrowdingSurvival
 from model.algorithm import Algorithm
 from model.individual import Individual
 from operators.polynomial_mutation import PolynomialMutation
@@ -49,19 +51,22 @@ class NSGA(Algorithm):
             pop = self.survival.survive(pop, self.pop_size)
 
         evaluator.notify(pop)
+
         return pop
 
     def get_offsprings(self, problem, evaluator, pop):
 
-        # create the mating pool
-        perm = np.concatenate([np.random.permutation(self.pop_size), np.random.permutation(self.pop_size)])
+        perm1 = range(self.pop_size)
+        perm2 = range(self.pop_size)
+        random.shuffle(perm1)
+        random.shuffle(perm2)
 
         # do recombination and save offsprings
         offsprings = []
-        for i in range(0, len(perm), 4):
+        for i in range(0, self.pop_size, 2):
             # find the parents by doing tournament selection
-            parent1 = pop[min(perm[i], perm[i + 1])]
-            parent2 = pop[min(perm[i + 2], perm[i + 3])]
+            parent1 = pop[min(perm1[i], perm1[i + 1])]
+            parent2 = pop[min(perm2[i], perm2[i + 1])]
 
             # do the crossover and mutation
             child1, child2 = self.crossover.crossover(parent1.x, parent2.x, problem.xl, problem.xu)

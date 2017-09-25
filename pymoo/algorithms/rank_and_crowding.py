@@ -1,5 +1,8 @@
-from util.non_dominated_rank import NonDominatedRank
 import numpy as np
+
+from configuration import Configuration
+from util.misc import print_pop
+from util.non_dominated_rank import NonDominatedRank
 
 
 class RankAndCrowdingSurvival:
@@ -9,10 +12,12 @@ class RankAndCrowdingSurvival:
         sorted_idx = sorted(range(len(pop)), key=lambda x: (rank[x], -crowding[x]))
         pop = [pop[i] for i in sorted_idx]
 
+        #print print_pop(pop, rank, crowding, sorted_idx)
+
         # now truncate the population
         return pop[:size]
 
-        # print NSGA.print_pop(pop, rank, crowding, sorted_idx)
+
 
     @staticmethod
     def calc_rank_and_crowding(pop):

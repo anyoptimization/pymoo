@@ -1,6 +1,14 @@
+import random
+
 import numpy as np
 
 
 class RandomFactory:
     def sample(self, n, xl, xu):
-        return [np.random.random(len(xl)) * (xu - xl) + xl for _ in range(n)]
+        val = np.zeros((n, len(xl)))
+
+        for i in range(n):
+            val[i, :] = random.uniform(xl, xu)
+
+        return val
+        # return np.array([np.random.uniform(xl[i], xu[i], n) for i in range(len(m))]).T

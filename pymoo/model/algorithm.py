@@ -1,3 +1,4 @@
+import random
 
 import numpy as np
 
@@ -12,6 +13,7 @@ class Algorithm:
     def solve(self, problem, evaluator, seed=1234):
 
         # set the random seed
+        random.seed(seed)
         np.random.seed(seed)
 
         if not isinstance(evaluator, Evaluator):

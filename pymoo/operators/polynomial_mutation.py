@@ -1,3 +1,5 @@
+from random import random
+
 import numpy as np
 
 
@@ -13,13 +15,13 @@ class PolynomialMutation:
 
         res = np.zeros(len(x))
         for j in range(len(x)):
-            if np.random.random() < self.p_mut:
+            if random() < self.p_mut:
                 y = x[j]
                 yl = xl[j]
                 yu = xu[j]
                 delta1 = (y - yl) / (yu - yl)
                 delta2 = (yu - y) / (yu - yl)
-                rnd = np.random.random()
+                rnd = random()
                 mut_pow = 1.0 / (self.eta_mut + 1.0)
                 if rnd <= 0.5:
                     xy = 1.0 - delta1
