@@ -4,33 +4,40 @@ import numpy as np
 
 from algorithms.nsga import NSGA
 from model.evaluator import Evaluator
+from operators.random_factory import RandomFactory
+from operators.random_spare_factory import RandomSpareFactory
 from problems.zdt import ZDT1, ZDT2, ZDT3, ZDT4, ZDT6
+from rand.default_random_generator import DefaultRandomGenerator
 from util.misc import get_f
+from rand.secure_random_generator import SecureRandomGenerator
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('-n', metavar='n', default=None, type=int, help='Execute a specific run (HPCC)')
+    parser.add_argument('-n', metavar='n', default=None, type=str, help='Execute a specific run (HPCC)')
     parser.add_argument('-o', '--out', default=None, help='Defines the storage of the output file(s).')
     parser.add_argument('--hist', help='If true a .hist file with the pareto fronts over time is created.',
                         action='store_true')
     args = parser.parse_args()
 
-    pop_size = 88
+    pop_size = 100
+    name = "pynsga"
 
-    algorithm = NSGA(pop_size=88)
+    algorithm = NSGA(pop_size=100, rnd=DefaultRandomGenerator())
     problems = [ZDT1(), ZDT2(), ZDT3(), ZDT4(), ZDT6()]
-    n_gen = [100, 200, 200, 500, 1000]
+    n_gen = [200, 200, 200, 400, 400]
     runs = 30
 
-    counter = -1
+    counter = 0
+
+    n = [int(args.n)] if '-' not in args.n else range(int(args.n.split('-')[0]), int(args.n.split('-')[1]) + 1)
 
     for p in range(len(problems)):
 
         for r in range(runs):
 
             counter += 1
-            if args.n is not None and counter != args.n:
+            if args.n is not None and counter not in n:
                 continue
 
             evaluator = Evaluator(n_gen[p] * pop_size)
@@ -40,8 +47,8 @@ if __name__ == '__main__':
                 data = evaluator.data
 
                 # save the final population
-                fname = args.out + '/%s_%s_%02d.out' % ('pynsga', problems[p].name(), (r + 1))
-                print fname
+                fname = args.out + '/%s_%s_%02d.out' % (name, problems[p].name(), (r + 1))
+                print(fname)
                 np.savetxt(fname, np.asarray(get_f(pop)), fmt='%.14f')
 
                 # save the files for each generation
@@ -54,6 +61,6 @@ if __name__ == '__main__':
                         obj = np.insert(obj, 0, i * np.ones(len(obj)), axis=1)
                         hist = obj if hist is None else np.concatenate((hist, obj), axis=0)
 
-                    fname = args.out + '/%s_%s_%02d.hist' % ('pynsga', problems[p].name(), (r + 1))
-                    print fname
+                    fname = args.out + '/%s_%s_%02d.hist' % (name, problems[p].name(), (r + 1))
+                    print(fname)
                     np.savetxt(fname, hist, fmt='%.14f')

@@ -2,12 +2,14 @@ import random
 
 import numpy as np
 
-from algorithms.rank_and_crowding import RankAndCrowdingSurvival
 from model.algorithm import Algorithm
 from model.individual import Individual
 from operators.polynomial_mutation import PolynomialMutation
 from operators.random_factory import RandomFactory
 from operators.simulated_binary_crossover import SimulatedBinaryCrossover
+from rand.default_random_generator import DefaultRandomGenerator
+from util.misc import evaluate
+from util.rank_and_crowding import RankAndCrowdingSurvival
 
 
 class NSGA(Algorithm):
@@ -16,29 +18,31 @@ class NSGA(Algorithm):
                  factory=RandomFactory(),  # factory for the initiation population
                  crossover=SimulatedBinaryCrossover(),  # crossover to be used
                  mutation=PolynomialMutation(),  # mutation to be used
-                 survival=RankAndCrowdingSurvival()  # determine which individuals survive,
+                 survival=RankAndCrowdingSurvival(),  # determine which individuals survive,
+                 rnd=DefaultRandomGenerator()
                  ):
         self.pop_size = pop_size
         self.factory = factory
         self.crossover = crossover
         self.mutation = mutation
         self.survival = survival
+        self.rnd = rnd
 
     def solve_(self, problem, evaluator):
 
         # create the population according to the factoring strategy
-        pop = [Individual(x) for x in self.factory.sample(self.pop_size, problem.xl, problem.xu)]
-        NSGA.evaluate(evaluator, problem, pop)
+        pop = [Individual(x) for x in self.factory.sample(self.pop_size, problem.xl, problem.xu, rnd=self.rnd)]
+        evaluate(evaluator, problem, pop)
         pop = self.survival.survive(pop, self.pop_size)
 
         # for each generation
         n_gen = 0
-        print 'gen = %d' % (n_gen + 1)
+        # print 'gen = %d' % (n_gen + 1)
 
         # while there are functions evaluations left
         while evaluator.has_next():
             n_gen += 1
-            print 'gen = %d' % (n_gen + 1)
+            # print 'gen = %d' % (n_gen + 1)
             evaluator.notify(pop)
 
             # create the offspring generation
@@ -48,6 +52,7 @@ class NSGA(Algorithm):
             pop = pop + offsprings
 
             # keep only the individuals that survive
+            random.shuffle(pop)
             pop = self.survival.survive(pop, self.pop_size)
 
         evaluator.notify(pop)
@@ -56,38 +61,24 @@ class NSGA(Algorithm):
 
     def get_offsprings(self, problem, evaluator, pop):
 
-        perm1 = range(self.pop_size)
-        perm2 = range(self.pop_size)
-        random.shuffle(perm1)
-        random.shuffle(perm2)
+        perm = np.array(self.rnd.permutation(self.pop_size))
+        perm = np.append(perm, np.array(self.rnd.permutation(self.pop_size)))
 
         # do recombination and save offsprings
         offsprings = []
-        for i in range(0, self.pop_size, 2):
+        for i in range(0, len(perm), 4):
             # find the parents by doing tournament selection
-            parent1 = pop[min(perm1[i], perm1[i + 1])]
-            parent2 = pop[min(perm2[i], perm2[i + 1])]
+            parent1 = pop[min(perm[i], perm[i + 1])]
+            parent2 = pop[min(perm[i + 2], perm[i + 3])]
 
-            # do the crossover and mutation
-            child1, child2 = self.crossover.crossover(parent1.x, parent2.x, problem.xl, problem.xu)
-            child1 = self.mutation.mutate(child1, problem.xl, problem.xu)
-            child2 = self.mutation.mutate(child2, problem.xl, problem.xu)
+            # do the crossover
+            children = self.crossover.crossover(parent1.x, parent2.x, problem.xl, problem.xu, rnd=self.rnd)
+            # mutate
+            children = [self.mutation.mutate(child, problem.xl, problem.xu, rnd=self.rnd) for child in children]
 
-            offsprings.append(Individual(child1))
-            offsprings.append(Individual(child2))
+            offsprings.extend([Individual(child) for child in children])
 
         # evaluate the offspring population
-        NSGA.evaluate(evaluator, problem, offsprings)
+        evaluate(evaluator, problem, offsprings)
 
         return offsprings
-
-    @staticmethod
-    def evaluate(evaluator, problem, pop):
-        for ind in pop:
-            ind.f, ind.g = evaluator.eval(problem, ind.x)
-
-    @staticmethod
-    def print_pop(pop, rank, crowding, sorted_idx):
-        for i in range(len(pop)):
-            print i, pop[i].f, rank[sorted_idx[i]], crowding[sorted_idx[i]]
-        print '---------'

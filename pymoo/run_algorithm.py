@@ -1,12 +1,11 @@
 import os
-import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-from algorithms.nsga import NSGA
+from algorithms.nsao import NSAO
+from measures.hypervolume import calc_hypervolume
 from problems.zdt import ZDT1
-from util.hypervolume import calc_hypervolume
 from util.misc import get_f
 
 
@@ -19,13 +18,12 @@ def write_final_pop_obj(pop, run):
 
 
 if __name__ == '__main__':
-    print os.path.dirname(os.path.abspath(__file__))
 
+    problem = ZDT1(n_var=5)
 
-    sys.path.extend('/Users/julesy/workspace/moo-python')
+    print problem
 
-    problem = ZDT1()
-    pop = NSGA(pop_size=8).solve(problem, evaluator=800, seed=4321)
+    pop = NSAO().solve(problem, evaluator=200, seed=4321)
 
     print np.array_str(np.asarray(get_f(pop)))
 

@@ -12,7 +12,7 @@ class RankAndCrowdingSurvival:
         sorted_idx = sorted(range(len(pop)), key=lambda x: (rank[x], -crowding[x]))
         pop = [pop[i] for i in sorted_idx]
 
-        #print print_pop(pop, rank, crowding, sorted_idx)
+        #print_pop(pop, rank, crowding, sorted_idx, 20)
 
         # now truncate the population
         return pop[:size]

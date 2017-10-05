@@ -1,14 +1,16 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas
+import plotly.plotly as py
+import plotly.graph_objs as go
 import pygmo
 import scipy
+import plotly
 from pandas.plotting import parallel_coordinates
-from sklearn.cluster import DBSCAN
-from sklearn.metrics import make_scorer, mean_squared_error, r2_score
+from plotly.graph_objs import Scatter, Layout
+from sklearn.metrics import make_scorer, r2_score
 from sklearn.model_selection import cross_val_score
-
-from sklearn.tree import DecisionTreeRegressor, ExtraTreeRegressor
-import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeRegressor
 
 from util.non_dominated_rank import NonDominatedRank
 
@@ -38,10 +40,26 @@ def show_correlation_plot(X, y, var, obj):
 
 
 if __name__ == '__main__':
-    data = np.loadtxt('/Users/julesy/workspace/b34.out')
 
-    X = data[:, 1:-2]
+    problem = 'b38'
+    data = np.loadtxt('/Users/julesy/workspace/%s.out' % problem, dtype=float)
+
+
+    X = np.array(data[:, 1:-2])
     y = data[:, [-2, -1]]
+
+    df = pandas.DataFrame(y)
+    df['rank'] = NonDominatedRank.calc_from_fronts(pygmo.fast_non_dominated_sorting(y)[0])
+    front = df[df['rank'] == 0]
+
+    plotly.offline.plot({
+        "data": [Scatter(x=df[df['rank'] != 0][0], y=df[df['rank'] != 0][1], mode = 'markers', name='DOE'), Scatter(x=df[df['rank'] == 0][0], y=df[df['rank'] == 0][1], mode = 'markers', name = 'front')],
+        "layout": Layout(title="Objective Space %s" % problem)
+    })
+
+
+
+
     epoch = data[:, 0]
 
     # print y
@@ -52,7 +70,7 @@ if __name__ == '__main__':
     for i in range(len(objectives)):
         for j in range(len(vars)):
             corr = scipy.stats.pearsonr(X[:, j], y[:, i])
-            print '%s - %s: %s' % (objectives[i], vars[j], corr)
+            print '%s [%s] - %s [%s]: %s' % (objectives[i], i, vars[j], j, corr)
 
     print '---------------------------'
 
@@ -77,6 +95,6 @@ if __name__ == '__main__':
 
 
     #show_correlation_plot(X, y, 0, 0)
-    #show_correlation_plot(X, y, 4, 0)
+    show_correlation_plot(X, y, 5, 0)
     #show_correlation_plot(X, y, 7, 0)
     #show_correlation_plot(X, y, 7, 1)

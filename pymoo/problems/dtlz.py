@@ -1,4 +1,4 @@
-import functools
+
 
 import numpy as np
 
@@ -16,8 +16,11 @@ class DTLZ(Problem):
         self.xu = np.ones(self.n_var)
 
 
-
 class DTLZ1(DTLZ):
+
+    def calc_pareto_front(self):
+        x1 = np.arange(0, 0.5, 100)
+        return np.array([x1, 0.5 - x1]).T
 
     def evaluate_(self, x, f):
 

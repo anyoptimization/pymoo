@@ -12,7 +12,10 @@ class Dominator:
     @staticmethod
     def get_constraint_violation(a):
         if a.c is None:
-            a.c = np.sum(a.g[a.g > 0])
+            if a.g is None:
+                a.c = 0
+            else:
+                a.c = np.sum(a.g[a.g > 0])
         return a.c
 
     @staticmethod

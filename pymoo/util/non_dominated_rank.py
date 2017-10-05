@@ -37,7 +37,7 @@ class NonDominatedRank:
             if constr[i] > 0:
                 objectives[i] = f_max + constr[i]
 
-        return pg.fast_non_dominated_sorting(objectives)[0]
+            return pg.fast_non_dominated_sorting(objectives)[0]
 
     @staticmethod
     def calc_as_fronts(pop):
