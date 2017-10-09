@@ -16,6 +16,6 @@ def evaluate(evaluator, problem, pop):
 
 def print_pop(pop, rank, crowding, sorted_idx, n):
     for i in range(n):
-        print(i, pop[i].f, rank[sorted_idx[i]], crowding[sorted_idx[i]])
+        print(i, pop[sorted_idx[i]].f, rank[sorted_idx[i]], crowding[sorted_idx[i]])
     print('---------')
 

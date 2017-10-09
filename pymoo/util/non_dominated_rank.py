@@ -23,21 +23,47 @@ class NonDominatedRank:
 
     @staticmethod
     def calc_as_fronts_pygmo(pop):
-
         n = len(pop)
         if n == 0:
             return np.array()
-        m = len(pop[0].f)
-
         objectives = [pop[i].f for i in range(n)]
-        constr = np.array([Dominator.get_constraint_violation(pop[i]) for i in range(n)])
-        f_max = np.array([max([objectives[i][j] for i in range(n)]) for j in range(m)])
+        return pg.fast_non_dominated_sorting(objectives)[0]
 
-        for i in range(len(constr)):
-            if constr[i] > 0:
-                objectives[i] = f_max + constr[i]
+    @staticmethod
+    def calc_as_fronts_naive(pop):
 
-            return pg.fast_non_dominated_sorting(objectives)[0]
+        fronts = []
+
+        left_over = list(range(len(pop)))
+
+        while len(left_over) > 0:
+
+            front = []
+
+            for i in left_over:
+
+                is_dominated = False
+                dominating = set()
+
+                for j in front:
+                    rel = Dominator.get_relation(pop[i], pop[j])
+                    if rel == 1:
+                        dominating.add(j)
+                    elif rel == -1:
+                        is_dominated = True
+                        break
+
+                if is_dominated:
+                    continue
+                else:
+                    front = [x for x in front if x not in dominating]
+                    front.append(i)
+
+            left_over = [e for e in left_over if e not in front]
+            fronts.append(front)
+
+        return fronts
+
 
     @staticmethod
     def calc_as_fronts(pop):
@@ -59,7 +85,7 @@ class NonDominatedRank:
 
         for i in range(n):
 
-            for j in range(i+1, n):
+            for j in range(i + 1, n):
                 rel = Dominator.get_relation(pop[i], pop[j])
                 if rel == 1:
                     is_dominating[i].append(j)

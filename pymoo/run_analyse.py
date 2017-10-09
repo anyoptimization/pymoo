@@ -59,7 +59,7 @@ def load_from_out(folder):
              # 'pop' : pop,
              'igd': igd,
              'hv' : hv,
-             'file' : fname
+             #'file' : fname
              }
 
         data.append(d)
@@ -77,11 +77,12 @@ if __name__ == '__main__':
 
     with pd.option_context('display.max_rows', None):
         print(df)
-        #print(df[df['problem'] == 'ZDT4'])
+        print(df[(df.problem == 'ZDT3') & (df.igd > 0.03)])
 
     with pd.option_context('display.max_rows', None):
         f = {'igd': ['median', 'min', 'mean', 'max', 'std']}
         print(df.groupby(['problem', 'algorithm']).agg(f))
+
 
     # np.save('out', data, allow_pickle=True)
     # data = np.load('out.npy', allow_pickle=True)

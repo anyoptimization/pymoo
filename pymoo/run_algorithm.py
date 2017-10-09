@@ -1,11 +1,11 @@
 import os
 
-import matplotlib.pyplot as plt
 import numpy as np
 
-from algorithms.nsao import NSAO
-from measures.hypervolume import calc_hypervolume
+from algorithms.nsga import NSGA
+from operators.polynomial_mutation import PolynomialMutation
 from problems.zdt import ZDT1
+from rand.my_random_generator import MyRandomGenerator
 from util.misc import get_f
 
 
@@ -19,21 +19,21 @@ def write_final_pop_obj(pop, run):
 
 if __name__ == '__main__':
 
-    problem = ZDT1(n_var=5)
+    problem = ZDT1()
 
-    print problem
+    print(problem)
 
-    pop = NSAO().solve(problem, evaluator=200, seed=4321)
+    pop = NSGA(mutation=PolynomialMutation(p_mut=0.033)).solve(problem, evaluator=200, seed=0.1, rnd=MyRandomGenerator())
 
-    print np.array_str(np.asarray(get_f(pop)))
+    print(np.array_str(np.asarray(get_f(pop))))
 
     x = [pop[i].f[0] for i in range(len(pop))]
     y = [pop[i].f[1] for i in range(len(pop))]
-    plt.scatter(x, y)
-    plt.show()
+    #plt.scatter(x, y)
+    #plt.show()
 
     r = np.array([1.01, 1.01])
 
-    print calc_hypervolume(get_f(pop), r)
+    #print(calc_hypervolume(get_f(pop), r))
 
     # write_final_pop_obj(pop,1)

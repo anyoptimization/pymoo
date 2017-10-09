@@ -18,10 +18,23 @@ class DefaultRandomGenerator:
             return val
 
 
-    def permutation(self, n):
-        perm = list(range(n))
-        random.shuffle(perm)
-        return perm
+    def permutation(self, length, n=1):
+        perms = []
+        for _ in range(n):
+            perm = list(range(length))
+            random.shuffle(perm)
+            perms.append(perm)
+        return perms
 
     def seed(self, x):
         random.seed(x)
+
+    def randint(self, low, high):
+        if low >= high:
+            return low
+        else:
+            res = low + (self.random() * (high - low))
+            if res > high:
+                res = high
+        return int(res)
+

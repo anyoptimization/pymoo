@@ -8,10 +8,13 @@ from operators.random_factory import RandomFactory
 from operators.random_spare_factory import RandomSpareFactory
 from problems.zdt import ZDT1, ZDT2, ZDT3, ZDT4, ZDT6
 from rand.default_random_generator import DefaultRandomGenerator
+from rand.my_random_generator import MyRandomGenerator
+from rand.numpy_random_generator import NumpyRandomGenerator
 from util.misc import get_f
 from rand.secure_random_generator import SecureRandomGenerator
 
 if __name__ == '__main__':
+
 
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('-n', metavar='n', default=None, type=str, help='Execute a specific run (HPCC)')
@@ -21,12 +24,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     pop_size = 100
-    name = "pynsga"
+    name = "pynsga-myrandom"
 
-    algorithm = NSGA(pop_size=100, rnd=DefaultRandomGenerator())
+    algorithm = NSGA(pop_size=100, )
     problems = [ZDT1(), ZDT2(), ZDT3(), ZDT4(), ZDT6()]
-    n_gen = [200, 200, 200, 400, 400]
+    n_gen = [200, 200, 200, 200, 400]
     runs = 30
+    rng = MyRandomGenerator()
 
     counter = 0
 
@@ -41,7 +45,7 @@ if __name__ == '__main__':
                 continue
 
             evaluator = Evaluator(n_gen[p] * pop_size)
-            pop = algorithm.solve(problems[p], evaluator, seed=r)
+            pop = algorithm.solve(problems[p], evaluator, seed=r, rnd=rng)
 
             if args.out is not None:
                 data = evaluator.data

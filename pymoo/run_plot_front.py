@@ -19,8 +19,10 @@ def parse_result_name(str):
 
 plots = []
 
-fn1 = '../../results/pynsga_ZDT4_06.out'
-fn2 = '../../results/cnsga_ZDT4_1.out'
+fn1 = '../../results/pynsga-myrandom_ZDT4_20.out'
+fn2 = '../../results/cnsga_ZDT3_1.out'
+
+plot = 1
 compare = 0
 plot_true_front = 1
 
@@ -39,8 +41,9 @@ if compare:
         f2_x, f2_y = load_non_dominated_from_file(fn2)
         plots.append(Scatter(x=f2_x, y=f2_y, name=parse_result_name(fn2), mode='markers', marker={"size": 8}))
 
-f_x, f_y = load_non_dominated_from_file(fn1)
-plots.append(Scatter(x=f_x, y=f_y, name=parse_result_name(fn1), mode='markers', marker={"size": 8}))
+if plot:
+    f_x, f_y = load_non_dominated_from_file(fn1)
+    plots.append(Scatter(x=f_x, y=f_y, name=parse_result_name(fn1), mode='markers', marker={"size": 8}))
 
 plotly.offline.plot({
     "data": plots,

@@ -1,5 +1,3 @@
-import random
-import numpy as np
 
 from rand.default_random_generator import DefaultRandomGenerator
 
