@@ -10,8 +10,8 @@ from util.quicksort import quicksort
 
 class RankAndCrowdingSurvival:
     def survive(self, pop, size, rnd=DefaultRandomGenerator()):
-        #fronts = NonDominatedRank.calc_as_fronts(pop)
-        fronts = NonDominatedRank.calc_as_fronts_naive(pop)
+        fronts = NonDominatedRank.calc_as_fronts_pygmo(pop)
+        #fronts = NonDominatedRank.calc_as_fronts_naive(pop)
 
         # contains all indices that survive
         next_pop = []
@@ -59,12 +59,11 @@ class RankAndCrowdingSurvival:
 
     @staticmethod
     def calc_rank_and_crowding(pop, rnd=DefaultRandomGenerator()):
-        #fronts = NonDominatedRank.calc_as_fronts_pygmo(pop)
-        fronts = NonDominatedRank.calc_as_fronts_naive(pop)
+        fronts = NonDominatedRank.calc_as_fronts_pygmo(pop)
+        #fronts = NonDominatedRank.calc_as_fronts_naive(pop)
         rank = NonDominatedRank.calc_from_fronts(fronts)
         cd = np.zeros(len(pop))
         for front in fronts:
-            front.reverse()
             cd_of_front = RankAndCrowdingSurvival.calc_crowding_distance([pop[x] for x in front], rnd=rnd)
             for i, idx_of_individual in enumerate(front):
                 cd[idx_of_individual] = cd_of_front[i]

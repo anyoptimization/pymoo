@@ -1,3 +1,5 @@
+import numpy as np
+
 
 class Evaluator:
 
@@ -7,8 +9,11 @@ class Evaluator:
         self.counter = 0
 
     def eval(self, problem, x):
-        self.counter += 1
+        self.counter += len(x)
         return problem.evaluate(x)
+
+    def count_left(self):
+        return self.n_eval - self.counter
 
     def has_next(self):
         return self.counter < self.n_eval

@@ -1,6 +1,5 @@
-import numpy as np
-import pygmo as pg
 import plotly
+import pygmo as pg
 from plotly.graph_objs import Layout, Scatter
 
 # this import is needed for the reflection object to get the true front -> don't remove it
@@ -19,8 +18,8 @@ def parse_result_name(str):
 
 plots = []
 
-fn1 = '../../results/pynsga-myrandom_ZDT4_20.out'
-fn2 = '../../results/cnsga_ZDT3_1.out'
+fn1 = '../../results_expensive/mma-gpflow-mean-30_ZDT3_30.out'
+fn2 = '../../results/cnsga_ZDT3_3.out'
 
 plot = 1
 compare = 0

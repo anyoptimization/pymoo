@@ -1,54 +1,102 @@
-import sklearn
-from sklearn.gaussian_process import gaussian_process
-from sklearn.gaussian_process.kernels import RBF, ConstantKernel, RationalQuadratic, ExpSineSquared, WhiteKernel, Matern
-from sklearn.metrics import make_scorer
-from sklearn.model_selection import cross_val_score
-import numpy as np
-import itertools
+from random import shuffle
 
-from metamodels.selection_error_probablity import selection_error_probability
+import numpy as np
+
+from util.misc import calc_mse
 
 
 class MetaModel:
     def __init__(self):
-        self.parameters = None
+        self.parameters = []
         self.gp = []
         self.goodness = []
 
+    def _get_parameter(self, d={}):
+        pass
+
+    def _predict(self, metamodel, X):
+        pass
+
+    def _create_and_fit(self, parameter, X, F):
+        pass
+
     def fit(self, X, F):
 
-        kernels = [WhiteKernel(), RationalQuadratic(), RBF(), ConstantKernel(), Matern()]
+        # only unique rows for X
+        y = np.ascontiguousarray(X).view(np.dtype((np.void, X.dtype.itemsize * X.shape[1])))
+        _, idx = np.unique(y, return_index=True)
+        X = X[idx]
+        F = F[idx]
+
+        n_observations = np.shape(F)[0]
         n_objectives = np.shape(F)[1]
 
-        self.goodness = np.zeros((n_objectives, len(kernels)))
+        self.goodness = []
 
+        # some metamodels need more information - it depends on the implementation
+        d = {
+            'n_var': X.shape[1]
+        }
+
+        # for each objective
         for m in range(n_objectives):
 
-            for kernel_idx in range(len(kernels)):
-                kernel = kernels[kernel_idx]
-                gp = sklearn.gaussian_process.GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=0)
-                # do cross validation
-                #scorer = make_scorer(selection_error_probability, greater_is_better=False)
-                scores = cross_val_score(gp, X, F[:, m], cv=4, scoring='neg_mean_squared_error')
-                # take the mean of the results
-                self.goodness[m, kernel_idx] = -np.mean(scores)
+            # for each metamodel
+            parameter = self._get_parameter(d)
 
-            best = np.argmin(self.goodness[m])
-            gp = sklearn.gaussian_process.GaussianProcessRegressor(kernel=kernels[best])
-            gp.fit(X, F[:, m])
-            self.gp.append(gp)
+            if len(parameter) == 1:
+                mean_scores = [0.0]
+            else:
+                mean_scores = []
+                for par in parameter:
 
-            print m
-            print gp
+                    scores = []
+                    for train, test in self.k_fold_cross_validation(range(n_observations), 5, False):
+                        # fit the meta model and predict results
+                        model = self._create_and_fit(par, X[train, :], F[train, m])
+                        f_hat, _ = self._predict(model, X[test, :])
+                        f_true = F[test, m]
+
+                        # calc metric for this run
+                        metric = calc_mse(f_true, f_hat)
+                        scores.append(metric)
+
+                    # save the goodness for this metamodel
+                    mean_scores.append(np.mean(scores))
+
+            # get the best metamodel for this objective
+            best_i = np.argmin(mean_scores)
+
+            # train it on all training data
+            par = self._get_parameter(d)[best_i]
+            self.parameters.append(par)
+
+            best = self._create_and_fit(par, X, F[:, m])
+            self.goodness.append(mean_scores[best_i])
+            self.gp.append(best)
+
+    def k_fold_cross_validation(self, items, k, randomize=False):
+
+        if randomize:
+            items = list(items)
+            shuffle(items)
+
+        slices = [items[i::k] for i in range(k)]
+
+        for i in range(k):
+            validation = slices[i]
+            training = [item
+                        for s in slices if s is not validation
+                        for item in s]
+            yield list(training), list(validation)
 
     def predict(self, X):
-
         n = len(X)
-        if X.ndim == 1:
-            X = X.reshape(1, -1)
-            n = 1
-
-        f = np.zeros((len(self.gp), n))
+        f = np.zeros((n, len(self.gp)))
+        std = np.zeros((n, len(self.gp)))
         for j in range(len(self.gp)):
-            f[j, :], _ = self.gp[j].predict(X, return_cov=True)
-        return np.transpose(f)
+            mean, _std = self._predict(self.gp[j], X)
+            f[:, j] = mean
+            std[:, j] = _std
+
+        return f, std

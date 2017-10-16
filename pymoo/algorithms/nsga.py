@@ -1,7 +1,3 @@
-import random
-
-import numpy as np
-
 from model.algorithm import Algorithm
 from model.individual import Individual
 from operators.polynomial_mutation import PolynomialMutation
@@ -9,9 +5,9 @@ from operators.random_factory import RandomFactory
 from operators.simulated_binary_crossover import SimulatedBinaryCrossover
 from rand.default_random_generator import DefaultRandomGenerator
 from util.dominator import Dominator
-from util.misc import evaluate
+from util.misc import evaluate, get_f, get_x, get_g, get_hist_from_pop
 from util.rank_and_crowding import RankAndCrowdingSurvival
-
+import numpy
 
 class NSGA(Algorithm):
     def __init__(self,
@@ -45,8 +41,8 @@ class NSGA(Algorithm):
         while evaluator.has_next():
 
             n_gen += 1
-            # print 'gen = %d' % (n_gen + 1)
-            evaluator.notify(pop)
+            # print('ge n = %d' % (n_gen + 1))
+            evaluator.notify({'snapshot': get_hist_from_pop(pop, evaluator.counter)})
 
             # create the offspring generation
             offsprings = self.get_offsprings(problem, evaluator, pop, rank, crowding)
@@ -57,9 +53,10 @@ class NSGA(Algorithm):
             # keep only the individuals that survive
             pop, rank, crowding = self.survival.survive(pop, self.pop_size, rnd=self.rnd)
 
-        evaluator.notify(pop)
+        evaluator.notify({'snapshot': get_hist_from_pop(pop, evaluator.counter)})
 
-        return pop
+        return get_x(pop), get_f(pop), get_g(pop)
+
 
     def get_offsprings(self, problem, evaluator, pop, rank, crowding):
 

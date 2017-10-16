@@ -2,7 +2,6 @@ import os
 
 import numpy as np
 
-from algorithms.nsao import NSAO
 from algorithms.nsga import NSGA
 from operators.polynomial_mutation import PolynomialMutation
 from problems.zdt import ZDT1
@@ -19,9 +18,22 @@ def write_final_pop_obj(pop, run):
 
 
 if __name__ == '__main__':
-    problem = ZDT1(n_var=5)
+
+    problem = ZDT1()
+
     print(problem)
 
-    x, f, g = NSGA().solve(problem, evaluator=10000, return_only_non_dominated=True)
+    pop = NSGA(mutation=PolynomialMutation(p_mut=0.033)).solve(problem, evaluator=200, seed=0.1, rnd=MyRandomGenerator())
 
-    print("DONE")
+    print(np.array_str(np.asarray(get_f(pop))))
+
+    x = [pop[i].f[0] for i in range(len(pop))]
+    y = [pop[i].f[1] for i in range(len(pop))]
+    #plt.scatter(x, y)
+    #plt.show()
+
+    r = np.array([1.01, 1.01])
+
+    #print(calc_hypervolume(get_f(pop), r))
+
+    # write_final_pop_obj(pop,1)

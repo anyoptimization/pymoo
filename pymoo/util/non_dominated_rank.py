@@ -1,6 +1,8 @@
 import numpy as np
 import pygmo as pg
+
 from util.dominator import Dominator
+from util.misc import get_f
 
 
 class NonDominatedRank:
@@ -26,8 +28,17 @@ class NonDominatedRank:
         n = len(pop)
         if n == 0:
             return np.array()
-        objectives = [pop[i].f for i in range(n)]
-        return pg.fast_non_dominated_sorting(objectives)[0]
+        m = len(pop[0].f)
+
+        f = get_f(pop)
+        constr = np.array([Dominator.get_constraint_violation(pop[i]) for i in range(n)])
+        f_max = np.max(f, axis=0)
+
+        for i in range(len(constr)):
+            if constr[i] > 0:
+                f[i] = f_max + constr[i]
+
+        return pg.fast_non_dominated_sorting(f)[0]
 
     @staticmethod
     def calc_as_fronts_naive(pop):

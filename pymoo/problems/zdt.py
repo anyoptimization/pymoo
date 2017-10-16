@@ -23,9 +23,9 @@ class ZDT1(ZDT):
         return np.array([x1, 1 - np.sqrt(x1)]).T
 
     def evaluate_(self, x, f):
-        f[0] = x[0]
-        g = 1 + 9.0 / (self.n_var - 1) * np.sum(x[1:])
-        f[1] = g * (1 - pow((f[0] / g), 0.5))
+        f[:, 0] = x[:, 0]
+        g = 1 + 9.0 / (self.n_var - 1) * np.sum(x[:,1:], axis=1)
+        f[:, 1] = g * (1 - np.power((f[:, 0] / g), 0.5))
 
 
 class ZDT2(ZDT):
@@ -34,10 +34,10 @@ class ZDT2(ZDT):
         return np.array([x1, 1 - np.power(x1, 2)]).T
 
     def evaluate_(self, x, f):
-        f[0] = x[0]
-        c = np.sum(x[1:])
+        f[:, 0] = x[:, 0]
+        c = np.sum(x[:,1:], axis=1)
         g = 1.0 + 9.0 * c / (self.n_var - 1)
-        f[1] = g * (1 - np.math.pow((f[0] * 1.0 / g), 2))
+        f[:, 1] = g * (1 - np.power((f[:, 0] * 1.0 / g), 2))
 
 
 class ZDT3(ZDT):
@@ -54,10 +54,10 @@ class ZDT3(ZDT):
         return pareto_front
 
     def evaluate_(self, x, f):
-        f[0] = x[0]
-        c = np.sum(x[1:])
+        f[:, 0] = x[:, 0]
+        c = np.sum(x[:,1:], axis=1)
         g = 1.0 + 9.0 * c / (self.n_var - 1)
-        f[1] = g * (1 - np.math.pow(f[0] * 1.0 / g, 0.5) - (f[0] * 1.0 / g) * np.math.sin(10 * np.math.pi * f[0]))
+        f[:,1] = g * (1 - np.power(f[:,0] * 1.0 / g, 0.5) - (f[:,0] * 1.0 / g) * np.sin(10 * np.pi * f[:,0]))
 
 
 class ZDT4(ZDT):
@@ -74,13 +74,13 @@ class ZDT4(ZDT):
         return np.array([x1, 1 - np.sqrt(x1)]).T
 
     def evaluate_(self, x, f):
-        f[0] = x[0]
+        f[:, 0] = x[:, 0]
         g = 1.0
         g += 10 * (self.n_var - 1)
         for i in range(1, self.n_var):
-            g += x[i] * x[i] - 10.0 * np.cos(4.0 * np.math.pi * x[i])
-        h = 1.0 - np.math.sqrt(f[0] / g)
-        f[1] = g * h
+            g += x[:, i] * x[:, i] - 10.0 * np.cos(4.0 * np.pi * x[:, i])
+        h = 1.0 - np.sqrt(f[:, 0] / g)
+        f[:, 1] = g * h
 
 
 class ZDT6(ZDT):
@@ -93,6 +93,6 @@ class ZDT6(ZDT):
         return np.array([x1, 1 - np.power(x1, 2)]).T
 
     def evaluate_(self, x, f):
-        f[0] = 1 - np.math.exp(-4 * x[0]) * np.math.pow(np.math.sin(6 * np.math.pi * x[0]), 6)
-        g = 1 + 9.0 * np.math.pow(sum(x[1:]) / (self.n_var - 1.0), 0.25)
-        f[1] = g * (1 - np.math.pow(f[0] / g, 2))
+        f[:, 0] = 1 - np.exp(-4 * x[:, 0]) * np.power(np.sin(6 * np.pi * x[:, 0]), 6)
+        g = 1 + 9.0 * np.power(np.sum(x[:,1:], axis=1) / (self.n_var - 1.0), 0.25)
+        f[:, 1] = g * (1 - np.power(f[:, 0] / g, 2))
