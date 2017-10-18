@@ -23,7 +23,7 @@ class Algorithm:
         if return_only_feasible:
             if g is not None and g.shape[0] == len(f) and g.shape[1] > 0:
                 b = numpy.array(numpy.where(g >= 0))[0]
-                x = x[b, :]
+                x  = x[b, :]
                 f = f[b, :]
                 if g is not None:
                     g = g[b, :]

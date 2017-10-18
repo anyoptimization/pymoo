@@ -9,7 +9,7 @@ from scipy.spatial.distance import pdist
 from algorithms.nsga import NSGA
 from measures.igd import IGD
 from metamodels.gpflow_metamodel import GPFlowMetamodel
-from metamodels.selection_error_probablity import selection_error_probability
+from metamodels.selection_error_probablity import calc_sep
 from model.algorithm import Algorithm
 from model.individual import Individual
 from operators.lhs_factory import LHS
@@ -70,9 +70,9 @@ class NSAO(Algorithm):
 
             # this can only be done for test problems of course
             mse_true = calc_metamodel_goodness(problem, metamodel, X=random_for_mse, func=calc_mse)
-            sep_true = calc_metamodel_goodness(problem, metamodel, X=random_for_mse, func=selection_error_probability)
+            sep_true = calc_metamodel_goodness(problem, metamodel, X=random_for_mse, func=calc_sep)
             mse_opt = calc_metamodel_goodness(problem, metamodel, X=opt_x, func=calc_mse)
-            sep_opt = calc_metamodel_goodness(problem, metamodel, X=opt_x, func=selection_error_probability)
+            sep_opt = calc_metamodel_goodness(problem, metamodel, X=opt_x, func=calc_sep)
             print("A-MSE: %s, A-SEP:%s, AOPT-MSE: %s, AOPT-SEP: %s" % (mse_true, sep_true, mse_opt, sep_opt))
 
             print("Uncertainty Weights: %s" % uncertainty)
@@ -97,7 +97,7 @@ class NSAO(Algorithm):
 
             # check the deviation from metamodel to evaluation
             mse_selected = [calc_mse(get_f(DOE)[:, i], f_hat[selected, i]) for i in range(problem.n_obj)]
-            sep_selected = [selection_error_probability(get_f(DOE)[:, i], f_hat[selected, i]) for i in
+            sep_selected = [calc_sep(get_f(DOE)[:, i], f_hat[selected, i]) for i in
                             range(problem.n_obj)]
             print("Metamodel Goodness for selected: %s" % mse_selected)
 

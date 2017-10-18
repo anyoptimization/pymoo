@@ -3,6 +3,7 @@ import pygmo as pg
 from plotly.graph_objs import Layout, Scatter
 
 # this import is needed for the reflection object to get the true front -> don't remove it
+from configuration import Configuration
 from problems.zdt import *
 
 
@@ -18,8 +19,8 @@ def parse_result_name(str):
 
 plots = []
 
-fn1 = '../../results_expensive/mma-gpflow-mean-30_ZDT3_30.out'
-fn2 = '../../results/cnsga_ZDT3_3.out'
+fn1 = Configuration.BENCHMARK_DIR + "expensive/" + "methodology12_ZDT3_1.out"
+fn2 = Configuration.BENCHMARK_DIR + "expensive/" + "cnsa-ea_ZDT3_2.out"
 
 plot = 1
 compare = 0

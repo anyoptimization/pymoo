@@ -6,7 +6,7 @@ import os
 import plotly
 from plotly.graph_objs import Layout
 import plotly.graph_objs as go
-
+from sklearn.metrics import mean_squared_error, r2_score
 from configuration import Configuration
 from operators.random_factory import RandomFactory
 
@@ -51,7 +51,17 @@ def perpendicular_dist(ref_dir, point):
 
 
 def calc_mse(f, f_hat):
-    return np.sum(np.power(f_hat - f, 2), axis=0)
+    return mean_squared_error(f, f_hat)
+    #return np.sum(np.power(f_hat - f, 2), axis=0)
+
+def calc_r2(f, f_hat):
+    return r2_score(f, f_hat)
+
+def calc_rmse(f, f_hat):
+    return np.sqrt(((f_hat - f) ** 2).mean())
+
+def calc_amse(f, f_hat):
+    return np.mean(np.abs( (f - f_hat) / f) )
 
 
 def uniform_2d_weights(n_weights):
@@ -117,18 +127,26 @@ def create_plot(fname, title, F, X=None, chart_type="line", labels=[], folder=Co
         elif type(F) is np.ndarray:
             data = F[m,:]
 
+        if type(X) is list:
+            if len(X) == 1:
+                data_X = X
+            else:
+                data_X = X[m]
+        elif type(X) is np.ndarray:
+            data_X = X[m,:]
+
         if chart_type is "line":
             if X is None:
                 X = np.array(list(range(len(F.shape[0]))))
-            plot = go.Scatter(x=X,y=data,mode='lines+markers',name=label)
+            plot = go.Scatter(x=data_X,y=data,mode='lines+markers',name=label)
         elif chart_type is "box":
             if grouped:
-                plot = go.Box(x=X, y=data, name=label)
+                plot = go.Box(x=data_X, y=data, name=label)
             else:
                 plot = go.Box(y=data, name=label)
 
         elif chart_type is "bar":
-            plot = go.Bar(x=X, y=data,name=label)
+            plot = go.Bar(x=data_X, y=data,name=label)
 
         plots.append(plot)
 

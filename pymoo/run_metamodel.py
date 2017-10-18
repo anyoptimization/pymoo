@@ -1,12 +1,14 @@
+import argparse
 import os
 
 import numpy as np
-from pandas import DataFrame
+import sys
 
 from configuration import Configuration
 from metamodels.gpflow_metamodel import GPFlowMetamodel
 from metamodels.gpy_metamodel import GPyMetaModel
 from metamodels.sklearn_metamodel_dace import SKLearnDACEMetaModel
+from metamodels.tensorflow_metamodel import TFLearnMetamodel
 from operators.lhs_factory import LHS
 from operators.random_factory import RandomFactory
 from problems.zdt import ZDT1, ZDT2, ZDT3
@@ -40,7 +42,16 @@ if __name__ == '__main__':
     #create_data()
     #exit()
 
-    files = load_files(os.path.join(Configuration.BENCHMARK_DIR, "metamodels"), ".*.x_test", columns=["set"])
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('-n', metavar='n', default=None, type=str, help='Execute a specific run (HPCC)')
+    parser.add_argument('-o', '--out', default=None, help='Defines the storage of the output file(s).')
+    args = parser.parse_args()
+
+    n = sys.argv[1]
+    counter = 0
+
+    #files = load_files(os.path.join(Configuration.BENCHMARK_DIR, "metamodels"), "ford.*.x_test", columns=["set", "run"])
+    files = load_files(args.out, "ford.*.x_test", columns=["set", "run"])
 
     for entry in files:
 
@@ -53,22 +64,32 @@ if __name__ == '__main__':
 
         def get_params():
             return [
-                ['SKLearnDACEMetaModel', SKLearnDACEMetaModel()],
-                # ['SKLearnMetaModel', SKLearnMetaModel()],
-                ['GPyMetaModel-one', GPyMetaModel()],
-                ['GPFlowMetamodel-linear', GPFlowMetamodel()]
+                #['SKLearnDACEMetaModel', SKLearnDACEMetaModel()],
+                #['SKLearnMetaModel', SKLearnMetaModel()],
+                #['GPyMetaModel', GPyMetaModel()],
+                #['GPFlowMetamodel-exp', GPFlowMetamodel()],
+                ['TensorFlowDNNRegression-deep', TFLearnMetamodel()]
             ]
 
 
         for i in range(len(get_params())):
+
+            counter += 1
+            if args.n is not None and counter != int(args.n):
+                continue
+
             param = get_params()[i]
 
+            print("------------------------------")
+            print(entry["path"])
+            print(param)
+            print(entry["run"])
             name = param[0]
             metamodel = param[1]
             metamodel.fit(X_train, F_train)
             F_test, _ = metamodel.predict(X_test)
 
-            fname = os.path.join(Configuration.BENCHMARK_DIR, "metamodels",
-                                 "%s_%s.out" % (name, entry['fname'].split('.')[0]))
+            #fname = os.path.join(Configuration.BENCHMARK_DIR, "metamodels", "%s_%s.out" % (name, entry['fname'].split('.')[0]))
+            fname = os.path.join(args.out, "%s_%s.out" % (name, entry['fname'].split('.')[0]))
             np.savetxt(fname, F_test)
             print(fname)

@@ -11,8 +11,8 @@ class PygmoFunction:
         self.my_problem = my_problem
 
     def fitness(self, x):
-        f,g =  self.my_problem.evaluate(x)
-        return f
+        f,g = self.my_problem.evaluate(x)
+        return f[0,:]
 
     def get_bounds(self):
         return (self.my_problem.xl, self.my_problem.xu)

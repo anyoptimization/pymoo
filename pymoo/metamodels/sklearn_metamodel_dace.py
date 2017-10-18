@@ -10,7 +10,7 @@ class SKLearnDACEMetaModel(MetaModel):
 
     def _gen_parameter(self):
         for corr in ['absolute_exponential', 'squared_exponential', 'cubic', 'linear']:
-            for regr in ['constant', 'linear', 'quadratic']:
+            for regr in ['constant', 'linear']: # , 'quadratic']:
                 yield [regr, corr]
 
     def _get_parameter(self, d={}):
@@ -19,8 +19,13 @@ class SKLearnDACEMetaModel(MetaModel):
     def _predict(self, metamodel, X):
         return metamodel.predict(X, eval_MSE=True)
 
-    def _create_and_fit(self, parameter, X, F):
+    def _create_and_fit(self, parameter, X, F, expensive=False):
         warnings.filterwarnings('ignore')
-        gp = GaussianProcess(regr=parameter[0], corr=parameter[1],random_start=5,nugget=50. * np.finfo(np.double).eps,
+        if expensive:
+            n_restarts = 20
+        else:
+            n_restarts = 3
+
+        gp = GaussianProcess(regr=parameter[0], corr=parameter[1],random_start=n_restarts,nugget=50. * np.finfo(np.double).eps,
                                                       theta0=10, thetaL=0.0001, thetaU=20)
         return gp.fit(X, F)

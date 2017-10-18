@@ -1,26 +1,19 @@
-import os
-
-import numpy as np
-import pygmo as pg
-import pandas as pd
 import sys
-import plotly
 
-from plotly.graph_objs import Layout
+import pandas as pd
+import pygmo as pg
 
+from configuration import Configuration
 from measures.hypervolume import Hypervolume
 from measures.igd import IGD
-import plotly.graph_objs as go
-
 # this import is needed for the reflection object to get the true front -> don't remove it
-from problems.zdt import *
 from problems.dtlz import *
 from util.misc import load_files, create_plot
 
 
 def load(folder):
 
-    data = load_files(folder, ".*_.*_.*\.out", ["algorithm", "problem", "run"])
+    data = load_files(folder, ".*_ZDT3_.*\.out", ["algorithm", "problem", "run"])
 
     for entry in data:
 
@@ -47,8 +40,12 @@ def load(folder):
             print("True front for problem %s not found. Can't calculate IDG. Continue." % problem)
             continue
 
+
+        print(reference_point)
         entry['igd'] = IGD(true_front).calc(pop)
         entry['hv'] = Hypervolume(reference_point).calc(pop)
+
+        #print(reference_point)
 
         del entry['path']
         del entry['fname']
@@ -57,14 +54,14 @@ def load(folder):
 
 
 if __name__ == '__main__':
-    df = load('../../results_expensive')
+    df = load(Configuration.BENCHMARK_DIR + "expensive")
 
     with pd.option_context('display.max_rows', None):
         print(df)
     #    print(df[(df.problem == 'ZDT3') & (df.igd > 0.03)])
 
     with pd.option_context('display.max_rows', None):
-        f = {'igd': ['median', 'min', 'mean', 'max', 'std']}
+        f = {'hv': ['median', 'min', 'mean', 'max', 'std']}
         print(df.groupby(['problem', 'algorithm']).agg(f))
 
     problems = ["ZDT1", "ZDT2", "ZDT3"]
@@ -75,5 +72,6 @@ if __name__ == '__main__':
 
         F = []
         for algorithm in data.algorithm.unique():
-            F.append(np.array(data[data.algorithm == algorithm].igd.tolist()))
+            F.append(np.array(data[data.algorithm == algorithm].hv.tolist()))
+
         create_plot("%s.html" % problem, "Measure %s" % problem, F, chart_type="box", labels=data.algorithm.unique())

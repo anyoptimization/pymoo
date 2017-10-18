@@ -92,7 +92,7 @@ if __name__ == '__main__':
                 print(e['metamodels'])
 
             evals = np.array([e['n_evals'] for e in data])
-            mse_true = np.array([e['mse_selected'] for e in data])
+            mse_true = np.array([e['mse_true'] for e in data])
 
             create_plot("mse.html", "MSE %s" % entry["fname"], mse_true.T, X=evals, chart_type="line")
 

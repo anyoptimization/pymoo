@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def selection_error_probability(F, F_hat):
+def calc_sep(F, F_hat):
     n = len(F)
     val = 0.00
     counter = 0
