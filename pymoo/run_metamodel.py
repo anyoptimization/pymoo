@@ -8,9 +8,11 @@ from configuration import Configuration
 from metamodels.gpflow_metamodel import GPFlowMetamodel
 from metamodels.gpy_metamodel import GPyMetaModel
 from metamodels.sklearn_metamodel_dace import SKLearnDACEMetaModel
-from metamodels.tensorflow_metamodel import TFLearnMetamodel
+from metamodels.tensorflow_metamodel import TensorFlowMetamodel
 from operators.lhs_factory import LHS
 from operators.random_factory import RandomFactory
+from problems.ackley import Ackley
+from problems.rastrigin import Rastrigin
 from problems.zdt import ZDT1, ZDT2, ZDT3
 from util.misc import load_files
 
@@ -18,7 +20,9 @@ from util.misc import load_files
 def create_data():
     folder = os.path.join(Configuration.BENCHMARK_DIR, "metamodels")
 
-    for prob in [ZDT1(n_var=5), ZDT2(n_var=5), ZDT3(n_var=5)]:
+    Rastrigin().evaluate(np.zeros((1, 2)))
+    for prob in [Rastrigin(), Ackley()]:
+    #for prob in [ZDT1(n_var=5), ZDT2(n_var=5), ZDT3(n_var=5), Rastrigin(), Ackley()]:
 
         for i in range(10):
 
@@ -28,13 +32,13 @@ def create_data():
             np.savetxt(prefix + ".x_test", X_test)
 
             F_test, _ = prob.evaluate(X_test)
-            np.savetxt(prefix + ".f_test", F_test[:, 1])
+            np.savetxt(prefix + ".f_test", F_test[:, 0])
 
             X_train = LHS().sample(50, prob.xl, prob.xu)
             np.savetxt(prefix + ".x_train", X_train)
 
             F_train, _ = prob.evaluate(X_train)
-            np.savetxt(prefix + ".f_train", F_train[:, 1])
+            np.savetxt(prefix + ".f_train", F_train[:, 0])
 
 
 if __name__ == '__main__':
@@ -51,7 +55,7 @@ if __name__ == '__main__':
     counter = 0
 
     #files = load_files(os.path.join(Configuration.BENCHMARK_DIR, "metamodels"), "ford.*.x_test", columns=["set", "run"])
-    files = load_files(args.out, "ford.*.x_test", columns=["set", "run"])
+    files = load_files(args.out, ".*.x_test", columns=["set", "run"])
 
     for entry in files:
 
@@ -64,11 +68,11 @@ if __name__ == '__main__':
 
         def get_params():
             return [
-                #['SKLearnDACEMetaModel', SKLearnDACEMetaModel()],
+                #['DACEMetaModel', SKLearnDACEMetaModel()],
                 #['SKLearnMetaModel', SKLearnMetaModel()],
-                #['GPyMetaModel', GPyMetaModel()],
-                #['GPFlowMetamodel-exp', GPFlowMetamodel()],
-                ['TensorFlowDNNRegression-deep', TFLearnMetamodel()]
+                #['GPyMetaModel-ARD', GPyMetaModel()],
+                ['GPFlowMetamodel-Restart', GPFlowMetamodel()],
+                #['TensorFlow', TensorFlowMetamodel()]
             ]
 
 

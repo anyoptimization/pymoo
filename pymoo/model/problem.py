@@ -25,9 +25,11 @@ class Problem:
     def evaluate(self, x):
 
         only_single_value = len(np.shape(x)) == 1
-
         if only_single_value:
             x = np.array([x])
+
+        if x.shape[1] != self.n_var:
+            raise Exception('Input dimension %s are not equal to n_var %s!' % (x.shape[1], self.n_var))
 
         f = np.zeros((x.shape[0], self.n_obj))
         g = np.zeros((x.shape[0], self.n_constr))

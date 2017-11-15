@@ -88,7 +88,7 @@ if __name__ == '__main__':
         with open(entry['path'], 'rb') as handle:
             data = pickle.load(handle)
             for e in data:
-                show_objective_space(e['n_evals'], e['pop_f'], e['f_hat'], e['f_selected'], e['f_selected_hat'])
+                #show_objective_space(e['n_evals'], e['pop_f'], e['f_hat'], e['f_selected'], e['f_selected_hat'])
                 print(e['metamodels'])
 
             evals = np.array([e['n_evals'] for e in data])

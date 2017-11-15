@@ -12,7 +12,7 @@ class GPFlowMetamodel(MetaModel):
     def _get_parameter(self, d={}):
         n_var = d['n_var']
 
-        return [gpflow.kernels.Exponential(n_var)] #, gpflow.kernels.Polynomial(n_var, ARD=True, degree=5), gpflow.kernels.RBF(n_var, ARD=True)]
+        return [gpflow.kernels.RBF(n_var, ARD=True)] #, gpflow.kernels.Polynomial(n_var, ARD=True, degree=5), gpflow.kernels.RBF(n_var, ARD=True)]
 
         k = gpflow.kernels.Constant(n_var)
 
@@ -69,7 +69,7 @@ class GPFlowMetamodel(MetaModel):
         print(res.x)
         print(res.fun)
 
-        print("DE:")
+        print("LHS:")
         #m.optimize(method=
 
 
@@ -109,8 +109,8 @@ class GPFlowMetamodel(MetaModel):
             print(result.fun)
             return result.x
 
-        if expensive:
-            m.optimize(method=minimize3)
+        #if expensive:
+        m.optimize(method=minimize3)
 
         #print(m)
         print("---------")

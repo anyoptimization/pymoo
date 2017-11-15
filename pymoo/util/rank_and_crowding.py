@@ -116,5 +116,5 @@ class RankAndCrowdingSurvival:
                         if last != current:
                             cd[sorted_idx[i]] += (next - last) / norm
 
-        cd = [val / n_obj for val in cd]
+        #cd = [val / n_obj for val in cd]
         return cd

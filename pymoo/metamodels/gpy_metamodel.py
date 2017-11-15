@@ -10,9 +10,8 @@ class GPyMetaModel(MetaModel):
 
 
     def _get_parameter(self, d):
-
         n_var = d['n_var']
-        return [GPy.kern.RBF(n_var)]
+        return [GPy.kern.RBF(n_var, ARD=True)]
 
 
     def _predict(self, metamodel, X):
@@ -26,6 +25,7 @@ class GPyMetaModel(MetaModel):
         return mean, cov
 
     def _create_and_fit(self, kernel, X, F, expensive=False):
-        model = GPy.models.GPRegression(X, np.array([F]).T, kernel=kernel)
+        mf = GPy.mappings.Linear(X.shape[1], 1)
+        model = GPy.models.GPRegression(X, np.array([F]).T, kernel=kernel, mean_function=mf)
         model.optimize()
         return model

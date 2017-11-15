@@ -4,7 +4,7 @@ from model.problem import Problem
 
 
 class Rastrigin(Problem):
-    def __init__(self,n_var=10, A=10):
+    def __init__(self,n_var=2, A=10):
         Problem.__init__(self)
         self.n_var = n_var
         self.A = A
@@ -16,4 +16,4 @@ class Rastrigin(Problem):
 
     def evaluate_(self, x, f):
         z = np.power(x, 2) - self.A * np.cos(2 * np.pi * x)
-        f[0] = self.A * self.n_var + np.sum(z)
+        f[:,0] = self.A * self.n_var + np.sum(z, axis=1)

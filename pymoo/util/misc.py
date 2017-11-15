@@ -133,7 +133,10 @@ def create_plot(fname, title, F, X=None, chart_type="line", labels=[], folder=Co
             else:
                 data_X = X[m]
         elif type(X) is np.ndarray:
-            data_X = X[m,:]
+            if X.ndim == 1:
+                data_X = X
+            else:
+                data_X = X[m,:]
 
         if chart_type is "line":
             if X is None:

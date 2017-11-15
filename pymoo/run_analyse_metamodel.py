@@ -8,14 +8,14 @@ from util.misc import calc_mse, load_files, create_plot, calc_r2, calc_rmse, nor
 if __name__ == '__main__':
 
     folder = os.path.join(Configuration.BENCHMARK_DIR, "metamodels/")
-    data = load_files(folder, ".*ford.*\.out", ["model", "problem", "run"])
+    data = load_files(folder, ".*.*\.out", ["model", "problem", "run"])
 
     measure = "amse"
 
+    data = [e for e in data if "ford" in e["fname"]]
+
     for entry in data:
 
-        # if "ford" in entry["fname"]:
-        #    continue
 
         F_test_fname = folder + entry['problem'] + '_' + entry['run'] + ".f_test"
         F = np.loadtxt(F_test_fname)

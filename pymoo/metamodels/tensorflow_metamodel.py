@@ -4,15 +4,14 @@ import tensorflow as tf
 from metamodels.metamodel import MetaModel
 
 
-class TFLearnMetamodel(MetaModel):
+class TensorFlowMetamodel(MetaModel):
 
-
-    def __init__(self):
+    def __init__(self, n_neural_nets=10):
         super().__init__()
         self.estimators = None
+        self.n_neural_nets = n_neural_nets
 
     def _get_parameter(self, d={}):
-        n_var = d['n_var']
         return [None]
 
     def _predict(self, metamodel, X):
@@ -38,7 +37,7 @@ class TFLearnMetamodel(MetaModel):
         feature_columns = [tf.feature_column.numeric_column("x", shape=[X.shape[1]])]
         input_fn = tf.estimator.inputs.numpy_input_fn({"x": X}, F, batch_size=4, num_epochs=None, shuffle=True)
 
-        for _ in range(10):
+        for _ in range(self.n_neural_nets):
             estimator = tf.estimator.DNNRegressor([1024, 512, 256], feature_columns=feature_columns)
             estimator = estimator.train(input_fn=input_fn, steps=1000)
             self.estimators.append(estimator)

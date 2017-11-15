@@ -8,6 +8,7 @@ from measures.hypervolume import Hypervolume
 from measures.igd import IGD
 # this import is needed for the reflection object to get the true front -> don't remove it
 from problems.dtlz import *
+from problems.zdt import *
 from util.misc import load_files, create_plot
 
 

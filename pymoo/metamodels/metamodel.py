@@ -84,7 +84,7 @@ class MetaModel:
 
             # train it on all training data
             par = self._get_parameter(d)[best_i]
-            print(par)
+            #print(par)
             self.parameters.append(par)
 
             best = self._create_and_fit(par, X_norm, F_norm[:, m], expensive=True)
