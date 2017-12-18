@@ -1,8 +1,8 @@
 import numpy as np
 import pygmo as pg
+from scipy.spatial.distance import squareform, pdist
 
-from util.dominator import Dominator
-from util.misc import get_f
+from pymoo.util.dominator import Dominator
 
 
 class NonDominatedRank:
@@ -17,28 +17,13 @@ class NonDominatedRank:
     @staticmethod
     def calc_from_fronts(fronts):
         n = sum([len(f) for f in fronts])
-        rank = np.zeros(n)
+        rank = np.zeros(n, dtype=np.int)
         for i in range(len(fronts)):
             for idx in fronts[i]:
                 rank[idx] = i
         return rank
 
-    @staticmethod
-    def calc_as_fronts_pygmo(pop):
-        n = len(pop)
-        if n == 0:
-            return np.array()
-        m = len(pop[0].f)
 
-        f = get_f(pop)
-        constr = np.array([Dominator.get_constraint_violation(pop[i]) for i in range(n)])
-        f_max = np.max(f, axis=0)
-
-        for i in range(len(constr)):
-            if constr[i] > 0:
-                f[i] = f_max + constr[i]
-
-        return pg.fast_non_dominated_sorting(f)[0]
 
     @staticmethod
     def calc_as_fronts_naive(pop):
@@ -76,15 +61,19 @@ class NonDominatedRank:
         return fronts
 
 
+
     @staticmethod
-    def calc_as_fronts(pop):
+    def calc_as_fronts(F, G):
+
+        # calculate the dominance matrix
+        n = F.shape[0]
+        M = Dominator.calc_domination_matrix(F,G)
+
         fronts = []
 
-        # number of individuals
-        n = len(pop)
-
         # final rank that will be returned
-        ranked = np.zeros(n)
+        n_ranked = 0
+        ranked = np.zeros(n, dtype=np.int)
 
         # for each individual a list of all individuals that are dominated by this one
         is_dominating = [[] for _ in range(n)]
@@ -97,7 +86,7 @@ class NonDominatedRank:
         for i in range(n):
 
             for j in range(i + 1, n):
-                rel = Dominator.get_relation(pop[i], pop[j])
+                rel = M[i, j]
                 if rel == 1:
                     is_dominating[i].append(j)
                     n_dominated[j] += 1
@@ -108,12 +97,13 @@ class NonDominatedRank:
             if n_dominated[i] == 0:
                 current_front.append(i)
                 ranked[i] = 1.0
+                n_ranked += 1
 
         # append the first front to the current front
         fronts.append(current_front)
 
         # while not all solutions are assigned to a pareto front
-        while np.sum(ranked) != n:
+        while n_ranked < n:
 
             next_front = []
 
@@ -126,6 +116,7 @@ class NonDominatedRank:
                     if n_dominated[j] == 0:
                         next_front.append(j)
                         ranked[j] = 1.0
+                        n_ranked += 1
 
             fronts.append(next_front)
             current_front = next_front

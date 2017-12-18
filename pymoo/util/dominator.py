@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial.distance import squareform, pdist
 
 """
 This class enables to compare different solutions according to their domination.
@@ -37,31 +38,39 @@ class Dominator:
     @staticmethod
     def get_relation(a, b):
 
-        # calculate sum of constraint violation if not done before
-        Dominator.get_constraint_violation(a)
-        Dominator.get_constraint_violation(b)
+        val = 0
 
-        # check out the constraint violation first
-        if a.c < b.c:
-            return 1
-        elif b.c < a.c:
-            return -1
-        else:
+        for i in range(len(a)):
 
-            # iterate through the objectives to check the relation
-            val = 0
-
-            for i in range(len(a.f)):
-
-                if a.f[i] < b.f[i]:
-                    # indifferent because once better and once worse
-                    if val == -1:
-                        return 0
-                    val = 1
-                elif b.f[i] < a.f[i]:
-                    # indifferent because once better and once worse
-                    if val == 1:
-                        return 0
-                    val = -1
+            if a[i] < b[i]:
+                # indifferent because once better and once worse
+                if val == -1:
+                    return 0
+                val = 1
+            elif b[i] < a[i]:
+                # indifferent because once better and once worse
+                if val == 1:
+                    return 0
+                val = -1
 
         return val
+
+    @staticmethod
+    def calc_domination_matrix_loop(F, G):
+        n = F.shape[0]
+        M = np.zeros((n, n))
+        for i in range(n):
+            for j in range(i, n):
+                M[i, j] = Dominator.get_relation(F[i, :], F[j, :])
+                M[j, i] = -M[i, j]
+
+        return M
+
+    @staticmethod
+    def calc_domination_matrix(F, G):
+        smaller = np.any(F[:, np.newaxis] < F, axis=2)
+        larger = np.any(F[:, np.newaxis] > F, axis=2)
+        M = np.logical_and(smaller, np.logical_not(larger)).astype(np.int) \
+            - np.logical_and(larger, np.logical_not(smaller)).astype(np.int)
+        return M
+

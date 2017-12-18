@@ -57,16 +57,3 @@ class Problem:
         s += "# f(xu): %s\n" % self.evaluate(self.xu)[0]
         return s
 
-
-def single_objective_problem_by_asf(problem, weights, ideal_point):
-    p = Problem()
-    p.n_var = problem.n_var
-    p.n_obj = 1
-    p.n_constr = problem.n_constr
-    p.xl = problem.xl
-    p.xu = problem.xl
-
-    def evaluate_(x, f):
-        f[:] = np.max(weights * (x - ideal_point))
-
-    p.func = evaluate_

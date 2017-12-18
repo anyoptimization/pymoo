@@ -1,6 +1,5 @@
 import numpy as np
-
-from model.problem import Problem
+from pymoo.model.problem import Problem
 
 
 class Kursawe(Problem):

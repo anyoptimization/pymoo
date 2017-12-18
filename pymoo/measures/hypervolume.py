@@ -1,7 +1,6 @@
-from pygmo.core import hypervolume
 import numpy as np
-
-from model.measure import Measure
+from pygmo.core import hypervolume
+from pymoo.model.measure import Measure
 
 
 class Hypervolume(Measure):

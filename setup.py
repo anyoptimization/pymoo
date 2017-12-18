@@ -1,5 +1,6 @@
-import os
-from setuptools import setup
+from setuptools import setup, find_packages
+
+
 
 
 setup(
@@ -9,6 +10,6 @@ setup(
     description=("Multi-Objective Optimization in Python"),
     license='MIT',
     keywords="moo,nsga",
-    packages=['pymoo'],
+    packages=find_packages(),
     install_requires=['numpy']
 )

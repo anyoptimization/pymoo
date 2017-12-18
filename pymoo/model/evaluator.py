@@ -1,6 +1,3 @@
-import numpy as np
-
-
 class Evaluator:
 
     def __init__(self, n_eval):

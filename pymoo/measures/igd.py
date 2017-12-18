@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from model.measure import Measure
+from pymoo.model.measure import Measure
 
 
 class IGD(Measure):
