@@ -1,6 +1,5 @@
-import numpy as np
-
 from pymoo.configuration import Configuration
+from pymoo.model import random
 from pymoo.model.crossover import Crossover
 
 
@@ -14,11 +13,11 @@ class SimulatedBinaryCrossover(Crossover):
 
         n = p.n_var
 
-        if np.random.random() <= self.p_xover:
+        if random.random() <= self.p_xover:
 
             for i in range(n):
 
-                if np.random.random() <= 0.5:
+                if random.random() <= 0.5:
 
                     if abs(parents[0, i] - parents[1, i]) > Configuration.EPS:
 
@@ -31,7 +30,7 @@ class SimulatedBinaryCrossover(Crossover):
 
                         yl = p.xl[i]
                         yu = p.xu[i]
-                        rand = np.random.random()
+                        rand = random.random()
                         beta = 1.0 + (2.0 * (y1 - yl) / (y2 - y1))
                         alpha = 2.0 - pow(beta, -(self.eta_c + 1.0))
                         if rand <= (1.0 / alpha):
@@ -58,7 +57,7 @@ class SimulatedBinaryCrossover(Crossover):
                             c1 = yu
                         if c2 > yu:
                             c2 = yu
-                        if np.random.random() <= 0.5:
+                        if random.random() <= 0.5:
                             children[0, i] = c2
                             children[1, i] = c1
 

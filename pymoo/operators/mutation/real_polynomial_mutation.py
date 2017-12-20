@@ -1,5 +1,4 @@
-import numpy as np
-
+from pymoo.model import random
 from pymoo.model.mutation import Mutation
 
 
@@ -11,24 +10,22 @@ class PolynomialMutation(Mutation):
     def _do(self, p, X, Y):
 
         if self.p_mut is None:
-            self.p_mut = 1.0 / len(X)
+            self.p_mut = 1.0 / p.n_var
 
         for i in range(X.shape[0]):
 
             for j in range(X.shape[1]):
 
-                # no mutation for this individuals
-                if np.random.random() > self.p_mut:
+                # no mutation for this index
+                if random.random() > self.p_mut:
                     Y[i, j] = X[i, j]
-
                 else:
-
-                    y = X[i,j]
+                    y = X[i, j]
                     yl = p.xl[j]
                     yu = p.xu[j]
                     delta1 = (y - yl) / (yu - yl)
                     delta2 = (yu - y) / (yu - yl)
-                    r = np.random.random()
+                    r = random.random()
                     mut_pow = 1.0 / (self.eta_m + 1.0)
                     if r <= 0.5:
                         xy = 1.0 - delta1
@@ -45,6 +42,6 @@ class PolynomialMutation(Mutation):
                         y = yl
                     if y > yu:
                         y = yu
-                    Y[i,j] = y
+                    Y[i, j] = y
 
         return Y

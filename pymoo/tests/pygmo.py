@@ -2,6 +2,9 @@ import numpy as np
 
 
 def calc_as_fronts_pygmo(pop):
+
+    import pygmo as pg
+
     if pop.size() == 0:
         return np.array()
 

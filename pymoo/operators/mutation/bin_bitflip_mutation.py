@@ -1,5 +1,4 @@
-import numpy as np
-
+from pymoo.model import random
 from pymoo.model.mutation import Mutation
 
 
@@ -7,11 +6,18 @@ class BinaryBitflipMutation(Mutation):
     def __init__(self, p_mut=None):
         self.p_mut = p_mut
 
-    def _do(self, p, x):
+    def _do(self, p, X, Y):
 
         if self.p_mut is None:
-            self.p_mut = 1.0 / len(x)
+            self.p_mut = 1.0 / len(X)
 
-        for i in range(p.n_var):
-            if np.random.rand() < self.p_mut:
-                x[i] = not x[i]
+        for i in range(X.shape[0]):
+
+            for j in range(X.shape[1]):
+
+                if random.random() < self.p_mut:
+                    Y[i,j] = not X[i,j]
+                else:
+                    Y[i, j] = X[i, j]
+
+        return Y

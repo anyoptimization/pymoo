@@ -1,6 +1,6 @@
-import numpy as np
+from pymoo.model import random
 
 
 class BinaryRandomSampling:
     def sample(self, p, n):
-        return np.random.randint(2, size=(n, p.n_var))
+        return random.randint(0, 1, size=(n, p.n_var))

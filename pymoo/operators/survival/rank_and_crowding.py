@@ -6,6 +6,7 @@ from pymoo.util.non_dominated_rank import NonDominatedRank
 
 
 class RankAndCrowdingSurvival(Survival):
+
     def _do(self, pop, size):
         # calculate rank and crowding and sort accordingly
         rank, crowding = RankAndCrowdingSurvival.calc_rank_and_crowding(pop)
@@ -19,7 +20,7 @@ class RankAndCrowdingSurvival(Survival):
 
     @staticmethod
     def calc_rank_and_crowding(pop):
-        fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
+        fronts = NonDominatedRank.calc_as_fronts_naive(pop.F, pop.G)
         rank = NonDominatedRank.calc_from_fronts(fronts)
         cd = np.zeros(pop.size())
         for front in fronts:

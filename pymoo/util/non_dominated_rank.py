@@ -1,6 +1,4 @@
 import numpy as np
-import pygmo as pg
-from scipy.spatial.distance import squareform, pdist
 
 from pymoo.util.dominator import Dominator
 
@@ -23,26 +21,25 @@ class NonDominatedRank:
                 rank[idx] = i
         return rank
 
-
-
     @staticmethod
-    def calc_as_fronts_naive(pop):
+    def calc_as_fronts_naive(F, G):
 
+        M = Dominator.calc_domination_matrix(F, G)
         fronts = []
 
-        left_over = list(range(len(pop)))
+        remaining = set(range(F.shape[0]))
 
-        while len(left_over) > 0:
+        while len(remaining) > 0:
 
             front = []
 
-            for i in left_over:
+            for i in remaining:
 
                 is_dominated = False
                 dominating = set()
 
                 for j in front:
-                    rel = Dominator.get_relation(pop[i], pop[j])
+                    rel = M[i, j]
                     if rel == 1:
                         dominating.add(j)
                     elif rel == -1:
@@ -55,19 +52,17 @@ class NonDominatedRank:
                     front = [x for x in front if x not in dominating]
                     front.append(i)
 
-            left_over = [e for e in left_over if e not in front]
+            [remaining.remove(e) for e in front]
             fronts.append(front)
 
         return fronts
 
-
-
     @staticmethod
-    def calc_as_fronts(F, G):
+    def calc_as_fronts(F, G, only_pareto_front=False):
 
         # calculate the dominance matrix
         n = F.shape[0]
-        M = Dominator.calc_domination_matrix(F,G)
+        M = Dominator.calc_domination_matrix(F, G)
 
         fronts = []
 
@@ -98,6 +93,9 @@ class NonDominatedRank:
                 current_front.append(i)
                 ranked[i] = 1.0
                 n_ranked += 1
+
+        if only_pareto_front:
+            return current_front
 
         # append the first front to the current front
         fronts.append(current_front)

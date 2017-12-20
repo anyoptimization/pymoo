@@ -1,9 +1,10 @@
-import pygmo
 import numpy as np
 
 
-def denormalize(x, min, max):
-    return x * (max - min) + min
+
+
+def denormalize(x, x_min, x_max):
+    return x * (x_max - x_min) + x_min
 
 
 def normalize(x, x_min=None, x_max=None, return_bounds=False):
@@ -19,17 +20,24 @@ def normalize(x, x_min=None, x_max=None, return_bounds=False):
         return res, x_min, x_max
 
 
-def print_pop(pop, rank, crowding, sorted_idx, n):
-    for i in range(n):
-        print(i, pop[sorted_idx[i]].f, pop[sorted_idx[i]].c, rank[sorted_idx[i]], crowding[sorted_idx[i]])
-    print('---------')
+# returns only the unique rows from a given matrix X
+def unique_rows(X):
+    y = np.ascontiguousarray(X).view(np.dtype((np.void, X.dtype.itemsize * X.shape[1])))
+    _, idx = np.unique(y, return_index=True)
+    return idx
 
 
 
-def get_front_by_index(f):
-    return pygmo.fast_non_dominated_sorting(f)[0][0]
+def create_hist(n_evals, pop):
+    return np.concatenate((np.ones((pop.size(), 1)) * n_evals, pop.X, pop.F, pop.G), axis=1)
 
 
-def get_front(f):
-    return f[get_front_by_index(f)]
+def save_hist(pathToFile, data):
+    hist = None
+    for i in range(len(data)):
+        obj = data[i]['snapshot']
+        hist = obj if hist is None else np.concatenate((hist, obj), axis=0)
+
+    np.savetxt(pathToFile, hist, fmt='%.14f')
+    print(pathToFile)
 
