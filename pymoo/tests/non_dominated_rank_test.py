@@ -1,23 +1,21 @@
 import unittest
 
 import numpy as np
-from pymoo.util.non_dominated_rank import NonDominatedRank
+
+from pymoo.operators.survival.rank_and_crowding import RankAndCrowdingSurvival
 
 
 class NonDominatedRankTest(unittest.TestCase):
-    def test_one_dimensional_rank(self):
-        pass
-        #i1 = make_individual(np.array([0,0,0]), np.array([1]))
-        #i2 = make_individual(np.array([1,1,1]), np.array([0]))
-        #i3 = make_individual(np.array([2,2,2]), np.array([0]))
-        #i4 = make_individual(np.array([2,2,2]), np.array([0]))
-        #i5 = make_individual(np.array([3,3,4]), np.array([0]))
+    def test_crowding_distance(self):
+        F = np.array([[0.31, 6.10], [0.22, 7.09], [0.79, 3.97], [0.27, 6.93]])
+        cd = RankAndCrowdingSurvival.calc_crowding_distance(F, F_min=np.array([0.1, 0]), F_max=np.array([1, 60]))
+        self.assertTrue(np.all(np.round(cd, decimals=2) == np.array([0.63, np.inf, np.inf, 0.12])))
 
-        #pop = [i1, i2, i3, i4, i5]
+    def test_crowding_distance_degenerated(self):
+        F = np.array([[0.0, 6.10], [0.0, 7.09], [0.0, 7.09]])
+        cd = RankAndCrowdingSurvival.calc_crowding_distance(F)
 
-        #self.assertTrue(np.array_equal(np.array([3, 0, 1, 1, 2]), NonDominatedRank.calc(pop)))
-        #self.assertTrue(np.array_equal(np.array([3, 0, 1, 1, 2]), NonDominatedRank.calc_from_fronts(NonDominatedRank.calc_as_fronts_pygmo(pop))))
-
+        print(cd)
 
 if __name__ == '__main__':
     unittest.main()

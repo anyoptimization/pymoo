@@ -1,5 +1,3 @@
-import time
-
 from pymoo.configuration import Configuration
 
 

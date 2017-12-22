@@ -20,8 +20,8 @@ def parse_result_name(str):
 
 plots = []
 
-fn1 = Configuration.BENCHMARK_DIR + "standard/" + "pynsganew_ZDT3_1.out"
-fn2 = Configuration.BENCHMARK_DIR + "standard/" + "cnsga_ZDT3_1.out"
+fn1 = Configuration.BENCHMARK_DIR + "standard/" + "pynsga2_ZDT3_2.out"
+fn2 = Configuration.BENCHMARK_DIR + "standard/" + "cnsga-rank_ZDT3_11.out"
 
 plot = 1
 compare = 1

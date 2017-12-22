@@ -1,11 +1,11 @@
 import numpy as np
 
-class Population:
-    def __init__(self):
-        self.X = None  # design variables
-        self.F = None  # objective values
-        self.G = None  # constraint violations as vectors
 
+class Population:
+    def __init__(self, X=None, F=None, G=None):
+        self.X = X  # design variables
+        self.F = F  # objective values
+        self.G = G  # constraint violations as vectors
 
     def merge(self, other):
         self.X = np.concatenate([self.X, other.X])
@@ -23,17 +23,6 @@ class Population:
         if self.X is None:
             return 0
         else:
-
-            X = np.zeros((len(v), self.X.shape[1]))
-            F = np.zeros((len(v), self.F.shape[1]))
-            G = np.zeros((len(v), self.G.shape[1]))
-
-            for i, o in enumerate(v):
-                X[i,:] = self.X[o,:]
-                F[i, :] = self.F[o, :]
-                G[i, :] = self.G[o, :]
-
-            self.X = X
-            self.F = F
-            self.G = G
-
+            self.X = self.X[v]
+            self.F = self.F[v]
+            self.G = self.G[v]

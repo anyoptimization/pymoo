@@ -9,7 +9,7 @@ class SimulatedBinaryCrossover(Crossover):
         self.p_xover = p_xover
         self.eta_c = eta_xover
 
-    def _do(self, p, parents, children):
+    def _do(self, p, parents, children, data=None):
 
         n = p.n_var
 

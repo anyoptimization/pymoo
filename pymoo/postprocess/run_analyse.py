@@ -13,6 +13,7 @@ from pymoo.problems.ZDT.zdt1 import ZDT1
 from pymoo.problems.ZDT.zdt2 import ZDT2
 from pymoo.problems.ZDT.zdt3 import ZDT3
 from pymoo.problems.ZDT.zdt4 import ZDT4
+from pymoo.problems.ZDT.zdt6 import ZDT6
 
 from pymoo.performance.hypervolume import Hypervolume
 from pymoo.performance.igd import IGD
@@ -108,7 +109,7 @@ def load(folder):
             continue
 
 
-        print(reference_point)
+        #print(reference_point)
         entry['igd'] = IGD(true_front).calc(pop)
         entry['hv'] = Hypervolume(reference_point).calc(pop)
 
@@ -154,13 +155,14 @@ def load_files(folder, regex, columns=[], split_char="_"):
 
 if __name__ == '__main__':
     df = load(Configuration.BENCHMARK_DIR + "standard")
+    df = df.sort_values(['algorithm', 'problem'])
 
     with pd.option_context('display.max_rows', None):
         print(df)
     #    print(df[(df.problem == 'ZDT3') & (df.igd > 0.03)])
 
     with pd.option_context('display.max_rows', None):
-        f = {'igd': ['median', 'min', 'mean', 'max', 'std']}
+        f = {'hv': ['median', 'min', 'mean', 'max', 'std']}
         print(df.groupby(['problem', 'algorithm']).agg(f))
 
     problems = ["ZDT1", "ZDT2", "ZDT3", "ZDT4", "ZDT6"]
@@ -171,7 +173,7 @@ if __name__ == '__main__':
 
         F = []
         for algorithm in data.algorithm.unique():
-            F.append(np.array(data[data.algorithm == algorithm].igd.tolist()))
+            F.append(np.array(data[data.algorithm == algorithm].hv.tolist()))
 
         create_plot("%s.html" % problem, "Measure %s" % problem, F, chart_type="box", labels=data.algorithm.unique())
 

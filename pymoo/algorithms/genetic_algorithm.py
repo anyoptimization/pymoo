@@ -15,22 +15,31 @@ class GeneticAlgorithm(Algorithm):
 
     Attributes
     ----------
+
     pop_size: int
         The population size to be used for the genetic algorithm.
+
     sampling : class
         The sampling implementation to create the initial population.
+
     selection : class
         A class to select the parents for the crossover
+
     crossover : class
         The crossover to be performed on parents.
+
     mutation : class
         The mutation that will be performed for each child after the crossover
+
     survival : class
         This class selects the individuals to survive for the next generation
+
     eliminate_duplicates : bool
         If this flag is set no duplicates are allowed in the population (mostly likely only used for binary or discrete)
+
     verbose : int
         If larger than zero output is provided. (verbose=1 means some output, verbose=2 details for debugging)
+
     callback : func
         A callback function can be passed that is executed every generation. The parameters for the function
         are the algorithm itself, the number of evaluations so far and the current population.
@@ -62,19 +71,13 @@ class GeneticAlgorithm(Algorithm):
         self.verbose = verbose
         self.callback = callback
 
-    def _initialize(self):
-        pass
-
     def _solve(self, problem, evaluator):
-
-        # initialize stuff before the initial population is created
-        self._initialize()
 
         # create the population according to the factoring strategy
         pop = Population()
-        pop.X = self.sampling.sample(problem, self.pop_size)
+        pop.X = self.sampling.sample(problem, self.pop_size, self)
         pop.F, pop.G = evaluator.eval(problem, pop.X)
-        pop = self.survival.do(pop, self.pop_size)
+        pop = self.survival.do(pop, self.pop_size, self)
 
         # setup initial generation
         n_gen = 0
@@ -86,45 +89,37 @@ class GeneticAlgorithm(Algorithm):
             self._do_each_generation(n_gen, evaluator, pop)
             n_gen += 1
 
-            # create the offspring generation
-            offsprings = self._get_offsprings(problem, evaluator, pop)
+            # initialize selection and offspring methods
+            off = Population()
+            off.X = np.full((self.pop_size, problem.n_var), np.inf)
+            self.selection.set_population(pop, self)
+
+            n_off = 0
+            n_parents = self.crossover.n_parents
+            n_children = self.crossover.n_children
+
+            while n_off < self.pop_size:
+                parents = self.selection.next(n_parents)
+                X = self.crossover.do(problem, pop.X[parents, :], self)
+
+                off.X[n_off:min(n_off + n_children, self.pop_size)] = X
+                n_off = n_off + X.shape[0]
+
+            off.X = self.mutation.do(problem, off.X)
+            off.F, off.G = evaluator.eval(problem, off.X)
 
             # merge the population
-            pop.merge(offsprings)
+            pop.merge(off)
 
             # eliminate all duplicates in the population
             if self.eliminate_duplicates:
                 pop.filter(unique_rows(pop.X))
 
             # truncate the population
-            pop = self.survival.do(pop, self.pop_size)
+            pop = self.survival.do(pop, self.pop_size, self)
 
         self._do_each_generation(n_gen, evaluator, pop)
-
         return pop.X, pop.F, pop.G
-
-    def _get_offsprings(self, problem, evaluator, pop):
-
-        # initialize selection and offspring methods
-        off = Population()
-        off.X = np.zeros((self.pop_size, problem.n_var))
-        self.selection._initialize(pop)
-
-        n_off = 0
-        n_parents = self.crossover.n_parents
-        n_children = self.crossover.n_children
-
-        while n_off < self.pop_size:
-            parents = self.selection.next(n_parents)
-            X = self.crossover.do(problem, pop.X[parents, :])
-
-            off.X[n_off:min(n_off + n_children, self.pop_size)] = X
-            n_off = n_off + len(X)
-
-        off.X = self.mutation.do(problem, off.X)
-        off.F, off.G = evaluator.eval(problem, off.X)
-
-        return off
 
     def _do_each_generation(self, n_gen, evaluator, pop):
         if self.verbose > 0:

@@ -11,9 +11,10 @@ class MyRandomGenerator(RandomGenerator):
         self.jrand = 0
 
     def seed(self, s):
-        while s >= 1:
-            s = s / 10.0
-        self._seed = s
+        import random
+        random.seed(s)
+        self._seed = random.random()
+
         self.__warmup_random()
 
     def rand(self, size=None):
@@ -47,7 +48,7 @@ class MyRandomGenerator(RandomGenerator):
 
     def randint(self, low, high, size=None):
         val = self.rand(size=size)
-        return (low + (val * (high - low + 1))).astype(np.int)
+        return (low + (val * (high - low))).astype(np.int)
 
     def __warmup_random(self):
         self.oldrand[54] = self._seed

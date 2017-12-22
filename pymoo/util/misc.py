@@ -1,6 +1,6 @@
 import numpy as np
 
-
+from pymoo.configuration import Configuration
 
 
 def denormalize(x, x_min, x_max):
@@ -13,11 +13,17 @@ def normalize(x, x_min=None, x_max=None, return_bounds=False):
     if x_max is None:
         x_max = np.max(x, axis=0)
 
-    res = (x - x_min) / (x_max - x_min)
+    denom = x_max - x_min
+    denom = denom + (denom == 0) * Configuration.EPS
+    res = (x - x_min) / denom
     if not return_bounds:
         return res
     else:
         return res, x_min, x_max
+
+
+def calc_constraint_violation(G):
+    return np.sum(G * (G > 0).astype(np.float), axis=1)
 
 
 # returns only the unique rows from a given matrix X

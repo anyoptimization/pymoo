@@ -1,8 +1,9 @@
 import numpy as np
 
+from pymoo.util.misc import calc_constraint_violation
+
 
 class Dominator:
-
     @staticmethod
     def get_relation(a, b, cva=None, cvb=None):
 
@@ -42,19 +43,23 @@ class Dominator:
     def calc_domination_matrix(F, G):
 
         if G is None:
-            constr = np.zeros((F.shape[0],F.shape[0]))
+            constr = np.zeros((F.shape[0], F.shape[0]))
         else:
             # consider the constraint violation
-            CV = np.sum(G * (G > 0).astype(np.float), axis=1)
+            CV = calc_constraint_violation(G)
             constr = (CV[:, None] < CV) * 1 + (CV[:, None] > CV) * -1
 
         # look at the obj for dom
-        smaller = np.any(F[:, np.newaxis] < F, axis=2)
-        larger = np.any(F[:, np.newaxis] > F, axis=2)
+        n = F.shape[0]
+        L = np.repeat(F, n, axis=0)
+        R = np.tile(F, (n, 1))
+
+        smaller = np.reshape(np.any(L < R, axis=1), (n, n))
+        larger = np.reshape(np.any(L > R, axis=1), (n, n))
+
         dom = np.logical_and(smaller, np.logical_not(larger)) * 1 \
               + np.logical_and(larger, np.logical_not(smaller)) * -1
 
         # if cv equal then look at dom
         M = constr + (constr == 0) * dom
         return M
-

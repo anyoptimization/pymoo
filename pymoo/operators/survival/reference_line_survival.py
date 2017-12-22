@@ -80,8 +80,6 @@ class ReferenceLineSurvival(Survival):
 
 
 def calc_perpendicular_dist_matrix(N, ref_lines):
-    """
-    """
     n = np.tile(ref_lines, (len(N), 1))
     p = np.repeat(N, len(ref_lines), axis=0)
     a = np.zeros((len(p), N.shape[1]))

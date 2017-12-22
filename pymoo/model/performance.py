@@ -3,7 +3,7 @@ import abc
 import numpy as np
 
 
-class Measure:
+class Performance:
 
     def __init__(self):
         self.default_if_empty = 0.0
@@ -18,15 +18,10 @@ class Measure:
         if F.shape[1] == 0:
             return self.default_if_empty
 
-        return self.calc_(F)
+        return self._calc(F)
 
     @abc.abstractmethod
-    def calc_(self, F):
-        """
-        Calcuates a measure on the objective space
-        :param F: ndarray
-        :return: scalar value that represents the measure
-        """
+    def _calc(self, F):
         return
 
 

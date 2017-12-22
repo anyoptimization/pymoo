@@ -1,14 +1,14 @@
 import numpy as np
 from pygmo.core import hypervolume
-from pymoo.model.measure import Measure
+from pymoo.model.performance import Performance
 
 
-class Hypervolume(Measure):
+class Hypervolume(Performance):
     def __init__(self, reference_point):
-        Measure.__init__(self)
+        Performance.__init__(self)
         self.reference_point = reference_point
 
-    def calc_(self, F):
+    def _calc(self, F):
 
         if F.shape[1] == 0:
             return 0.0
