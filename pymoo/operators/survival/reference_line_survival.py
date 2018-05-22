@@ -1,9 +1,9 @@
 import numpy as np
-
-from pymoo.model import random
 from pymoo.model.survival import Survival
-from pymoo.util.misc import normalize
+from pymoo.rand import random
+from pymoo.util.misc import normalize, normalize_by_asf_interceptions
 from pymoo.util.non_dominated_rank import NonDominatedRank
+from scipy.spatial.distance import cdist
 
 
 class ReferenceLineSurvival(Survival):
@@ -11,7 +11,7 @@ class ReferenceLineSurvival(Survival):
         super().__init__()
         self.ref_lines = ref_lines
 
-    def _do(self, pop, size):
+    def _do(self, pop, n_survive, data, return_only_index=False):
 
         fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
 
@@ -19,7 +19,7 @@ class ReferenceLineSurvival(Survival):
         survival = []
 
         for front in fronts:
-            if len(survival) + len(front) > size:
+            if len(survival) + len(front) > n_survive:
                 break
             survival.extend(front)
 
@@ -28,19 +28,17 @@ class ReferenceLineSurvival(Survival):
         survival = list(range(0, len(survival)))
         last_front = list(range(len(survival), pop.size()))
 
+        N = normalize_by_asf_interceptions(pop.F, return_bounds=False)
+        #N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
+        #N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
+
         # if the last front needs to be splitted
-        n_remaining = size - len(survival)
+        n_remaining = n_survive - len(survival)
         if n_remaining > 0:
-
-            # TODO: Add the Das Dennis stuff here for normalization
-            ideal = np.min(pop.F, axis=0)
-            nadir = np.max(pop.F, axis=0)
-
-            N = normalize(pop.F, x_min=ideal, x_max=nadir)
 
             dist_matrix = calc_perpendicular_dist_matrix(N, self.ref_lines)
             niche_of_individuals = np.argmin(dist_matrix, axis=1)
-            min_dist_matrix = dist_matrix[np.arange(len(dist_matrix)),niche_of_individuals]
+            min_dist_matrix = dist_matrix[np.arange(len(dist_matrix)), niche_of_individuals]
 
             # for each reference direction the niche count
             niche_count = np.zeros(len(self.ref_lines))
@@ -73,20 +71,35 @@ class ReferenceLineSurvival(Survival):
                 niche_count[next_niche] += 1
                 n_remaining -= 1
 
+        if return_only_index:
+            return survival
+
         # now truncate the population
         pop.filter(survival)
 
         return pop
 
 
-def calc_perpendicular_dist_matrix(N, ref_lines):
-    n = np.tile(ref_lines, (len(N), 1))
-    p = np.repeat(N, len(ref_lines), axis=0)
-    a = np.zeros((len(p), N.shape[1]))
+def calc_perpendicular_dist(v, u):
+    norm_u = np.linalg.norm(u)
+    scalar_proj = np.dot(v, u) / norm_u
+    proj = scalar_proj * u / norm_u
+    return np.linalg.norm(proj - v)
 
-    val = (a-p) - ((a-p)*n)*n
-    dist = np.linalg.norm(val, axis=1)
-    matrix = np.reshape(dist, (len(N), len(ref_lines)))
+
+def calc_perpendicular_dist_matrix_slow(N, ref_lines):
+    return cdist(N, ref_lines, metric=calc_perpendicular_dist)
+
+
+def calc_perpendicular_dist_matrix(N, ref_lines):
+    u = np.tile(ref_lines, (len(N), 1))
+    v = np.repeat(N, len(ref_lines), axis=0)
+
+    norm_u = np.linalg.norm(u, axis=1)
+
+    scalar_proj = np.sum(v * u, axis=1) / norm_u
+    proj = scalar_proj[:, None] * u / norm_u[:, None]
+    val = np.linalg.norm(proj - v, axis=1)
+    matrix = np.reshape(val, (len(N), len(ref_lines)))
 
     return matrix
-

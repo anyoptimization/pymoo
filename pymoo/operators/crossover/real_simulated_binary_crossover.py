@@ -1,6 +1,6 @@
 from pymoo.configuration import Configuration
-from pymoo.model import random
 from pymoo.model.crossover import Crossover
+from pymoo.rand import random
 
 
 class SimulatedBinaryCrossover(Crossover):

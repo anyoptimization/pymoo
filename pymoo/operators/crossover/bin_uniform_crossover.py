@@ -1,12 +1,12 @@
-from pymoo.model import random
 from pymoo.model.crossover import Crossover
+from pymoo.rand import random
 
 
 class BinaryUniformCrossover(Crossover):
     def __init__(self):
         super().__init__(2, 2)
 
-    def _do(self, p, parents, children):
+    def _do(self, p, parents, children, data=None):
 
         for i in range(p.n_var):
 

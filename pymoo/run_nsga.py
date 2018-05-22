@@ -1,56 +1,36 @@
-import os
 import time
 
 import matplotlib.pyplot as plt
-import numpy as np
-
-from pymoo.algorithms.NSGAII import NSGAII
 from pymoo.algorithms.NSGAIII import NSGAIII
-from pymoo.model import random
 from pymoo.model.evaluator import Evaluator
-from pymoo.problems.ZDT.zdt1 import ZDT1
-from pymoo.problems.ZDT.zdt3 import ZDT3
-from pymoo.util.misc import save_hist
+from mpl_toolkits.mplot3d import Axes3D
+
+from pyop.problems.dtlz import DTLZ2
 
 if __name__ == '__main__':
 
-    problem = ZDT3()
-    run = 20
-
+    problem = DTLZ2(n_var=10, n_obj=3)
     start_time = time.time()
 
     # run the algorithm
-    nsga = NSGAII("real", verbose=True)
-    eval = Evaluator(20000)
-    X, F, G = nsga.solve(problem, evaluator=eval, seed=run)
+    # algorithm = SingleObjectiveGeneticAlgorithm("binary")
+    algorithm = NSGAIII("real", pop_size=92, verbose=True)
+    eval = Evaluator(92 * 200)
+    X, F, G = algorithm.solve(problem, evaluator=eval, seed=1)
     print("--- %s seconds ---" % (time.time() - start_time))
-
     print(F)
 
 
-    # save the result as a test
-    fname = os.path.join('..', '..', '..', 'benchmark', 'standard',
-                         'pynsga2_' + problem.__class__.__name__ + '_%s' % run)
-    np.savetxt(fname + ".out", F)
-    save_hist(fname + ".hist", eval.data)
+    plot = True
+    is_2d = F.shape[1] == 2
+    is_3d = F.shape[1] == 3
 
-    # save the whole history
-
-    plot = False
-    if plot:
+    if plot and is_2d:
         plt.scatter(F[:, 0], F[:, 1])
-
-        for l in nsga.ref_lines[1:-1]:
-            x = np.linspace(0,1,100)
-            y = x / l[1] * l[0]
-            plt.plot(x,y)
-
-        plt.ylim(0,1)
-        plt.xlim(0,1)
         plt.show()
 
-    # r = np.array([1.01, 1.01])
-
-    # print(calc_hypervolume(get_f(pop), r))
-
-    # write_final_pop_obj(pop,1)
+    if plot and is_3d:
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.scatter(F[:, 0], F[:, 1], F[:, 2])
+        plt.show()

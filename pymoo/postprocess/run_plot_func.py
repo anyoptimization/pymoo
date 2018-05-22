@@ -4,29 +4,48 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
 
-from pymoo.problems.rastrigin import Rastrigin
+from scipy.spatial.distance import squareform
 
-p = Rastrigin(2, 10)
+from pyop.problems.griewank import Griewank
+from pyop.problems.zakharov import Zakharov
 
-X = np.arange(-5, 5, 0.25)
-Y = np.arange(-5, 5, 0.25)
-X, Y = np.meshgrid(X, Y)
 
-F = np.zeros((len(X), len(Y)))
-for i in range(len(X)):
-    for j in range(len(Y)):
-        F[i, j], _ = p.evaluate(np.array([X[i, j], Y[i, j]]))
+def plot_func_3d(plot, func_eval, xlim=(0, 1), ylim=(0, 1)):
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+    n = 100
 
-# Plot the surface.
-surf = ax.plot_surface(X, Y, F, cmap=cm.coolwarm, linewidth=0, antialiased=False)
+    X_range = np.linspace(xlim[0], xlim[1], num=n)
+    Y_range = np.linspace(ylim[0], ylim[1], num=n)
+    X, Y = np.meshgrid(X_range, Y_range)
 
-ax.zaxis.set_major_locator(LinearLocator(10))
-ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    A = np.zeros((n*n,2))
+    counter = 0
+    for i, x in enumerate(X_range):
+        for j, y in enumerate(Y_range):
+            A[counter, 0] = x
+            A[counter, 1] = y
+            counter += 1
+    F = np.reshape(func_eval(A), (n,n))
 
-# Add a color bar which maps values to colors.
-fig.colorbar(surf, shrink=0.5, aspect=5)
+    # Plot the surface.
+    # CS = plot.contour(X, Y, F)
+    # plt.colorbar(CS)
 
-plt.show()
+    # plot.plot_wireframe(X, Y, F)
+    plot.plot_surface(X, Y, F, cmap=cm.coolwarm, linewidth=0, antialiased=False)
+
+
+if __name__ == '__main__':
+
+    problem = Zakharov(n_var=2)
+
+    fig = plt.figure(1)
+    plot = fig.add_subplot(111, projection='3d')
+    plot_func_3d(plot, lambda x: problem.evaluate(x)[0], xlim=[np.min(problem.xl), np.min(problem.xu)], ylim=[np.min(problem.xl), np.min(problem.xu)])
+    plt.show()
+
+    X = np.linspace(np.min(problem.xl), np.min(problem.xu), num=1000)
+    Y, _ = Griewank(n_var=1).evaluate(X[:, None])
+    plt.plot(X, Y)
+    plt.show()
+    print()

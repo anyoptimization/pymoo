@@ -1,7 +1,6 @@
 import numpy as np
-
-from pymoo.model import random
 from pymoo.model.selection import Selection
+from pymoo.rand import random
 
 
 class TournamentSelection(Selection):

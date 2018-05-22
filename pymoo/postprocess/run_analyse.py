@@ -7,17 +7,17 @@ import pandas as pd
 import plotly
 import plotly.graph_objs as go
 from plotly.graph_objs import Layout
-from pymeta.configuration import Configuration
-# this import is needed for the reflection object to get the true front -> don't remove it
-from pymoo.problems.ZDT.zdt1 import ZDT1
-from pymoo.problems.ZDT.zdt2 import ZDT2
-from pymoo.problems.ZDT.zdt3 import ZDT3
-from pymoo.problems.ZDT.zdt4 import ZDT4
-from pymoo.problems.ZDT.zdt6 import ZDT6
-
+from pymoo.configuration import Configuration
 from pymoo.performance.hypervolume import Hypervolume
 from pymoo.performance.igd import IGD
 from pymoo.util.non_dominated_rank import NonDominatedRank
+
+# this import is needed for the reflection object to get the true front -> don't remove it
+from pyop.problems.zdt import *
+from pyop.problems.rastrigin import *
+from pyop.problems.ackley import *
+
+# this import is needed for the reflection object to get the true front -> don't remove it
 
 
 def create_plot(fname, title, F, X=None, chart_type="line", labels=[], folder=Configuration.BENCHMARK_DIR,
@@ -77,43 +77,41 @@ def create_plot(fname, title, F, X=None, chart_type="line", labels=[], folder=Co
     )
 
 
-
-
 def load(folder):
-
-    data = load_files(folder, ".*_ZDT.*_.*\.out", ["algorithm", "problem", "run"])
+    data = load_files(folder, ".*_.*_.*\.out", ["algorithm", "problem", "run"])
 
     for entry in data:
 
-        pop = np.loadtxt(entry['path'])
+        F = np.loadtxt(entry['path'])
 
-        if len(np.shape(pop)) == 1:
-            pop = np.array([pop])
+        problem = globals()[entry['problem']]()
+
+        if problem.n_obj == 1:
+            entry['igd'] = np.min(F)
+            entry['hv'] = np.min(F)
         else:
-            pop = pop[NonDominatedRank.calc_as_fronts(pop, None, only_pareto_front=True)]
 
-        # if only a 1d array
-        if len(pop.shape) == 1:
-            pop = np.array([pop])
+            if len(np.shape(F)) == 1:
+                F = np.array([F])
+            else:
+                F = F[NonDominatedRank.calc_as_fronts(F, None, only_pareto_front=True)]
 
-        true_front = None
-        try:
-            problem_clazz = globals()[entry['problem']]()
-            true_front = problem_clazz.pareto_front()
-            reference_point = problem_clazz.nadir_point() * 1.01
-        except:
-            print("Unexpected error:", sys.exc_info()[0])
+            true_front = None
+            try:
+                true_front = problem.pareto_front()
+                reference_point = problem.nadir_point() * 1.01
+            except:
+                print("Unexpected error:", sys.exc_info()[0])
 
-        if true_front is None:
-            print("True front for problem %s not found. Can't calculate IDG. Continue." % entry['problem'])
-            continue
+            if true_front is None:
+                print("True front for problem %s not found. Can't calculate IDG. Continue." % entry['problem'])
+                continue
 
+            # print(reference_point)
+            entry['igd'] = IGD(true_front).calc(F)
+            entry['hv'] = Hypervolume(reference_point).calc(F)
 
-        #print(reference_point)
-        entry['igd'] = IGD(true_front).calc(pop)
-        entry['hv'] = Hypervolume(reference_point).calc(pop)
-
-        #print(reference_point)
+        # print(reference_point)
 
         del entry['path']
         del entry['fname']
@@ -121,18 +119,18 @@ def load(folder):
     return pd.DataFrame(data)
 
 
-
-
-
-
 def load_files(folder, regex, columns=[], split_char="_"):
     data = []
-    for fname in os.listdir(folder):
 
-        if not re.match(regex, fname):
+    files = []
+    [files.extend([os.path.join(dirpath, f) for f in filelist]) for dirpath, _, filelist in os.walk(folder)]
+
+    for i, fname in enumerate(files):
+
+        if not re.match(regex, fname.split("/")[-1]):
             continue
 
-        sname = fname.split(".")[0]
+        sname = fname.split("/")[-1].split(".")[0]
         entry = {}
 
         array = sname.split(split_char)
@@ -150,33 +148,29 @@ def load_files(folder, regex, columns=[], split_char="_"):
     return data
 
 
-
-
-
 if __name__ == '__main__':
-    df = load(Configuration.BENCHMARK_DIR + "standard")
+    df = load(Configuration.BENCHMARK_DIR + "expensive")
     df = df.sort_values(['algorithm', 'problem'])
 
     with pd.option_context('display.max_rows', None):
         print(df)
-    #    print(df[(df.problem == 'ZDT3') & (df.igd > 0.03)])
+    # print(df[(df.problem == 'ZDT3') & (df.igd > 0.03)])
 
     with pd.option_context('display.max_rows', None):
         f = {'hv': ['median', 'min', 'mean', 'max', 'std']}
         print(df.groupby(['problem', 'algorithm']).agg(f))
 
-    problems = ["ZDT1", "ZDT2", "ZDT3", "ZDT4", "ZDT6"]
+    problems = ["ZDT1", "ZDT2", "ZDT3", "ZDT4", "ZDT6", "Rastrigin", "Ackley"]
 
     for problem in problems:
 
         data = df[(df.problem == problem)]
 
+        if data.size == 0:
+            continue
+
         F = []
         for algorithm in data.algorithm.unique():
-            F.append(np.array(data[data.algorithm == algorithm].hv.tolist()))
+            F.append(np.array(data[data.algorithm == algorithm].igd.tolist()))
 
         create_plot("%s.html" % problem, "Measure %s" % problem, F, chart_type="box", labels=data.algorithm.unique())
-
-
-
-

@@ -1,30 +1,39 @@
-import plotly
-import pygmo as pg
-from plotly.graph_objs import Layout, Scatter
-from pymeta.configuration import Configuration
 import numpy as np
+import plotly
+from plotly.graph_objs import Layout, Scatter, Scatter3d
 
 # this import is needed for the reflection object to get the true front -> don't remove it
+from pymoo.configuration import Configuration
+from pymoo.util.non_dominated_rank import NonDominatedRank
 
 
-def load_non_dominated_from_file(file, non_dom = True):
+def load_non_dominated_from_file(file, non_dom=True):
     f = np.loadtxt(file)
     if non_dom:
-        f = np.array([f[i, :] for i in pg.fast_non_dominated_sorting(f)[0][0]])
-    return f[:, 0], f[:, 1]
+        f = f[NonDominatedRank.get_front(f), :]
+    return f
 
 
 def parse_result_name(str):
     return str.split('/')[-1][0:-4]
 
 
+def create_plot(file):
+    f = load_non_dominated_from_file(file, True)
+    if f.shape[1] == 2:
+        return Scatter(x=f[:, 0], y=f[:, 1], name=parse_result_name(fn1), mode='markers', marker={"size": 8})
+    elif f.shape[1] == 3:
+        return Scatter3d(x=f[:, 0], y=f[:, 1], z=f[:, 2], name=parse_result_name(fn1), mode='markers',
+                         marker={"size": 4})
+
+
 plots = []
 
-fn1 = Configuration.BENCHMARK_DIR + "standard/" + "pynsga2_ZDT3_2.out"
-fn2 = Configuration.BENCHMARK_DIR + "standard/" + "cnsga-rank_ZDT3_11.out"
+fn1 = Configuration.BENCHMARK_DIR + "standard/" + "LMA_TNK_0.out"
+fn2 = Configuration.BENCHMARK_DIR + "expensive/" + "nsa-ea/nsa-ea_ZDT4_50.out"
 
 plot = 1
-compare = 1
+compare = 0
 plot_true_front = 0
 
 problem = fn1.split('/')[-1][0:-4].split("_")[1]
@@ -36,12 +45,10 @@ if plot_true_front:
 
 # if it should be compared and if it is the same problem
 if compare:
-    f2_x, f2_y = load_non_dominated_from_file(fn2, False)
-    plots.append(Scatter(x=f2_x, y=f2_y, name=parse_result_name(fn2), mode='markers', marker={"size": 8}))
+    plots.append(create_plot(fn2))
 
 if plot:
-    f_x, f_y = load_non_dominated_from_file(fn1, True)
-    plots.append(Scatter(x=f_x, y=f_y, name=parse_result_name(fn1), mode='markers', marker={"size": 8}))
+    plots.append(create_plot(fn1))
 
 plotly.offline.plot({
     "data": plots,

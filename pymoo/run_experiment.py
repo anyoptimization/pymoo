@@ -1,10 +1,13 @@
 import os
 import random
 import sys
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 
-from pymoo.algorithms.NSGAII import NSGAII
+
+from pymoo.algorithms.NSGAIII import NSGAIII
+
 
 
 import time
@@ -25,7 +28,7 @@ if not os.path.exists(output):
 
 
 def get_params():
-    for algorithm in [NSGAII("real", verbose=0)]:
+    for algorithm in [NSGAIII("real", verbose=0)]:
         for problem in [ZDT1(), ZDT2(), ZDT3(), ZDT4(), ZDT6()]:
             for run in range(1, n_runs + 1):
                 yield (algorithm, problem, run)
@@ -58,7 +61,7 @@ if __name__ == '__main__':
         print("--- %s seconds ---" % (time.time() - start_time))
 
         # save the result as a test
-        fname = os.path.join(output, 'pynsga2-dom-myrand_' + problem.__class__.__name__ + '_%s' % run)
+        fname = os.path.join(output, 'pynsga3_' + problem.__class__.__name__ + '_%s' % run)
         np.savetxt(fname + ".out", F)
         print(fname + ".out")
         #save_hist(fname + ".hist", eval.data)

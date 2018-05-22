@@ -8,8 +8,25 @@ class NonDominatedRank:
         pass
 
     @staticmethod
-    def calc(pop):
-        fronts = NonDominatedRank.calc_as_fronts(pop)
+    def is_dominating(f, F):
+        smaller = np.any(f < F, axis=1)
+        larger = np.any(f > F, axis=1)
+        dom = np.logical_and(smaller, np.logical_not(larger)) * 1 \
+              + np.logical_and(larger, np.logical_not(smaller)) * -1
+        return dom
+
+    @staticmethod
+    def get_non_dominated(F, F_, return_index=False):
+        F_all = np.concatenate([F, F_], axis=0)
+        front = NonDominatedRank().get_front(F_all)
+        front = [i-F.shape[0] for i in front if i >= F.shape[0]]
+        if return_index:
+            return front
+        return F_[front, :]
+
+    @staticmethod
+    def calc(F):
+        fronts = NonDominatedRank.calc_as_fronts(F, None)
         return NonDominatedRank.calc_from_fronts(fronts)
 
     @staticmethod
@@ -58,7 +75,11 @@ class NonDominatedRank:
         return fronts
 
     @staticmethod
-    def calc_as_fronts(F, G, only_pareto_front=False):
+    def get_front(F, G=None):
+        return NonDominatedRank.calc_as_fronts(F, G, only_pareto_front=True)
+
+    @staticmethod
+    def calc_as_fronts(F, G=None, only_pareto_front=False):
 
         # calculate the dominance matrix
         n = F.shape[0]

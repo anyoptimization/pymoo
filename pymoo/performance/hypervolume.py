@@ -1,7 +1,9 @@
 import numpy as np
-from pygmo.core import hypervolume
 from pymoo.model.performance import Performance
 
+
+def hypervolume(F):
+    pass
 
 class Hypervolume(Performance):
     def __init__(self, reference_point):

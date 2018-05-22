@@ -1,4 +1,7 @@
 from abc import abstractmethod
+import numpy as np
+
+from pyop.problem import Problem
 
 
 class Sampling:
@@ -31,3 +34,13 @@ class Sampling:
 
         """
         pass
+
+    def sample_by_bounds(self, x_min, x_max, n_var, n_samples, data=None):
+        class P(Problem):
+            def __init__(self) -> None:
+                self.n_var = n_var
+                self.xl = np.full(n_var, x_min)
+                self.xu = np.full(n_var, x_max)
+
+        return self.sample(P(), n_samples, data)
+

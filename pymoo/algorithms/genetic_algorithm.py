@@ -73,9 +73,14 @@ class GeneticAlgorithm(Algorithm):
 
     def _solve(self, problem, evaluator):
 
+        self._initialize(problem)
+
         # create the population according to the factoring strategy
         pop = Population()
-        pop.X = self.sampling.sample(problem, self.pop_size, self)
+        if isinstance(self.sampling, np.ndarray):
+            pop.X = self.sampling
+        else:
+            pop.X = self.sampling.sample(problem, self.pop_size, self)
         pop.F, pop.G = evaluator.eval(problem, pop.X)
         pop = self.survival.do(pop, self.pop_size, self)
 
@@ -113,6 +118,7 @@ class GeneticAlgorithm(Algorithm):
 
             # eliminate all duplicates in the population
             if self.eliminate_duplicates:
+                # pop.filter(unique_rows(pop.F))
                 pop.filter(unique_rows(pop.X))
 
             # truncate the population
@@ -133,3 +139,6 @@ class GeneticAlgorithm(Algorithm):
              'n_evals': evaluator.counter,
              'snapshot': create_hist(evaluator.counter, pop)
              })
+
+    def _initialize(self, problem):
+        pass

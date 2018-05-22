@@ -1,5 +1,4 @@
-from pymoo.rand.my_random_generator import MyRandomGenerator
-from pymoo.rand.numpy_random_generator import NumpyRandomGenerator
+from pymoo.rand.impl.my_random_generator import MyRandomGenerator
 
 
 class Configuration:

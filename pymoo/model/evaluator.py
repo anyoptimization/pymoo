@@ -1,12 +1,15 @@
 class Evaluator:
 
-    def __init__(self, n_eval):
+    def __init__(self, n_eval=1000000000):
         self.n_eval = n_eval
         self.data = []
         self.counter = 0
 
     def eval(self, problem, x):
-        self.counter += len(x)
+        if len(x.shape) == 1:
+            self.counter += 1
+        else:
+            self.counter += x.shape[0]
         return problem.evaluate(x)
 
     def count_left(self):

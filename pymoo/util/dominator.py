@@ -42,7 +42,7 @@ class Dominator:
     @staticmethod
     def calc_domination_matrix(F, G):
 
-        if G is None:
+        if G is None or len(G) == 0:
             constr = np.zeros((F.shape[0], F.shape[0]))
         else:
             # consider the constraint violation

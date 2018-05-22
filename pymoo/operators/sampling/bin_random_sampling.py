@@ -1,4 +1,4 @@
-from pymoo.model import random
+from pymoo.rand import random
 
 
 class BinaryRandomSampling:
@@ -7,4 +7,4 @@ class BinaryRandomSampling:
     """
 
     def sample(self, problem, n_samples, data):
-        return random.randint(0, 1, size=(n_samples, problem.n_var))
+        return random.randint(0, 2, size=(n_samples, problem.n_var))

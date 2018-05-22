@@ -1,5 +1,4 @@
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.model import random
 from pymoo.operators.crossover.bin_uniform_crossover import BinaryUniformCrossover
 from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.bin_bitflip_mutation import BinaryBitflipMutation
@@ -8,6 +7,7 @@ from pymoo.operators.sampling.bin_random_sampling import BinaryRandomSampling
 from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection
 from pymoo.operators.survival.rank_and_crowding import RankAndCrowdingSurvival
+from pymoo.rand import random
 from pymoo.util.dominator import Dominator
 
 
@@ -16,21 +16,22 @@ class NSGAII(GeneticAlgorithm):
 
         if var_type == "real":
             super().__init__(
-                pop_size=pop_size,
-                sampling=RealRandomSampling(),
-                selection=TournamentSelection(f_comp=comp_by_rank_and_crowding),
-                crossover=SimulatedBinaryCrossover(),
-                mutation=PolynomialMutation(),
-                survival=RankAndCrowdingSurvival(),
+                pop_size,
+                RealRandomSampling(),
+                TournamentSelection(f_comp=comp_by_rank_and_crowding),
+                SimulatedBinaryCrossover(),
+                PolynomialMutation(),
+                RankAndCrowdingSurvival(),
                 verbose=verbose
             )
         elif var_type == "binary":
             super().__init__(
-                sampling=BinaryRandomSampling(),
-                selection=TournamentSelection(f_comp=comp_by_rank_and_crowding),
-                crossover=BinaryUniformCrossover(),
-                mutation=BinaryBitflipMutation(),
-                survival=RankAndCrowdingSurvival(),
+                pop_size,
+                BinaryRandomSampling(),
+                TournamentSelection(f_comp=comp_by_rank_and_crowding),
+                BinaryUniformCrossover(),
+                BinaryBitflipMutation(),
+                RankAndCrowdingSurvival(),
                 verbose=verbose,
                 eliminate_duplicates=True
             )

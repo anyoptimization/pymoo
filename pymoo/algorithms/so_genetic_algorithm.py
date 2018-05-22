@@ -5,39 +5,33 @@ from pymoo.operators.mutation.bin_bitflip_mutation import BinaryBitflipMutation
 from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.bin_random_sampling import BinaryRandomSampling
 from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
-from pymoo.operators.selection.random_selection import RandomSelection
-from pymoo.operators.survival.reference_line_survival import ReferenceLineSurvival
-from pymoo.util.reference_directions import get_ref_dirs_from_n
+from pymoo.operators.selection.tournament_selection import TournamentSelection
+from pymoo.operators.survival.fitness_survival import FitnessSurvival
 
 
-class NSGAIII(GeneticAlgorithm):
+class SingleObjectiveGeneticAlgorithm(GeneticAlgorithm):
     def __init__(self, var_type, pop_size=100, verbose=1):
 
         if var_type == "real":
             super().__init__(
                 pop_size=pop_size,
                 sampling=RealRandomSampling(),
-                selection=RandomSelection(),
+                selection=TournamentSelection(),
                 crossover=SimulatedBinaryCrossover(),
                 mutation=PolynomialMutation(),
-                survival=None,
+                survival=FitnessSurvival(),
                 verbose=verbose
             )
         elif var_type == "binary":
             super().__init__(
                 pop_size=pop_size,
                 sampling=BinaryRandomSampling(),
-                selection=RandomSelection(),
+                selection=TournamentSelection(),
                 crossover=BinaryUniformCrossover(),
                 mutation=BinaryBitflipMutation(),
-                survival=None,
+                survival=FitnessSurvival(),
                 verbose=verbose,
                 eliminate_duplicates=True
             )
 
-        self.ref_lines = None
 
-    def _initialize(self, problem):
-        super()._initialize(problem)
-        self.ref_lines = get_ref_dirs_from_n(problem.n_obj, self.pop_size)
-        self.survival = ReferenceLineSurvival(self.ref_lines)

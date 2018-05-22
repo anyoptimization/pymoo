@@ -1,7 +1,9 @@
 from abc import abstractmethod
 
-from pymoo.model import random
+import numpy
+import pymoo
 from pymoo.model.evaluator import Evaluator
+from pymoo.rand import random
 from pymoo.util.misc import calc_constraint_violation
 from pymoo.util.non_dominated_rank import NonDominatedRank
 
@@ -53,8 +55,13 @@ class Algorithm:
 
         """
 
-        # set the random seed
+        # set the random seed for generator
+        pymoo.rand.random.seed(seed)
+
+        # just to be sure also for the others
+        seed = pymoo.rand.random.randint(0, 100000)
         random.seed(seed)
+        numpy.random.seed(seed)
 
         if not isinstance(evaluator, Evaluator):
             evaluator = Evaluator(evaluator)
@@ -65,10 +72,10 @@ class Algorithm:
         if return_only_feasible:
             if G is not None and G.shape[0] == len(F) and G.shape[1] > 0:
                 cv = calc_constraint_violation(G)
-                X = X[cv, :]
-                F = F[cv, :]
+                X = X[cv <= 0, :]
+                F = F[cv <= 0, :]
                 if G is not None:
-                    G = G[cv, :]
+                    G = G[cv <= 0, :]
 
         if return_only_non_dominated:
             idx_non_dom = NonDominatedRank.calc_as_fronts(F,G)[0]

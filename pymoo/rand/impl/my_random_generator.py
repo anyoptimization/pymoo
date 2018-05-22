@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.model.random_generator import RandomGenerator
+from pymoo.rand.random_generator import RandomGenerator
 
 
 class MyRandomGenerator(RandomGenerator):

@@ -1,5 +1,5 @@
-from pymoo.model import random
 from pymoo.model.mutation import Mutation
+from pymoo.rand import random
 
 
 class BinaryBitflipMutation(Mutation):
