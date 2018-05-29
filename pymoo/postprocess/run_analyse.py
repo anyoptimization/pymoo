@@ -13,9 +13,9 @@ from pymoo.performance.igd import IGD
 from pymoo.util.non_dominated_rank import NonDominatedRank
 
 # this import is needed for the reflection object to get the true front -> don't remove it
-from pyop.problems.zdt import *
-from pyop.problems.rastrigin import *
-from pyop.problems.ackley import *
+from pymop.problems.zdt import *
+from pymop.problems.rastrigin import *
+from pymop.problems.ackley import *
 
 # this import is needed for the reflection object to get the true front -> don't remove it
 

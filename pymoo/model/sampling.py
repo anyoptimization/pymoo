@@ -1,7 +1,7 @@
 from abc import abstractmethod
 import numpy as np
 
-from pyop.problem import Problem
+from pymop.problem import Problem
 
 
 class Sampling:

@@ -32,11 +32,13 @@ class ReferenceLineSurvival(Survival):
         #N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
         #N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
 
+        dist_matrix = calc_perpendicular_dist_matrix(N, self.ref_lines)
+
         # if the last front needs to be splitted
         n_remaining = n_survive - len(survival)
         if n_remaining > 0:
 
-            dist_matrix = calc_perpendicular_dist_matrix(N, self.ref_lines)
+
             niche_of_individuals = np.argmin(dist_matrix, axis=1)
             min_dist_matrix = dist_matrix[np.arange(len(dist_matrix)), niche_of_individuals]
 

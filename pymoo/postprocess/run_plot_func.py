@@ -6,8 +6,8 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from scipy.spatial.distance import squareform
 
-from pyop.problems.griewank import Griewank
-from pyop.problems.zakharov import Zakharov
+from pymop.problems.griewank import Griewank
+from pymop.problems.zakharov import Zakharov
 
 
 def plot_func_3d(plot, func_eval, xlim=(0, 1), ylim=(0, 1)):
