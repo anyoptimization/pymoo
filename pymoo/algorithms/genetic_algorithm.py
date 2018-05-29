@@ -134,11 +134,18 @@ class GeneticAlgorithm(Algorithm):
             pass
         if self.callback is not None:
             self.callback(self, evaluator.counter, pop)
-        evaluator.notify(
-            {'n_gen': n_gen,
-             'n_evals': evaluator.counter,
-             'snapshot': create_hist(evaluator.counter, pop)
-             })
+
+        if self.history is not None:
+            self.history.append(
+                {'n_gen': n_gen,
+                 'n_evals': evaluator.counter,
+                 'X': np.copy(pop.X),
+                 'F': np.copy(pop.F)
+                 })
 
     def _initialize(self, problem):
         pass
+
+
+
+

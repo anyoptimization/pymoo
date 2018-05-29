@@ -16,7 +16,13 @@ class Algorithm:
 
     """
 
-    def solve(self, problem, evaluator, seed=1, return_only_feasible=True, return_only_non_dominated=True):
+    def solve(self,
+              problem,
+              evaluator,
+              seed=1,
+              return_only_feasible=True,
+              return_only_non_dominated=True,
+              history=None):
         """
 
         Solve a given problem by a given evaluator. The evaluator determines the termination condition and
@@ -62,6 +68,11 @@ class Algorithm:
         seed = pymoo.rand.random.randint(0, 100000)
         random.seed(seed)
         numpy.random.seed(seed)
+
+        # add the history object
+        self.history = history
+        if self.history is True:
+            self.history = []
 
         if not isinstance(evaluator, Evaluator):
             evaluator = Evaluator(evaluator)

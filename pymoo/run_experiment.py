@@ -1,25 +1,12 @@
 import os
-import random
 import sys
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
-
-
-from pymoo.algorithms.NSGAIII import NSGAIII
-
-
-
 import time
 
 import numpy as np
+from pymop.zdt import ZDT1, ZDT2, ZDT3, ZDT4, ZDT6
 
+from pymoo.algorithms.NSGAIII import NSGAIII
 from pymoo.model.evaluator import Evaluator
-from pymoo.problems.ZDT.zdt1 import ZDT1
-from pymoo.problems.ZDT.zdt2 import ZDT2
-from pymoo.problems.ZDT.zdt3 import ZDT3
-from pymoo.problems.ZDT.zdt4 import ZDT4
-from pymoo.problems.ZDT.zdt6 import ZDT6
 
 n_runs = 20
 output = os.path.join('..', '..', '..', 'benchmark', 'standard')

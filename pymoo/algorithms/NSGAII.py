@@ -1,10 +1,5 @@
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.operators.crossover.bin_uniform_crossover import BinaryUniformCrossover
-from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.mutation.bin_bitflip_mutation import BinaryBitflipMutation
-from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.bin_random_sampling import BinaryRandomSampling
-from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
+from pymoo.operators.default_operators import set_default_if_none, set_if_none
 from pymoo.operators.selection.tournament_selection import TournamentSelection
 from pymoo.operators.survival.rank_and_crowding import RankAndCrowdingSurvival
 from pymoo.rand import random
@@ -12,29 +7,11 @@ from pymoo.util.dominator import Dominator
 
 
 class NSGAII(GeneticAlgorithm):
-    def __init__(self, var_type, pop_size=100, verbose=1):
-
-        if var_type == "real":
-            super().__init__(
-                pop_size,
-                RealRandomSampling(),
-                TournamentSelection(f_comp=comp_by_rank_and_crowding),
-                SimulatedBinaryCrossover(),
-                PolynomialMutation(),
-                RankAndCrowdingSurvival(),
-                verbose=verbose
-            )
-        elif var_type == "binary":
-            super().__init__(
-                pop_size,
-                BinaryRandomSampling(),
-                TournamentSelection(f_comp=comp_by_rank_and_crowding),
-                BinaryUniformCrossover(),
-                BinaryBitflipMutation(),
-                RankAndCrowdingSurvival(),
-                verbose=verbose,
-                eliminate_duplicates=True
-            )
+    def __init__(self, var_type, **kwargs):
+        set_default_if_none(var_type, kwargs)
+        set_if_none(kwargs, 'selection', TournamentSelection(f_comp=comp_by_rank_and_crowding))
+        set_if_none(kwargs, 'survival', RankAndCrowdingSurvival())
+        super().__init__(**kwargs)
 
 
 def comp_by_rank_and_crowding(pop, indices, data):
