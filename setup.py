@@ -21,5 +21,5 @@ setup(
     license='MIT',
     keywords="optimization",
     packages=['pymoo'],
-    install_requires=['pymop' 'numpy', 'scipy']
+    install_requires=['pymop' 'numpy', 'scipy', 'matplotlib']
 )

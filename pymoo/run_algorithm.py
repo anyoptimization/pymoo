@@ -33,6 +33,8 @@ if __name__ == '__main__':
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
+    print(F)
+
     scatter_plot = True
     save_animation = True
 

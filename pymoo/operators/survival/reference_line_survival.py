@@ -27,7 +27,8 @@ class ReferenceLineSurvival(Survival):
         # filter the front to only relevant entries
         pop.filter(survival + front)
         survival = list(range(0, len(survival)))
-        last_front = list(range(len(survival), pop.size()))
+        last_front = np.arrange(len(survival), pop.size())
+        remaining_index = np.arrange(0, len(last_front))
 
         N = normalize_by_asf_interceptions(pop.F, return_bounds=False)
         #N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
@@ -49,8 +50,11 @@ class ReferenceLineSurvival(Survival):
 
             while n_remaining > 0:
 
+                # get all remaining individuals from the last front
+                last_front_remaining = last_front[remaining_index]
+
                 # all niches where new individuals can be assigned to
-                next_niches_list = np.unique(niche_of_individuals[last_front])
+                next_niches_list = np.unique(niche_of_individuals[last_front_remaining])
 
                 # pick a niche with minimum assigned individuals - break tie if necessary
                 next_niche_count = niche_count[next_niches_list]
@@ -59,7 +63,7 @@ class ReferenceLineSurvival(Survival):
                 next_niche = next_niches_list[next_niche]
 
                 # indices of individuals in last front to assign niche to
-                next_ind = np.array(last_front)[np.where(niche_of_individuals[last_front] == next_niche)[0]]
+                next_ind = np.where(niche_of_individuals[last_front_remaining] == next_niche)[0]
 
                 if len(next_ind) == 1:
                     next_ind = next_ind[0]
@@ -68,8 +72,8 @@ class ReferenceLineSurvival(Survival):
                 else:
                     next_ind = next_ind[random.randint(0, len(next_ind))]
 
-                survival.append(next_ind)
-                last_front.remove(next_ind)
+                survival.append(last_front[next_ind])
+                remaining_index.remove(next_ind)
                 niche_count[next_niche] += 1
                 n_remaining -= 1
 
