@@ -1,12 +1,12 @@
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from pymoo.model.performance import Performance
+from pymoo.model.indicator import Indicator
 
 
-class IGD(Performance):
+class IGD(Indicator):
     def __init__(self, true_front):
-        Performance.__init__(self)
+        Indicator.__init__(self)
         self.true_front = true_front
 
     def _calc(self, F):

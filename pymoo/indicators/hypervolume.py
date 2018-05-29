@@ -1,13 +1,13 @@
 import numpy as np
-from pymoo.model.performance import Performance
+from pymoo.model.indicator import Indicator
 
 
 def hypervolume(F):
     pass
 
-class Hypervolume(Performance):
+class Hypervolume(Indicator):
     def __init__(self, reference_point):
-        Performance.__init__(self)
+        Indicator.__init__(self)
         self.reference_point = reference_point
 
     def _calc(self, F):

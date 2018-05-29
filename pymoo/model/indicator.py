@@ -3,7 +3,7 @@ import abc
 import numpy as np
 
 
-class Performance:
+class Indicator:
 
     def __init__(self):
         self.default_if_empty = 0.0
