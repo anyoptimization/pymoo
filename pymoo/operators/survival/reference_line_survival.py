@@ -27,8 +27,8 @@ class ReferenceLineSurvival(Survival):
         # filter the front to only relevant entries
         pop.filter(survival + front)
         survival = list(range(0, len(survival)))
-        last_front = np.arrange(len(survival), pop.size())
-        remaining_index = np.arrange(0, len(last_front))
+        last_front = np.arange(len(survival), pop.size())
+        remaining_index = np.arange(0, len(last_front))
 
         N = normalize_by_asf_interceptions(pop.F, return_bounds=False)
         #N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
