@@ -4,6 +4,7 @@ from matplotlib import animation
 import matplotlib.pyplot as plt
 import numpy as np
 
+from pymoo.algorithms.NSGAIII import NSGAIII
 
 if __name__ == '__main__':
 
@@ -12,8 +13,8 @@ if __name__ == '__main__':
     problem = ZDT1(n_var=30)
 
     # create the algorithm instance by specifying the intended parameters
-    from pymoo.algorithms.NSGAII import NSGAII
-    algorithm = NSGAII("real", pop_size=100, verbose=True)
+    from pymoo.algorithms.NSGAIII import NSGAIII
+    algorithm = NSGAIII("real", pop_size=100, verbose=True)
 
     start_time = time.time()
 

@@ -1,6 +1,5 @@
 import numpy as np
 from numpy.linalg import LinAlgError
-from pymoo.configuration import Configuration
 
 
 def denormalize(x, x_min, x_max):

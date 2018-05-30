@@ -28,18 +28,19 @@ class ReferenceLineSurvival(Survival):
         pop.filter(survival + front)
         survival = list(range(0, len(survival)))
         last_front = np.arange(len(survival), pop.size())
-        remaining_index = np.arange(0, len(last_front))
+
 
         N = normalize_by_asf_interceptions(pop.F, return_bounds=False)
         #N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
         #N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
 
-        dist_matrix = calc_perpendicular_dist_matrix(N, self.ref_dirs)
+
 
         # if the last front needs to be splitted
         n_remaining = n_survive - len(survival)
         if n_remaining > 0:
 
+            dist_matrix = calc_perpendicular_dist_matrix(N, self.ref_dirs)
             niche_of_individuals = np.argmin(dist_matrix, axis=1)
             min_dist_matrix = dist_matrix[np.arange(len(dist_matrix)), niche_of_individuals]
 
@@ -48,13 +49,20 @@ class ReferenceLineSurvival(Survival):
             for i in niche_of_individuals[survival]:
                 niche_count[i] += 1
 
+
+
+            # relative index now to dist and the niches
+            min_dist_matrix = min_dist_matrix[last_front]
+            niche_of_individuals = niche_of_individuals[last_front]
+
+            # boolean array of elements that survive if true
+            survival_last_front = np.full(len(last_front), False)
+
+
             while n_remaining > 0:
 
-                # get all remaining individuals from the last front
-                last_front_remaining = last_front[remaining_index]
-
                 # all niches where new individuals can be assigned to
-                next_niches_list = np.unique(niche_of_individuals[last_front_remaining])
+                next_niches_list = np.unique(niche_of_individuals[np.logical_not(survival_last_front)])
 
                 # pick a niche with minimum assigned individuals - break tie if necessary
                 next_niche_count = niche_count[next_niches_list]
@@ -63,7 +71,8 @@ class ReferenceLineSurvival(Survival):
                 next_niche = next_niches_list[next_niche]
 
                 # indices of individuals in last front to assign niche to
-                next_ind = np.where(niche_of_individuals[last_front_remaining] == next_niche)[0]
+                next_ind = np.where(niche_of_individuals[np.logical_not(survival_last_front)] == next_niche)[0]
+                next_ind = np.where(np.logical_not(survival_last_front))[0][next_ind]
 
                 if len(next_ind) == 1:
                     next_ind = next_ind[0]
@@ -72,10 +81,11 @@ class ReferenceLineSurvival(Survival):
                 else:
                     next_ind = next_ind[random.randint(0, len(next_ind))]
 
-                survival.append(last_front[next_ind])
-                remaining_index.remove(next_ind)
+                survival_last_front[next_ind] = True
                 niche_count[next_niche] += 1
                 n_remaining -= 1
+
+            survival.extend(last_front[survival_last_front])
 
         if return_only_index:
             return survival
