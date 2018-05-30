@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
             # get the bounds for plotting and add padding
             min = np.min(_F, axis=0) - 0.1
-            max = np.max(_F, axis=0) + 0.
+            max = np.max(_F, axis=0) + 0.1
 
             # set the scatter object with padding
             ax.set_xlim(min[0], max[0])
