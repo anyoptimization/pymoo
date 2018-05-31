@@ -42,6 +42,16 @@ def get_number_of_reference_directions(n_obj, n_sections):
     return int(special.binom(n_obj + n_sections - 1, n_sections))
 
 
+def get_ref_dirs_from_points(n_obj):
+
+    extreme_reference_points = np.eye(n_obj)
+
+    ref_points = np.array([[0.2, 0.4], [0.8, 0.4]])
+
+    ref_points = np.append(ref_points, extreme_reference_points, axis=0)
+
+    return ref_points
+
 
 if __name__ == '__main__':
 
