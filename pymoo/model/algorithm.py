@@ -77,6 +77,9 @@ class Algorithm:
         if not isinstance(evaluator, Evaluator):
             evaluator = Evaluator(evaluator)
 
+        # run the initialization method first
+        self._initialize(problem)
+
         # call the algorithm to solve the problem
         X, F, G = self._solve(problem, evaluator)
 
@@ -100,3 +103,9 @@ class Algorithm:
     @abstractmethod
     def _solve(self, problem, evaluator):
         pass
+
+    def _initialize(self, problem):
+        pass
+
+
+

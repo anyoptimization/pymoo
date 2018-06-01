@@ -1,9 +1,10 @@
 import numpy as np
 from scipy import special
 
+from pymoo.rand import random
+
 
 def get_ref_dirs_from_section(n_obj, n_sections):
-
     if n_obj == 1:
         return np.array([1.0])
 
@@ -16,10 +17,25 @@ def get_ref_dirs_from_section(n_obj, n_sections):
 
 
 # returns the closest possible number of references lines to given one
-def get_ref_dirs_from_n(n_obj, n_refs, max_sections=100):
-    n_sections = np.array([get_number_of_reference_directions(n_obj, i) for i in range(max_sections)])
-    idx = np.argmin((n_sections < n_refs).astype(np.int))
-    return get_ref_dirs_from_section(n_obj, idx-1)
+def get_ref_dirs_from_n(n_obj, n_refs, fill_up_with_random_weights=True, max_sections=100):
+    if n_obj < 2:
+        raise Exception("No Decomposition possible!")
+    elif n_obj == 2:
+        refs = np.linspace(1, 0, n_refs)[:, None]
+        ref_dirs = np.concatenate([refs, 1 - refs], axis=1)
+    elif n_obj > 2:
+        n_sections = np.array([get_number_of_reference_directions(n_obj, i) for i in range(max_sections)])
+        idx = np.argmin((n_sections < n_refs).astype(np.int))
+        ref_dirs = get_ref_dirs_from_section(n_obj, idx - 1)
+
+    # add up random ref dirs if uniform did not provide exactly n_refs
+    if fill_up_with_random_weights and ref_dirs.shape[0] < n_refs:
+        ref_dirs = np.concatenate([ref_dirs, random.random((n_refs - ref_dirs.shape[0], n_obj))])
+
+    # add a small eps for numerical stability
+    ref_dirs[ref_dirs == 0] = 0.00000001
+
+    return ref_dirs
 
 
 def ref_recursive(v, sections, level, max_level, result):
@@ -40,7 +56,6 @@ def ref_recursive(v, sections, level, max_level, result):
 
 def get_number_of_reference_directions(n_obj, n_sections):
     return int(special.binom(n_obj + n_sections - 1, n_sections))
-
 
 
 if __name__ == '__main__':

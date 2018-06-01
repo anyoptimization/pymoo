@@ -124,6 +124,8 @@ The non-dominated sorting considers the rank determined by being in the ith fron
 **NSGA-III** [2][3]: A referenced-based algorithm used to solve many-objective problems. 
 The survival selection uses the perpendicular distance to the reference directions. As normalization the boundary intersection method is used [5].
 
+**MOEAD/D** [6]: The classical MOEAD/D implementation using the Tchebichew decomposition function.
+
 ## Methods
 
 **Simulated Binary Crossover** [4]: This crossover simulates a single-point crossover in a binary representation by using an exponential distribution for real values. The polynomial mutation is defined accordingly which performs basically a binary bitflip for real numbers.
@@ -147,6 +149,8 @@ doi: 10.1109/TEVC.2013.2281535
 [4] Kalyanmoy Deb, Karthik Sindhya, and Tatsuya Okabe. 2007. Self-adaptive simulated binary crossover for real-parameter optimization. In Proceedings of the 9th annual conference on Genetic and evolutionary computation (GECCO '07). ACM, New York, NY, USA, 1187-1194.
 
 [5] Indraneel Das and J. E. Dennis. 1998. Normal-Boundary Intersection: A New Method for Generating the Pareto Surface in Nonlinear Multicriteria Optimization Problems. SIAM J. on Optimization 8, 3 (March 1998), 631-657.
+
+[6] Q. Zhang and H. Li, "MOEA/D: A Multiobjective Evolutionary Algorithm Based on Decomposition," in IEEE Transactions on Evolutionary Computation, vol. 11, no. 6, pp. 712-731, Dec. 2007.
 
 # Contact
 

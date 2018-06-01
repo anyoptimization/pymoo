@@ -49,7 +49,7 @@ class ReferenceLineSurvival(Survival):
             dist_to_niche = dist_to_niche[last_front]
             niche_of_individuals = niche_of_individuals[last_front]
 
-            # boolean array of elements that survive if true
+            # boolean array of elements that are considered for each iteration
             remaining_last_front = np.full(len(last_front), True)
 
             while n_remaining > 0:
@@ -63,7 +63,7 @@ class ReferenceLineSurvival(Survival):
                 next_niche = next_niche[random.randint(0, len(next_niche))]
                 next_niche = next_niches_list[next_niche]
 
-                # indices of individuals in last front to assign niche to
+                # indices of individuals that are considered and assign to next_niche
                 next_ind = np.where(np.logical_and(niche_of_individuals == next_niche, remaining_last_front))[0]
 
                 if len(next_ind) == 1:

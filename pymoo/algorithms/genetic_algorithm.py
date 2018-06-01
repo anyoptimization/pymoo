@@ -73,8 +73,6 @@ class GeneticAlgorithm(Algorithm):
 
     def _solve(self, problem, evaluator):
 
-        self._initialize(problem)
-
         # create the population according to the factoring strategy
         pop = Population()
         if isinstance(self.sampling, np.ndarray):
@@ -142,10 +140,5 @@ class GeneticAlgorithm(Algorithm):
                  'X': np.copy(pop.X),
                  'F': np.copy(pop.F)
                  })
-
-    def _initialize(self, problem):
-        pass
-
-
 
 
