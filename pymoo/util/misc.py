@@ -45,6 +45,7 @@ def normalize_by_asf_interceptions(x, return_bounds=False):
     try:
         b = np.ones(n_obj)
         A = np.linalg.solve(S, b)
+        A[A==0] = 0.000001
         A = 1 / A
         A = A.T
     except LinAlgError:
@@ -82,4 +83,3 @@ def save_hist(pathToFile, data):
 
     np.savetxt(pathToFile, hist, fmt='%.14f')
     print(pathToFile)
-

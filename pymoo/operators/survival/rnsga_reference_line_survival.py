@@ -8,10 +8,10 @@ from pymoo.util.non_dominated_rank import NonDominatedRank
 
 
 class ReferenceLineSurvival(Survival):
-    def __init__(self, ref_dirs):
+    def __init__(self, ref_dirs, epsilon):
         super().__init__()
         self.ref_dirs = ref_dirs
-        self.epsilon = 0.001
+        self.epsilon = epsilon
 
     def _do(self, pop, n_survive, data, return_only_index=False):
 
@@ -34,8 +34,6 @@ class ReferenceLineSurvival(Survival):
 
         N = normalize_by_asf_interceptions(pop.F, return_bounds=False)
         #N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
-        #N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
-
 
         # if the last front needs to be splitted
         n_remaining = n_survive - len(survival)
@@ -43,9 +41,10 @@ class ReferenceLineSurvival(Survival):
 
         if n_remaining > 0:
 
-            dist_matrix = cdist(N, self.ref_dirs)
-            point_distance_matrix = cdist(N[last_front, :], N[last_front, :])
-
+            # dist_matrix = calc_perpendicular_dist_matrix(N, self.ref_dirs)
+            dist_matrix = calc_ref_dist_matrix(pop.F, self.ref_dirs)
+            # point_distance_matrix = cdist(N[last_front, :], N[last_front, :])
+            point_distance_matrix = calc_ref_dist_matrix(pop.F[last_front, :], pop.F[last_front, :])
             niche_of_individuals = np.argmin(dist_matrix, axis=1)
             min_dist_matrix = dist_matrix[np.arange(len(dist_matrix)), niche_of_individuals]
 
@@ -112,19 +111,21 @@ def calc_perpendicular_dist(v, u):
     return np.linalg.norm(proj - v)
 
 
-def calc_perpendicular_dist_matrix_slow(N, ref_dirs):
-    return cdist(N, ref_dirs, metric=calc_perpendicular_dist)
+def calc_ref_dist_matrix_slow(F, ref_dirs):
+    F_min, F_max = F.min(axis=0), F.max(axis=0)
+    w = np.full(F.shape[1], 1 / F.shape[1])
+    def calc_dist_matrix(f, r):
+        return np.sqrt(np.sum(w*((f-r)/(F_max-F_min))**2))
 
+    return cdist(F, ref_dirs, metric=calc_dist_matrix)
 
-def calc_perpendicular_dist_matrix(N, ref_dirs):
-    u = np.tile(ref_dirs, (len(N), 1))
-    v = np.repeat(N, len(ref_dirs), axis=0)
+def calc_ref_dist_matrix(F, ref_dirs):
+    F_min, F_max = F.min(axis=0), F.max(axis=0)
+    w = np.full(F.shape[1], 1 / F.shape[1])
 
-    norm_u = np.linalg.norm(u, axis=1)
+    r = np.tile(ref_dirs, (len(F), 1))
+    f = np.repeat(F, len(ref_dirs), axis=0)
 
-    scalar_proj = np.sum(v * u, axis=1) / norm_u
-    proj = scalar_proj[:, None] * u / norm_u[:, None]
-    val = np.linalg.norm(proj - v, axis=1)
-    matrix = np.reshape(val, (len(N), len(ref_dirs)))
-
+    matrix = np.sqrt(np.sum(w * ((f - r) / (F_max - F_min)) ** 2, axis=1))
+    matrix  = np.reshape(matrix, (len(F), len(ref_dirs)))
     return matrix

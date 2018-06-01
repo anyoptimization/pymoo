@@ -19,7 +19,9 @@ def get_ref_dirs_from_section(n_obj, n_sections):
 def get_ref_dirs_from_n(n_obj, n_refs, max_sections=100):
     n_sections = np.array([get_number_of_reference_directions(n_obj, i) for i in range(max_sections)])
     idx = np.argmin((n_sections < n_refs).astype(np.int))
-    return get_ref_dirs_from_section(n_obj, idx-1)
+    M = get_ref_dirs_from_section(n_obj, idx-1)
+    M[M==0] = 0.000001
+    return M
 
 
 def ref_recursive(v, sections, level, max_level, result):
@@ -42,14 +44,11 @@ def get_number_of_reference_directions(n_obj, n_sections):
     return int(special.binom(n_obj + n_sections - 1, n_sections))
 
 
-def get_ref_dirs_from_points(n_obj):
+def get_ref_dirs_from_points(points, n_obj):
 
     extreme_reference_points = np.eye(n_obj)
 
-    ref_points = np.array([[0.2, 0.4], [0.8, 0.4]])
-
-    ref_points = np.append(ref_points, extreme_reference_points, axis=0)
-
+    ref_points = np.append(points, extreme_reference_points, axis=0)
     return ref_points
 
 
