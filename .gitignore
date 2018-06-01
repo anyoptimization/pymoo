@@ -6,6 +6,7 @@ __pycache__/
 *$py.class
 
 *.mp4
+*.out
 
 .DS_Store
 
