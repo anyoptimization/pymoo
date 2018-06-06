@@ -127,5 +127,5 @@ def calc_ref_dist_matrix(F, ref_dirs):
     f = np.repeat(F, len(ref_dirs), axis=0)
 
     matrix = np.sqrt(np.sum(w * ((f - r) / (F_max - F_min)) ** 2, axis=1))
-    matrix  = np.reshape(matrix, (len(F), len(ref_dirs)))
+    matrix = np.reshape(matrix, (len(F), len(ref_dirs)))
     return matrix
