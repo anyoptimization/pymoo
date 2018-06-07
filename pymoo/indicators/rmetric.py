@@ -8,6 +8,14 @@ from pymoo.util.non_dominated_rank import NonDominatedRank
 
 class RMetric(Indicator):
     def __init__(self, curr_pop, whole_pop, ref_points, problem, w=None):
+        """
+        RMetric Constructor
+        :param curr_pop: numpy array: Population from algorithm being evaluated
+        :param whole_pop: numpy array: Whole population of all algorithms
+        :param ref_points: numpy array: list of reference points
+        :param problem: problem: problem
+        :param w: numpy array: weights for each objective
+        """
         Indicator.__init__(self)
         self.curr_pop = curr_pop
         self.whole_pop = whole_pop
@@ -85,6 +93,13 @@ class RMetric(Indicator):
 
 
     def _trim(self, pop, centeroid, range=0.2):
+        """
+        Box trimming
+        :param pop:
+        :param centeroid:
+        :param range:
+        :return:
+        """
         popsize, objDim = pop.shape
         diff_matrix = pop - np.tile(centeroid,(popsize, 1))[0]
         flags = np.sum(abs(diff_matrix) < range/2, axis=1)
@@ -92,12 +107,22 @@ class RMetric(Indicator):
         return filtered_matrix
 
     def _trim_fast(self, pop, centeroid, range=0.2):
+        """
+        Euclidean trimming
+        :param pop:
+        :param centeroid:
+        :param range:
+        :return:
+        """
         centeroid_matrix = cdist(pop, centeroid, metric='euclidean')
         filtered_matrix = pop[np.where(centeroid_matrix < range/2), :][0]
         return filtered_matrix
 
     def calc(self):
-
+        """
+        This method calculates the R-IGD and R-HV based off of the population that was provided
+        :return: R-IGD and R-HV
+        """
         translated = []
         final_PF = []
 
@@ -142,14 +167,18 @@ class RMetric(Indicator):
 
             nadir_point = np.amax(self.w_points, axis=0)
             front = translated
+            dim = self.ref_points[0].shape[0]
+            if dim <=3:
+                #Python
+                from pymoo.indicators.hv import HyperVolume
+                hv = HyperVolume(nadir_point)
+                volume = hv.compute(front)
+            else:
+                # cpp
+                from pymoo.cpp.hypervolume.build import hypervolume
 
-            # volume = hypervolume(front, nadir_point)
-            # pop_ = pygmo.population(prob=pygmo.dtlz(prob_id=2), dim=14, fdim=5)
+                volume = hypervolume.calculate(dim, len(front), front, nadir_point)
 
-            # hv = pygmo.hypervolume(pop=pop_)
-            # volume = hv.compute(nadir_point)
-            # hv = HyperVolume(nadir_point)
-            # volume = hv.compute(front)
 
         return igd, volume
 
@@ -167,6 +196,7 @@ def kmeans(data, k):
 
     return labels
 
+# Matlab code PF calculation method
 def calc_PF(problem_id, sample_size=10000, objDim=None):
     # ZDT 1
     if problem_id == 1:
