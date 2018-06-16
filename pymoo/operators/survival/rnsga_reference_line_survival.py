@@ -8,10 +8,11 @@ from pymoo.util.non_dominated_rank import NonDominatedRank
 
 
 class ReferenceLineSurvival(Survival):
-    def __init__(self, ref_dirs, epsilon):
+    def __init__(self, ref_points, epsilon, weights):
         super().__init__()
-        self.ref_dirs = ref_dirs
+        self.ref_points = ref_points
         self.epsilon = epsilon
+        self.weights = weights
 
     def _do(self, pop, n_survive, data, return_only_index=False):
 
@@ -26,30 +27,38 @@ class ReferenceLineSurvival(Survival):
             survival.extend(front)
 
         # filter the front to only relevant entries
-        pop.filter(survival + front)
+        # pop.filter(survival + front)
         survival = list(range(0, len(survival)))
         last_front = np.arange(len(survival), pop.size())
         # Indices of last front members that survived
         survived = []
 
-        N = normalize_by_asf_interceptions(pop.F, return_bounds=False)
-        #N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
+        # N = normalize_by_asf_interceptions(pop.F, return_bounds=False)
+        # N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
 
         # if the last front needs to be splitted
         n_remaining = n_survive - len(survival)
 
 
+
         if n_remaining > 0:
 
             # dist_matrix = calc_perpendicular_dist_matrix(N, self.ref_dirs)
-            dist_matrix = calc_ref_dist_matrix(pop.F, self.ref_dirs)
+            F_bar = map_linear(pop.F, pop.F)
+            Z_bar = map_linear(self.ref_points, pop.F)
+            dist_matrix = calc_ref_dist_matrix(F_bar, Z_bar, self.weights)
+            point_distance_matrix = calc_ref_dist_matrix(F_bar[last_front, :], F_bar[last_front, :], self.weights)
+
+            # dist_matrix = calc_ref_dist_matrix(pop.F, self.ref_points, self.weights)
+            # point_distance_matrix = calc_ref_dist_matrix(pop.F[last_front, :], pop.F[last_front, :], self.weights)
+
             # point_distance_matrix = cdist(N[last_front, :], N[last_front, :])
-            point_distance_matrix = calc_ref_dist_matrix(pop.F[last_front, :], pop.F[last_front, :])
+
             niche_of_individuals = np.argmin(dist_matrix, axis=1)
             min_dist_matrix = dist_matrix[np.arange(len(dist_matrix)), niche_of_individuals]
 
             # for each reference direction the niche count
-            niche_count = np.zeros(len(self.ref_dirs))
+            niche_count = np.zeros(len(self.ref_points))
             for i in niche_of_individuals[survival]:
                 niche_count[i] += 1
 
@@ -103,6 +112,13 @@ class ReferenceLineSurvival(Survival):
 
         return pop
 
+def map_linear(xa, xb):
+    f_min = xb.min(axis=0)
+    f_max = xb.max(axis=0)
+    # f_max = np.ones(len(f_min))
+    return (xa - f_min)/(f_max-f_min)
+
+
 
 def calc_perpendicular_dist(v, u):
     norm_u = np.linalg.norm(u)
@@ -119,13 +135,24 @@ def calc_ref_dist_matrix_slow(F, ref_dirs):
 
     return cdist(F, ref_dirs, metric=calc_dist_matrix)
 
-def calc_ref_dist_matrix(F, ref_dirs):
-    F_min, F_max = F.min(axis=0), F.max(axis=0)
-    w = np.full(F.shape[1], 1 / F.shape[1])
+def calc_ref_dist_matrix(F, ref_dirs, weights, F_min=None, F_max=None):
+    if F_min is None:
+        F_min = F.min(axis=0)
+    if F_max is None:
+        F_max = F.max(axis=0)
+    if weights is None:
+        weights = np.full(F.shape[1], 1 / F.shape[1])
+
 
     r = np.tile(ref_dirs, (len(F), 1))
     f = np.repeat(F, len(ref_dirs), axis=0)
 
-    matrix = np.sqrt(np.sum(w * ((f - r) / (F_max - F_min)) ** 2, axis=1))
+    # if not np.array_equal(F_max, F_min):
+    #     matrix = np.sqrt(np.sum(weights * ((f - r) / (F_max - F_min)) ** 2, axis=1))
+    # else:
+    #     matrix = np.sqrt(np.sum(weights * (f - r) ** 2, axis=1))
+
+    # matrix = np.sqrt(np.sum(weights * ((f - r) / (F_max - F_min)) ** 2, axis=1))
+    matrix = np.sqrt(np.sum((f - r) ** 2, axis=1))
     matrix = np.reshape(matrix, (len(F), len(ref_dirs)))
     return matrix
