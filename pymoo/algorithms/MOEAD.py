@@ -14,19 +14,24 @@ class MOEAD(Algorithm):
                  pop_size=100,
                  n_neighbors=20,
                  sampling=RealRandomSampling(),
-                 crossover=DifferentalEvolutionCrossover(p_xover=0.3, scale=0.2),
                  mutation=PolynomialMutation(),
+                 CR = 0.5,
+                 F = 1,
                  verbose=False,
                  callback=None):
         super().__init__()
 
         self.pop_size = pop_size
         self.sampling = sampling
-        self.crossover = crossover
+
         self.mutation = mutation
         self.verbose = verbose
         self.callback = callback
         self.n_neighbors = n_neighbors
+
+        # the crossover is predefined
+        self.CR = CR
+        self.crossover = DifferentalEvolutionCrossover(p_xover=1.0, scale=F, repair=True)
 
         # initialized when problem is known
         self.weights = None
@@ -60,6 +65,10 @@ class MOEAD(Algorithm):
 
                 # do recombination and create an offspring
                 off_X = self.crossover.do(problem, X[parents, :])
+                r = random.random(problem.n_var) > self.CR
+                off_X[:,r] = X[i, r]
+
+                # do the mutation
                 off_X = self.mutation.do(problem, off_X)
 
                 # evaluate the offspring

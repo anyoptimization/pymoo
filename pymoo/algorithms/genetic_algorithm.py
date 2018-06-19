@@ -105,7 +105,6 @@ class GeneticAlgorithm(Algorithm):
 
             n_off = 0
             n_parents = self.crossover.n_parents
-            n_children = self.crossover.n_children
 
             while n_off < self.n_offsprings:
                 parents = self.selection.next(n_parents)

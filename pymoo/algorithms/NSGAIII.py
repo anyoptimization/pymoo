@@ -19,7 +19,8 @@ class NSGAIII(GeneticAlgorithm):
 
             # if ref dirs are not initialized do it based on the population size
             if self.ref_dirs is None:
-                self.ref_dirs = get_ref_dirs_from_n(problem.n_obj, self.pop_size)
+                #self.ref_dirs = get_uniform_weights(self.pop_size, problem.n_obj, None, max_sections=1000)
+                self.ref_dirs = get_ref_dirs_from_n(problem.n_obj, self.pop_size, max_sections=300)
 
             # set the survival method itself
             self.survival = ReferenceLineSurvival(self.ref_dirs)
