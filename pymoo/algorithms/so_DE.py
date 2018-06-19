@@ -10,17 +10,16 @@ class DifferentialEvolution(Algorithm):
     def __init__(self,
                  pop_size=100,
                  sampling=RealRandomSampling(),
-                 crossover=DifferentialEvolutionCrossover(F_CR=1, F=0.85, variant="DE/rand/1", method="binomial"),
-                 verbose=False,
-                 callback=None):
-        super().__init__()
+                 crossover=DifferentialEvolutionCrossover(prob=0.5, weight=0.75, variant="DE/best/1",
+                                                          method="binomial"),
+                 **kwargs):
+
+        super().__init__(**kwargs)
 
         self.pop_size = pop_size
         self.sampling = sampling
         self.crossover = crossover
         self.best_i = None
-        self.verbose = verbose
-        self.callback = callback
 
     def _solve(self, problem, evaluator):
 
@@ -38,7 +37,7 @@ class DifferentialEvolution(Algorithm):
 
             P = np.reshape(np.concatenate([random.perm(self.pop_size) for _ in range(self.crossover.n_parents)]),
                            (-1, self.crossover.n_parents))
-            off_X = self.crossover.do(problem, X[P, :], X=X)
+            off_X = self.crossover.do(problem, X[P, :], X=X, best_i=self.best_i)
 
             # evaluate the offsprings
             off_F, _ = evaluator.eval(problem, off_X)

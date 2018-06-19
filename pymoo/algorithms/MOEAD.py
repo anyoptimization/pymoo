@@ -15,23 +15,17 @@ class MOEAD(Algorithm):
                  n_neighbors=20,
                  sampling=RealRandomSampling(),
                  mutation=PolynomialMutation(),
-                 CR = 0.5,
-                 F = 1,
-                 verbose=False,
-                 callback=None):
-        super().__init__()
+                 crossover=DifferentialEvolutionCrossover(),
+                 **kwargs):
+
+        super().__init__(**kwargs)
 
         self.pop_size = pop_size
         self.sampling = sampling
 
+        self.crossover = crossover
         self.mutation = mutation
-        self.verbose = verbose
-        self.callback = callback
         self.n_neighbors = n_neighbors
-
-        # the crossover is predefined
-        self.CR = CR
-        self.crossover = DifferentialEvolutionCrossover()
 
         # initialized when problem is known
         self.weights = None

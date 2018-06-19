@@ -1,26 +1,19 @@
 import time
 
+from matplotlib import animation
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import animation
 
-from pymoo.algorithms.MOEAD import MOEAD
-from pymoo.algorithms.NSGAII import NSGAII
-from pymoo.algorithms.NSGAIII import NSGAIII
-from pymoo.algorithms.so_DE import DifferentialEvolution
-from pymop.rastrigin import Rastrigin
-from pymop.zdt import ZDT1
 
 if __name__ == '__main__':
 
+    # load the problem instance
+    from pymop.zdt import ZDT1
+    problem = ZDT1(n_var=30)
 
-    problem = Rastrigin()
-    #problem = ZDT1()
-
-    algorithm = DifferentialEvolution(verbose=True)
-    #algorithm = NSGAII("real", verbose=True)
-    #algorithm = NSGAIII("real", verbose=True)
-    #algorithm = MOEAD(verbose=True)
+    # create the algorithm instance by specifying the intended parameters
+    from pymoo.algorithms.NSGAII import NSGAII
+    algorithm = NSGAII("real", pop_size=100, verbose=True)
 
     start_time = time.time()
 
@@ -40,8 +33,6 @@ if __name__ == '__main__':
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    print(F)
-
     scatter_plot = True
     save_animation = False
 
@@ -50,13 +41,12 @@ if __name__ == '__main__':
     is_3d = problem.n_obj == 3
 
     if scatter_plot and is_2d:
-        pf = problem.pareto_front()
-        plt.scatter(pf[:, 0], pf[:, 1], label='Pareto Front', s=60, facecolors='none', edgecolors='r')
-        plt.scatter(F[:, 0], F[:, 1], color='b')
+        plt.scatter(F[:, 0], F[:, 1])
         plt.show()
 
     if scatter_plot and is_3d:
         fig = plt.figure()
+        from mpl_toolkits.mplot3d import Axes3D
         ax = fig.add_subplot(111, projection='3d')
         ax.scatter(F[:, 0], F[:, 1], F[:, 2])
         plt.show()
@@ -79,7 +69,7 @@ if __name__ == '__main__':
 
             # get the bounds for plotting and add padding
             min = np.min(_F, axis=0) - 0.1
-            max = np.max(_F, axis=0) + 0.1
+            max = np.max(_F, axis=0) + 0.
 
             # set the scatter object with padding
             ax.set_xlim(min[0], max[0])
@@ -87,7 +77,7 @@ if __name__ == '__main__':
 
 
         # create the animation
-        ani = animation.FuncAnimation(fig, update, frames=len(history))
+        ani = animation.FuncAnimation(fig, update, frames=range(n_gen))
 
         # write the file
         Writer = animation.writers['ffmpeg']

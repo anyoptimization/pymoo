@@ -16,13 +16,22 @@ class Algorithm:
 
     """
 
+    def __init__(self,
+                 verbose=False,
+                 callback=None
+                 ):
+        self.verbose = verbose
+        self.callback = callback
+
+
     def solve(self,
               problem,
               evaluator,
               seed=1,
               return_only_feasible=True,
               return_only_non_dominated=True,
-              history=None):
+              history=None,
+              ):
         """
 
         Solve a given problem by a given evaluator. The evaluator determines the termination condition and
@@ -92,7 +101,7 @@ class Algorithm:
                     G = G[cv <= 0, :]
 
         if return_only_non_dominated:
-            idx_non_dom = NonDominatedRank.calc_as_fronts(F,G)[0]
+            idx_non_dom = NonDominatedRank.calc_as_fronts(F, G)[0]
             X = X[idx_non_dom, :]
             F = F[idx_non_dom, :]
             if G is not None:
@@ -106,6 +115,3 @@ class Algorithm:
 
     def _initialize(self, problem):
         pass
-
-
-
