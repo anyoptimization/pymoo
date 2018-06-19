@@ -4,16 +4,20 @@ from matplotlib import animation
 import matplotlib.pyplot as plt
 import numpy as np
 
+from pymoo.algorithms.so_DE import DifferentialEvolution
+from pymop.rastrigin import Rastrigin
 
 if __name__ == '__main__':
 
     # load the problem instance
     from pymop.zdt import ZDT1
     problem = ZDT1(n_var=30)
+    problem = Rastrigin(n_var=30)
 
     # create the algorithm instance by specifying the intended parameters
     from pymoo.algorithms.NSGAII import NSGAII
     algorithm = NSGAII("real", pop_size=100, verbose=True)
+    algorithm = DifferentialEvolution(pop_size=100, verbose=True)
 
     start_time = time.time()
 

@@ -4,6 +4,7 @@ from pymoo.model.algorithm import Algorithm
 from pymoo.operators.crossover.real_differental_evolution_crossover import DifferentialEvolutionCrossover
 from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
 from pymoo.rand import random
+from pymoo.util.misc import parameter_less_constraints
 
 
 class DifferentialEvolution(Algorithm):
@@ -30,7 +31,8 @@ class DifferentialEvolution(Algorithm):
             X = self.sampling.sample(problem, self.pop_size, self)
 
         # evaluate and find ideal point
-        F, _ = evaluator.eval(problem, X)
+        F, CV = evaluator.eval(problem, X)
+        F = parameter_less_constraints(F, CV)
         self.best_i = np.argmin(F)
 
         while evaluator.has_next():
@@ -40,7 +42,8 @@ class DifferentialEvolution(Algorithm):
             off_X = self.crossover.do(problem, X[P, :], X=X, best_i=self.best_i)
 
             # evaluate the offsprings
-            off_F, _ = evaluator.eval(problem, off_X)
+            off_F, off_CV = evaluator.eval(problem, off_X, return_constraints=2)
+            off_F = parameter_less_constraints(off_F, off_CV)
 
             # replace if better
             off_is_better = np.where(off_F < F)[0]

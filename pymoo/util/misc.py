@@ -88,3 +88,11 @@ def repair(X, xl, xu):
     X[0, smaller_than_xl] = xl[smaller_than_xl]
 
     return X
+
+
+def parameter_less_constraints(F, CV, F_max=None):
+    if F_max is None:
+        F_max = np.max(F)
+    has_constraint_violation = CV > 0
+    F[has_constraint_violation] = CV[has_constraint_violation] + F_max
+    return F

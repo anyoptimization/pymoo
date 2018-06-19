@@ -15,6 +15,31 @@ pip install pymoo
 
 
 
+# Implementations
+
+
+## Algorithms
+
+**Genetic Algorithm**: A simple genetic algorithm to solve single-objective problems. 
+
+**NSGA-II** [1]: Non-dominated sorting genetic algorithm for bi-objective problems. The mating selection is done using the binary tournament by comparing the rank and the crowding distance. 
+The crowding distance is a niching measure in a two-dimensional space which sums up the difference to the neighbours in each dimension.
+The non-dominated sorting considers the rank determined by being in the ith front and the crowding distance to achieve a good diversity when converging.
+
+**NSGA-III** [2][3]: A referenced-based algorithm used to solve many-objective problems. 
+The survival selection uses the perpendicular distance to the reference directions. As normalization the boundary intersection method is used [5].
+
+**MOEAD/D** [6]: The classical MOEAD/D implementation using the Tchebichew decomposition function.
+
+**Differential Evolution**  [7]: The classical single-objective differential evolution algorithm where different crossover variations and methods can be defined. It is known for its good results for effective global optimization.
+
+## Methods
+
+**Simulated Binary Crossover** [4]: This crossover simulates a single-point crossover in a binary representation by using an exponential distribution for real values. The polynomial mutation is defined accordingly which performs basically a binary bitflip for real numbers.
+
+
+
+
 # Usage
 
 
@@ -110,30 +135,6 @@ if __name__ == '__main__':
 
 
 
-# Implementations
-
-
-## Algorithms
-
-**Genetic Algorithm**: A simple genetic algorithm to solve single-objective problems. 
-
-**NSGA-II** [1]: Non-dominated sorting genetic algorithm for bi-objective problems. The mating selection is done using the binary tournament by comparing the rank and the crowding distance. 
-The crowding distance is a niching measure in a two-dimensional space which sums up the difference to the neighbours in each dimension.
-The non-dominated sorting considers the rank determined by being in the ith front and the crowding distance to achieve a good diversity when converging.
-
-**NSGA-III** [2][3]: A referenced-based algorithm used to solve many-objective problems. 
-The survival selection uses the perpendicular distance to the reference directions. As normalization the boundary intersection method is used [5].
-
-**MOEAD/D** [6]: The classical MOEAD/D implementation using the Tchebichew decomposition function.
-
-## Methods
-
-**Simulated Binary Crossover** [4]: This crossover simulates a single-point crossover in a binary representation by using an exponential distribution for real values. The polynomial mutation is defined accordingly which performs basically a binary bitflip for real numbers.
-
-
-# Structure
-
-
 
 
 # References
@@ -151,6 +152,8 @@ doi: 10.1109/TEVC.2013.2281535
 [5] Indraneel Das and J. E. Dennis. 1998. Normal-Boundary Intersection: A New Method for Generating the Pareto Surface in Nonlinear Multicriteria Optimization Problems. SIAM J. on Optimization 8, 3 (March 1998), 631-657.
 
 [6] Q. Zhang and H. Li, "MOEA/D: A Multiobjective Evolutionary Algorithm Based on Decomposition," in IEEE Transactions on Evolutionary Computation, vol. 11, no. 6, pp. 712-731, Dec. 2007.
+
+[7] Kenneth Price, Rainer M. Storn, and Jouni A. Lampinen. 2005. Differential Evolution: A Practical Approach to Global Optimization (Natural Computing Series). Springer-Verlag, Berlin, Heidelberg.
 
 # Contact
 
