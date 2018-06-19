@@ -44,7 +44,8 @@ class ReferencePointSurvival(Survival):
             # dist_matrix = calc_perpendicular_dist_matrix(N, self.ref_dirs)
             dist_matrix = calc_ref_dist_matrix(pop.F, self.ref_points, F_min, F_max, weights=self.weights)
             # point_distance_matrix = cdist(N[last_front, :], N[last_front, :])
-            point_distance_matrix = calc_ref_dist_matrix(pop.F[last_front, :], pop.F[last_front, :], F_min, F_max, weights=self.weights)
+            point_distance_matrix = calc_ref_dist_matrix(pop.F[last_front, :], pop.F[last_front, :], F_min, F_max,
+                                                         weights=self.weights)
             niche_of_individuals = np.argmin(dist_matrix, axis=1)
             min_dist_matrix = dist_matrix[np.arange(len(dist_matrix)), niche_of_individuals]
 
@@ -104,18 +105,7 @@ class ReferencePointSurvival(Survival):
         return pop
 
 
-def calc_ref_dist_matrix_slow(F, ref_points):
-    F_min, F_max = F.min(axis=0), F.max(axis=0)
-    w = np.full(F.shape[1], 1 / F.shape[1])
-
-    def calc_dist_matrix(f, r):
-        return np.sqrt(np.sum(w * ((f - r) / (F_max - F_min)) ** 2))
-
-    return cdist(F, ref_points, metric=calc_dist_matrix)
-
-
 def calc_ref_dist_matrix(F, ref_points, F_min, F_max, weights=None):
-
     if weights is None:
         weights = np.full(F.shape[1], 1 / F.shape[1])
 

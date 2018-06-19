@@ -6,10 +6,10 @@ from pymoo.rand import random
 
 class DifferentialEvolutionCrossover(Crossover):
 
-    def __init__(self, variant="DE/rand/1", F_CR=0.5, F=0.8, method="binomial", bounce_back_in_bounds=True):
+    def __init__(self, variant="DE/rand/1", prob=0.5, weight=0.8, method="binomial", bounce_back_in_bounds=True):
         super().__init__(3, 1)
-        self.F_CR = F_CR
-        self.F = F
+        self.prob = prob
+        self.weight = weight
         self.type = method
         self.variant = variant
         self.bounce_back_in_bounds = bounce_back_in_bounds
@@ -25,7 +25,7 @@ class DifferentialEvolutionCrossover(Crossover):
         if self.type == "binomial":
 
             # uniformly for each individual and each entry
-            r = random.random(size=X.shape) < self.F_CR
+            r = random.random(size=X.shape) < self.prob
 
         elif self.type == "exponential":
 
@@ -34,7 +34,7 @@ class DifferentialEvolutionCrossover(Crossover):
             # start point of crossover
             n = random.randint(0, n_var, size=X.shape[0])
             # length of chromosome to do the crossover
-            L = np.argmax((random.random(X.shape) > self.F_CR), axis=1)
+            L = np.argmax((random.random(X.shape) > self.prob), axis=1)
 
             # create for each individual the crossover range
             for i in range(X.shape[0]):
@@ -48,12 +48,11 @@ class DifferentialEvolutionCrossover(Crossover):
         children = np.copy(X)
 
         if self.variant == "DE/rand/1":
-            trial = parents[:, 2] + self.F * (parents[:, 0] - parents[:, 1])
+            trial = parents[:, 2] + self.weight * (parents[:, 0] - parents[:, 1])
         elif self.variant == "DE/target-to-best/1":
-            trial = X + self.F * (X[best_i, :] - X) + self.F * (parents[:, 0] - parents[:, 1])
+            trial = X + self.weight * (X[best_i, :] - X) + self.weight * (parents[:, 0] - parents[:, 1])
         elif self.variant == "DE/best/1":
-            sc = self.F + random.random(p.n_var) * 1e-4
-            trial = X[best_i, :] + (parents[:, 0] - parents[:, 1]) * sc
+            trial = X[best_i, :] + (parents[:, 0] - parents[:, 1]) * self.weight
         else:
             raise Exception("DE variant %s not known." % self.variant)
 

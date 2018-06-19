@@ -58,9 +58,10 @@ class GeneticAlgorithm(Algorithm):
                  survival,
                  n_offsprings=None,
                  eliminate_duplicates=False,
-                 verbose=False,
-                 callback=None
+                 **kwargs
                  ):
+
+        super().__init__(**kwargs)
 
         self.pop_size = pop_size
         self.sampling = sampling
@@ -69,8 +70,6 @@ class GeneticAlgorithm(Algorithm):
         self.mutation = mutation
         self.survival = survival
         self.eliminate_duplicates = eliminate_duplicates
-        self.verbose = verbose
-        self.callback = callback
         self.n_offsprings = n_offsprings
 
         # default set the number of offsprings to the population size
