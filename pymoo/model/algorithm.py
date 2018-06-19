@@ -4,8 +4,8 @@ import numpy
 import pymoo
 from pymoo.model.evaluator import Evaluator
 from pymoo.rand import random
-from pymoo.util.misc import calc_constraint_violation
 from pymoo.util.non_dominated_rank import NonDominatedRank
+from pymop.problem import Problem
 
 
 class Algorithm:
@@ -85,7 +85,7 @@ class Algorithm:
 
         if return_only_feasible:
             if G is not None and G.shape[0] == len(F) and G.shape[1] > 0:
-                cv = calc_constraint_violation(G)
+                cv = Problem.calc_constraint_violation(G)
                 X = X[cv <= 0, :]
                 F = F[cv <= 0, :]
                 if G is not None:

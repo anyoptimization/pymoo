@@ -2,11 +2,11 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from pymoo.model.algorithm import Algorithm
-from pymoo.operators.crossover.real_differental_evolution_crossover import DifferentalEvolutionCrossover
+from pymoo.operators.crossover.real_differental_evolution_crossover import DifferentialEvolutionCrossover
 from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
 from pymoo.rand import random
-from pymoo.util.reference_directions import get_ref_dirs_from_n
+from pymop.util import get_weights
 
 
 class MOEAD(Algorithm):
@@ -31,14 +31,14 @@ class MOEAD(Algorithm):
 
         # the crossover is predefined
         self.CR = CR
-        self.crossover = DifferentalEvolutionCrossover(p_xover=1.0, scale=F, repair=True)
+        self.crossover = DifferentialEvolutionCrossover()
 
         # initialized when problem is known
         self.weights = None
         self.neighbours = None
 
     def _initialize(self, problem):
-        self.weights = get_ref_dirs_from_n(problem.n_obj, self.pop_size)
+        self.weights = get_weights(self.pop_size, problem.n_obj, func_random=random.random, method="uniform")
         self.neighbours = np.argsort(cdist(self.weights, self.weights), axis=1)[:, :self.n_neighbors]
 
     def _solve(self, problem, evaluator):
@@ -64,9 +64,7 @@ class MOEAD(Algorithm):
                 parents = self.neighbours[i, random.perm(self.n_neighbors)[:self.crossover.n_parents]]
 
                 # do recombination and create an offspring
-                off_X = self.crossover.do(problem, X[parents, :])
-                r = random.random(problem.n_var) > self.CR
-                off_X[:,r] = X[i, r]
+                off_X = self.crossover.do(problem, X[None, parents,:], X=X[[i],:])
 
                 # do the mutation
                 off_X = self.mutation.do(problem, off_X)

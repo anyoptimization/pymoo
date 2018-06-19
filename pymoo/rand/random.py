@@ -20,8 +20,11 @@ def perm(size):
     return Singleton.get_instance().perm(size)
 
 
-def random(size=None):
-    return Singleton.get_instance().rand(size=size)
+def random(*params, size=None):
+    if len(params) > 0:
+        return Singleton.get_instance().rand(size=params)
+    else:
+        return Singleton.get_instance().rand(size=size)
 
 
 def randint(low, high, size=None):
