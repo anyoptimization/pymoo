@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.util.misc import calc_constraint_violation
+from pymop.problem import Problem
 
 
 class Dominator:
@@ -46,7 +46,7 @@ class Dominator:
             constr = np.zeros((F.shape[0], F.shape[0]))
         else:
             # consider the constraint violation
-            CV = calc_constraint_violation(G)
+            CV = Problem.calc_constraint_violation(G)
             constr = (CV[:, None] < CV) * 1 + (CV[:, None] > CV) * -1
 
         # look at the obj for dom

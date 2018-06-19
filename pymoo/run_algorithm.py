@@ -3,41 +3,24 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import animation
-from pymop.zdt import ZDT
 
+from pymoo.algorithms.MOEAD import MOEAD
+from pymoo.algorithms.NSGAII import NSGAII
 from pymoo.algorithms.NSGAIII import NSGAIII
-from pymoo.algorithms.RNSGAIII import RNSGAIII
+from pymoo.algorithms.so_DE import DifferentialEvolution
+from pymop.rastrigin import Rastrigin
+from pymop.zdt import ZDT1
 
 if __name__ == '__main__':
 
-    # load the problem instance
-    class ZDT1(ZDT):
-        def __init__(self, n_var=30):
-            ZDT.__init__(self, n_var)
 
-        def calc_pareto_front(self):
-            x1 = np.arange(0, 1.01, 0.01)
-            return np.array([x1, 1 - np.sqrt(x1)]).T
+    problem = Rastrigin()
+    #problem = ZDT1()
 
-        def _evaluate(self, x, f):
-            f[:, 0] = x[:, 0]
-            f[:, 0] = -100 + (f[:, 0] * 50)
-            g = 1 + 9.0 / (self.n_var - 1) * np.sum(x[:, 1:], axis=1)
-            f[:, 1] = g * (1 - np.power((x[:, 0] / g), 0.5))
-
-        def pareto_front(self):
-            pf = super().pareto_front()
-            pf[:, 0] = -100 + (pf[:, 0] * 50)
-            return pf
-
-
-    problem = ZDT1()
-
-    ref_points = np.array([[-100, 0.6], [-60, 0.05]])
-    plt.scatter(ref_points[:,0], ref_points[:,1])
-
-    algorithm = RNSGAIII("real", ref_points, verbose=True, epsilon=0.001, weights=None)
-    algorithm = NSGAIII("real", pop_size=200)
+    algorithm = DifferentialEvolution(verbose=True)
+    #algorithm = NSGAII("real", verbose=True)
+    #algorithm = NSGAIII("real", verbose=True)
+    #algorithm = MOEAD(verbose=True)
 
     start_time = time.time()
 
@@ -57,7 +40,6 @@ if __name__ == '__main__':
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    print(X)
     print(F)
 
     scatter_plot = True

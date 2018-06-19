@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.population import Population
-from pymoo.util.misc import unique_rows, create_hist
+from pymoo.util.misc import unique_rows
 
 
 class GeneticAlgorithm(Algorithm):
@@ -108,7 +108,7 @@ class GeneticAlgorithm(Algorithm):
 
             while n_off < self.n_offsprings:
                 parents = self.selection.next(n_parents)
-                X = self.crossover.do(problem, pop.X[parents, :], self)
+                X = self.crossover.do(problem, pop.X[parents, :])
 
                 # if more offsprings than necessary - truncate them
                 if X.shape[0] > self.n_offsprings - n_off:
