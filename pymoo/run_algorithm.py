@@ -1,20 +1,43 @@
 import time
 
-from matplotlib import animation
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import animation
+from pymop.zdt import ZDT
 
 from pymoo.algorithms.NSGAIII import NSGAIII
+from pymoo.algorithms.RNSGAIII import RNSGAIII
 
 if __name__ == '__main__':
 
     # load the problem instance
-    from pymop.zdt import ZDT1
-    problem = ZDT1(n_var=30)
+    class ZDT1(ZDT):
+        def __init__(self, n_var=30):
+            ZDT.__init__(self, n_var)
 
-    # create the algorithm instance by specifying the intended parameters
-    from pymoo.algorithms.NSGAIII import NSGAIII
-    algorithm = NSGAIII("real", pop_size=100, verbose=True)
+        def calc_pareto_front(self):
+            x1 = np.arange(0, 1.01, 0.01)
+            return np.array([x1, 1 - np.sqrt(x1)]).T
+
+        def _evaluate(self, x, f):
+            f[:, 0] = x[:, 0]
+            f[:, 0] = -100 + (f[:, 0] * 50)
+            g = 1 + 9.0 / (self.n_var - 1) * np.sum(x[:, 1:], axis=1)
+            f[:, 1] = g * (1 - np.power((x[:, 0] / g), 0.5))
+
+        def pareto_front(self):
+            pf = super().pareto_front()
+            pf[:, 0] = -100 + (pf[:, 0] * 50)
+            return pf
+
+
+    problem = ZDT1()
+
+    ref_points = np.array([[-100, 0.6], [-60, 0.05]])
+    plt.scatter(ref_points[:,0], ref_points[:,1])
+
+    algorithm = RNSGAIII("real", ref_points, verbose=True, epsilon=0.001, weights=None)
+    algorithm = NSGAIII("real", pop_size=200)
 
     start_time = time.time()
 
@@ -34,22 +57,24 @@ if __name__ == '__main__':
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
+    print(X)
     print(F)
 
     scatter_plot = True
-    save_animation = True
+    save_animation = False
 
     # get the problem dimensionality
     is_2d = problem.n_obj == 2
     is_3d = problem.n_obj == 3
 
     if scatter_plot and is_2d:
-        plt.scatter(F[:, 0], F[:, 1])
+        pf = problem.pareto_front()
+        plt.scatter(pf[:, 0], pf[:, 1], label='Pareto Front', s=60, facecolors='none', edgecolors='r')
+        plt.scatter(F[:, 0], F[:, 1], color='b')
         plt.show()
 
     if scatter_plot and is_3d:
         fig = plt.figure()
-        from mpl_toolkits.mplot3d import Axes3D
         ax = fig.add_subplot(111, projection='3d')
         ax.scatter(F[:, 0], F[:, 1], F[:, 2])
         plt.show()
@@ -80,7 +105,7 @@ if __name__ == '__main__':
 
 
         # create the animation
-        ani = animation.FuncAnimation(fig, update, frames=range(n_gen))
+        ani = animation.FuncAnimation(fig, update, frames=len(history))
 
         # write the file
         Writer = animation.writers['ffmpeg']

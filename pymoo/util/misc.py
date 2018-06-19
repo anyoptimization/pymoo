@@ -5,6 +5,7 @@ from numpy.linalg import LinAlgError
 def denormalize(x, x_min, x_max):
     return x * (x_max - x_min) + x_min
 
+
 def normalize(x, x_min=None, x_max=None, return_bounds=False):
     if x_min is None:
         x_min = np.min(x, axis=0)
@@ -21,9 +22,24 @@ def normalize(x, x_min=None, x_max=None, return_bounds=False):
         return res, x_min, x_max
 
 
+def standardize(x, return_bounds=False):
+    mean = np.mean(x, axis=0)
+    std = np.std(x, axis=0)
+
+    # standardize
+    val = (x - mean) / std
+
+    if not return_bounds:
+        return val
+    else:
+        return val, mean, std
+
+
+def destandardize(x, mean, std):
+    return (x * std) + mean
+
 
 def normalize_by_asf_interceptions(x, return_bounds=False):
-
     # find the x_min point
     n_obj = x.shape[1]
     x_min = np.min(x, axis=0)
@@ -50,6 +66,7 @@ def normalize_by_asf_interceptions(x, return_bounds=False):
     except LinAlgError:
         A = np.max(S, axis=0)
 
+    A[A == 0] = 0.000001
     F = F / A
 
     if not return_bounds:
@@ -70,6 +87,16 @@ def unique_rows(X):
     return idx
 
 
+def repair(X, xl, xu):
+    larger_than_xu = X[0, :] > xu
+    X[0, larger_than_xu] = xu[larger_than_xu]
+
+    smaller_than_xl = X[0, :] < xl
+    X[0, smaller_than_xl] = xl[smaller_than_xl]
+
+    return X
+
+
 def create_hist(n_evals, pop):
     return np.concatenate((np.ones((pop.size(), 1)) * n_evals, pop.X, pop.F, pop.G), axis=1)
 
@@ -82,4 +109,3 @@ def save_hist(pathToFile, data):
 
     np.savetxt(pathToFile, hist, fmt='%.14f')
     print(pathToFile)
-
