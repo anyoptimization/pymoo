@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 from scipy import special
 
@@ -51,13 +52,42 @@ def get_ref_dirs_from_points(points, n_obj):
     ref_points = np.append(points, extreme_reference_points, axis=0)
     return ref_points
 
+def get_ref_dirs_from_points(ref_point, n_obj, alpha=0.1):
+    """
+    This function takes user specified reference points, and creates smaller sets of equidistant
+    Das-Dennis points around the projection of user points on the Das-Dennis hyperplane
+    :param ref_point: List of user specified reference points
+    :param n_obj: Number of objectives to consider
+    :param alpha: Shrinkage factor (0-1), Smaller = tigher convergence, Larger= larger convergence
+    :return: Set of reference points
+    """
+    ref_dirs = []
+    n_vector = np.ones(n_obj) / np.linalg.norm(np.ones(n_obj))  # Normal vector of Das Dennis plane
+    point_on_plane = np.eye(n_obj)[0]  # Point on Das-Dennis
+    reference_directions = get_ref_dirs_from_n(n_obj, 21)  # Das-Dennis points
+
+    for point in ref_point:
+        # ref_proj = point - np.dot(point - point_on_plane, n_vector) * n_vector
+        # TODO: Compute which is faster, a copy.deepcopy, or recomputing all the points from get_ref_dirs_from_n
+        ref_dir = copy.deepcopy(reference_directions)  # Copy of computed reference directions
+        for i in range(n_obj):  # Shrink Das-Dennis points by a factor of alpha
+            ref_dir[:, i] = point[i] + alpha * (ref_dir[:, i] - point[i])
+        for d in ref_dir:  # Project shrunked Das-Dennis points back onto original Das-Dennis hyperplane
+            ref_dirs.append(d - np.dot(d - point_on_plane, n_vector) * n_vector)
+    # TODO: Extreme points are only extreme of the scale is normalized between 0-1, how to make them truly extreme?
+    ref_dirs.extend(np.eye(n_obj))  # Add extreme points
+    return np.array(ref_dirs)
+
 
 if __name__ == '__main__':
 
     test = get_ref_dirs_from_n(2, 100)
 
-    for i in [3]:
-        for j in range(20):
-            test = get_ref_dirs_from_section(i, j)
-            print(j, len(test), get_number_of_reference_directions(i, j))
-    print()
+    # for i in [3]:
+    #     for j in range(20):
+    #         test = get_ref_dirs_from_section(i, j)
+    #         print(j, len(test), get_number_of_reference_directions(i, j))
+    # print()
+    import pylab as pl
+    fig = pl.subplot()
+    pl.scatter(test[:, 0], test[:, 1])

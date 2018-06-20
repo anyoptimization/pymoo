@@ -27,7 +27,7 @@ class ReferenceLineSurvival(Survival):
             survival.extend(front)
 
         # filter the front to only relevant entries
-        # pop.filter(survival + front)
+        pop.filter(survival + front)
         survival = list(range(0, len(survival)))
         last_front = np.arange(len(survival), pop.size())
         # Indices of last front members that survived
@@ -40,17 +40,16 @@ class ReferenceLineSurvival(Survival):
         n_remaining = n_survive - len(survival)
 
 
-
         if n_remaining > 0:
 
             # dist_matrix = calc_perpendicular_dist_matrix(N, self.ref_dirs)
-            F_bar = map_linear(pop.F, pop.F)
-            Z_bar = map_linear(self.ref_points, pop.F)
-            dist_matrix = calc_ref_dist_matrix(F_bar, Z_bar, self.weights)
-            point_distance_matrix = calc_ref_dist_matrix(F_bar[last_front, :], F_bar[last_front, :], self.weights)
+            # F_bar = map_linear(pop.F, pop.F)
+            # Z_bar = map_linear(self.ref_points, pop.F)
+            # dist_matrix = calc_ref_dist_matrix(F_bar, Z_bar, self.weights)
+            # point_distance_matrix = calc_ref_dist_matrix(F_bar[last_front, :], F_bar[last_front, :], self.weights)
 
-            # dist_matrix = calc_ref_dist_matrix(pop.F, self.ref_points, self.weights)
-            # point_distance_matrix = calc_ref_dist_matrix(pop.F[last_front, :], pop.F[last_front, :], self.weights)
+            dist_matrix = calc_ref_dist_matrix(pop.F, self.ref_points, self.weights)
+            point_distance_matrix = calc_ref_dist_matrix(pop.F[last_front, :], pop.F[last_front, :], self.weights)
 
             # point_distance_matrix = cdist(N[last_front, :], N[last_front, :])
 
@@ -147,12 +146,12 @@ def calc_ref_dist_matrix(F, ref_dirs, weights, F_min=None, F_max=None):
     r = np.tile(ref_dirs, (len(F), 1))
     f = np.repeat(F, len(ref_dirs), axis=0)
 
-    # if not np.array_equal(F_max, F_min):
-    #     matrix = np.sqrt(np.sum(weights * ((f - r) / (F_max - F_min)) ** 2, axis=1))
-    # else:
-    #     matrix = np.sqrt(np.sum(weights * (f - r) ** 2, axis=1))
+    if not np.array_equal(F_max, F_min):
+        matrix = np.sqrt(np.sum(weights * ((f - r) / (F_max - F_min)) ** 2, axis=1))
+    else:
+        matrix = np.sqrt(np.sum(weights * (f - r) ** 2, axis=1))
 
     # matrix = np.sqrt(np.sum(weights * ((f - r) / (F_max - F_min)) ** 2, axis=1))
-    matrix = np.sqrt(np.sum((f - r) ** 2, axis=1))
-    matrix = np.reshape(matrix, (len(F), len(ref_dirs)))
+    # matrix = np.sqrt(np.sum((f - r) ** 2, axis=1))
+    matrix = np.reshape(matrix, (F.shape[0], ref_dirs.shape[0]))
     return matrix

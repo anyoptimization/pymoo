@@ -4,7 +4,7 @@ import numpy as np
 
 class DefaultRandomGenerator:
 
-    def random(self, size=None):
+    def rand(self, size=None):
         if size is None:
             return random.random()
         else:
@@ -18,7 +18,7 @@ class DefaultRandomGenerator:
             return val
 
 
-    def permutation(self, length, n=1):
+    def perm(self, length, n=1):
         perms = []
         for _ in range(n):
             perm = list(range(length))
@@ -29,11 +29,11 @@ class DefaultRandomGenerator:
     def seed(self, x):
         random.seed(x)
 
-    def randint(self, low, high):
+    def randint(self, low, high, size=None):
         if low >= high:
             return low
         else:
-            res = low + (self.random() * (high - low))
+            res = low + (self.rand(size) * (high - low))
             if res > high:
                 res = high
         return int(res)

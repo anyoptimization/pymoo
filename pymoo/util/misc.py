@@ -21,7 +21,6 @@ def normalize(x, x_min=None, x_max=None, return_bounds=False):
         return res, x_min, x_max
 
 
-
 def normalize_by_asf_interceptions(x, return_bounds=False):
 
     # find the x_min point
@@ -49,8 +48,9 @@ def normalize_by_asf_interceptions(x, return_bounds=False):
         A = 1 / A
         A = A.T
     except LinAlgError:
-        A = np.max(S, axis=0)
 
+        A = np.max(S, axis=0)
+    A[A == 0] = 0.000001
     F = F / A
 
     if not return_bounds:
