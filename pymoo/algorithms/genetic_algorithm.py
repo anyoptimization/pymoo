@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.population import Population
-from pymoo.util.misc import unique_rows, create_hist
+from pymoo.util.misc import unique_rows
 
 
 class GeneticAlgorithm(Algorithm):
@@ -56,10 +56,12 @@ class GeneticAlgorithm(Algorithm):
                  crossover,
                  mutation,
                  survival,
+                 n_offsprings=None,
                  eliminate_duplicates=False,
-                 verbose=False,
-                 callback=None
+                 **kwargs
                  ):
+
+        super().__init__(**kwargs)
 
         self.pop_size = pop_size
         self.sampling = sampling
@@ -68,12 +70,13 @@ class GeneticAlgorithm(Algorithm):
         self.mutation = mutation
         self.survival = survival
         self.eliminate_duplicates = eliminate_duplicates
-        self.verbose = verbose
-        self.callback = callback
+        self.n_offsprings = n_offsprings
+
+        # default set the number of offsprings to the population size
+        if self.n_offsprings is None:
+            self.n_offsprings = pop_size
 
     def _solve(self, problem, evaluator):
-
-        self._initialize(problem)
 
         # create the population according to the factoring strategy
         pop = Population()
@@ -96,18 +99,21 @@ class GeneticAlgorithm(Algorithm):
 
             # initialize selection and offspring methods
             off = Population()
-            off.X = np.full((self.pop_size, problem.n_var), np.inf)
+            off.X = np.full((self.n_offsprings, problem.n_var), np.inf)
             self.selection.set_population(pop, self)
 
             n_off = 0
             n_parents = self.crossover.n_parents
-            n_children = self.crossover.n_children
 
-            while n_off < self.pop_size:
+            while n_off < self.n_offsprings:
                 parents = self.selection.next(n_parents)
-                X = self.crossover.do(problem, pop.X[parents, :], self)
+                X = self.crossover.do(problem, pop.X[parents, :])
 
-                off.X[n_off:min(n_off + n_children, self.pop_size)] = X
+                # if more offsprings than necessary - truncate them
+                if X.shape[0] > self.n_offsprings - n_off:
+                    X = X[:self.n_offsprings - n_off, :]
+
+                off.X[n_off:n_off+X.shape[0], :] = X
                 n_off = n_off + X.shape[0]
 
             off.X = self.mutation.do(problem, off.X)
@@ -142,10 +148,5 @@ class GeneticAlgorithm(Algorithm):
                  'X': np.copy(pop.X),
                  'F': np.copy(pop.F)
                  })
-
-    def _initialize(self, problem):
-        pass
-
-
 
 

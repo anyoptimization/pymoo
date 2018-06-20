@@ -16,9 +16,9 @@ class RNSGAIII(GeneticAlgorithm):
 
         # if survival not define differently
         if self.survival is None:
-
             # if ref dirs are not initialized do it based on the population size
             if self.ref_dirs is None:
                 self.ref_dirs = get_ref_dirs_from_points(self.ref_points, problem.n_obj)
 
             self.survival = ReferenceLineSurvival(self.ref_dirs)
+

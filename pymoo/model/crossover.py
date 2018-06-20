@@ -17,7 +17,7 @@ class Crossover:
         self.n_parents = n_parents
         self.n_children = n_children
 
-    def do(self, problem, parents, data=None):
+    def do(self, problem, parents, **kwargs):
         """
 
         This method executes the crossover on the parents. This class wraps the implementation of the class
@@ -45,16 +45,16 @@ class Crossover:
         """
         n_var = parents.shape[1]
 
-        if n_var != problem.n_var:
-            raise ValueError('Exception during crossover: Variable length is not equal to the defined one in problem.')
+        #if n_var != problem.n_var:
+        #    raise ValueError('Exception during crossover: Variable length is not equal to the defined one in problem.')
 
-        if self.n_parents != parents.shape[0]:
-            raise ValueError('Exception during crossover: Number of parents differs from defined at crossover.')
+        #if self.n_parents != parents.shape[0]:
+        #    raise ValueError('Exception during crossover: Number of parents differs from defined at crossover.')
 
         children = np.full((self.n_children, n_var), np.inf)
-        return self._do(problem, parents, children, data)
+        return self._do(problem, parents, children,  **kwargs)
 
 
     @abstractmethod
-    def _do(self, problem, parents, children, data=None):
+    def _do(self, problem, parents, children,  **kwargs):
         pass

@@ -22,7 +22,6 @@ def normalize(x, x_min=None, x_max=None, return_bounds=False):
 
 
 def normalize_by_asf_interceptions(x, return_bounds=False):
-
     # find the x_min point
     n_obj = x.shape[1]
     x_min = np.min(x, axis=0)
@@ -59,10 +58,21 @@ def normalize_by_asf_interceptions(x, return_bounds=False):
         x_max = A + x_min
         return F, x_min, x_max
 
+def standardize(x, return_bounds=False):
+    mean = np.mean(x, axis=0)
+    std = np.std(x, axis=0)
 
-def calc_constraint_violation(G):
-    return np.sum(G * (G > 0).astype(np.float), axis=1)
+    # standardize
+    val = (x - mean) / std
 
+    if not return_bounds:
+        return val
+    else:
+        return val, mean, std
+
+
+def destandardize(x, mean, std):
+    return (x * std) + mean
 
 # returns only the unique rows from a given matrix X
 def unique_rows(X):
@@ -71,15 +81,20 @@ def unique_rows(X):
     return idx
 
 
-def create_hist(n_evals, pop):
-    return np.concatenate((np.ones((pop.size(), 1)) * n_evals, pop.X, pop.F, pop.G), axis=1)
+# repairs a numpy array to be in bounds
+def repair(X, xl, xu):
+    larger_than_xu = X[0, :] > xu
+    X[0, larger_than_xu] = xu[larger_than_xu]
+
+    smaller_than_xl = X[0, :] < xl
+    X[0, smaller_than_xl] = xl[smaller_than_xl]
+
+    return X
 
 
-def save_hist(pathToFile, data):
-    hist = None
-    for i in range(len(data)):
-        obj = data[i]['snapshot']
-        hist = obj if hist is None else np.concatenate((hist, obj), axis=0)
-
-    np.savetxt(pathToFile, hist, fmt='%.14f')
-    print(pathToFile)
+def parameter_less_constraints(F, CV, F_max=None):
+    if F_max is None:
+        F_max = np.max(F)
+    has_constraint_violation = CV > 0
+    F[has_constraint_violation] = CV[has_constraint_violation] + F_max
+    return F

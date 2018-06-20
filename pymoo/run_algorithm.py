@@ -4,17 +4,20 @@ from matplotlib import animation
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pymoo.algorithms.NSGAIII import NSGAIII
+from pymoo.algorithms.so_DE import DifferentialEvolution
+from pymop.rastrigin import Rastrigin
 
 if __name__ == '__main__':
 
     # load the problem instance
     from pymop.zdt import ZDT1
     problem = ZDT1(n_var=30)
+    problem = Rastrigin(n_var=30)
 
     # create the algorithm instance by specifying the intended parameters
-    from pymoo.algorithms.NSGAIII import NSGAIII
-    algorithm = NSGAIII("real", pop_size=100, verbose=True)
+    from pymoo.algorithms.NSGAII import NSGAII
+    algorithm = NSGAII("real", pop_size=100, verbose=True)
+    algorithm = DifferentialEvolution(pop_size=100, verbose=True)
 
     start_time = time.time()
 
@@ -34,10 +37,8 @@ if __name__ == '__main__':
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    print(F)
-
     scatter_plot = True
-    save_animation = True
+    save_animation = False
 
     # get the problem dimensionality
     is_2d = problem.n_obj == 2

@@ -4,8 +4,8 @@ import numpy
 import pymoo
 from pymoo.model.evaluator import Evaluator
 from pymoo.rand import random
-from pymoo.util.misc import calc_constraint_violation
 from pymoo.util.non_dominated_rank import NonDominatedRank
+from pymop.problem import Problem
 
 
 class Algorithm:
@@ -16,13 +16,22 @@ class Algorithm:
 
     """
 
+    def __init__(self,
+                 verbose=False,
+                 callback=None
+                 ):
+        self.verbose = verbose
+        self.callback = callback
+
+
     def solve(self,
               problem,
               evaluator,
               seed=1,
               return_only_feasible=True,
               return_only_non_dominated=True,
-              history=None):
+              history=None,
+              ):
         """
 
         Solve a given problem by a given evaluator. The evaluator determines the termination condition and
@@ -77,19 +86,22 @@ class Algorithm:
         if not isinstance(evaluator, Evaluator):
             evaluator = Evaluator(evaluator)
 
+        # run the initialization method first
+        self._initialize(problem)
+
         # call the algorithm to solve the problem
         X, F, G = self._solve(problem, evaluator)
 
         if return_only_feasible:
             if G is not None and G.shape[0] == len(F) and G.shape[1] > 0:
-                cv = calc_constraint_violation(G)
+                cv = Problem.calc_constraint_violation(G)
                 X = X[cv <= 0, :]
                 F = F[cv <= 0, :]
                 if G is not None:
                     G = G[cv <= 0, :]
 
         if return_only_non_dominated:
-            idx_non_dom = NonDominatedRank.calc_as_fronts(F,G)[0]
+            idx_non_dom = NonDominatedRank.calc_as_fronts(F, G)[0]
             X = X[idx_non_dom, :]
             F = F[idx_non_dom, :]
             if G is not None:
@@ -99,4 +111,7 @@ class Algorithm:
 
     @abstractmethod
     def _solve(self, problem, evaluator):
+        pass
+
+    def _initialize(self, problem):
         pass
