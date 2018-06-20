@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.spatial.distance import cdist
-from sklearn.cluster import KMeans
 
 from pymoo.model.indicator import Indicator
 from pymoo.util.non_dominated_rank import NonDominatedRank
@@ -118,7 +117,7 @@ class RMetric(Indicator):
         filtered_matrix = pop[np.where(centeroid_matrix < range/2), :][0]
         return filtered_matrix
 
-    def calc(self):
+    def calc(self, hyper_volume=True):
         """
         This method calculates the R-IGD and R-HV based off of the population that was provided
         :return: R-IGD and R-HV
@@ -127,13 +126,12 @@ class RMetric(Indicator):
         final_PF = []
 
         # 1. Prescreen Procedure - NDS Filtering
-        pop = self._filter_fast()
+        pop = self._filter()
 
         solution = self.problem.calc_pareto_front()
         # solution = calc_PF(1, 10000, 2)
 
-        labels = kmeans(pop, self.ref_points)
-        # labels = np.argmin(cdist(pop, self.ref_points), axis=1)
+        labels = np.argmin(cdist(pop, self.ref_points), axis=1)
 
         for i in range(len(self.ref_points)):
             cluster = pop[np.where(labels == i)]
@@ -157,7 +155,7 @@ class RMetric(Indicator):
 
         if np.size(translated) == 0:
             igd = -1
-            HV = -1
+            volume= -1
         else:
             # IGD Computation
             from pymoo.indicators.igd import IGD
@@ -168,33 +166,26 @@ class RMetric(Indicator):
             nadir_point = np.amax(self.w_points, axis=0)
             front = translated
             dim = self.ref_points[0].shape[0]
-            if dim <=3:
-                #Python
-                from pymoo.indicators.hv import HyperVolume
-                hv = HyperVolume(nadir_point)
-                volume = hv.compute(front)
+            if hyper_volume:
+                if dim <3:
+                    try:
+                        #Python
+                        from pymoo.indicators.hv import HyperVolume
+                        hv = HyperVolume(nadir_point)
+                        volume = hv.compute(front)
+                    except TypeError:
+                        volume = -1
+
+                else:
+                    # cpp
+
+                    from pymoo.cpp.hypervolume.build import hypervolume
+
+                    volume = hypervolume.calculate(dim, len(front), front, nadir_point)
             else:
-                # cpp
-                from pymoo.cpp.hypervolume.build import hypervolume
-
-                volume = hypervolume.calculate(dim, len(front), front, nadir_point)
-
-
+                volume = np.nan
         return igd, volume
 
-
-def kmeans(data, k):
-
-    # Number of clusters
-    kmeans = KMeans(n_clusters=len(k))
-    # Fitting the input data
-    kmeans = kmeans.fit(data)
-    # Getting the cluster labels
-    labels = kmeans.predict(data)
-    # Centroid values
-    centroids = kmeans.cluster_centers_
-
-    return labels
 
 # Matlab code PF calculation method
 def calc_PF(problem_id, sample_size=10000, objDim=None):
