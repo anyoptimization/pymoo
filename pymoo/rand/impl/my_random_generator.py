@@ -18,6 +18,10 @@ class MyRandomGenerator(RandomGenerator):
         self.__warmup_random()
 
     def rand(self, size=None):
+
+        if isinstance(size, tuple) and len(size) == 1:
+            size = size[0]
+
         if size is None:
             return self.__randomperc()
         elif isinstance(size, int):
@@ -26,6 +30,7 @@ class MyRandomGenerator(RandomGenerator):
                 val[j] = self.__randomperc()
             return val
         elif isinstance(size, tuple) and len(size) == 2:
+
             n = size[0]
             m = size[1]
             val = np.zeros((n, m))

@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.model.survival import Survival
-from pymoo.util.misc import calc_constraint_violation
+from pymop.problem import Problem
 
 
 class FitnessSurvival(Survival):
@@ -20,7 +20,7 @@ class FitnessSurvival(Survival):
         if pop.G is None or len(pop.G) == 0:
             CV = np.zeros(pop.F.shape[0])
         else:
-            CV = calc_constraint_violation(pop.G)
+            CV = Problem.calc_constraint_violation(pop.G)
             CV[CV < 0] = 0.0
 
         # sort by cv and fitness
