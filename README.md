@@ -159,8 +159,11 @@ doi: 10.1109/TEVC.2013.2281535
 
 Feel free to contact me if you have any question:
 
-Julian Blank (blankjul@egr.msu.edu)<br/>
-Michigan State University<br/>
-Computational Optimization and Innovation Laboratory (COIN)<br/>
-East Lansing, MI 48824, USA <br/>
+Julian Blank (blankjul@egr.msu.edu)
+
+Michigan State University
+
+Computational Optimization and Innovation Laboratory (COIN)
+
+East Lansing, MI 48824, USA
 

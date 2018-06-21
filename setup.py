@@ -1,7 +1,8 @@
+import setuptools
 from setuptools import setup
 
 __author__ = "Julian Blank"
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 try:
     import pypandoc
@@ -22,6 +23,6 @@ setup(
     url="https://github.com/julesy89/pymoo",
     license='MIT',
     keywords="optimization",
-    packages=['pymoo'],
+    packages=setuptools.find_packages(),
     install_requires=['pymop', 'numpy', 'scipy', 'matplotlib']
 )
