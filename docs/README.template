@@ -1,0 +1,18 @@
+pymop - Optimization Test Problems
+==================================
+
+Installation
+==================================
+{% include 'source/_installation.rst' %}
+
+Implementations
+==================================
+{% include 'source/_implementations.rst' %}
+
+Usage
+==================================
+{% include 'source/_usage.rst' %}
+
+Contact
+==================================
+{% include 'source/_contact.rst' %}
