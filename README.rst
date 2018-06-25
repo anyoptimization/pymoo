@@ -1,4 +1,4 @@
-pymop - Optimization Test Problems
+pymoo - Multi-Objective Optimization
 ==================================
 
 Installation
