@@ -38,6 +38,7 @@ class Crossover:
             length of the problem.
 
         """
+        n_matings = parents.shape[0]
         n_var = parents.shape[2]
 
         if n_var != problem.n_var:
@@ -46,7 +47,7 @@ class Crossover:
         if self.n_parents != parents.shape[1]:
             raise ValueError('Exception during crossover: Number of parents differs from defined at crossover.')
 
-        children = np.full((parents.shape[0] * self.n_children, n_var), np.inf)
+        children = np.full((n_matings * self.n_children, n_var), np.inf)
         self._do(problem, parents, children,  **kwargs)
         return children
 

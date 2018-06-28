@@ -26,7 +26,7 @@ class Evaluator:
 
         Returns
         -------
-        val
+        val : any
             Returns whatever the problem used to evaluate returns. Can be only objective values or also constraints.
 
         """

@@ -8,13 +8,17 @@ class BinaryUniformCrossover(Crossover):
 
     def _do(self, p, parents, children, data=None):
 
-        for i in range(p.n_var):
+        # number of parents
+        n_parents = parents.shape[0]
 
-            if random.random() < 0.5:
-                children[0,i] = parents[0,i]
-                children[1, i] = parents[1, i]
-            else:
-                children[0, i] = parents[1, i]
-                children[1, i] = parents[0, i]
+        # random matrix to do the crossover
+        M = random.random(n_parents, p.n_var)
+        smaller, larger = M < 0.5, M > 0.5
 
-        return children
+        # first possibility where first parent 0 is copied
+        children[:n_parents][smaller] = parents[:, 0, :][smaller]
+        children[:n_parents][larger] = parents[:, 1, :][larger]
+
+        # now flip the order of parents with the same random array and write the second half of children
+        children[n_parents:][smaller] = parents[:, 1, :][smaller]
+        children[n_parents:][larger] = parents[:, 0, :][larger]

@@ -23,6 +23,19 @@ class Algorithm:
                  verbose=False,
                  callback=None
                  ):
+        """
+        Parameters
+        ----------
+        verbose : int
+            If larger than zero output is provided. (verbose=1 means some output, verbose=2 details for debugging)
+
+        callback : func
+            A callback function can be passed that is executed every generation. The parameters for the function
+            are the algorithm itself, the number of evaluations so far and the current population.
+
+                def callback(algorithm, n_evals, pop):
+                    print()
+        """
         self.verbose = verbose
         self.callback = callback
 

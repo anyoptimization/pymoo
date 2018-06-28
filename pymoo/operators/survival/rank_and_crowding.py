@@ -46,23 +46,31 @@ class RankAndCrowdingSurvival(Survival):
         else:
 
             cd = np.zeros(n)
-            N = normalize(F, F_min, F_max)
+
+            # calculate the normalization - avoid division by 0
+            if F_min is None:
+                F_min = np.min(F, axis=0)
+
+            if F_max is None:
+                F_max = np.max(F, axis=0)
 
             # for each objective
             for j in range(m):
 
                 # sort by its objective
-                sorted_idx = np.argsort(N[:, j])
+                sorted_idx = np.argsort(F[:, j])
 
                 # set the corner points to infinity
                 cd[sorted_idx[0]] = np.inf
                 cd[sorted_idx[-1]] = np.inf
+
+                norm = F_max[j] - F_min[j] if F_min[j] != F_max[j] else 10e-30
 
                 # add up the crowding measure for all points in between
                 for i in range(1, n - 1):
                     if np.isinf(cd[sorted_idx[i]]):
                         continue
                     else:
-                        cd[sorted_idx[i]] += N[sorted_idx[i + 1], j] - N[sorted_idx[i - 1], j]
+                        cd[sorted_idx[i]] += (F[sorted_idx[i + 1], j] - F[sorted_idx[i - 1], j]) / norm
 
         return cd
