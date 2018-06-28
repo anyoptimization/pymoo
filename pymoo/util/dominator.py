@@ -47,7 +47,7 @@ class Dominator:
         else:
             # consider the constraint violation
             CV = Problem.calc_constraint_violation(G)
-            constr = (CV[:, None] < CV) * 1 + (CV[:, None] > CV) * -1
+            constr = (CV < CV) * 1 + (CV > CV) * -1
 
         # look at the obj for dom
         n = F.shape[0]

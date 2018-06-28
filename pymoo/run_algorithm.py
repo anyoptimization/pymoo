@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pymoo.algorithms.so_DE import DifferentialEvolution
+from pymop.knapsack import Knapsack, create_random_knapsack_problem
 from pymop.rastrigin import Rastrigin
 
 if __name__ == '__main__':
@@ -14,9 +15,11 @@ if __name__ == '__main__':
     problem = ZDT1(n_var=30)
     #problem = Rastrigin(n_var=30)
 
+    problem = create_random_knapsack_problem(200)
+
     # create the algorithm instance by specifying the intended parameters
     from pymoo.algorithms.NSGAII import NSGAII
-    algorithm = NSGAII("real", pop_size=100, verbose=True, n_offsprings=200)
+    algorithm = NSGAII("binary", pop_size=100, verbose=True)
     #algorithm = DifferentialEvolution(pop_size=100, verbose=True)
 
     start_time = time.time()
