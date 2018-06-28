@@ -72,6 +72,9 @@ class GeneticAlgorithm(Algorithm):
         self.eliminate_duplicates = eliminate_duplicates
         self.n_offsprings = n_offsprings
 
+        # dictionary which is used to share data among modules
+        self.data = {}
+
         # default set the number of offsprings to the population size
         if self.n_offsprings is None:
             self.n_offsprings = pop_size
@@ -85,13 +88,13 @@ class GeneticAlgorithm(Algorithm):
         else:
             pop.X = self.sampling.sample(problem, self.pop_size, self)
         pop.F, pop.G = evaluator.eval(problem, pop.X)
-        pop = self.survival.do(pop, self.pop_size, self)
+        pop = self.survival.do(pop, self.pop_size, data=self.data)
 
         # setup initial generation
         n_gen = 0
 
         # while there are functions evaluations left
-        while evaluator.has_next():
+        while evaluator.has_remaining():
 
             # increase the generation and do printing and callback
             self._do_each_generation(n_gen, evaluator, pop)
@@ -100,21 +103,23 @@ class GeneticAlgorithm(Algorithm):
             # initialize selection and offspring methods
             off = Population()
             off.X = np.full((self.n_offsprings, problem.n_var), np.inf)
-            self.selection.set_population(pop, self)
-
-            n_off = 0
+            n_offsprings = 0
             n_parents = self.crossover.n_parents
 
-            while n_off < self.n_offsprings:
-                parents = self.selection.next(n_parents)
+            # do the mating until all offspring are created
+            while n_offsprings < self.n_offsprings:
+
+                # select from the current population individuals for mating
+                n_select = int(self.n_offsprings - n_offsprings / self.crossover.n_children)
+                parents = self.selection.next(pop, n_select, n_parents, data=self.data)
                 X = self.crossover.do(problem, pop.X[parents, :])
 
                 # if more offsprings than necessary - truncate them
-                if X.shape[0] > self.n_offsprings - n_off:
-                    X = X[:self.n_offsprings - n_off, :]
+                if X.shape[0] > self.n_offsprings - n_offsprings:
+                    X = X[:self.n_offsprings - n_offsprings, :]
 
-                off.X[n_off:n_off+X.shape[0], :] = X
-                n_off = n_off + X.shape[0]
+                off.X[n_offsprings:n_offsprings + X.shape[0], :] = X
+                n_offsprings = n_offsprings + X.shape[0]
 
             off.X = self.mutation.do(problem, off.X)
             off.F, off.G = evaluator.eval(problem, off.X)
@@ -128,7 +133,7 @@ class GeneticAlgorithm(Algorithm):
                 pop.filter(unique_rows(pop.X))
 
             # truncate the population
-            pop = self.survival.do(pop, self.pop_size, self)
+            pop = self.survival.do(pop, self.pop_size)
 
         self._do_each_generation(n_gen, evaluator, pop)
         return pop.X, pop.F, pop.G
@@ -144,9 +149,7 @@ class GeneticAlgorithm(Algorithm):
         if self.history is not None:
             self.history.append(
                 {'n_gen': n_gen,
-                 'n_evals': evaluator.counter,
+                 'n_evals': evaluator.n_eval,
                  'X': np.copy(pop.X),
                  'F': np.copy(pop.F)
                  })
-
-
