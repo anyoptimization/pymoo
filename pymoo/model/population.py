@@ -3,9 +3,18 @@ import numpy as np
 
 class Population:
     def __init__(self, X=None, F=None, G=None):
-        self.X = X  # design variables
-        self.F = F  # objective values
-        self.G = G  # constraint violations as vectors
+
+        # design variables
+        self.X = X
+
+        # objective values
+        self.F = F
+
+        # constraint violations as vectors
+        self.G = G
+
+        # any additional data to be stored
+        self.D = {}
 
     def merge(self, other):
         if self.X is not None:

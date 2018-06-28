@@ -3,12 +3,11 @@ from abc import abstractmethod
 
 class Survival:
     """
-
-    The class represents the survival selection during the evolution. Only the fittest can survive.
-
+    The survival process is implemented inheriting from this class, which selects from a population only
+    specific individuals to survive.
     """
 
-    def do(self, pop, n_survive, data):
+    def do(self, pop, n_survive, **kwargs):
         """
 
         The whole population is provided and the number of individuals to survive. If the number of survivers
@@ -18,10 +17,10 @@ class Survival:
         Parameters
         ----------
         pop: class
-            The population.
+            The population the selected surviving individuals from.
         n_survive: int
-            number of individuals that should survive.
-        data: class
+            Number of individuals that should survive.
+        kwargs: class
             Any additional data that might be needed to choose what individuals survive.
 
         Returns
@@ -30,8 +29,8 @@ class Survival:
             The population that has survived.
 
         """
-        return self._do(pop, n_survive, data)
+        return self._do(pop, n_survive, **kwargs)
 
     @abstractmethod
-    def _do(self, pop, n_survive, data):
+    def _do(self, pop, n_survive, **kwargs):
         pass

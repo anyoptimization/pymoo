@@ -49,7 +49,7 @@ class MOEAD(Algorithm):
 
         iteration = 1
 
-        while evaluator.has_next():
+        while evaluator.has_remaining():
 
             # iterate for each member of the population
             for i in range(self.pop_size):
