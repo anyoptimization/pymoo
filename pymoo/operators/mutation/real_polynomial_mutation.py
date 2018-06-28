@@ -44,4 +44,3 @@ class PolynomialMutation(Mutation):
                         y = yu
                     Y[i, j] = y
 
-        return Y

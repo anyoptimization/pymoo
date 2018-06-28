@@ -28,6 +28,11 @@ References
 API
 ==================================
 
+The framework provides some modules which are used in the genetic algorithm implementation:
+
+.. automodule:: pymoo
+    :members:
+
 
 
 Contact

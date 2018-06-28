@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 from pymoo.model.selection import Selection
 from pymoo.rand import random
@@ -5,11 +7,8 @@ from pymoo.rand import random
 
 class TournamentSelection(Selection):
     """
-
       The Tournament selection is used to simulated a tournament between individuals. The pressure balances
       greedy the genetic algorithm will be.
-
-
     """
 
     def __init__(self, f_comp=None, pressure=2):
@@ -36,51 +35,19 @@ class TournamentSelection(Selection):
         self.pop = None
         self.perm = None
         self.counter = None
-        self.data = None
 
-    def set_population(self, pop, data):
-        """
+    def _next(self, pop, n_select, n_parents=1, **kwargs):
 
-        Parameters
-        ----------
-        pop: class
-            The population to be selected from.
-        data: class
-            Any additional data that might be needed for the selection.
+        l = []
+        for i in range(math.ceil(n_select * n_parents * self.pressure / pop.size())):
+            l.append(random.perm(size=pop.size()))
 
-        """
-        self.pop = pop
-        self.data = data
-        self.perm = random.perm(self.pop.size())
-        self.counter = 0
+        P = np.concatenate(l)[:n_select * n_parents * self.pressure]
+        P = np.reshape(P, (n_select * n_parents, self.pressure))
 
-    def next(self, n_selected):
-        """
-
-        Parameters
-        ----------
-        n_selected: int
-            Number of individuals to be selected.
-
-        Returns
-        -------
-        v: vector
-            Selected indices of individuals as a integer vector.
-
-        """
-
-        selected = np.zeros(n_selected, dtype=np.int)
-
-        for i in range(n_selected):
-
-            if self.counter + self.pressure >= self.pop.size():
-                self.perm = random.perm(self.pop.size())
-                self.counter = 0
-            selected[i] = self.f_comp(self.pop, self.perm[self.counter:self.counter + self.pressure], self.data)
-            self.counter = self.counter + self.pressure
-
-        return selected
+        S = self.f_comp(pop, P, **kwargs)
+        return np.reshape(S, (n_select, n_parents))
 
     # select simply by minimum index and assume sorting of the population according selection criteria
-    def select_by_min_index(self, pop, indices, data):
-        return np.min(indices)
+    def select_by_min_index(self, pop, P, **kwargs):
+        return np.min(P, axis=1)

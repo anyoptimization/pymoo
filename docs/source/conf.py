@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# pymop documentation build configuration file, created by
+# pymoo documentation build configuration file, created by
 # sphinx-quickstart on Fri Jun 22 09:10:28 2018.
 #
 # This file is execfile()d with the current directory set to its
@@ -20,6 +20,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('../../../pymop'))
 
 # show doc
 autoclass_content = 'both'
@@ -53,7 +54,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'pymop'
+project = 'pymoo'
 copyright = '2018, Julian Blank'
 author = 'Julian Blank'
 
@@ -120,7 +121,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pymopdoc'
+htmlhelp_basename = 'pymoodoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -147,8 +148,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'pymop.tex', 'pymop Documentation',
-     'Julian Blank', 'manual'),
+    (master_doc, 'pymoo.tex', 'pymoo Documentation',
+     'Julian Blank', 'howto'),
 ]
 
 
@@ -157,7 +158,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pymop', 'pymop Documentation',
+    (master_doc, 'pymoo', 'pymoo Documentation',
      [author], 1)
 ]
 
@@ -168,8 +169,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'pymop', 'pymop Documentation',
-     author, 'pymop', 'One line description of project.',
+    (master_doc, 'pymoo', 'pymoo Documentation',
+     author, 'pymoo', 'One line description of project.',
      'Miscellaneous'),
 ]
 

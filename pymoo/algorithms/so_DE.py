@@ -35,7 +35,7 @@ class DifferentialEvolution(Algorithm):
         F = parameter_less_constraints(F, CV)
         self.best_i = np.argmin(F)
 
-        while evaluator.has_next():
+        while evaluator.has_remaining():
 
             P = np.reshape(np.concatenate([random.perm(self.pop_size) for _ in range(self.crossover.n_parents)]),
                            (-1, self.crossover.n_parents))

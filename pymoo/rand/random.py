@@ -1,5 +1,7 @@
 from pymoo.configuration import Configuration
 
+import numpy as np
+
 
 class Singleton:
     __instance = None
@@ -17,7 +19,7 @@ def seed(s):
 
 
 def perm(size):
-    return Singleton.get_instance().perm(size)
+    return Singleton.get_instance().perm(size).astype(np.int)
 
 
 def random(*params, size=None):

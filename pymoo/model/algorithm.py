@@ -1,11 +1,12 @@
 from abc import abstractmethod
 
 import numpy
+from pymop.problem import Problem
+
 import pymoo
 from pymoo.model.evaluator import Evaluator
 from pymoo.rand import random
 from pymoo.util.non_dominated_rank import NonDominatedRank
-from pymop.problem import Problem
 
 
 class Algorithm:
@@ -13,6 +14,8 @@ class Algorithm:
 
     This class represents the abstract class for any algorithm to be implemented. Most importantly it
     provides the solve method that is used to optimize a given problem.
+
+    The solve method provides a wrapper function which does validate the input.
 
     """
 
@@ -22,7 +25,6 @@ class Algorithm:
                  ):
         self.verbose = verbose
         self.callback = callback
-
 
     def solve(self,
               problem,
