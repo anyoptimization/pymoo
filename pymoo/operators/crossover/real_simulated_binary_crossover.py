@@ -2,8 +2,6 @@ from pymoo.configuration import Configuration
 from pymoo.model.crossover import Crossover
 from pymoo.rand import random
 
-import numpy as np
-
 
 class SimulatedBinaryCrossover(Crossover):
     def __init__(self, eta_xover=15, p_xover=0.9):
@@ -17,8 +15,6 @@ class SimulatedBinaryCrossover(Crossover):
         n_children = 0
 
         for k in range(parents.shape[0]):
-
-            _children = np.full((self.n_children, n_var), np.inf)
 
             if random.random() <= self.p_xover:
 
@@ -65,31 +61,24 @@ class SimulatedBinaryCrossover(Crossover):
                             if c2 > yu:
                                 c2 = yu
                             if random.random() <= 0.5:
-                                _children[0, i] = c2
-                                _children[1, i] = c1
+                                children[n_children, i] = c2
+                                children[n_children+1, i] = c1
 
                             else:
-                                _children[0, i] = c1
-                                _children[1, i] = c2
+                                children[n_children, i] = c1
+                                children[n_children+1, i] = c2
 
                         else:
-                            _children[0, i] = parents[k, 0, i]
-                            _children[1, i] = parents[k, 1, i]
+                            children[n_children, i] = parents[k, 0, i]
+                            children[n_children+1, i] = parents[k, 1, i]
 
                     else:
-                        _children[0, i] = parents[k, 0, i]
-                        _children[1, i] = parents[k, 1, i]
+                        children[n_children, i] = parents[k, 0, i]
+                        children[n_children+1, i] = parents[k, 1, i]
 
             else:
-                _children[0, :] = parents[k, 0, :]
-                _children[1, :] = parents[k, 1, :]
+                children[n_children, :] = parents[k, 0, :]
+                children[n_children+1, :] = parents[k, 1, :]
 
-            # if more children than necessary - filter them out
-            if n_children + _children.shape[0] > children.shape[0]:
-                _children = children[:children.shape[0] - n_children, :]
+            n_children += self.n_children
 
-            # set the children in the main matrix
-            children[n_children:n_children + _children.shape[0], :] = _children
-
-            # increase the number of children
-            n_children += _children.shape[0]

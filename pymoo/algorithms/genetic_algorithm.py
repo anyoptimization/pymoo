@@ -1,8 +1,10 @@
+import math
+
 import numpy as np
+from scipy.spatial.distance import cdist
 
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.population import Population
-from pymoo.util.misc import unique_rows
 
 
 class GeneticAlgorithm(Algorithm):
@@ -36,16 +38,6 @@ class GeneticAlgorithm(Algorithm):
 
     eliminate_duplicates : bool
         If this flag is set no duplicates are allowed in the population (mostly likely only used for binary or discrete)
-
-    verbose : int
-        If larger than zero output is provided. (verbose=1 means some output, verbose=2 details for debugging)
-
-    callback : func
-        A callback function can be passed that is executed every generation. The parameters for the function
-        are the algorithm itself, the number of evaluations so far and the current population.
-
-            def callback(algorithm, n_evals, pop):
-                print()
 
     """
 
@@ -81,6 +73,9 @@ class GeneticAlgorithm(Algorithm):
 
     def _solve(self, problem, evaluator):
 
+        # setup initial generation
+        n_gen = 0
+
         # create the population according to the factoring strategy
         pop = Population()
         if isinstance(self.sampling, np.ndarray):
@@ -89,9 +84,6 @@ class GeneticAlgorithm(Algorithm):
             pop.X = self.sampling.sample(problem, self.pop_size, self)
         pop.F, pop.G = evaluator.eval(problem, pop.X)
         pop = self.survival.do(pop, self.pop_size, data=self.data)
-
-        # setup initial generation
-        n_gen = 0
 
         # while there are functions evaluations left
         while evaluator.has_remaining():
@@ -106,11 +98,14 @@ class GeneticAlgorithm(Algorithm):
             n_offsprings = 0
             n_parents = self.crossover.n_parents
 
+            # mating counter - for discrete problems where no new solutions can be generated
+            n_matings = 0
+
             # do the mating until all offspring are created
             while n_offsprings < self.n_offsprings:
 
                 # select from the current population individuals for mating
-                n_select = int(self.n_offsprings - n_offsprings / self.crossover.n_children)
+                n_select = int(math.ceil((self.n_offsprings - n_offsprings) / self.crossover.n_children))
                 parents = self.selection.next(pop, n_select, n_parents, data=self.data)
                 X = self.crossover.do(problem, pop.X[parents, :])
 
@@ -118,19 +113,28 @@ class GeneticAlgorithm(Algorithm):
                 if X.shape[0] > self.n_offsprings - n_offsprings:
                     X = X[:self.n_offsprings - n_offsprings, :]
 
+                # do the mutation
+                X = self.mutation.do(problem, X)
+
+                # eliminate duplicates if too close to the current population
+                if self.eliminate_duplicates:
+                    is_equal = np.min(cdist(X, pop.X), axis=1) <= 1e-60
+                    X = X[np.logical_not(is_equal), :]
+
+                # add to the offsprings
                 off.X[n_offsprings:n_offsprings + X.shape[0], :] = X
                 n_offsprings = n_offsprings + X.shape[0]
 
-            off.X = self.mutation.do(problem, off.X)
+                n_matings += 1
+
+                if n_matings > 100:
+                    off.X = off.X[:n_offsprings, :]
+                    break
+
             off.F, off.G = evaluator.eval(problem, off.X)
 
             # merge the population
             pop.merge(off)
-
-            # eliminate all duplicates in the population
-            if self.eliminate_duplicates:
-                # pop.filter(unique_rows(pop.F))
-                pop.filter(unique_rows(pop.X))
 
             # truncate the population
             pop = self.survival.do(pop, self.pop_size)
@@ -140,7 +144,7 @@ class GeneticAlgorithm(Algorithm):
 
     def _do_each_generation(self, n_gen, evaluator, pop):
         if self.verbose > 0:
-            print('gen = %d' % (n_gen + 1))
+            print('gen = %d (FE:%s)' % (n_gen + 1, evaluator.n_eval))
         if self.verbose > 1:
             pass
         if self.callback is not None:
