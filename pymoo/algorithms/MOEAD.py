@@ -6,7 +6,7 @@ from pymoo.operators.crossover.real_differental_evolution_crossover import Diffe
 from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
 from pymoo.rand import random
-from pymop.util import get_weights
+from pymop.util import get_uniform_weights
 
 
 class MOEAD(Algorithm):
@@ -32,7 +32,7 @@ class MOEAD(Algorithm):
         self.neighbours = None
 
     def _initialize(self, problem):
-        self.weights = get_weights(self.pop_size, problem.n_obj, func_random=random.random, method="uniform")
+        self.weights = get_uniform_weights(self.pop_size, problem.n_obj)
         self.neighbours = np.argsort(cdist(self.weights, self.weights), axis=1)[:, :self.n_neighbors]
 
     def _solve(self, problem, evaluator):
