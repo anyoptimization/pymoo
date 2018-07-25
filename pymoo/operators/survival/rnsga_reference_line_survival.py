@@ -5,17 +5,20 @@ from pymoo.model.survival import Survival
 from pymoo.rand import random
 from pymoo.util.misc import normalize_by_asf_interceptions
 from pymoo.util.non_dominated_rank import NonDominatedRank
+from pymoo.util.reference_directions import get_ref_dirs_from_points
 
 
 class ReferenceLineSurvival(Survival):
-    def __init__(self, ref_dirs):
+    def __init__(self, ref_dirs, n_obj):
         super().__init__()
         self.ref_dirs = ref_dirs
+        self.n_obj = n_obj
+        self.extreme = None
+        self.asf = None
 
     def _do(self, pop, n_survive, data, return_only_index=False):
-
+        self.ref_dirs = data.ref_dirs
         fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
-
         # all indices to survive
         survival = []
 
@@ -29,10 +32,20 @@ class ReferenceLineSurvival(Survival):
         survival = list(range(0, len(survival)))
         last_front = np.arange(len(survival), pop.size())
 
-        N = normalize_by_asf_interceptions(pop.F, return_bounds=False)
-        # N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
+        N, self.asf, self.extreme, F_min, F_max = normalize_by_asf_interceptions(np.vstack((pop.F, data.ref_points)),
+                                                                                 len(fronts[0]),
+                                                                                 prev_asf=self.asf,
+                                                                                 prev_S=self.extreme,
+                                                                                 return_bounds=True)
 
-        # if the last front needs to be splitted
+        z_ = (data.ref_points - F_min)/(F_max - F_min)  # Normalized reference points
+        data.F_min, data.F_max = F_min, F_max
+        self.ref_dirs = get_ref_dirs_from_points(z_, self.n_obj, data.ref_pop_size, alpha=data.alpha, method=data.method, p=data.p)  # New structured reference points
+        data.ref_dirs = self.ref_dirs
+        # L = (self.ref_dirs + F_min) * (F_max - F_min)
+        # np.savetxt("ref_dirs.txt", L)
+
+        # if the last front needs to be split
         n_remaining = n_survive - len(survival)
         if n_remaining > 0:
 
@@ -84,20 +97,8 @@ class ReferenceLineSurvival(Survival):
 
         # now truncate the population
         pop.filter(survival)
-
+        # np.savetxt("ref_dirs.txt", data.ref_dirs)
         return pop
-
-
-def calc_perpendicular_dist(v, u):
-    norm_u = np.linalg.norm(u)
-    scalar_proj = np.dot(v, u) / norm_u
-    proj = scalar_proj * u / norm_u
-    return np.linalg.norm(proj - v)
-
-
-def calc_perpendicular_dist_matrix_slow(N, ref_dirs):
-    return cdist(N, ref_dirs, metric=calc_perpendicular_dist)
-
 
 def calc_perpendicular_dist_matrix(N, ref_dirs):
     u = np.tile(ref_dirs, (len(N), 1))

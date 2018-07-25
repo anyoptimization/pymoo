@@ -5,12 +5,16 @@ from pymoo.model.survival import Survival
 from pymoo.rand import random
 from pymoo.util.misc import normalize_by_asf_interceptions
 from pymoo.util.non_dominated_rank import NonDominatedRank
+from pymoo.util.reference_directions import get_ref_dirs_from_n
 
 
 class ReferenceLineSurvival(Survival):
-    def __init__(self, ref_dirs):
+    def __init__(self, ref_dirs, n_obj):
         super().__init__()
+        self.n_obj = n_obj
         self.ref_dirs = ref_dirs
+        self.extreme = None
+        self.asf = None
 
     def _do(self, pop, n_survive, data, return_only_index=False):
 
@@ -29,8 +33,14 @@ class ReferenceLineSurvival(Survival):
         survival = list(range(0, len(survival)))
         last_front = np.arange(len(survival), pop.size())
 
-        N = normalize_by_asf_interceptions(pop.F, return_bounds=False)
-        # N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
+        N, self.asf, self.extreme, F_min, F_max = normalize_by_asf_interceptions(pop.F,
+                                                         len(fronts[0]),
+                                                         prev_asf=self.asf,
+                                                         prev_S=self.extreme,
+                                                         return_bounds=True)
+
+        self.ref_dirs = get_ref_dirs_from_n(self.n_obj, data.pop_size)
+        data.F_min, data.F_max = F_min, F_max
 
         # if the last front needs to be splitted
         n_remaining = n_survive - len(survival)

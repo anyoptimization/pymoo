@@ -1,8 +1,6 @@
 import numpy as np
-from scipy.spatial.distance import cdist
 from pymoo.model.survival import Survival
 from pymoo.rand import random
-from pymoo.util.misc import normalize_by_asf_interceptions
 from pymoo.util.non_dominated_rank import NonDominatedRank
 
 
@@ -14,7 +12,6 @@ class ReferencePointSurvival(Survival):
         self.orig = ref_points
         self.ref_points = ref_points
         self.epsilon = epsilon
-        self.weights = weights
 
     def _do(self, pop, n_survive, data, return_only_index=False):
 
@@ -35,25 +32,16 @@ class ReferencePointSurvival(Survival):
         # Indices of last front members that survived
         survived = []
 
-        # N = normalize_by_asf_interceptions(pop.F, return_bounds=False)
-        # N = normalize(pop.F, np.zeros(pop.F.shape[1]), np.ones(pop.F.shape[1]))
-
         # if the last front needs to be splitted
         n_remaining = n_survive - len(survival)
 
 
         if n_remaining > 0:
 
-            # dist_matrix = calc_perpendicular_dist_matrix(N, self.ref_dirs)
-            # F_bar = map_linear(pop.F, pop.F)
-            # Z_bar = map_linear(self.ref_points, pop.F)
-            # dist_matrix = calc_ref_dist_matrix(F_bar, Z_bar, self.weights)
-            # point_distance_matrix = calc_ref_dist_matrix(F_bar[last_front, :], F_bar[last_front, :], self.weights)
-
             F_min, F_max = pop.F.min(axis=0), pop.F.max(axis=0)
 
-            dist_matrix, self.ref_points = calc_ref_dist_matrix(pop.F, self.orig, self.weights, n_obj=self.n_obj, return_bounds=False)
-            point_distance_matrix = calc_dist_matrix(pop.F[last_front, :], pop.F[last_front, :], self.weights, F_min=F_min, F_max=F_max)
+            dist_matrix, self.ref_points = calc_ref_dist_matrix(pop.F, self.orig, weights=data.weights, n_obj=self.n_obj)
+            point_distance_matrix = calc_dist_matrix(pop.F[last_front, :], pop.F[last_front, :], F_min=F_min, F_max=F_max)
 
             niche_of_individuals = np.argmin(dist_matrix, axis=1)
             min_dist_matrix = dist_matrix[np.arange(len(dist_matrix)), niche_of_individuals]
@@ -113,28 +101,6 @@ class ReferencePointSurvival(Survival):
 
         return pop
 
-def map_linear(xa, xb):
-    f_min = xb.min(axis=0)
-    f_max = xb.max(axis=0)
-    # f_max = np.ones(len(f_min))
-    return (xa - f_min)/(f_max-f_min)
-
-
-
-def calc_perpendicular_dist(v, u):
-    norm_u = np.linalg.norm(u)
-    scalar_proj = np.dot(v, u) / norm_u
-    proj = scalar_proj * u / norm_u
-    return np.linalg.norm(proj - v)
-
-
-def calc_ref_dist_matrix_slow(F, ref_dirs):
-    F_min, F_max = F.min(axis=0), F.max(axis=0)
-    w = np.full(F.shape[1], 1 / F.shape[1])
-    def calc_dist_matrix(f, r):
-        return np.sqrt(np.sum(w*((f-r)/(F_max-F_min))**2))
-
-    return cdist(F, ref_dirs, metric=calc_dist_matrix)
 
 def calc_ref_dist_matrix(F, orig, weights, n_obj, F_min=None, F_max=None, return_bounds=False):
 
@@ -145,18 +111,18 @@ def calc_ref_dist_matrix(F, orig, weights, n_obj, F_min=None, F_max=None, return
 
         r = np.tile(r_, (len(f_), 1))
         f = np.repeat(f_, len(r_), axis=0)
-        d = np.sqrt(np.sum((f - r) ** 2, axis=1))
-        # d = f-r
+        d = np.sqrt(np.sum(weights * (f - r) ** 2, axis=1))
+
         d = np.reshape(d, (f_.shape[0], r_.shape[0]))
 
         return d, r_
 
-    def normalize_extreme_points(F, n_obj, f_max, f_min):
+    def normalize_extreme_points(F, n_obj):
         extreme = np.eye(n_obj)
         r = np.tile(extreme, (len(F), 1))
         f = np.repeat(F, len(extreme), axis=0)
         # matrix = np.sqrt(np.sum(weights * ((f - r) / (f_max - f_min)) ** 2, axis=1))
-        matrix = np.sqrt(np.sum((f - r) ** 2, axis=1))
+        matrix = np.sqrt(np.sum(weights * (f - r) ** 2, axis=1))
         matrix = np.reshape(matrix, (F.shape[0], extreme.shape[0]))
 
         return matrix, extreme
@@ -169,30 +135,30 @@ def calc_ref_dist_matrix(F, orig, weights, n_obj, F_min=None, F_max=None, return
         weights = np.full(F.shape[1], 1 / F.shape[1])
 
     user_points, r_ = normalize_reference_points(F, orig, F_min, F_max)
-    extreme_points, e_ = normalize_extreme_points(F, n_obj, F_min, F_max)
+    extreme_points, e_ = normalize_extreme_points(F, n_obj)
 
     matrix = np.concatenate((user_points, extreme_points), axis=1)
     ref_points = np.concatenate((r_, e_), axis=0)
+
     if return_bounds==True:
-        return matrix, F_min, F_max
+        return matrix, ref_points, F_min, F_max
     else:
         return matrix, ref_points
 
-def calc_dist_matrix(F, ref_dirs, weights, F_min=None, F_max=None, return_bounds=False):
+
+def calc_dist_matrix(F, ref_dirs, F_min=None, F_max=None, return_bounds=False):
     if F_min is None:
         F_min = F.min(axis=0)
     if F_max is None:
         F_max = F.max(axis=0)
-    if weights is None:
-        weights = np.full(F.shape[1], 1 / F.shape[1])
 
     r = np.tile(ref_dirs, (len(F), 1))
     f = np.repeat(F, len(ref_dirs), axis=0)
 
     if not np.array_equal(F_max, F_min):
-        matrix = np.sqrt(np.sum(weights * ((f - r) / (F_max - F_min)) ** 2, axis=1))
+        matrix = np.sqrt(np.sum(((f - r) / (F_max - F_min)) ** 2, axis=1))
     else:
-        matrix = np.sqrt(np.sum(weights * (f - r) ** 2, axis=1))
+        matrix = np.sqrt(np.sum((f - r) ** 2, axis=1))
 
     matrix = np.reshape(matrix, (F.shape[0], ref_dirs.shape[0]))
 
