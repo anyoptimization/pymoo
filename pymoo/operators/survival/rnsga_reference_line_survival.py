@@ -40,10 +40,8 @@ class ReferenceLineSurvival(Survival):
 
         z_ = (data.ref_points - F_min)/(F_max - F_min)  # Normalized reference points
         data.F_min, data.F_max = F_min, F_max
-        self.ref_dirs = get_ref_dirs_from_points(z_, self.n_obj, data.ref_pop_size, alpha=data.alpha, method=data.method, p=data.p)  # New structured reference points
+        self.ref_dirs = get_ref_dirs_from_points(z_, self.n_obj, data.ref_pop_size, alpha=data.mu, method=data.method, p=data.p)  # New structured reference points
         data.ref_dirs = self.ref_dirs
-        # L = (self.ref_dirs + F_min) * (F_max - F_min)
-        # np.savetxt("ref_dirs.txt", L)
 
         # if the last front needs to be split
         n_remaining = n_survive - len(survival)

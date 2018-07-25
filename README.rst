@@ -32,6 +32,10 @@ many-objective problems. The survival selection uses the perpendicular
 distance to the reference directions. As normalization the boundary
 intersection method is used [5].
 
+**R-NSGA-III** : A reference-point based algorithm for solving
+many-objective problems. An extension on the NSGA-III algorithm
+R-NSGA-III is used to find solutions around a user specified region.
+
 **MOEAD/D** : The classical MOEAD\D implementation using the
 Tchebichew decomposition function.
 
