@@ -23,14 +23,18 @@ def comp_by_rank_and_crowding(pop, P, **kwargs):
     rank = kwargs['data']['rank']
     crowding = kwargs['data']['crowding']
 
+    # the winner of the tournament selection
     S = np.zeros((P.shape[0], 1), dtype=np.int)
 
     for i, p in enumerate(P):
 
+        # first by rank
         if rank[P[i, 0]] < rank[P[i, 1]]:
             S[i, 0] = P[i, 0]
         elif rank[P[i, 1]] < rank[P[i, 0]]:
             S[i, 0] = P[i, 1]
+
+        # then by crowding
         else:
             if crowding[P[i, 0]] > crowding[P[i, 1]]:
                 S[i, 0] = P[i, 0]
@@ -53,10 +57,13 @@ def comp_by_dom_and_crowding(pop, P, **kwargs):
 
         rel = Dominator.get_relation(pop.F[P[i, 0], :], pop.F[P[i, 1], :])
 
+        # first by domination
         if rel == 1:
             S[i, 0] = P[i, 0]
         elif rel == -1:
             S[i, 0] = P[i, 1]
+
+        # then by crowding
         else:
             if crowding[P[i, 0]] > crowding[P[i, 1]]:
                 S[i, 0] = P[i, 0]

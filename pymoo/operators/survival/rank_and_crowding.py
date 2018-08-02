@@ -1,7 +1,6 @@
 import numpy as np
 
 from pymoo.model.survival import Survival
-from pymoo.util.misc import normalize
 from pymoo.util.non_dominated_rank import NonDominatedRank
 
 

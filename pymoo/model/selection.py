@@ -7,7 +7,7 @@ class Selection:
     used to increase the selection pressure.
     """
 
-    def next(self, pop, n_select, n_parents=None, **kwargs):
+    def next(self, pop, n_select, n_parents=2, **kwargs):
         """
         Choose from the population new individuals to be selected.
 
@@ -21,7 +21,7 @@ class Selection:
             Number of individuals to select.
 
         n_parents : int
-            If not None, a two dimensional array is returned which has n_select rows and n_parents columns.
+            Number of parents needed to create an offspring.
 
         Returns
         -------
@@ -33,5 +33,5 @@ class Selection:
         return self._next(pop, n_select, n_parents, **kwargs)
 
     @abstractmethod
-    def _next(self, pop, n_select, n_parents=None, **kwargs):
+    def _next(self, pop, n_select, n_parents, **kwargs):
         pass

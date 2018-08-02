@@ -1,8 +1,8 @@
 import numpy as np
+
 from pymoo.model.survival import Survival
 from pymoo.rand import random
 from pymoo.util.non_dominated_rank import NonDominatedRank
-from scipy.spatial.distance import cdist
 
 
 class ReferencePointSurvival(Survival):
@@ -14,7 +14,7 @@ class ReferencePointSurvival(Survival):
         self.F_min = F_min
         self.F_max = F_max
 
-    def _do(self, pop, n_survive, data, return_only_index=False):
+    def _do(self, pop, n_survive, return_only_index=False, **kwargs):
 
         fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
 

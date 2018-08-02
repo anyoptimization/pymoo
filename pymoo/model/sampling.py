@@ -1,4 +1,5 @@
 from abc import abstractmethod
+
 import numpy as np
 
 from pymop.problem import Problem
@@ -46,14 +47,14 @@ def sample_by_bounds(clazz, n_samples, n_var, x_min, x_max, **kwargs):
     ----------
     clazz : class
         The sampling strategy to be used.
-    x_min : np.array
-        lower bounds
-    x_max : np.array
-        upper bounds
     n_var : int
         number of variables
     n_samples : int
         number of samples
+    x_min : np.array
+        lower bounds
+    x_max : np.array
+        upper bounds
     kwargs : dict
         additional arguments
 
