@@ -3,44 +3,35 @@ from abc import abstractmethod
 
 class Selection:
     """
-
-    This class represents the selection of individuals for the mating.
-
+    This class is used to select parents for the mating or other evolutionary operators. Several strategies can be
+    used to increase the selection pressure.
     """
 
-    @abstractmethod
-    def set_population(self, pop, data):
+    def next(self, pop, n_select, n_parents=2, **kwargs):
         """
-
-        Set the population to be selected from.
-
-        Parameters
-        ----------
-        pop: class
-            An object that stores the current population to be selected from.
-        data: class
-            Any other additional data that might be needed for the selection procedure.
-
-        """
-        pass
-
-    @abstractmethod
-    def next(self, n_select):
-        """
-
         Choose from the population new individuals to be selected.
 
         Parameters
         ----------
-        n_select: int
-            How many individuals that should be selected.
+        pop : class
+            The population which should be selected from. Some criteria from the design or objective space
+            might be used for the selection. Therefore, only the number of individual might be not enough.
+
+        n_select : int
+            Number of individuals to select.
+
+        n_parents : int
+            Number of parents needed to create an offspring.
 
         Returns
         -------
-
-        select: vector
-            A vector that contains the result indices of selected individuals.
+        P : np.array
+            Indices of selected individuals.
 
         """
 
+        return self._next(pop, n_select, n_parents, **kwargs)
+
+    @abstractmethod
+    def _next(self, pop, n_select, n_parents, **kwargs):
         pass

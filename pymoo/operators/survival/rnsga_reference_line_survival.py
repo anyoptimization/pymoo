@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.spatial.distance import cdist
 
 from pymoo.model.survival import Survival
 from pymoo.rand import random
@@ -9,6 +8,7 @@ from pymoo.util.reference_directions import get_ref_dirs_from_points
 
 
 class ReferenceLineSurvival(Survival):
+
     def __init__(self, ref_dirs, n_obj):
         super().__init__()
         self.ref_dirs = ref_dirs
@@ -16,8 +16,10 @@ class ReferenceLineSurvival(Survival):
         self.extreme = None
         self.asf = None
 
-    def _do(self, pop, n_survive, data, return_only_index=False):
-        self.ref_dirs = data.ref_dirs
+    def _do(self, pop, n_survive, return_only_index=False, **kwargs):
+
+        data = kwargs['data']
+
         fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
         # all indices to survive
         survival = []
@@ -40,7 +42,7 @@ class ReferenceLineSurvival(Survival):
 
         z_ = (data.ref_points - F_min)/(F_max - F_min)  # Normalized reference points
         data.F_min, data.F_max = F_min, F_max
-        self.ref_dirs = get_ref_dirs_from_points(z_, self.n_obj, data.ref_pop_size, alpha=data.mu, method=data.method, p=data.p)  # New structured reference points
+        self.ref_dirs = get_ref_dirs_from_points(z_, self.n_obj, data.ref_pop_size, alpha=data.mu, method=data.method, p=data.p)
         data.ref_dirs = self.ref_dirs
 
         # if the last front needs to be split

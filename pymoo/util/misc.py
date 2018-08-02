@@ -1,6 +1,8 @@
 import numpy as np
 from numpy.linalg import LinAlgError
 
+from pymoo.rand import random
+
 
 def denormalize(x, x_min, x_max):
     return x * (x_max - x_min) + x_min
@@ -187,3 +189,12 @@ def parameter_less_constraints(F, CV, F_max=None):
     has_constraint_violation = CV > 0
     F[has_constraint_violation] = CV[has_constraint_violation] + F_max
     return F
+
+
+def random_permuations(n, l):
+    perms = []
+    for i in range(n):
+        perms.append(random.perm(size=l))
+    P = np.concatenate(perms)
+    return P
+

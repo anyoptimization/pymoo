@@ -64,5 +64,3 @@ class DifferentialEvolutionCrossover(Crossover):
             smaller_than_min, larger_than_max = p.xl > children, p.xu < children
             children[smaller_than_min] = (p.xl + (p.xl - children))[smaller_than_min]
             children[larger_than_max] = (p.xu - (children - p.xu))[larger_than_max]
-
-        return children

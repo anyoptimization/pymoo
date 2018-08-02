@@ -1,23 +1,24 @@
 import time
 
-from matplotlib import animation
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import animation
 
-from pymoo.algorithms.so_DE import DifferentialEvolution
-from pymop.rastrigin import Rastrigin
+from pymop.dtlz import DTLZ2
 
 if __name__ == '__main__':
 
     # load the problem instance
-    from pymop.zdt import ZDT1
-    problem = ZDT1(n_var=30)
-    problem = Rastrigin(n_var=30)
+    #from pymop.zdt import ZDT1
+    #problem = ZDT1(n_var=30)
+    #problem = Rastrigin(n_var=30)
+
+    problem = DTLZ2(n_var=10)
 
     # create the algorithm instance by specifying the intended parameters
-    from pymoo.algorithms.NSGAII import NSGAII
-    algorithm = NSGAII("real", pop_size=100, verbose=True)
-    algorithm = DifferentialEvolution(pop_size=100, verbose=True)
+    from pymoo.algorithms.NSGAIII import NSGAIII
+    algorithm = NSGAIII("real", pop_size=91, verbose=True)
+    #algorithm = DifferentialEvolution(pop_size=100, verbose=True)
 
     start_time = time.time()
 
@@ -37,6 +38,8 @@ if __name__ == '__main__':
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
+    print(F)
+
     scatter_plot = True
     save_animation = False
 
@@ -50,7 +53,6 @@ if __name__ == '__main__':
 
     if scatter_plot and is_3d:
         fig = plt.figure()
-        from mpl_toolkits.mplot3d import Axes3D
         ax = fig.add_subplot(111, projection='3d')
         ax.scatter(F[:, 0], F[:, 1], F[:, 2])
         plt.show()

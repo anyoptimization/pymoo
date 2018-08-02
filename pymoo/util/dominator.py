@@ -46,7 +46,10 @@ class Dominator:
             constr = np.zeros((F.shape[0], F.shape[0]))
         else:
             # consider the constraint violation
-            CV = Problem.calc_constraint_violation(G)
+            #CV = Problem.calc_constraint_violation(G)
+            #constr = (CV < CV) * 1 + (CV > CV) * -1
+
+            CV = Problem.calc_constraint_violation(G)[:,0]
             constr = (CV[:, None] < CV) * 1 + (CV[:, None] > CV) * -1
 
         # look at the obj for dom
