@@ -1,22 +1,22 @@
+import math
+
+import numpy as np
+
 from pymoo.model.selection import Selection
-from pymoo.rand import random
+from pymoo.util.misc import random_permuations
 
 
 class RandomSelection(Selection):
-    def __init__(self):
-        self.perm = None
-        self.counter = None
-        self.pop = None
 
-    def set_population(self, pop, data):
-        self.pop = pop
+    def _next(self, pop, n_select, n_parents, **kwargs):
 
-    def next(self, n_selected):
-        if self.perm is None or self.counter + n_selected >= self.pop.size():
-            self.perm = random.perm(self.pop.size())
-            self.counter = 0
+        # number of random individuals needed
+        n_random = n_select * n_parents
 
-        selected = self.perm[self.counter:self.counter+n_selected]
-        self.counter = self.counter + n_selected
+        # number of permutations needed
+        n_perms = math.ceil(n_random / pop.size())
 
-        return selected
+        # get random permutations and reshape them
+        P = random_permuations(n_perms, pop.size())[:n_random]
+
+        return np.reshape(P, (n_select, n_parents))

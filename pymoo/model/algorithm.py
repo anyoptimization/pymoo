@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-import numpy
+import numpy as np
 from pymop.problem import Problem
 
 import pymoo
@@ -65,10 +65,10 @@ class Algorithm:
         seed: int
             Random seed for this run. Before the algorithm starts this seed is set.
 
-        return_only_feasible:
+        return_only_feasible : bool
             If true, only feasible solutions are returned.
 
-        return_only_non_dominated
+        return_only_non_dominated : bool
             If true, only the non dominated solutions are returned. Otherwise, it might be - dependend on the
             algorithm - the final population
 
@@ -91,7 +91,7 @@ class Algorithm:
         # just to be sure also for the others
         seed = pymoo.rand.random.randint(0, 100000)
         random.seed(seed)
-        numpy.random.seed(seed)
+        np.random.seed(seed)
 
         # add the history object
         self.history = history
@@ -109,7 +109,7 @@ class Algorithm:
 
         if return_only_feasible:
             if G is not None and G.shape[0] == len(F) and G.shape[1] > 0:
-                cv = Problem.calc_constraint_violation(G)
+                cv = Problem.calc_constraint_violation(G)[:,0]
                 X = X[cv <= 0, :]
                 F = F[cv <= 0, :]
                 if G is not None:

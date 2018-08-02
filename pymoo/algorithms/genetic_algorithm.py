@@ -22,10 +22,10 @@ class GeneticAlgorithm(Algorithm):
         The population size to be used for the genetic algorithm.
 
     sampling : class
-        The sampling implementation to create the initial population.
+        The sampling strategy to create the initial population.
 
     selection : class
-        A class to select the parents for the crossover
+        The method to select the parents for the crossover
 
     crossover : class
         The crossover to be performed on parents.
@@ -35,6 +35,9 @@ class GeneticAlgorithm(Algorithm):
 
     survival : class
         This class selects the individuals to survive for the next generation
+
+    n_offsprings : int
+        Number of offspring to be generate each epoch. Can be 1 to create a steady-state algorithm.
 
     eliminate_duplicates : bool
         If this flag is set no duplicates are allowed in the population (mostly likely only used for binary or discrete)
@@ -81,7 +84,7 @@ class GeneticAlgorithm(Algorithm):
         if isinstance(self.sampling, np.ndarray):
             pop.X = self.sampling
         else:
-            pop.X = self.sampling.sample(problem, self.pop_size, self)
+            pop.X = self.sampling.sample(problem, self.pop_size)
         pop.F, pop.G = evaluator.eval(problem, pop.X)
         pop = self.survival.do(pop, self.pop_size, data=self.data)
 
@@ -89,7 +92,7 @@ class GeneticAlgorithm(Algorithm):
         while evaluator.has_remaining():
 
             # increase the generation and do printing and callback
-            self._do_each_generation(n_gen, evaluator, pop)
+            self._do_each_iteration(n_gen, evaluator, pop)
             n_gen += 1
 
             # initialize selection and offspring methods
@@ -98,14 +101,15 @@ class GeneticAlgorithm(Algorithm):
             n_offsprings = 0
             n_parents = self.crossover.n_parents
 
-            # mating counter - for discrete problems where no new solutions can be generated
+            # mating counter - counts how often the mating needs to be done to fill up n_offsprings
             n_matings = 0
 
-            # do the mating until all offspring are created
+            # do the mating until all offspring are created usually it should be done is one iteration
+            # through duplicate eliminate more might be necessary
             while n_offsprings < self.n_offsprings:
 
                 # select from the current population individuals for mating
-                n_select = int(math.ceil((self.n_offsprings - n_offsprings) / self.crossover.n_children))
+                n_select = math.ceil((self.n_offsprings - n_offsprings) / self.crossover.n_children)
                 parents = self.selection.next(pop, n_select, n_parents, data=self.data)
                 X = self.crossover.do(problem, pop.X[parents, :])
 
@@ -127,8 +131,10 @@ class GeneticAlgorithm(Algorithm):
 
                 n_matings += 1
 
+                # if no new offsprings can be generated within 100 trails -> return the current result
                 if n_matings > 100:
                     off.X = off.X[:n_offsprings, :]
+                    evaluator.n_eval = evaluator.n_max_eval
                     break
 
             off.F, off.G = evaluator.eval(problem, off.X)
@@ -139,12 +145,12 @@ class GeneticAlgorithm(Algorithm):
             # truncate the population
             pop = self.survival.do(pop, self.pop_size)
 
-        self._do_each_generation(n_gen, evaluator, pop)
+        self._do_each_iteration(n_gen, evaluator, pop)
         return pop.X, pop.F, pop.G
 
-    def _do_each_generation(self, n_gen, evaluator, pop):
+    def _do_each_iteration(self, n_iteration, evaluator, pop):
         if self.verbose > 0:
-            print('gen = %d (FE:%s)' % (n_gen + 1, evaluator.n_eval))
+            print('gen = %d (FE:%s)' % (n_iteration + 1, evaluator.n_eval))
         if self.verbose > 1:
             pass
         if self.callback is not None:
@@ -152,7 +158,7 @@ class GeneticAlgorithm(Algorithm):
 
         if self.history is not None:
             self.history.append(
-                {'n_gen': n_gen,
+                {'n_gen': n_iteration,
                  'n_evals': evaluator.n_eval,
                  'X': np.copy(pop.X),
                  'F': np.copy(pop.F)

@@ -1,9 +1,11 @@
 import numpy as np
 from numpy.linalg import LinAlgError
+from pymoo.rand import random
 
 
 def denormalize(x, x_min, x_max):
     return x * (x_max - x_min) + x_min
+
 
 def normalize(x, x_min=None, x_max=None, return_bounds=False):
     if x_min is None:
@@ -43,7 +45,7 @@ def normalize_by_asf_interceptions(x, return_bounds=False):
     try:
         b = np.ones(n_obj)
         A = np.linalg.solve(S, b)
-        A[A==0] = 0.000001
+        A[A == 0] = 0.000001
         A = 1 / A
         A = A.T
     except LinAlgError:
@@ -57,6 +59,7 @@ def normalize_by_asf_interceptions(x, return_bounds=False):
     else:
         x_max = A + x_min
         return F, x_min, x_max
+
 
 def standardize(x, return_bounds=False):
     mean = np.mean(x, axis=0)
@@ -73,6 +76,7 @@ def standardize(x, return_bounds=False):
 
 def destandardize(x, mean, std):
     return (x * std) + mean
+
 
 # returns only the unique rows from a given matrix X
 def unique_rows(X):
@@ -98,3 +102,11 @@ def parameter_less_constraints(F, CV, F_max=None):
     has_constraint_violation = CV > 0
     F[has_constraint_violation] = CV[has_constraint_violation] + F_max
     return F
+
+
+def random_permuations(n, l):
+    perms = []
+    for i in range(n):
+        perms.append(random.perm(size=l))
+    P = np.concatenate(perms)
+    return P

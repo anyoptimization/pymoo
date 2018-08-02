@@ -12,7 +12,7 @@ class FitnessSurvival(Survival):
 
 
     """
-    def _do(self, pop, size, data):
+    def _do(self, pop, size, **kwargs):
 
         if pop.F.shape[1] != 1:
             raise ValueError("FitnessSurvival can only used for single objective problems!")

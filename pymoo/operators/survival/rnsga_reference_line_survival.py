@@ -3,7 +3,6 @@ from scipy.spatial.distance import cdist
 
 from pymoo.model.survival import Survival
 from pymoo.rand import random
-from pymoo.util.misc import normalize_by_asf_interceptions
 from pymoo.util.non_dominated_rank import NonDominatedRank
 
 
@@ -14,7 +13,7 @@ class ReferenceLineSurvival(Survival):
         self.epsilon = epsilon
         self.weights = weights
 
-    def _do(self, pop, n_survive, data, return_only_index=False):
+    def _do(self, pop, n_survive, return_only_index=False, **kwargs):
 
         fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
 

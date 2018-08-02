@@ -12,7 +12,7 @@ class ReferenceLineSurvival(Survival):
         super().__init__()
         self.ref_dirs = ref_dirs
 
-    def _do(self, pop, n_survive, data, return_only_index=False):
+    def _do(self, pop, n_survive, return_only_index=False, **kwargs):
 
         fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
 
