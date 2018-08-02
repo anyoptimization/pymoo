@@ -3,14 +3,13 @@ import sys
 import time
 
 import numpy as np
-from pymop.zdt import ZDT1, ZDT2, ZDT3, ZDT4, ZDT6
-from pymop.dtlz import DTLZ2
 
-from pymoo.algorithms.ERNSGAII import RNSGAIII
+from pymoo.algorithms.RNSGAIII import RNSGAIII
+from pymoo.indicators.rmetric import RMetric
 from pymoo.model.evaluator import Evaluator
 from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
-
-from pymoo.indicators.rmetric import RMetric
+from pymop.dtlz import DTLZ2
+from pymop.zdt import ZDT1, ZDT2, ZDT3
 
 n_runs = 30
 output = os.path.join('.', 'benchmark/')

@@ -12,7 +12,6 @@ except (IOError, ImportError):
     long_description = ''
 
 
-
 setup(
     name="pymoo",
     version=__version__,

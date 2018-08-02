@@ -1,3 +1,5 @@
+import numpy as np
+
 from pymoo.configuration import Configuration
 
 
@@ -17,7 +19,7 @@ def seed(s):
 
 
 def perm(size):
-    return Singleton.get_instance().perm(size)
+    return Singleton.get_instance().perm(size).astype(np.int)
 
 
 def random(*params, size=None):

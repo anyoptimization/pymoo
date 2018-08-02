@@ -5,8 +5,26 @@ import numpy as np
 
 class Mutation:
     def do(self, problem, X):
+        """
+
+        Mutate variables in a genetic way.
+
+        Parameters
+        ----------
+        problem : class
+            The problem instance - specific information such as variable bounds might be needed.
+        X : np.ndarray
+            Two dimensional array where each row is an individual and each column represents a variable.
+
+        Returns
+        -------
+        Y : np.ndarray
+            The mutated individuals
+
+        """
         Y = np.full(X.shape, np.inf)
-        return self._do(problem, X, Y)
+        self._do(problem, X, Y)
+        return Y
 
     @abstractmethod
     def _do(self, problem, X):

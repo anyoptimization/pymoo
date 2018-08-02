@@ -16,7 +16,9 @@ class ReferenceLineSurvival(Survival):
         self.extreme = None
         self.asf = None
 
-    def _do(self, pop, n_survive, data, return_only_index=False):
+    def _do(self, pop, n_survive, return_only_index=False, **kwargs):
+
+        data = kwargs['data']
 
         fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
 
@@ -38,9 +40,7 @@ class ReferenceLineSurvival(Survival):
                                                          prev_asf=self.asf,
                                                          prev_S=self.extreme,
                                                          return_bounds=True)
-
-        self.ref_dirs = get_ref_dirs_from_n(self.n_obj, data.pop_size)
-        data.F_min, data.F_max = F_min, F_max
+        data['F_min'], data['F_max'] = F_min, F_max
 
         # if the last front needs to be splitted
         n_remaining = n_survive - len(survival)
