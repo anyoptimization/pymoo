@@ -1,8 +1,9 @@
 import math
 
 import numpy as np
+
 from pymoo.model.selection import Selection
-from pymoo.rand import random
+from pymoo.util.misc import random_permuations
 
 
 class TournamentSelection(Selection):
@@ -29,7 +30,7 @@ class TournamentSelection(Selection):
 
         self.f_comp = f_comp
         if self.f_comp is None:
-            self.f_comp = self.select_by_min_index
+            raise Exception("Please provide the comparing function for the tournament selection!")
 
         # attributes that will be set during the optimization
         self.pop = None
@@ -38,16 +39,17 @@ class TournamentSelection(Selection):
 
     def _next(self, pop, n_select, n_parents=1, **kwargs):
 
-        l = []
-        for i in range(math.ceil(n_select * n_parents * self.pressure / pop.size())):
-            l.append(random.perm(size=pop.size()))
+        # number of random individuals needed
+        n_random = n_select * n_parents * self.pressure
 
-        P = np.concatenate(l)[:n_select * n_parents * self.pressure]
+        # number of permutations needed
+        n_perms = math.ceil(n_random / pop.size())
+
+        # get random permutations and reshape them
+        P = random_permuations(n_perms, pop.size())[:n_random]
         P = np.reshape(P, (n_select * n_parents, self.pressure))
 
+        # compare using tournament function
         S = self.f_comp(pop, P, **kwargs)
-        return np.reshape(S, (n_select, n_parents))
 
-    # select simply by minimum index and assume sorting of the population according selection criteria
-    def select_by_min_index(self, pop, P, **kwargs):
-        return np.min(P, axis=1)
+        return np.reshape(S, (n_select, n_parents))
