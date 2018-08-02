@@ -10,9 +10,8 @@ class FitnessSurvival(Survival):
     This survival method is just for single-objective algorithm.
     Simply sort by first constraint violation and then fitness value and truncate the worst individuals.
 
-
     """
-    def _do(self, pop, size, data):
+    def _do(self, pop, size, **kwargs):
 
         if pop.F.shape[1] != 1:
             raise ValueError("FitnessSurvival can only used for single objective problems!")

@@ -1,9 +1,7 @@
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.operators.default_operators import set_default_if_none, set_if_none
 from pymoo.operators.survival.reference_line_survival import ReferenceLineSurvival
-from pymoo.rand import random
-# from pymop.util import get_weights
-from pymoo.util.reference_directions import get_ref_dirs_from_n
+from pymoo.util.reference_directions import get_uniform_weights
 
 
 class NSGAIII(GeneticAlgorithm):
@@ -20,9 +18,8 @@ class NSGAIII(GeneticAlgorithm):
         if self.survival is None:
 
             # if ref dirs are not initialized do it based on the population size
-            # import numpy as np
             if self.ref_dirs is None:
-                # self.ref_dirs = get_weights(self.pop_size, problem.n_obj, func_random=np.random.rand, method="uniform")
-                self.ref_dirs = get_ref_dirs_from_n(problem.n_obj, self.pop_size)
+                self.ref_dirs = get_uniform_weights(self.pop_size, problem.n_obj)
+
             # set the survival method itself
             self.survival = ReferenceLineSurvival(self.ref_dirs, problem.n_obj)
