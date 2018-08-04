@@ -8,7 +8,7 @@ from pymoo.util.misc import random_permuations
 
 class RandomSelection(Selection):
 
-    def _next(self, pop, n_select, n_parents, **kwargs):
+    def _do(self, pop, n_select, n_parents, **kwargs):
 
         # number of random individuals needed
         n_random = n_select * n_parents

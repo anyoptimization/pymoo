@@ -8,13 +8,25 @@ from pymoo.util.non_dominated_rank import NonDominatedRank
 class RMetric(Indicator):
     def __init__(self, curr_pop, whole_pop, ref_points, problem, w=None):
         """
-        RMetric Constructor
-        :param curr_pop: numpy array: Population from algorithm being evaluated
-        :param whole_pop: numpy array: Whole population of all algorithms
-        :param ref_points: numpy array: list of reference points
-        :param problem: problem: problem
-        :param w: numpy array: weights for each objective
+
+        Parameters
+        ----------
+        curr_pop : numpy.array
+             Population from algorithm being evaluated
+
+        whole_pop : numpy.array
+            Whole population of all algorithms
+
+        ref_points : numpy.array
+            list of reference points
+
+        problem : class
+            problem instance
+
+        w : numpy.array
+            weights for each objective
         """
+
         Indicator.__init__(self)
         self.curr_pop = curr_pop
         self.whole_pop = whole_pop

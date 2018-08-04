@@ -22,7 +22,7 @@ class TournamentSelection(Selection):
             If the function is None it is assumed the population is sorted by a criterium and only indices are compared.
 
         pressure: int
-            The selection pressure to be applied. Default it is a binary tournament.
+            The selection pressure to bie applied. Default it is a binary tournament.
         """
 
         # selection pressure to be applied
@@ -37,7 +37,7 @@ class TournamentSelection(Selection):
         self.perm = None
         self.counter = None
 
-    def _next(self, pop, n_select, n_parents=1, **kwargs):
+    def _do(self, pop, n_select, n_parents=1, **kwargs):
 
         # number of random individuals needed
         n_random = n_select * n_parents * self.pressure

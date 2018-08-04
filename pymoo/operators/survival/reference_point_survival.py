@@ -13,7 +13,7 @@ class ReferencePointSurvival(Survival):
         self.ref_points = ref_points
         self.epsilon = epsilon
 
-    def _do(self, pop, n_survive, return_only_index=False, **kwargs):
+    def _do(self, pop, off, n_survive, return_only_index=False, **kwargs):
 
         fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
 
@@ -35,13 +35,14 @@ class ReferencePointSurvival(Survival):
         # if the last front needs to be splitted
         n_remaining = n_survive - len(survival)
 
-
         if n_remaining > 0:
 
             F_min, F_max = pop.F.min(axis=0), pop.F.max(axis=0)
 
-            dist_matrix, self.ref_points = calc_ref_dist_matrix(pop.F, self.orig, weights=data.weights, n_obj=self.n_obj)
-            point_distance_matrix = calc_dist_matrix(pop.F[last_front, :], pop.F[last_front, :], F_min=F_min, F_max=F_max)
+            dist_matrix, self.ref_points = calc_ref_dist_matrix(pop.F, self.orig, weights=data.weights,
+                                                                n_obj=self.n_obj)
+            point_distance_matrix = calc_dist_matrix(pop.F[last_front, :], pop.F[last_front, :], F_min=F_min,
+                                                     F_max=F_max)
 
             niche_of_individuals = np.argmin(dist_matrix, axis=1)
             min_dist_matrix = dist_matrix[np.arange(len(dist_matrix)), niche_of_individuals]
@@ -99,15 +100,12 @@ class ReferencePointSurvival(Survival):
         # now truncate the population
         pop.filter(survival)
 
-        return pop
-
 
 def calc_ref_dist_matrix(F, orig, weights, n_obj, F_min=None, F_max=None, return_bounds=False):
-
     def normalize_reference_points(F, orig, f_min, f_max):
 
         r_ = (orig - f_min) / (f_max - f_min)
-        f_ = (F - f_min)/(f_max-f_min)
+        f_ = (F - f_min) / (f_max - f_min)
 
         r = np.tile(r_, (len(f_), 1))
         f = np.repeat(f_, len(r_), axis=0)
@@ -140,7 +138,7 @@ def calc_ref_dist_matrix(F, orig, weights, n_obj, F_min=None, F_max=None, return
     matrix = np.concatenate((user_points, extreme_points), axis=1)
     ref_points = np.concatenate((r_, e_), axis=0)
 
-    if return_bounds==True:
+    if return_bounds == True:
         return matrix, ref_points, F_min, F_max
     else:
         return matrix, ref_points
@@ -162,7 +160,7 @@ def calc_dist_matrix(F, ref_dirs, F_min=None, F_max=None, return_bounds=False):
 
     matrix = np.reshape(matrix, (F.shape[0], ref_dirs.shape[0]))
 
-    if return_bounds==True:
+    if return_bounds == True:
         return matrix, F_min, F_max
     else:
         return matrix

@@ -3,9 +3,8 @@ from scipy.spatial.distance import cdist
 
 from pymoo.model.survival import Survival
 from pymoo.rand import random
-from pymoo.util.misc import normalize_by_asf_interceptions
+from pymoo.util.normalization import normalize_by_asf_interceptions
 from pymoo.util.non_dominated_rank import NonDominatedRank
-from pymoo.util.reference_directions import get_ref_dirs_from_n
 
 
 class ReferenceLineSurvival(Survival):
@@ -16,9 +15,7 @@ class ReferenceLineSurvival(Survival):
         self.extreme = None
         self.asf = None
 
-    def _do(self, pop, n_survive, return_only_index=False, **kwargs):
-
-        data = kwargs['data']
+    def _do(self, pop, off, n_survive, return_only_index=False, out=None, **kwargs):
 
         fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
 
@@ -40,8 +37,6 @@ class ReferenceLineSurvival(Survival):
                                                          prev_asf=self.asf,
                                                          prev_S=self.extreme,
                                                          return_bounds=True)
-        data['F_min'], data['F_max'] = F_min, F_max
-
         # if the last front needs to be splitted
         n_remaining = n_survive - len(survival)
         if n_remaining > 0:
@@ -95,7 +90,6 @@ class ReferenceLineSurvival(Survival):
         # now truncate the population
         pop.filter(survival)
 
-        return pop
 
 
 def calc_perpendicular_dist(v, u):

@@ -4,7 +4,7 @@ import time
 
 import numpy as np
 
-from pymoo.algorithms.RNSGAIII import RNSGAIII
+from pymoo.algorithms.rnsga3 import RNSGAIII
 from pymoo.indicators.rmetric import RMetric
 from pymoo.model.evaluator import Evaluator
 from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
