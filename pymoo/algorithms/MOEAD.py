@@ -1,113 +1,86 @@
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from pymoo.model.algorithm import Algorithm
-from pymoo.operators.crossover.real_differental_evolution_crossover import DifferentialEvolutionCrossover
-from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
+from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
+from pymoo.model.survival import Survival
+from pymoo.operators.default_operators import set_default_if_none
 from pymoo.rand import random
+from pymoo.util.display import disp_multi_objective
 from pymop.util import get_uniform_weights
 
 
-class MOEAD(Algorithm):
+class MOEAD(GeneticAlgorithm):
     def __init__(self,
-                 pop_size=100,
-                 n_neighbors=20,
-                 sampling=RealRandomSampling(),
-                 mutation=PolynomialMutation(),
-                 crossover=DifferentialEvolutionCrossover(),
+                 var_type="real",
+                 n_neighbors=15,
                  **kwargs):
 
+        #set_if_none(kwargs, "crossover", DifferentialEvolutionCrossover())
+        set_default_if_none(var_type, kwargs)
+
         super().__init__(**kwargs)
-
-        self.pop_size = pop_size
-        self.sampling = sampling
-
-        self.crossover = crossover
-        self.mutation = mutation
         self.n_neighbors = n_neighbors
 
         # initialized when problem is known
         self.weights = None
         self.neighbours = None
+        self.ideal_point = None
 
-    def _initialize(self, problem):
-        self.weights = get_uniform_weights(self.pop_size, problem.n_obj)
-        self.neighbours = np.argsort(cdist(self.weights, self.weights), axis=1)[:, :self.n_neighbors]
+    def _initialize(self):
 
-    def _solve(self, problem, evaluator):
+        # weights to be used for decomposition
+        self.weights = get_uniform_weights(self.pop_size, self.problem.n_obj)
 
-        # create the population according to the factoring strategy
-        if isinstance(self.sampling, np.ndarray):
-            X = self.sampling
-        else:
-            X = self.sampling.sample(problem, self.pop_size, self)
+        # neighbours includes the entry by itself intentionally for the survival method
+        self.neighbours = np.argsort(cdist(self.weights, self.weights), axis=1)[:, :self.n_neighbors + 1]
 
-        # evaluate and find ideal point
-        F, _ = evaluator.eval(problem, X)
-        ideal_point = np.min(F, axis=0)
+        # survival selection is included in the _mating method
+        self.survival = Survival()
 
-        iteration = 1
+        pop = super()._initialize()
 
-        while evaluator.has_remaining():
+        # set the initial ideal point
+        self.ideal_point = np.min(pop.F, axis=0)
 
-            # iterate for each member of the population
-            for i in range(self.pop_size):
+        return pop
 
-                # select the parents from the neighbourhood
-                parents = self.neighbours[i, random.perm(self.n_neighbors)[:self.crossover.n_parents]]
+    def _next(self, pop):
 
-                # do recombination and create an offspring
-                off_X = self.crossover.do(problem, X[None, parents,:], X=X[[i],:])
+        # iterate for each member of the population
+        for i in range(self.pop_size):
 
-                # do the mutation
-                off_X = self.mutation.do(problem, off_X)
+            # all neighbors shuffled (excluding the individual itself)
+            neighbors = self.neighbours[i][1:][random.perm(self.n_neighbors - 1)]
+            parents = np.concatenate([[i], neighbors[:self.crossover.n_parents - 1]])
 
-                # evaluate the offspring
-                off_F, _ = evaluator.eval(problem, off_X)
+            # do recombination and create an offspring
+            X = self.crossover.do(self.problem, pop.X[None, parents, :], X=pop.X[[i], :])
+            X = self.mutation.do(self.problem, X)
 
-                # update the ideal point
-                ideal_point = np.min(np.concatenate([ideal_point[None, :], off_F], axis=0), axis=0)
+            # evaluate the offspring
+            F, _ = self.evaluator.eval(self.problem, X)
 
-                # for each offspring that was created
-                for k in range(self.crossover.n_children):
+            # update the ideal point
+            self.ideal_point = np.min(np.concatenate([self.ideal_point[None, :], F], axis=0), axis=0)
 
-                    # the weights of each neighbor
-                    weights_of_neighbors = self.weights[self.neighbours[i], :]
+            # for each offspring that was created
+            for k in range(self.crossover.n_children):
+                # the weights of each neighbor
+                weights_of_neighbors = self.weights[self.neighbours[i], :]
 
-                    # calculate the decomposed values for each neighbour
-                    FV = tchebi(F[self.neighbours[i]], weights_of_neighbors, ideal_point)
-                    off_FV = tchebi(off_F[[k], :], weights_of_neighbors, ideal_point)
+                # calculate the decomposed values for each neighbour
+                FV = tchebi(pop.F[self.neighbours[i]], weights_of_neighbors, self.ideal_point)
+                off_FV = tchebi(F[[k], :], weights_of_neighbors, self.ideal_point)
 
-                    # get the absolute index in F where offspring is better than the current F (decomposed space)
-                    off_is_better = self.neighbours[i][np.where(off_FV < FV)[0]]
-                    F[off_is_better, :] = off_F[k, :]
-                    X[off_is_better, :] = off_X[k, :]
+                # get the absolute index in F where offspring is better than the current F (decomposed space)
+                off_is_better = self.neighbours[i][np.where(off_FV < FV)[0]]
+                pop.F[off_is_better, :] = F[k, :]
+                pop.X[off_is_better, :] = X[k, :]
 
-            self._do_each_generation(iteration, evaluator, X, F)
-            iteration += 1
-
-        return X, F, np.zeros(self.pop_size)[:, None]
-
-    def _do_each_generation(self, n_gen, evaluator, X, F):
-        if self.verbose > 0:
-            print('gen = %d' % (n_gen + 1))
-        if self.verbose > 1:
-            pass
-        if self.callback is not None:
-            pass
-            #self.callback(self, evaluator.counter, pop)
-
-        if self.history is not None:
-            self.history.append(
-                {'n_gen': n_gen,
-                 'n_evals': evaluator.counter,
-                 'X': np.copy(X),
-                 'F': np.copy(F)
-                 })
+    def _display_attrs(self, D):
+        return disp_multi_objective(self.problem, self.evaluator, D)
 
 
 def tchebi(F, weights, ideal_point):
     v = np.abs((F - ideal_point) * weights)
     return np.max(v, axis=1)
-

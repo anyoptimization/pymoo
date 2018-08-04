@@ -3,11 +3,11 @@ from pymoo.rand import random
 
 
 class PolynomialMutation(Mutation):
-    def __init__(self, eta_mut=20, p_mut=None):
+    def __init__(self, prob_mut=None, eta_mut=15):
         self.eta_m = eta_mut
-        self.p_mut = p_mut
+        self.p_mut = prob_mut
 
-    def _do(self, p, X, Y):
+    def _do(self, p, X, Y, **kwargs):
 
         if self.p_mut is None:
             self.p_mut = 1.0 / p.n_var

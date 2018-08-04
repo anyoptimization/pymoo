@@ -4,21 +4,46 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import animation
 
-from pymop.dtlz import DTLZ2
+from pymop.problems.dtlz import DTLZ2
+from pymop.problems.rastrigin import Rastrigin
+from pymop.problems.zdt import ZDT1
 
 if __name__ == '__main__':
 
-    # load the problem instance
-    #from pymop.zdt import ZDT1
-    #problem = ZDT1(n_var=30)
-    #problem = Rastrigin(n_var=30)
+    def fun(x):
+        return ZDT1(n_var=30).evaluate(x)
 
+        n_samples = x.shape[0]
+
+        f = np.full((n_samples, 2), np.inf)
+        f[:, 0] = np.sum(np.square(x - 0.25), axis=1)
+        f[:, 1] = np.sum(np.square(x - 0.75), axis=1)
+
+        g = np.full((n_samples, 1), np.inf)
+        g[:, 0] = 0.1 - f[:, 0]
+
+        return f, g
+
+
+    from pymoo.optimize import minimize
+
+    res = minimize(Rastrigin(n_var=30), method="de", termination=('n_eval', 90000), disp=True)
+
+    plt.scatter(res['F'][:,0], res['F'][:,1])
+    plt.show()
+
+    exit()
+
+    # load the problem instance
+    # from pymop.problems.zdt import ZDT4
+    # problem = ZDT4()
+    # problem = Rastrigin(n_var=30)
     problem = DTLZ2(n_var=10)
 
     # create the algorithm instance by specifying the intended parameters
-    from pymoo.algorithms.NSGAIII import NSGAIII
-    algorithm = NSGAIII("real", pop_size=91, verbose=True)
-    #algorithm = DifferentialEvolution(pop_size=100, verbose=True)
+    from pymoo.algorithms.nsga3 import NSGA3
+
+    algorithm = NSGA3("real", pop_size=100, verbose=True)
 
     start_time = time.time()
 
@@ -37,7 +62,6 @@ if __name__ == '__main__':
                               history=history)
 
     print("--- %s seconds ---" % (time.time() - start_time))
-
     print(F)
 
     scatter_plot = True
@@ -52,6 +76,8 @@ if __name__ == '__main__':
         plt.show()
 
     if scatter_plot and is_3d:
+        from mpl_toolkits.mplot3d import Axes3D
+
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
         ax.scatter(F[:, 0], F[:, 1], F[:, 2])
@@ -59,13 +85,12 @@ if __name__ == '__main__':
 
     # create an animation to watch the convergence over time
     if is_2d and save_animation:
-
         fig = plt.figure()
         ax = plt.gca()
 
         _F = history[0]['F']
         pf = problem.pareto_front()
-        plt.scatter(pf[:,0], pf[:,1], label='Pareto Front', s=60, facecolors='none', edgecolors='r')
+        plt.scatter(pf[:, 0], pf[:, 1], label='Pareto Front', s=60, facecolors='none', edgecolors='r')
         scat = plt.scatter(_F[:, 0], _F[:, 1])
 
 

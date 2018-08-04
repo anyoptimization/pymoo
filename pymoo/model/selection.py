@@ -7,7 +7,7 @@ class Selection:
     used to increase the selection pressure.
     """
 
-    def next(self, pop, n_select, n_parents=2, **kwargs):
+    def do(self, pop, n_select, n_parents=2, **kwargs):
         """
         Choose from the population new individuals to be selected.
 
@@ -30,8 +30,8 @@ class Selection:
 
         """
 
-        return self._next(pop, n_select, n_parents, **kwargs)
+        return self._do(pop, n_select, n_parents, **kwargs)
 
     @abstractmethod
-    def _next(self, pop, n_select, n_parents, **kwargs):
+    def _do(self, pop, n_select, n_parents, **kwargs):
         pass

@@ -5,7 +5,10 @@ from pymoo.util.non_dominated_rank import NonDominatedRank
 
 
 class RankAndCrowdingSurvival(Survival):
-    def _do(self, pop, size, return_sorted_idx=False, **kwargs):
+    def _do(self, pop, off, size, return_sorted_idx=False, out=None, **kwargs):
+
+        if off is not None:
+            pop.merge(off)
 
         fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
         rank = NonDominatedRank.calc_from_fronts(fronts)
@@ -26,9 +29,9 @@ class RankAndCrowdingSurvival(Survival):
         rank = rank[sorted_idx]
         crowding = crowding[sorted_idx]
 
-        if 'data' in kwargs:
-            kwargs['data']['rank'] = rank
-            kwargs['data']['crowding'] = crowding
+        if out is not None:
+            out['rank'] = rank
+            out['crowding'] = crowding
 
         return pop
 

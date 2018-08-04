@@ -9,38 +9,39 @@ from pymoo.model.population import Population
 
 class GeneticAlgorithm(Algorithm):
     """
-
     This class represents a basic genetic algorithm that can be extended and modified by
-    providing different modules in the constructor. Most importantly the modules for the initial sampling,
-    recombination and the survival selection should be provided.
-    Different implementations of algorithm can use this class.
+    providing different modules or operators.
 
     Attributes
     ----------
 
     pop_size: int
-        The population size to be used for the genetic algorithm.
+        The population size for the genetic algorithm. Depending on the problem complexity and modality the
+        it makes sense to experiment with the population size.
+        Also, to create a steady state algorithm the offspring_size can be changed.
 
-    sampling : class
-        The sampling strategy to create the initial population.
+    sampling : class or numpy.array
+        The sampling methodology that is used to create the initial population in the first generation. Also,
+        the initial population can be provided directly in case it is known deterministically beforehand.
 
-    selection : class
-        The method to select the parents for the crossover
+    selection : pymoo.model.selection.Selection
+        The mating selection methodology that is used to determine the parents for the mating process.
 
-    crossover : class
-        The crossover to be performed on parents.
+    crossover : pymoo.model.selection.Crossover
+        The crossover methodology that recombines at least two parents to at least one offspring. Depending on
+        the arity the number of crossover execution might vary.
 
-    mutation : class
-        The mutation that will be performed for each child after the crossover
+    mutation : pymoo.model.selection.Mutation
+        The mutation methodology that is used to perturbate an individual. After performing the crossover
+        a mutation is executed.
 
-    survival : class
-        This class selects the individuals to survive for the next generation
+    survival : pymoo.model.selection.Survival
+        Each generation usually a survival selection is performed to follow the survival of the fittest principle.
+        However, other strategies such as niching, diversity preservation and so on can be implemented here.
 
     n_offsprings : int
-        Number of offspring to be generate each epoch. Can be 1 to create a steady-state algorithm.
-
-    eliminate_duplicates : bool
-        If this flag is set no duplicates are allowed in the population (mostly likely only used for binary or discrete)
+        Number of offsprings to be generated each generation. Can be 1 to define a steady-state algorithm.
+        Default it is equal to the population size.
 
     """
 
@@ -64,102 +65,105 @@ class GeneticAlgorithm(Algorithm):
         self.crossover = crossover
         self.mutation = mutation
         self.survival = survival
-        self.eliminate_duplicates = eliminate_duplicates
         self.n_offsprings = n_offsprings
-
-        # dictionary that shared among the modules. Note, here variables can be modified and the changes will reflect.
-        self.data = {'pop_size': pop_size}
+        self.eliminate_duplicates = eliminate_duplicates
 
         # default set the number of offsprings to the population size
         if self.n_offsprings is None:
             self.n_offsprings = pop_size
 
+    def _next(self, pop):
+
+        # do the iteration for the next generation - population objective is modified inplace
+        # do the mating and evaluate the offsprings
+        off = Population()
+        off.X = self._mating(pop)
+        off.F, off.G = self.evaluator.eval(self.problem, off.X)
+
+        # do the survival selection with the merged population
+        self.survival.do(pop, off, self.pop_size, out=self.D, **self.D)
+
+        return off
+
     def _solve(self, problem, evaluator):
 
-        # setup initial generation
+        # for convenience add to class attributes for access in all sub-methods
+        self.problem, self.evaluator = problem, evaluator
+
+        # dictionary that shared among the modules. Note, here variables can be modified and the changes will reflect.
+        # all variables here are only valid for one run using the solve method.
+        self.D = {}
+
+        # generation counter
         n_gen = 0
 
-        # create the population according to the factoring strategy
+        # initialize the first population and evaluate it
+        pop = self._initialize()
+        self._each_iteration({'algorithm': self, 'n_gen': n_gen, 'pop': pop, **self.D}, first=True)
+
+        # while there are functions evaluations left
+        while evaluator.has_remaining():
+            n_gen += 1
+
+            # do the next iteration
+            self._next(pop)
+
+            # execute the callback function in the end of each generation
+            self._each_iteration({'algorithm': self, 'n_gen': n_gen, 'pop': pop, **self.D})
+
+        return pop.X, pop.F, pop.G
+
+    def _initialize(self):
+
         pop = Population()
         if isinstance(self.sampling, np.ndarray):
             pop.X = self.sampling
         else:
-            pop.X = self.sampling.sample(problem, self.pop_size)
-        pop.F, pop.G = evaluator.eval(problem, pop.X)
-        pop = self.survival.do(pop, self.pop_size, data=self.data)
+            pop.X = self.sampling.sample(self.problem, self.pop_size)
+        pop.F, pop.G = self.evaluator.eval(self.problem, pop.X)
+        return pop
 
-        # while there are functions evaluations left
-        while evaluator.has_remaining():
+    def _mating(self, pop):
 
-            # increase the generation and do printing and callback
-            self._do_each_iteration(n_gen, evaluator, pop)
-            n_gen += 1
+        # initialize selection and offspring methods
+        X = np.full((self.n_offsprings, self.problem.n_var), np.inf)
+        n_offsprings = 0
+        n_parents = self.crossover.n_parents
 
-            # initialize selection and offspring methods
-            off = Population()
-            off.X = np.full((self.n_offsprings, problem.n_var), np.inf)
-            n_offsprings = 0
-            n_parents = self.crossover.n_parents
+        # mating counter - counts how often the mating needs to be done to fill up n_offsprings
+        n_matings = 0
 
-            # mating counter - counts how often the mating needs to be done to fill up n_offsprings
-            n_matings = 0
+        # do the mating until all offspring are created usually it should be done is one iteration
+        # through duplicate eliminate more might be necessary
+        while n_offsprings < self.n_offsprings:
 
-            # do the mating until all offspring are created usually it should be done is one iteration
-            # through duplicate eliminate more might be necessary
-            while n_offsprings < self.n_offsprings:
+            # select from the current population individuals for mating
+            n_select = math.ceil((self.n_offsprings - n_offsprings) / self.crossover.n_children)
+            parents = self.selection.do(pop, n_select, n_parents, out=self.D, **self.D)
+            X = self.crossover.do(self.problem, pop.X[parents, :], out=self.D, **self.D)
 
-                # select from the current population individuals for mating
-                n_select = math.ceil((self.n_offsprings - n_offsprings) / self.crossover.n_children)
-                parents = self.selection.next(pop, n_select, n_parents, data=self.data)
-                X = self.crossover.do(problem, pop.X[parents, :])
+            # do the mutation
+            X = self.mutation.do(self.problem, X, out=self.D, **self.D)
 
-                # if more offsprings than necessary - truncate them
-                if X.shape[0] > self.n_offsprings - n_offsprings:
-                    X = X[:self.n_offsprings - n_offsprings, :]
+            # if more offsprings than necessary - truncate them
+            if X.shape[0] > self.n_offsprings - n_offsprings:
+                X = X[:self.n_offsprings - n_offsprings, :]
 
-                # do the mutation
-                X = self.mutation.do(problem, X)
+            # eliminate duplicates if too close to the current population
+            if self.eliminate_duplicates:
+                is_equal = np.min(cdist(X, pop.X), axis=1) <= 1e-60
+                X = X[np.logical_not(is_equal), :]
 
-                # eliminate duplicates if too close to the current population
-                if self.eliminate_duplicates:
-                    is_equal = np.min(cdist(X, pop.X), axis=1) <= 1e-60
-                    X = X[np.logical_not(is_equal), :]
+            # add to the offsprings
+            X[n_offsprings:n_offsprings + X.shape[0], :] = X
+            n_offsprings = n_offsprings + X.shape[0]
 
-                # add to the offsprings
-                off.X[n_offsprings:n_offsprings + X.shape[0], :] = X
-                n_offsprings = n_offsprings + X.shape[0]
+            n_matings += 1
 
-                n_matings += 1
+            # if no new offsprings can be generated within 100 trails -> return the current result
+            if n_matings > 100:
+                X = X[:n_offsprings, :]
+                self.evaluator.n_eval = self.evaluator.n_max_eval
+                break
 
-                # if no new offsprings can be generated within 100 trails -> return the current result
-                if n_matings > 100:
-                    off.X = off.X[:n_offsprings, :]
-                    evaluator.n_eval = evaluator.n_max_eval
-                    break
-
-            off.F, off.G = evaluator.eval(problem, off.X)
-
-            # merge the population
-            pop.merge(off)
-
-            # truncate the population
-            pop = self.survival.do(pop, self.pop_size, data=self.data)
-
-        self._do_each_iteration(n_gen, evaluator, pop)
-        return pop.X, pop.F, pop.G
-
-    def _do_each_iteration(self, n_iteration, evaluator, pop):
-        if self.verbose > 0:
-            print('gen = %d (FE:%s)' % (n_iteration + 1, evaluator.n_eval))
-        if self.verbose > 1:
-            pass
-        if self.callback is not None:
-            self.callback(self, evaluator.counter, pop)
-
-        if self.history is not None:
-            self.history.append(
-                {'n_gen': n_iteration,
-                 'n_evals': evaluator.n_eval,
-                 'X': np.copy(pop.X),
-                 'F': np.copy(pop.F)
-                 })
+        return X

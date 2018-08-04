@@ -20,14 +20,14 @@ class Algorithm:
     """
 
     def __init__(self,
-                 verbose=False,
-                 callback=None
+                 disp=False,
+                 callback=None,
                  ):
         """
         Parameters
         ----------
-        verbose : int
-            If larger than zero output is provided. (verbose=1 means some output, verbose=2 details for debugging)
+        disp : bool
+            If it is true than information during the algorithm execution are displayed
 
         callback : func
             A callback function can be passed that is executed every generation. The parameters for the function
@@ -36,8 +36,9 @@ class Algorithm:
                 def callback(algorithm, n_evals, pop):
                     print()
         """
-        self.verbose = verbose
+        self.disp = disp
         self.callback = callback
+
 
     def solve(self,
               problem,
@@ -93,16 +94,9 @@ class Algorithm:
         random.seed(seed)
         np.random.seed(seed)
 
-        # add the history object
-        self.history = history
-        if self.history is True:
-            self.history = []
-
+        # this allows to provide only an integer instead of an evaluator object
         if not isinstance(evaluator, Evaluator):
             evaluator = Evaluator(evaluator)
-
-        # run the initialization method first
-        self._initialize(problem)
 
         # call the algorithm to solve the problem
         X, F, G = self._solve(problem, evaluator)
@@ -124,9 +118,31 @@ class Algorithm:
 
         return X, F, G
 
+    # method that is called each iteration to call some methods regularly
+    def _each_iteration(self, D, first=False, **kwargs):
+
+        # display the output if defined by the algorithm
+        if self.disp:
+            disp = self._display_attrs(D)
+            if disp is not None:
+                self._display(disp, header=first)
+
+        # if a callback function is provided it is called after each iteration
+        if self.callback is not None:
+            self.callback(D)
+
+    # attributes are a list of tuples of length 3: (name, val, width)
+    def _display(self, disp, header=False):
+            regex = " | ".join(["{}"] * len(disp))
+            if header:
+                print("=" * 40)
+                print(regex.format(*[name.ljust(width) for name, _, width in disp]))
+                print("=" * 40)
+            print(regex.format(*[str(val).ljust(width) for _, val, width in disp]))
+
+    def _display_attrs(self, attrs):
+        return None
+
     @abstractmethod
     def _solve(self, problem, evaluator):
-        pass
-
-    def _initialize(self, problem):
         pass

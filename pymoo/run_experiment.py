@@ -6,7 +6,7 @@ import numpy as np
 from pymop.zdt import ZDT1, ZDT2, ZDT3, ZDT4, ZDT6
 from pymop.dtlz import DTLZ2
 
-from pymoo.algorithms.RNSGAIII import RNSGAIII
+from pymoo.algorithms.rnsga3 import RNSGAIII
 from pymoo.model.evaluator import Evaluator
 from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
 

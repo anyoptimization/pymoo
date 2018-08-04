@@ -7,7 +7,7 @@ class Survival:
     specific individuals to survive.
     """
 
-    def do(self, pop, n_survive, **kwargs):
+    def do(self, pop, off, n_survive, **kwargs):
         """
 
         The whole population is provided and the number of individuals to survive. If the number of survivors
@@ -16,21 +16,16 @@ class Survival:
 
         Parameters
         ----------
-        pop: class
+        pop : class
             The population the selected surviving individuals from.
-        n_survive: int
+        n_survive : int
             Number of individuals that should survive.
-        kwargs: class
+        kwargs : class
             Any additional data that might be needed to choose what individuals survive.
 
-        Returns
-        -------
-        pop: class
-            The population that has survived.
-
         """
-        return self._do(pop, n_survive, **kwargs)
+        return self._do(pop, off, n_survive, **kwargs)
 
     @abstractmethod
-    def _do(self, pop, n_survive, **kwargs):
+    def _do(self, pop, off, n_survive, **kwargs):
         pass

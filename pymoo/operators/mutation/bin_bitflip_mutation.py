@@ -6,7 +6,7 @@ class BinaryBitflipMutation(Mutation):
     def __init__(self, p_mut=None):
         self.p_mut = p_mut
 
-    def _do(self, p, X, Y):
+    def _do(self, p, X, Y, **kwargs):
 
         if self.p_mut is None:
             self.p_mut = 1.0 / len(X)

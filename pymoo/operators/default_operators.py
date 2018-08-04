@@ -14,14 +14,15 @@ def set_if_none(kwargs, str, val):
 
 def set_default_if_none(var_type, kwargs):
     set_if_none(kwargs, 'pop_size', 100)
-    set_if_none(kwargs, 'verbose', False)
+    set_if_none(kwargs, 'disp', False)
     set_if_none(kwargs, 'selection', RandomSelection())
+    set_if_none(kwargs, 'survival', None)
 
     # values for mating
     if var_type == "real":
         set_if_none(kwargs, 'sampling', RealRandomSampling())
-        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover())
-        set_if_none(kwargs, 'mutation', PolynomialMutation())
+        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=20))
+        set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=None, eta_mut=15))
     elif var_type == "binary":
         set_if_none(kwargs, 'sampling', BinaryRandomSampling())
         set_if_none(kwargs, 'crossover', BinaryUniformCrossover())

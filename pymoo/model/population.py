@@ -2,50 +2,46 @@ import numpy as np
 
 
 class Population:
-    def __init__(self, X=None, F=None, G=None):
 
-        # design variables
-        self.X = X
+    def __init__(self, **kwargs):
+        D = dict(kwargs)
+        self.D = D
 
-        # objective values
-        self.F = F
+    def __getattr__(self, name):
+        if name == "D":
+            return self.D
+        else:
+            return self.D[name]
 
-        # constraint violations as vectors
-        self.G = G
-
-        # any additional data to be stored
-        self.D = {}
+    def __setattr__(self, name, value):
+        if name == "D":
+            self.__dict__[name] = value
+        else:
+            self.D[name] = value
 
     def merge(self, other):
-        if self.X is not None:
-            self.X = np.concatenate([self.X, other.X])
-        else:
-            self.X = other.X
+        D = {}
+        for key, value in self.D.items():
 
-        if self.F is not None:
-            self.F = np.concatenate([self.F, other.F])
-        else:
-            self.F = other.F
+            # key must be in both populations
+            if key not in other.D:
+                continue
 
-        if self.G is not None and other.G is not None:
-            self.G = np.concatenate([self.G, other.G])
-        else:
-            self.G = other.G
-
-        return self
+            if isinstance(value, np.ndarray):
+                try:
+                    D[key] = np.concatenate([self.D[key], other.D[key]])
+                except:
+                    D[key] = self.D[key]
+        self.D = D
 
     def size(self):
-        if self.F is None:
-            return 0
-        else:
-            return len(self.F)
+        return self.X.shape[0]
 
     def filter(self, v):
-        if self.X is None:
-            return 0
-        else:
-            self.X = self.X[v]
-            self.F = self.F[v]
-            if self.G is not None:
-                self.G = self.G[v]
-        return self
+        D = {}
+        for key, value in self.D.items():
+            if value is not None and isinstance(value, np.ndarray):
+                D[key] = value[v, :]
+            else:
+                D[key] = value
+        self.D = D
