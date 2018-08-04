@@ -4,7 +4,7 @@ import numpy as np
 
 
 class Mutation:
-    def do(self, problem, X):
+    def do(self, problem, X, **kwargs):
         """
 
         Mutate variables in a genetic way.
@@ -23,9 +23,9 @@ class Mutation:
 
         """
         Y = np.full(X.shape, np.inf)
-        self._do(problem, X, Y)
+        self._do(problem, X, Y, **kwargs)
         return Y
 
     @abstractmethod
-    def _do(self, problem, X):
+    def _do(self, problem, X, **kwargs):
         pass

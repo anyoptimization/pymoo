@@ -4,19 +4,19 @@ from pymoo.rand import random
 
 
 class SimulatedBinaryCrossover(Crossover):
-    def __init__(self, eta_xover=15, p_xover=0.9):
+    def __init__(self,  prob_cross, eta_cross):
         super().__init__(2, 2)
-        self.p_xover = p_xover
-        self.eta_c = eta_xover
+        self.prob_cross = prob_cross
+        self.eta_cross = eta_cross
 
-    def _do(self, p, parents, children):
+    def _do(self, p, parents, children, **kwargs):
 
         n_var = p.n_var
         n_children = 0
 
         for k in range(parents.shape[0]):
 
-            if random.random() <= self.p_xover:
+            if random.random() <= self.prob_cross:
 
                 for i in range(n_var):
 
@@ -35,20 +35,20 @@ class SimulatedBinaryCrossover(Crossover):
                             yu = p.xu[i]
                             rand = random.random()
                             beta = 1.0 + (2.0 * (y1 - yl) / (y2 - y1))
-                            alpha = 2.0 - pow(beta, -(self.eta_c + 1.0))
+                            alpha = 2.0 - pow(beta, -(self.eta_cross + 1.0))
                             if rand <= (1.0 / alpha):
-                                betaq = pow((rand * alpha), (1.0 / (self.eta_c + 1.0)))
+                                betaq = pow((rand * alpha), (1.0 / (self.eta_cross + 1.0)))
 
                             else:
-                                betaq = pow((1.0 / (2.0 - rand * alpha)), (1.0 / (self.eta_c + 1.0)))
+                                betaq = pow((1.0 / (2.0 - rand * alpha)), (1.0 / (self.eta_cross + 1.0)))
 
                             c1 = 0.5 * ((y1 + y2) - betaq * (y2 - y1))
                             beta = 1.0 + (2.0 * (yu - y2) / (y2 - y1))
-                            alpha = 2.0 - pow(beta, -(self.eta_c + 1.0))
+                            alpha = 2.0 - pow(beta, -(self.eta_cross + 1.0))
                             if rand <= (1.0 / alpha):
-                                betaq = pow((rand * alpha), (1.0 / (self.eta_c + 1.0)))
+                                betaq = pow((rand * alpha), (1.0 / (self.eta_cross + 1.0)))
                             else:
-                                betaq = pow((1.0 / (2.0 - rand * alpha)), (1.0 / (self.eta_c + 1.0)))
+                                betaq = pow((1.0 / (2.0 - rand * alpha)), (1.0 / (self.eta_cross + 1.0)))
 
                             c2 = 0.5 * ((y1 + y2) + betaq * (y2 - y1))
 

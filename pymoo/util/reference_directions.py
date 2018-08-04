@@ -1,7 +1,7 @@
 import copy
+
 import numpy as np
 from scipy import special
-from scipy.spatial.distance import cdist
 
 
 def get_ref_dirs_from_section(n_obj, n_sections):
@@ -187,7 +187,6 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
     fig = plt.figure()
-    from mpl_toolkits.mplot3d import Axes3D
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(w[:, 0], w[:, 1], w[:, 2])
     ax.scatter(pt[:, 0], pt[:, 1], pt[:, 2])

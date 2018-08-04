@@ -25,7 +25,7 @@ class Crossover:
             The problem to be solved. Provides information such as lower and upper bounds or feasibility
             conditions for custom crossovers.
 
-        parents: np.ndarray
+        parents: numpy.ndarray
             The parents as a matrix. Each row is a parent and the columns are equal to the parameter length.
 
         kwargs : dict:

@@ -80,19 +80,19 @@ class HyperVolume:
         elif dimIndex == 0:
             # special case: only one dimension
             # why using hypervolume at all?
-            return -sentinel.next[0].cargo[0]
+            return -sentinel.do[0].cargo[0]
         elif dimIndex == 1:
             # special case: two dimensions, end recursion
-            q = sentinel.next[1]
+            q = sentinel.do[1]
             h = q.cargo[0]
-            p = q.next[1]
+            p = q.do[1]
             while p is not sentinel:
                 pCargo = p.cargo
                 hvol += h * (q.cargo[1] - pCargo[1])
                 if pCargo[0] < h:
                     h = pCargo[0]
                 q = p
-                p = q.next[1]
+                p = q.do[1]
             hvol += h * q.cargo[1]
             return hvol
         else:
@@ -135,7 +135,7 @@ class HyperVolume:
                 reinsert(p, dimIndex, bounds)
                 length += 1
                 q = p
-                p = p.next[dimIndex]
+                p = p.do[dimIndex]
                 q.volume[dimIndex] = hvol
                 if q.ignore >= dimIndex:
                     q.area[dimIndex] = q.prev[dimIndex].area[dimIndex]
@@ -229,7 +229,7 @@ class MultiList:
     def append(self, node, index):
         """Appends a node to the end of the list at the given index."""
         lastButOne = self.sentinel.prev[index]
-        node.next[index] = self.sentinel
+        node.do[index] = self.sentinel
         node.prev[index] = lastButOne
         # set the last element as the new one
         self.sentinel.prev[index] = node
@@ -240,7 +240,7 @@ class MultiList:
         sentinel = self.sentinel
         for node in nodes:
             lastButOne = sentinel.prev[index]
-            node.next[index] = sentinel
+            node.do[index] = sentinel
             node.prev[index] = lastButOne
             # set the last element as the new one
             sentinel.prev[index] = node
@@ -250,8 +250,8 @@ class MultiList:
         """Removes and returns 'node' from all lists in [0, 'index'[."""
         for i in range(index):
             predecessor = node.prev[i]
-            successor = node.next[i]
-            predecessor.next[i] = successor
+            successor = node.do[i]
+            predecessor.do[i] = successor
             successor.prev[i] = predecessor
             if bounds[i] > node.cargo[i]:
                 bounds[i] = node.cargo[i]
@@ -265,8 +265,8 @@ class MultiList:
 
         """
         for i in range(index):
-            node.prev[i].next[i] = node
-            node.next[i].prev[i] = node
+            node.prev[i].do[i] = node
+            node.do[i].prev[i] = node
             if bounds[i] > node.cargo[i]:
                 bounds[i] = node.cargo[i]
 

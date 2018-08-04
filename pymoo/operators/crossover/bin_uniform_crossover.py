@@ -6,7 +6,7 @@ class BinaryUniformCrossover(Crossover):
     def __init__(self):
         super().__init__(2, 2)
 
-    def _do(self, p, parents, children, data=None):
+    def _do(self, p, parents, children, **kwargs):
 
         # number of parents
         n_parents = parents.shape[0]

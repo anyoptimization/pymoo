@@ -16,7 +16,7 @@ class ReferenceLineSurvival(Survival):
         self.extreme = None
         self.asf = None
 
-    def _do(self, pop, n_survive, return_only_index=False, **kwargs):
+    def _do(self, pop, off, n_survive, return_only_index=False, **kwargs):
 
         data = kwargs['data']
 
@@ -98,7 +98,7 @@ class ReferenceLineSurvival(Survival):
         # now truncate the population
         pop.filter(survival)
         # np.savetxt("ref_dirs.txt", data.ref_dirs)
-        return pop
+
 
 def calc_perpendicular_dist_matrix(N, ref_dirs):
     u = np.tile(ref_dirs, (len(N), 1))

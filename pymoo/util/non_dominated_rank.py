@@ -4,8 +4,6 @@ from pymoo.util.dominator import Dominator
 
 
 class NonDominatedRank:
-    def __init__(self):
-        pass
 
     @staticmethod
     def is_dominating(f, F):
@@ -80,6 +78,14 @@ class NonDominatedRank:
 
     @staticmethod
     def calc_as_fronts(F, G=None, only_pareto_front=False):
+
+        """
+        try:
+            import pygmo as pg
+            ndf, dl, dc, ndr = pg.fast_non_dominated_sorting(F)
+        except ImportError:
+            pass
+        """
 
         # calculate the dominance matrix
         n = F.shape[0]
