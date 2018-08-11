@@ -6,7 +6,7 @@ import numpy as np
 from pymop.zdt import ZDT1, ZDT2, ZDT3, ZDT4, ZDT6
 from pymop.dtlz import DTLZ2
 
-from pymoo.algorithms.rnsga3 import RNSGAIII
+from pymoo.algorithms.rnsga3 import RNSGA3
 from pymoo.model.evaluator import Evaluator
 from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
 
@@ -25,7 +25,7 @@ def ZDT_Test():
 
     for problem, ref_points in ref_dirs.items():
         for points in ref_points:
-            for algorithm in [RNSGAIII("real", pop_size=100, ep=0.001, crossover=crossover, ref_dirs=points, verbose=0)]:
+            for algorithm in [RNSGA3("real", pop_size=100, ep=0.001, crossover=crossover, ref_dirs=points, verbose=0)]:
                 for run in range(1, n_runs + 1):
                     yield (algorithm, problem, run)
 
@@ -43,7 +43,7 @@ def DTLZ_test():
             print(problem)
             prob = problem(**parameters)
             for points in params["ref_points"]:
-                for algorithm in [RNSGAIII("real", pop_size=100, ep=0.01, crossover=crossover, ref_dirs=points, verbose=0)]:
+                for algorithm in [RNSGA3("real", pop_size=100, ep=0.01, crossover=crossover, ref_dirs=points, verbose=0)]:
                     for run in range(1, n_runs + 1):
                         yield (algorithm, prob, run)
 

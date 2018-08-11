@@ -11,6 +11,4 @@ class SingleObjectiveGeneticAlgorithm(GeneticAlgorithm):
         set_if_none(kwargs, 'survival', FitnessSurvival())
         set_default_if_none(var_type, kwargs)
         super().__init__(**kwargs)
-
-    def _display_attrs(self, D):
-        return disp_single_objective(self.problem, self.evaluator, D)
+        self.func_display_attrs = disp_single_objective

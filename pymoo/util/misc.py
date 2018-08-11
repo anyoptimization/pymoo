@@ -3,12 +3,6 @@ import numpy as np
 from pymoo.rand import random
 
 
-# returns only the unique rows from a given matrix X
-def unique_rows(X):
-    y = np.ascontiguousarray(X).view(np.dtype((np.void, X.dtype.itemsize * X.shape[1])))
-    _, idx = np.unique(y, return_index=True)
-    return idx
-
 
 # repairs a numpy array to be in bounds
 def repair(X, xl, xu):

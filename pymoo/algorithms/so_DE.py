@@ -12,13 +12,21 @@ class DifferentialEvolution(GeneticAlgorithm):
                  **kwargs):
         set_default_if_none("real", kwargs)
         super().__init__(**kwargs)
-        self.crossover = DifferentialEvolutionCrossover(prob=0.5, weight=0.75, variant="DE/rand/1", method="binomial")
+        self.crossover = DifferentialEvolutionCrossover(prob=0.5, weight=0.75, variant="DE/best/1", method="binomial")
+        self.func_display_attrs = disp_single_objective
 
     def _next(self, pop):
 
         # all neighbors shuffled (excluding the individual itself)
         P = RandomSelection().do(pop, self.pop_size, self.crossover.n_parents - 1)
-        P = np.concatenate([np.arange(self.pop_size)[:, None], P], axis=1)
+
+        origin = None
+        if "rand" in self.crossover.variant:
+            origin = np.arange(self.pop_size)
+        elif "best" in self.crossover.variant:
+            origin = np.full(self.pop_size, np.argmin(pop.F))
+
+        P = np.concatenate([origin[:, None], P], axis=1)
 
         # do recombination and create an offspring
         X = self.crossover.do(self.problem, pop.X[P, :])
@@ -28,6 +36,3 @@ class DifferentialEvolution(GeneticAlgorithm):
         off_is_better = np.where(F < pop.F)[0]
         pop.F[off_is_better, :] = F[off_is_better, :]
         pop.X[off_is_better, :] = X[off_is_better, :]
-
-    def _display_attrs(self, D):
-        return disp_single_objective(self.problem, self.evaluator, D)

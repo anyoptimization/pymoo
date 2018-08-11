@@ -4,7 +4,7 @@ import time
 
 import numpy as np
 
-from pymoo.algorithms.rnsga3 import RNSGAIII
+from pymoo.algorithms.rnsga3 import RNSGA3
 from pymoo.indicators.rmetric import RMetric
 from pymoo.model.evaluator import Evaluator
 from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
@@ -29,7 +29,7 @@ def ZDT_Test():
         for i, points in enumerate(ref_points):
 
             sublist = []
-            for algorithm in [RNSGAIII("real", pop_size=100, ep=0.001, crossover=crossover, ref_dirs=points, verbose=0)]:
+            for algorithm in [RNSGA3("real", pop_size=100, ep=0.001, crossover=crossover, ref_dirs=points, verbose=0)]:
                 for run in range(1, n_runs + 1):
                     name = problem.__class__.__name__ + '_' + str(i) + '_' + str(run)
                     sublist.append((algorithm, problem, run, points, name))
@@ -52,7 +52,7 @@ def DTLZ_test():
             prob = problem(**parameters)
             for i, points in enumerate(params["ref_points"]):
                 sublist = []
-                for algorithm in [RNSGAIII("real", pop_size=100, ep=0.01, crossover=crossover, ref_dirs=points, verbose=0)]:
+                for algorithm in [RNSGA3("real", pop_size=100, ep=0.01, crossover=crossover, ref_dirs=points, verbose=0)]:
                     for run in range(1, n_runs + 1):
                         name = problem.__class__.__name__ + '_' + str(i) + '_' + str(run)
                         sublist.append((algorithm, prob, run, points, name))

@@ -3,13 +3,15 @@ import numpy as np
 from pymoo.algorithms.moead import MOEAD
 from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.algorithms.nsga3 import NSGA3
+from pymoo.algorithms.rnsga3 import RNSGA3
 from pymoo.algorithms.so_DE import DifferentialEvolution
 from pymoo.algorithms.so_genetic_algorithm import SingleObjectiveGeneticAlgorithm
 from pymoo.model.evaluator import Evaluator
 from pymop.problem import Problem
 
 
-def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, fun_args={}, method='auto', method_args={},
+def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, fun_args={}, method='auto',
+             method_args={},
              seed=None, callback=None, disp=True):
     """
 
@@ -27,30 +29,25 @@ def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, f
         A function that gets X which is a 2d array as input. Each row represents a solution to evaluate
         and each column a variable. The function needs to return also the same number of rows and each column
         is one objective to optimize. In case of constraints, a second 2d array can be returned.
-
     xl : numpy.array or number
         The lower boundaries of variables as a 1d array
-
     xu : numpy.array or number
         The upper boundaries of variables as a 1d array
-
     n_var : int
         If xl or xu is only a number, this is used to create the boundary numpy arrays. Other it remains unused.
-
     termination : tuple
         The termination criterium that is used to stop the algorithm when the result is satisfying.
-
     fun_args : dict
         Additional arguments if necessary to evaluate the solutions (constants, random seed, ...)
-
-
     method : string
         Algorithm that is used to solve the problem.
-
+    method_args : dict
+        Additional arguments to initialize the algorithm object
+    seed : int
+        Random seed to be used for the run
     callback : callable, optional
         Called after each iteration, as ``callback(D)``, where ``D`` is a dictionary with
         algorithm information, such as the current design, objective and constraint space.
-
     disp : bool
         Whether to display each generation the current result or not.
 
@@ -61,8 +58,6 @@ def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, f
 
 
     """
-
-    problem = None
 
     if isinstance(fun, Problem):
         problem = fun
@@ -120,7 +115,6 @@ def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, f
     else:
         raise Exception('Unknown Termination criterium: %s' % termination_criterium)
 
-
     return minimize_(problem, evaluator, method=method, method_args=method_args, seed=seed,
                      callback=callback,
                      disp=disp)
@@ -138,18 +132,21 @@ def minimize_(problem, evaluator, method='auto', method_args={}, seed=None,
 
     # choose the algorithm implementation given the string
     if method == 'nsga2':
-        algorithm = NSGA2("real", disp=disp, **method_args)
+        algorithm = NSGA2(**method_args)
     elif method == 'nsga3':
-        algorithm = NSGA3("real", disp=disp, **method_args)
+        algorithm = NSGA3(**method_args)
+    elif method == 'rnsga3':
+        algorithm = RNSGA3(**method_args)
     elif method == 'moead':
-        algorithm = MOEAD("real", disp=disp, **method_args)
+        algorithm = MOEAD(**method_args)
     elif method == 'de':
-        algorithm = DifferentialEvolution(disp=disp, **method_args)
+        algorithm = DifferentialEvolution(**method_args)
     elif method == 'ga':
-        algorithm = SingleObjectiveGeneticAlgorithm("real", disp=disp, **method_args)
+        algorithm = SingleObjectiveGeneticAlgorithm("real", **method_args)
     else:
         raise Exception('Unknown method: %s' % method)
 
-    X, F, G = algorithm.solve(problem, evaluator)
+
+    X, F, G = algorithm.solve(problem, evaluator, disp=disp, callback=callback, seed=seed)
 
     return {'problem': problem, 'X': X, 'F': F, 'G': G}

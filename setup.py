@@ -2,7 +2,7 @@ import setuptools
 from setuptools import setup
 
 __author__ = "Julian Blank"
-__version__ = '0.1.2'
+__version__ = '0.2.0'
 
 try:
     import pypandoc
@@ -19,7 +19,7 @@ setup(
     author_email="blankjul@egr.msu.edu",
     description="Multi-Objective Optimization Algorithms",
     long_description=long_description,
-    url="https://github.com/julesy89/pymoo",
+    url="https://github.com/msu-coinlab/pymoo",
     license='MIT',
     keywords="optimization",
     packages=setuptools.find_packages(),

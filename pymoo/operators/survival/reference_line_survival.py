@@ -3,7 +3,7 @@ from scipy.spatial.distance import cdist
 
 from pymoo.model.survival import Survival
 from pymoo.rand import random
-from pymoo.util.normalization import normalize_by_asf_interceptions
+from pymoo.util.normalization import normalize_by_asf_interceptions, normalize_by_asf_interceptions_
 from pymoo.util.non_dominated_rank import NonDominatedRank
 
 
@@ -17,6 +17,7 @@ class ReferenceLineSurvival(Survival):
 
     def _do(self, pop, off, n_survive, return_only_index=False, out=None, **kwargs):
 
+        pop.merge(off)
         fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
 
         # all indices to survive
@@ -32,11 +33,16 @@ class ReferenceLineSurvival(Survival):
         survival = list(range(0, len(survival)))
         last_front = np.arange(len(survival), pop.size())
 
+        """
         N, self.asf, self.extreme, F_min, F_max = normalize_by_asf_interceptions(pop.F,
                                                          len(fronts[0]),
                                                          prev_asf=self.asf,
                                                          prev_S=self.extreme,
                                                          return_bounds=True)
+        """
+
+        N, F_min, F_max = normalize_by_asf_interceptions_(pop.F, return_bounds=True)
+
         # if the last front needs to be splitted
         n_remaining = n_survive - len(survival)
         if n_remaining > 0:
