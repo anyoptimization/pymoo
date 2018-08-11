@@ -2,25 +2,30 @@ import numpy as np
 
 from pymoo.model.survival import Survival
 from pymoo.rand import random
-from pymoo.util.misc import normalize_by_asf_interceptions
 from pymoo.util.non_dominated_rank import NonDominatedRank
+from pymoo.util.normalization import normalize_by_asf_interceptions
 from pymoo.util.reference_directions import get_ref_dirs_from_points
 
 
 class ReferenceLineSurvival(Survival):
 
-    def __init__(self, ref_dirs, n_obj):
+    def __init__(self, ref_dirs, ref_points, ref_pop_size, mu, method, p, n_obj):
         super().__init__()
         self.ref_dirs = ref_dirs
+        self.ref_points = ref_points
+        self.ref_pop_size = ref_pop_size
+        self.mu = mu
+        self.method = method
+        self.p = p
         self.n_obj = n_obj
         self.extreme = None
         self.asf = None
 
     def _do(self, pop, off, n_survive, return_only_index=False, **kwargs):
 
-        data = kwargs['data']
-
+        pop.merge(off)
         fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
+
         # all indices to survive
         survival = []
 
@@ -34,16 +39,14 @@ class ReferenceLineSurvival(Survival):
         survival = list(range(0, len(survival)))
         last_front = np.arange(len(survival), pop.size())
 
-        N, self.asf, self.extreme, F_min, F_max = normalize_by_asf_interceptions(np.vstack((pop.F, data.ref_points)),
+        N, self.asf, self.extreme, F_min, F_max = normalize_by_asf_interceptions(np.vstack((pop.F, self.ref_points)),
                                                                                  len(fronts[0]),
                                                                                  prev_asf=self.asf,
                                                                                  prev_S=self.extreme,
                                                                                  return_bounds=True)
 
-        z_ = (data.ref_points - F_min)/(F_max - F_min)  # Normalized reference points
-        data.F_min, data.F_max = F_min, F_max
-        self.ref_dirs = get_ref_dirs_from_points(z_, self.n_obj, data.ref_pop_size, alpha=data.mu, method=data.method, p=data.p)
-        data.ref_dirs = self.ref_dirs
+        z_ = (self.ref_points - F_min)/(F_max - F_min)  # Normalized reference points
+        self.ref_dirs = get_ref_dirs_from_points(z_, self.n_obj, self.ref_pop_size, mu=self.mu, method=self.method, p=self.p)
 
         # if the last front needs to be split
         n_remaining = n_survive - len(survival)

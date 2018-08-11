@@ -3,6 +3,7 @@ import numpy as np
 from pymoo.configuration import Configuration
 
 
+# use a singleton class to set the random generator globally
 class Singleton:
     __instance = None
 

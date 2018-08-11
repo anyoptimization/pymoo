@@ -99,7 +99,7 @@ class GeneticAlgorithm(Algorithm):
 
         # initialize the first population and evaluate it
         pop = self._initialize()
-        self._each_iteration({'algorithm': self, 'n_gen': n_gen, 'pop': pop, **self.D}, first=True)
+        self._each_iteration({'n_gen': n_gen, 'pop': pop, **self.D}, first=True)
 
         # while there are functions evaluations left
         while evaluator.has_remaining():
@@ -109,7 +109,7 @@ class GeneticAlgorithm(Algorithm):
             self._next(pop)
 
             # execute the callback function in the end of each generation
-            self._each_iteration({'algorithm': self, 'n_gen': n_gen, 'pop': pop, **self.D})
+            self._each_iteration({'n_gen': n_gen, 'pop': pop, **self.D})
 
         return pop.X, pop.F, pop.G
 

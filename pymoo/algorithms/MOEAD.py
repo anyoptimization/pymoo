@@ -2,24 +2,36 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.model.survival import Survival
-from pymoo.operators.default_operators import set_default_if_none
+from pymoo.operators.crossover.real_differental_evolution_crossover import DifferentialEvolutionCrossover
+from pymoo.operators.default_operators import set_if_none
+from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
 from pymoo.rand import random
+from pymoo.util.decomposition import tchebi
 from pymoo.util.display import disp_multi_objective
 from pymop.util import get_uniform_weights
 
 
 class MOEAD(GeneticAlgorithm):
     def __init__(self,
-                 var_type="real",
+                 pop_size=100,
                  n_neighbors=15,
+                 prob=0.5,
+                 weight=0.8,
+                 method="binomial",
                  **kwargs):
 
-        #set_if_none(kwargs, "crossover", DifferentialEvolutionCrossover())
-        set_default_if_none(var_type, kwargs)
+        self.n_neighbors = n_neighbors
+
+        set_if_none(kwargs, 'pop_size', pop_size)
+        set_if_none(kwargs, 'sampling', RealRandomSampling())
+        set_if_none(kwargs, 'crossover', DifferentialEvolutionCrossover(prob=prob, weight=weight, method=method))
+        set_if_none(kwargs, 'selection', None)
+        set_if_none(kwargs, 'mutation', None)
+        set_if_none(kwargs, 'survival', None)
 
         super().__init__(**kwargs)
-        self.n_neighbors = n_neighbors
+
+        self.func_display_attrs = disp_multi_objective
 
         # initialized when problem is known
         self.weights = None
@@ -34,12 +46,8 @@ class MOEAD(GeneticAlgorithm):
         # neighbours includes the entry by itself intentionally for the survival method
         self.neighbours = np.argsort(cdist(self.weights, self.weights), axis=1)[:, :self.n_neighbors + 1]
 
-        # survival selection is included in the _mating method
-        self.survival = Survival()
-
-        pop = super()._initialize()
-
         # set the initial ideal point
+        pop = super()._initialize()
         self.ideal_point = np.min(pop.F, axis=0)
 
         return pop
@@ -55,7 +63,6 @@ class MOEAD(GeneticAlgorithm):
 
             # do recombination and create an offspring
             X = self.crossover.do(self.problem, pop.X[None, parents, :], X=pop.X[[i], :])
-            X = self.mutation.do(self.problem, X)
 
             # evaluate the offspring
             F, _ = self.evaluator.eval(self.problem, X)
@@ -76,11 +83,3 @@ class MOEAD(GeneticAlgorithm):
                 off_is_better = self.neighbours[i][np.where(off_FV < FV)[0]]
                 pop.F[off_is_better, :] = F[k, :]
                 pop.X[off_is_better, :] = X[k, :]
-
-    def _display_attrs(self, D):
-        return disp_multi_objective(self.problem, self.evaluator, D)
-
-
-def tchebi(F, weights, ideal_point):
-    v = np.abs((F - ideal_point) * weights)
-    return np.max(v, axis=1)

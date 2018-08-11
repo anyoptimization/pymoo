@@ -5,7 +5,7 @@ from pymoo.operators.default_operators import set_default_if_none, set_if_none
 from pymoo.operators.survival.reference_point_survival import ReferencePointSurvival
 
 
-class ERNSGAII(GeneticAlgorithm):
+class ERNSGA2(GeneticAlgorithm):
 
     def __init__(self,
                  var_type,

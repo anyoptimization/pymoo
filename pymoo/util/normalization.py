@@ -22,6 +22,43 @@ def normalize(x, x_min=None, x_max=None, return_bounds=False):
         return res, x_min, x_max
 
 
+def normalize_by_asf_interceptions_(x, return_bounds=False):
+
+    # find the x_min point
+    n_obj = x.shape[1]
+    x_min = np.min(x, axis=0)
+    # transform the objective that 0 means the best
+    F = x - x_min
+
+    # calculate the asf matrix
+    asf = np.eye(n_obj)
+    asf = asf + (asf == 0) * 1e-16
+
+    # result matrix with the selected points
+    S = np.zeros((n_obj, n_obj))
+
+    # find for each direction the best
+    for i in range(len(asf)):
+        val = np.max(F / asf[i, :], axis=1) + 0.0001 * np.sum(F / asf[i, :])
+        S[i, :] = F[np.argmin(val), :]
+
+    try:
+        b = np.ones(n_obj)
+        A = np.linalg.solve(S, b)
+        A = 1 / A
+        A = A.T
+    except LinAlgError:
+        A = np.max(S, axis=0)
+
+    F = F / A
+
+    if not return_bounds:
+        return F
+    else:
+        x_max = A + x_min
+        return F, x_min, x_max
+
+
 def normalize_by_asf_interceptions(X, first_front, prev_S=None, prev_asf=None, return_bounds=False):
     """
 
