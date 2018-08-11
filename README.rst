@@ -10,6 +10,14 @@ The test problems are uploaded to the PyPi Repository.
 
     pip install pymoo
 
+For the current development version:
+
+.. code:: bash
+
+    git clone https://github.com/msu-coinlab/pymoo
+    cd pymoo
+    python setup.py install
+
 Implementations
 ==================================
 
@@ -31,10 +39,6 @@ crowding distance to achieve a good diversity when converging.
 many-objective problems. The survival selection uses the perpendicular
 distance to the reference directions. As normalization the boundary
 intersection method is used [5].
-
-**R-NSGA-III** : A reference-point based algorithm for solving
-many-objective problems. An extension on the NSGA-III algorithm
-R-NSGA-III is used to find solutions around a user specified region.
 
 **MOEAD/D** : The classical MOEAD\D implementation using the
 Tchebichew decomposition function.
@@ -59,25 +63,21 @@ Usage
 
     import time
 
-    from matplotlib import animation
-    import matplotlib.pyplot as plt
     import numpy as np
 
+    from pymoo.util.plotting import plot, animate
 
     if __name__ == '__main__':
 
         # load the problem instance
-        from pymop.zdt import ZDT1
+        from pymop.problems.zdt import ZDT1
         problem = ZDT1(n_var=30)
 
         # create the algorithm instance by specifying the intended parameters
-        from pymoo.algorithms.NSGAII import NSGAII
-        algorithm = NSGAII("real", pop_size=100, verbose=True)
+        from pymoo.algorithms.nsga2 import NSGA2
+        algorithm = NSGA2(pop_size=100)
 
         start_time = time.time()
-
-        # save the history in an object to observe the convergence over generations
-        history = []
 
         # number of generations to run it
         n_gen = 200
@@ -88,60 +88,20 @@ Usage
                                   seed=2,
                                   return_only_feasible=False,
                                   return_only_non_dominated=False,
-                                  history=history)
+                                  disp=True,
+                                  save_history=True)
 
         print("--- %s seconds ---" % (time.time() - start_time))
 
         scatter_plot = True
         save_animation = True
 
-        # get the problem dimensionality
-        is_2d = problem.n_obj == 2
-        is_3d = problem.n_obj == 3
+        if scatter_plot:
+            plot(F)
 
-        if scatter_plot and is_2d:
-            plt.scatter(F[:, 0], F[:, 1])
-            plt.show()
-
-        if scatter_plot and is_3d:
-            fig = plt.figure()
-            from mpl_toolkits.mplot3d import Axes3D
-            ax = fig.add_subplot(111, projection='3d')
-            ax.scatter(F[:, 0], F[:, 1], F[:, 2])
-            plt.show()
-
-        # create an animation to watch the convergence over time
-        if is_2d and save_animation:
-
-            fig = plt.figure()
-            ax = plt.gca()
-
-            _F = history[0]['F']
-            pf = problem.pareto_front()
-            plt.scatter(pf[:,0], pf[:,1], label='Pareto Front', s=60, facecolors='none', edgecolors='r')
-            scat = plt.scatter(_F[:, 0], _F[:, 1])
-
-
-            def update(frame_number):
-                _F = history[frame_number]['F']
-                scat.set_offsets(_F)
-
-                # get the bounds for plotting and add padding
-                min = np.min(_F, axis=0) - 0.1
-                max = np.max(_F, axis=0) + 0.
-
-                # set the scatter object with padding
-                ax.set_xlim(min[0], max[0])
-                ax.set_ylim(min[1], max[1])
-
-
-            # create the animation
-            ani = animation.FuncAnimation(fig, update, frames=range(n_gen))
-
-            # write the file
-            Writer = animation.writers['ffmpeg']
-            writer = Writer(fps=6, bitrate=1800)
-            ani.save('%s.mp4' % problem.name(), writer=writer)
+        if save_animation:
+            H = np.concatenate([e['pop'].F[None, :, :] for e in algorithm.history], axis=0)
+            animate('%s.mp4' % problem.name(), H, problem)
 
 Contact
 ==================================

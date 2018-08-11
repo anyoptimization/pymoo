@@ -46,7 +46,7 @@ class DifferentialEvolutionCrossover(Crossover):
         children[:, :] = parents[:, 0]
 
         if self.variant == "DE/rand/1":
-            trial = parents[:, 3] + self.weight * (parents[:, 1] - parents[:, 2])
+            trial = parents[:, 1] + self.weight * (parents[:, 2] - parents[:, 3])
         else:
             raise Exception("DE variant %s not known." % self.variant)
 

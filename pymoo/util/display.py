@@ -1,3 +1,4 @@
+from pymoo.indicators.gd import GD
 from pymoo.indicators.igd import IGD
 import numpy as np
 
@@ -18,5 +19,6 @@ def disp_multi_objective(problem, evaluator, D):
     pf = problem.pareto_front()
     if pf is not None:
         attrs.append(('igd', "%.5f" % IGD(pf).calc(D['pop'].F), 8))
+        attrs.append(('gd', "%.5f" % GD(pf).calc(D['pop'].F), 8))
 
     return attrs

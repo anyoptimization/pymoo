@@ -1,16 +1,37 @@
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.operators.default_operators import set_default_if_none, set_if_none
+from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.default_operators import set_if_none
+from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
+from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
+from pymoo.operators.selection.random_selection import RandomSelection
 from pymoo.operators.survival.reference_line_survival import ReferenceLineSurvival
 from pymoo.util.display import disp_multi_objective
 from pymoo.util.reference_directions import get_uniform_weights
 
 
 class NSGA3(GeneticAlgorithm):
-    def __init__(self, var_type, ref_dirs=None, **kwargs):
+
+    def __init__(self,
+                 pop_size=100,
+                 ref_dirs=None,
+                 prob_cross=0.9,
+                 eta_cross=20,
+                 prob_mut=None,
+                 eta_mut=15,
+                 **kwargs):
+
         self.ref_dirs = ref_dirs
-        set_default_if_none(var_type, kwargs)
+
+        set_if_none(kwargs, 'pop_size', pop_size)
+        set_if_none(kwargs, 'sampling', RealRandomSampling())
+        set_if_none(kwargs, 'selection', RandomSelection())
+        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=prob_cross, eta_cross=eta_cross))
+        set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=prob_mut, eta_mut=eta_mut))
         set_if_none(kwargs, 'survival', None)
+        set_if_none(kwargs, 'eliminated_duplicates', False)
         super().__init__(**kwargs)
+
+        self.func_display_attrs = disp_multi_objective
 
     def _initialize(self):
         pop = super()._initialize()
@@ -26,8 +47,3 @@ class NSGA3(GeneticAlgorithm):
             self.survival = ReferenceLineSurvival(self.ref_dirs, self.problem.n_obj)
 
         return pop
-
-    def _display_attrs(self, D):
-        return disp_multi_objective(self.problem, self.evaluator, D)
-
-
