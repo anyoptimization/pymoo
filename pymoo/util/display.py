@@ -1,6 +1,7 @@
+import numpy as np
+
 from pymoo.indicators.gd import GD
 from pymoo.indicators.igd import IGD
-import numpy as np
 
 
 def disp_single_objective(problem, evaluator, D):
@@ -13,8 +14,12 @@ def disp_single_objective(problem, evaluator, D):
 
 
 def disp_multi_objective(problem, evaluator, D):
-    attrs = [('n_gen', D['n_gen'], 5),
+    attrs = [('n_gen', D['n_gen']+1, 5),
              ('n_eval', evaluator.n_eval, 7)]
+
+    if problem.n_constr > 0:
+        attrs.append(('min_constr', "%.5f" % np.min(D['pop'].CV), 8))
+        attrs.append(('avg_constr', "%.5f" % np.mean(D['pop'].CV), 8))
 
     pf = problem.pareto_front()
     if pf is not None:

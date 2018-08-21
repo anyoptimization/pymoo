@@ -44,7 +44,7 @@ class MOEAD(GeneticAlgorithm):
         self.weights = get_uniform_weights(self.pop_size, self.problem.n_obj)
 
         # neighbours includes the entry by itself intentionally for the survival method
-        self.neighbours = np.argsort(cdist(self.weights, self.weights), axis=1)[:, :self.n_neighbors + 1]
+        self.neighbours = np.argsort(cdist(self.weights, self.weights), axis=1, kind='quicksort')[:, :self.n_neighbors + 1]
 
         # set the initial ideal point
         pop = super()._initialize()

@@ -5,8 +5,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+
+tests/resources/*
+
 *.mp4
 *.out
+*.dat
 
 .DS_Store
 

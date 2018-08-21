@@ -1,78 +1,130 @@
 import numpy as np
 
-from pymoo.model.survival import Survival
+from pymoo.model.survival import Survival, split_by_feasibility
 from pymoo.util.non_dominated_rank import NonDominatedRank
+from pymoo.util.randomized_argsort import randomized_argsort
 
 
 class RankAndCrowdingSurvival(Survival):
-    def _do(self, pop, off, size, return_sorted_idx=False, out=None, **kwargs):
+    def _do(self, pop, n_survive, out=None, **kwargs):
 
-        if off is not None:
-            pop.merge(off)
+        feasible, infeasible = split_by_feasibility(pop)
+        fronts = NonDominatedRank.calc_as_fronts(pop.F[feasible, :])
 
-        fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
-        rank = NonDominatedRank.calc_from_fronts(fronts)
-        crowding = np.zeros(pop.F.shape[0])
+        rank = np.full(pop.size(), -1)
+        crowding = np.full(pop.size(), -1.0)
 
-        for front in fronts:
-            cd_of_front = RankAndCrowdingSurvival.calc_crowding_distance(pop.F[front, :])
-            crowding[front] = cd_of_front
+        survivors = []
 
-        sorted_idx = sorted(range(pop.size()), key=lambda x: (rank[x], -crowding[x]))
+        for k, front in enumerate(fronts):
 
-        if return_sorted_idx:
-            return sorted_idx
+            # convert to numpy array
+            front = feasible[front]
+
+            # calculate crowding distance for the current front
+            crowding_of_front = RankAndCrowdingSurvival.calc_crowding_distance(pop.F[front, :])
+
+            # set values of the overall vector
+            rank[front] = k
+            crowding[front] = crowding_of_front
+
+            # current front sorted by the crowding distance
+            I = randomized_argsort(crowding_of_front, order='descending', method='numpy')
+
+            # if no splitting front
+            if len(survivors) + len(front) <= n_survive:
+                survivors.extend(front[I])
+
+            # if splitting front sort by crowding distance
+            else:
+
+                # remove the last individuals with the least crowding and add to survivors
+                survivors.extend(front[I][:(n_survive - len(survivors))])
+                break
+
+        # individuals sorted by constraint violation are added
+        if len(survivors) < n_survive:
+            survivors.extend(infeasible[:(n_survive - len(survivors))])
 
         # now truncate the population
-        sorted_idx = sorted_idx[:size]
-        pop.filter(sorted_idx)
-        rank = rank[sorted_idx]
-        crowding = crowding[sorted_idx]
+        pop.filter(survivors)
 
         if out is not None:
-            out['rank'] = rank
-            out['crowding'] = crowding
-
-        return pop
+            out['rank'] = rank[survivors]
+            out['crowding'] = crowding[survivors]
 
     @staticmethod
-    def calc_crowding_distance(F, F_min=None, F_max=None):
+    def calc_crowding_distance(F):
 
-        n = F.shape[0]
-        m = F.shape[1]
+        infinity = 1e+14
 
-        if n == 0:
-            return []
-        elif n == 1 or n == 2:
-            return np.full(n, np.inf)
+        n_points = F.shape[0]
+        n_obj = F.shape[1]
+
+        if n_points <= 2:
+            return np.full(n_points, infinity)
         else:
 
-            cd = np.zeros(n)
-
-            # calculate the normalization - avoid division by 0
-            if F_min is None:
-                F_min = np.min(F, axis=0)
-
-            if F_max is None:
-                F_max = np.max(F, axis=0)
+            # the final crowding distance result
+            crowding = np.zeros(n_points)
 
             # for each objective
-            for j in range(m):
+            for m in range(n_obj):
 
-                # sort by its objective
-                sorted_idx = np.argsort(F[:, j])
+                # sort by objective randomize if they are equal
+                I = np.argsort(F[:,m], kind='mergesort')
+                #I = randomized_argsort(F[:, m], order='ascending')
 
-                # set the corner points to infinity
-                cd[sorted_idx[0]] = np.inf
-                cd[sorted_idx[-1]] = np.inf
+                # norm which will be used for distance normalization
+                norm = np.max(F[:, m]) - np.min(F[:, m])
 
-                norm = F_max[j] - F_min[j] if F_min[j] != F_max[j] else 10e-30
+                # set crowding to infinity of extreme point
+                crowding[I[0]] = np.inf
+                crowding[I[-1]] = np.inf
 
-                # add up the crowding measure for all points in between
-                for i in range(1, n - 1):
-                    if np.isinf(cd[sorted_idx[i]]):
-                        continue
-                    else:
-                        cd[sorted_idx[i]] += (F[sorted_idx[i + 1], j] - F[sorted_idx[i - 1], j]) / norm
+                # if norm is zero -> next objective
+                if norm != 0.0:
 
-        return cd
+                    # add up the crowding measure for all points in between
+                    for i in range(1, n_points - 1):
+
+                        # the current values to have a look at
+                        _current, _last, _next = i, i - 1, i + 1
+
+                        # if the current entry is already infinity the values will not change
+                        if not np.isinf(crowding[I[_current]]):
+                            #crowding[I[_current]] += (F[I[_next], m] - F[I[_last], m]) / norm
+
+                            # search for last and next value that are not equal
+                            while _last >= 0 and F[I[_last], m] == F[I[_current], m]:
+                                _last -= 1
+
+                            while _next < n_points and F[I[_next], m] == F[I[_current], m]:
+                                _next += 1
+
+                            # if the point is in fact also an extreme point
+                            if _last < 0 or _next == n_points:
+                                crowding[I[_current]] = np.inf
+
+                            # otherwise, which will be usually the case
+                            else:
+                                crowding[I[_current]] += (F[I[_next], m] - F[I[_last], m]) / norm
+
+        # divide by the number of objectives
+        crowding = crowding / n_obj
+
+        # replace infinity with a large number
+        crowding[np.isinf(crowding)] = infinity
+
+        return crowding
+
+
+if __name__ == '__main__':
+    F = np.random.rand(100, 2)
+    F[0] = np.max(F, axis=0)
+    F[5] = F[0]
+    F[50] = F[51]
+
+    crowding = RankAndCrowdingSurvival.calc_crowding_distance(F)
+    print(crowding[50], crowding[51])
+    print(crowding[0], crowding[5])

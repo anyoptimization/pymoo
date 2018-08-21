@@ -21,6 +21,9 @@ def normalize(x, x_min=None, x_max=None, return_bounds=False):
     else:
         return res, x_min, x_max
 
+def normalize_by_asf_interceptions__(F, non_dom, return_bounds=False):
+    pass
+
 
 def normalize_by_asf_interceptions_(x, return_bounds=False):
 
