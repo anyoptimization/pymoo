@@ -120,7 +120,7 @@ def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, f
                      disp=disp)
 
 
-def minimize_(problem, evaluator, method='auto', method_args={}, seed=None,
+def minimize_(problem, evaluator, method='auto', method_args={}, seed=1,
               callback=None, disp=False):
     """
         See :func:`~pymoo.optimize.minimize` for description. Instead of a function the parameter is a problem class.

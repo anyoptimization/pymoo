@@ -24,7 +24,7 @@ class NonDominatedRank:
 
     @staticmethod
     def calc(F):
-        fronts = NonDominatedRank.calc_as_fronts(F, None)
+        fronts = NonDominatedRank.calc_as_fronts(F)
         return NonDominatedRank.calc_from_fronts(fronts)
 
     @staticmethod

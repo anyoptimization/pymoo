@@ -38,7 +38,6 @@ class SimulatedBinaryCrossover(Crossover):
                             alpha = 2.0 - pow(beta, -(self.eta_cross + 1.0))
                             if rand <= (1.0 / alpha):
                                 betaq = pow((rand * alpha), (1.0 / (self.eta_cross + 1.0)))
-
                             else:
                                 betaq = pow((1.0 / (2.0 - rand * alpha)), (1.0 / (self.eta_cross + 1.0)))
 
@@ -62,6 +61,9 @@ class SimulatedBinaryCrossover(Crossover):
                                 c1 = yu
                             if c2 > yu:
                                 c2 = yu
+
+                            children[n_children, i] = c1
+                            children[n_children + 1, i] = c2
 
                             if random.random() <= 0.5:
                                 children[n_children, i] = c2

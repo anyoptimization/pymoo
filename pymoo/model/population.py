@@ -56,7 +56,17 @@ class Population:
         self.D = D
 
     def size(self):
-        return self.X.shape[0]
+        if self.X is not None:
+            return self.X.shape[0]
+        elif self.F is not None:
+            return self.F.shape[0]
+        else:
+            return None
+
+    def copy(self):
+        pop = Population()
+        pop.D = copy.deepcopy(self.D)
+        return pop
 
     def filter(self, v):
         D = {}

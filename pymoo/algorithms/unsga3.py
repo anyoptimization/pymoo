@@ -1,50 +1,73 @@
-from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.default_operators import set_if_none
-from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
-from pymoo.operators.selection.random_selection import RandomSelection
-from pymoo.operators.survival.reference_line_survival import ReferenceLineSurvival
-from pymoo.util.display import disp_multi_objective
-from pymoo.util.reference_directions import get_uniform_weights
+import numpy as np
+
+from pymoo.algorithms.nsga3 import NSGA3
+from pymoo.operators.selection.tournament_selection import TournamentSelection
+from pymoo.rand import random
 
 
-class NSGA3(GeneticAlgorithm):
-
-    def __init__(self,
-                 pop_size=100,
-                 ref_dirs=None,
-                 prob_cross=0.9,
-                 eta_cross=20,
-                 prob_mut=None,
-                 eta_mut=15,
-                 **kwargs):
-
-        self.ref_dirs = ref_dirs
-
-        set_if_none(kwargs, 'pop_size', pop_size)
-        set_if_none(kwargs, 'sampling', RealRandomSampling())
-        set_if_none(kwargs, 'selection', RandomSelection())
-        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=prob_cross, eta_cross=eta_cross))
-        set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=prob_mut, eta_mut=eta_mut))
-        set_if_none(kwargs, 'survival', None)
-        set_if_none(kwargs, 'eliminated_duplicates', False)
-
-        super().__init__(**kwargs)
-
-        self.func_display_attrs = disp_multi_objective
+class UNSGA3(NSGA3):
 
     def _initialize(self):
         pop = super()._initialize()
 
-        # if survival not define differently
-        if self.survival is None:
+        # to set the rank and niches
+        self.survival.do(pop, self.pop_size, out=self.D, **self.D)
 
-            # if ref dirs are not initialized do it based on the population size
-            if self.ref_dirs is None:
-                self.ref_dirs = get_uniform_weights(self.pop_size, self.problem.n_obj)
-
-            # set the survival method itself
-            self.survival = ReferenceLineSurvival(self.ref_dirs)
+        # add selection pressure to improve convergence
+        self.selection = TournamentSelection(f_comp=comp_by_rank_and_ref_line_dist)
 
         return pop
+
+
+def comp_by_rank_and_ref_line_dist(pop, P, niche, rank, **kwargs):
+    if P.shape[1] != 2:
+        raise ValueError("Only implemented for binary tournament!")
+
+    S = np.zeros((P.shape[0]), dtype=np.int)
+
+    # boolean array for feasibility
+    feasible = pop.CV[:, 0] <= 0
+
+    for i in range(P.shape[0]):
+
+        a, b = P[i, 0], P[i, 1]
+
+        if feasible[a] and not feasible[b]:
+            S[i] = a
+        elif not feasible[a] and feasible[b]:
+            S[i] = b
+        elif not feasible[b] and not feasible[a]:
+
+            if pop.CV[a, 0] < pop.CV[b, 0]:
+                S[i] = a
+            elif pop.CV[b, 0] < pop.CV[a, 0]:
+                S[i] = b
+            else:
+                if random.random() < 0.5:
+                    S[i] = a
+                else:
+                    S[i] = b
+
+        # both are feasible
+        else:
+
+            if niche[a] == niche[b]:
+
+                if rank[a] < rank[b]:
+                    S[i] = a
+                elif rank[b] < rank[a]:
+                    S[i] = b
+                else:
+                    if random.random() < 0.5:
+                        S[i] = a
+                    else:
+                        S[i] = b
+
+            else:
+
+                if random.random() < 0.5:
+                    S[i] = a
+                else:
+                    S[i] = b
+
+    return S[:, None]

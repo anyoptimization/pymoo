@@ -1,13 +1,10 @@
 import copy
 from abc import abstractmethod
 
-import numpy as np
-from pymop.problem import Problem
-
-import pymoo
 from pymoo.model.evaluator import Evaluator
 from pymoo.rand import random
 from pymoo.util.non_dominated_rank import NonDominatedRank
+from pymop.problem import Problem
 
 
 class Algorithm:
@@ -90,12 +87,7 @@ class Algorithm:
         """
 
         # set the random seed for generator
-        pymoo.rand.random.seed(seed)
-
-        # just to be sure also for the others
-        seed = pymoo.rand.random.randint(0, 100000)
         random.seed(seed)
-        np.random.seed(seed)
 
         self.disp = disp
         self.callback = callback

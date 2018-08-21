@@ -10,7 +10,3 @@ class PythonRandomGenerator(RandomGenerator):
 
     def _rand_float(self):
         return random.random()
-
-
-
-
