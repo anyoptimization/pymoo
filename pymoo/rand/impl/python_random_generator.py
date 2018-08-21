@@ -3,7 +3,7 @@ import random
 from pymoo.rand.random_generator import RandomGenerator
 
 
-class DefaultRandomGenerator(RandomGenerator):
+class PythonRandomGenerator(RandomGenerator):
 
     def _seed(self, n):
         random.seed(n)
