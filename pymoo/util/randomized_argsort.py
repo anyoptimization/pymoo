@@ -4,11 +4,11 @@ from pymoo.rand import random
 from pymoo.util.misc import swap
 
 
-def randomized_sort(A, method="numpy", order='ascending'):
+def randomized_argsort(A, method="numpy", order='ascending'):
     if method == "numpy":
         P = random.perm(len(A))
-        I = np.argsort(A[P])
-        I = I[P]
+        I = np.argsort(A[P], kind='quicksort')
+        I = P[I]
 
     elif method == "quicksort":
         I = quicksort(A)
@@ -54,8 +54,8 @@ def _quicksort(A, I, left, right):
 
 
 if __name__ == '__main__':
-    a = np.array([0,0,0])
+    a = np.array([5, 9, 10, 0, 0, 0, 100, -2])
 
     for i in range(200):
-        I = randomized_sort(a, method="quicksort")
+        I = randomized_argsort(a, method="numpy")
         print(I)

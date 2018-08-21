@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+import numpy as np
+
 
 class RandomGenerator:
     """
@@ -7,18 +9,41 @@ class RandomGenerator:
     be inherited from.
     """
 
-    @abstractmethod
-    def seed(self, s):
-        pass
+    def seed(self, n):
+        if n < 0:
+            raise Exception("Random seed must be larger than 0!")
+        
+        self._seed(n)
 
-    @abstractmethod
     def perm(self, size):
+        return np.argsort(self.random(size), kind='quicksort')
+
+    def randint(self, low, high=None, size=None):
+        val = self.random(size)
+        return (low + (val * (high - low))).astype(np.int)
+
+    def random(self, size=None):
+        if size is None:
+            return self._rand((1, 1))[0, 0]
+
+        elif isinstance(size, int):
+            return self._rand((1, size))[0, :]
+
+        elif isinstance(size, tuple):
+            return self._rand(size)
+        else:
+            raise Exception("rand method not defined for: %s" % size)
+
+    def _rand(self, size=None):
+        val = np.full(size, np.inf)
+        for index, _ in np.ndenumerate(val):
+            val[index] = self._rand_float()
+        return val
+
+    @abstractmethod
+    def _rand_float(self):
         pass
 
     @abstractmethod
-    def rand(self, size=None):
-        pass
-
-    @abstractmethod
-    def randint(self, low, high, size=None):
+    def _seed(self, s):
         pass

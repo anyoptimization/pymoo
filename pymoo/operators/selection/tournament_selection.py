@@ -18,7 +18,7 @@ class TournamentSelection(Selection):
         Parameters
         ----------
         f_comp: func
-            The function to compare two individuals. It has the shape: comp(pop, indices, data) and returns the winner.
+            The function to compare two individuals. It has the shape: comp(pop, indices) and returns the winner.
             If the function is None it is assumed the population is sorted by a criterium and only indices are compared.
 
         pressure: int
@@ -32,13 +32,7 @@ class TournamentSelection(Selection):
         if self.f_comp is None:
             raise Exception("Please provide the comparing function for the tournament selection!")
 
-        # attributes that will be set during the optimization
-        self.pop = None
-        self.perm = None
-        self.counter = None
-
     def _do(self, pop, n_select, n_parents=1, **kwargs):
-
         # number of random individuals needed
         n_random = n_select * n_parents * self.pressure
 

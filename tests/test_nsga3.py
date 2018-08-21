@@ -1,69 +1,114 @@
+import json
 import os
-import pickle
 import unittest
+from unittest.mock import MagicMock
 
 import numpy as np
 
+from pymoo.configuration import Configuration
 from pymoo.model.population import Population
-from pymoo.operators.survival.rank_and_crowding import RankAndCrowdingSurvival
-from pymoo.rand.impl.custom_random_generator import CustomRandomGenerator
+from pymoo.operators.survival.reference_line_survival import ReferenceLineSurvival, associate_to_niches
 from pymoo.util.non_dominated_rank import NonDominatedRank
 
 
-class NSGA2Test(unittest.TestCase):
-    """
-    Some methods compare with one test run from the C code (200 generations) and
-    tests if the rank is always equal.
-
-    """
+class NSGA3Test(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        with open(os.path.join("resources", "cnsga2_zdt4.dat"), 'rb') as f:
-            cls.data = pickle.load(f)
-
-    # tests whether the first number by the random generator is equal
-    def test_custom_random_generator(self):
-        rand = CustomRandomGenerator(0.1)
-        val = rand.rand()
-        self.assertAlmostEqual(val, 0.337237, places=6)
+        with open(os.path.join("resources", "hist.json"), encoding='utf-8') as f:
+            cls.data = json.loads(f.read())
 
     def test_non_dominated_rank(self):
-        for i, D in enumerate(self.data):
-            _rank = NonDominatedRank().calc(D['F'])
-            rank = D['rank'].astype(np.int) - 1
+        for i, D in enumerate(self.data['hist']):
+            _rank = NonDominatedRank().calc(np.array(D['cand_F']))
+            rank = np.array(D['cand_rank']).astype(np.int) - 1
             is_equal = np.all(_rank == rank)
             self.assertTrue(is_equal)
 
-    def test_crowding_distance(self):
-        for i, D in enumerate(self.data):
+    def test_run(self):
 
-            _rank = np.full(D['crowding'].shape[0], -1)
-            _crowding = np.full(D['crowding'].shape[0], -1.0)
-            fronts = NonDominatedRank.calc_as_fronts(D['F'], None)
-            for k, front in enumerate(fronts):
-                cd_of_front = RankAndCrowdingSurvival.calc_crowding_distance(D['F'][front, :])
-                #print(D['F'][front, :])
-                _crowding[front] = cd_of_front
-                _rank[front] = k+1
+        ref_dirs = np.array(self.data['ref_dir'])
+        survival = ReferenceLineSurvival(ref_dirs)
 
-            crowding = D['crowding']
+        D = self.data['hist'][0]
+        pop = Population()
+        pop.X = np.array(D['before_X'])
+        pop.F = np.array(D['before_F'])
+        survival.do(pop, pop.size())
 
-            is_equal = np.all(np.abs(_crowding - crowding) < 0.001)
+        for i, D in enumerate(self.data['hist']):
 
-            #if False:
-            if not is_equal:
-                print("-" * 30)
-                print("Generation: ", i)
-                print("Is rank equal: ", np.all(D['rank'] == _rank))
-                index = np.where(np.abs(_crowding - crowding) > 0.001)
-                print(index)
-                print(D['rank'][index])
-                print(D['F'][index])
-                print(np.concatenate([_crowding[:, None], crowding[:, None]], axis=1)[index, :])
+            out = {}
+            vars = {'out': out}
 
-            #self.assertTrue(is_equal)
+            pop = Population()
+            pop.X = np.array(D['before_X'])
+            pop.F = np.array(D['before_F'])
 
+            off = Population()
+            off.X = np.array(D['off_X'])
+            off.F = np.array(D['off_F'])
+
+            pop.merge(off)
+
+            cand = Population()
+            cand.X = np.array(D['cand_X'])
+            cand.F = np.array(D['cand_F'])
+
+            Configuration.rand.randint = MagicMock()
+            Configuration.rand.randint.side_effect = D['rnd_niching']
+
+            fronts = []
+            ranks = np.array(D['cand_rank'])
+            for r in np.unique(ranks):
+                fronts.append(np.where(ranks == r)[0].tolist())
+
+            NonDominatedRank.calc_as_fronts = MagicMock()
+            NonDominatedRank.calc_as_fronts.return_value = fronts
+
+            cand_copy = cand.copy()
+
+            # necessary because only candidates are provided
+            if survival.ideal_point is None:
+                survival.ideal_point = np.min(pop.F, axis=0)
+            else:
+                survival.ideal_point = np.min(np.concatenate([survival.ideal_point[None, :], pop.F], axis=0), axis=0)
+
+
+            survival.do(cand, pop.size() / 2, **vars)
+
+            is_equal = np.all(survival.extreme_points == np.array(D['extreme']))
+            self.assertTrue(is_equal)
+
+            is_equal = np.all(survival.ideal_point == np.array(D['ideal']))
+            self.assertTrue(is_equal)
+
+            is_equal = np.all(np.abs(survival.intercepts - np.array(D['intercepts'])) < 0.000001)
+            self.assertTrue(is_equal)
+
+
+
+            niche_of_individuals, dist_to_niche = associate_to_niches(cand_copy.F, ref_dirs, survival.ideal_point,
+                                                                      survival.intercepts)
+            for r, v in enumerate(D['ref_dir']):
+                self.assertTrue(np.all(ref_dirs[niche_of_individuals[r]] == v))
+
+            is_equal = np.all(np.abs(dist_to_niche - np.array(D['perp_dist'])) < 0.0000001)
+            self.assertTrue(is_equal)
+
+
+
+
+            surv_pop = Population()
+            surv_pop.X = np.array(D['X'])
+            surv_pop.F = np.array(D['F'])
+
+            for k in range(cand.size()):
+                is_equal = np.any(np.all(cand.X[k, :] == surv_pop.X, axis=1))
+                self.assertTrue(is_equal)
+
+                is_equal = np.any(np.all(surv_pop.X[k, :] == cand.X, axis=1))
+                self.assertTrue(is_equal)
 
 if __name__ == '__main__':
     unittest.main()

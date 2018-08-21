@@ -1,41 +1,63 @@
+import os
+import pickle
+import sys
 import time
 
 import numpy as np
 
-from pymoo.util.plotting import plot, animate
-
 if __name__ == '__main__':
+    """
+    This class performs one run given a pickled object saving all the necessary data.
+    """
 
-    # load the problem instance
-    from pymop.problems.zdt import ZDT4
-    problem = ZDT4(n_var=10)
+    # insert this project in path
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-    # create the algorithm instance by specifying the intended parameters
-    from pymoo.algorithms.nsga2 import NSGA2
-    algorithm = NSGA2(pop_size=100)
+    import sys
+
+    sys.path.append('/home/blankjul/workspace/pymop')
+    import pymop
+
+    if len(sys.argv) < 2:
+        raise Exception("Usage: python run.py <dat> [<out>]")
+
+    # load the data for the experiment
+    fname = sys.argv[1]
+    with open(fname, 'rb') as f:
+        data = pickle.load(f)
+
+    problem, algorithm, evaluator, seed = data['problem'], data['algorithm'], data['evaluator'], data['seed']
+
+    if len(sys.argv) == 2:
+        tmp = sys.argv[1]
+        out = tmp[:tmp.find('.')] + '.out'
+    else:
+        out = sys.argv[2]
 
     start_time = time.time()
+    try:
 
-    # number of generations to run it
-    n_gen = 200
+        X, F, G = algorithm.solve(problem,
+                                  evaluator=evaluator,
+                                  seed=seed,
+                                  save_history=(len(sys.argv) == 4),
+                                  return_only_feasible=False,
+                                  return_only_non_dominated=False,
+                                  disp=False)
 
-    # solve the problem and return the results
-    X, F, G = algorithm.solve(problem,
-                              evaluator=(100 * n_gen),
-                              seed=26,
-                              return_only_feasible=False,
-                              return_only_non_dominated=False,
-                              disp=True,
-                              save_history=True)
+        elapsed = (time.time() - start_time)
+        print(fname, "in --- %s seconds ---" % elapsed)
 
-    print("--- %s seconds ---" % (time.time() - start_time))
+        np.savetxt(out, F)
 
-    scatter_plot = True
-    save_animation = True
+        if len(sys.argv) == 4:
+            out_dat = sys.argv[3]
+            with open(out_dat, 'wb') as f:
+                pickle.dump({'hist': algorithm.history}, f)
 
-    if scatter_plot:
-        plot(F)
+    except:
+        print("Error: %s" % fname)
 
-    if save_animation:
-        H = np.concatenate([e['pop'].F[None, :, :] for e in algorithm.history], axis=0)
-        animate('%s.mp4' % problem.name(), H, problem)
+    # pf = problem.pareto_front()
+    # print(IGD(pf).calc(F))
+    # print(IGD(pf).calc(_F))
