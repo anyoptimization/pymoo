@@ -15,7 +15,7 @@ class NSGA3Test(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        with open(os.path.join("resources", "hist.json"), encoding='utf-8') as f:
+        with open(os.path.join("resources", "_hist.json"), encoding='utf-8') as f:
             cls.data = json.loads(f.read())
 
     def test_non_dominated_rank(self):
@@ -99,7 +99,7 @@ class NSGA3Test(unittest.TestCase):
             for r, v in enumerate(D['ref_dir']):
                 self.assertTrue(np.all(ref_dirs[niche_of_individuals[r]] == v))
 
-            is_equal = np.all(np.abs(dist_to_niche - np.array(D['perp_dist'])) < 0.00000000001)
+            is_equal = np.all(np.abs(dist_to_niche - np.array(D['perp_dist'])) < 0.000001)
 
             if not is_equal:
                 print(i)

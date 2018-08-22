@@ -182,7 +182,7 @@ def associate_to_niches(F, niches, ideal_point, intercepts, utopianEpsilon=-0.00
     N = (F - ideal_point) / intercepts
 
     # make sure that no values are 0. (subtracting a negative epsilon)
-    N -= - utopianEpsilon
+    N -= utopianEpsilon
 
     dist_matrix = calc_perpendicular_dist_matrix(N, niches)
 
