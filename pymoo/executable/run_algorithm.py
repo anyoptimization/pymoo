@@ -3,32 +3,35 @@ import time
 import numpy as np
 
 from pymoo.util.plotting import plot, animate
+from pymop.problems.dtlz import DTLZ4
 
 if __name__ == '__main__':
-
-    from pymoo.cpp import hello_module
-    hello_module.print_hello_world()
-
 
     # load the problem instance
     from pymop.problems.zdt import ZDT3
 
-    problem = ZDT3()
+    problem = DTLZ4(n_var=12, n_obj=3)
+    problem.n_pareto_points = 92
 
     # create the algorithm instance by specifying the intended parameters
-    from pymoo.algorithms.nsga2 import NSGA2
+    from pymoo.algorithms.nsga3 import NSGA3
 
-    algorithm = NSGA2()
+    algorithm = NSGA3(pop_size=92,
+                 ref_dirs=None,
+                 prob_cross=0.9,
+                 eta_cross=20,
+                 prob_mut=None,
+                 eta_mut=30)
 
     start_time = time.time()
 
     # number of generations to run it
-    n_gen = 200
+    n_gen = 500
 
     # solve the problem and return the results
     X, F, G = algorithm.solve(problem,
                               evaluator=(algorithm.pop_size * n_gen),
-                              seed=15,
+                              seed=25,
                               return_only_feasible=False,
                               return_only_non_dominated=False,
                               disp=True,

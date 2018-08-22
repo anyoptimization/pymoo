@@ -40,7 +40,7 @@ class Dominator:
         return M
 
     @staticmethod
-    def calc_domination_matrix(F, G):
+    def calc_domination_matrix(F, G, epsilon=1e-10):
 
         if G is None or len(G) == 0:
             constr = np.zeros((F.shape[0], F.shape[0]))
@@ -57,8 +57,8 @@ class Dominator:
         L = np.repeat(F, n, axis=0)
         R = np.tile(F, (n, 1))
 
-        smaller = np.reshape(np.any(L < R, axis=1), (n, n))
-        larger = np.reshape(np.any(L > R, axis=1), (n, n))
+        smaller = np.reshape(np.any(L + epsilon < R, axis=1), (n, n))
+        larger = np.reshape(np.any(L > R + epsilon, axis=1), (n, n))
 
         dom = np.logical_and(smaller, np.logical_not(larger)) * 1 \
               + np.logical_and(larger, np.logical_not(smaller)) * -1

@@ -12,7 +12,6 @@ class RandomGenerator:
     def seed(self, n):
         if n < 0:
             raise Exception("Random seed must be larger than 0!")
-        
         self._seed(n)
 
     def perm(self, size):

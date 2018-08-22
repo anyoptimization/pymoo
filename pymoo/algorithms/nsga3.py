@@ -14,10 +14,10 @@ class NSGA3(GeneticAlgorithm):
     def __init__(self,
                  pop_size=100,
                  ref_dirs=None,
-                 prob_cross=0.9,
+                 prob_cross=1.0,
                  eta_cross=20,
                  prob_mut=None,
-                 eta_mut=15,
+                 eta_mut=30,
                  **kwargs):
 
         self.ref_dirs = ref_dirs

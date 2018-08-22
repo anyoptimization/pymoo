@@ -19,7 +19,7 @@ class NSGA3Test(unittest.TestCase):
             cls.data = json.loads(f.read())
 
     def test_non_dominated_rank(self):
-        for i, D in enumerate(self.data['hist']):
+        for i, D in enumerate(self.data['_hist']):
             _rank = NonDominatedRank().calc(np.array(D['cand_F']))
             rank = np.array(D['cand_rank']).astype(np.int) - 1
             is_equal = np.all(_rank == rank)
@@ -34,6 +34,11 @@ class NSGA3Test(unittest.TestCase):
         pop = Population()
         pop.X = np.array(D['before_X'])
         pop.F = np.array(D['before_F'])
+
+        _rank = NonDominatedRank.calc(pop.F) + 1
+        rank = np.array(D['before_rank'])
+        self.assertTrue(np.all(_rank == rank))
+
         survival.do(pop, pop.size())
 
         for i, D in enumerate(self.data['hist']):
@@ -74,7 +79,6 @@ class NSGA3Test(unittest.TestCase):
             else:
                 survival.ideal_point = np.min(np.concatenate([survival.ideal_point[None, :], pop.F], axis=0), axis=0)
 
-
             survival.do(cand, pop.size() / 2, **vars)
 
             is_equal = np.all(survival.extreme_points == np.array(D['extreme']))
@@ -84,31 +88,41 @@ class NSGA3Test(unittest.TestCase):
             self.assertTrue(is_equal)
 
             is_equal = np.all(np.abs(survival.intercepts - np.array(D['intercepts'])) < 0.000001)
+
+            if not is_equal:
+                print(i)
+                print(survival.intercepts, np.array(D['intercepts']))
             self.assertTrue(is_equal)
-
-
 
             niche_of_individuals, dist_to_niche = associate_to_niches(cand_copy.F, ref_dirs, survival.ideal_point,
                                                                       survival.intercepts)
             for r, v in enumerate(D['ref_dir']):
                 self.assertTrue(np.all(ref_dirs[niche_of_individuals[r]] == v))
 
-            is_equal = np.all(np.abs(dist_to_niche - np.array(D['perp_dist'])) < 0.0000001)
+            is_equal = np.all(np.abs(dist_to_niche - np.array(D['perp_dist'])) < 0.00000000001)
+
+            if not is_equal:
+                print(i)
+
             self.assertTrue(is_equal)
-
-
-
 
             surv_pop = Population()
             surv_pop.X = np.array(D['X'])
             surv_pop.F = np.array(D['F'])
 
-            for k in range(cand.size()):
-                is_equal = np.any(np.all(cand.X[k, :] == surv_pop.X, axis=1))
+            for k in range(surv_pop.size()):
+                is_equal = np.any(np.all(surv_pop.X[k, :] == cand.X, axis=1))
+
+                if not is_equal:
+                    print(i)
+                    print(k)
+
                 self.assertTrue(is_equal)
 
-                is_equal = np.any(np.all(surv_pop.X[k, :] == cand.X, axis=1))
+            for k in range(cand.size()):
+                is_equal = np.any(np.all(cand.F[k, :] == surv_pop.F, axis=1))
                 self.assertTrue(is_equal)
+
 
 if __name__ == '__main__':
     unittest.main()
