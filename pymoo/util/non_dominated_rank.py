@@ -37,7 +37,7 @@ class NonDominatedRank:
         return rank
 
     @staticmethod
-    def calc_as_fronts_naive(F, G):
+    def calc_as_fronts_naive(F, G=None):
 
         M = Dominator.calc_domination_matrix(F, G)
         fronts = []

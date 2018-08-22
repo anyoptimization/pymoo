@@ -59,7 +59,7 @@ class ReferenceLineSurvival(Survival):
 
         # associate individuals to niches
         niche_of_individuals, dist_to_niche = associate_to_niches(pop.F, self.ref_dirs, self.ideal_point,
-                                                           self.intercepts)
+                                                                  self.intercepts)
 
         # if a splitting of the last front is not necessary
         if pop.size() == n_survive:
@@ -110,7 +110,7 @@ class ReferenceLineSurvival(Survival):
                 else:
                     # not sorted so randomly the first is fine here
                     next_ind = next_ind[0]
-                    #next_ind = next_ind[random.randint(0, len(next_ind))]
+                    # next_ind = next_ind[random.randint(0, len(next_ind))]
 
                 remaining_last_front[next_ind] = False
                 survival.append(int(last_front[next_ind]))
@@ -126,9 +126,6 @@ class ReferenceLineSurvival(Survival):
 
         # now truncate the population
         pop.filter(survival)
-
-
-
 
 
 def get_extreme_points(F, ideal_point, extreme_points=None):
@@ -149,13 +146,24 @@ def get_extreme_points(F, ideal_point, extreme_points=None):
 
 
 def get_intercepts(extreme_points, ideal_point, nadir_point, worst_point):
+
+    # normalization of the points in the new space
+    nadir_point -= ideal_point
+    worst_point -= ideal_point
+
     try:
         # find the intercepts using gaussian elimination
         intercepts = np.linalg.solve(extreme_points - ideal_point, np.ones(extreme_points.shape[1]))
+
+        intercepts = (1 / intercepts)
+
+        """
         if np.any(intercepts < 1e-6):
             raise LinAlgError()
         else:
             intercepts = (1 / intercepts)
+        """
+
 
     except LinAlgError:
         # set to zero which will be handled later
@@ -169,7 +177,13 @@ def get_intercepts(extreme_points, ideal_point, nadir_point, worst_point):
 
 
 def associate_to_niches(F, niches, ideal_point, intercepts, utopianEpsilon=-0.001):
-    N = (F - ideal_point) / intercepts - utopianEpsilon
+
+    # normalize by ideal point and intercepts
+    N = (F - ideal_point) / intercepts
+
+    # make sure that no values are 0. (subtracting a negative epsilon)
+    N -= - utopianEpsilon
+
     dist_matrix = calc_perpendicular_dist_matrix(N, niches)
 
     niche_of_individuals = np.argmin(dist_matrix, axis=1)

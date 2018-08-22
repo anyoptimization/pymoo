@@ -11,9 +11,8 @@ class FitnessSurvival(Survival):
     Simply sort by first constraint violation and then fitness value and truncate the worst individuals.
 
     """
-    def _do(self, pop, off, size, **kwargs):
 
-        pop.merge(off)
+    def _do(self, pop, n_survive, out=None, **kwargs):
 
         if pop.F.shape[1] != 1:
             raise ValueError("FitnessSurvival can only used for single objective problems!")
@@ -28,7 +27,7 @@ class FitnessSurvival(Survival):
         sorted_idx = sorted(range(pop.size()), key=lambda x: (CV[x], pop.F[x]))
 
         # now truncate the population
-        sorted_idx = sorted_idx[:size]
+        sorted_idx = sorted_idx[:n_survive]
         pop.filter(sorted_idx)
 
 
