@@ -7,6 +7,7 @@ from pymoo.algorithms.rnsga3 import RNSGA3
 from pymoo.algorithms.so_DE import DifferentialEvolution
 from pymoo.algorithms.so_genetic_algorithm import SingleObjectiveGeneticAlgorithm
 from pymoo.model.evaluator import Evaluator
+from pymoo.rand import random
 from pymop.problem import Problem
 
 
@@ -115,6 +116,10 @@ def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, f
     else:
         raise Exception('Unknown Termination criterium: %s' % termination_criterium)
 
+    # set a random random seed if not provided
+    if seed is None:
+        seed = random.randint(1, 10000)
+
     return minimize_(problem, evaluator, method=method, method_args=method_args, seed=seed,
                      callback=callback,
                      disp=disp)
@@ -142,10 +147,9 @@ def minimize_(problem, evaluator, method='auto', method_args={}, seed=1,
     elif method == 'de':
         algorithm = DifferentialEvolution(**method_args)
     elif method == 'ga':
-        algorithm = SingleObjectiveGeneticAlgorithm("real", **method_args)
+        algorithm = SingleObjectiveGeneticAlgorithm(**method_args)
     else:
         raise Exception('Unknown method: %s' % method)
-
 
     X, F, G = algorithm.solve(problem, evaluator, disp=disp, callback=callback, seed=seed)
 

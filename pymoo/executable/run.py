@@ -55,7 +55,8 @@ if __name__ == '__main__':
             with open(out_dat, 'wb') as f:
                 pickle.dump({'hist': algorithm.history}, f)
 
-    except:
+    except Exception as e:
+        print(e)
         print("Error: %s" % fname)
 
     # pf = problem.pareto_front()
