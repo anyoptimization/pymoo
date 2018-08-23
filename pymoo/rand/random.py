@@ -70,3 +70,10 @@ def randint(low, high=None, size=None):
         return Singleton.get_instance().randint(0, high=low, size=size)
     else:
         return Singleton.get_instance().randint(low, high=high, size=size)
+
+
+def choice(a):
+    """
+    Select randomly an element from a list.
+    """
+    return Singleton.get_instance().choice(a)

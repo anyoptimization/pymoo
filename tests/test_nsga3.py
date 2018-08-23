@@ -15,12 +15,12 @@ class NSGA3Test(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        with open(os.path.join("resources", "_hist.json"), encoding='utf-8') as f:
+        with open(os.path.join("resources", "hist.json"), encoding='utf-8') as f:
             cls.data = json.loads(f.read())
 
     def test_non_dominated_rank(self):
         for i, D in enumerate(self.data['_hist']):
-            _rank = NonDominatedRank().calc(np.array(D['cand_F']))
+            _rank = NonDominatedRank().do(np.array(D['cand_F']))
             rank = np.array(D['cand_rank']).astype(np.int) - 1
             is_equal = np.all(_rank == rank)
             self.assertTrue(is_equal)
@@ -35,9 +35,9 @@ class NSGA3Test(unittest.TestCase):
         pop.X = np.array(D['before_X'])
         pop.F = np.array(D['before_F'])
 
-        _rank = NonDominatedRank.calc(pop.F) + 1
+        _, _rank = NonDominatedRank(epsilon=1e-10).do(pop.F, return_rank=True)
         rank = np.array(D['before_rank'])
-        self.assertTrue(np.all(_rank == rank))
+        self.assertTrue(np.all(_rank+1 == rank))
 
         survival.do(pop, pop.size())
 
@@ -68,8 +68,8 @@ class NSGA3Test(unittest.TestCase):
             for r in np.unique(ranks):
                 fronts.append(np.where(ranks == r)[0].tolist())
 
-            NonDominatedRank.calc_as_fronts = MagicMock()
-            NonDominatedRank.calc_as_fronts.return_value = fronts
+            NonDominatedRank.do = MagicMock()
+            NonDominatedRank.do.return_value = [np.array(front) for front in fronts], ranks-1
 
             cand_copy = cand.copy()
 
@@ -87,7 +87,7 @@ class NSGA3Test(unittest.TestCase):
             is_equal = np.all(survival.ideal_point == np.array(D['ideal']))
             self.assertTrue(is_equal)
 
-            is_equal = np.all(np.abs(survival.intercepts - np.array(D['intercepts'])) < 0.000001)
+            is_equal = np.all(np.abs(survival.intercepts - np.array(D['intercepts'])) < 0.0001)
 
             if not is_equal:
                 print(i)

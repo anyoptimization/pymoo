@@ -37,7 +37,7 @@ class NSGA2Test(unittest.TestCase):
 
             _rank = np.full(rank.shape, -1)
             _crowding = np.full(crowding.shape, -1.0)
-            fronts = NonDominatedRank.calc_as_fronts(F)
+            fronts = NonDominatedRank().do(F)
             for k, front in enumerate(fronts):
                 cd_of_front = RankAndCrowdingSurvival.calc_crowding_distance(F[front, :])
                 _crowding[front] = cd_of_front

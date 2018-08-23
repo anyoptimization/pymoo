@@ -25,11 +25,12 @@ def split_by_feasibility(pop):
     if pop.CV is None:
         return np.arange(pop.size()), np.array([])
 
-    P = np.argsort(pop.CV[:, 0])
+    feasible, infeasible = [], []
 
-    # split into a set of feasible and infeasible
-    b = pop.CV[P, 0] <= 0
-    feasible = P[np.where(b)[0]]
-    infeasible = P[np.where(np.logical_not(b))[0]]
+    for i in range(pop.size()):
+        if pop.CV[i, 0] <= 0:
+            feasible.append(i)
+        else:
+            infeasible.append(i)
 
-    return feasible, infeasible
+    return np.array(feasible), np.array(infeasible)
