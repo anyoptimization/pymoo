@@ -109,7 +109,7 @@ class Algorithm:
                     G = G[cv <= 0, :]
 
         if return_only_non_dominated:
-            idx_non_dom = NonDominatedRank.calc_as_fronts(F, G)[0]
+            idx_non_dom = NonDominatedRank().do(F, G=G)[0]
             X = X[idx_non_dom, :]
             F = F[idx_non_dom, :]
             if G is not None:

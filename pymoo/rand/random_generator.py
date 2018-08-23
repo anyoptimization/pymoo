@@ -21,6 +21,9 @@ class RandomGenerator:
         val = self.random(size)
         return (low + (val * (high - low))).astype(np.int)
 
+    def choice(self, a):
+        return a[self.randint(0, len(a))]
+
     def random(self, size=None):
         if size is None:
             return self._rand((1, 1))[0, 0]

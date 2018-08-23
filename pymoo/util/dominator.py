@@ -1,9 +1,36 @@
 import numpy as np
 
+from pymoo.rand import random
 from pymop.problem import Problem
 
 
+def compare(a, a_val, b, b_val, method, return_random_if_equal=False):
+    if method == 'larger_is_better':
+        if a_val > b_val:
+            return a
+        elif a_val < b_val:
+            return b
+        else:
+            if return_random_if_equal:
+                return random.choice([a, b])
+            else:
+                return None
+    elif method == 'smaller_is_better':
+        if a_val < b_val:
+            return a
+        elif a_val > b_val:
+            return b
+        else:
+            if return_random_if_equal:
+                return random.choice([a, b])
+            else:
+                return None
+    else:
+        raise Exception("Unknown method.")
+
+
 class Dominator:
+
     @staticmethod
     def get_relation(a, b, cva=None, cvb=None):
 
@@ -40,16 +67,16 @@ class Dominator:
         return M
 
     @staticmethod
-    def calc_domination_matrix(F, G, epsilon=1e-10):
+    def calc_domination_matrix(F, G, epsilon=0.0):
 
         if G is None or len(G) == 0:
             constr = np.zeros((F.shape[0], F.shape[0]))
         else:
             # consider the constraint violation
-            #CV = Problem.calc_constraint_violation(G)
-            #constr = (CV < CV) * 1 + (CV > CV) * -1
+            # CV = Problem.calc_constraint_violation(G)
+            # constr = (CV < CV) * 1 + (CV > CV) * -1
 
-            CV = Problem.calc_constraint_violation(G)[:,0]
+            CV = Problem.calc_constraint_violation(G)[:, 0]
             constr = (CV[:, None] < CV) * 1 + (CV[:, None] > CV) * -1
 
         # look at the obj for dom

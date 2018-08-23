@@ -1,4 +1,3 @@
-from pymoo.rand.impl.custom_random_generator import CustomRandomGenerator
 from pymoo.rand.impl.numpy_random_generator import NumpyRandomGenerator
 
 
