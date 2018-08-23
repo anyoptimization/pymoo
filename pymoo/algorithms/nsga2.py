@@ -7,9 +7,8 @@ from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection
 from pymoo.operators.survival.rank_and_crowding import RankAndCrowdingSurvival
-from pymoo.rand import random
 from pymoo.util.display import disp_multi_objective
-from pymoo.util.dominator import Dominator
+from pymoo.util.dominator import Dominator, compare
 
 
 class NSGA2(GeneticAlgorithm):
@@ -21,7 +20,6 @@ class NSGA2(GeneticAlgorithm):
                  prob_mut=None,
                  eta_mut=20,
                  **kwargs):
-
         set_if_none(kwargs, 'pop_size', pop_size)
         set_if_none(kwargs, 'sampling', RealRandomSampling())
         set_if_none(kwargs, 'selection', TournamentSelection(f_comp=comp_by_dom_and_crowding))
@@ -35,110 +33,45 @@ class NSGA2(GeneticAlgorithm):
 
     def _initialize(self):
         pop = super()._initialize()
+        self.D['tournament_type'] = 'comp_by_dom_and_crowding'
         # after initializing the rank and crowding needs to be calculated for the tournament selection
         self.survival.do(pop, self.pop_size, out=self.D, **self.D)
         return pop
 
 
-def comp_by_rank_and_crowding(pop, P, rank, crowding, **kwargs):
+def comp_by_dom_and_crowding(pop, P, rank, crowding, tournament_type, **kwargs):
     if P.shape[1] != 2:
         raise ValueError("Only implemented for binary tournament!")
 
-    S = np.zeros((P.shape[0]), dtype=np.int)
-    feasible = pop.CV[:, 0] <= 0
+    S = np.full(P.shape[0], np.nan)
 
     for i in range(P.shape[0]):
 
         a, b = P[i, 0], P[i, 1]
 
-        if feasible[a] and not feasible[b]:
-            S[i] = a
-        elif not feasible[a] and feasible[b]:
-            S[i] = b
-        elif not feasible[b] and not feasible[a]:
+        # if at least one solution is infeasible
+        if pop.CV[a, 0] > 0.0 or pop.CV[b, 0] > 0.0:
+            S[i] = compare(a, pop.CV[a, 0], b, pop.CV[b, 0], method='smaller_is_better', return_random_if_equal=True)
 
-            if pop.CV[a, 0] < pop.CV[b, 0]:
-                S[i] = a
-            elif pop.CV[b, 0] < pop.CV[a, 0]:
-                S[i] = b
-            else:
-                if random.random() < 0.5:
-                    S[i] = a
-                else:
-                    S[i] = b
-
-        # both are feasible
+        # both solutions are feasible
         else:
 
-            # first by rank
-            if rank[a] < rank[b]:
-                S[i] = a
-            elif rank[b] < rank[a]:
-                S[i] = b
-
-            # then by crowding
-            else:
-                if crowding[a] > crowding[b]:
+            if tournament_type == 'comp_by_dom_and_crowding':
+                rel = Dominator.get_relation(pop.F[a, :], pop.F[b, :])
+                if rel == 1:
                     S[i] = a
-                elif crowding[b] > crowding[a]:
-                    S[i] = b
-                else:
-                    if random.random() < 0.5:
-                        S[i] = a
-                    else:
-                        S[i] = b
-
-    return S[:, None]
-
-
-def comp_by_dom_and_crowding(pop, P, crowding, **kwargs):
-    if P.shape[1] != 2:
-        raise ValueError("Only implemented for binary tournament!")
-
-    S = np.zeros((P.shape[0]), dtype=np.int)
-    feasible = pop.CV[:, 0] <= 0
-
-    for i in range(P.shape[0]):
-
-        a, b = P[i, 0], P[i, 1]
-
-        if feasible[a] and not feasible[b]:
-            S[i] = a
-        elif not feasible[a] and feasible[b]:
-            S[i] = b
-        elif not feasible[b] and not feasible[a]:
-
-            if pop.CV[a, 0] < pop.CV[b, 0]:
-                S[i] = a
-            elif pop.CV[b, 0] < pop.CV[a, 0]:
-                S[i] = b
-            else:
-                if random.random() < 0.5:
-                    S[i] = a
-                else:
+                elif rel == -1:
                     S[i] = b
 
-        # both are feasible
-        else:
+            elif tournament_type == 'comp_by_rank_and_crowding':
+                S[i] = compare(a, rank[a], b, rank[b], method='smaller_is_better')
 
-            rel = Dominator.get_relation(pop.F[a, :], pop.F[b, :])
-
-            # first by domination
-            if rel == 1:
-                S[i] = a
-            elif rel == -1:
-                S[i] = b
-
-            # then by crowding
             else:
-                if crowding[a] > crowding[b]:
-                    S[i] = a
-                elif crowding[b] > crowding[a]:
-                    S[i] = b
-                else:
-                    if random.random() < 0.5:
-                        S[i] = a
-                    else:
-                        S[i] = b
+                raise Exception("Unknown tournament type.")
 
-    return S[:, None]
+            # if rank or domination relation didn't make a decision compare by crowding
+            if np.isnan(S[i]):
+                S[i] = compare(a, crowding[a], b, crowding[b], method='larger_is_better',
+                               return_random_if_equal=True)
+
+    return S[:, None].astype(np.int)
