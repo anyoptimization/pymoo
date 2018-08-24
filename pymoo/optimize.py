@@ -13,7 +13,7 @@ from pymop.problem import Problem
 
 def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, fun_args={}, method='auto',
              method_args={},
-             seed=None, callback=None, disp=True):
+             seed=None, callback=None, disp=True, save_history=False):
     """
 
     Minimization of function of one or more variables, objectives and constraints.
@@ -122,11 +122,11 @@ def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, f
 
     return minimize_(problem, evaluator, method=method, method_args=method_args, seed=seed,
                      callback=callback,
-                     disp=disp)
+                     disp=disp, save_history=save_history)
 
 
 def minimize_(problem, evaluator, method='auto', method_args={}, seed=1,
-              callback=None, disp=False):
+              callback=None, disp=False, save_history=False):
     """
         See :func:`~pymoo.optimize.minimize` for description. Instead of a function the parameter is a problem class.
     """
@@ -151,6 +151,11 @@ def minimize_(problem, evaluator, method='auto', method_args={}, seed=1,
     else:
         raise Exception('Unknown method: %s' % method)
 
-    X, F, G = algorithm.solve(problem, evaluator, disp=disp, callback=callback, seed=seed)
+    X, F, G = algorithm.solve(problem, evaluator, disp=disp, callback=callback, seed=seed,
+                              save_history=save_history)
 
-    return {'problem': problem, 'X': X, 'F': F, 'G': G}
+    res = {'problem': problem, 'X': X, 'F': F, 'G': G}
+    if save_history:
+        res['history'] = algorithm.history
+
+    return res
