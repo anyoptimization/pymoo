@@ -7,7 +7,6 @@ from pymoo.rand.random import random
 
 
 def get_ref_dirs_from_section(n_obj, n_sections):
-
     if n_obj == 1:
         return np.array([1.0])
 
@@ -23,8 +22,8 @@ def get_ref_dirs_from_section(n_obj, n_sections):
 def get_ref_dirs_from_n(n_obj, n_refs, max_sections=100):
     n_sections = np.array([get_number_of_reference_directions(n_obj, i) for i in range(max_sections)])
     idx = np.argmin((n_sections < n_refs).astype(np.int))
-    M = get_ref_dirs_from_section(n_obj, idx-1)
-    M[M==0] = 0.000001
+    M = get_ref_dirs_from_section(n_obj, idx - 1)
+    M[M == 0] = 0.000001
     return M
 
 
@@ -88,7 +87,6 @@ def get_uniform_weights(n_points, n_dim, max_sections=300):
     return M
 
 
-
 def get_ref_dirs_from_points(ref_point, n_obj, pop_size, mu=0.1, method='uniform', p=None):
     """
     This function takes user specified reference points, and creates smaller sets of equidistant
@@ -98,6 +96,7 @@ def get_ref_dirs_from_points(ref_point, n_obj, pop_size, mu=0.1, method='uniform
     :param mu: Shrinkage factor (0-1), Smaller = tigher convergence, Larger= larger convergence
     :return: Set of reference points
     """
+
     def get_directions(method, n_obj, pop_size):
         if method == 'uniform':
             if p is None:
@@ -119,16 +118,17 @@ def get_ref_dirs_from_points(ref_point, n_obj, pop_size, mu=0.1, method='uniform
         #     reference_directions = np.vstack((reference_directions, nested))
         #     # return np.array(ref_dirs)
         return reference_directions
+
     ref_dirs = []
-    n_vector = np.ones(n_obj)/ np.sqrt(n_obj)  # Normal vector of Das Dennis plane
+    n_vector = np.ones(n_obj) / np.sqrt(n_obj)  # Normal vector of Das Dennis plane
     point_on_plane = np.eye(n_obj)[0]  # Point on Das-Dennis
-    pop_size = pop_size/len(ref_point)  # Limit the number of Das-Dennis points
+    pop_size = pop_size / len(ref_point)  # Limit the number of Das-Dennis points
     reference_directions = get_directions(method, n_obj, pop_size)
     for point in ref_point:
 
         ref_dir = copy.deepcopy(reference_directions)  # Copy of computed reference directions
         ref_dir = mu * ref_dir
-        cent = np.mean(ref_dir, axis=0)  # Find centeroid of shrunken reference points
+        cent = np.mean(ref_dir, axis=0)  # Find centroid of shrunken reference points
 
         # Project shrunken Das-Dennis points back onto original Das-Dennis hyperplane
         intercept = line_plane_intersection(np.zeros(n_obj), point, point_on_plane, n_vector)
@@ -136,14 +136,15 @@ def get_ref_dirs_from_points(ref_point, n_obj, pop_size, mu=0.1, method='uniform
 
         ref_dir += shift
         # If reference directions are located outside of first octant, redefine points onto the border
-        if (ref_dir>0).min() == False:
-            ref_dir[ref_dir<0] = 0
-            ref_dir = ref_dir/np.sum(ref_dir, axis=1)[:, None]
+        if not (ref_dir > 0).min():
+            ref_dir[ref_dir < 0] = 0
+            ref_dir = ref_dir / np.sum(ref_dir, axis=1)[:, None]
 
         ref_dirs.extend(ref_dir)
 
     ref_dirs.extend(np.eye(n_obj))  # Add extreme points
     return np.array(ref_dirs)
+
 
 # intersection function
 
@@ -159,7 +160,7 @@ def line_plane_intersection(l0, l1, p0, p_no, epsilon=1e-6):
     return a Vector or None (when the intersection can't be found).
     """
 
-    l = l1-l0
+    l = l1 - l0
     dot = np.dot(l, p_no)
 
     if abs(dot) > epsilon:
@@ -181,6 +182,7 @@ def line_plane_intersection(l0, l1, p0, p_no, epsilon=1e-6):
 if __name__ == '__main__':
 
     import time
+
     pt = np.array([[0.4, 0.6, 0.2], [0.8, 0.6, 0.8]])
     # pt = np.array([[0.1, 2, 1]])
     start = time.time()
@@ -193,7 +195,7 @@ if __name__ == '__main__':
     ax.scatter(w[:, 0], w[:, 1], w[:, 2])
     ax.scatter(pt[:, 0], pt[:, 1], pt[:, 2])
     for p in pt:
-        p = p - np.dot(p - np.array([1,0,0]), np.ones(3)/ np.sqrt(3)) * np.ones(3)/ np.sqrt(3)
+        p = p - np.dot(p - np.array([1, 0, 0]), np.ones(3) / np.sqrt(3)) * np.ones(3) / np.sqrt(3)
         p_p = p
         p_p[p < 0] = 0
         ax.scatter(p[0], p[1], p[2], c='r', marker='d')
