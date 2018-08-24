@@ -1,9 +1,35 @@
 import numpy as np
 
-from pymop.problem import Problem
+from pymoo.rand import random
+
+
+def compare(a, a_val, b, b_val, method, return_random_if_equal=False):
+    if method == 'larger_is_better':
+        if a_val > b_val:
+            return a
+        elif a_val < b_val:
+            return b
+        else:
+            if return_random_if_equal:
+                return random.choice([a, b])
+            else:
+                return None
+    elif method == 'smaller_is_better':
+        if a_val < b_val:
+            return a
+        elif a_val > b_val:
+            return b
+        else:
+            if return_random_if_equal:
+                return random.choice([a, b])
+            else:
+                return None
+    else:
+        raise Exception("Unknown method.")
 
 
 class Dominator:
+
     @staticmethod
     def get_relation(a, b, cva=None, cvb=None):
 
@@ -40,29 +66,37 @@ class Dominator:
         return M
 
     @staticmethod
-    def calc_domination_matrix(F, G):
+    def calc_domination_matrix(F, _F=None, epsilon=0.0):
 
+        """
         if G is None or len(G) == 0:
             constr = np.zeros((F.shape[0], F.shape[0]))
         else:
             # consider the constraint violation
-            #CV = Problem.calc_constraint_violation(G)
-            #constr = (CV < CV) * 1 + (CV > CV) * -1
+            # CV = Problem.calc_constraint_violation(G)
+            # constr = (CV < CV) * 1 + (CV > CV) * -1
 
-            CV = Problem.calc_constraint_violation(G)[:,0]
+            CV = Problem.calc_constraint_violation(G)[:, 0]
             constr = (CV[:, None] < CV) * 1 + (CV[:, None] > CV) * -1
+        """
+
+        if _F is None:
+            _F = F
 
         # look at the obj for dom
         n = F.shape[0]
-        L = np.repeat(F, n, axis=0)
-        R = np.tile(F, (n, 1))
+        m = _F.shape[0]
 
-        smaller = np.reshape(np.any(L < R, axis=1), (n, n))
-        larger = np.reshape(np.any(L > R, axis=1), (n, n))
+        L = np.repeat(F, m, axis=0)
+        R = np.tile(_F, (n, 1))
 
-        dom = np.logical_and(smaller, np.logical_not(larger)) * 1 \
-              + np.logical_and(larger, np.logical_not(smaller)) * -1
+        smaller = np.reshape(np.any(L + epsilon < R, axis=1), (n, m))
+        larger = np.reshape(np.any(L > R + epsilon, axis=1), (n, m))
+
+        M = np.logical_and(smaller, np.logical_not(larger)) * 1 \
+            + np.logical_and(larger, np.logical_not(smaller)) * -1
 
         # if cv equal then look at dom
-        M = constr + (constr == 0) * dom
+        # M = constr + (constr == 0) * dom
+
         return M

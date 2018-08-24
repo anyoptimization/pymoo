@@ -11,24 +11,69 @@ class Singleton:
     def get_instance():
         if Singleton.__instance is None:
             Singleton.__instance = Configuration.rand
-            Singleton.__instance.seed(1)
         return Singleton.__instance
 
 
 def seed(s):
-    return Singleton.get_instance().seed(s)
+    """
+    Set the random seed of the current random instance that is used.
+
+    Parameters
+    ----------
+    s : int
+        seed
+
+    """
+    Singleton.get_instance().seed(s)
 
 
-def perm(size):
-    return Singleton.get_instance().perm(size).astype(np.int)
+def perm(n):
+    """
+    Returns a random permutation with length n.
+
+    Parameters
+    ----------
+    n : int
+        Length of the permutation array.
+
+    Returns
+    -------
+    p : numpy.array
+        Permutation array with type integer.
+
+    """
+    return Singleton.get_instance().perm(n).astype(np.int)
 
 
-def random(*params, size=None):
-    if len(params) > 0:
-        return Singleton.get_instance().rand(size=params)
+def random(size=None):
+    """
+    If size is None returns one random float [0.0,1.0), other an numpy array with the predefined size.
+
+    Parameters
+    ----------
+    size : tuple
+        (Optional): Shape of the numpy array
+
+    """
+    return Singleton.get_instance().random(size=size)
+
+
+def randint(low, high=None, size=None):
+    """
+    Return random integers from low (inclusive) to high (exclusive).
+
+    Return random integers from the “discrete uniform” distribution in the “half-open” interval [low, high).
+    If high is None (the default), then results are from [0, low).
+
+    """
+    if high is None:
+        return Singleton.get_instance().randint(0, high=low, size=size)
     else:
-        return Singleton.get_instance().rand(size=size)
+        return Singleton.get_instance().randint(low, high=high, size=size)
 
 
-def randint(low, high, size=None):
-    return Singleton.get_instance().randint(low, high, size=size)
+def choice(a):
+    """
+    Select randomly an element from a list.
+    """
+    return Singleton.get_instance().choice(a)

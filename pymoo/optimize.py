@@ -6,13 +6,15 @@ from pymoo.algorithms.nsga3 import NSGA3
 from pymoo.algorithms.rnsga3 import RNSGA3
 from pymoo.algorithms.so_DE import DifferentialEvolution
 from pymoo.algorithms.so_genetic_algorithm import SingleObjectiveGeneticAlgorithm
+from pymoo.algorithms.unsga3 import UNSGA3
 from pymoo.model.evaluator import Evaluator
+from pymoo.rand import random
 from pymop.problem import Problem
 
 
 def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, fun_args={}, method='auto',
              method_args={},
-             seed=None, callback=None, disp=True):
+             seed=None, callback=None, disp=True, save_history=False):
     """
 
     Minimization of function of one or more variables, objectives and constraints.
@@ -115,13 +117,17 @@ def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, f
     else:
         raise Exception('Unknown Termination criterium: %s' % termination_criterium)
 
+    # set a random random seed if not provided
+    if seed is None:
+        seed = random.randint(1, 10000)
+
     return minimize_(problem, evaluator, method=method, method_args=method_args, seed=seed,
                      callback=callback,
-                     disp=disp)
+                     disp=disp, save_history=save_history)
 
 
-def minimize_(problem, evaluator, method='auto', method_args={}, seed=None,
-              callback=None, disp=False):
+def minimize_(problem, evaluator, method='auto', method_args={}, seed=1,
+              callback=None, disp=False, save_history=False):
     """
         See :func:`~pymoo.optimize.minimize` for description. Instead of a function the parameter is a problem class.
     """
@@ -135,6 +141,8 @@ def minimize_(problem, evaluator, method='auto', method_args={}, seed=None,
         algorithm = NSGA2(**method_args)
     elif method == 'nsga3':
         algorithm = NSGA3(**method_args)
+    elif method == 'unsga3':
+        algorithm = UNSGA3(**method_args)
     elif method == 'rnsga3':
         algorithm = RNSGA3(**method_args)
     elif method == 'moead':
@@ -142,11 +150,15 @@ def minimize_(problem, evaluator, method='auto', method_args={}, seed=None,
     elif method == 'de':
         algorithm = DifferentialEvolution(**method_args)
     elif method == 'ga':
-        algorithm = SingleObjectiveGeneticAlgorithm("real", **method_args)
+        algorithm = SingleObjectiveGeneticAlgorithm(**method_args)
     else:
         raise Exception('Unknown method: %s' % method)
 
+    X, F, G = algorithm.solve(problem, evaluator, disp=disp, callback=callback, seed=seed,
+                              save_history=save_history)
 
-    X, F, G = algorithm.solve(problem, evaluator, disp=disp, callback=callback, seed=seed)
+    res = {'problem': problem, 'X': X, 'F': F, 'G': G}
+    if save_history:
+        res['history'] = algorithm.history
 
-    return {'problem': problem, 'X': X, 'F': F, 'G': G}
+    return res

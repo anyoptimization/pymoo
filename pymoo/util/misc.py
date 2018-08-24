@@ -1,7 +1,11 @@
 import numpy as np
 
-from pymoo.rand import random
 
+
+def swap(M, a, b):
+    tmp = M[a]
+    M[a] = M[b]
+    M[b] = tmp
 
 
 # repairs a numpy array to be in bounds
@@ -24,9 +28,38 @@ def parameter_less_constraints(F, CV, F_max=None):
 
 
 def random_permuations(n, l):
+    from pymoo.rand import random
     perms = []
     for i in range(n):
-        perms.append(random.perm(size=l))
+        perms.append(random.perm(l))
     P = np.concatenate(perms)
     return P
 
+
+def get_duplicates(M):
+    res = []
+    I = np.lexsort([M[:, i] for i in reversed(range(0, M.shape[1]))])
+    S = M[I, :]
+
+    i = 0
+
+    while i < S.shape[0] - 1:
+        l = []
+        while np.all(S[i, :] == S[i + 1, :]):
+            l.append(I[i])
+            i += 1
+        if len(l) > 0:
+            l.append(I[i])
+            res.append(l)
+        i += 1
+
+    return res
+
+
+if __name__ == '__main__':
+    M = np.random.random((100, 3))
+
+    M[3, :] = M[55, :]
+    M[10, :] = M[55, :]
+
+    print(get_duplicates(M))
