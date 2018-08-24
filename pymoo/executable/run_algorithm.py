@@ -2,6 +2,7 @@ import time
 
 import numpy as np
 
+from pymoo.algorithms.so_genetic_algorithm import SingleObjectiveGeneticAlgorithm
 from pymoo.util.plotting import plot, animate
 from pymop.problems.dtlz import DTLZ4
 from pymop.problems.osy import OSY
@@ -13,21 +14,23 @@ if __name__ == '__main__':
     from pymop.problems.zdt import ZDT3, ZDT4
 
     problem = DTLZ4(n_var=12, n_obj=3)
-    problem.n_pareto_points = 92
+    problem.n_pareto_points = 92#
 
-    problem = OSY()
+    problem = ZDT4()
 
     # create the algorithm instance by specifying the intended parameters
     from pymoo.algorithms.unsga3 import UNSGA3
     from pymoo.algorithms.nsga3 import NSGA3
     from pymoo.algorithms.nsga2 import NSGA2
 
-    algorithm = NSGA3(pop_size=200,
+    SingleObjectiveGeneticAlgorithm()
+
+    algorithm = NSGA3(pop_size=100,
                       ref_dirs=None,
                       prob_cross=0.9,
                       eta_cross=20,
                       prob_mut=None,
-                      eta_mut=30)
+                      eta_mut=15)
 
     start_time = time.time()
 

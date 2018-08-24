@@ -5,11 +5,18 @@ from pymoo.indicators.igd import IGD
 
 
 def disp_single_objective(problem, evaluator, D):
-    attrs = [('n_gen', D['n_gen'], 5),
-             ('n_eval', evaluator.n_eval, 7),
+    attrs = [('n_gen', D['n_gen']+1, 5),
+             ('n_eval', evaluator.n_eval, 7)]
+
+    if problem.n_constr > 0:
+        attrs.append(('min_constr', "%.5f" % np.min(D['pop'].CV), 8))
+        attrs.append(('avg_constr', "%.5f" % np.mean(D['pop'].CV), 8))
+
+    attrs.extend([
              ('favg', "%.5f" % np.mean(D['pop'].F), 5),
              ('fopt', "%.10f" % np.min(D['pop'].F), 5)
-             ]
+             ])
+
     return attrs
 
 
