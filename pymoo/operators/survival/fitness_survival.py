@@ -1,33 +1,30 @@
 import numpy as np
 
-from pymoo.model.survival import Survival
-from pymop.problem import Problem
+from pymoo.model.survival import Survival, split_by_feasibility
 
 
 class FitnessSurvival(Survival):
-    """
-
-    This survival method is just for single-objective algorithm.
-    Simply sort by first constraint violation and then fitness value and truncate the worst individuals.
-
-    """
 
     def _do(self, pop, n_survive, out=None, **kwargs):
 
         if pop.F.shape[1] != 1:
             raise ValueError("FitnessSurvival can only used for single objective problems!")
 
-        if pop.G is None or len(pop.G) == 0:
-            CV = np.zeros(pop.F.shape[0])
+        # split by feasibility
+        feasible, infeasible = split_by_feasibility(pop)
+        survivors = np.array([], dtype=np.int)
+
+        # if there are feasible solutions add them first
+        if len(feasible) > 0:
+            survivors = feasible[np.argsort(pop.F[feasible, 0])]
+
+        # if we can select only from feasible - truncate here
+        if len(feasible) > n_survive:
+            survivors = survivors[:n_survive]
+
+        # otherwise fill up with least infeasible ones
         else:
-            CV = Problem.calc_constraint_violation(pop.G)
-            CV[CV < 0] = 0.0
+            n_infeasible = (n_survive - len(feasible))
+            survivors = np.concatenate([survivors, infeasible[:n_infeasible]])
 
-        # sort by cv and fitness
-        sorted_idx = sorted(range(pop.size()), key=lambda x: (CV[x], pop.F[x]))
-
-        # now truncate the population
-        sorted_idx = sorted_idx[:n_survive]
-        pop.filter(sorted_idx)
-
-
+        pop.filter(survivors)

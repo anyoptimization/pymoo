@@ -12,7 +12,7 @@ class UNSGA3(NSGA3):
         pop = super()._initialize()
 
         # add selection pressure to improve convergence
-        self.selection = TournamentSelection(f_comp=comp_by_rank_and_ref_line_dist)
+        self.selection = TournamentSelection(func_comp=comp_by_rank_and_ref_line_dist)
 
         return pop
 

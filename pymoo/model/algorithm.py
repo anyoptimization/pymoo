@@ -3,7 +3,7 @@ from abc import abstractmethod
 
 from pymoo.model.evaluator import Evaluator
 from pymoo.rand import random
-from pymoo.util.non_dominated_rank import NonDominatedRank
+from pymoo.util.non_dominated_rank import NonDominatedRank, find_non_dominated
 from pymop.problem import Problem
 
 
@@ -61,7 +61,7 @@ class Algorithm:
             are the algorithm itself, the number of evaluations so far and the current population.
 
                 def callback(algorithm, n_evals, pop):
-                    print()
+                    pass
 
         return_only_feasible : bool
             If true, only feasible solutions are returned.
@@ -109,7 +109,7 @@ class Algorithm:
                     G = G[cv <= 0, :]
 
         if return_only_non_dominated:
-            idx_non_dom = NonDominatedRank().do(F, G=G)[0]
+            idx_non_dom = find_non_dominated(X)
             X = X[idx_non_dom, :]
             F = F[idx_non_dom, :]
             if G is not None:

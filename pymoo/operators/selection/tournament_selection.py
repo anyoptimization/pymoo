@@ -12,12 +12,12 @@ class TournamentSelection(Selection):
       greedy the genetic algorithm will be.
     """
 
-    def __init__(self, f_comp=None, pressure=2):
+    def __init__(self, func_comp=None, pressure=2):
         """
 
         Parameters
         ----------
-        f_comp: func
+        func_comp: func
             The function to compare two individuals. It has the shape: comp(pop, indices) and returns the winner.
             If the function is None it is assumed the population is sorted by a criterium and only indices are compared.
 
@@ -28,7 +28,7 @@ class TournamentSelection(Selection):
         # selection pressure to be applied
         self.pressure = pressure
 
-        self.f_comp = f_comp
+        self.f_comp = func_comp
         if self.f_comp is None:
             raise Exception("Please provide the comparing function for the tournament selection!")
 

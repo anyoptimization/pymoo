@@ -1,6 +1,7 @@
 import numpy as np
 
 
+
 def swap(M, a, b):
     tmp = M[a]
     M[a] = M[b]
