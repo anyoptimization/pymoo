@@ -9,10 +9,10 @@ class NonDominatedRank:
         super().__init__()
         self.epsilon = epsilon
 
-    def do(self, F, G=None, return_rank=False, only_non_dominated_front=False, n_stop_if_exceed=None):
+    def do(self, F, return_rank=False, only_non_dominated_front=False, n_stop_if_exceed=None):
 
         # calculate the domination matrix - faster because vectorized
-        M = Dominator.calc_domination_matrix(F, G, epsilon=self.epsilon)
+        M = Dominator.calc_domination_matrix(F, epsilon=self.epsilon)
 
         # get the fronts using that matrix
         fronts = fast_non_dominated_sort(M)
@@ -45,11 +45,11 @@ class NonDominatedRank:
         return fronts
 
 
+
 # Returns all indices of F that are not dominated by the other objective values
-def find_non_dominated(F, other):
-    _F = np.concatenate([F, other], axis=0)
-    fronts = NonDominatedRank().do(_F)
-    I = [e for e in fronts if e < F.shape[0]]
+def find_non_dominated(F, _F=None):
+    M = Dominator.calc_domination_matrix(F, _F)
+    I = np.where(np.all(M >= 0, axis=1))[0]
     return I
 
 

@@ -20,7 +20,7 @@ class Survival:
         pass
 
 
-def split_by_feasibility(pop):
+def split_by_feasibility(pop, sort_infeasbible_by_cv=True):
     # if no constraint violation is provided
     if pop.CV is None:
         return np.arange(pop.size()), np.array([])
@@ -32,5 +32,8 @@ def split_by_feasibility(pop):
             feasible.append(i)
         else:
             infeasible.append(i)
+
+    if sort_infeasbible_by_cv:
+        infeasible = sorted(infeasible, key=lambda i: pop.CV[i,:])
 
     return np.array(feasible), np.array(infeasible)

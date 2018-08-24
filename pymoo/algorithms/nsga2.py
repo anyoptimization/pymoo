@@ -22,7 +22,7 @@ class NSGA2(GeneticAlgorithm):
                  **kwargs):
         set_if_none(kwargs, 'pop_size', pop_size)
         set_if_none(kwargs, 'sampling', RealRandomSampling())
-        set_if_none(kwargs, 'selection', TournamentSelection(f_comp=comp_by_dom_and_crowding))
+        set_if_none(kwargs, 'selection', TournamentSelection(func_comp=comp_by_dom_and_crowding))
         set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=prob_cross, eta_cross=eta_cross))
         set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=prob_mut, eta_mut=eta_mut))
         set_if_none(kwargs, 'survival', RankAndCrowdingSurvival())
