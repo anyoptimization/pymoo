@@ -8,27 +8,19 @@
 
     if __name__ == '__main__':
 
-        # load the problem instance
         from pymop.problems.zdt import ZDT1
         problem = ZDT1(n_var=30)
 
-        # create the algorithm instance by specifying the intended parameters
-        from pymoo.algorithms.nsga2 import NSGA2
-        algorithm = NSGA2(pop_size=100)
-
         start_time = time.time()
 
-        # number of generations to run it
-        n_gen = 200
-
-        # solve the problem and return the results
-        X, F, G = algorithm.solve(problem,
-                                  evaluator=(100 * n_gen),
-                                  seed=2,
-                                  return_only_feasible=False,
-                                  return_only_non_dominated=False,
-                                  disp=True,
-                                  save_history=True)
+        from pymoo.optimize import minimize
+        res = minimize(problem,
+                       method='nsga3',
+                       method_args={'pop_size': 92},
+                       termination=('n_eval', 92 * 200),
+                       seed=2,
+                       save_history=True,
+                       disp=True)
 
         print("--- %s seconds ---" % (time.time() - start_time))
 
@@ -36,8 +28,8 @@
         save_animation = True
 
         if scatter_plot:
-            plot(F)
+            plot(res['F'])
 
         if save_animation:
-            H = np.concatenate([e['pop'].F[None, :, :] for e in algorithm.history], axis=0)
+            H = np.concatenate([e['pop'].F[None, :, :] for e in res['history']], axis=0)
             animate('%s.mp4' % problem.name(), H, problem)
