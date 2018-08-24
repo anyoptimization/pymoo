@@ -69,6 +69,10 @@ class Population:
         return pop
 
     def filter(self, v):
+
+        if isinstance(v, np.ndarray):
+            v = v.astype(np.int)
+
         D = {}
         for key, value in self.D.items():
             if value is not None and isinstance(value, np.ndarray):

@@ -11,38 +11,41 @@ class RankAndCrowdingSurvival(Survival):
         # split by feasibility
         feasible, infeasible = split_by_feasibility(pop)
 
-        # calculate rank only of feasible solutions
-        F = pop.F[feasible, :]
-        fronts = NonDominatedRank().do(F, n_stop_if_exceed=n_survive)
-
+        # final result that contains indices, rank and crowding of surviving individuals
         survivors = []
         crowding = []
         rank = []
 
-        # go through all fronts except the last one
-        for k, front in enumerate(fronts):
+        if len(feasible) > 0:
 
-            # calculate the crowding distance of the front
-            crowding_of_front = RankAndCrowdingSurvival.calc_crowding_distance(F[front, :])
+            # calculate rank only of feasible solutions
+            F = pop.F[feasible, :]
+            fronts = NonDominatedRank().do(F, n_stop_if_exceed=n_survive)
 
-            # index sorted by crowding distance
-            I = randomized_argsort(crowding_of_front, order='descending', method='numpy')
+            # go through all fronts except the last one
+            for k, front in enumerate(fronts):
 
-            # current front sorted by crowding distance
-            if len(survivors) + len(front) > n_survive:
-                I = I[:(n_survive - len(survivors))]
+                # calculate the crowding distance of the front
+                crowding_of_front = RankAndCrowdingSurvival.calc_crowding_distance(F[front, :])
 
-            # calculate crowding distance for the current front
-            crowding.append(crowding_of_front[I])
-            rank.append(np.array([k] * len(I)))
-            survivors.extend(front[I])
+                # index sorted by crowding distance
+                I = randomized_argsort(crowding_of_front, order='descending', method='numpy')
 
-        # create numpy arrays out of the lists
-        rank = np.concatenate(rank)
-        crowding = np.concatenate(crowding)
+                # current front sorted by crowding distance
+                if len(survivors) + len(front) > n_survive:
+                    I = I[:(n_survive - len(survivors))]
 
-        # get absolute index from filtering before
-        survivors = feasible[survivors]
+                # calculate crowding distance for the current front
+                crowding.append(crowding_of_front[I])
+                rank.append(np.array([k] * len(I)))
+                survivors.extend(front[I])
+
+            # create numpy arrays out of the lists
+            rank = np.concatenate(rank)
+            crowding = np.concatenate(crowding)
+
+            # get absolute index from filtering before
+            survivors = feasible[survivors]
 
         # if infeasible solutions need to be added - individuals sorted by constraint violation are added
         n_infeasible = (n_survive - len(survivors))

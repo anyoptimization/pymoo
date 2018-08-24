@@ -18,12 +18,6 @@ class NSGA3Test(unittest.TestCase):
         with open(os.path.join("resources", "hist.json"), encoding='utf-8') as f:
             cls.data = json.loads(f.read())
 
-    def test_non_dominated_rank(self):
-        for i, D in enumerate(self.data['_hist']):
-            _rank = NonDominatedRank().do(np.array(D['cand_F']))
-            rank = np.array(D['cand_rank']).astype(np.int) - 1
-            is_equal = np.all(_rank == rank)
-            self.assertTrue(is_equal)
 
     def test_run(self):
 

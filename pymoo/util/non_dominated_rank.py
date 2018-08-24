@@ -45,7 +45,6 @@ class NonDominatedRank:
         return fronts
 
 
-
 # Returns all indices of F that are not dominated by the other objective values
 def find_non_dominated(F, _F=None):
     M = Dominator.calc_domination_matrix(F, _F)
@@ -54,7 +53,6 @@ def find_non_dominated(F, _F=None):
 
 
 def non_dominated_sort_naive(M):
-
     fronts = []
     remaining = set(range(M.shape[0]))
 
@@ -88,11 +86,13 @@ def non_dominated_sort_naive(M):
 
 
 def fast_non_dominated_sort(M):
-
     # calculate the dominance matrix
     n = M.shape[0]
 
     fronts = []
+
+    if n == 0:
+        return fronts
 
     # final rank that will be returned
     n_ranked = 0
