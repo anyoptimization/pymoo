@@ -78,10 +78,11 @@ class GeneticAlgorithm(Algorithm):
         # do the mating and evaluate the offsprings
         off = Population()
         off.X = self._mating(pop)
-        off.F, off.G = self.evaluator.eval(self.problem, off.X)
+        off.F, off.CV = self.evaluator.eval(self.problem, off.X)
 
         # do the survival selection with the merged population
-        self.survival.do(pop, off, self.pop_size, out=self.D, **self.D)
+        pop.merge(off)
+        self.survival.do(pop, self.pop_size, out=self.D, **self.D)
 
         return off
 
@@ -120,14 +121,14 @@ class GeneticAlgorithm(Algorithm):
             pop.X = self.sampling
         else:
             pop.X = self.sampling.sample(self.problem, self.pop_size)
-        pop.F, pop.G = self.evaluator.eval(self.problem, pop.X)
+        pop.F, pop.CV = self.evaluator.eval(self.problem, pop.X)
         return pop
 
     def _mating(self, pop):
 
         # initialize selection and offspring methods
         X = np.full((self.n_offsprings, self.problem.n_var), np.inf)
-        n_offsprings = 0
+        n_gen_off = 0
         n_parents = self.crossover.n_parents
 
         # mating counter - counts how often the mating needs to be done to fill up n_offsprings
@@ -135,34 +136,35 @@ class GeneticAlgorithm(Algorithm):
 
         # do the mating until all offspring are created usually it should be done is one iteration
         # through duplicate eliminate more might be necessary
-        while n_offsprings < self.n_offsprings:
+        while n_gen_off < self.n_offsprings:
 
             # select from the current population individuals for mating
-            n_select = math.ceil((self.n_offsprings - n_offsprings) / self.crossover.n_children)
+            n_select = math.ceil((self.n_offsprings - n_gen_off) / self.crossover.n_children)
             parents = self.selection.do(pop, n_select, n_parents, out=self.D, **self.D)
-            X = self.crossover.do(self.problem, pop.X[parents, :], out=self.D, **self.D)
+            _X = self.crossover.do(self.problem, pop.X[parents, :], out=self.D, **self.D)
 
             # do the mutation
-            X = self.mutation.do(self.problem, X, out=self.D, **self.D)
-
-            # if more offsprings than necessary - truncate them
-            if X.shape[0] > self.n_offsprings - n_offsprings:
-                X = X[:self.n_offsprings - n_offsprings, :]
+            _X = self.mutation.do(self.problem, _X, out=self.D, **self.D)
 
             # eliminate duplicates if too close to the current population
             if self.eliminate_duplicates:
-                is_equal = np.min(cdist(X, pop.X), axis=1) <= 1e-60
-                X = X[np.logical_not(is_equal), :]
+                not_equal = np.where(np.all(cdist(_X, pop.X) > 1e-32, axis=1))[0]
+                _X = _X[not_equal, :]
+
+            # if more offsprings than necessary - truncate them
+            if _X.shape[0] > self.n_offsprings - n_gen_off:
+                _X = _X[:self.n_offsprings - n_gen_off, :]
 
             # add to the offsprings
-            X[n_offsprings:n_offsprings + X.shape[0], :] = X
-            n_offsprings = n_offsprings + X.shape[0]
+            X[n_gen_off:n_gen_off + _X.shape[0], :] = _X
+            n_gen_off += _X.shape[0]
 
+            # increase the mating number
             n_matings += 1
 
             # if no new offsprings can be generated within 100 trails -> return the current result
             if n_matings > 100:
-                X = X[:n_offsprings, :]
+                X = X[:n_gen_off, :]
                 self.evaluator.n_eval = self.evaluator.n_max_eval
                 break
 

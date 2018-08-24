@@ -3,6 +3,8 @@ import copy
 import numpy as np
 from scipy import special
 
+from pymoo.rand.random import random
+
 
 def get_ref_dirs_from_section(n_obj, n_sections):
 
@@ -104,7 +106,7 @@ def get_ref_dirs_from_points(ref_point, n_obj, pop_size, mu=0.1, method='uniform
                 reference_directions = get_ref_dirs_from_section(n_obj, p)
 
         elif method == 'random':
-            reference_directions = np.random.rand(int(pop_size), int(n_obj))
+            reference_directions = random(int(pop_size), int(n_obj))
             reference_directions = reference_directions - np.dot(reference_directions - point_on_plane, n_vector)[:,
                                                           None] * n_vector
         #  Need to find a good way of getting p values for nested reference directions

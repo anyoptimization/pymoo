@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+import numpy as np
+
 
 class Survival:
     """
@@ -7,25 +9,31 @@ class Survival:
     specific individuals to survive.
     """
 
-    def do(self, pop, off, n_survive, **kwargs):
-        """
+    def __init__(self) -> None:
+        super().__init__()
 
-        The whole population is provided and the number of individuals to survive. If the number of survivors
-        is less than the populations a survival selection is done. Otherwise, the elements might only
-        be sorted by a specific criteria. This depends on the survival implementation.
-
-        Parameters
-        ----------
-        pop : class
-            The population the selected surviving individuals from.
-        n_survive : int
-            Number of individuals that should survive.
-        kwargs : class
-            Any additional data that might be needed to choose what individuals survive.
-
-        """
-        return self._do(pop, off, n_survive, **kwargs)
+    def do(self, pop, n_survive, **kwargs):
+        self._do(pop, n_survive, **kwargs)
 
     @abstractmethod
-    def _do(self, pop, off, n_survive, **kwargs):
+    def _do(self, pop, n_survive, **kwargs):
         pass
+
+
+def split_by_feasibility(pop, sort_infeasbible_by_cv=True):
+    # if no constraint violation is provided
+    if pop.CV is None:
+        return np.arange(pop.size()), np.array([])
+
+    feasible, infeasible = [], []
+
+    for i in range(pop.size()):
+        if pop.CV[i, 0] <= 0:
+            feasible.append(i)
+        else:
+            infeasible.append(i)
+
+    if sort_infeasbible_by_cv:
+        infeasible = sorted(infeasible, key=lambda i: pop.CV[i,:])
+
+    return np.array(feasible), np.array(infeasible)
