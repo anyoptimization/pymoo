@@ -3,33 +3,44 @@ import numpy as np
 from pymoo.util.dominator import Dominator
 
 
-class NonDominatedRank:
+class NonDominatedSorting:
 
-    def __init__(self, epsilon=0.0) -> None:
+    def __init__(self, epsilon=0.0, method="cython_best_order_sort") -> None:
         super().__init__()
         self.epsilon = epsilon
+        self.method = method
 
-    def do(self, F, return_rank=False, only_non_dominated_front=False, n_stop_if_exceed=None):
+    def do(self, F, return_rank=False, only_non_dominated_front=False, n_stop_if_ranked=None):
 
-        # calculate the domination matrix - faster because vectorized
-        M = Dominator.calc_domination_matrix(F, epsilon=self.epsilon)
+        if self.method == 'fast_non_dominated_rank':
+            M = Dominator.calc_domination_matrix(F, epsilon=self.epsilon)
+            from pymoo.util.non_dominated_sorting import fast_non_dominated_sort
+            fronts = fast_non_dominated_sort(M)
 
-        # get the fronts using that matrix
-        fronts = fast_non_dominated_sort(M)
+        elif self.method == 'cython_fast_non_dominated_rank':
+            from pymoo.cython.non_dominated_sorting import fast_non_dominated_sort
+            fronts = fast_non_dominated_sort(F, self.epsilon, n_stop_if_ranked=n_stop_if_ranked)
+
+        elif self.method == 'cython_best_order_sort':
+            from pymoo.cython.non_dominated_sorting import best_order_sort
+            fronts = best_order_sort(F)
+
+        else:
+            raise Exception("Unknown non-dominated sorting method: %s" % self.method)
 
         # convert to numpy array for each front and filter by n_stop_if_ranked if desired
         _fronts = []
-        ranked = 0
+        n_ranked = 0
         for front in fronts:
 
-            # stop if more than this solutions are ranked
-            if n_stop_if_exceed is not None and ranked > n_stop_if_exceed:
-                break
-            else:
-                _fronts.append(np.array(front, dtype=np.int))
+            _fronts.append(np.array(front, dtype=np.int))
 
-            # increment the ranked solution counter
-            ranked += len(front)
+            # increment the n_ranked solution counter
+            n_ranked += len(front)
+
+            # stop if more than this solutions are n_ranked
+            if n_stop_if_ranked is not None and n_ranked >= n_stop_if_ranked:
+                break
 
         fronts = _fronts
 
@@ -37,13 +48,26 @@ class NonDominatedRank:
             return fronts[0]
 
         if return_rank:
-            rank = np.full(M.shape[0], np.inf, dtype=np.int)
-            for i, front in enumerate(fronts):
-                rank[front] = i
+            rank = rank_from_fronts(fronts, n_ranked)
             return fronts, rank
 
         return fronts
 
+
+def rank_from_fronts(fronts, n_points=None):
+
+    # if not provided get the number of fronts
+    if n_points is None:
+        n_points = 0
+        for front in fronts:
+            n_points += len(front)
+
+    # create the rank array and set values
+    rank = np.full(n_points, np.inf, dtype=np.int)
+    for i, front in enumerate(fronts):
+        rank[front] = i
+
+    return rank
 
 # Returns all indices of F that are not dominated by the other objective values
 def find_non_dominated(F, _F=None):

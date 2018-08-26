@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import animation
 
 
-def plot(F):
+def plot(F, problem=None):
 
     if F.ndim == 1:
         print("Cannot plot a one dimensional array.")
@@ -12,7 +12,7 @@ def plot(F):
     n_dim = F.shape[1]
 
     if n_dim == 2:
-        plot_2d(F)
+        plot_2d(F, problem)
     elif n_dim == 3:
         plot_3d(F)
     else:
@@ -27,8 +27,13 @@ def plot_3d(F):
     ax.scatter(F[:, 0], F[:, 1], F[:, 2])
     plt.show()
 
-def plot_2d(F):
+def plot_2d(F, problem=None):
     plt.scatter(F[:, 0], F[:, 1])
+
+    if problem is not None:
+        pf = problem.pareto_front()
+        plt.scatter(pf[:, 0], pf[:, 1], label='Pareto Front', s=20, facecolors='none', edgecolors='r')
+
     plt.show()
 
 def animate(path_to_file, H, problem=None):

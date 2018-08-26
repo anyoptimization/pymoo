@@ -2,7 +2,7 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from pymoo.model.indicator import Indicator
-from pymoo.util.non_dominated_rank import NonDominatedRank
+from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 
 class RMetric(Indicator):
@@ -67,7 +67,7 @@ class RMetric(Indicator):
         return filtered_pop
 
     def _filter_fast(self):
-        filtered_pop = NonDominatedRank.get_non_dominated(self.whole_pop, self.curr_pop)
+        filtered_pop = NonDominatedSorting.get_non_dominated(self.whole_pop, self.curr_pop)
         return filtered_pop
 
     def _preprocess(self, data, ref_point, w_point):

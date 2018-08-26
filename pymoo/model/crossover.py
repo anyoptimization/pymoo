@@ -38,20 +38,33 @@ class Crossover:
             length of the problem.
 
         """
-        n_matings = parents.shape[0]
+        n_matings = parents.shape[1]
         n_var = parents.shape[2]
 
         if n_var != problem.n_var:
             raise ValueError('Exception during crossover: Variable length is not equal to the defined one in problem.')
 
-        if self.n_parents != parents.shape[1]:
+        if self.n_parents != parents.shape[0]:
             raise ValueError('Exception during crossover: Number of parents differs from defined at crossover.')
 
         children = np.full((n_matings * self.n_children, n_var), np.inf)
-        self._do(problem, parents, children,  **kwargs)
+        self._do(problem, parents, children, **kwargs)
         return children
 
+    @abstractmethod
+    def _do(self, problem, parents, children, **kwargs):
+        n_children = 0
+        for k in range(parents.shape[1]):
+
+            _children = np.full((self.n_children, problem.n_var), np.inf)
+
+            self._mating(problem, parents[:, k, :], _children, **kwargs)
+
+            for i in range(_children.shape[0]):
+                children[n_children + i, :] = _children[i, :]
+
+            n_children += self.n_children
 
     @abstractmethod
-    def _do(self, problem, parents, children,  **kwargs):
+    def _mating(self, problem, parents, children, **kwargs):
         pass

@@ -8,7 +8,7 @@ import numpy as np
 from pymoo.configuration import Configuration
 from pymoo.model.population import Population
 from pymoo.operators.survival.reference_line_survival import ReferenceLineSurvival, associate_to_niches
-from pymoo.util.non_dominated_rank import NonDominatedRank
+from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 
 class NSGA3Test(unittest.TestCase):
@@ -29,7 +29,7 @@ class NSGA3Test(unittest.TestCase):
         pop.X = np.array(D['before_X'])
         pop.F = np.array(D['before_F'])
 
-        _, _rank = NonDominatedRank(epsilon=1e-10).do(pop.F, return_rank=True)
+        _, _rank = NonDominatedSorting(epsilon=1e-10).do(pop.F, return_rank=True)
         rank = np.array(D['before_rank'])
         self.assertTrue(np.all(_rank+1 == rank))
 
@@ -62,8 +62,8 @@ class NSGA3Test(unittest.TestCase):
             for r in np.unique(ranks):
                 fronts.append(np.where(ranks == r)[0].tolist())
 
-            NonDominatedRank.do = MagicMock()
-            NonDominatedRank.do.return_value = [np.array(front) for front in fronts], ranks-1
+            NonDominatedSorting.do = MagicMock()
+            NonDominatedSorting.do.return_value = [np.array(front) for front in fronts], ranks - 1
 
             cand_copy = cand.copy()
 
