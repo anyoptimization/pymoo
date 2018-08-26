@@ -122,19 +122,14 @@ def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, f
         seed = random.randint(1, 10000)
 
     return minimize_(problem, evaluator, method=method, method_args=method_args, seed=seed,
-                     callback=callback,
-                     disp=disp, save_history=save_history)
+                     callback=callback, disp=disp, save_history=save_history)
 
 
-def minimize_(problem, evaluator, method='auto', method_args={}, seed=1,
+def minimize_(problem, evaluator, method, method_args={}, seed=1,
               callback=None, disp=False, save_history=False):
     """
         See :func:`~pymoo.optimize.minimize` for description. Instead of a function the parameter is a problem class.
     """
-
-    # try to find a good algorithm if auto is selected
-    if method == 'auto':
-        method = 'nsga2'
 
     # choose the algorithm implementation given the string
     if method == 'nsga2':

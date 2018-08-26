@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.model.survival import Survival
 from pymoo.rand import random
-from pymoo.util.non_dominated_rank import NonDominatedRank
+from pymoo.util.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.normalization import normalize_by_asf_interceptions
 from pymoo.util.reference_directions import get_ref_dirs_from_points
 
@@ -24,7 +24,7 @@ class ReferenceLineSurvival(Survival):
     def _do(self, pop, off, n_survive, return_only_index=False, **kwargs):
 
         pop.merge(off)
-        fronts = NonDominatedRank.calc_as_fronts(pop.F, pop.G)
+        fronts = NonDominatedSorting.calc_as_fronts(pop.F, pop.G)
 
         # all indices to survive
         survival = []

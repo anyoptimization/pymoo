@@ -1,9 +1,9 @@
 import numpy as np
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.operators.crossover.real_simulated_binary_crossover_c import SimulatedBinaryCrossover
+from pymoo.operators.crossover.real_simulated_binary_crossover_vectorized import SimulatedBinaryCrossover
 from pymoo.operators.default_operators import set_if_none
-from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
+from pymoo.operators.mutation.real_polynomial_mutation_vectorized import PolynomialMutation
 from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection
 from pymoo.operators.survival.rank_and_crowding import RankAndCrowdingSurvival
@@ -20,6 +20,7 @@ class NSGA2(GeneticAlgorithm):
                  prob_mut=None,
                  eta_mut=20,
                  **kwargs):
+
         set_if_none(kwargs, 'pop_size', pop_size)
         set_if_none(kwargs, 'sampling', RealRandomSampling())
         set_if_none(kwargs, 'selection', TournamentSelection(func_comp=comp_by_dom_and_crowding))
