@@ -1,4 +1,6 @@
+import numpy
 import setuptools
+from Cython.Build import cythonize
 from setuptools import setup
 
 __author__ = "Julian Blank"
@@ -11,7 +13,6 @@ try:
 except (IOError, ImportError):
     long_description = ''
 
-
 setup(
     name="pymoo",
     version=__version__,
@@ -23,5 +24,7 @@ setup(
     license='MIT',
     keywords="optimization",
     packages=setuptools.find_packages(),
-    install_requires=['pymop', 'numpy', 'scipy', 'matplotlib']
+    install_requires=['pymop', 'numpy', 'scipy', 'matplotlib'],
+    ext_modules=cythonize("pymoo/cython/*.pyx", language="c++"),
+    include_dirs=[numpy.get_include()]
 )

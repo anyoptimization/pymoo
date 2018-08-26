@@ -141,7 +141,7 @@ class GeneticAlgorithm(Algorithm):
             # select from the current population individuals for mating
             n_select = math.ceil((self.n_offsprings - n_gen_off) / self.crossover.n_children)
             parents = self.selection.do(pop, n_select, n_parents, out=self.D, **self.D)
-            _X = self.crossover.do(self.problem, pop.X[parents, :], out=self.D, **self.D)
+            _X = self.crossover.do(self.problem, pop.X[parents.T], out=self.D, **self.D)
 
             # do the mutation
             _X = self.mutation.do(self.problem, _X, out=self.D, **self.D)

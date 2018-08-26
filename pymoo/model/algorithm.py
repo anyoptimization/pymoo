@@ -3,7 +3,7 @@ from abc import abstractmethod
 
 from pymoo.model.evaluator import Evaluator
 from pymoo.rand import random
-from pymoo.util.non_dominated_rank import NonDominatedRank, find_non_dominated
+from pymoo.util.non_dominated_sorting import NonDominatedSorting, find_non_dominated
 from pymop.problem import Problem
 
 
@@ -109,7 +109,7 @@ class Algorithm:
                     G = G[cv <= 0, :]
 
         if return_only_non_dominated:
-            idx_non_dom = find_non_dominated(X)
+            idx_non_dom = find_non_dominated(F)
             X = X[idx_non_dom, :]
             F = F[idx_non_dom, :]
             if G is not None:
@@ -117,7 +117,7 @@ class Algorithm:
 
         return X, F, G
 
-    # method that is called each iteration to call some methods regularly
+    # method that is called each iteration to call so#me methods regularly
     def _each_iteration(self, D, first=False, **kwargs):
 
         # display the output if defined by the algorithm

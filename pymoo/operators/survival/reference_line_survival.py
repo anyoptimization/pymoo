@@ -3,7 +3,7 @@ from numpy.linalg import LinAlgError
 
 from pymoo.model.survival import Survival, split_by_feasibility
 from pymoo.rand import random
-from pymoo.util.non_dominated_rank import NonDominatedRank
+from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 
 class ReferenceLineSurvival(Survival):
@@ -46,7 +46,7 @@ class ReferenceLineSurvival(Survival):
                 self.ideal_point = np.min(np.concatenate([self.ideal_point[None, :], F], axis=0), axis=0)
 
             # calculate the fronts of the population
-            fronts, _rank = NonDominatedRank(epsilon=1e-10).do(F, return_rank=True, n_stop_if_exceed=n_survive_feasible)
+            fronts, _rank = NonDominatedSorting(epsilon=1e-10).do(F, return_rank=True, n_stop_if_ranked=n_survive_feasible)
             non_dominated = fronts[0]
 
             # calculate the worst point of feasible individuals

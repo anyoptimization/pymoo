@@ -6,7 +6,7 @@ import numpy as np
 
 from pymoo.operators.survival.rank_and_crowding import RankAndCrowdingSurvival
 from pymoo.rand.impl.custom_random_generator import CustomRandomGenerator
-from pymoo.util.non_dominated_rank import NonDominatedRank
+from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 
 class NSGA2Test(unittest.TestCase):
@@ -33,15 +33,15 @@ class NSGA2Test(unittest.TestCase):
             survivor_and_last_front = np.where(D['rank'] != -1.0)[0]
             crowding = D['crowding'][survivor_and_last_front]
             rank = D['rank'][survivor_and_last_front].astype(np.int)
-            F = D['F'][survivor_and_last_front,:]
+            F = D['F'][survivor_and_last_front, :]
 
             _rank = np.full(rank.shape, -1)
             _crowding = np.full(crowding.shape, -1.0)
-            fronts = NonDominatedRank().do(F)
+            fronts = NonDominatedSorting().do(F)
             for k, front in enumerate(fronts):
                 cd_of_front = RankAndCrowdingSurvival.calc_crowding_distance(F[front, :])
                 _crowding[front] = cd_of_front
-                _rank[front] = k+1
+                _rank[front] = k + 1
 
             is_equal = np.all(rank == _rank)
             if not is_equal:
@@ -49,25 +49,30 @@ class NSGA2Test(unittest.TestCase):
                 print(index)
                 print(D['rank'][index])
                 print(D['F'][index])
+
             self.assertTrue(is_equal)
 
-
             is_equal = np.all(np.abs(_crowding - crowding) < 0.001)
-            #if False:
             if not is_equal:
-                print("-" * 30)
-                print("Generation: ", i)
-                print("Is rank equal: ", np.all(rank == _rank))
+
                 index = np.where(np.abs(_crowding - crowding) > 0.001)[0]
                 index = index[np.argsort(rank[index])]
 
-                print(index)
-                print(rank[index])
-                print(F[index])
-                print(np.concatenate([_crowding[:, None], crowding[:, None]], axis=1)[index, :])
-                print()
+                # only an error if it is not a duplicate F value
+                for i_not_equal in index:
 
-            #self.assertTrue(is_equal)
+                    if len(np.where(np.all(F[i_not_equal, :] == F, axis=1))[0]) == 1:
+                        print("-" * 30)
+                        print("Generation: ", i)
+                        print("Is rank equal: ", np.all(rank == _rank))
+
+                        print(index)
+                        print(rank[index])
+                        print(F[index])
+                        print(np.concatenate([_crowding[:, None], crowding[:, None]], axis=1)[index, :])
+                        print()
+
+                        self.assertTrue(is_equal)
 
 
 if __name__ == '__main__':
