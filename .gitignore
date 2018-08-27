@@ -10,6 +10,8 @@ __pycache__/
 *.so
 
 
+pymoo/cython/*html
+
 
 tests/resources/*
 
@@ -17,7 +19,7 @@ tests/resources/*
 *.out
 *.dat
 
-.DS_Store
+pymoo/.DS_Store
 
 .idea/
 
