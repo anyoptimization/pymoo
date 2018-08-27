@@ -4,10 +4,12 @@ from non_dominated_sorting import get_relation, best_order_sort
 from pymoo.util.non_dominated_sorting import NonDominatedSorting, rank_from_fronts
 
 
-def best_order_sort(F):
+def _best_order_sort(F):
     n_points, n_obj = F.shape
 
-    Q = np.argsort(F, axis=0)
+    Q = np.zeros(F.shape, dtype=np.int)
+    for j in range(n_obj):
+        Q[:, j] = np.lexsort(F[:, j:][:, ::-1].T, axis=0)
 
     rank = np.full(n_points, -1, dtype=np.int)
 
@@ -79,7 +81,7 @@ if __name__ == '__main__':
     F = np.random.random((200, 2))
 
     fronts, rank = NonDominatedSorting().do(F, return_rank=True)
-    _fronts = best_order_sort(F)
+    _fronts = _best_order_sort(F)
 
-    print(np.all(rank == rank_from_fronts(_fronts)))
+    print(np.all(rank == rank_from_fronts(_fronts, F.shape[0])))
 

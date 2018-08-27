@@ -5,6 +5,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+*.c
+*.cpp
+*.so
+
+
 
 tests/resources/*
 
