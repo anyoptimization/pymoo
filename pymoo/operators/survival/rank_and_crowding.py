@@ -100,7 +100,12 @@ def calc_crowding_distance_vectorized(F):
 
         # normalize all the distances
         norm = np.max(F, axis=0) - np.min(F, axis=0)
+        norm[norm == 0] = np.nan
         dist_to_last, dist_to_next = dist_to_last[:-1] / norm, dist_to_next[1:] / norm
+
+        # if we divided by zero because all values in one columns are equal replace by none
+        dist_to_last[np.isnan(dist_to_last)] = 0.0
+        dist_to_next[np.isnan(dist_to_next)] = 0.0
 
         # sum up the distance to next and last and norm by objectives - also reorder from sorted list
         J = np.argsort(I, axis=0)
