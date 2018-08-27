@@ -28,11 +28,12 @@ def plot_3d(F):
     plt.show()
 
 def plot_2d(F, problem=None):
-    plt.scatter(F[:, 0], F[:, 1])
+    plt.scatter(F[:, 0], F[:, 1], label="F")
 
     if problem is not None:
         pf = problem.pareto_front()
         plt.scatter(pf[:, 0], pf[:, 1], label='Pareto Front', s=20, facecolors='none', edgecolors='r')
+        plt.legend()
 
     plt.show()
 
