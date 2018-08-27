@@ -1,56 +1,60 @@
 # distutils: language = c++
+#cython: boundscheck=False, wraparound=False, cdivision=True
+
 
 cimport cython
 import numpy as np
-cimport numpy as np
+cimport numpy as cnp
 from libcpp cimport bool
 from libcpp.vector cimport vector
 
-def fast_non_dominated_sort(double[:,:] F, double epsilon = 0.0, n_stop_if_ranked=None):
+
+cdef extern from "limits.h":
+    int INT_MAX
+
+def fast_non_dominated_sort(double[:,:] F, double epsilon = 0.0, int n_stop_if_ranked=INT_MAX):
     return c_fast_non_dominated_sort(F, epsilon, n_stop_if_ranked)
 
-def best_order_sort(double[:,:] F, double epsilon = 0.0, n_stop_if_ranked=None):
-    return c_best_order_sort(F, epsilon, n_stop_if_ranked)
+def best_order_sort(double[:,:] F, double epsilon = 0.0):
+    return c_best_order_sort(F, epsilon)
 
 def get_relation(F, a, b, epsilon = 0.0):
     return c_get_relation(F, a, b, epsilon)
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
-cdef c_fast_non_dominated_sort(double[:,:] F, double epsilon = 0.0, n_stop_if_ranked=None):
+
+cdef vector[vector[int]] c_fast_non_dominated_sort(double[:,:] F, double epsilon = 0.0, int n_stop_if_ranked=INT_MAX):
 
     cdef:
-        int n, i, j, rel, n_ranked
-        int[:] ranked, n_dominated
-        vector[int] current_front, next_front
+        int n_points, i, j, rel, n_ranked
+        vector[int] current_front, next_front, n_dominated
         vector[vector[int]] fronts, is_dominating
 
     # calculate the dominance matrix
-    n = F.shape[0]
+    n_points = F.shape[0]
 
     fronts = vector[vector[int]]()
 
-    if n == 0:
+    if n_points == 0:
         return fronts
 
     # final rank that will be returned
     n_ranked = 0
-    ranked = np.zeros(n, dtype=np.intc)
 
     # for each individual a list of all individuals that are dominated by this one
-    is_dominating = vector[vector[int]](n)
-    for _ in range(n):
-        is_dominating.push_back(vector[int](n))
+    is_dominating = vector[vector[int]](n_points)
+    for _ in range(n_points):
+        is_dominating.push_back(vector[int](n_points))
 
-    # storage for the number of solutions dominated this one
-    n_dominated = np.zeros(n, dtype=np.intc)
+    n_dominated = vector[int]()
+    for i in range(n_points):
+        n_dominated.push_back(0)
 
     current_front = vector[int]()
 
-    for i in range(n):
+    for i in range(n_points):
 
-        for j in range(i + 1, n):
+        for j in range(i + 1, n_points):
 
             rel = c_get_relation(F, i, j, epsilon)
 
@@ -64,18 +68,13 @@ cdef c_fast_non_dominated_sort(double[:,:] F, double epsilon = 0.0, n_stop_if_ra
 
         if n_dominated[i] == 0:
             current_front.push_back(i)
-            ranked[i] = 1
             n_ranked += 1
 
     # append the first front to the current front
     fronts.push_back(current_front)
 
     # while not all solutions are assigned to a pareto front or we can stop early because of stop criterium
-    while n_ranked < n:
-
-        # if we can stop earlier because of custom number of solutions to be ranked
-        if n_stop_if_ranked is not None and n_ranked >= n_stop_if_ranked:
-            break
+    while (n_ranked < n_points) and (n_ranked < n_stop_if_ranked):
 
         next_front = vector[int]()
 
@@ -88,7 +87,6 @@ cdef c_fast_non_dominated_sort(double[:,:] F, double epsilon = 0.0, n_stop_if_ra
                 n_dominated[j] -= 1
                 if n_dominated[j] == 0:
                     next_front.push_back(j)
-                    ranked[j] = 1
                     n_ranked += 1
 
         fronts.push_back(next_front)
@@ -97,15 +95,11 @@ cdef c_fast_non_dominated_sort(double[:,:] F, double epsilon = 0.0, n_stop_if_ra
     return fronts
 
 
-
-@cython.boundscheck(False)
-@cython.wraparound(False)
-cdef vector[vector[int]] c_best_order_sort(double[:,:] F, double epsilon = 0.0, n_stop_if_ranked=None):
-
+cdef vector[vector[int]] c_best_order_sort(double[:,:] F, double epsilon = 0.0):
 
     cdef:
-        int n_points, n_obj, n_fronts, n_ranked, i, j, s, e, l
-        int[:] rank
+        int n_points, n_obj, n_fronts, n_ranked, i, j, s, e, l, z
+        vector[int] rank
         int[:,:] Q
         bool is_dominated
         vector[vector[int]] fronts, empty
@@ -113,17 +107,20 @@ cdef vector[vector[int]] c_best_order_sort(double[:,:] F, double epsilon = 0.0, 
 
     n_points = F.shape[0]
     n_obj = F.shape[1]
-    Q = np.argsort(F, axis=0).astype(np.intc)
-
-    rank = np.full(n_points, -1, dtype=np.intc)
-
     fronts = vector[vector[int]]()
-    fronts.push_back(vector[int]())
+
+    _Q = np.zeros((n_points, n_obj), dtype=np.intc)
+    for j in range(n_obj):
+        _Q[:, j] = np.lexsort(F[:, j:][:, ::-1].T, axis=0)
+    Q = _Q[:,:]
+
+    rank = vector[int]()
+    for i in range(n_points):
+        rank.push_back(-1)
 
     L = vector[vector[vector[int]]]()
     for j in range(n_obj):
         empty = vector[vector[int]]()
-        empty.push_back(vector[int]())
         L.push_back(empty)
 
     n_fronts = 0
@@ -158,7 +155,7 @@ cdef vector[vector[int]] c_best_order_sort(double[:,:] F, double epsilon = 0.0, 
 
                         is_dominated = c_get_relation(F, s, e, epsilon) == -1
 
-                        # if just one solution dominates the current one - go to the next front
+                        # if one solution dominates the current one - go to the next front
                         if is_dominated:
                             break
 
@@ -169,6 +166,7 @@ cdef vector[vector[int]] c_best_order_sort(double[:,:] F, double epsilon = 0.0, 
 
                 # we need to add a new front for each objective
                 if s_rank == -1:
+
                     s_rank = n_fronts
                     n_fronts += 1
 
@@ -181,15 +179,13 @@ cdef vector[vector[int]] c_best_order_sort(double[:,:] F, double epsilon = 0.0, 
                 rank[s] = s_rank
                 n_ranked += 1
 
-                if n_ranked == n_points or \
-                        (n_stop_if_ranked is not None and n_ranked >= n_stop_if_ranked):
+                if n_ranked == n_points:
                     break
 
     return fronts
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
+
 cdef int c_get_relation(double[:,:] F, int a, int b, double epsilon = 0.0):
 
     cdef int size = F.shape[1]

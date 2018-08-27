@@ -1,7 +1,7 @@
 import numpy
 import setuptools
 from Cython.Build import cythonize
-from setuptools import setup
+from setuptools import setup, Extension
 
 __author__ = "Julian Blank"
 __version__ = '0.2.0-dev'
@@ -12,6 +12,8 @@ try:
     long_description = pypandoc.convert('README.md', 'rst')
 except (IOError, ImportError):
     long_description = ''
+
+
 
 setup(
     name="pymoo",
@@ -25,6 +27,6 @@ setup(
     keywords="optimization",
     packages=setuptools.find_packages(),
     install_requires=['pymop', 'numpy', 'scipy', 'matplotlib'],
-    ext_modules=cythonize("pymoo/cython/*.pyx", language="c++"),
+    ext_modules=cythonize("pymoo/cython/*.pyx", ),
     include_dirs=[numpy.get_include()]
 )

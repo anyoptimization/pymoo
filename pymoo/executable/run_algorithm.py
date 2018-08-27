@@ -6,40 +6,41 @@ from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.indicators.igd import IGD
 from pymoo.util.plotting import plot, animate
 from pymop.problems.dtlz import DTLZ4, DTLZ2
-from pymop.problems.osy import OSY
 from pymop.problems.tnk import TNK
-from pymop.problems.welded_beam import WeldedBeam
-from pymop.problems.zdt import ZDT4, ZDT1
+from pymop.problems.zdt import ZDT4, ZDT3, ZDT1
 
 if __name__ == '__main__':
 
     # load the problem instance
 
-    problem = DTLZ2(n_var=50, n_obj=30)
+    problem = DTLZ2(n_var=40, n_obj=10)
     problem.n_pareto_points = 92
 
-    #problem = OSY()
+    problem = ZDT4()
 
     # create the algorithm instance by specifying the intended parameters
     from pymoo.algorithms.nsga3 import NSGA3
 
-    algorithm = NSGA2(pop_size=200, eta_cross=5, eta_mut=5)
+    algorithm = NSGA2(pop_size=100)
 
-    start_time = time.time()
+    for i in range(30):
+        start_time = time.time()
 
-    # number of generations to run it
-    n_gen = 250
+        # number of generations to run it
+        n_gen = 200
 
-    # solve the problem and return the results
-    X, F, G = algorithm.solve(problem,
-                              evaluator=(algorithm.pop_size * n_gen),
-                              seed=23,
-                              return_only_feasible=False,
-                              return_only_non_dominated=False,
-                              disp=True,
-                              save_history=False)
+        # solve the problem and return the results
+        X, F, G = algorithm.solve(problem,
+                                  evaluator=(algorithm.pop_size * n_gen),
+                                  seed=i,
+                                  return_only_feasible=False,
+                                  return_only_non_dominated=False,
+                                  disp=False,
+                                  save_history=False)
 
-    print("--- %s seconds ---" % (time.time() - start_time))
+        print(IGD(problem.pareto_front()).calc(F))
+
+        #print("--- %s seconds ---" % (time.time() - start_time))
 
     scatter_plot = True
     save_animation = False
