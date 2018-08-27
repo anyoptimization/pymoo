@@ -11,73 +11,67 @@ class SimulatedBinaryCrossover(Crossover):
         self.eta_cross = float(eta_cross)
 
     def _do(self, p, parents, children, **kwargs):
+        n_matings = parents.shape[1]
 
-        n_children = 0
+        # crossover mask that will be used in the end
+        do_crossover = np.full(parents[0].shape, True)
 
-        for k in range(parents.shape[0]):
+        # simulating probability of doing a crossover with the parents at all
+        do_crossover[random.random(n_matings) > self.prob_cross, :] = False
+        # per variable the probability is then 50%
+        do_crossover[random.random((n_matings, p.n_var)) <= 0.5] = False
+        # also if values are too close no mating is done
+        do_crossover[np.abs(parents[0] - parents[1]) <= 1.0e-14] = False
 
-            if random.random() <= self.prob_cross:
+        # assign y1 the smaller and y2 the larger value
+        y1 = np.min(parents, axis=0)
+        y2 = np.max(parents, axis=0)
 
-                for i in range(p.n_var):
+        # random values for each individual
+        rand = random.random((n_matings, p.n_var))
 
-                    rnd = random.random()
-                    if rnd <= 0.5:
+        def calc_betaq(beta):
+            alpha = 2.0 - np.power(beta, -(self.eta_cross + 1.0))
 
-                        if np.abs(parents[k, 0, i] - parents[k, 1, i]) > 1.0e-10:
+            mask, mask_not = (rand <= (1.0 / alpha)), (rand > (1.0 / alpha))
 
-                            yl = p.xl[i]
-                            yu = p.xu[i]
+            betaq = np.zeros(mask.shape)
+            betaq[mask] = np.power((rand * alpha), (1.0 / (self.eta_cross + 1.0)))[mask]
+            betaq[mask_not] = np.power((1.0 / (2.0 - rand * alpha)), (1.0 / (self.eta_cross + 1.0)))[mask_not]
 
-                            if parents[k, 0, i] < parents[k, 1, i]:
-                                y1 = parents[k, 0, i]
-                                y2 = parents[k, 1, i]
-                            else:
-                                y1 = parents[k, 1, i]
-                                y2 = parents[k, 0, i]
+            return betaq
 
-                            if (y1 - yl) > (yu - y2):
-                                beta = 1 / (1 + (2 * (yu - y2) / (y2 - y1)))
-                            else:
-                                beta = 1 / (1 + (2 * (y1 - yl) / (y2 - y1)))
+        # difference between all variables
+        delta = (y2 - y1)
 
-                            alpha = (2.0 - pow(beta, self.eta_cross + 1.0))
+        # now just be sure not dividing by zero (these cases will be filtered later anyway)
+        delta[delta < 1.0e-14] = 1.0e-14
 
-                            rnd = random.random()
+        beta = 1.0 + (2.0 * (y1 - p.xl) / delta)
+        betaq = calc_betaq(beta)
+        c1 = 0.5 * ((y1 + y2) - betaq * delta)
 
-                            if rnd <= 1.0 / alpha:
-                                alpha *= rnd
-                            else:
-                                alpha *= rnd
-                                alpha = 1.0 / (2.0 - alpha)
+        beta = 1.0 + (2.0 * (p.xu - y2) / delta)
+        betaq = calc_betaq(beta)
+        c2 = 0.5 * ((y1 + y2) + betaq * delta)
 
-                            betaq = pow(alpha, 1.0 / (self.eta_cross + 1.0))
+        # do randomly a swap of variables
+        b = random.random((n_matings, p.n_var)) <= 0.5
+        val = c1[b]
+        c1[b] = c2[b]
+        c2[b] = val
 
-                            c1 = 0.5 * ((y1 + y2) - betaq * (y2 - y1))
-                            c2 = 0.5 * ((y1 + y2) + betaq * (y2 - y1))
+        # take the parents as template
+        c = parents
 
-                            if c1 < yl:
-                                c1 = yl
-                            if c2 < yl:
-                                c2 = yl
-                            if c1 > yu:
-                                c1 = yu
-                            if c2 > yu:
-                                c2 = yu
+        # copy the positions where the crossover was done
+        c[0, do_crossover] = c1[do_crossover]
+        c[1, do_crossover] = c2[do_crossover]
 
-                            children[n_children, i] = c1
-                            children[n_children + 1, i] = c2
+        # copy to the structure which is returned
+        children[:n_matings, :] = c[0]
+        children[n_matings:, :] = c[1]
 
-                        else:
-
-                            children[n_children, i] = parents[k, 0, i]
-                            children[n_children + 1, i] = parents[k, 1, i]
-
-                    else:
-                        children[n_children, i] = parents[k, 0, i]
-                        children[n_children + 1, i] = parents[k, 1, i]
-
-            else:
-                children[n_children, :] = parents[k, 0, :]
-                children[n_children + 1, :] = parents[k, 1, :]
-
-            n_children += self.n_children
+        # just be sure we are not out of bounds
+        children[children < p.xl] = np.repeat(p.xl[None, :], children.shape[0], axis=0)[children < p.xl]
+        children[children > p.xu] = np.repeat(p.xu[None, :], children.shape[0], axis=0)[children > p.xu]

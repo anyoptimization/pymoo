@@ -3,12 +3,11 @@ import time
 import numpy as np
 
 from pymoo.util.plotting import plot, animate
+from pymop.problems.zdt import ZDT1
 
-if __name__ == '__main__':
 
-    from pymop.problems.osy import OSY
-
-    problem = OSY()
+def run():
+    problem = ZDT1()
 
     start_time = time.time()
 
@@ -17,7 +16,7 @@ if __name__ == '__main__':
     res = minimize(problem,
                    method='nsga2',
                    method_args={'pop_size': 100},
-                   termination=('n_eval', 100 * 250),
+                   termination=('n_eval', 100 * 200),
                    seed=1,
                    save_history=True,
                    disp=True)
@@ -34,3 +33,7 @@ if __name__ == '__main__':
     if save_animation:
         H = np.concatenate([e['pop'].F[None, :, :] for e in res['history']], axis=0)
         animate('%s.mp4' % problem.name(), H, problem)
+
+
+if __name__ == '__main__':
+    run()
