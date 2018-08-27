@@ -1,3 +1,5 @@
+import numpy as np
+
 from pymoo.model.mutation import Mutation
 from pymoo.rand import random
 
@@ -15,41 +17,43 @@ class PolynomialMutation(Mutation):
         if self.prob_mut is None:
             self.prob_mut = 1.0 / p.n_var
 
-        for i in range(X.shape[0]):
+        do_mutation = random.random(X.shape) < self.prob_mut
 
-            for j in range(X.shape[1]):
+        Y[:, :] = X
 
-                rnd = random.random()
-                if rnd <= self.prob_mut:
+        xl = np.repeat(p.xl[None, :], X.shape[0], axis=0)[do_mutation]
+        xu = np.repeat(p.xu[None, :], X.shape[0], axis=0)[do_mutation]
 
-                    y = X[i, j]
-                    yl = p.xl[j]
-                    yu = p.xu[j]
+        X = X[do_mutation]
 
-                    delta1 = (y - yl) / (yu - yl)
-                    delta2 = (yu - y) / (yu - yl)
+        delta1 = (X - xl) / (xu - xl)
+        delta2 = (xu - X) / (xu - xl)
 
-                    mut_pow = 1.0 / (self.eta_mut + 1.0)
+        mut_pow = 1.0 / (self.eta_mut + 1.0)
 
-                    rnd = random.random()
-                    if rnd <= 0.5:
-                        xy = 1.0 - delta1
-                        val = 2.0 * rnd + (1.0 - 2.0 * rnd) * (pow(xy, (self.eta_mut + 1.0)))
-                        deltaq = pow(val, mut_pow) - 1.0
-                    else:
-                        xy = 1.0 - delta2
-                        val = 2.0 * (1.0 - rnd) + 2.0 * (rnd - 0.5) * (pow(xy, (self.eta_mut + 1.0)))
-                        deltaq = 1.0 - (pow(val, mut_pow))
+        rand = random.random(X.shape)
+        mask = rand <= 0.5
+        mask_not = np.logical_not(mask)
 
-                    y = y + deltaq * (yu - yl)
+        deltaq = np.zeros(X.shape)
 
-                    if y < yl:
-                        y = yl
+        xy = 1.0 - delta1
+        val = 2.0 * rand + (1.0 - 2.0 * rand) * (np.power(xy, (self.eta_mut + 1.0)))
+        d = np.power(val, mut_pow) - 1.0
+        deltaq[mask] = d[mask]
 
-                    if y > yu:
-                        y = yu
+        xy = 1.0 - delta2
+        val = 2.0 * (1.0 - rand) + 2.0 * (rand - 0.5) * (np.power(xy, (self.eta_mut + 1.0)))
+        d = 1.0 - (np.power(val, mut_pow))
+        deltaq[mask_not] = d[mask_not]
 
-                    Y[i, j] = y
+        # mutated values
+        _Y = X + deltaq * (xu - xl)
 
-                else:
-                    Y[i, j] = X[i, j]
+        # back in bounds if necessary (floating point issues)
+        _Y[_Y < xl] = xl[_Y < xl]
+        _Y[_Y > xu] = xu[_Y > xu]
+
+        # set the values for output
+        Y[do_mutation] = _Y
+

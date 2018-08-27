@@ -4,7 +4,7 @@ import unittest
 
 import numpy as np
 
-from pymoo.operators.survival.rank_and_crowding import RankAndCrowdingSurvival
+from pymoo.operators.survival.rank_and_crowding import RankAndCrowdingSurvival, calc_crowding_distance
 from pymoo.rand.impl.custom_random_generator import CustomRandomGenerator
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
@@ -39,7 +39,7 @@ class NSGA2Test(unittest.TestCase):
             _crowding = np.full(crowding.shape, -1.0)
             fronts = NonDominatedSorting().do(F)
             for k, front in enumerate(fronts):
-                cd_of_front = RankAndCrowdingSurvival.calc_crowding_distance(F[front, :])
+                cd_of_front = calc_crowding_distance(F[front, :])
                 _crowding[front] = cd_of_front
                 _rank[front] = k + 1
 

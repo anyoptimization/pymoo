@@ -3,6 +3,7 @@ from numpy.linalg import LinAlgError
 
 from pymoo.model.survival import Survival, split_by_feasibility
 from pymoo.rand import random
+from pymoo.util.mathematics import Mathematics
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 
@@ -46,7 +47,7 @@ class ReferenceLineSurvival(Survival):
                 self.ideal_point = np.min(np.concatenate([self.ideal_point[None, :], F], axis=0), axis=0)
 
             # calculate the fronts of the population
-            fronts, _rank = NonDominatedSorting(epsilon=1e-10).do(F, return_rank=True, n_stop_if_ranked=n_survive_feasible)
+            fronts, _rank = NonDominatedSorting(epsilon=Mathematics.EPS).do(F, return_rank=True, n_stop_if_ranked=n_survive_feasible)
             non_dominated = fronts[0]
 
             # calculate the worst point of feasible individuals
@@ -141,9 +142,9 @@ class ReferenceLineSurvival(Survival):
         n_infeasible = n_survive - len(survivors)
         if n_infeasible > 0:
             survivors = np.concatenate([survivors, infeasible[:n_infeasible]])
-            rank = np.concatenate([rank, 1e16 * np.ones(n_infeasible)])
+            rank = np.concatenate([rank, Mathematics.INF * np.ones(n_infeasible)])
             niche_of_individuals = np.concatenate([niche_of_individuals, -1 * np.ones(n_infeasible)])
-            dist_to_niche = np.concatenate([dist_to_niche, 1e30 * np.ones(n_infeasible)])
+            dist_to_niche = np.concatenate([dist_to_niche, Mathematics.INF * np.ones(n_infeasible)])
 
         # set attributes globally for other modules
         if out is not None:
@@ -190,7 +191,7 @@ def get_intercepts(extreme_points, ideal_point, nadir_point, worst_point):
         intercepts = worst_point
 
     # if also the worst point is very small we set it to a small value, to avoid division by zero
-    intercepts[intercepts < 1e-16] = 1e-16
+    #intercepts[intercepts < 1e-16] = 1e-16
 
     return intercepts
 

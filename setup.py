@@ -1,7 +1,7 @@
 import numpy
 import setuptools
 from Cython.Build import cythonize
-from setuptools import setup, Extension
+from setuptools import setup
 
 __author__ = "Julian Blank"
 __version__ = '0.2.0-dev'
