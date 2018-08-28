@@ -16,7 +16,7 @@ if __name__ == '__main__':
     problem = DTLZ2(n_var=40, n_obj=10)
     problem.n_pareto_points = 92
 
-    problem = ZDT4()
+    problem = ZDT1()
 
     # create the algorithm instance by specifying the intended parameters
     from pymoo.algorithms.nsga3 import NSGA3
@@ -27,7 +27,7 @@ if __name__ == '__main__':
         start_time = time.time()
 
         # number of generations to run it
-        n_gen = 200
+        n_gen = 400
 
         # solve the problem and return the results
         X, F, G = algorithm.solve(problem,
@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
         #print("--- %s seconds ---" % (time.time() - start_time))
 
-    scatter_plot = True
+    scatter_plot = False
     save_animation = False
 
     if scatter_plot:

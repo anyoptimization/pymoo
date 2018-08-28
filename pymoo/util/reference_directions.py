@@ -4,6 +4,7 @@ import numpy as np
 from scipy import special
 
 from pymoo.rand.random import random
+from pymoo.util.plotting import plot_3d
 
 
 def get_ref_dirs_from_section(n_obj, n_sections):
@@ -13,9 +14,23 @@ def get_ref_dirs_from_section(n_obj, n_sections):
     # all possible values for the vector
     sections = np.linspace(0, 1, num=n_sections + 1)[::-1]
 
+    M = []
+    ref_recursive([], sections, 0, n_obj, M)
+    M = np.array(M)
+    M[M == 0] = 0.000001
+
+    return M
+
+def get_multi_layer_ref_dirs(n_obj, p_and_scaling):
+
     ref_dirs = []
-    ref_recursive([], sections, 0, n_obj, ref_dirs)
-    return np.array(ref_dirs)
+
+    for p, scaling in p_and_scaling:
+        r = get_ref_dirs_from_section(n_obj, p)
+        r = r * scaling + ((1 - scaling) / n_obj)
+        ref_dirs.append(r)
+    ref_dirs = np.concatenate(ref_dirs, axis=0)
+    return ref_dirs
 
 
 # returns the closest possible number of references lines to given one
@@ -23,7 +38,6 @@ def get_ref_dirs_from_n(n_obj, n_refs, max_sections=100):
     n_sections = np.array([get_number_of_reference_directions(n_obj, i) for i in range(max_sections)])
     idx = np.argmin((n_sections < n_refs).astype(np.int))
     M = get_ref_dirs_from_section(n_obj, idx - 1)
-    M[M == 0] = 0.000001
     return M
 
 
@@ -51,33 +65,6 @@ def get_number_of_reference_directions(n_obj, n_sections):
 def get_uniform_weights(n_points, n_dim, max_sections=300):
     def n_uniform_weights(n_obj, n_sections):
         return int(special.binom(n_obj + n_sections - 1, n_sections))
-
-    def get_ref_dirs_from_section(n_obj, n_sections):
-
-        if n_obj == 1:
-            return np.array([1.0])
-
-        # all possible values for the vector
-        sections = np.linspace(0, 1, num=n_sections + 1)[::-1]
-
-        ref_dirs = []
-        ref_recursive([], sections, 0, n_obj, ref_dirs)
-        return np.array(ref_dirs)
-
-    def ref_recursive(v, sections, level, max_level, result):
-        v_sum = np.sum(np.array(v))
-
-        # sum slightly above or below because of numerical issues
-        if v_sum > 1.0001:
-            return
-        elif level == max_level:
-            if 1.0 - v_sum < 0.0001:
-                result.append(v)
-        else:
-            for e in sections:
-                next = list(v)
-                next.append(e)
-                ref_recursive(next, sections, level + 1, max_level, result)
 
     # Generates uniform distribution of reference points
     n_sections = np.array([n_uniform_weights(n_dim, i) for i in range(max_sections)])
@@ -182,13 +169,21 @@ def line_plane_intersection(l0, l1, p0, p_no, epsilon=1e-6):
 if __name__ == '__main__':
 
     import time
+    import matplotlib.pyplot as plt
+
+    ref_dirs = get_multi_layer_ref_dirs(3, [(12,1.0), (12, 0.1)])
+
+
+    plot_3d(ref_dirs)
+    exit(0)
+
 
     pt = np.array([[0.4, 0.6, 0.2], [0.8, 0.6, 0.8]])
     # pt = np.array([[0.1, 2, 1]])
     start = time.time()
     w = get_ref_dirs_from_points(pt, n_obj=3, pop_size=100)
     print(f'{time.time()-start}')
-    import matplotlib.pyplot as plt
+
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')

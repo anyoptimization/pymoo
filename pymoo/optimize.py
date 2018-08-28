@@ -1,5 +1,6 @@
 import numpy as np
 
+from pymoo.algorithms.adaptive_nsga3 import AdaptiveNSGA3
 from pymoo.algorithms.moead import MOEAD
 from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.algorithms.nsga3 import NSGA3
@@ -140,6 +141,8 @@ def minimize_(problem, evaluator, method, method_args={}, seed=1,
         algorithm = UNSGA3(**method_args)
     elif method == 'rnsga3':
         algorithm = RNSGA3(**method_args)
+    elif method == 'ansga3':
+        algorithm = AdaptiveNSGA3(**method_args)
     elif method == 'moead':
         algorithm = MOEAD(**method_args)
     elif method == 'de':
