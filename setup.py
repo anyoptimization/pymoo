@@ -13,8 +13,6 @@ try:
 except (IOError, ImportError):
     long_description = ''
 
-
-
 setup(
     name="pymoo",
     version=__version__,
@@ -27,6 +25,9 @@ setup(
     keywords="optimization",
     packages=setuptools.find_packages(),
     install_requires=['pymop', 'numpy', 'scipy', 'matplotlib'],
-    ext_modules=cythonize("pymoo/cython/*.pyx", ),
-    include_dirs=[numpy.get_include()]
+    ext_modules=cythonize(
+        "pymoo/cython/non_dominated_sorting.pyx",
+        language="c++",
+    ),
+    include_dirs=[numpy.get_include()],
 )
