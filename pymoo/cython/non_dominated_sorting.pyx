@@ -1,5 +1,5 @@
 # distutils: language = c++
-#cython: boundscheck=False, wraparound=False, cdivision=True
+# cython: boundscheck=False, wraparound=False, cdivision=True
 
 
 cimport cython
@@ -183,7 +183,6 @@ cdef vector[vector[int]] c_best_order_sort(double[:,:] F, double epsilon = 0.0):
                     break
 
     return fronts
-
 
 
 cdef int c_get_relation(double[:,:] F, int a, int b, double epsilon = 0.0):

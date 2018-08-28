@@ -1,13 +1,67 @@
 import numpy as np
-from numpy.linalg import LinAlgError
 
+from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
+from pymoo.algorithms.nsga3 import NSGA3, comp_by_cv_then_random
 from pymoo.model.survival import Survival, split_by_feasibility
+from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.default_operators import set_if_none
+from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
+from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
+from pymoo.operators.selection.tournament_selection import TournamentSelection
+from pymoo.operators.survival.reference_line_survival import get_extreme_points, get_intercepts, associate_to_niches
 from pymoo.rand import random
+from pymoo.util.display import disp_multi_objective
 from pymoo.util.mathematics import Mathematics
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
+from pymop.util import get_uniform_weights
 
 
-class ReferenceLineSurvival(Survival):
+class AdaptiveNSGA3(GeneticAlgorithm):
+
+    def __init__(self,
+                 pop_size=100,
+                 ref_dirs=None,
+                 prob_cross=1.0,
+                 eta_cross=20,
+                 prob_mut=None,
+                 eta_mut=30,
+                 **kwargs):
+
+        self.ref_dirs = ref_dirs
+
+        set_if_none(kwargs, 'pop_size', pop_size)
+        set_if_none(kwargs, 'sampling', RealRandomSampling())
+        set_if_none(kwargs, 'selection', TournamentSelection(func_comp=comp_by_cv_then_random))
+        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=prob_cross, eta_cross=eta_cross))
+        set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=prob_mut, eta_mut=eta_mut))
+        set_if_none(kwargs, 'survival', None)
+        set_if_none(kwargs, 'eliminate_duplicates', True)
+
+        super().__init__(**kwargs)
+
+        self.func_display_attrs = disp_multi_objective
+
+    def _initialize(self):
+        pop = super()._initialize()
+
+        # if survival not define differently
+        if self.survival is None:
+
+            # if ref dirs are not initialized do it based on the population size
+            if self.ref_dirs is None:
+                self.ref_dirs = get_uniform_weights(self.pop_size, self.problem.n_obj)
+
+            # set the survival method itself
+            self.survival = AdaptiveReferenceLineSurvival(self.ref_dirs)
+
+        # call the survival to initialize ideal point and so on - does not do a actual survival
+        self.survival.do(pop, self.pop_size, out=self.D, **self.D)
+
+        return pop
+
+
+
+class AdaptiveReferenceLineSurvival(Survival):
     def __init__(self, ref_dirs):
         super().__init__()
         self.ref_dirs = ref_dirs
@@ -15,6 +69,14 @@ class ReferenceLineSurvival(Survival):
         self.extreme_points = None
         self.intercepts = None
         self.ideal_point = None
+        self.nadir_point = None
+
+
+        self.adam_alpha = 0.001
+        self.adam_beta_1 = 0.9
+        self.adam_beta_2 = 0.999
+        self.adam_epsilon = 1e-8
+
 
     def _do(self, pop, n_survive, out=None, **kwargs):
 
@@ -24,7 +86,7 @@ class ReferenceLineSurvival(Survival):
         # first split by feasibility for normalization
         feasible, infeasible = split_by_feasibility(pop)
 
-        # number of survivors from the feasible population 
+        # number of survivors from the feasible population
         # in case of having not enough feasible solution all feasible will survive
         if len(feasible) < n_survive:
             n_survive_feasible = len(feasible)
@@ -40,32 +102,44 @@ class ReferenceLineSurvival(Survival):
             # consider only feasible solutions form now on
             F = pop.F[feasible, :]
 
+            # calculate the fronts of the population
+            fronts, _rank = NonDominatedSorting(epsilon=Mathematics.EPS).do(F, return_rank=True,
+                                                                            n_stop_if_ranked=n_survive_feasible)
+
             # find or usually update the new ideal point - from feasible solutions
             if self.ideal_point is None:
                 self.ideal_point = np.min(F, axis=0)
             else:
                 self.ideal_point = np.min(np.concatenate([self.ideal_point[None, :], F], axis=0), axis=0)
 
-            # calculate the fronts of the population
-            fronts, _rank = NonDominatedSorting(epsilon=Mathematics.EPS).do(F, return_rank=True, n_stop_if_ranked=n_survive_feasible)
-            non_dominated = fronts[0]
+            self.extreme_points = get_extreme_points(F, self.ideal_point, extreme_points=self.extreme_points)
 
-            # calculate the worst point of feasible individuals
-            worst_point = np.max(F, axis=0)
-            # calculate the nadir point from non dominated individuals
-            nadir_point = np.max(F[non_dominated, :], axis=0)
+            # now update the nadir point to the correct direction - take the worst of initial population
+            if self.nadir_point is None:
+                self.nadir_point = np.max(F, axis=0)
+                payoff_nadir_point = self.nadir_point
+            else:
+
+                # estimate the nadir point using the payoff table estimation
+                estimated_nadir_point = np.max(self.extreme_points, axis=0)
+
+                # now update the nadir point using the adam update rule - this is our "gradient"
+                g = (estimated_nadir_point - self.nadir_point)
+
+
+
+
+
+
+
+            self.intercepts = self.nadir_point - self.ideal_point
+
+
+            print(self.intercepts, (payoff_nadir_point - self.nadir_point))
 
             # consider only the first n fronts form now on - including splitting front
             I = np.concatenate(fronts)
             F = F[I, :]
-
-            # find the extreme points for normalization
-            self.extreme_points = get_extreme_points(F, self.ideal_point, extreme_points=self.extreme_points)
-
-            # find the intercepts for normalization and do backup if gaussian elimination fails
-            self.intercepts = get_intercepts(self.extreme_points, self.ideal_point, nadir_point, worst_point)
-
-            #print(self.intercepts + self.ideal_point)
 
             # associate individuals to niches
             niche_of_individuals, dist_to_niche = associate_to_niches(F, self.ref_dirs, self.ideal_point,
@@ -156,106 +230,3 @@ class ReferenceLineSurvival(Survival):
 
         # now truncate the population
         pop.filter(survivors)
-
-
-def get_extreme_points(F, ideal_point, extreme_points=None):
-    # calculate the asf which is used for the extreme point decomposition
-    asf = np.eye(F.shape[1])
-    asf[asf == 0] = 1e-6
-
-    # add the old extreme points to never loose them for normalization
-    _F = F
-    if extreme_points is not None:
-        _F = np.concatenate([_F, extreme_points], axis=0)
-
-    # update the extreme points for the normalization having the highest asf value each
-    F_asf = np.max((_F - ideal_point) / asf[:, None, :], axis=2)
-    extreme_points = _F[np.argmin(F_asf, axis=1), :]
-
-    return extreme_points
-
-
-def get_intercepts(extreme_points, ideal_point, nadir_point, worst_point):
-    # normalization of the points in the new space
-    nadir_point -= ideal_point
-    worst_point -= ideal_point
-
-    try:
-        # find the intercepts using gaussian elimination
-        intercepts = 1 / np.linalg.solve(extreme_points - ideal_point, np.ones(extreme_points.shape[1]))
-
-    except LinAlgError:
-        # set to zero which will be handled later
-        intercepts = nadir_point
-
-    # if even that point is too small
-    if np.any(intercepts < 1e-6):
-        intercepts = worst_point
-
-    # if also the worst point is very small we set it to a small value, to avoid division by zero
-    #intercepts[intercepts < 1e-16] = 1e-16
-
-    return intercepts
-
-
-def get_intercepts_mod(extreme_points, ideal_point, nadir_point, worst_point):
-    # normalization of the points in the new space
-    nadir_point -= ideal_point
-    worst_point -= ideal_point
-
-    gaussian_elimination_failed = False
-
-    try:
-        # find the intercepts using gaussian elimination
-        intercepts = 1 / np.linalg.solve(extreme_points - ideal_point, np.ones(extreme_points.shape[1]))
-    except LinAlgError:
-        gaussian_elimination_failed = True
-
-    # in case the gaussian elimination failed (this will happen when ever the matrix is singular)
-    if gaussian_elimination_failed:
-        intercepts = nadir_point
-
-    else:
-
-        # gaussian elimination is degenerated - (negative intercepts, too small, too large)
-        b = np.logical_or(intercepts < 1e-6, intercepts > 1e6)
-
-        # replace these values with nadir
-        if np.any(b):
-            intercepts[b] = nadir_point[b]
-
-    # if even that point is too small still (after taking the nadir point usually - if only one dominated point it is 0)
-    b = intercepts < 1e-6
-    intercepts[b] = worst_point[b]
-
-    return intercepts
-
-
-def associate_to_niches(F, niches, ideal_point, intercepts, utopianEpsilon=-0.001):
-
-    # normalize by ideal point and intercepts
-    N = (F - ideal_point) / intercepts
-
-    # make sure that no values are 0. (subtracting a negative epsilon)
-    N -= utopianEpsilon
-
-    dist_matrix = calc_perpendicular_dist_matrix(N, niches)
-
-    niche_of_individuals = np.argmin(dist_matrix, axis=1)
-    dist_to_niche = np.min(dist_matrix, axis=1)
-
-    return niche_of_individuals, dist_to_niche
-
-
-def calc_perpendicular_dist_matrix(N, ref_dirs):
-    u = np.tile(ref_dirs, (len(N), 1))
-    v = np.repeat(N, len(ref_dirs), axis=0)
-
-    norm_u = np.linalg.norm(u, axis=1)
-
-    scalar_proj = np.sum(v * u, axis=1) / norm_u
-    proj = scalar_proj[:, None] * u / norm_u[:, None]
-    val = np.linalg.norm(proj - v, axis=1)
-    matrix = np.reshape(val, (len(N), len(ref_dirs)))
-
-    return matrix

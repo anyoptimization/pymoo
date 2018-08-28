@@ -10,13 +10,13 @@ from pymoo.operators.survival.reference_line_survival import ReferenceLineSurviv
 from pymoo.rand import random
 from pymoo.util.display import disp_multi_objective
 from pymoo.util.dominator import compare
-from pymoo.util.reference_directions import get_uniform_weights
+from pymoo.util.reference_directions import get_uniform_weights, get_ref_dirs_from_section, get_multi_layer_ref_dirs
 
 
 class NSGA3(GeneticAlgorithm):
 
     def __init__(self,
-                 pop_size=100,
+                 n_sections=None,
                  ref_dirs=None,
                  prob_cross=1.0,
                  eta_cross=20,
@@ -25,8 +25,18 @@ class NSGA3(GeneticAlgorithm):
                  **kwargs):
 
         self.ref_dirs = ref_dirs
+        self.n_sections = n_sections
 
-        set_if_none(kwargs, 'pop_size', pop_size)
+        # at least one of both must be provided
+        if self.ref_dirs is None and self.n_sections is None:
+            raise Exception("Either provide the reference lines directly or the number of sections for the uniform "
+                            "reference line sampling!")
+
+        if self.ref_dirs is not None:
+            kwargs['pop_size'] = ref_dirs.shape[0]
+        else:
+            kwargs['pop_size'] = -1
+
         set_if_none(kwargs, 'sampling', RealRandomSampling())
         set_if_none(kwargs, 'selection', TournamentSelection(func_comp=comp_by_cv_then_random))
         set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=prob_cross, eta_cross=eta_cross))
@@ -39,17 +49,28 @@ class NSGA3(GeneticAlgorithm):
         self.func_display_attrs = disp_multi_objective
 
     def _initialize(self):
-        pop = super()._initialize()
 
         # if survival not define differently
         if self.survival is None:
 
             # if ref dirs are not initialized do it based on the population size
             if self.ref_dirs is None:
-                self.ref_dirs = get_uniform_weights(self.pop_size, self.problem.n_obj)
+
+                if isinstance(self.n_sections, int):
+                    self.ref_dirs = get_ref_dirs_from_section(self.problem.n_obj, self.n_sections)
+                elif isinstance(self.n_sections, list):
+                    self.ref_dirs = get_multi_layer_ref_dirs(self.problem.n_obj, self.n_sections)
+                else:
+                    raise Exception("n_section must be either an integer or list [(p1, scaling1), (p2, scaling2), ..]")
+
+                self.pop_size = self.ref_dirs.shape[0]
+                if self.n_offsprings == -1:
+                    self.n_offsprings = self.pop_size
 
             # set the survival method itself
             self.survival = ReferenceLineSurvival(self.ref_dirs)
+
+        pop = super()._initialize()
 
         # call the survival to initialize ideal point and so on - does not do a actual survival
         self.survival.do(pop, self.pop_size, out=self.D, **self.D)
@@ -72,4 +93,3 @@ def comp_by_cv_then_random(pop, P, **kwargs):
             S[i] = random.choice([a, b])
 
     return S[:, None].astype(np.int)
-
