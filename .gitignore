@@ -10,6 +10,9 @@ __pycache__/
 *.so
 
 
+pymoo/experimental/*
+
+
 pymoo/cython/*html
 
 

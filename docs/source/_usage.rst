@@ -9,16 +9,18 @@
 
 
     def run():
+
+        # create the optimization problem
         problem = ZDT1()
 
         start_time = time.time()
 
+        # solve the given problem using an optimization algorithm (here: nsga2)
         from pymoo.optimize import minimize
-
         res = minimize(problem,
                        method='nsga2',
                        method_args={'pop_size': 100},
-                       termination=('n_eval', 100 * 200),
+                       termination=('n_gen', 200),
                        seed=1,
                        save_history=True,
                        disp=True)

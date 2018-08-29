@@ -15,10 +15,10 @@ class NoExceptionTest(unittest.TestCase):
 
         self.algorithms = []
         for name in ['nsga2', 'nsga3', 'unsga3']:
-            d = {'name': name, 'pop_size': 20, 'n_eval': 100}
+            d = {'name': name, 'pop_size': 20, 'n_eval': 100, 'n_sections': 12}
             self.algorithms.append(d)
 
-    def test_no_excpetion(self):
+    def test_no_exception(self):
 
         for problem in self.problems:
 
