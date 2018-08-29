@@ -47,7 +47,8 @@ class ReferenceLineSurvival(Survival):
                 self.ideal_point = np.min(np.concatenate([self.ideal_point[None, :], F], axis=0), axis=0)
 
             # calculate the fronts of the population
-            fronts, _rank = NonDominatedSorting(epsilon=Mathematics.EPS).do(F, return_rank=True, n_stop_if_ranked=n_survive_feasible)
+            fronts, _rank = NonDominatedSorting(epsilon=Mathematics.EPS).do(F, return_rank=True,
+                                                                            n_stop_if_ranked=n_survive_feasible)
             non_dominated = fronts[0]
 
             # calculate the worst point of feasible individuals
@@ -65,7 +66,7 @@ class ReferenceLineSurvival(Survival):
             # find the intercepts for normalization and do backup if gaussian elimination fails
             self.intercepts = get_intercepts(self.extreme_points, self.ideal_point, nadir_point, worst_point)
 
-            #print(self.intercepts + self.ideal_point)
+            # print(self.intercepts + self.ideal_point)
 
             # associate individuals to niches
             niche_of_individuals, dist_to_niche = associate_to_niches(F, self.ref_dirs, self.ideal_point,
@@ -193,46 +194,12 @@ def get_intercepts(extreme_points, ideal_point, nadir_point, worst_point):
         intercepts = worst_point
 
     # if also the worst point is very small we set it to a small value, to avoid division by zero
-    #intercepts[intercepts < 1e-16] = 1e-16
-
-    return intercepts
-
-
-def get_intercepts_mod(extreme_points, ideal_point, nadir_point, worst_point):
-    # normalization of the points in the new space
-    nadir_point -= ideal_point
-    worst_point -= ideal_point
-
-    gaussian_elimination_failed = False
-
-    try:
-        # find the intercepts using gaussian elimination
-        intercepts = 1 / np.linalg.solve(extreme_points - ideal_point, np.ones(extreme_points.shape[1]))
-    except LinAlgError:
-        gaussian_elimination_failed = True
-
-    # in case the gaussian elimination failed (this will happen when ever the matrix is singular)
-    if gaussian_elimination_failed:
-        intercepts = nadir_point
-
-    else:
-
-        # gaussian elimination is degenerated - (negative intercepts, too small, too large)
-        b = np.logical_or(intercepts < 1e-6, intercepts > 1e6)
-
-        # replace these values with nadir
-        if np.any(b):
-            intercepts[b] = nadir_point[b]
-
-    # if even that point is too small still (after taking the nadir point usually - if only one dominated point it is 0)
-    b = intercepts < 1e-6
-    intercepts[b] = worst_point[b]
+    intercepts[intercepts < 1e-16] = 1e-16
 
     return intercepts
 
 
 def associate_to_niches(F, niches, ideal_point, intercepts, utopianEpsilon=-0.001):
-
     # normalize by ideal point and intercepts
     N = (F - ideal_point) / intercepts
 

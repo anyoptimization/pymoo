@@ -4,6 +4,7 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from pymoo.model.algorithm import Algorithm
+from pymoo.model.evaluator import Evaluator
 from pymoo.model.population import Population
 
 
@@ -54,6 +55,7 @@ class GeneticAlgorithm(Algorithm):
                  survival,
                  n_offsprings=None,
                  eliminate_duplicates=False,
+                 func_repair=None,
                  **kwargs
                  ):
 
@@ -67,6 +69,7 @@ class GeneticAlgorithm(Algorithm):
         self.survival = survival
         self.n_offsprings = n_offsprings
         self.eliminate_duplicates = eliminate_duplicates
+        self.func_repair = func_repair
 
         # default set the number of offsprings to the population size
         if self.n_offsprings is None:
@@ -78,7 +81,8 @@ class GeneticAlgorithm(Algorithm):
         # do the mating and evaluate the offsprings
         off = Population()
         off.X = self._mating(pop)
-        off.F, off.CV = self.evaluator.eval(self.problem, off.X)
+        off.F, off.CV, off.G = self.evaluator.eval(self.problem, off.X,
+                                                   return_constraint_violation=True, return_constraints=True)
 
         # do the survival selection with the merged population
         pop.merge(off)
@@ -86,24 +90,25 @@ class GeneticAlgorithm(Algorithm):
 
         return off
 
-    def _solve(self, problem, evaluator):
+    def _solve(self, problem, termination):
 
-        # for convenience add to class attributes for access in all sub-methods
-        self.problem, self.evaluator = problem, evaluator
+        # always create a new function evaluator which is counting the evaluations
+        self.problem = problem
+        self.evaluator = Evaluator()
 
         # dictionary that shared among the modules. Note, here variables can be modified and the changes will reflect.
         # all variables here are only valid for one run using the solve method.
         self.D = {}
 
         # generation counter
-        n_gen = 0
+        n_gen = 1
 
         # initialize the first population and evaluate it
         pop = self._initialize()
         self._each_iteration({'n_gen': n_gen, 'pop': pop, **self.D}, first=True)
 
-        # while there are functions evaluations left
-        while evaluator.has_remaining():
+        # while termination criterium not fulfilled
+        while termination.do_continue({'n_gen': n_gen, 'n_eval': self.evaluator.n_eval, 'pop': pop, **self.D}):
             n_gen += 1
 
             # do the next iteration
@@ -112,7 +117,7 @@ class GeneticAlgorithm(Algorithm):
             # execute the callback function in the end of each generation
             self._each_iteration({'n_gen': n_gen, 'pop': pop, **self.D})
 
-        return pop.X, pop.F, pop.G
+        return pop
 
     def _initialize(self):
 
@@ -121,7 +126,10 @@ class GeneticAlgorithm(Algorithm):
             pop.X = self.sampling
         else:
             pop.X = self.sampling.sample(self.problem, self.pop_size)
-        pop.F, pop.CV = self.evaluator.eval(self.problem, pop.X)
+
+        pop.F, pop.CV, pop.G = self.evaluator.eval(self.problem, pop.X,
+                                                   return_constraint_violation=True, return_constraints=True)
+
         return pop
 
     def _mating(self, pop):
@@ -145,6 +153,10 @@ class GeneticAlgorithm(Algorithm):
 
             # do the mutation
             _X = self.mutation.do(self.problem, _X, out=self.D, **self.D)
+
+            # repair the individuals if necessary
+            if self.func_repair is not None:
+                self.func_repair(self.problem, _X)
 
             # eliminate duplicates if too close to the current population
             if self.eliminate_duplicates:

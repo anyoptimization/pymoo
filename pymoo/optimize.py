@@ -1,19 +1,18 @@
 import numpy as np
 
-from pymoo.algorithms.adaptive_nsga3 import AdaptiveNSGA3
 from pymoo.algorithms.moead import MOEAD
 from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.algorithms.nsga3 import NSGA3
-from pymoo.algorithms.rnsga3 import RNSGA3
 from pymoo.algorithms.so_DE import DifferentialEvolution
 from pymoo.algorithms.so_genetic_algorithm import SingleObjectiveGeneticAlgorithm
 from pymoo.algorithms.unsga3 import UNSGA3
-from pymoo.model.evaluator import Evaluator
+from pymoo.experimental.adaptive_nsga3 import AdaptiveNSGA3
+from pymoo.model.termination import MaximumFunctionCallTermination, MaximumGenerationTermination, IGDTermination
 from pymoo.rand import random
 from pymop.problem import Problem
 
 
-def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, fun_args={}, method='auto',
+def minimize(fun, xl=None, xu=None, termination=('n_gen', 200), n_var=None, fun_args={}, method='auto',
              method_args={},
              seed=None, callback=None, disp=True, save_history=False):
     """
@@ -114,7 +113,11 @@ def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, f
     # create an evaluator defined by the termination criterium
     termination_criterium, termination_val = termination
     if termination_criterium == 'n_eval':
-        evaluator = Evaluator(termination_val)
+        termination = MaximumFunctionCallTermination(termination_val)
+    elif termination_criterium == 'n_gen':
+        termination = MaximumGenerationTermination(termination_val)
+    elif termination_criterium == 'igd':
+        termination = IGDTermination(problem, termination_val)
     else:
         raise Exception('Unknown Termination criterium: %s' % termination_criterium)
 
@@ -122,11 +125,11 @@ def minimize(fun, xl=None, xu=None, termination=('n_eval', 10000), n_var=None, f
     if seed is None:
         seed = random.randint(1, 10000)
 
-    return minimize_(problem, evaluator, method=method, method_args=method_args, seed=seed,
+    return _minimize(problem, termination, method=method, method_args=method_args, seed=seed,
                      callback=callback, disp=disp, save_history=save_history)
 
 
-def minimize_(problem, evaluator, method, method_args={}, seed=1,
+def _minimize(problem, termination, method, method_args={}, seed=1,
               callback=None, disp=False, save_history=False):
     """
         See :func:`~pymoo.optimize.minimize` for description. Instead of a function the parameter is a problem class.
@@ -139,8 +142,6 @@ def minimize_(problem, evaluator, method, method_args={}, seed=1,
         algorithm = NSGA3(**method_args)
     elif method == 'unsga3':
         algorithm = UNSGA3(**method_args)
-    elif method == 'rnsga3':
-        algorithm = RNSGA3(**method_args)
     elif method == 'ansga3':
         algorithm = AdaptiveNSGA3(**method_args)
     elif method == 'moead':
@@ -152,11 +153,13 @@ def minimize_(problem, evaluator, method, method_args={}, seed=1,
     else:
         raise Exception('Unknown method: %s' % method)
 
-    X, F, G = algorithm.solve(problem, evaluator, disp=disp, callback=callback, seed=seed,
-                              save_history=save_history)
-
-    res = {'problem': problem, 'X': X, 'F': F, 'G': G}
-    if save_history:
-        res['history'] = algorithm.history
+    res = algorithm.solve(problem,
+                          termination,
+                          disp=disp,
+                          callback=callback,
+                          seed=seed,
+                          return_only_feasible=True,
+                          return_only_non_dominated=True,
+                          save_history=save_history)
 
     return res

@@ -6,7 +6,7 @@ class Evaluator:
 
     """
 
-    def __init__(self, n_eval=10000):
+    def __init__(self, n_eval=1e10):
         self.n_max_eval = n_eval
         self.n_eval = 0
 

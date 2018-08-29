@@ -1,10 +1,11 @@
 import copy
 from abc import abstractmethod
 
-from pymoo.model.evaluator import Evaluator
+import numpy as np
+
+from pymoo.model.termination import MaximumFunctionCallTermination
 from pymoo.rand import random
-from pymoo.util.non_dominated_sorting import NonDominatedSorting, find_non_dominated
-from pymop.problem import Problem
+from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 
 class Algorithm:
@@ -26,7 +27,7 @@ class Algorithm:
 
     def solve(self,
               problem,
-              evaluator,
+              termination,
               seed=1,
               disp=False,
               callback=None,
@@ -75,14 +76,8 @@ class Algorithm:
 
         Returns
         -------
-        X: matrix
-            Design space
-
-        F: matrix
-            Objective space
-
-        G: matrix
-            Constraint space
+        res : dict
+            A dictionary that saves all the results of the algorithm. Also, the history if save_history is true.
 
         """
 
@@ -93,29 +88,23 @@ class Algorithm:
         self.callback = callback
         self.save_history = save_history
 
-        # this allows to provide only an integer instead of an evaluator object
-        if not isinstance(evaluator, Evaluator):
-            evaluator = Evaluator(evaluator)
+        if isinstance(termination, int):
+            termination = MaximumFunctionCallTermination(termination)
 
         # call the algorithm to solve the problem
-        X, F, G = self._solve(problem, evaluator, **kwargs)
+        pop = self._solve(problem, termination, **kwargs)
 
         if return_only_feasible:
-            if G is not None and G.shape[0] == len(F) and G.shape[1] > 0:
-                cv = Problem.calc_constraint_violation(G)[:, 0]
-                X = X[cv <= 0, :]
-                F = F[cv <= 0, :]
-                if G is not None:
-                    G = G[cv <= 0, :]
+            feasible = np.where(pop.CV[:, 0] <= 0.0)[0]
+            pop.filter(feasible)
 
-        if return_only_non_dominated:
-            idx_non_dom = find_non_dominated(F)
-            X = X[idx_non_dom, :]
-            F = F[idx_non_dom, :]
-            if G is not None:
-                G = G[idx_non_dom, :]
+        if pop.size() > 0 and return_only_non_dominated:
+            I = NonDominatedSorting().do(pop.F, only_non_dominated_front=True)
+            pop.filter(I)
 
-        return X, F, G
+        res = {'problem': problem, 'X': pop.X, 'F': pop.F, 'CV': pop.CV, 'G': pop.G, 'history': self.history}
+
+        return res
 
     # method that is called each iteration to call so#me methods regularly
     def _each_iteration(self, D, first=False, **kwargs):
@@ -143,5 +132,5 @@ class Algorithm:
         print(regex.format(*[str(val).ljust(width) for _, val, width in disp]))
 
     @abstractmethod
-    def _solve(self, problem, evaluator):
+    def _solve(self, problem, termination):
         pass
