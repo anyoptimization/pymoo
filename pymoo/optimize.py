@@ -6,7 +6,6 @@ from pymoo.algorithms.nsga3 import NSGA3
 from pymoo.algorithms.so_DE import DifferentialEvolution
 from pymoo.algorithms.so_genetic_algorithm import SingleObjectiveGeneticAlgorithm
 from pymoo.algorithms.unsga3 import UNSGA3
-from pymoo.experimental.adaptive_nsga3 import AdaptiveNSGA3
 from pymoo.model.termination import MaximumFunctionCallTermination, MaximumGenerationTermination, IGDTermination
 from pymoo.rand import random
 from pymop.problem import Problem
@@ -142,8 +141,6 @@ def _minimize(problem, termination, method, method_args={}, seed=1,
         algorithm = NSGA3(**method_args)
     elif method == 'unsga3':
         algorithm = UNSGA3(**method_args)
-    elif method == 'ansga3':
-        algorithm = AdaptiveNSGA3(**method_args)
     elif method == 'moead':
         algorithm = MOEAD(**method_args)
     elif method == 'de':
