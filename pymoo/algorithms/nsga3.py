@@ -10,7 +10,7 @@ from pymoo.operators.survival.reference_line_survival import ReferenceLineSurviv
 from pymoo.rand import random
 from pymoo.util.display import disp_multi_objective
 from pymoo.util.dominator import compare
-from pymoo.util.reference_directions import get_uniform_weights, get_ref_dirs_from_section, get_multi_layer_ref_dirs
+from pymoo.util.reference_directions import get_ref_dirs_from_section, get_multi_layer_ref_dirs
 
 
 class NSGA3(GeneticAlgorithm):
