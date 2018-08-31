@@ -1,6 +1,9 @@
+
+
 import numpy as np
 from numpy.linalg import LinAlgError
 
+from pymoo.cython.my_math import cython_calc_perpendicular_distance
 from pymoo.model.survival import Survival, split_by_feasibility
 from pymoo.rand import random
 from pymoo.util.mathematics import Mathematics
@@ -11,10 +14,9 @@ class ReferenceLineSurvival(Survival):
     def __init__(self, ref_dirs):
         super().__init__()
         self.ref_dirs = ref_dirs
-
         self.extreme_points = None
         self.intercepts = None
-        self.ideal_point = None
+        self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
 
     def _do(self, pop, n_survive, out=None, **kwargs):
 
@@ -41,24 +43,17 @@ class ReferenceLineSurvival(Survival):
             F = pop.F[feasible, :]
 
             # find or usually update the new ideal point - from feasible solutions
-            if self.ideal_point is None:
-                self.ideal_point = np.min(F, axis=0)
-            else:
-                self.ideal_point = np.min(np.concatenate([self.ideal_point[None, :], F], axis=0), axis=0)
+            self.ideal_point = np.min(np.concatenate([self.ideal_point[None, :], F], axis=0), axis=0)
 
             # calculate the fronts of the population
             fronts, _rank = NonDominatedSorting(epsilon=Mathematics.EPS).do(F, return_rank=True,
                                                                             n_stop_if_ranked=n_survive_feasible)
-            non_dominated = fronts[0]
+            non_dominated, last_front = fronts[0], fronts[-1]
 
             # calculate the worst point of feasible individuals
             worst_point = np.max(F, axis=0)
             # calculate the nadir point from non dominated individuals
             nadir_point = np.max(F[non_dominated, :], axis=0)
-
-            # consider only the first n fronts form now on - including splitting front
-            I = np.concatenate(fronts)
-            F = F[I, :]
 
             # find the extreme points for normalization
             self.extreme_points = get_extreme_points(F, self.ideal_point, extreme_points=self.extreme_points)
@@ -66,7 +61,9 @@ class ReferenceLineSurvival(Survival):
             # find the intercepts for normalization and do backup if gaussian elimination fails
             self.intercepts = get_intercepts(self.extreme_points, self.ideal_point, nadir_point, worst_point)
 
-            # print(self.intercepts + self.ideal_point)
+            # index of the first n fronts form now on - including splitting front
+            I = np.concatenate(fronts)
+            F = F[I, :]
 
             # associate individuals to niches
             niche_of_individuals, dist_to_niche = associate_to_niches(F, self.ref_dirs, self.ideal_point,
@@ -79,59 +76,25 @@ class ReferenceLineSurvival(Survival):
             # otherwise we have to select using niching
             else:
 
-                # number of individuals taken by fronts - if only one front niching over all solutions
-                if len(fronts) == 1:
-                    n_until_splitting_front = 0
-                else:
-                    n_until_splitting_front = len(np.concatenate(fronts[:-1]))
-                _survivors = np.arange(n_until_splitting_front).tolist()
+                _last_front = np.arange(len(I) - len(last_front), len(I))
+                _until_last_front = np.arange(0, len(I) - len(last_front))
 
-                # last front to be assigned to
-                last_front = np.arange(n_until_splitting_front, F.shape[0])
+                _survivors = []
+                n_remaining = n_survive_feasible
+                niche_count = np.zeros(len(self.ref_dirs), dtype=np.int)
 
-                # if the last front needs to be splitted
-                n_remaining = n_survive_feasible - len(_survivors)
+                if len(fronts) > 1:
+                    _survivors.extend(_until_last_front)
+                    niche_count = calc_niche_count(len(self.ref_dirs), niche_of_individuals[_until_last_front])
+                    n_remaining -= len(_until_last_front)
 
-                # for each reference direction the niche count
-                niche_count = np.zeros(len(self.ref_dirs))
-                for i in niche_of_individuals[_survivors]:
-                    niche_count[i] += 1
+                # S = niching(F[_last_front, :], n_remaining, niche_count, niche_of_individuals[_last_front],
+                #            dist_to_niche[_last_front])
 
-                # relative index to dist and the niches just of the last front
-                lf_dist_to_niche = dist_to_niche[last_front]
-                lf_niche_of_individuals = niche_of_individuals[last_front]
+                S = niching_vectorized(F[_last_front, :], n_remaining, niche_count, niche_of_individuals[_last_front],
+                                       dist_to_niche[_last_front])
 
-                # boolean array of elements that are considered for each iteration
-                remaining_last_front = np.full(len(last_front), True)
-
-                while n_remaining > 0:
-
-                    # all niches where new individuals can be assigned to
-                    next_niches_list = np.unique(lf_niche_of_individuals[remaining_last_front])
-
-                    # pick a niche with minimum assigned individuals - break tie if necessary
-                    next_niche_count = niche_count[next_niches_list]
-                    next_niche = np.where(next_niche_count == next_niche_count.min())[0]
-                    next_niche = next_niches_list[next_niche]
-                    next_niche = next_niche[random.randint(0, len(next_niche))]
-
-                    # indices of individuals that are considered and assign to next_niche
-                    next_ind = np.where(np.logical_and(lf_niche_of_individuals == next_niche, remaining_last_front))[0]
-
-                    if len(next_ind) == 1:
-                        next_ind = next_ind[0]
-                    elif niche_count[next_niche] == 0:
-                        next_ind = next_ind[np.argmin(lf_dist_to_niche[next_ind])]
-                    else:
-                        # not sorted so randomly the first is fine here
-                        next_ind = next_ind[0]
-                        # next_ind = next_ind[random.randint(0, len(next_ind))]
-
-                    remaining_last_front[next_ind] = False
-                    _survivors.append(int(last_front[next_ind]))
-
-                    niche_count[next_niche] += 1
-                    n_remaining -= 1
+                _survivors.extend(_last_front[S].tolist())
 
             # reindex the survivors to the absolute index
             survivors = feasible[I[_survivors]]
@@ -159,6 +122,124 @@ class ReferenceLineSurvival(Survival):
         pop.filter(survivors)
 
 
+def niching_vectorized(F, n_survive, niche_count, niche_of_individuals, dist_to_niche):
+
+    survivors = []
+    n_niches = len(niche_count)
+
+    # maximum niche count of the last front
+    max_niche_count = np.max(np.unique(niche_of_individuals, return_counts=True)[1])
+
+    # stores for each niche the corresponding individuals - (-1=does not exist, -2=added before, i=otherwise)
+    individuals_of_niches = np.full((n_niches, max_niche_count + 1), -1, dtype=np.int)
+
+    # the minimum distance to the niche - just used to find the closest niche
+    min_dist_closest_to_niche = np.full(n_niches, np.inf)
+
+    # closest individual to niche - (NOTE: it is just an index to individuals_of_niches!)
+    ind_closest_to_niche = np.full(n_niches, -1, dtype=np.int)
+
+    # fill individuals_of_niches and ind_closest_to_niche with values
+    counter = np.zeros(n_niches, dtype=np.int)
+    for i in range(F.shape[0]):
+        niche = niche_of_individuals[i]
+        individuals_of_niches[niche, counter[niche]] = i
+
+        if dist_to_niche[i] < min_dist_closest_to_niche[niche]:
+            min_dist_closest_to_niche[niche] = dist_to_niche[i]
+            ind_closest_to_niche[niche] = counter[niche]
+
+        counter[niche] += 1
+
+    # this mask is used to selected for the corresponding niches the next individuals
+    mask = np.zeros(n_niches, dtype=np.int)
+
+    # while we do have individuals to assign
+    while len(survivors) < n_survive:
+
+        # only consider niches that do have at least one individual assigned
+        niches_remaining = np.where(individuals_of_niches[np.arange(n_niches), mask] != -1)[0]
+        niche_count_remaining = niche_count[niches_remaining]
+
+        # the minimum niche count of the remaining niches
+        min_niche_count = np.min(niche_count_remaining)
+
+        # get all niches with the minimum assignment
+        selected_niches = niches_remaining[niche_count_remaining == min_niche_count]
+
+        # remaining individuals which is the same as niches to select
+        n_remaining = n_survive - len(survivors)
+
+        # if only a few niches need to be select to fill up until n_survive - select the randomly
+        if n_remaining < len(selected_niches):
+            P = random.perm(len(selected_niches))
+            selected_niches = selected_niches[P[:n_remaining]]
+
+        # if we did not assign any individual
+        if min_niche_count == 0:
+
+            # select the closest individual to niche
+            closest_individuals_of_niche = ind_closest_to_niche[selected_niches]
+            S = individuals_of_niches[selected_niches, closest_individuals_of_niche]
+
+            # since increasing does not work - here the selected are marked and skipped later
+            individuals_of_niches[selected_niches, closest_individuals_of_niche] = -2
+
+        else:
+            # otherwise we just select one randomly through mask (values or not sorted)
+            S = individuals_of_niches[selected_niches, mask[selected_niches]]
+            # increase the mask by one for selected
+            mask[selected_niches] += 1
+
+        # if the mask points to an individual select by closest distance just point to the next
+        mask[individuals_of_niches[np.arange(n_niches), mask] == -2] += 1
+
+        # increase the niche count of the corresponding niche
+        niche_count[selected_niches] += 1
+
+        # save the individuals that survived
+        survivors.extend(S)
+
+    return survivors
+
+
+def niching(F, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
+    survivors = []
+
+    # boolean array of elements that are considered for each iteration
+    mask = np.full(F.shape[0], True)
+
+    while len(survivors) < n_remaining:
+
+        # all niches where new individuals can be assigned to
+        next_niches_list = np.unique(niche_of_individuals[mask])
+
+        # pick a niche with minimum assigned individuals - break tie if necessary
+        next_niche_count = niche_count[next_niches_list]
+        next_niche = np.where(next_niche_count == next_niche_count.min())[0]
+        next_niche = next_niches_list[next_niche]
+        next_niche = next_niche[random.randint(0, len(next_niche))]
+
+        # indices of individuals that are considered and assign to next_niche
+        next_ind = np.where(np.logical_and(niche_of_individuals == next_niche, mask))[0]
+
+        if len(next_ind) == 1:
+            next_ind = next_ind[0]
+        elif niche_count[next_niche] == 0:
+            next_ind = next_ind[np.argmin(dist_to_niche[next_ind])]
+        else:
+            # not sorted so randomly the first is fine here
+            next_ind = next_ind[0]
+            # next_ind = next_ind[random.randint(0, len(next_ind))]
+
+        mask[next_ind] = False
+        survivors.append(int(next_ind))
+
+        niche_count[next_niche] += 1
+
+    return survivors
+
+
 def get_extreme_points(F, ideal_point, extreme_points=None):
     # calculate the asf which is used for the extreme point decomposition
     asf = np.eye(F.shape[1])
@@ -181,12 +262,22 @@ def get_intercepts(extreme_points, ideal_point, nadir_point, worst_point):
     nadir_point -= ideal_point
     worst_point -= ideal_point
 
+    use_nadir = False
+
     try:
         # find the intercepts using gaussian elimination
-        intercepts = 1 / np.linalg.solve(extreme_points - ideal_point, np.ones(extreme_points.shape[1]))
+        plane = np.linalg.solve(extreme_points - ideal_point, np.ones(extreme_points.shape[1]))
+
+        # if the plane
+        if np.any(plane == 0):
+            use_nadir = True
+        else:
+            intercepts = 1 / plane
 
     except LinAlgError:
-        # set to zero which will be handled later
+        use_nadir = True
+
+    if use_nadir:
         intercepts = nadir_point
 
     # if even that point is too small
@@ -206,10 +297,11 @@ def associate_to_niches(F, niches, ideal_point, intercepts, utopianEpsilon=-0.00
     # make sure that no values are 0. (subtracting a negative epsilon)
     N -= utopianEpsilon
 
-    dist_matrix = calc_perpendicular_dist_matrix(N, niches)
+    #dist_matrix = calc_perpendicular_dist_matrix(N, niches)
+    dist_matrix = cython_calc_perpendicular_distance(N, niches)
 
     niche_of_individuals = np.argmin(dist_matrix, axis=1)
-    dist_to_niche = np.min(dist_matrix, axis=1)
+    dist_to_niche = dist_matrix[np.arange(F.shape[0]), niche_of_individuals]
 
     return niche_of_individuals, dist_to_niche
 
@@ -226,3 +318,10 @@ def calc_perpendicular_dist_matrix(N, ref_dirs):
     matrix = np.reshape(val, (len(N), len(ref_dirs)))
 
     return matrix
+
+
+def calc_niche_count(n_niches, niche_of_individuals):
+    niche_count = np.zeros(n_niches, dtype=np.int)
+    index, count = np.unique(niche_of_individuals, return_counts=True)
+    niche_count[index] = count
+    return niche_count
