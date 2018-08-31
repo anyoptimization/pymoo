@@ -21,8 +21,8 @@ def get_ref_dirs_from_section(n_obj, n_sections):
 
     return M
 
-def get_multi_layer_ref_dirs(n_obj, p_and_scaling):
 
+def get_multi_layer_ref_dirs(n_obj, p_and_scaling):
     ref_dirs = []
 
     for p, scaling in p_and_scaling:
@@ -171,19 +171,16 @@ if __name__ == '__main__':
     import time
     import matplotlib.pyplot as plt
 
-    ref_dirs = get_multi_layer_ref_dirs(3, [(12,1.0), (12, 0.1)])
-
+    ref_dirs = get_multi_layer_ref_dirs(3, [(12, 1.0), (12, 0.1)])
 
     plot_3d(ref_dirs)
     exit(0)
-
 
     pt = np.array([[0.4, 0.6, 0.2], [0.8, 0.6, 0.8]])
     # pt = np.array([[0.1, 2, 1]])
     start = time.time()
     w = get_ref_dirs_from_points(pt, n_obj=3, pop_size=100)
     print(f'{time.time()-start}')
-
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')

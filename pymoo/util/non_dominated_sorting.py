@@ -5,7 +5,7 @@ from pymoo.util.dominator import Dominator
 
 class NonDominatedSorting:
 
-    def __init__(self, epsilon=0.0, method="cython_fast_non_dominated_sort") -> None:
+    def __init__(self, epsilon=0.0, method="cython_fast_best_order_sort") -> None:
         super().__init__()
         self.epsilon = epsilon
         self.method = method
@@ -28,6 +28,10 @@ class NonDominatedSorting:
         elif self.method == 'cython_best_order_sort':
             from pymoo.cython.non_dominated_sorting import best_order_sort
             fronts = best_order_sort(F, self.epsilon)
+
+        elif self.method == 'cython_fast_best_order_sort':
+            from pymoo.cython.non_dominated_sorting import fast_best_order_sort
+            fronts = fast_best_order_sort(F, self.epsilon)
 
         else:
             raise Exception("Unknown non-dominated sorting method: %s" % self.method)
