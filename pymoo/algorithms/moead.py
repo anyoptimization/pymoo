@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from pymoo.cython.decomposition import cython_pbi
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.default_operators import set_if_none
@@ -17,7 +16,6 @@ class MOEAD(GeneticAlgorithm):
                  ref_dirs,
                  n_neighbors=15,
                  decomposition="cython_pbi",
-                 crossover="sbx",
                  prob_neighbor_mating=0.7,
                  **kwargs):
 
@@ -79,14 +77,15 @@ class MOEAD(GeneticAlgorithm):
                 N = self.neighbors[i, :]
                 w = self.ref_dirs[N, :]
 
-                # calculate the decomposed values for each neighbour
-                FV = decompose(pop.F[N, :], w, method=self.decomposition, ideal_point=self.ideal_point)[0]
-                off_FV = decompose(F[None, :], w, method=self.decomposition, ideal_point=self.ideal_point)[0]
+                # calculate the decomposed values for each neighbor
+                FV = decompose(pop.F[N, :], w, method=self.decomposition, ideal_point=self.ideal_point, theta=0.01)
+                off_FV = decompose(F[None, :], w, method=self.decomposition, ideal_point=self.ideal_point, theta=0.01)
 
                 # get the absolute index in F where offspring is better than the current F (decomposed space)
                 neighbors_to_update = N[off_FV < FV]
                 pop.F[neighbors_to_update, :] = F
                 pop.X[neighbors_to_update, :] = X
+
 
             else:
 
@@ -95,10 +94,11 @@ class MOEAD(GeneticAlgorithm):
                     # the weight vector of this neighbor
                     w = self.ref_dirs[neighbor, :]
 
-                    FV = decompose(pop.F[[neighbor], :], w, method=self.decomposition, ideal_point=self.ideal_point)
-                    off_FV = decompose(F[None, :], w, method=self.decomposition, ideal_point=self.ideal_point)
+                    FV = decompose(pop.F[[neighbor], :], w, method=self.decomposition, ideal_point=self.ideal_point,
+                                   theta=0.01)
+                    off_FV = decompose(F[None, :], w, method=self.decomposition, ideal_point=self.ideal_point,
+                                       theta=0.01)
 
                     # replace if better
                     if np.all(off_FV < FV):
                         pop.X[neighbor, :], pop.F[neighbor, :] = X, F
-

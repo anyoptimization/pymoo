@@ -11,15 +11,10 @@ def decompose(F, weights, method, **kwargs):
         return cython_pbi(F, weights, **kwargs)
 
 
-def pbi(F, weights, ideal_point, theta=0.1, **kwargs):
-    d1 = np.linalg.norm((F - ideal_point) * weights, axis=1) / np.linalg.norm(weights)
-    d2 = np.linalg.norm(F - (ideal_point - d1[:,None] * weights), axis=1)
+def pbi(F, weights, ideal_point, theta, **kwargs):
+    d1 = np.linalg.norm((F - ideal_point) * weights, axis=1) / np.linalg.norm(weights, axis=1)
+    d2 = np.linalg.norm(F - (ideal_point - d1[:, None] * weights), axis=1)
     return d1 + theta * d2
-
-
-def moead(F, weights, ideal_point, alpha=0.1, **kwargs):
-    v = (F - ideal_point) * (1 / F.shape[1] + alpha * weights)
-    return np.max(v, axis=1)
 
 
 def tchebi(F, weights, ideal_point, **kwargs):
