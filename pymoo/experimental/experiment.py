@@ -4,12 +4,13 @@ import numpy as np
 
 from pymoo.util.plotting import plot, animate
 from pymoo.util.reference_directions import get_ref_dirs_from_section
+from pymop.problems.dtlz import DTLZ2
 from pymop.problems.zdt import ZDT1, ZDT4
 
 
 def run():
 
-    problem = ZDT4()
+    problem = ZDT1()
 
     start_time = time.time()
 
