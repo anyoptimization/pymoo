@@ -88,11 +88,11 @@ class ReferenceLineSurvival(Survival):
                     niche_count = calc_niche_count(len(self.ref_dirs), niche_of_individuals[_until_last_front])
                     n_remaining -= len(_until_last_front)
 
-                # S = niching(F[_last_front, :], n_remaining, niche_count, niche_of_individuals[_last_front],
-                #            dist_to_niche[_last_front])
+                S = niching(F[_last_front, :], n_remaining, niche_count, niche_of_individuals[_last_front],
+                            dist_to_niche[_last_front])
 
-                S = niching_vectorized(F[_last_front, :], n_remaining, niche_count, niche_of_individuals[_last_front],
-                                       dist_to_niche[_last_front])
+                #S = niching_vectorized(F[_last_front, :], n_remaining, niche_count, niche_of_individuals[_last_front],
+                #                       dist_to_niche[_last_front])
 
                 _survivors.extend(_last_front[S].tolist())
 
