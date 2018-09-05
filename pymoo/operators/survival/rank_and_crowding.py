@@ -7,7 +7,7 @@ from pymoo.util.randomized_argsort import randomized_argsort
 
 
 class RankAndCrowdingSurvival(Survival):
-    def _do(self, pop, n_survive, out=None, **kwargs):
+    def _do(self, pop, n_survive, D=None, **kwargs):
 
         # split by feasibility
         feasible, infeasible = split_by_feasibility(pop)
@@ -61,9 +61,9 @@ class RankAndCrowdingSurvival(Survival):
         # now truncate the population
         pop.filter(survivors)
 
-        if out is not None:
-            out['rank'] = rank
-            out['crowding'] = crowding
+        if D is not None:
+            D['rank'] = rank
+            D['crowding'] = crowding
 
 
 def calc_crowding_distance(F):

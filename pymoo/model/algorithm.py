@@ -102,7 +102,8 @@ class Algorithm:
             I = NonDominatedSorting().do(pop.F, only_non_dominated_front=True)
             pop.filter(I)
 
-        res = {'problem': problem, 'X': pop.X, 'F': pop.F, 'CV': pop.CV, 'G': pop.G, 'history': self.history}
+        res = {'problem': problem, 'history': self.history}
+        res = {**res, **pop.D}
 
         return res
 
@@ -111,7 +112,7 @@ class Algorithm:
 
         # display the output if defined by the algorithm
         if self.disp and self.func_display_attrs is not None:
-            disp = self.func_display_attrs(self.problem, self.evaluator, D)
+            disp = self.func_display_attrs(D['problem'], D['evaluator'], D)
             if disp is not None:
                 self._display(disp, header=first)
 

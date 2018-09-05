@@ -5,9 +5,9 @@ from pymoo.util.dominator import Dominator
 
 class NonDominatedSorting:
 
-    def __init__(self, epsilon=0.0, method="cython_fast_non_dominated_sort") -> None:
+    def __init__(self, epsilon=0.0, method="cython_best_order_sort") -> None:
         super().__init__()
-        self.epsilon = epsilon
+        self.epsilon = float(epsilon)
         self.method = method
 
     def do(self, F, return_rank=False, only_non_dominated_front=False, n_stop_if_ranked=None):
