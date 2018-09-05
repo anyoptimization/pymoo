@@ -9,8 +9,8 @@ from pymop.problems.zdt import ZDT1, ZDT4
 
 
 def run():
-
-    problem = ZDT1()
+    problem = DTLZ2()
+    # problem = ZDT1()
 
     start_time = time.time()
 
@@ -18,12 +18,14 @@ def run():
 
     res = minimize(problem,
                    method='moead',
-                   method_args={'ref_dirs': get_ref_dirs_from_section(problem.n_obj, 99)},
+                   method_args={'ref_dirs': get_ref_dirs_from_section(problem.n_obj, 12)},
                    termination=('n_gen', 200),
                    seed=1,
                    save_history=True,
                    disp=True)
-    F = res['F']
+    X, F = res['X'], res['F']
+    print(X)
+    print(F)
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
@@ -34,7 +36,6 @@ def run():
         plot(F, problem)
 
     if save_animation:
-
         def fun(ax, entry):
             nadir_point = entry['nadir_point'][None, :]
             ax.scatter(nadir_point[:, 0], nadir_point[:, 1], marker="x")
@@ -51,9 +52,6 @@ def run():
             # set the scatter object with padding
             ax.set_xlim(min[0], max[0])
             ax.set_ylim(min[1], max[1])
-
-
-
 
         animate('%s.mp4' % problem.name(), res['history'], problem)
 

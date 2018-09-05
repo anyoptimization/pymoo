@@ -17,7 +17,7 @@ class MaximumFunctionCallTermination(Termination):
         self.n_max_evals = n_max_evals
 
     def do_continue(self, D):
-        return D['n_eval'] < self.n_max_evals
+        return D['evaluator'].n_eval < self.n_max_evals
 
 
 class MaximumGenerationTermination(Termination):

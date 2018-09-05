@@ -1,9 +1,6 @@
-import copy
-
 import numpy as np
 from scipy import special
 
-from pymoo.rand.random import random
 from pymoo.util.plotting import plot_3d
 
 
@@ -34,9 +31,13 @@ def get_multi_layer_ref_dirs(n_obj, p_and_scaling):
 
 
 # returns the closest possible number of references lines to given one
-def get_ref_dirs_from_n(n_obj, n_refs, max_sections=100):
+def get_ref_dirs_from_n(n_obj, n_refs, max_sections=1000):
+
+    if n_obj == 1:
+        return np.array([[1.0]])
+
     n_sections = np.array([get_number_of_reference_directions(n_obj, i) for i in range(max_sections)])
-    idx = np.argmin((n_sections < n_refs).astype(np.int))
+    idx = np.argmin((n_sections <= n_refs).astype(np.int))
     M = get_ref_dirs_from_section(n_obj, idx - 1)
     return M
 
@@ -74,7 +75,7 @@ def get_uniform_weights(n_points, n_dim, max_sections=300):
     return M
 
 
-def get_ref_dirs_from_points(ref_point, n_obj, pop_size, mu=0.1, method='uniform', p=None):
+def get_ref_dirs_from_points(ref_point, ref_dirs, mu=0.1, method='uniform', p=None):
     """
     This function takes user specified reference points, and creates smaller sets of equidistant
     Das-Dennis points around the projection of user points on the Das-Dennis hyperplane
@@ -84,53 +85,34 @@ def get_ref_dirs_from_points(ref_point, n_obj, pop_size, mu=0.1, method='uniform
     :return: Set of reference points
     """
 
-    def get_directions(method, n_obj, pop_size):
-        if method == 'uniform':
-            if p is None:
-                reference_directions = get_ref_dirs_from_n(n_obj, pop_size)  # Das-Dennis points
-            else:
-                reference_directions = get_ref_dirs_from_section(n_obj, p)
+    n_obj = ref_point.shape[1]
 
-        elif method == 'random':
-            reference_directions = random(int(pop_size), int(n_obj))
-            reference_directions = reference_directions - np.dot(reference_directions - point_on_plane, n_vector)[:,
-                                                          None] * n_vector
-        #  Need to find a good way of getting p values for nested reference directions
-        # elif method == 'nested':
-        #     reference_directions = get_ref_dirs_from_section(n_obj, 2)  # Das-Dennis points
-        #     # ref_dirs.extend(reference_directions)
-        #     nested = get_ref_dirs_from_section(n_obj, 2)
-        #     nested = 0.3333333 + 0.5 * (nested - 0.3333333)  # Shrink the nested region
-        #     nested = (nested - np.dot(nested - point_on_plane, n_vector)[:, None] * n_vector)
-        #     reference_directions = np.vstack((reference_directions, nested))
-        #     # return np.array(ref_dirs)
-        return reference_directions
-
-    ref_dirs = []
+    val = []
     n_vector = np.ones(n_obj) / np.sqrt(n_obj)  # Normal vector of Das Dennis plane
     point_on_plane = np.eye(n_obj)[0]  # Point on Das-Dennis
-    pop_size = pop_size / len(ref_point)  # Limit the number of Das-Dennis points
-    reference_directions = get_directions(method, n_obj, pop_size)
+
     for point in ref_point:
 
-        ref_dir = copy.deepcopy(reference_directions)  # Copy of computed reference directions
-        ref_dir = mu * ref_dir
-        cent = np.mean(ref_dir, axis=0)  # Find centroid of shrunken reference points
+        ref_dir_for_aspiration_point = np.copy(ref_dirs)  # Copy of computed reference directions
+        ref_dir_for_aspiration_point = mu * ref_dir_for_aspiration_point
+
+        cent = np.mean(ref_dir_for_aspiration_point, axis=0)  # Find centroid of shrunken reference points
 
         # Project shrunken Das-Dennis points back onto original Das-Dennis hyperplane
         intercept = line_plane_intersection(np.zeros(n_obj), point, point_on_plane, n_vector)
         shift = intercept - cent  # shift vector
 
-        ref_dir += shift
+        ref_dir_for_aspiration_point += shift
+
         # If reference directions are located outside of first octant, redefine points onto the border
-        if not (ref_dir > 0).min():
-            ref_dir[ref_dir < 0] = 0
-            ref_dir = ref_dir / np.sum(ref_dir, axis=1)[:, None]
+        if not (ref_dir_for_aspiration_point > 0).min():
+            ref_dir_for_aspiration_point[ref_dir_for_aspiration_point < 0] = 0
+            ref_dir_for_aspiration_point = ref_dir_for_aspiration_point / np.sum(ref_dir_for_aspiration_point, axis=1)[
+                                                                          :, None]
+        val.extend(ref_dir_for_aspiration_point)
 
-        ref_dirs.extend(ref_dir)
-
-    ref_dirs.extend(np.eye(n_obj))  # Add extreme points
-    return np.array(ref_dirs)
+    val.extend(np.eye(n_obj))  # Add extreme points
+    return np.array(val)
 
 
 # intersection function

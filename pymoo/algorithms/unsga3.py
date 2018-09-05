@@ -17,8 +17,10 @@ class UNSGA3(NSGA3):
         return pop
 
 
-def comp_by_rank_and_ref_line_dist(pop, P, niche, rank, **kwargs):
+def comp_by_rank_and_ref_line_dist(pop, P, D):
     S = np.full(P.shape[0], np.nan)
+
+    rank, niche = D['niche'], D['rank']
 
     for i in range(P.shape[0]):
         a, b = P[i, 0], P[i, 1]

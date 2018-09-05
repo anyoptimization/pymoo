@@ -18,7 +18,7 @@ class ReferenceLineSurvival(Survival):
         self.intercepts = None
         self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
 
-    def _do(self, pop, n_survive, out=None, **kwargs):
+    def _do(self, pop, n_survive, D=None, **kwargs):
 
         # convert to integer for later usage
         n_survive = int(n_survive)
@@ -113,10 +113,10 @@ class ReferenceLineSurvival(Survival):
             dist_to_niche = np.concatenate([dist_to_niche, Mathematics.INF * np.ones(n_infeasible)])
 
         # set attributes globally for other modules
-        if out is not None:
-            out['rank'] = rank
-            out['niche'] = niche_of_individuals
-            out['dist_to_niche'] = dist_to_niche
+        if D is not None:
+            D['rank'] = rank
+            D['niche'] = niche_of_individuals
+            D['dist_to_niche'] = dist_to_niche
 
         # now truncate the population
         pop.filter(survivors)

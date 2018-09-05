@@ -3,6 +3,8 @@ import math
 import numpy as np
 from scipy.spatial.distance import cdist
 
+from pymoo.model.individual import Individual
+from pymoo.model.individual import get_genome, create_from_genome, create_as_objects
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.evaluator import Evaluator
 from pymoo.model.population import Population
@@ -70,6 +72,8 @@ class GeneticAlgorithm(Algorithm):
         self.n_offsprings = n_offsprings
         self.eliminate_duplicates = eliminate_duplicates
         self.func_repair = func_repair
+        self.clazz = None
+        self.D = {}
 
         # default set the number of offsprings to the population size
         if self.n_offsprings is None:
@@ -79,63 +83,91 @@ class GeneticAlgorithm(Algorithm):
 
         # do the iteration for the next generation - population objective is modified inplace
         # do the mating and evaluate the offsprings
-        off = Population()
-        off.X = self._mating(pop)
-        off.F, off.CV, off.G = self.evaluator.eval(self.problem, off.X,
-                                                   return_constraint_violation=True, return_constraints=True)
+        off = self._mating(pop)
+
+        # if it is a custom class also create the custom object and store it in the population
+        if self.clazz is not None:
+            off.individuals = create_from_genome(self.clazz, off.X)
+
+        off.F, off.CV, off.G = self.D['evaluator'].eval(self.D['problem'], off.X, D=self.D, individuals=off.individuals,
+                                                        return_constraint_violation=True, return_constraints=True)
+        self.D = {**self.D, 'off': off}
 
         # do the survival selection with the merged population
         pop.merge(off)
-        self.survival.do(pop, self.pop_size, out=self.D, **self.D)
+        self.survival.do(pop, self.pop_size, D=self.D)
 
         return off
 
     def _solve(self, problem, termination):
 
-        # always create a new function evaluator which is counting the evaluations
-        self.problem = problem
-        self.evaluator = Evaluator()
+        # the evaluator object which is counting the evaluations
+        evaluator = Evaluator()
 
-        # dictionary that shared among the modules. Note, here variables can be modified and the changes will reflect.
-        # all variables here are only valid for one run using the solve method.
-        self.D = {}
+        # always create a new function evaluator which is counting the evaluations
+        self.D = {**self.D, 'problem': problem, 'evaluator': evaluator}
 
         # generation counter
         n_gen = 1
 
         # initialize the first population and evaluate it
         pop = self._initialize()
-        self._each_iteration({'n_gen': n_gen, 'pop': pop, **self.D}, first=True)
+        self.D = {**self.D, 'n_gen': n_gen, 'pop': pop}
+        self._each_iteration(self.D, first=True)
 
         # while termination criterium not fulfilled
-        while termination.do_continue({'n_gen': n_gen, 'n_eval': self.evaluator.n_eval, 'pop': pop, **self.D}):
-            n_gen += 1
+        while termination.do_continue(self.D):
+            self.D['n_gen'] += 1
 
             # do the next iteration
             self._next(pop)
 
             # execute the callback function in the end of each generation
-            self._each_iteration({'n_gen': n_gen, 'pop': pop, **self.D})
+            self._each_iteration(self.D)
 
         return pop
 
     def _initialize(self):
 
+        problem, evaluator = self.D['problem'], self.D['evaluator']
+
         pop = Population()
+
+        # add to the data dictionary to be used in all modules
+        self.D = {**self.D, 'pop': pop}
+
         if isinstance(self.sampling, np.ndarray):
             pop.X = self.sampling
         else:
-            pop.X = self.sampling.sample(self.problem, self.pop_size)
+            pop.X = self.sampling.sample(problem, self.pop_size, D=self.D)
 
-        pop.F, pop.CV, pop.G = self.evaluator.eval(self.problem, pop.X,
-                                                   return_constraint_violation=True, return_constraints=True)
+        # create custom objects from the provided custom class that should be used
+        self.clazz = Individual().__class__
+        pop.individuals = create_as_objects(self.clazz, self.pop_size)
+
+        # if we got a custom object during the sampling
+        if pop.X.dtype != np.float:
+
+            # set the class of the custom object
+            self.clazz = pop.X[0, 0].__class__
+            obj = pop.X[0, 0].get_genome()
+
+            # now either they return also float - we extract the matrix
+            if obj is not None and obj.dtype == np.float:
+                pop.individuals = pop.X
+                pop.X = get_genome(pop.individuals)
+
+        # add to the data dictionary to be used in all modules
+        self.D = {**self.D, 'pop': pop}
+
+        pop.F, pop.CV, pop.G = evaluator.eval(problem, pop.X, D=self.D, individuals=pop.individuals,
+                                              return_constraint_violation=True, return_constraints=True)
 
         return pop
 
     def _mating(self, pop):
 
-        # initialize selection and offspring methods
-        X = np.full((self.n_offsprings, self.problem.n_var), np.inf)
+        off = Population(X=np.full((0, self.D['problem'].n_var), np.inf), individuals=create_as_objects(self.clazz, 0))
         n_gen_off = 0
         n_parents = self.crossover.n_parents
 
@@ -148,27 +180,31 @@ class GeneticAlgorithm(Algorithm):
 
             # select from the current population individuals for mating
             n_select = math.ceil((self.n_offsprings - n_gen_off) / self.crossover.n_children)
-            parents = self.selection.do(pop, n_select, n_parents, out=self.D, **self.D)
-            _X = self.crossover.do(self.problem, pop.X[parents.T], out=self.D, **self.D)
+            parents = self.selection.do(pop, n_select, n_parents, D=self.D)
+
+            # object that represent the individuals
+            _individuals = create_as_objects(self.clazz, parents.shape[0] * self.crossover.n_children)
+
+            _X = self.crossover.do(self.D['problem'], pop.X[parents.T], D={**self.D, 'individuals': _individuals})
 
             # do the mutation
-            _X = self.mutation.do(self.problem, _X, out=self.D, **self.D)
+            _X = self.mutation.do(self.D['problem'], _X, D={**self.D, 'individuals': _individuals})
 
             # repair the individuals if necessary
             if self.func_repair is not None:
-                self.func_repair(self.problem, _X)
+                self.func_repair(self.D['problem'], _X, D={**self.D, 'individuals': _individuals})
 
             # eliminate duplicates if too close to the current population
             if self.eliminate_duplicates:
                 not_equal = np.where(np.all(cdist(_X, pop.X) > 1e-32, axis=1))[0]
-                _X = _X[not_equal, :]
+                _X, _individuals = _X[not_equal, :], _individuals[not_equal, :]
 
             # if more offsprings than necessary - truncate them
             if _X.shape[0] > self.n_offsprings - n_gen_off:
-                _X = _X[:self.n_offsprings - n_gen_off, :]
+                _X, _individuals = _X[:self.n_offsprings - n_gen_off, :], _individuals[:self.n_offsprings - n_gen_off, :]
 
             # add to the offsprings
-            X[n_gen_off:n_gen_off + _X.shape[0], :] = _X
+            off.merge(Population(X=_X, individuals=_individuals))
             n_gen_off += _X.shape[0]
 
             # increase the mating number
@@ -176,8 +212,7 @@ class GeneticAlgorithm(Algorithm):
 
             # if no new offsprings can be generated within 100 trails -> return the current result
             if n_matings > 100:
-                X = X[:n_gen_off, :]
                 self.evaluator.n_eval = self.evaluator.n_max_eval
                 break
 
-        return X
+        return off

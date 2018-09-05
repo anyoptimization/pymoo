@@ -31,6 +31,9 @@ class NSGA3Test(unittest.TestCase):
 
         _, _rank = NonDominatedSorting(epsilon=1e-10).do(pop.F, return_rank=True)
         rank = np.array(D['before_rank'])
+
+        if not np.all(_rank+1 == rank):
+            print("")
         self.assertTrue(np.all(_rank+1 == rank))
 
         survival.do(pop, pop.size())
