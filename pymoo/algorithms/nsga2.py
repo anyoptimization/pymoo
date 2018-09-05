@@ -36,13 +36,15 @@ class NSGA2(GeneticAlgorithm):
         pop = super()._initialize()
         self.D['tournament_type'] = 'comp_by_dom_and_crowding'
         # after initializing the rank and crowding needs to be calculated for the tournament selection
-        self.survival.do(pop, self.pop_size, out=self.D, **self.D)
+        self.survival.do(pop, self.pop_size, D=self.D)
         return pop
 
 
-def comp_by_dom_and_crowding(pop, P, rank, crowding, tournament_type, **kwargs):
+def comp_by_dom_and_crowding(pop, P, D):
     if P.shape[1] != 2:
         raise ValueError("Only implemented for binary tournament!")
+
+    rank, crowding, tournament_type = D['rank'], D['crowding'], D['tournament_type']
 
     S = np.full(P.shape[0], np.nan)
 

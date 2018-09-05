@@ -1,28 +1,29 @@
 import numpy as np
 
-from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
+from pymoo.algorithms.nsga3 import comp_by_cv_then_random, NSGA3
 from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.default_operators import set_if_none
 from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection
-from pymoo.operators.survival.reference_line_survival import ReferenceLineSurvival
-from pymoo.rand import random
+from pymoo.operators.survival.aspiration_point_survival import AspirationPointSurvival
 from pymoo.util.display import disp_multi_objective
-from pymoo.util.dominator import compare
-from pymoo.util.reference_directions import get_ref_dirs_from_section, get_multi_layer_ref_dirs, get_ref_dirs_from_n
+from pymoo.util.reference_directions import get_ref_dirs_from_n
 
 
-class NSGA3(GeneticAlgorithm):
+class RNSGA3(NSGA3):
 
     def __init__(self,
-                 pop_size=100,
+                 ref_points,
+                 pop_size,
+                 mu=0.1,
                  prob_cross=1.0,
                  eta_cross=20,
                  prob_mut=None,
                  eta_mut=30,
                  **kwargs):
-        self.ref_dirs = None
+        self.ref_points = ref_points
+        self.mu = mu
 
         set_if_none(kwargs, 'pop_size', pop_size)
         set_if_none(kwargs, 'sampling', RealRandomSampling())
@@ -38,11 +39,17 @@ class NSGA3(GeneticAlgorithm):
 
     def _initialize(self):
         problem = self.D['problem']
+        n_ref_points = self.ref_points.shape[0]
 
-        ref_dirs = get_ref_dirs_from_n(problem.n_obj, self.pop_size)
+        # add the aspiration point lines
+        aspiration_ref_dirs = []
+        n_aspriation_ref_dirs_per_point = int(self.pop_size / n_ref_points)
+        for i in range(n_ref_points):
+            aspiration_ref_dirs.extend(get_ref_dirs_from_n(problem.n_obj, n_aspriation_ref_dirs_per_point))
+        aspiration_ref_dirs = np.array(aspiration_ref_dirs)
 
-        # set the survival method itself
-        self.survival = ReferenceLineSurvival(ref_dirs)
+        # create the survival strategy
+        self.survival = AspirationPointSurvival(self.ref_points, aspiration_ref_dirs, mu=self.mu)
 
         pop = super()._initialize()
 
@@ -50,20 +57,3 @@ class NSGA3(GeneticAlgorithm):
         self.survival.do(pop, self.pop_size, D=self.D)
 
         return pop
-
-
-def comp_by_cv_then_random(pop, P, **kwargs):
-    S = np.full(P.shape[0], np.nan)
-
-    for i in range(P.shape[0]):
-        a, b = P[i, 0], P[i, 1]
-
-        # if at least one solution is infeasible
-        if pop.CV[a, 0] > 0.0 or pop.CV[b, 0] > 0.0:
-            S[i] = compare(a, pop.CV[a, 0], b, pop.CV[b, 0], method='smaller_is_better', return_random_if_equal=True)
-
-        # both solutions are feasible just set random
-        else:
-            S[i] = random.choice([a, b])
-
-    return S[:, None].astype(np.int)

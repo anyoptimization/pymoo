@@ -7,7 +7,7 @@ from pymoo.operators.default_operators import set_if_none
 from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
 from pymoo.rand import random
-from pymoo.util.decomposition import decompose
+from pymoo.util.decomposition import DoNotKnow
 from pymoo.util.display import disp_multi_objective
 
 
@@ -15,7 +15,8 @@ class MOEAD(GeneticAlgorithm):
     def __init__(self,
                  ref_dirs,
                  n_neighbors=15,
-                 decomposition="cython_pbi",
+                 #decomposition=PenaltyBasedBoundaryInterception(theta=0.00000001),
+                 decomposition=DoNotKnow(),
                  prob_neighbor_mating=0.7,
                  **kwargs):
 
@@ -38,6 +39,10 @@ class MOEAD(GeneticAlgorithm):
         # initialized when problem is known
         self.ref_dirs = ref_dirs
 
+        if self.ref_dirs.shape[0] < self.n_neighbors:
+            print("Setting number of neighbours to population size: %s" % self.ref_dirs.shape[0])
+            self.n_neighbors = self.ref_dirs.shape[0]
+
         # neighbours includes the entry by itself intentionally for the survival method
         self.neighbors = np.argsort(cdist(self.ref_dirs, self.ref_dirs), axis=1, kind='quicksort')[:, :self.n_neighbors]
 
@@ -49,6 +54,8 @@ class MOEAD(GeneticAlgorithm):
         return pop
 
     def _next(self, pop):
+
+        print(np.unique(pop.X, axis=0).shape[0])
 
         # iterate for each member of the population in random order
         for i in random.perm(self.pop_size):
@@ -69,36 +76,14 @@ class MOEAD(GeneticAlgorithm):
             # update the ideal point
             self.ideal_point = np.min(np.vstack([self.ideal_point, F]), axis=0)
 
-            batch = False
+            # all neighbors of this individual and corresponding weights
+            N = self.neighbors[i, :]
 
-            if batch:
+            # calculate the decomposed values for each neighbor
+            FV = self.decomposition.do(pop.F[N, :], weights=self.ref_dirs[N, :], ideal_point=self.ideal_point)
+            off_FV = self.decomposition.do(F[None, :], weights=self.ref_dirs[N, :], ideal_point=self.ideal_point)
 
-                # all neighbors of this individual and corresponding weights
-                N = self.neighbors[i, :]
-                w = self.ref_dirs[N, :]
-
-                # calculate the decomposed values for each neighbor
-                FV = decompose(pop.F[N, :], w, method=self.decomposition, ideal_point=self.ideal_point, theta=0.01)
-                off_FV = decompose(F[None, :], w, method=self.decomposition, ideal_point=self.ideal_point, theta=0.01)
-
-                # get the absolute index in F where offspring is better than the current F (decomposed space)
-                neighbors_to_update = N[off_FV < FV]
-                pop.F[neighbors_to_update, :] = F
-                pop.X[neighbors_to_update, :] = X
-
-
-            else:
-
-                for neighbor in self.neighbors[i][random.perm(self.n_neighbors)]:
-
-                    # the weight vector of this neighbor
-                    w = self.ref_dirs[neighbor, :]
-
-                    FV = decompose(pop.F[[neighbor], :], w, method=self.decomposition, ideal_point=self.ideal_point,
-                                   theta=0.01)
-                    off_FV = decompose(F[None, :], w, method=self.decomposition, ideal_point=self.ideal_point,
-                                       theta=0.01)
-
-                    # replace if better
-                    if np.all(off_FV < FV):
-                        pop.X[neighbor, :], pop.F[neighbor, :] = X, F
+            # get the absolute index in F where offspring is better than the current F (decomposed space)
+            I = np.where(off_FV < FV)[0]
+            pop.F[N[I], :] = F
+            pop.X[N[I], :] = X

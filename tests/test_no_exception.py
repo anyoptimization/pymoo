@@ -1,6 +1,7 @@
 import unittest
 
 from pymoo.optimize import minimize
+from pymoo.util.reference_directions import get_ref_dirs_from_section
 from pymop.problems.osy import OSY
 from pymop.problems.rastrigin import Rastrigin
 from pymop.problems.zdt import ZDT1, ZDT4
@@ -15,7 +16,7 @@ class NoExceptionTest(unittest.TestCase):
 
         self.algorithms = []
         for name in ['nsga2', 'nsga3', 'unsga3']:
-            d = {'name': name, 'pop_size': 20, 'n_eval': 100, 'n_sections': 12}
+            d = {'name': name, 'pop_size': 100, 'n_eval': 300}
             self.algorithms.append(d)
 
     def test_no_exception(self):
