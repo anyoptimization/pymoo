@@ -1,6 +1,5 @@
 import numpy as np
 
-from decomposition import cython_pbi
 from pymoo.util.mathematics import Mathematics
 
 
