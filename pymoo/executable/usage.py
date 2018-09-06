@@ -3,20 +3,21 @@ import time
 import numpy as np
 
 from pymoo.util.plotting import plot, animate
-from pymop.problems.dtlz import DTLZ2
+from pymop.problems.zdt import ZDT1
 
 
 def run():
+
     # create the optimization problem
-    problem = DTLZ2()
+    problem = ZDT1()
 
     start_time = time.time()
 
     # solve the given problem using an optimization algorithm (here: nsga2)
     from pymoo.optimize import minimize
     res = minimize(problem,
-                   method='rnsga3',
-                   method_args={'ref_points': np.array([[0.4, 0.1, 0.6], [0.8, 0.5, 0.8]]), 'pop_size': 182},
+                   method='nsga2',
+                   method_args={'pop_size': 100},
                    termination=('n_gen', 200),
                    seed=1,
                    save_history=True,
