@@ -10,7 +10,7 @@ class SimulatedBinaryCrossover(Crossover):
         self.prob_cross = float(prob_cross)
         self.eta_cross = float(eta_cross)
 
-    def _do(self, p, parents, children, **kwargs):
+    def _do(self, p, parents, children, D, **kwargs):
         n_matings = parents.shape[1]
 
         # crossover mask that will be used in the end

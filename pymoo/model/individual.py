@@ -24,16 +24,22 @@ def get_genome(individuals):
 
 
 def create_from_genome(clazz, X):
-    l = []
-    for i in range(X.shape[0]):
-        obj = clazz()
-        obj.set_genome(X[i, :])
-        l.append(obj)
-    return np.array(l, dtype=np.object)[:, None]
+    if clazz is None:
+        return np.full((X.shape[0], 1), np.inf)
+    else:
+        l = []
+        for i in range(X.shape[0]):
+            obj = clazz()
+            obj.set_genome(X[i, :])
+            l.append(obj)
+        return np.array(l, dtype=np.object)[:, None]
 
 
 def create_as_objects(clazz, n_objects):
-    l = []
-    for i in range(n_objects):
-        l.append(clazz())
-    return np.array(l, dtype=np.object)[:, None]
+    if clazz is None:
+        return np.full((n_objects, 1), np.inf)
+    else:
+        l = []
+        for i in range(n_objects):
+            l.append(clazz())
+        return np.array(l, dtype=np.object)[:, None]

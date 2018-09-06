@@ -1,13 +1,13 @@
 import math
 
 import numpy as np
-from scipy.spatial.distance import cdist
 
 from pymoo.model.individual import Individual
 from pymoo.model.individual import get_genome, create_from_genome, create_as_objects
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.evaluator import Evaluator
 from pymoo.model.population import Population
+from pymoo.util.misc import cdist
 
 
 class GeneticAlgorithm(Algorithm):
@@ -58,6 +58,7 @@ class GeneticAlgorithm(Algorithm):
                  n_offsprings=None,
                  eliminate_duplicates=False,
                  func_repair=None,
+                 clazz=Individual().__class__,
                  **kwargs
                  ):
 
@@ -72,7 +73,7 @@ class GeneticAlgorithm(Algorithm):
         self.n_offsprings = n_offsprings
         self.eliminate_duplicates = eliminate_duplicates
         self.func_repair = func_repair
-        self.clazz = None
+        self.clazz = clazz
         self.D = {}
 
         # default set the number of offsprings to the population size
@@ -86,8 +87,7 @@ class GeneticAlgorithm(Algorithm):
         off = self._mating(pop)
 
         # if it is a custom class also create the custom object and store it in the population
-        if self.clazz is not None:
-            off.individuals = create_from_genome(self.clazz, off.X)
+        off.individuals = create_from_genome(self.clazz, off.X)
 
         off.F, off.CV, off.G = self.D['evaluator'].eval(self.D['problem'], off.X, D=self.D, individuals=off.individuals,
                                                         return_constraint_violation=True, return_constraints=True)
@@ -141,14 +141,10 @@ class GeneticAlgorithm(Algorithm):
         else:
             pop.X = self.sampling.sample(problem, self.pop_size, D=self.D)
 
-        # create custom objects from the provided custom class that should be used
-        self.clazz = Individual().__class__
-        pop.individuals = create_as_objects(self.clazz, self.pop_size)
+        # if we got a custom object during the sampling - figure out the clazz type directly
+        if pop.X.dtype == np.object:
 
-        # if we got a custom object during the sampling
-        if pop.X.dtype != np.float:
-
-            # set the class of the custom object
+            # set the class of the custom object to be used for factory later
             self.clazz = pop.X[0, 0].__class__
             obj = pop.X[0, 0].get_genome()
 
@@ -157,11 +153,25 @@ class GeneticAlgorithm(Algorithm):
                 pop.individuals = pop.X
                 pop.X = get_genome(pop.individuals)
 
+        # the object has a type which can be represented in a matrix - only if clazz is not None create an extra object
+        else:
+
+            # if no individual object is desired create a dummy array
+            if self.clazz is None:
+                pop.individuals = np.full((pop.size(), 1), np.inf)
+
+            # otherwise we create objects from this clazz
+            else:
+                pop.individuals = create_as_objects(self.clazz, self.pop_size)
+
         # add to the data dictionary to be used in all modules
         self.D = {**self.D, 'pop': pop}
 
         pop.F, pop.CV, pop.G = evaluator.eval(problem, pop.X, D=self.D, individuals=pop.individuals,
                                               return_constraint_violation=True, return_constraints=True)
+
+        # that call is a dummy survival to set attirbutes that are necessary for the mating selection
+        self.survival.do(pop, self.pop_size, D=self.D)
 
         return pop
 
@@ -180,28 +190,29 @@ class GeneticAlgorithm(Algorithm):
 
             # select from the current population individuals for mating
             n_select = math.ceil((self.n_offsprings - n_gen_off) / self.crossover.n_children)
-            parents = self.selection.do(pop, n_select, n_parents, D=self.D)
+            parents = self.selection.do(pop, n_select, n_parents, D=self.D, indviduals=pop.individuals)
 
             # object that represent the individuals
             _individuals = create_as_objects(self.clazz, parents.shape[0] * self.crossover.n_children)
 
-            _X = self.crossover.do(self.D['problem'], pop.X[parents.T], D={**self.D, 'individuals': _individuals})
+            _X = self.crossover.do(self.D['problem'], pop.X[parents.T], D=self.D, individuals=_individuals)
 
             # do the mutation
-            _X = self.mutation.do(self.D['problem'], _X, D={**self.D, 'individuals': _individuals})
+            _X = self.mutation.do(self.D['problem'], _X, D=self.D, individuals=_individuals)
 
             # repair the individuals if necessary
             if self.func_repair is not None:
-                self.func_repair(self.D['problem'], _X, D={**self.D, 'individuals': _individuals})
+                self.func_repair(self.D['problem'], _X, D=self.D, individuals=_individuals)
 
             # eliminate duplicates if too close to the current population
             if self.eliminate_duplicates:
-                not_equal = np.where(np.all(cdist(_X, pop.X) > 1e-32, axis=1))[0]
+                not_equal = np.where(np.all(cdist(_X, pop.X) > 1e-12, axis=1))[0]
                 _X, _individuals = _X[not_equal, :], _individuals[not_equal, :]
 
             # if more offsprings than necessary - truncate them
             if _X.shape[0] > self.n_offsprings - n_gen_off:
-                _X, _individuals = _X[:self.n_offsprings - n_gen_off, :], _individuals[:self.n_offsprings - n_gen_off, :]
+                _X = _X[:self.n_offsprings - n_gen_off, :]
+                _individuals = _individuals[:self.n_offsprings - n_gen_off, :]
 
             # add to the offsprings
             off.merge(Population(X=_X, individuals=_individuals))
