@@ -1,6 +1,8 @@
 import numpy as np
 
 from pymoo.algorithms.nsga3 import NSGA3
+from pymoo.operators.default_operators import set_if_none
+from pymoo.operators.selection.tournament_selection import TournamentSelection
 from pymoo.rand import random
 from pymoo.util.dominator import compare
 
@@ -13,12 +15,13 @@ class UNSGA3(NSGA3):
                  **kwargs):
 
         if pop_size is not None:
-            kwargs['pop_size'] = pop_size
+            kwargs['pop_size'] = ref_dirs.shape[0]
+        set_if_none(kwargs, 'selection', TournamentSelection(func_comp=comp_by_rank_and_ref_line_dist))
 
         super().__init__(ref_dirs, **kwargs)
 
 
-def comp_by_rank_and_ref_line_dist(pop, P, D):
+def comp_by_rank_and_ref_line_dist(pop, P, D, **kwargs):
     S = np.full(P.shape[0], np.nan)
 
     rank, niche = D['niche'], D['rank']
