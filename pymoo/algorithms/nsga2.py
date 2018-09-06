@@ -13,34 +13,25 @@ from pymoo.util.dominator import Dominator, compare
 
 class NSGA2(GeneticAlgorithm):
 
-    def __init__(self,
-                 pop_size=100,
-                 prob_cross=0.9,
-                 eta_cross=15,
-                 prob_mut=None,
-                 eta_mut=20,
-                 **kwargs):
+    def __init__(self, pop_size=100, **kwargs):
 
+        # default settings for nsga2 - not overwritten if provided as kwargs
         set_if_none(kwargs, 'pop_size', pop_size)
         set_if_none(kwargs, 'sampling', RealRandomSampling())
         set_if_none(kwargs, 'selection', TournamentSelection(func_comp=comp_by_dom_and_crowding))
-        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=prob_cross, eta_cross=eta_cross))
-        set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=prob_mut, eta_mut=eta_mut))
+        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=15))
+        set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=None, eta_mut=20))
         set_if_none(kwargs, 'survival', RankAndCrowdingSurvival())
         set_if_none(kwargs, 'eliminate_duplicates', True)
 
         super().__init__(**kwargs)
+
+        self.D['tournament_type'] = 'comp_by_dom_and_crowding'
         self.func_display_attrs = disp_multi_objective
 
-    def _initialize(self):
-        pop = super()._initialize()
-        self.D['tournament_type'] = 'comp_by_dom_and_crowding'
-        # after initializing the rank and crowding needs to be calculated for the tournament selection
-        self.survival.do(pop, self.pop_size, D=self.D)
-        return pop
 
 
-def comp_by_dom_and_crowding(pop, P, D):
+def comp_by_dom_and_crowding(pop, P, D, **kwargs):
     if P.shape[1] != 2:
         raise ValueError("Only implemented for binary tournament!")
 

@@ -27,7 +27,7 @@ setup(
     install_requires=['pymop', 'numpy', 'scipy', 'matplotlib'],
     ext_modules=cythonize(
         "pymoo/cython/*.pyx",
-        language="c++",
+        language="c++"
     ),
     include_dirs=[numpy.get_include()],
 )

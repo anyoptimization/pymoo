@@ -1,5 +1,6 @@
-import numpy as np
+import scipy
 
+import numpy as np
 
 
 def swap(M, a, b):
@@ -54,6 +55,18 @@ def get_duplicates(M):
         i += 1
 
     return res
+
+
+def cdist(A, B, **kwargs):
+    if A.dtype != np.object:
+        return scipy.spatial.distance.cdist(A, B, **kwargs)
+    else:
+        D = np.full((A.shape[0], B.shape[1]), np.inf, dtype=np.float)
+        for i in range(A.shape[0]):
+            for j in range(i + 1, B.shape[1]):
+                d = M[i].distance_to(M[j])
+                D[i, j], D[j, i] = d, d
+        return D
 
 
 if __name__ == '__main__':

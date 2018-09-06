@@ -5,27 +5,42 @@ import numpy as np
 from pymoo.util.plotting import plot, animate
 from pymoo.util.reference_directions import get_ref_dirs_from_section
 from pymop.problems.dtlz import DTLZ2
-from pymop.problems.zdt import ZDT1, ZDT4
+from pymop.problems.zdt import ZDT1, ZDT4, ZDT
 
 
 def run():
-    problem = DTLZ2()
-    # problem = ZDT1()
+
+    class ZDT1(ZDT):
+        def __init__(self, n_var=30):
+            ZDT.__init__(self, n_var)
+
+        def _calc_pareto_front(self):
+            x1 = np.arange(0, 1.01, 0.01)
+            return np.array([x1, 1 - np.sqrt(x1)]).T
+
+        def _evaluate(self, x, f, individuals):
+            f[:, 0] = x[:, 0]
+            g = 1 + 9.0 / (self.n_var - 1) * np.sum(x[:, 1:], axis=1)
+            f[:, 1] = g * (1 - np.power((f[:, 0] / g), 0.5))
 
     start_time = time.time()
+
+    problem = DTLZ2()
 
     from pymoo.optimize import minimize
 
     res = minimize(problem,
-                   method='moead',
-                   method_args={'ref_dirs': get_ref_dirs_from_section(problem.n_obj, 12)},
+                   method='rnsga3',
+                   method_args={'ref_points': np.array([[0.4, 0.1, 0.6], [0.8,   0.5, 0.8]]), 'pop_per_ref_point' : 91},
+                   #method_args={'pop_size': 100},
                    termination=('n_gen', 200),
                    seed=1,
                    save_history=True,
                    disp=True)
+
     X, F = res['X'], res['F']
-    print(X)
-    print(F)
+
+
 
     print("--- %s seconds ---" % (time.time() - start_time))
 

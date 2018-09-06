@@ -1,11 +1,8 @@
 import numpy as np
-from numpy.linalg import LinAlgError
 
-from pymoo.cython.my_math import cython_calc_perpendicular_distance
 from pymoo.model.survival import Survival, split_by_feasibility
 from pymoo.operators.survival.reference_line_survival import associate_to_niches, calc_niche_count, niching, \
     get_extreme_points, get_intercepts
-from pymoo.rand import random
 from pymoo.util.mathematics import Mathematics
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.reference_directions import get_ref_dirs_from_points
