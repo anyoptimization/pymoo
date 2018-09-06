@@ -3,7 +3,7 @@ import time
 import numpy as np
 
 from pymoo.util.plotting import plot, animate
-from pymoo.util.reference_directions import get_ref_dirs_from_section
+from pymoo.util.reference_directions import get_ref_dirs_from_section, get_ref_dirs_from_n
 from pymop.problems.dtlz import DTLZ2
 from pymop.problems.zdt import ZDT1, ZDT4, ZDT
 
@@ -30,11 +30,12 @@ def run():
     from pymoo.optimize import minimize
 
     res = minimize(problem,
-                   method='rnsga3',
-                   method_args={'ref_points': np.array([[0.4, 0.1, 0.6], [0.8,   0.5, 0.8]]), 'pop_per_ref_point' : 91},
+                   method='nsga3',
+                   #method_args={'ref_points': np.array([[0.4, 0.1, 0.6], [0.8,   0.5, 0.8]]), 'pop_per_ref_point' : 91},
                    #method_args={'pop_size': 100},
-                   termination=('n_gen', 200),
-                   seed=1,
+                   method_args={'ref_dirs': get_ref_dirs_from_section(3, 12)},
+                   termination=('n_gen', 250),
+                   seed=2,
                    save_history=True,
                    disp=True)
 
