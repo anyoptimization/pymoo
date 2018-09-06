@@ -1,20 +1,21 @@
 import numpy as np
 
 from pymoo.algorithms.nsga3 import NSGA3
-from pymoo.operators.selection.tournament_selection import TournamentSelection
 from pymoo.rand import random
 from pymoo.util.dominator import compare
 
 
 class UNSGA3(NSGA3):
 
-    def _initialize(self):
-        pop = super()._initialize()
+    def __init__(self,
+                 ref_dirs,
+                 pop_size=None,
+                 **kwargs):
 
-        # add selection pressure to improve convergence
-        self.selection = TournamentSelection(func_comp=comp_by_rank_and_ref_line_dist)
+        if pop_size is not None:
+            kwargs['pop_size'] = pop_size
 
-        return pop
+        super().__init__(ref_dirs, **kwargs)
 
 
 def comp_by_rank_and_ref_line_dist(pop, P, D):
@@ -41,4 +42,3 @@ def comp_by_rank_and_ref_line_dist(pop, P, D):
                 S[i] = random.choice([a, b])
 
     return S[:, None].astype(np.int)
-

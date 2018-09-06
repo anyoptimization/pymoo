@@ -15,14 +15,14 @@ cdef extern from "limits.h":
 def fast_non_dominated_sort(double[:,:] F, double epsilon = 0.0, int n_stop_if_ranked=INT_MAX):
     return c_fast_non_dominated_sort(F, epsilon, n_stop_if_ranked)
 
-def best_order_sort(double[:,:] F, double epsilon = 0.0):
-    return c_best_order_sort(F, epsilon)
+def best_order_sort(double[:,:] F):
+    return c_best_order_sort(F)
 
-def get_relation(F, a, b, epsilon = 0.0):
-    return c_get_relation(F, a, b, epsilon)
+def get_relation(F, a, b):
+    return c_get_relation(F, a, b)
 
-def fast_best_order_sort(double[:,:] F, double epsilon = 0.0):
-    return c_fast_best_order_sort(F, epsilon)
+def fast_best_order_sort(double[:,:] F):
+    return c_fast_best_order_sort(F)
 
 
 
@@ -98,7 +98,7 @@ cdef vector[vector[int]] c_fast_non_dominated_sort(double[:,:] F, double epsilon
     return fronts
 
 
-cdef vector[vector[int]] c_best_order_sort(double[:,:] F, double epsilon = 0.0):
+cdef vector[vector[int]] c_best_order_sort(double[:,:] F):
 
     cdef:
         int n_points, n_obj, n_fronts, n_ranked, i, j, s, e, l, z
@@ -156,7 +156,7 @@ cdef vector[vector[int]] c_best_order_sort(double[:,:] F, double epsilon = 0.0):
                     # for each entry in that front
                     for e in L[j][k]:
 
-                        is_dominated = c_get_relation(F, s, e, epsilon) == -1
+                        is_dominated = c_get_relation(F, s, e) == -1
 
                         # if one solution dominates the current one - go to the next front
                         if is_dominated:
@@ -188,7 +188,7 @@ cdef vector[vector[int]] c_best_order_sort(double[:,:] F, double epsilon = 0.0):
     return fronts
 
 
-cdef vector[vector[int]] c_fast_best_order_sort(double[:,:] F, double epsilon = 0.0):
+cdef vector[vector[int]] c_fast_best_order_sort(double[:,:] F):
 
     cdef:
         int n_points, n_obj, n_fronts, n_ranked, i, j, s, e, l, z, s_next
@@ -278,7 +278,7 @@ cdef vector[vector[int]] c_fast_best_order_sort(double[:,:] F, double epsilon = 
                     for e in L[j][k]:
 
                         # get the domination relation - might return true even if equal
-                        is_dominated = c_is_dominating_or_equal(F, e, s, C, counter[s], epsilon)
+                        is_dominated = c_is_dominating_or_equal(F, e, s, C, counter[s])
 
                         if is_dominated and check_if_equal[e] == s:
                             is_equal = c_is_equal(F, s, e)
@@ -313,7 +313,7 @@ cdef vector[vector[int]] c_fast_best_order_sort(double[:,:] F, double epsilon = 
     return fronts
 
 
-cdef int c_get_relation(double[:,:] F, int a, int b, double epsilon):
+cdef int c_get_relation(double[:,:] F, int a, int b, double epsilon = 0.0):
 
     cdef int size = F.shape[1]
     cdef int val
@@ -340,11 +340,11 @@ cdef int c_get_relation(double[:,:] F, int a, int b, double epsilon):
 
 
 
-cdef bool c_is_dominating_or_equal(double[:,:] F, int a, int b, vector[vector[int]]& C, int k, double epsilon):
+cdef bool c_is_dominating_or_equal(double[:,:] F, int a, int b, vector[vector[int]]& C, int k):
     cdef int i, j
     for i in range(k, C[0].size()):
         j = C[b][i]
-        if F[b, j] + epsilon < F[a, j]:
+        if F[b, j] < F[a, j]:
             return False
     return True
 
