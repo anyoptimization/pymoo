@@ -1,9 +1,9 @@
 image: blankjul/pymoo-test
 
-host: gitlab.msu.edu
+stages:
+  - build
+  - test
 
-variables:
-  pymoo_dir: 'pwd'
 
 dev:
 
