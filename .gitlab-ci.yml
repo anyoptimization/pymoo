@@ -6,6 +6,7 @@ variables:
 dev:
 
   before_script:
+    - ping -c5 gitlab.msu.edu
     - git clone https://github.com/msu-coinlab/pymop.git
     - cd pymop
     - python setup.py install
