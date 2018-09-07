@@ -1,5 +1,7 @@
 image: blankjul/pymoo-test
 
+host: gitlab.msu.edu
+
 variables:
   pymoo_dir: 'pwd'
 
