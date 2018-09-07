@@ -1,0 +1,9 @@
+image: continuumio/miniconda3:latest
+
+before_script:
+  - pip install pymoo
+
+tests:
+  stage: test
+  script:
+    - python -m unittest discover -v
