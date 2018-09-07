@@ -16,6 +16,7 @@ class NSGA3(GeneticAlgorithm):
 
     def __init__(self, ref_dirs, **kwargs):
 
+        self.ref_dirs = ref_dirs
         set_if_none(kwargs, 'pop_size', len(ref_dirs))
         set_if_none(kwargs, 'sampling', RealRandomSampling())
         set_if_none(kwargs, 'selection', TournamentSelection(func_comp=comp_by_cv_then_random))
@@ -27,6 +28,14 @@ class NSGA3(GeneticAlgorithm):
         super().__init__(**kwargs)
 
         self.func_display_attrs = disp_multi_objective
+
+    def _solve(self, problem, termination):
+        if self.ref_dirs.shape[1] != problem.n_obj:
+            raise Exception(
+                "Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
+                (self.ref_dirs.shape[1], problem.n_obj))
+
+        return super()._solve(problem, termination)
 
 
 def comp_by_cv_then_random(pop, P, **kwargs):

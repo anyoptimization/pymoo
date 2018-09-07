@@ -7,13 +7,16 @@ Installation
 ==================================
 .. include:: _installation.rst
 
-Implementations
-==================================
-.. include:: _implementations.rst
 
 Usage
 ==================================
 .. include:: _usage.rst
+
+
+Algorithms
+==================================
+
+.. include:: _algorithms.rst
 
 
 References

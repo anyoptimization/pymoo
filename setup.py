@@ -17,6 +17,7 @@ setup(
     name="pymoo",
     version=__version__,
     author=__author__,
+    python_requires='>3.3.0',
     author_email="blankjul@egr.msu.edu",
     description="Multi-Objective Optimization Algorithms",
     long_description=long_description,
@@ -24,7 +25,7 @@ setup(
     license='MIT',
     keywords="optimization",
     packages=setuptools.find_packages(),
-    install_requires=['pymop', 'numpy', 'scipy', 'matplotlib'],
+    install_requires=['cython', 'pymop', 'numpy', 'scipy', 'matplotlib'],
     ext_modules=cythonize(
         "pymoo/cython/*.pyx",
         language="c++"
