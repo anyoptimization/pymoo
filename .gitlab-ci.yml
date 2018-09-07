@@ -1,9 +1,16 @@
-image: continuumio/miniconda3:latest
+image: blankjul/pymoo-test
 
-before_script:
-  - pip install pymoo
+variables:
+  pymoo_dir: 'pwd'
 
-tests:
-  stage: test
+dev:
+
+  before_script:
+    - git clone https://github.com/msu-coinlab/pymop.git
+    - cd pymop
+    - python setup.py install
+    - cd ..
+    - python setup.py install
+
   script:
-    - python -m unittest discover -v
+    - python tests/test_no_exception.py
