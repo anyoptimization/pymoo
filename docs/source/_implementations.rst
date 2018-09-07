@@ -2,8 +2,7 @@
 Algorithms
 ----------
 
-**Genetic Algorithm**: A simple genetic algorithm to solve
-single-objective problems.
+**Genetic Algorithm**: A simple genetic algorithm to solve single-objective problems.
 
 **NSGA-II** :cite:`Deb:2002:FEM:2221359.2221582`: Non-dominated sorting genetic algorithm for
 bi-objective problems. The mating selection is done using the binary

@@ -158,7 +158,7 @@ class GeneticAlgorithm(Algorithm):
 
             # if no individual object is desired create a dummy array
             if self.clazz is None:
-                pop.individuals = np.full((pop.size(), 1), np.inf)
+                pop.individuals = np.full((self.pop_size, 1), np.inf)
 
             # otherwise we create objects from this clazz
             else:
@@ -170,7 +170,7 @@ class GeneticAlgorithm(Algorithm):
         pop.F, pop.CV, pop.G = evaluator.eval(problem, pop.X, D=self.D, individuals=pop.individuals,
                                               return_constraint_violation=True, return_constraints=True)
 
-        # that call is a dummy survival to set attirbutes that are necessary for the mating selection
+        # that call is a dummy survival to set attributes that are necessary for the mating selection
         self.survival.do(pop, self.pop_size, D=self.D)
 
         return pop

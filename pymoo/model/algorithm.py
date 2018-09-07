@@ -121,7 +121,13 @@ class Algorithm:
             self.callback(D)
 
         if self.save_history:
-            self.history.append(copy.deepcopy(D))
+            hist = self.history
+            self.history = None
+
+            obj = copy.deepcopy(self)
+            self.history = hist
+
+            self.history.append(obj)
 
     # attributes are a list of tuples of length 3: (name, val, width)
     def _display(self, disp, header=False):

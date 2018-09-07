@@ -4,6 +4,9 @@ pymoo - Multi-Objective Optimization
 Installation
 ==================================
 
+
+Requirements: Python3, pip>=9.0.0
+
 The test problems are uploaded to the PyPi Repository.
 
 .. code:: bash
@@ -18,14 +21,22 @@ For the current development version:
     cd pymoo
     python setup.py install
 
+
+Just locally to be used directly in another project:
+
+.. code:: bash
+
+    git clone https://github.com/msu-coinlab/pymoo
+    cd pymoo
+    pyhton setup.py build_ext --inplace
+
 Implementations
 ==================================
 
 Algorithms
 ----------
 
-**Genetic Algorithm**: A simple genetic algorithm to solve
-single-objective problems.
+**Genetic Algorithm**: A simple genetic algorithm to solve single-objective problems.
 
 **NSGA-II** : Non-dominated sorting genetic algorithm for
 bi-objective problems. The mating selection is done using the binary
