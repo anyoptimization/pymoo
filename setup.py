@@ -25,7 +25,8 @@ setup(
     license='MIT',
     keywords="optimization",
     packages=setuptools.find_packages(),
-    install_requires=['cython', 'pymop', 'numpy', 'scipy', 'matplotlib'],
+    setup_requires=['cython'],
+    install_requires=['pymop', 'numpy', 'scipy', 'matplotlib'],
     ext_modules=cythonize(
         "pymoo/cython/*.pyx",
         language="c++"
