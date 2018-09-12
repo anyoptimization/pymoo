@@ -5,7 +5,6 @@ from pymoo.operators.survival.reference_line_survival import associate_to_niches
     get_extreme_points, get_intercepts
 from pymoo.util.mathematics import Mathematics
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
-from pymoo.util.reference_directions import get_ref_dirs_from_points
 
 
 class AspirationPointSurvival(Survival):
@@ -127,3 +126,76 @@ class AspirationPointSurvival(Survival):
 
         # now truncate the population
         pop.filter(survivors)
+
+
+def get_ref_dirs_from_points(ref_point, ref_dirs, mu=0.1):
+    """
+    This function takes user specified reference points, and creates smaller sets of equidistant
+    Das-Dennis points around the projection of user points on the Das-Dennis hyperplane
+    :param ref_point: List of user specified reference points
+    :param n_obj: Number of objectives to consider
+    :param mu: Shrinkage factor (0-1), Smaller = tigher convergence, Larger= larger convergence
+    :return: Set of reference points
+    """
+
+    n_obj = ref_point.shape[1]
+
+    val = []
+    n_vector = np.ones(n_obj) / np.sqrt(n_obj)  # Normal vector of Das Dennis plane
+    point_on_plane = np.eye(n_obj)[0]  # Point on Das-Dennis
+
+    for point in ref_point:
+
+        ref_dir_for_aspiration_point = np.copy(ref_dirs)  # Copy of computed reference directions
+        ref_dir_for_aspiration_point = mu * ref_dir_for_aspiration_point
+
+        cent = np.mean(ref_dir_for_aspiration_point, axis=0)  # Find centroid of shrunken reference points
+
+        # Project shrunken Das-Dennis points back onto original Das-Dennis hyperplane
+        intercept = line_plane_intersection(np.zeros(n_obj), point, point_on_plane, n_vector)
+        shift = intercept - cent  # shift vector
+
+        ref_dir_for_aspiration_point += shift
+
+        # If reference directions are located outside of first octant, redefine points onto the border
+        if not (ref_dir_for_aspiration_point > 0).min():
+            ref_dir_for_aspiration_point[ref_dir_for_aspiration_point < 0] = 0
+            ref_dir_for_aspiration_point = ref_dir_for_aspiration_point / np.sum(ref_dir_for_aspiration_point, axis=1)[
+                                                                          :, None]
+        val.extend(ref_dir_for_aspiration_point)
+
+    val.extend(np.eye(n_obj))  # Add extreme points
+    return np.array(val)
+
+
+# intersection function
+
+def line_plane_intersection(l0, l1, p0, p_no, epsilon=1e-6):
+    """
+    l0, l1: define the line
+    p0, p_no: define the plane:
+        p0 is a point on the plane (plane coordinate).
+        p_no is a normal vector defining the plane direction;
+             (does not need to be normalized).
+
+    reference: https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection
+    return a Vector or None (when the intersection can't be found).
+    """
+
+    l = l1 - l0
+    dot = np.dot(l, p_no)
+
+    if abs(dot) > epsilon:
+        # the factor of the point between p0 -> p1 (0 - 1)
+        # if 'fac' is between (0 - 1) the point intersects with the segment.
+        # otherwise:
+        #  < 0.0: behind p0.
+        #  > 1.0: infront of p1.
+        w = p0 - l0
+        d = np.dot(w, p_no) / dot
+        l = l * d
+        return l0 + l
+    else:
+        # The segment is parallel to plane then return the perpendicular projection
+        ref_proj = l1 - (np.dot(l1 - p0, p_no) * p_no)
+        return ref_proj
