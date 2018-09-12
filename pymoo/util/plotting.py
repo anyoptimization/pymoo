@@ -25,7 +25,6 @@ def plot_3d(F):
     from mpl_toolkits.mplot3d import Axes3D
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(F[:, 0], F[:, 1], F[:, 2])
-    plt.show()
 
 def plot_2d(F, problem=None):
     plt.scatter(F[:, 0], F[:, 1], label="F")
@@ -36,7 +35,6 @@ def plot_2d(F, problem=None):
             plt.scatter(pf[:, 0], pf[:, 1], label='Pareto Front', s=20, facecolors='none', edgecolors='r')
             plt.legend()
 
-    plt.show()
 
 def animate(path_to_file, history, problem=None, func_iter=None):
 

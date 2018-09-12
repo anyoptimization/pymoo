@@ -45,8 +45,13 @@ class UniformReferenceDirectionFactory(ReferenceDirectionFactory):
 
     @staticmethod
     def get_partition_closest_to_points(n_points, n_dim):
+
+        # in this case the do method will always return one values anyway
+        if n_dim == 1:
+            return 0
+
         n_partitions = 1
-        _n_points = 0
+        _n_points = UniformReferenceDirectionFactory.get_n_points(n_partitions, n_dim)
         while _n_points <= n_points:
             n_partitions += 1
             _n_points = UniformReferenceDirectionFactory.get_n_points(n_partitions, n_dim)
@@ -92,7 +97,7 @@ class MultiLayerReferenceDirectionFactory:
 
 
 if __name__ == '__main__':
-    ref_dirs = UniformReferenceDirectionFactory(3, n_partitions=12).do()
+    ref_dirs = UniformReferenceDirectionFactory(2, n_points=100).do()
     print(np.sum(ref_dirs, axis=1))
 
     multi_layer = MultiLayerReferenceDirectionFactory()
