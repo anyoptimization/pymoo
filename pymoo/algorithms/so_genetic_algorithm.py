@@ -14,6 +14,7 @@ from pymoo.util.dominator import compare
 class SingleObjectiveGeneticAlgorithm(GeneticAlgorithm):
 
     def __init__(self, **kwargs):
+
         set_if_none(kwargs, 'sampling', RealRandomSampling())
         set_if_none(kwargs, 'selection', TournamentSelection(func_comp=comp_by_cv_and_fitness))
         set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=3))

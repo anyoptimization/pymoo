@@ -15,8 +15,11 @@ if __name__ == '__main__':
 
     import sys
 
-    sys.path.append('/home/blankjul/workspace/pymop')
+    sys.path.append("/home/blankjul/workspace/pymop/")
+    sys.path.append("/Users/julesy/workspace/pymop/")
+
     import pymop
+    from pymop.problems.dtlz import DTLZ1
 
     if len(sys.argv) < 2:
         raise Exception("Usage: python run.py <dat> [<out>]")
@@ -26,7 +29,7 @@ if __name__ == '__main__':
     with open(fname, 'rb') as f:
         data = pickle.load(f)
 
-    problem, algorithm, evaluator, seed = data['problem'], data['algorithm'], data['evaluator'], data['seed']
+    problem, algorithm, termination, seed = data['problem'], data['algorithm'], data['termination'], data['seed']
 
     if len(sys.argv) == 2:
         tmp = sys.argv[1]
@@ -37,16 +40,21 @@ if __name__ == '__main__':
     start_time = time.time()
     try:
 
-        X, F, G = algorithm.solve(problem,
-                                  evaluator=evaluator,
+        res = algorithm.solve(problem,
+                                  termination=termination,
                                   seed=seed,
                                   save_history=(len(sys.argv) == 4),
                                   return_only_feasible=False,
                                   return_only_non_dominated=False,
                                   disp=False)
 
+        F = res['F']
+
         elapsed = (time.time() - start_time)
         print(fname, "in --- %s seconds ---" % elapsed)
+
+        # create directory of necessary
+        os.makedirs(os.path.dirname(out), exist_ok=True)
 
         np.savetxt(out, F)
 
