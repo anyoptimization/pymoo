@@ -1,10 +1,8 @@
 import numpy as np
 
-from pymoo.algorithms.moead import MOEAD
 from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.algorithms.nsga3 import NSGA3
 from pymoo.algorithms.rnsga3 import RNSGA3
-from pymoo.algorithms.so_DE import DifferentialEvolution
 from pymoo.algorithms.so_genetic_algorithm import SingleObjectiveGeneticAlgorithm
 from pymoo.algorithms.unsga3 import UNSGA3
 from pymoo.model.termination import MaximumFunctionCallTermination, MaximumGenerationTermination, IGDTermination
@@ -12,9 +10,19 @@ from pymoo.rand import random
 from pymop.problem import Problem
 
 
-def minimize(fun, xl=None, xu=None, termination=('n_gen', 200), n_var=None, fun_args={}, method='auto',
+def minimize(fun,
+             xl=None,
+             xu=None,
+             termination=('n_gen', 200),
+             n_var=None,
+             fun_args={},
+             method='auto',
              method_args={},
-             seed=None, callback=None, disp=True, save_history=False):
+             seed=None,
+             callback=None,
+             disp=True,
+             save_history=False):
+
     """
 
     Minimization of function of one or more variables, objectives and constraints.
@@ -52,6 +60,8 @@ def minimize(fun, xl=None, xu=None, termination=('n_gen', 200), n_var=None, fun_
         algorithm information, such as the current design, objective and constraint space.
     disp : bool
         Whether to display each generation the current result or not.
+    save_history : bool
+        If true every iteration a snapshot of the algorithm is stored.
 
     Returns
     -------
@@ -144,10 +154,6 @@ def _minimize(problem, termination, method, method_args={}, seed=1,
         algorithm = RNSGA3(**method_args)
     elif method == 'unsga3':
         algorithm = UNSGA3(**method_args)
-    elif method == 'moead':
-        algorithm = MOEAD(**method_args)
-    elif method == 'de':
-        algorithm = DifferentialEvolution(**method_args)
     elif method == 'ga':
         algorithm = SingleObjectiveGeneticAlgorithm(**method_args)
     else:
