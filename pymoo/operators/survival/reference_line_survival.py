@@ -1,5 +1,3 @@
-
-
 import numpy as np
 from numpy.linalg import LinAlgError
 
@@ -91,7 +89,7 @@ class ReferenceLineSurvival(Survival):
                 S = niching(F[_last_front, :], n_remaining, niche_count, niche_of_individuals[_last_front],
                             dist_to_niche[_last_front])
 
-                #S = niching_vectorized(F[_last_front, :], n_remaining, niche_count, niche_of_individuals[_last_front],
+                # S = niching_vectorized(F[_last_front, :], n_remaining, niche_count, niche_of_individuals[_last_front],
                 #                       dist_to_niche[_last_front])
 
                 _survivors.extend(_last_front[S].tolist())
@@ -123,7 +121,6 @@ class ReferenceLineSurvival(Survival):
 
 
 def niching_vectorized(F, n_survive, niche_count, niche_of_individuals, dist_to_niche):
-
     survivors = []
     n_niches = len(niche_count)
 
@@ -297,7 +294,7 @@ def associate_to_niches(F, niches, ideal_point, intercepts, utopianEpsilon=-0.00
     # make sure that no values are 0. (subtracting a negative epsilon)
     N -= utopianEpsilon
 
-    #dist_matrix = calc_perpendicular_dist_matrix(N, niches)
+    # dist_matrix = calc_perpendicular_dist_matrix(N, niches)
     dist_matrix = cython_calc_perpendicular_distance(N, niches)
 
     niche_of_individuals = np.argmin(dist_matrix, axis=1)
