@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.algorithms.nsga3 import NSGA3
 from pymoo.operators.survival.aspiration_point_survival import AspirationPointSurvival
-from pymoo.util.reference_directions import get_ref_dirs_from_n
+from pymoo.util.reference_direction import UniformReferenceDirectionFactory
 
 
 class RNSGA3(NSGA3):
@@ -19,7 +19,8 @@ class RNSGA3(NSGA3):
         # add the aspiration point lines
         aspiration_ref_dirs = []
         for i in range(n_ref_points):
-            aspiration_ref_dirs.extend(get_ref_dirs_from_n(n_obj, pop_per_ref_point))
+            ref_dirs = UniformReferenceDirectionFactory(n_dim=n_obj, n_points=pop_per_ref_point).do()
+            aspiration_ref_dirs.extend(ref_dirs)
         aspiration_ref_dirs = np.array(aspiration_ref_dirs)
 
         kwargs['ref_dirs'] = aspiration_ref_dirs

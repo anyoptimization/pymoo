@@ -1,7 +1,7 @@
 import unittest
 
 from pymoo.optimize import minimize
-from pymoo.util.reference_directions import get_ref_dirs_from_n
+from pymoo.util.reference_direction import UniformReferenceDirectionFactory
 from pymop.problems.osy import OSY
 from pymop.problems.rastrigin import Rastrigin
 from pymop.problems.zdt import ZDT1, ZDT4
@@ -28,7 +28,7 @@ class NoExceptionTest(unittest.TestCase):
                 try:
                     minimize(problem,
                              method=algorithm['name'],
-                             method_args={**algorithm, 'ref_dirs': get_ref_dirs_from_n(problem.n_obj, 100)},
+                             method_args={**algorithm, 'ref_dirs': UniformReferenceDirectionFactory(n_dim=problem.n_obj, n_points=100).do()},
                              termination=('n_eval', algorithm['n_eval']),
                              seed=2,
                              save_history=True,
