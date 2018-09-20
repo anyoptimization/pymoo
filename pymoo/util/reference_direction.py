@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import special
 
-from pymoo.util.misc import cdist, unique_rows
+from pymoo.util.misc import unique_rows
 from pymoo.util.plotting import plot_3d
 
 

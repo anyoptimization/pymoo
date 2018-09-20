@@ -8,6 +8,7 @@ class PseudoWeights(DecisionMaking):
     def __init__(self, weights) -> None:
         super().__init__()
         self.weights = weights
+        self.pseudo_weights = None
 
     def do(self, F, **kwargs):
         # get minimum and maximum for each objective
@@ -18,16 +19,16 @@ class PseudoWeights(DecisionMaking):
         norm = F_max - F_min
 
         # normalized distance to the worst solution
-        w = ((F_max - F) / norm)
+        self.pseudo_weights = ((F_max - F) / norm)
 
         # normalize weights to sum up to one
-        w = w / np.sum(w, axis=1)[:, None]
+        self.pseudo_weights = self.pseudo_weights / np.sum(self.pseudo_weights, axis=1)[:, None]
 
         # normalize the provided weights as well
-        norm_weights = self.weights / np.sum(self.weights)
+        weights_norm = self.weights / np.sum(self.weights)
 
         # search for the closest individual having this pseudo weights
-        I = np.argmin(np.sum(np.abs(w - norm_weights), axis=1))
+        I = np.argmin(np.sum(np.abs(self.pseudo_weights - weights_norm), axis=1))
 
         return I
 

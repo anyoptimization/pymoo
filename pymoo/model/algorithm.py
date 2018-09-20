@@ -61,7 +61,7 @@ class Algorithm:
             A callback function can be passed that is executed every generation. The parameters for the function
             are the algorithm itself, the number of evaluations so far and the current population.
 
-                def callback(algorithm, n_evals, pop):
+                def callback(algorithm):
                     pass
 
         return_only_feasible : bool
@@ -118,7 +118,7 @@ class Algorithm:
 
         # if a callback function is provided it is called after each iteration
         if self.callback is not None:
-            self.callback(D)
+            self.callback(self)
 
         if self.save_history:
             hist = self.history
@@ -141,3 +141,4 @@ class Algorithm:
     @abstractmethod
     def _solve(self, problem, termination):
         pass
+
