@@ -4,8 +4,21 @@ pymoo - Multi-Objective Optimization
 Installation
 ==================================
 
+Before using the installer check if the following requirements are fulfilled:
 
-Requirements: Python3, pip>=9.0.0
+Python Version 3
+.. code:: bash
+    python --version
+
+pip>=9.0.0
+.. code:: bash
+    pip --version
+
+cython:
+.. code:: bash
+    pip install cython
+
+
 
 The test problems are uploaded to the PyPi Repository.
 
@@ -29,6 +42,7 @@ Just locally to be used directly in another project:
     git clone https://github.com/msu-coinlab/pymoo
     cd pymoo
     pyhton setup.py build_ext --inplace
+
 
 Implementations
 ==================================
