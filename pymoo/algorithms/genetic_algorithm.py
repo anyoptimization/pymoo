@@ -104,15 +104,15 @@ class GeneticAlgorithm(Algorithm):
         # the evaluator object which is counting the evaluations
         evaluator = Evaluator()
 
-        # always create a new function evaluator which is counting the evaluations
-        self.D = {**self.D, 'problem': problem, 'evaluator': evaluator}
-
         # generation counter
         n_gen = 1
 
+        # always create a new function evaluator which is counting the evaluations
+        self.D = {**self.D, 'problem': problem, 'evaluator': evaluator, 'n_gen': n_gen}
+
         # initialize the first population and evaluate it
         pop = self._initialize()
-        self.D = {**self.D, 'n_gen': n_gen, 'pop': pop}
+        self.D = {**self.D, 'pop': pop}
         self._each_iteration(self.D, first=True)
 
         # while termination criterium not fulfilled
@@ -124,6 +124,8 @@ class GeneticAlgorithm(Algorithm):
 
             # execute the callback function in the end of each generation
             self._each_iteration(self.D)
+
+        self._finalize()
 
         return pop
 
@@ -227,3 +229,6 @@ class GeneticAlgorithm(Algorithm):
                 break
 
         return off
+
+    def _finalize(self):
+        pass

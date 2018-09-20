@@ -1,20 +1,19 @@
 import numpy as np
-from numpy.linalg import LinAlgError
 
-from pymoo.cython.my_math import cython_calc_perpendicular_distance
 from pymoo.model.survival import Survival, split_by_feasibility
+from pymoo.operators.survival.c_reference_line_survival import get_extreme_points_c, get_intercepts_c, \
+    c_associate_to_niches
 from pymoo.operators.survival.reference_line_survival import niching, calc_niche_count
 from pymoo.util.mathematics import Mathematics
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 
-class ReferenceLineSurvival(Survival):
+class PayoffReferenceLineSurvival(Survival):
     def __init__(self, ref_dirs):
         super().__init__()
         self.ref_dirs = ref_dirs
         self.extreme_points = None
         self.intercepts = None
-        self.nadir_point = None
         self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
 
     def _do(self, pop, n_survive, D=None, **kwargs):
@@ -38,28 +37,27 @@ class ReferenceLineSurvival(Survival):
         # if there are feasible solutions to survive
         if len(feasible) > 0:
 
+            # find or usually update the new ideal point - from feasible solutions
+            self.ideal_point = np.min(np.vstack((self.ideal_point, pop.F[feasible, :])), axis=0)
+
+            # now add additional points contributing to ideal or extreme
+            I_ideal_point = np.where(np.any(pop.F[feasible, :] == self.ideal_point, axis=1))[0]
+            I_payoff = np.unique(I_ideal_point[np.argmax(pop.F[feasible, :][I_ideal_point, :], axis=0)])
+
+            self.nadir_point = np.max(pop.F[feasible, :][I_payoff, :], axis=0)
+            self.intercepts = self.nadir_point - self.ideal_point
+
+            _feasible = np.array([e for e in feasible if e not in I_payoff])
+            I_payoff = feasible[I_payoff]
+            feasible = _feasible
+
             # consider only feasible solutions form now on
             F = pop.F[feasible, :]
-
-            # find or usually update the new ideal point - from feasible solutions
-            self.ideal_point = np.min(np.concatenate([self.ideal_point[None, :], F], axis=0), axis=0)
 
             # calculate the fronts of the population
             fronts, _rank = NonDominatedSorting(epsilon=Mathematics.EPS).do(F, return_rank=True,
                                                                             n_stop_if_ranked=n_survive_feasible)
             non_dominated, last_front = fronts[0], fronts[-1]
-
-            # calculate the worst point of feasible individuals
-            worst_point = np.max(F, axis=0)
-            # calculate the nadir point from non dominated individuals
-            nadir_point = np.max(F[non_dominated, :], axis=0)
-
-            # find the extreme points for normalization
-            self.extreme_points = get_extreme_points_c(F, self.ideal_point, extreme_points=self.extreme_points)
-
-            # find the intercepts for normalization and do backup if gaussian elimination fails
-            self.intercepts = get_intercepts_c(self.extreme_points, self.ideal_point, nadir_point, worst_point)
-            self.nadir_point = self.ideal_point + self.intercepts
 
             # index of the first n fronts form now on - including splitting front
             I = np.concatenate(fronts)
@@ -67,10 +65,10 @@ class ReferenceLineSurvival(Survival):
 
             # associate individuals to niches
             niche_of_individuals, dist_to_niche = c_associate_to_niches(F, self.ref_dirs, self.ideal_point,
-                                                                      self.nadir_point)
+                                                                        self.nadir_point)
 
             # if a splitting of the last front is not necessary
-            if F.shape[0] == n_survive_feasible:
+            if len(feasible) <= n_survive_feasible:
                 _survivors = np.arange(F.shape[0])
 
             # otherwise we have to select using niching
@@ -99,6 +97,9 @@ class ReferenceLineSurvival(Survival):
             # reindex the survivors to the absolute index
             survivors = feasible[I[_survivors]]
 
+            # add points used for normalization
+            survivors = np.hstack((survivors, I_payoff))
+
             # save the attributes for surviving individuals
             rank = _rank[I[_survivors]]
             niche_of_individuals = niche_of_individuals[_survivors]
@@ -120,73 +121,3 @@ class ReferenceLineSurvival(Survival):
 
         # now truncate the population
         pop.filter(survivors)
-
-
-def get_extreme_points_c(F, ideal_point, extreme_points=None):
-    # calculate the asf which is used for the extreme point decomposition
-    asf = np.eye(F.shape[1])
-    asf[asf == 0] = 1e-6
-
-    # add the old extreme points to never loose them for normalization
-    _F = F
-    if extreme_points is not None:
-        _F = np.concatenate([_F, extreme_points], axis=0)
-
-    # use __F because we substitute small values to be 0
-    __F = _F - ideal_point
-    __F[__F < 1e-3] = 0
-
-    # update the extreme points for the normalization having the highest asf value each
-    F_asf = np.max(__F / asf[:, None, :], axis=2)
-    I = np.argmin(F_asf, axis=1)
-    extreme_points = _F[I, :]
-
-    return extreme_points
-
-
-def get_intercepts_c(extreme_points, ideal_point, nadir_point, worst_point):
-    # normalization of the points in the new space
-    nadir_point -= ideal_point
-    worst_point -= ideal_point
-
-    use_nadir = False
-
-    try:
-        # find the intercepts using gaussian elimination
-        plane = np.linalg.solve(extreme_points - ideal_point, np.ones(extreme_points.shape[1]))
-
-        # if the plane
-        if np.any(plane <= 1e-6):
-            use_nadir = True
-
-    except LinAlgError:
-        use_nadir = True
-
-    if use_nadir:
-        intercepts = nadir_point
-    else:
-        intercepts = 1 / plane
-
-    # if also the worst point is very small we set it to a small value, to avoid division by zero
-    b = intercepts < 1e-6
-    intercepts[b] = worst_point[b]
-
-    b = intercepts < 1e-6
-    intercepts[b] = 1e-12
-
-    return intercepts
-
-
-def c_associate_to_niches(F, niches, ideal_point, nadir_point):
-    # normalize by ideal point and intercepts
-    N = (F - ideal_point) / (nadir_point - ideal_point)
-
-    # dist_matrix = calc_perpendicular_dist_matrix(N, niches)
-    dist_matrix = cython_calc_perpendicular_distance(N, niches)
-
-    niche_of_individuals = np.argmin(dist_matrix, axis=1)
-    dist_to_niche = dist_matrix[np.arange(F.shape[0]), niche_of_individuals]
-
-    return niche_of_individuals, dist_to_niche
-
-

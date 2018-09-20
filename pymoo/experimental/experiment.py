@@ -3,19 +3,23 @@ import time
 import numpy as np
 
 from pymoo.algorithms.nsga3 import NSGA3
+from pymoo.experimental.normalization.maxnondom import MaxNonDominatedReferenceLineSurvival
+from pymoo.experimental.normalization.minmax import MinMaxReferenceLineSurvival
+from pymoo.experimental.normalization.payoff import PayoffReferenceLineSurvival
+from pymoo.experimental.normalization.plus import PlusReferenceLineSurvival
 from pymoo.model.termination import MaximumGenerationTermination
-from pymoo.util.plotting import plot, animate, plot_3d
+from pymoo.util.plotting import plot, animate
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
-from pymop.problem import ScaledProblem, ConvexProblem
-from pymop.problems.dtlz import DTLZ2, DTLZ1
-
-import matplotlib.pyplot as plt
+from pymop.problem import ScaledProblem
+from pymop.problems.dtlz import DTLZ2, DTLZ1, DTLZ4
 
 
 def run():
     start_time = time.time()
 
-    problem = ScaledProblem(DTLZ2(n_var=12, n_obj=3), 10)
+    #problem = ScaledProblem(DTLZ2(n_var=12, n_obj=3), 10)
+    problem = DTLZ2(n_var=7, n_obj=3)
+    problem.n_pareto_points = 91
 
     #plot_3d(problem.pareto_front())
     #plt.xlabel("X")
@@ -23,11 +27,14 @@ def run():
     #plt.zlabel("Z")
     #plt.show()
 
-    algorithm = NSGA3(ref_dirs=UniformReferenceDirectionFactory(n_dim=3, n_partitions=12).do())
+    ref_dirs = UniformReferenceDirectionFactory(n_dim=3, n_partitions=12).do()
+
+    algorithm = NSGA3(ref_dirs)
+    #algorithm.survival = MaxNonDominatedReferenceLineSurvival(ref_dirs)
 
     res = algorithm.solve(problem,
-                          termination=MaximumGenerationTermination(250),
-                          seed=2,
+                          termination=MaximumGenerationTermination(400),
+                          seed=69,
                           save_history=True,
                           disp=True)
 

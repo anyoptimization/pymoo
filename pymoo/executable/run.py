@@ -19,7 +19,6 @@ if __name__ == '__main__':
     sys.path.append("/Users/julesy/workspace/pymop/")
 
     import pymop
-    from pymop.problems.dtlz import DTLZ1
 
     if len(sys.argv) < 2:
         raise Exception("Usage: python run.py <dat> [<out>]")
@@ -41,12 +40,12 @@ if __name__ == '__main__':
     try:
 
         res = algorithm.solve(problem,
-                                  termination=termination,
-                                  seed=seed,
-                                  save_history=(len(sys.argv) == 4),
-                                  return_only_feasible=False,
-                                  return_only_non_dominated=False,
-                                  disp=False)
+                              termination=termination,
+                              seed=seed,
+                              save_history=(len(sys.argv) == 4),
+                              return_only_feasible=False,
+                              return_only_non_dominated=False,
+                              disp=False)
 
         F = res['F']
 
@@ -60,8 +59,30 @@ if __name__ == '__main__':
 
         if len(sys.argv) == 4:
             out_dat = sys.argv[3]
-            with open(out_dat, 'wb') as f:
-                pickle.dump({'hist': algorithm.history}, f)
+
+            from pymoo.util.non_dominated_sorting import NonDominatedSorting
+            from pymoo.indicators.igd import IGD
+
+            hist = res['history']
+            pf = problem.pareto_front()
+
+            igd = np.zeros(len(hist))
+
+            nadir_point = np.zeros((len(hist), problem.n_obj))
+            ideal_point = np.zeros((len(hist), problem.n_obj))
+
+            for i, e in enumerate(hist):
+
+                nadir_point[i, :] = e.survival.nadir_point
+                ideal_point[i, :] = e.survival.ideal_point
+
+                F = e.D['pop'].F
+                I = NonDominatedSorting().do(F, only_non_dominated_front=True)
+                igd[i] = IGD(pf).calc(F[I, :])
+
+            D = {'igd': igd, 'nadir_point': nadir_point, 'ideal_point': ideal_point}
+
+            pickle.dump(D, open(out_dat, 'wb'))
 
     except Exception as e:
         print(e)
