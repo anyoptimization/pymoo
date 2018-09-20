@@ -43,15 +43,13 @@ class PerfectReferenceLineSurvival(Survival):
                                                                             n_stop_if_ranked=n_survive_feasible)
             non_dominated, last_front = fronts[0], fronts[-1]
 
-            self.intercepts = self.nadir_point - self.ideal_point
-
             # index of the first n fronts form now on - including splitting front
             I = np.concatenate(fronts)
             F = F[I, :]
 
             # associate individuals to niches
             niche_of_individuals, dist_to_niche = c_associate_to_niches(F, self.ref_dirs, self.ideal_point,
-                                                                        self.intercepts)
+                                                                        self.nadir_point)
 
             # if a splitting of the last front is not necessary
             if F.shape[0] == n_survive_feasible:
