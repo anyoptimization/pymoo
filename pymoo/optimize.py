@@ -11,12 +11,12 @@ from pymop.problem import Problem
 
 
 def minimize(fun,
+             method,
              xl=None,
              xu=None,
              termination=('n_gen', 200),
              n_var=None,
              fun_args={},
-             method='auto',
              method_args={},
              seed=None,
              callback=None,
@@ -135,7 +135,7 @@ def minimize(fun,
     if seed is None:
         seed = random.randint(1, 10000)
 
-    return _minimize(problem, termination, method=method, method_args=method_args, seed=seed,
+    return _minimize(problem, termination, method, method_args=method_args, seed=seed,
                      callback=callback, disp=disp, save_history=save_history)
 
 

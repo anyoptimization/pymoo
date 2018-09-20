@@ -4,7 +4,7 @@ from Cython.Build import cythonize
 from setuptools import setup
 
 __author__ = "Julian Blank"
-__version__ = '0.2.0-dev'
+__version__ = '0.2.1'
 
 try:
     import pypandoc
@@ -26,7 +26,7 @@ setup(
     keywords="optimization",
     packages=setuptools.find_packages(),
     setup_requires=['cython'],
-    install_requires=['pymop', 'numpy', 'scipy', 'matplotlib'],
+    install_requires=['pymop==0.2.1', 'numpy', 'scipy', 'matplotlib'],
     ext_modules=cythonize(
         "pymoo/cython/*.pyx",
         language="c++"
