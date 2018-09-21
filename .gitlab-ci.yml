@@ -1,9 +1,5 @@
 image: blankjul/pymoo-test
 
-stages:
-  - build
-  - test
-
 
 dev:
 

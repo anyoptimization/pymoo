@@ -1,24 +1,41 @@
 pymoo - Multi-Objective Optimization
-==================================
+====================================================================
 
-Installation
-==================================
+.. image:: https://gitlab.msu.edu/blankjul/pymoo/badges/master/pipeline.svg
+   :alt: pipeline status
+   :target: https://gitlab.msu.edu/blankjul/pymoo/commits/master
+
+
+| You can find the detailed documentation `here <http://www.research-blank.de/pymoo>`_.
+
+
+Requirements
+====================================================================
 
 Before using the installer check if the following requirements are fulfilled:
 
-Python Version 3
+Python 3
+
 .. code:: bash
+
     python --version
 
 pip>=9.0.0
+
 .. code:: bash
+
     pip --version
 
-cython:
+Cython:
+
 .. code:: bash
+
     pip install cython
 
 
+
+Installation
+====================================================================
 
 The test problems are uploaded to the PyPi Repository.
 
@@ -43,9 +60,8 @@ Just locally to be used directly in another project:
     cd pymoo
     pyhton setup.py build_ext --inplace
 
-
 Implementations
-==================================
+====================================================================
 
 Algorithms
 ----------
@@ -83,9 +99,11 @@ defined accordingly which performs basically a binary bitflip for real
 numbers.
 
 Usage
-==================================
+====================================================================
+
 .. code:: python
 
+    
     import time
 
     import numpy as np
@@ -129,10 +147,27 @@ Usage
         run()
 
 Contact
-==================================
+====================================================================
 Feel free to contact me if you have any question:
 
 | Julian Blank (blankjul [at] egr.msu.edu)
 | Michigan State University
 | Computational Optimization and Innovation Laboratory (COIN)
 | East Lansing, MI 48824, USA
+
+
+
+Contributors
+====================================================================
+Julian Blank
+
+
+
+
+
+Changelog
+====================================================================
+`0.2.1`
+-------------------------
+
+* First official release providing NSGA2, NSGA3 and RNSGA3
