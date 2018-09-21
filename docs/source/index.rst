@@ -3,6 +3,10 @@
    :caption: Contents:
 
 
+Requiremnts
+==================================
+.. include:: _requirements.rst
+
 Installation
 ==================================
 .. include:: _installation.rst
@@ -19,6 +23,16 @@ Algorithms
 .. include:: _algorithms.rst
 
 
+Contributors
+==================================
+Julian Blank
+
+
+Contact
+==================================
+.. include:: _contact.rst
+
+
 References
 ==================================
 
@@ -28,17 +42,9 @@ References
    :all:
 
 
-API
+
+Changelog
 ==================================
 
-The framework provides some modules which are used in the genetic algorithm implementation:
-
-.. automodule:: pymoo
-    :members:
-
-
-
-Contact
-==================================
-.. include:: _contact.rst
+.. include:: _changelog.rst
 

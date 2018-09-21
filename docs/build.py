@@ -3,9 +3,9 @@ import re
 
 import jinja2
 
-TEMPLATE_DIR = os.path.join(os.path.dirname(__file__))
+TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)))
 env = jinja2.Environment(autoescape=False, loader=jinja2.FileSystemLoader(TEMPLATE_DIR))
-template = env.get_template('README.template')
+template = env.get_template('docs/README.template')
 output = template.render()
 
 # remove all cites
