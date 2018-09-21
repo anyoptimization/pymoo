@@ -1,18 +1,47 @@
 pymoo - Multi-Objective Optimization
-==================================
+====================================================================
+
+.. image:: https://gitlab.msu.edu/blankjul/pymoo/badges/master/pipeline.svg
+   :alt: pipeline status
+   :target: https://gitlab.msu.edu/blankjul/pymoo/commits/master
+
+
+| You can find the detailed documentation `here <http://www.research-blank.de/pymoo>`_.
+
+
+Requirements
+====================================================================
+{% include 'docs/source/_requirements.rst' %}
 
 Installation
-==================================
-{% include 'source/_installation.rst' %}
+====================================================================
+{% include 'docs/source/_installation.rst' %}
 
 Implementations
-==================================
-{% include 'source/_implementations.rst' %}
+====================================================================
+{% include 'docs/source/_implementations.rst' %}
 
 Usage
-==================================
-{% include 'source/_usage.rst' %}
+====================================================================
+
+.. code:: python
+
+    {% macro someop() %}{% include "pymoo/usage/run_minimize.py" %}{% endmacro %}
+    {{ someop()|indent }}
 
 Contact
-==================================
-{% include 'source/_contact.rst' %}
+====================================================================
+{% include 'docs/source/_contact.rst' %}
+
+
+Contributors
+====================================================================
+Julian Blank
+
+
+
+
+
+Changelog
+====================================================================
+{% include 'docs/source/_changelog.rst' %}

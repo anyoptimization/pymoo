@@ -4,7 +4,8 @@ from Cython.Build import cythonize
 from setuptools import setup
 
 __author__ = "Julian Blank"
-__version__ = '0.2.1'
+__version__ = '0.2.1-dev8'
+__url__ = "https://github.com/msu-coinlab/pymoo"
 
 try:
     import pypandoc
@@ -21,10 +22,10 @@ setup(
     author_email="blankjul@egr.msu.edu",
     description="Multi-Objective Optimization Algorithms",
     long_description=long_description,
-    url="https://github.com/msu-coinlab/pymoo",
-    license='MIT',
+    url=__url__,
+    license='Apache License 2.0',
     keywords="optimization",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(include="*.pyx", exclude=["tests", "docs"]),
     setup_requires=['cython'],
     install_requires=['pymop==0.2.1', 'numpy', 'scipy', 'matplotlib'],
     ext_modules=cythonize(
@@ -32,4 +33,6 @@ setup(
         language="c++"
     ),
     include_dirs=[numpy.get_include()],
+    include_package_data=True,
+    platforms='any',
 )
