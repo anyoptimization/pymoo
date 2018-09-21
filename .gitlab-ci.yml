@@ -11,4 +11,4 @@ dev:
     - python setup.py install
 
   script:
-    - python tests/test_no_exception.py
+    - python tests/test_suite.py
