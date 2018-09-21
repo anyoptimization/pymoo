@@ -10,6 +10,7 @@ __pycache__/
 *.so
 
 
+README.html
 
 pymoo/cython/*html
 

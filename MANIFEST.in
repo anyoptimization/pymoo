@@ -1,1 +1,3 @@
-recursive-include pymoo/cython/ *.pyx *.pyd
+recursive-include pymoo *.py *.pyx *.pxd
+recursive-exclude pymoo *.so
+include LICENSE
