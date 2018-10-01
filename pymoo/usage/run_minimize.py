@@ -3,23 +3,28 @@ import time
 import numpy as np
 
 from pymoo.util.plotting import plot, animate
-from pymop.problems.zdt import ZDT1
+from pymoo.util.reference_direction import UniformReferenceDirectionFactory
+from pymop import DTLZ1
 
 
 def run():
-
     # create the optimization problem
-    problem = ZDT1()
+    problem = DTLZ1(n_var=8, n_obj=3)
+    problem.n_pareto_points = 91
 
     start_time = time.time()
+
+    ref_dirs = UniformReferenceDirectionFactory(3, n_points=91).do()
 
     # solve the given problem using an optimization algorithm (here: nsga2)
     from pymoo.optimize import minimize
     res = minimize(problem,
-                   method='nsga2',
-                   method_args={'pop_size': 100},
-                   termination=('n_gen', 200),
-                   seed=1,
+                   method='nsga3',
+                   method_args={
+                       'ref_dirs': ref_dirs,
+                    },
+                   termination=('n_gen', 400),
+                   seed=3,
                    save_history=True,
                    disp=True)
     F = res['F']

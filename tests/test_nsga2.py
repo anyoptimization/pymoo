@@ -18,7 +18,7 @@ class NSGA2Test(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        with open(os.path.join("resources", "cnsg2_run_zdt4.dat"), 'rb') as f:
+        with open(os.path.join("resources", "cnsga2_run_zdt4.dat"), 'rb') as f:
             cls.data = pickle.load(f)
 
     # tests whether the first number by the random generator is equal

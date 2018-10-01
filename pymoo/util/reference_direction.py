@@ -20,6 +20,8 @@ class ReferenceDirectionFactory:
             ref_dirs = self._do()
             if self.scaling is not None:
                 ref_dirs = ref_dirs * self.scaling + ((1 - self.scaling) / self.n_dim)
+
+            #ref_dirs[ref_dirs == 0] = 1e-10
             return ref_dirs
 
     def _do(self):
