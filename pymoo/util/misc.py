@@ -75,6 +75,15 @@ def cdist(A, B, **kwargs):
         return D
 
 
+def vectorized_cdist(A, B, func_dist):
+    u = np.tile(A, (B.shape[0], 1))
+    v = np.repeat(B, A.shape[0], axis=0)
+
+    D = func_dist(u, v)
+    M = np.reshape(D, (A.shape[0], B.shape[0]))
+    return M
+
+
 if __name__ == '__main__':
     M = np.random.random((100, 3))
 
