@@ -2,18 +2,18 @@ import numpy as np
 from numpy.linalg import LinAlgError
 
 from pymoo.cython.my_math import cython_calc_perpendicular_distance
+from pymoo.experimental.normalization.methods import naive_estimate_nadir_point
 from pymoo.model.survival import Survival, split_by_feasibility
 from pymoo.operators.survival.reference_line_survival import niching, calc_niche_count
 from pymoo.util.mathematics import Mathematics
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 
-class ReferenceLineSurvival(Survival):
+class FinalReferenceLineSurvival(Survival):
     def __init__(self, ref_dirs):
         super().__init__()
         self.ref_dirs = ref_dirs
         self.extreme_points = None
-        self.intercepts = None
         self.nadir_point = None
         self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
 
@@ -42,7 +42,7 @@ class ReferenceLineSurvival(Survival):
             F = pop.F[feasible, :]
 
             # find or usually update the new ideal point - from feasible solutions
-            self.ideal_point = np.min(np.concatenate([self.ideal_point[None, :], F], axis=0), axis=0)
+            self.ideal_point = np.min(np.vstack((self.ideal_point, F)), axis=0)
 
             # calculate the fronts of the population
             fronts, _rank = NonDominatedSorting(epsilon=Mathematics.EPS).do(F, return_rank=True,
@@ -55,20 +55,20 @@ class ReferenceLineSurvival(Survival):
             nadir_point = np.max(F[non_dominated, :], axis=0)
 
             # find the extreme points for normalization
-            self.extreme_points = c_get_extreme_points(F, self.ideal_point, extreme_points=self.extreme_points)
+            self.extreme_points = final_get_extreme_points(F, self.ideal_point, extreme_points=self.extreme_points)
 
             # find the intercepts for normalization and do backup if gaussian elimination fails
-            self.intercepts = c_get_intercepts(self.extreme_points, self.ideal_point, nadir_point, worst_point)
-            self.nadir_point = self.ideal_point + self.intercepts
+            intercepts = final_get_intercepts(self.extreme_points, self.ideal_point, nadir_point, worst_point)
 
+            self.nadir_point = self.ideal_point + intercepts
 
             # index of the first n fronts form now on - including splitting front
             I = np.concatenate(fronts)
             F = F[I, :]
 
             # associate individuals to niches
-            niche_of_individuals, dist_to_niche = c_associate_to_niches(F, self.ref_dirs, self.ideal_point,
-                                                                      self.nadir_point)
+            niche_of_individuals, dist_to_niche = final_associate_to_niches(F, self.ref_dirs, self.ideal_point,
+                                                                            self.nadir_point)
 
             # if a splitting of the last front is not necessary
             if F.shape[0] == n_survive_feasible:
@@ -123,7 +123,7 @@ class ReferenceLineSurvival(Survival):
         pop.filter(survivors)
 
 
-def c_get_extreme_points(F, ideal_point, extreme_points=None):
+def final_get_extreme_points(F, ideal_point, extreme_points=None):
     # calculate the asf which is used for the extreme point decomposition
     asf = np.eye(F.shape[1])
     asf[asf == 0] = 1e-6
@@ -145,7 +145,7 @@ def c_get_extreme_points(F, ideal_point, extreme_points=None):
     return extreme_points
 
 
-def c_get_intercepts(extreme_points, ideal_point, nadir_point, worst_point):
+def final_get_intercepts(extreme_points, ideal_point, nadir_point, worst_point):
     # normalization of the points in the new space
     nadir_point -= ideal_point
     worst_point -= ideal_point
@@ -178,9 +178,10 @@ def c_get_intercepts(extreme_points, ideal_point, nadir_point, worst_point):
     return intercepts
 
 
-def c_associate_to_niches(F, niches, ideal_point, nadir_point):
+def final_associate_to_niches(F, niches, ideal_point, nadir_point, utopian_epsilon=1e-10):
     # normalize by ideal point and intercepts
     N = (F - ideal_point) / (nadir_point - ideal_point)
+    N += utopian_epsilon
 
     # dist_matrix = calc_perpendicular_dist_matrix(N, niches)
     dist_matrix = cython_calc_perpendicular_distance(N, niches)
@@ -189,5 +190,3 @@ def c_associate_to_niches(F, niches, ideal_point, nadir_point):
     dist_to_niche = dist_matrix[np.arange(F.shape[0]), niche_of_individuals]
 
     return niche_of_individuals, dist_to_niche
-
-
