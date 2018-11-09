@@ -12,6 +12,8 @@ class DifferentialEvolution(GeneticAlgorithm):
                  **kwargs):
         set_default_if_none("real", kwargs)
         super().__init__(**kwargs)
+
+
         self.crossover = DifferentialEvolutionCrossover(prob=0.5, weight=0.75, variant="DE/best/1", method="binomial")
         self.func_display_attrs = disp_single_objective
 

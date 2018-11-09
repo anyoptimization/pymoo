@@ -11,7 +11,7 @@ def readme():
 
 __name__ = "pymoo"
 __author__ = "Julian Blank"
-__version__ = '0.2.2.dev'
+__version__ = '0.2.2'
 __url__ = "https://github.com/msu-coinlab/pymoo"
 
 

@@ -10,18 +10,33 @@ from pymoo.util.display import disp_single_objective
 
 class DifferentialEvolution(GeneticAlgorithm):
     def __init__(self,
+                 variant="DE/rand/1/exp",
+                 CR=0.1,
+                 F=0.75,
                  **kwargs):
         set_default_if_none("real", kwargs)
         super().__init__(**kwargs)
         self.selection = RandomSelection()
-        self.crossover = DifferentialEvolutionCrossover(weight=0.75)
-        self.mutation = DifferentialEvolutionMutation("binomial", 0.1)
+
+        self.crossover = DifferentialEvolutionCrossover(weight=F)
+
+        _, self.var_selection, self.var_n, self.var_mutation, = variant.split("/")
+
+        self.mutation = DifferentialEvolutionMutation(self.var_mutation, CR)
         self.func_display_attrs = disp_single_objective
 
     def _next(self, pop):
 
         # create offsprings and add it to the data of the algorithm
-        P = self.selection.do(pop, self.pop_size, self.crossover.n_parents)
+        if self.var_selection == "rand":
+            P = self.selection.do(pop, self.pop_size, self.crossover.n_parents)
+        elif self.var_selection == "best":
+            P = self.selection.do(pop, self.pop_size, self.crossover.n_parents - 1)
+            best = np.argmin(pop.get("F")[:, 0])
+            P = np.hstack([np.full(len(pop), best)[:, None], P])
+        else:
+            raise Exception("Unknown selection: %s" % self.var_selection)
+
         off = self.crossover.do(self.problem, pop, P)
         self.data = {**self.data, "off": off}
 
