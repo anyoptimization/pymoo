@@ -3,6 +3,7 @@ from abc import abstractmethod
 
 import numpy as np
 
+from pymoo.model.result import Result
 from pymoo.model.termination import MaximumFunctionCallTermination
 from pymoo.rand import random
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
@@ -24,6 +25,8 @@ class Algorithm:
         self.func_display_attrs = None
         self.callback = None
         self.history = []
+        self.save_history = None
+        self.pf = None
 
     def solve(self,
               problem,
@@ -31,9 +34,8 @@ class Algorithm:
               seed=1,
               disp=False,
               callback=None,
-              return_only_feasible=True,
-              return_only_non_dominated=True,
               save_history=False,
+              pf=None,
               **kwargs
               ):
         """
@@ -48,7 +50,7 @@ class Algorithm:
         problem: class
             Problem to be solved by the algorithm
 
-        evaluator: class
+        termination: class
             object that evaluates and saves the number of evaluations and determines the stopping condition
 
         seed: int
@@ -64,15 +66,11 @@ class Algorithm:
                 def callback(algorithm):
                     pass
 
-        return_only_feasible : bool
-            If true, only feasible solutions are returned.
-
-        return_only_non_dominated : bool
-            If true, only the non dominated solutions are returned. Otherwise, it might be - dependend on the
-            algorithm - the final population
-
         save_history : bool
             If true, a current snapshot of each generation is saved.
+
+        pf : np.array
+            The Pareto-front for the given problem. If provided performance metrics are printed during execution.
 
         Returns
         -------
@@ -87,23 +85,40 @@ class Algorithm:
         self.disp = disp
         self.callback = callback
         self.save_history = save_history
+        self.pf = pf
 
         if isinstance(termination, int):
             termination = MaximumFunctionCallTermination(termination)
 
         # call the algorithm to solve the problem
-        pop = self._solve(problem, termination, **kwargs)
+        pop = self._solve(problem, termination)
 
-        if return_only_feasible:
-            feasible = np.where(pop.CV[:, 0] <= 0.0)[0]
-            pop.filter(feasible)
+        # get the optimal result by filtering feasible and non-dominated
+        opt = pop.copy()
+        opt = opt[opt.collect(lambda ind: ind.feasible)[:, 0]]
 
-        if pop.size() > 0 and return_only_non_dominated:
-            I = NonDominatedSorting().do(pop.F, only_non_dominated_front=True)
-            pop.filter(I)
+        # if at least one feasible solution was found
+        if len(opt) > 0:
 
-        res = {'problem': problem, 'history': self.history}
-        res = {**res, **pop.D}
+            if problem.n_obj > 1:
+                I = NonDominatedSorting().do(opt.get("F"), only_non_dominated_front=True)
+                opt = opt[I]
+                X, F, CV, G = opt.get("X", "F", "CV", "G")
+
+            else:
+                opt = pop[np.argmin(pop.get("F"))]
+                X, F, CV, G = opt.X, opt.F, opt.CV, opt.G
+        else:
+            opt = None
+
+        res = Result(opt, opt is None, "")
+        res.algorithm, res.problem, res.pf = self, problem, pf
+        res.pop = pop
+
+        if opt is not None:
+            res.X, res.F, res.CV, res.G = X, F, CV, G
+
+        res.history = self.history
 
         return res
 
@@ -112,7 +127,7 @@ class Algorithm:
 
         # display the output if defined by the algorithm
         if self.disp and self.func_display_attrs is not None:
-            disp = self.func_display_attrs(D['problem'], D['evaluator'], D)
+            disp = self.func_display_attrs(D['problem'], D['evaluator'], D, self.pf)
             if disp is not None:
                 self._display(disp, header=first)
 
@@ -141,4 +156,3 @@ class Algorithm:
     @abstractmethod
     def _solve(self, problem, termination):
         pass
-

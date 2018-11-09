@@ -7,7 +7,7 @@ from pymoo.rand import random
 class DifferentialEvolutionCrossover(Crossover):
 
     def __init__(self, variant="DE/rand/1", prob=0.5, weight=0.8, method="binomial", bounce_back_in_bounds=True):
-        super().__init__(4, 1)
+        super().__init__(4, 1, True)
         self.prob = prob
         self.weight = weight
         self.type = method

@@ -19,16 +19,19 @@ if __name__ == '__main__':
     sys.path.append("/Users/julesy/workspace/pymop/")
 
     import pymop
+    from pymoo.util.non_dominated_sorting import NonDominatedSorting
+    from pymoo.indicators.igd import IGD
 
     if len(sys.argv) < 2:
-        raise Exception("Usage: python run.py <dat> [<out>]")
+        raise Exception("Usage: python pyford.py <dat> [<out>]")
 
     # load the data for the experiment
     fname = sys.argv[1]
     with open(fname, 'rb') as f:
         data = pickle.load(f)
 
-    problem, algorithm, termination, seed = data['problem'], data['algorithm'], data['termination'], data['seed']
+    problem, algorithm, termination, seed, pf = data['problem'], data['algorithm'], data['termination'], data['seed'], \
+                                                data['pf']
 
     if len(sys.argv) == 2:
         tmp = sys.argv[1]
@@ -48,6 +51,8 @@ if __name__ == '__main__':
                               disp=False)
 
         F = res['F']
+        I = NonDominatedSorting().do(F, only_non_dominated_front=True)
+        igd = IGD(pf, normalize=True).calc(F[I, :])
 
         elapsed = (time.time() - start_time)
         print(fname, "in --- %s seconds ---" % elapsed)
@@ -60,27 +65,23 @@ if __name__ == '__main__':
         if len(sys.argv) == 4:
             out_dat = sys.argv[3]
 
-            from pymoo.util.non_dominated_sorting import NonDominatedSorting
-            from pymoo.indicators.igd import IGD
-
             hist = res['history']
-            pf = problem.pareto_front()
 
-            igd = np.zeros(len(hist))
-
+            H = []
+            _igd = np.zeros(len(hist))
             nadir_point = np.zeros((len(hist), problem.n_obj))
             ideal_point = np.zeros((len(hist), problem.n_obj))
 
             for i, e in enumerate(hist):
-
                 nadir_point[i, :] = e.survival.nadir_point
                 ideal_point[i, :] = e.survival.ideal_point
 
-                F = e.D['pop'].F
-                I = NonDominatedSorting().do(F, only_non_dominated_front=True)
-                igd[i] = IGD(pf).calc(F[I, :])
+                _F = e.D['pop'].F
+                I = NonDominatedSorting().do(_F, only_non_dominated_front=True)
+                _igd[i] = IGD(pf, normalize=False).calc(_F[I, :])
+                H.append(_F[I, :])
 
-            D = {'igd': igd, 'nadir_point': nadir_point, 'ideal_point': ideal_point}
+            D = {'F': F, 'igd': F, '_igd': _igd, 'nadir_point': nadir_point, 'ideal_point': ideal_point, 'H': H}
 
             pickle.dump(D, open(out_dat, 'wb'))
 
