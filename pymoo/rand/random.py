@@ -77,3 +77,10 @@ def choice(a):
     Select randomly an element from a list.
     """
     return Singleton.get_instance().choice(a)
+
+
+def shuffle(a):
+    """
+    Shuffle a given array using the permutation random function
+    """
+    return Singleton.get_instance().shuffle(a)

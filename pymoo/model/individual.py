@@ -1,45 +1,26 @@
-import numpy as np
+import copy
 
 
 class Individual:
 
-    def __init__(self) -> None:
+    def __init__(self, **kwargs) -> None:
         self.X = None
-        self.D = {}
+        self.F = None
+        self.CV = None
+        self.G = None
+        self.feasible = None
+        self.data = kwargs
 
-    def get_genome(self):
-        return self.X
+    def set(self, key, value):
+        self.data[key] = value
 
-    def set_genome(self, X):
-        self.X = X
+    def copy(self):
+        ind = copy.copy(self)
+        ind.data = self.data.copy()
+        return ind
 
-
-def get_genome(individuals):
-    n_individuals = len(individuals)
-    n_dim = individuals[0, 0].get_genome().shape[0]
-    X = np.full((n_individuals, n_dim), np.inf, dtype=np.double)
-    for i in range(n_individuals):
-        X[i, :] = individuals[i, 0].get_genome()
-    return X
-
-
-def create_from_genome(clazz, X):
-    if clazz is None:
-        return np.full((X.shape[0], 1), np.inf)
-    else:
-        l = []
-        for i in range(X.shape[0]):
-            obj = clazz()
-            obj.set_genome(X[i, :])
-            l.append(obj)
-        return np.array(l, dtype=np.object)[:, None]
-
-
-def create_as_objects(clazz, n_objects):
-    if clazz is None:
-        return np.full((n_objects, 1), np.inf)
-    else:
-        l = []
-        for i in range(n_objects):
-            l.append(clazz())
-        return np.array(l, dtype=np.object)[:, None]
+    def get(self, key):
+        if key in self.data:
+            return self.data[key]
+        else:
+            return None

@@ -7,9 +7,8 @@ from libcpp.vector cimport vector
 
 
 
-def cython_calc_perpendicular_distance(double[:,:] P, double[:,:] L):
+def calc_perpendicular_distance(double[:,:] P, double[:,:] L):
     return np.array(c_calc_perpendicular_distance(P, L))
-
 
 
 cdef extern from "math.h":

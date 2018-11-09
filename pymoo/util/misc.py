@@ -1,6 +1,5 @@
-import scipy
-
 import numpy as np
+import scipy
 
 
 def swap(M, a, b):
@@ -76,8 +75,8 @@ def cdist(A, B, **kwargs):
 
 
 def vectorized_cdist(A, B, func_dist):
-    u = np.tile(A, (B.shape[0], 1))
-    v = np.repeat(B, A.shape[0], axis=0)
+    u = np.repeat(A, B.shape[0], axis=0)
+    v = np.tile(B, (A.shape[0], 1))
 
     D = func_dist(u, v)
     M = np.reshape(D, (A.shape[0], B.shape[0]))

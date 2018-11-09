@@ -1,24 +1,31 @@
+import numpy as np
+
 from pymoo.model.crossover import Crossover
 from pymoo.rand import random
 
 
 class BinaryUniformCrossover(Crossover):
     def __init__(self):
-        super().__init__(2, 2)
+        super().__init__(2, 2, True)
 
-    def _do(self, p, parents, children, **kwargs):
+    def _do(self, problem, pop, parents, **kwargs):
 
         # number of parents
-        n_parents = parents.shape[0]
+        n_matings = parents.shape[0]
+        off = np.full((n_matings * self.n_offsprings, problem.n_var), np.inf)
+
+        X = pop.get("X")[parents.T]
 
         # random matrix to do the crossover
-        M = random.random(n_parents, p.n_var)
+        M = random.random((n_matings, problem.n_var))
         smaller, larger = M < 0.5, M > 0.5
 
         # first possibility where first parent 0 is copied
-        children[:n_parents][smaller] = parents[:, 0, :][smaller]
-        children[:n_parents][larger] = parents[:, 1, :][larger]
+        off[:n_matings][smaller] = X[0, :, :][smaller]
+        off[:n_matings][larger] = X[1, :, :][larger]
 
-        # now flip the order of parents with the same random array and write the second half of children
-        children[n_parents:][smaller] = parents[:, 1, :][smaller]
-        children[n_parents:][larger] = parents[:, 0, :][larger]
+        # now flip the order of parents with the same random array and write the second half of off
+        off[n_matings:][smaller] = X[1, :, :][smaller]
+        off[n_matings:][larger] = X[0, :, :][larger]
+
+        return pop.new("X", off.astype(np.bool))

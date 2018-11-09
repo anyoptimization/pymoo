@@ -80,4 +80,4 @@ class SimulatedBinaryCrossover(Crossover):
                 children[n_children, :] = parents[k, 0, :]
                 children[n_children + 1, :] = parents[k, 1, :]
 
-            n_children += self.n_children
+            n_children += self.n_offsprings

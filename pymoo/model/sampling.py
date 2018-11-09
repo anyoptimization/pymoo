@@ -14,7 +14,7 @@ class Sampling:
     """
 
     @abstractmethod
-    def sample(self, problem, n_samples, **kwargs):
+    def sample(self, problem, pop, n_samples, **kwargs):
         """
         Sample new points with problem information if necessary.
 
@@ -31,11 +31,11 @@ class Sampling:
 
         Returns
         -------
-        X : np.ndarray
+        X : np.array
             Samples points in a two dimensional array
 
         """
-        pass
+        return pop
 
 
 def sample_by_bounds(clazz, n_samples, n_var, x_min, x_max, **kwargs):
@@ -60,7 +60,7 @@ def sample_by_bounds(clazz, n_samples, n_var, x_min, x_max, **kwargs):
 
     Returns
     -------
-    X : np.ndarray
+    X : np.array
         Samples points in a two dimensional array
 
     """
