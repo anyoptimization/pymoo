@@ -27,7 +27,13 @@ class FunctionLoader:
     def load(self, module, func_name=None):
 
         if self.cythonize:
-            vals = importlib.import_module('pymoo.cython.%s_cython' % module)
+
+            try:
+                vals = importlib.import_module('pymoo.cython.%s_cython' % module)
+            except Exception as e:
+                print(e)
+                vals = importlib.import_module('pymoo.cython.%s' % module)
+
         else:
             vals = importlib.import_module('pymoo.cython.%s' % module)
 
