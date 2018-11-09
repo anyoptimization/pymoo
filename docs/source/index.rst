@@ -3,18 +3,13 @@
    :caption: Contents:
 
 
-Requiremnts
+Requirements
 ==================================
 .. include:: _requirements.rst
 
 Installation
 ==================================
 .. include:: _installation.rst
-
-
-Usage
-==================================
-.. include:: _usage.rst
 
 
 Algorithms
