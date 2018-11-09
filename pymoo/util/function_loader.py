@@ -10,7 +10,7 @@ class FunctionLoader:
         self.cythonize = False
 
         try:
-            from pymoo.cython.extensions import info
+            from pymoo.cython.info import info
             if info() == "yes":
                 self.cythonize = True
             else:
