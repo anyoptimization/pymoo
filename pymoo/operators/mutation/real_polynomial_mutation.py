@@ -6,23 +6,27 @@ from pymoo.rand import random
 
 class PolynomialMutation(Mutation):
     def __init__(self, eta_mut, prob_mut=None):
+        super().__init__(True)
         self.eta_mut = float(eta_mut)
         if prob_mut is not None:
             self.prob_mut = float(prob_mut)
         else:
             self.prob_mut = None
 
-    def _do(self, p, X, Y, **kwargs):
+    def _do(self, problem, pop, **kwargs):
+
+        X = pop.get("X")
+        Y = np.full(X.shape, np.inf)
 
         if self.prob_mut is None:
-            self.prob_mut = 1.0 / p.n_var
+            self.prob_mut = 1.0 / problem.n_var
 
         do_mutation = random.random(X.shape) < self.prob_mut
 
         Y[:, :] = X
 
-        xl = np.repeat(p.xl[None, :], X.shape[0], axis=0)[do_mutation]
-        xu = np.repeat(p.xu[None, :], X.shape[0], axis=0)[do_mutation]
+        xl = np.repeat(problem.xl[None, :], X.shape[0], axis=0)[do_mutation]
+        xu = np.repeat(problem.xu[None, :], X.shape[0], axis=0)[do_mutation]
 
         X = X[do_mutation]
 
@@ -56,4 +60,6 @@ class PolynomialMutation(Mutation):
 
         # set the values for output
         Y[do_mutation] = _Y
+
+        return pop.new("X", Y)
 

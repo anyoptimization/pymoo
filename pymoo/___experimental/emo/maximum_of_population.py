@@ -1,20 +1,16 @@
 import numpy as np
 
-from pymoo.experimental.normalization_non_dominated_front import get_nadir_point_from_fronts
+from pymoo.emo.niching import associate_to_niches, calc_niche_count, niching
 from pymoo.model.survival import Survival, split_by_feasibility
-from pymoo.operators.survival.c_reference_line_survival import c_associate_to_niches, c_get_extreme_points, \
-    c_get_intercepts
-from pymoo.operators.survival.reference_line_survival import niching, calc_niche_count
 from pymoo.util.mathematics import Mathematics
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 
-class ProposeReferenceLineSurvival(Survival):
+class MaximumOfPopulationReferenceSurvival(Survival):
+
     def __init__(self, ref_dirs):
         super().__init__()
         self.ref_dirs = ref_dirs
-        self.extreme_points = None
-        self.intercepts = None
         self.nadir_point = None
         self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
 
@@ -26,7 +22,7 @@ class ProposeReferenceLineSurvival(Survival):
         # first split by feasibility for normalization
         feasible, infeasible = split_by_feasibility(pop)
 
-        # number of survivors from the feasible population 
+        # number of survivors from the feasible population
         # in case of having not enough feasible solution all feasible will survive
         if len(feasible) < n_survive:
             n_survive_feasible = len(feasible)
@@ -42,34 +38,21 @@ class ProposeReferenceLineSurvival(Survival):
             # consider only feasible solutions form now on
             F = pop.F[feasible, :]
 
-            # find or usually update the new ideal point - from feasible solutions
-            self.ideal_point = np.min(np.concatenate([self.ideal_point[None, :], F], axis=0), axis=0)
-
             # calculate the fronts of the population
-            fronts, _rank = NonDominatedSorting(epsilon=Mathematics.EPS).do(F, return_rank=True,
-                                                                            n_stop_if_ranked=n_survive_feasible)
+            fronts, _rank = NonDominatedSorting().do(F, return_rank=True, n_stop_if_ranked=n_survive_feasible)
             non_dominated, last_front = fronts[0], fronts[-1]
-
-            # calculate the worst point of feasible individuals
-            worst_point = np.max(F, axis=0)
-            # calculate the nadir point from non dominated individuals
-            nadir_point = np.max(F[non_dominated, :], axis=0)
-
-            # find the extreme points for normalization
-            self.extreme_points = c_get_extreme_points(F, self.ideal_point, extreme_points=self.extreme_points)
-
-            # find the intercepts for normalization and do backup if gaussian elimination fails
-            self.intercepts = c_get_intercepts(self.extreme_points, self.ideal_point, nadir_point, worst_point)
-
-            self.nadir_point = self.ideal_point + self.intercepts
 
             # index of the first n fronts form now on - including splitting front
             I = np.concatenate(fronts)
             F = F[I, :]
 
+            # find normalization boundaries
+            self.ideal_point = np.min(np.vstack((self.ideal_point, F)), axis=0)
+            self.nadir_point = np.max(F, 0)
+
             # associate individuals to niches
-            niche_of_individuals, dist_to_niche = c_associate_to_niches(F, self.ref_dirs, self.ideal_point,
-                                                                      self.nadir_point)
+            niche_of_individuals, dist_to_niche = associate_to_niches(F, self.ref_dirs, self.ideal_point,
+                                                                      self.nadir_point, utopian_epsilon=1e-10)
 
             # if a splitting of the last front is not necessary
             if F.shape[0] == n_survive_feasible:
@@ -92,9 +75,6 @@ class ProposeReferenceLineSurvival(Survival):
 
                 S = niching(F[_last_front, :], n_remaining, niche_count, niche_of_individuals[_last_front],
                             dist_to_niche[_last_front])
-
-                # S = niching_vectorized(F[_last_front, :], n_remaining, niche_count, niche_of_individuals[_last_front],
-                #                       dist_to_niche[_last_front])
 
                 _survivors.extend(_last_front[S].tolist())
 
@@ -122,5 +102,4 @@ class ProposeReferenceLineSurvival(Survival):
 
         # now truncate the population
         pop.filter(survivors)
-
 

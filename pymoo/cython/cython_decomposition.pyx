@@ -2,7 +2,7 @@
 # cython: boundscheck=False, wraparound=False, cdivision=True
 
 
-from my_math cimport c_norm
+from calc_perpendicular_distance_cython cimport c_norm
 from libcpp.vector cimport vector
 
 import numpy as np

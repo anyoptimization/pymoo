@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import animation
 
 
-def plot(F, problem=None):
+def plot(F, problem=None, **kwargs):
 
     if F.ndim == 1:
         print("Cannot plot a one dimensional array.")
@@ -12,33 +12,37 @@ def plot(F, problem=None):
     n_dim = F.shape[1]
 
     if n_dim == 2:
-        plot_2d(F, problem)
+        plot_2d(F, problem, **kwargs)
     elif n_dim == 3:
-        plot_3d(F)
+        plot_3d(F, **kwargs)
     else:
         print("Cannot plot a %s dimensional array." % n_dim)
         return
 
 
-def plot_3d(F):
+def plot_3d(F, show=True):
     fig = plt.figure()
     from mpl_toolkits.mplot3d import Axes3D
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(F[:, 0], F[:, 1], F[:, 2])
 
-def plot_2d(F, problem=None):
+    if show:
+        plt.show()
+
+def plot_2d(F, pf=None, show=True):
     plt.scatter(F[:, 0], F[:, 1], label="F")
 
-    if problem is not None:
-        pf = problem.pareto_front()
-        if pf is not None:
-            plt.scatter(pf[:, 0], pf[:, 1], label='Pareto Front', s=20, facecolors='none', edgecolors='r')
-            plt.legend()
+    if pf is not None:
+        plt.scatter(pf[:, 0], pf[:, 1], label='Pareto Front', s=20, facecolors='none', edgecolors='r')
+        plt.legend()
+
+    if show:
+        plt.show()
 
 
-def animate(path_to_file, history, problem=None, func_iter=None):
 
-    H = np.concatenate([e['pop'].F[None, :, :] for e in history], axis=0)
+def animate(path_to_file, H, problem=None, func_iter=None):
+
 
     if H.ndim != 3 or H.shape[2] != 2:
         print("Can only animate a two dimensional set of arrays.")
