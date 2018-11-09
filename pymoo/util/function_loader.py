@@ -30,8 +30,8 @@ class FunctionLoader:
 
             try:
                 vals = importlib.import_module('pymoo.cython.%s_cython' % module)
-            except Exception as e:
-                print(e)
+            except:
+                print("Compiled module %s cannot be loaded." % module)
                 vals = importlib.import_module('pymoo.cython.%s' % module)
 
         else:
