@@ -1,15 +1,11 @@
 import time
 
-import numpy as np
-
 from pymoo.algorithms.nsga3 import NSGA3
-from pymoo.emo.propose import ProposeReferenceLineSurvival
-from pymoo.indicators.igd import IGD
 from pymoo.model.termination import MaximumGenerationTermination
 from pymoo.util.plotting import plot, animate
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory, MultiLayerReferenceDirectionFactory
-from pymop import ScaledProblem, DTLZ3
-from pymop.problems.dtlz import DTLZ1, DTLZ2, DTLZ4
+from pymop import DTLZ3
+from pymop.problems.dtlz import DTLZ1
 
 
 def run():
