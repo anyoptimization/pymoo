@@ -16,7 +16,7 @@ res = minimize(problem,
                method_args={
                    'pop_size': 100,
                    'ref_dirs': ref_dirs},
-               termination=('n_gen', 400),
+               termination=('n_gen', 200),
                pf=pf,
                disp=True)
 plotting.plot(res.F)

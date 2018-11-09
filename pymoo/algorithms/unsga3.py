@@ -2,9 +2,8 @@ import numpy as np
 
 from pymoo.algorithms.nsga3 import NSGA3
 from pymoo.operators.default_operators import set_if_none
-from pymoo.operators.selection.tournament_selection import TournamentSelection
+from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
 from pymoo.rand import random
-from pymoo.util.dominator import compare
 
 
 class UNSGA3(NSGA3):

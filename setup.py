@@ -1,7 +1,7 @@
+
 import numpy
 import setuptools
-from Cython.Build import cythonize
-from setuptools import setup
+from setuptools import setup, Extension
 
 
 def readme():
@@ -11,12 +11,14 @@ def readme():
 
 __name__ = "pymoo"
 __author__ = "Julian Blank"
-__version__ = '0.2.2'
+__version__ = '0.2.2.dev'
 __url__ = "https://github.com/msu-coinlab/pymoo"
 
 
 def run_setup(binary=False):
     if binary:
+
+        from Cython.Build import cythonize
         kwargs = dict(
             setup_requires=['cython'],
             include_dirs=[numpy.get_include()],
@@ -49,18 +51,15 @@ def run_setup(binary=False):
 
 try:
     run_setup(True)
-except:
-    BUILD_EXT_WARNING = ("WARNING: The C extension could not be compiled, "
-                         "speedups are not enabled.")
+    print("Python installation with compiled extensions succeeded.")
+except BaseException as e:
     print('*' * 75)
-    print(BUILD_EXT_WARNING)
-    print("Failure information, if any, is above.")
-    print("I'm retrying the build without the C extension now.")
+    print("WARNING", e)
+    print("WARNING: The C extension could not be compiled, speedups are not enabled.")
     print('*' * 75)
 
     run_setup(False)
 
     print('*' * 75)
-    print(BUILD_EXT_WARNING)
-    print("Plain-Python installation succeeded.")
+    print("Python installation succeeded.")
     print('*' * 75)

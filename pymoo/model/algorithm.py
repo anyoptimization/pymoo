@@ -148,9 +148,9 @@ class Algorithm:
     def _display(self, disp, header=False):
         regex = " | ".join(["{}"] * len(disp))
         if header:
-            print("=" * 40)
+            print("=" * 50)
             print(regex.format(*[name.ljust(width) for name, _, width in disp]))
-            print("=" * 40)
+            print("=" * 50)
         print(regex.format(*[str(val).ljust(width) for _, val, width in disp]))
 
     @abstractmethod

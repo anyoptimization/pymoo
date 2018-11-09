@@ -14,9 +14,9 @@ class RandomSelection(Selection):
         n_random = n_select * n_parents
 
         # number of permutations needed
-        n_perms = math.ceil(n_random / pop.size())
+        n_perms = math.ceil(n_random / len(pop))
 
         # get random permutations and reshape them
-        P = random_permuations(n_perms, pop.size())[:n_random]
+        P = random_permuations(n_perms, len(pop))[:n_random]
 
         return np.reshape(P, (n_select, n_parents))
