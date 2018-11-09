@@ -157,7 +157,8 @@ class GeneticAlgorithm(Algorithm):
             self.evaluator.eval(self.problem, pop, D=self.data)
 
         # that call is a dummy survival to set attributes that are necessary for the mating selection
-        pop = self.survival.do(self.problem, pop, self.pop_size, D=self.data)
+        if self.survival:
+            pop = self.survival.do(self.problem, pop, self.pop_size, D=self.data)
 
         return pop
 
@@ -210,7 +211,7 @@ class GeneticAlgorithm(Algorithm):
             if self.eliminate_duplicates:
                 # eliminate duplicates if too close to the current population or already recombined individuals
                 if isinstance(self.eliminate_duplicates, bool):
-                    is_duplicate = self._is_duplicate(_off, pop, off)
+                    is_duplicate = default_is_duplicate(_off, pop, off)
                 elif isinstance(self.eliminate_duplicates, function):
                     is_duplicate = self.eliminate_duplicates(_off, pop, off)
                 # filter out the duplicates from the offsprings before adding
@@ -232,21 +233,24 @@ class GeneticAlgorithm(Algorithm):
 
         return off
 
-    def _is_duplicate(self, pop, *other, epsilon=1e-20):
 
-        if len(other) == 0:
-            return np.full(len(pop), False)
-
-        X = pop.get("X")
-
-        _X = other[0].get("X")
-        for o in other[1:]:
-            if len(o) > 0:
-                _X = np.concatenate([_X, o.get("X")])
-
-        is_duplicate = np.any(cdist(X, _X) < epsilon, axis=1)
-
-        return is_duplicate
 
     def _finalize(self):
         pass
+
+
+def default_is_duplicate(pop, *other, epsilon=1e-20):
+
+    if len(other) == 0:
+        return np.full(len(pop), False)
+
+    X = pop.get("X")
+
+    _X = other[0].get("X")
+    for o in other[1:]:
+        if len(o) > 0:
+            _X = np.concatenate([_X, o.get("X")])
+
+    is_duplicate = np.any(cdist(X, _X) < epsilon, axis=1)
+
+    return is_duplicate

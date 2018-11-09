@@ -1,10 +1,6 @@
 import os
 import unittest
 
-import matplotlib
-from matplotlib import pyplot as plt
-
-
 class UsageTest(unittest.TestCase):
 
     def test(self):

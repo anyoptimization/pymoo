@@ -19,6 +19,9 @@ def get_alorithm(name):
     elif name == 'rnsga3':
         from pymoo.algorithms.rnsga3 import RNSGA3
         return RNSGA3
+    elif name == 'de':
+        from pymoo.algorithms.so_de import DifferentialEvolution
+        return DifferentialEvolution
     else:
         raise Exception("Algorithm not known.")
 

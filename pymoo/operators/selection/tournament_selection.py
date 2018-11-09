@@ -3,6 +3,7 @@ import math
 import numpy as np
 
 from pymoo.model.selection import Selection
+from pymoo.rand import random
 from pymoo.util.misc import random_permuations
 
 
@@ -47,3 +48,28 @@ class TournamentSelection(Selection):
         S = self.f_comp(pop, P, **kwargs)
 
         return np.reshape(S, (n_select, n_parents))
+
+
+def compare(a, a_val, b, b_val, method, return_random_if_equal=False):
+    if method == 'larger_is_better':
+        if a_val > b_val:
+            return a
+        elif a_val < b_val:
+            return b
+        else:
+            if return_random_if_equal:
+                return random.choice([a, b])
+            else:
+                return None
+    elif method == 'smaller_is_better':
+        if a_val < b_val:
+            return a
+        elif a_val > b_val:
+            return b
+        else:
+            if return_random_if_equal:
+                return random.choice([a, b])
+            else:
+                return None
+    else:
+        raise Exception("Unknown method.")
