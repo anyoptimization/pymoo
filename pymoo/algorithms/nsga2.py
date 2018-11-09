@@ -7,9 +7,9 @@ from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedB
 from pymoo.operators.default_operators import set_if_none
 from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
-from pymoo.operators.selection.tournament_selection import TournamentSelection
+from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
 from pymoo.util.display import disp_multi_objective
-from pymoo.util.dominator import Dominator, compare
+from pymoo.util.dominator import Dominator
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.randomized_argsort import randomized_argsort
 

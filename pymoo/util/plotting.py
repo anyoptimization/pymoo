@@ -4,7 +4,6 @@ from matplotlib import animation
 
 
 def plot(F, problem=None, **kwargs):
-
     if F.ndim == 1:
         print("Cannot plot a one dimensional array.")
         return
@@ -29,6 +28,7 @@ def plot_3d(F, show=True):
     if show:
         plt.show()
 
+
 def plot_2d(F, pf=None, show=True):
     plt.scatter(F[:, 0], F[:, 1], label="F")
 
@@ -40,10 +40,7 @@ def plot_2d(F, pf=None, show=True):
         plt.show()
 
 
-
 def animate(path_to_file, H, problem=None, func_iter=None):
-
-
     if H.ndim != 3 or H.shape[2] != 2:
         print("Can only animate a two dimensional set of arrays.")
         return
@@ -62,8 +59,7 @@ def animate(path_to_file, H, problem=None, func_iter=None):
     plt.title("0")
 
     if func_iter is not None:
-        func_iter(ax, history[0])
-
+        func_iter(ax, H[0])
 
     # the update method
     def update(n):
@@ -79,7 +75,7 @@ def animate(path_to_file, H, problem=None, func_iter=None):
         ax.set_ylim(min[1], max[1])
 
         if func_iter is not None:
-            func_iter(ax, history[n])
+            func_iter(ax, H[n])
 
         plt.title(n)
 
@@ -90,6 +86,3 @@ def animate(path_to_file, H, problem=None, func_iter=None):
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=6, bitrate=1800)
     ani.save(path_to_file, writer=writer)
-
-
-
