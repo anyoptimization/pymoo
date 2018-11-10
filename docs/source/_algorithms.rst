@@ -1,10 +1,10 @@
 
 
-GeneticAlgorithm
+Genetic Algorithm
 ----------------------------------
 A simple genetic algorithm to solve single-objective problems.
 
-.. literalinclude:: ../../usage/ga.py
+.. literalinclude:: ../../pymoo/usage/ga.py
    :language: python
 
 
@@ -14,7 +14,7 @@ NSGA2
 The algorithm is coded corresponding to :cite:`Deb:2002:FEM:2221359.2221582`.
 
 
-.. literalinclude:: ../../usage/nsga2.py
+.. literalinclude:: ../../pymoo/usage/nsga2.py
    :language: python
 
 
@@ -35,7 +35,7 @@ distance to the reference directions. As normalization the boundary
 intersection method is used.
 
 
-.. literalinclude:: ../../usage/nsga3.py
+.. literalinclude:: ../../pymoo/usage/nsga3.py
    :language: python
 
 UNSGA3
@@ -43,7 +43,7 @@ UNSGA3
 
 
 
-.. literalinclude:: ../../usage/unsga3.py
+.. literalinclude:: ../../pymoo/usage/unsga3.py
    :language: python
 
 
@@ -51,14 +51,14 @@ RNSGA3
 ----------------------------------
 
 
-.. literalinclude:: ../../usage/rnsga3.py
+.. literalinclude:: ../../pymoo/usage/rnsga3.py
    :language: python
 
 
 
 
 
-DE - Differential Evolution
+Differential Evolution
 ----------------------------------
 
 :cite:`Price:2005:DEP:1121631` The classical single-objective
@@ -66,6 +66,6 @@ differential evolution algorithm where different crossover variations
 and methods can be defined. It is known for its good results for
 effective global optimization.
 
-.. literalinclude:: ../../usage/de.py
+.. literalinclude:: ../../pymoo/usage/de.py
    :language: python
 

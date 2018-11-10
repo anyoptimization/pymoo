@@ -1,16 +1,26 @@
 pymoo - Multi-Objective Optimization Framework
 ====================================================================
 
-
 You can find the detailed documentation here:
 https://www.egr.msu.edu/coinlab/blankjul/pymoo/
-
 
 
 Installation
 ====================================================================
 
-The test problems are uploaded to the PyPi Repository.
+First, make sure you have a python environment installed. We recommend miniconda3 or anaconda3.
+
+.. code:: bash
+    conda --version
+
+Then from scratch create a virtual environment for pymoo:
+
+.. code:: bash
+    conda create -n pymoo -y python==3.7.1 cython numpy
+    conda activate pymoo
+
+
+For the current stable release please execute:
 
 .. code:: bash
 
@@ -22,57 +32,22 @@ For the current development version:
 
     git clone https://github.com/msu-coinlab/pymoo
     cd pymoo
-    python setup.py install
+    pip install .
 
-
-Just locally to be used directly in another project:
+Since for speedup some of the modules are also available compiled you can double check
+if the compilation worked:
 
 .. code:: bash
+    python -c 'from pymoo.cython.function_loader import is_compiled;print("Compiled Extentions: ", is_compiled())'
 
-    git clone https://github.com/msu-coinlab/pymoo
-    cd pymoo
-    pyhton setup.py build_ext --inplace
 
-Implementations
-====================================================================
 
-Algorithms
-----------
-
-**Genetic Algorithm**: A simple genetic algorithm to solve single-objective problems.
-
-**NSGA-II** : Non-dominated sorting genetic algorithm for
-bi-objective problems. The mating selection is done using the binary
-tournament by comparing the rank and the crowding distance. The crowding
-distance is a niching measure in a two-dimensional space which sums up
-the difference to the neighbours in each dimension. The non-dominated
-sorting considers the rank determined by being in the ith front and the
-crowding distance to achieve a good diversity when converging.
-
-**NSGA-III** : A referenced-based algorithm used to solve
-many-objective problems. The survival selection uses the perpendicular
-distance to the reference directions. As normalization the boundary
-intersection method is used [5].
-
-**MOEAD/D** : The classical MOEAD\D implementation using the
-Tchebichew decomposition function.
-
-**Differential Evolution** : The classical single-objective
-differential evolution algorithm where different crossover variations
-and methods can be defined. It is known for its good results for
-effective global optimization.
-
-Methods
--------
-
-**Simulated Binary Crossover** : This crossover simulates a
-single-point crossover in a binary representation by using an
-exponential distribution for real values. The polynomial mutation is
-defined accordingly which performs basically a binary bitflip for real
-numbers.
 
 Usage
-====================================================================
+==================================
+
+We refer here to our documentation for all the details.
+However, for instance executing NSGA2:
 
 .. code:: python
 
@@ -93,6 +68,8 @@ Usage
                    save_history=False,
                    disp=True)
     plotting.plot(res.F)
+
+
 
 Contact
 ====================================================================

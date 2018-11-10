@@ -1,5 +1,19 @@
 
-The test problems are uploaded to the PyPi Repository.
+First, make sure you have a python environment installed. We recommend miniconda3 or anaconda3.
+
+.. code:: bash
+
+    conda --version
+
+Then from scratch create a virtual environment for pymoo:
+
+.. code:: bash
+
+    conda create -n pymoo -y python==3.7.1 cython numpy
+    conda activate pymoo
+
+
+For the current stable release please execute:
 
 .. code:: bash
 
@@ -11,13 +25,13 @@ For the current development version:
 
     git clone https://github.com/msu-coinlab/pymoo
     cd pymoo
-    python setup.py install
+    pip install .
 
-
-Just locally to be used directly in another project:
+Since for speedup some of the modules are also available compiled you can double check
+if the compilation worked:
 
 .. code:: bash
 
-    git clone https://github.com/msu-coinlab/pymoo
-    cd pymoo
-    pyhton setup.py build_ext --inplace
+    python -c 'from pymoo.cython.function_loader import is_compiled;print("Compiled Extentions: ", is_compiled())'
+
+
