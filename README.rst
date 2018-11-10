@@ -11,11 +11,13 @@ Installation
 First, make sure you have a python environment installed. We recommend miniconda3 or anaconda3.
 
 .. code:: bash
+
     conda --version
 
 Then from scratch create a virtual environment for pymoo:
 
 .. code:: bash
+
     conda create -n pymoo -y python==3.7.1 cython numpy
     conda activate pymoo
 
@@ -38,6 +40,7 @@ Since for speedup some of the modules are also available compiled you can double
 if the compilation worked:
 
 .. code:: bash
+
     python -c 'from pymoo.cython.function_loader import is_compiled;print("Compiled Extentions: ", is_compiled())'
 
 
