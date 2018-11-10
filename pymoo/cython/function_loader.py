@@ -4,19 +4,22 @@ import importlib
 class FunctionLoader:
     __instance = None
 
-    def __init__(self) -> None:
-        super().__init__()
-
-        self.cythonize = False
-
+    def is_compiled(self):
         try:
             from pymoo.cython.info import info
             if info() == "yes":
-                self.cythonize = True
+                return True
             else:
-                raise Exception()
+                return False
         except:
-            print("\nCython can not be used. Compile for speedup!\n")
+            return False
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.cythonize = self.is_compiled()
+
+        if not self.cythonize:
+            print("\nCompiled libraries can not be used. Compile for speedup!\n")
 
     @staticmethod
     def get_instance():
@@ -45,3 +48,7 @@ class FunctionLoader:
 
 def load_function(module, func_name=None):
     return FunctionLoader.get_instance().load(module, func_name=func_name)
+
+
+def is_compiled():
+    return FunctionLoader.get_instance().is_compiled()

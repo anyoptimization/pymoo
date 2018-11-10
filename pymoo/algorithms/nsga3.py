@@ -2,6 +2,7 @@ import numpy as np
 from numpy.linalg import LinAlgError
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
+from pymoo.cython.function_loader import load_function
 from pymoo.model.individual import Individual
 from pymoo.model.survival import Survival
 from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
@@ -11,7 +12,6 @@ from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
 from pymoo.rand import random
 from pymoo.util.display import disp_multi_objective
-from pymoo.util.function_loader import load_function
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 

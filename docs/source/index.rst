@@ -3,13 +3,11 @@
    :caption: Contents:
 
 
-Requirements
-==================================
-.. include:: _requirements.rst
 
 Installation
 ==================================
 .. include:: _installation.rst
+
 
 
 Algorithms
