@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
     testmodules = [
         'tests.test_nsga2',
-        'tests.test_usage'
+        'pymoo.usage.test_usage'
     ]
 
     suite = unittest.TestSuite()

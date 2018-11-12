@@ -6,7 +6,7 @@ from pymoo.operators.sampling.bin_random_sampling import BinaryRandomSampling
 from pymoo.optimize import minimize
 from pymop import create_random_knapsack_problem
 
-problem = create_random_knapsack_problem(30, seed=1)
+problem = create_random_knapsack_problem(30)
 
 res = minimize(problem,
                method='ga',
