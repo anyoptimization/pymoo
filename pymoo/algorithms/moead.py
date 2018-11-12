@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from decomposition import PenaltyBasedBoundaryIntersection
+from pymoo.cython.decomposition import PenaltyBasedBoundaryIntersection, Tchebicheff
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.default_operators import set_if_none
@@ -14,9 +14,8 @@ from pymoo.util.display import disp_multi_objective
 class MOEAD(GeneticAlgorithm):
     def __init__(self,
                  ref_dirs,
-                 n_neighbors=10,
-                 # decomposition=Tchebicheff(),
-                 decomposition=PenaltyBasedBoundaryIntersection(5),
+                 n_neighbors=15,
+                 decomposition='auto',
                  prob_neighbor_mating=0.7,
                  **kwargs):
 
@@ -46,8 +45,29 @@ class MOEAD(GeneticAlgorithm):
         self.neighbors = np.argsort(cdist(self.ref_dirs, self.ref_dirs), axis=1, kind='quicksort')[:, :self.n_neighbors]
 
     def _initialize(self):
+
+        if isinstance(self.decomposition, str):
+
+            # for one or two objectives use tchebi otherwise pbi
+            if self.decomposition == 'auto':
+                if self.problem.n_obj <= 2:
+                    str_decomposition = 'tchebi'
+                else:
+                    str_decomposition = 'pbi'
+            else:
+                str_decomposition = self.decomposition
+
+            if str_decomposition == 'tchebi':
+                self._decomposition = Tchebicheff()
+            elif str_decomposition == 'pbi':
+                self._decomposition = PenaltyBasedBoundaryIntersection(5)
+
+        else:
+            self._decomposition = self.decomposition
+
         pop = super()._initialize()
         self.ideal_point = np.min(pop.get("F"), axis=0)
+
         return pop
 
     def _next(self, pop):
@@ -75,8 +95,8 @@ class MOEAD(GeneticAlgorithm):
             self.ideal_point = np.min(np.vstack([self.ideal_point, off.F]), axis=0)
 
             # calculate the decomposed values for each neighbor
-            FV = self.decomposition.do(pop[N].get("F"), weights=self.ref_dirs[N, :], ideal_point=self.ideal_point)
-            off_FV = self.decomposition.do(off.F[None, :], weights=self.ref_dirs[N, :], ideal_point=self.ideal_point)
+            FV = self._decomposition.do(pop[N].get("F"), weights=self.ref_dirs[N, :], ideal_point=self.ideal_point)
+            off_FV = self._decomposition.do(off.F[None, :], weights=self.ref_dirs[N, :], ideal_point=self.ideal_point)
 
             # get the absolute index in F where offspring is better than the current F (decomposed space)
             I = np.where(off_FV < FV)[0]

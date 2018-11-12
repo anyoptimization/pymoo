@@ -13,7 +13,6 @@ ref_dirs = UniformReferenceDirectionFactory(2, n_points=92).do()
 # create the pareto front for the given reference lines
 pf = problem.pareto_front(100)
 
-# solve the given problem using an optimization algorithm (here: nsga3)
 res = minimize(problem,
                method='rnsga3',
                method_args={

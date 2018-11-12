@@ -220,13 +220,6 @@ def niching(F, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
     return survivors
 
 
-def calc_niche_count(n_niches, niche_of_individuals):
-    niche_count = np.zeros(n_niches, dtype=np.int)
-    index, count = np.unique(niche_of_individuals, return_counts=True)
-    niche_count[index] = count
-    return niche_count
-
-
 def associate_to_niches(F, niches, ideal_point, nadir_point, utopian_epsilon=0.0):
     utopian_point = ideal_point - utopian_epsilon
 
