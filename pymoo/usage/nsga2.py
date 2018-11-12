@@ -4,13 +4,14 @@ from pymop.factory import get_problem
 
 # create the optimization problem
 problem = get_problem("zdt1")
+pf = problem.pareto_front(100)
 
 # solve the given problem using an optimization algorithm (here: nsga2)
 res = minimize(problem,
                method='nsga2',
                method_args={'pop_size': 100},
                termination=('n_gen', 200),
-               pf=problem.pareto_front(100),
+               pf=pf,
                save_history=False,
                disp=True)
-plotting.plot(res.F)
+plotting.plot(pf, res.F, labels=["Pareto-front", "F"])
