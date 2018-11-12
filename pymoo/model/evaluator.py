@@ -1,5 +1,6 @@
 import numpy as np
 
+from pymoo.model.individual import Individual
 from pymoo.model.population import Population
 
 
@@ -29,7 +30,17 @@ class Evaluator:
 
         """
 
-        if isinstance(X, Population):
+        if isinstance(X, Individual):
+
+            self.n_eval += 1
+            X.F, X.CV, X.G = problem.evaluate(X.X,
+                                        return_constraint_violation=True,
+                                        return_constraints=True,
+                                        individuals=X,
+                                        **kwargs)
+            X.feasible = X.CV <= 0
+
+        elif isinstance(X, Population):
 
             pop, _X = X, X.get("X")
             self.n_eval += len(pop)

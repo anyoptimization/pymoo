@@ -7,6 +7,7 @@ from pymoo.model.algorithm import Algorithm
 from pymoo.model.evaluator import Evaluator
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
+from pymoo.rand import random
 
 
 class GeneticAlgorithm(Algorithm):
@@ -19,7 +20,7 @@ class GeneticAlgorithm(Algorithm):
 
     pop_size: int
         The population size for the genetic algorithm. Depending on the problem complexity and modality the
-        it makes sense to experiment with the population size.
+        it makes sense to experiments with the population size.
         Also, to create a steady state algorithm the offspring_size can be changed.
 
     sampling : class or numpy.array
@@ -219,7 +220,7 @@ class GeneticAlgorithm(Algorithm):
 
             # if more offsprings than necessary - truncate them
             if len(_off) > self.n_offsprings - len(off):
-                I = np.arange(0, self.n_offsprings - len(off))
+                I = random.perm(self.n_offsprings - len(off))
                 _off = _off[I]
 
             # add to the offsprings and increase the mating counter
@@ -233,14 +234,11 @@ class GeneticAlgorithm(Algorithm):
 
         return off
 
-
-
     def _finalize(self):
         pass
 
 
 def default_is_duplicate(pop, *other, epsilon=1e-20):
-
     if len(other) == 0:
         return np.full(len(pop), False)
 

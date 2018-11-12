@@ -1,4 +1,3 @@
 recursive-include pymoo *.py *.pyx *.pxd
 recursive-exclude pymoo *.so
-recursive-include usage *.py *.pyx *.pxd
 include LICENSE

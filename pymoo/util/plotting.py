@@ -3,7 +3,9 @@ import numpy as np
 from matplotlib import animation
 
 
-def plot(F, problem=None, **kwargs):
+def plot(*args, show=True, **kwargs):
+    F = args[0]
+
     if F.ndim == 1:
         print("Cannot plot a one dimensional array.")
         return
@@ -11,33 +13,38 @@ def plot(F, problem=None, **kwargs):
     n_dim = F.shape[1]
 
     if n_dim == 2:
-        plot_2d(F, problem, **kwargs)
+        plot_2d(*args, **kwargs)
     elif n_dim == 3:
-        plot_3d(F, **kwargs)
+        plot_3d(*args, **kwargs)
     else:
         print("Cannot plot a %s dimensional array." % n_dim)
         return
 
+    plt.legend()
+    if show:
+        plt.show()
 
-def plot_3d(F, show=True):
+
+def plot_3d(*args, labels=None):
     fig = plt.figure()
     from mpl_toolkits.mplot3d import Axes3D
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(F[:, 0], F[:, 1], F[:, 2])
 
-    if show:
-        plt.show()
+    for i, F in enumerate(args):
+        if labels:
+            ax.scatter(F[:, 0], F[:, 1], F[:, 2], label=labels[i])
+        else:
+            ax.scatter(F[:, 0], F[:, 1], F[:, 2])
 
 
-def plot_2d(F, pf=None, show=True):
-    plt.scatter(F[:, 0], F[:, 1], label="F")
 
-    if pf is not None:
-        plt.scatter(pf[:, 0], pf[:, 1], label='Pareto Front', s=20, facecolors='none', edgecolors='r')
-        plt.legend()
+def plot_2d(*args, labels=None):
 
-    if show:
-        plt.show()
+    for i, F in enumerate(args):
+        if labels:
+            plt.scatter(F[:, 0], F[:, 1], label=labels[i])
+        else:
+            plt.scatter(F[:, 0], F[:, 1])
 
 
 def animate(path_to_file, H, problem=None, func_iter=None):
