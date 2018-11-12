@@ -23,7 +23,7 @@ kwargs = dict(
     long_description=readme(),
     license='Apache License 2.0',
     keywords="optimization",
-    packages=setuptools.find_packages(exclude=['tests', 'docs']),
+    packages=setuptools.find_packages(exclude=['tests', 'docs', 'experiments']),
     install_requires=['pymop==0.2.3', 'numpy', 'scipy', 'matplotlib'],
     include_package_data=True,
     platforms='any'

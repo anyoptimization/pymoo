@@ -14,6 +14,8 @@ README.html
 
 pymoo/cython/*html
 
+experiments/runs
+
 
 tests/resources/*
 
