@@ -4,9 +4,8 @@ from pymop.factory import get_problem
 
 # create the optimization problem
 problem = get_problem("zdt1")
-pf = problem.pareto_front(100)
+pf = problem.pareto_front()
 
-# solve the given problem using an optimization algorithm (here: nsga2)
 res = minimize(problem,
                method='nsga2',
                method_args={'pop_size': 100},

@@ -1,6 +1,6 @@
 import numpy as np
 
-from function_loader import load_function
+from pymoo.cython.function_loader import load_function
 
 
 class Decomposition:
@@ -29,7 +29,6 @@ class PenaltyBasedBoundaryIntersection(Decomposition):
             raise Exception("Either for each point a weight, one weight, or one objective value.")
 
         func = load_function("decomposition", "pbi")
-        #func = pbi
         return func(F, weights, ideal_point, self.theta)
 
 
@@ -41,8 +40,8 @@ class WeightedSum(Decomposition):
 
 class Tchebicheff(Decomposition):
 
-    def _do(self, F, weights, ideal_point, **kwargs):
-        v = np.abs(F - ideal_point) * weights
+    def _do(self, F, weights, ideal_point, eps=1e-10, **kwargs):
+        v = np.abs(F - ideal_point + eps) * weights
         return np.max(v, axis=1)
 
 
