@@ -31,15 +31,15 @@ class NSGA2(GeneticAlgorithm):
 
         super().__init__(**kwargs)
 
-        self.data['tournament_type'] = 'comp_by_dom_and_crowding'
+        self.tournament_type = 'comp_by_dom_and_crowding'
         self.func_display_attrs = disp_multi_objective
 
 
-def binary_tournament(pop, P, D, **kwargs):
+def binary_tournament(pop, P, algorithm, **kwargs):
     if P.shape[1] != 2:
         raise ValueError("Only implemented for binary tournament!")
 
-    tournament_type = D['tournament_type']
+    tournament_type = algorithm.tournament_type
     S = np.full(P.shape[0], np.nan)
 
     for i in range(P.shape[0]):

@@ -1,7 +1,7 @@
+import numpy as np
+
 from pymoo.model.mutation import Mutation
 from pymoo.rand import random
-
-import numpy as np
 
 
 class DifferentialEvolutionMutation(Mutation):
@@ -10,11 +10,11 @@ class DifferentialEvolutionMutation(Mutation):
         self.CR = CR
         self.variant = variant
 
-    def _do(self, problem, pop, D=None, **kwargs):
+    def _do(self, problem, pop, algorithm, **kwargs):
 
         X = pop.get("X")
 
-        off = D['off']
+        off = algorithm.off
         _X = off.get("X")
 
         # do the crossover

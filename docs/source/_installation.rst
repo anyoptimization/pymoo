@@ -9,7 +9,7 @@ Then from scratch create a virtual environment for pymoo:
 
 .. code:: bash
 
-    conda create -n pymoo -y python==3.7.1 cython numpy
+    conda create -n pymoo -y python==3.6 cython numpy
     conda activate pymoo
 
 
@@ -32,6 +32,5 @@ if the compilation worked:
 
 .. code:: bash
 
-    python -c 'from pymoo.cython.function_loader import is_compiled;print("Compiled Extentions: ", is_compiled())'
-
+    python -c "from pymoo.cython.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
 
