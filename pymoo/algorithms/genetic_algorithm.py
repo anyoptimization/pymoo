@@ -1,4 +1,5 @@
 import math
+import types
 
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -194,9 +195,9 @@ class GeneticAlgorithm(Algorithm):
             if self.eliminate_duplicates:
                 # eliminate duplicates if too close to the current population or already recombined individuals
                 if isinstance(self.eliminate_duplicates, bool):
-                    is_duplicate = default_is_duplicate(_off, pop, off)
-                elif isinstance(self.eliminate_duplicates, function):
-                    is_duplicate = self.eliminate_duplicates(_off, pop, off)
+                    is_duplicate = default_is_duplicate(_off, pop, off, algorithm=self)
+                elif isinstance(self.eliminate_duplicates, types.FunctionType):
+                    is_duplicate = self.eliminate_duplicates(_off, pop, off, algorithm=self)
                 # filter out the duplicates from the offsprings before adding
                 _off = _off[np.logical_not(is_duplicate)]
 
@@ -220,7 +221,7 @@ class GeneticAlgorithm(Algorithm):
         pass
 
 
-def default_is_duplicate(pop, *other, epsilon=1e-20):
+def default_is_duplicate(pop, *other, epsilon=1e-20, **kwargs):
     if len(other) == 0:
         return np.full(len(pop), False)
 
