@@ -5,11 +5,11 @@ from pymoo.indicators.hv import Hypervolume
 from pymoo.indicators.igd import IGD
 
 
-def disp_single_objective(problem, evaluator, D, pf=None):
-    attrs = [('n_gen', D['n_gen'], 5),
+def disp_single_objective(problem, evaluator, algorithm, pf=None):
+    attrs = [('n_gen', algorithm.n_gen, 5),
              ('n_eval', evaluator.n_eval, 7)]
 
-    F, CV = D['pop'].get("F", "CV")
+    F, CV = algorithm.pop.get("F", "CV")
 
     if problem.n_constr > 0:
         attrs.append(('cv (min/avg)', "%.5f / %.5f" % (np.min(CV), np.mean(CV)), 13))
@@ -22,11 +22,11 @@ def disp_single_objective(problem, evaluator, D, pf=None):
     return attrs
 
 
-def disp_multi_objective(problem, evaluator, D, pf=None):
-    attrs = [('n_gen', D['n_gen'], 5),
+def disp_multi_objective(problem, evaluator, algorithm, pf=None):
+    attrs = [('n_gen', algorithm.n_gen, 5),
              ('n_eval', evaluator.n_eval, 7)]
 
-    F, CV = D['pop'].get("F", "CV")
+    F, CV = algorithm.pop.get("F", "CV")
 
     if problem.n_constr > 0:
         attrs.append(('cv (min/avg)', "%.5f / %.5f" % (np.min(CV), np.mean(CV)), 13))
