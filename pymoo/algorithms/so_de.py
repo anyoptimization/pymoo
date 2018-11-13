@@ -37,18 +37,17 @@ class DifferentialEvolution(GeneticAlgorithm):
         else:
             raise Exception("Unknown selection: %s" % self.var_selection)
 
-        off = self.crossover.do(self.problem, pop, P)
-        self.data = {**self.data, "off": off}
+        self.off = self.crossover.do(self.problem, pop, P)
 
         # do the mutation by using the offsprings
-        off = self.mutation.do(self.problem, pop, D=self.data)
+        self.off = self.mutation.do(self.problem, pop, algorithm=self)
 
         # evaluate the results
-        self.evaluator.eval(self.problem, off, D=self.data)
+        self.evaluator.eval(self.problem, self.off, algorithm=self)
 
         # replace whenever offspring is better than population member
         for i in range(len(pop)):
-            if off[i].F < pop[i].F:
-                pop[i] = off[i]
+            if self.off[i].F < pop[i].F:
+                pop[i] = self.off[i]
 
         return pop

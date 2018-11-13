@@ -20,8 +20,8 @@ class MaximumFunctionCallTermination(Termination):
         super().__init__()
         self.n_max_evals = n_max_evals
 
-    def _do_continue(self, D):
-        return D['evaluator'].n_eval < self.n_max_evals
+    def _do_continue(self, algorithm):
+        return algorithm.evaluator.n_eval < self.n_max_evals
 
 
 class MaximumGenerationTermination(Termination):
@@ -30,22 +30,48 @@ class MaximumGenerationTermination(Termination):
         super().__init__()
         self.n_max_gen = n_max_gen
 
-    def _do_continue(self, D):
-        return D['n_gen'] < self.n_max_gen
+    def _do_continue(self, algorithm):
+        return algorithm.n_gen < self.n_max_gen
 
 
 class IGDTermination(Termination):
 
-    def __init__(self, problem, igd) -> None:
+    def __init__(self, min_igd, pf) -> None:
         super().__init__()
-        pf = problem.pareto_front()
-
         if pf is None:
             raise Exception("You can only use IGD termination criteria if the pareto front is known!")
 
         self.obj = IGD(pf)
-        self.igd = igd
+        self.igd = min_igd
 
-    def _do_continue(self, D):
-        return self.obj.calc(D['pop'].F) > self.igd
+    def _do_continue(self, algorithm):
+        F = algorithm.pop.get("F")
+        return self.obj.calc(F) > self.igd
 
+
+def get_termination(_type, *args, pf=None):
+    """
+
+    Parameters
+    ----------
+    _type : str
+        Type of termination as string
+    args : list
+        List of arguments for the termination object
+    pf : np.array
+        The pareto-front if it is known. Might be necessary for some termination criteria.
+
+    Returns
+    -------
+    The termination object to be used in the algorithm.
+
+    """
+    if _type == 'n_eval':
+        termination = MaximumFunctionCallTermination(*args)
+    elif _type == 'n_gen':
+        termination = MaximumGenerationTermination(*args)
+    elif _type == 'igd':
+        termination = IGDTermination(*args, pf=pf)
+    else:
+        raise Exception('Unknown Termination criterium: %s' % _type)
+    return termination

@@ -4,7 +4,6 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from pymoo.model.algorithm import Algorithm
-from pymoo.model.evaluator import Evaluator
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
 from pymoo.rand import random
@@ -98,44 +97,33 @@ class GeneticAlgorithm(Algorithm):
         if self.n_offsprings is None:
             self.n_offsprings = pop_size
 
-        # all run specific data are stored in this dictionary - (is sharing in all modules, e.g. sampling, mutation,..)
-        self.data = {}
-
         # other run specific data updated whenever solve is called - to share them in all methods
-        self.evaluator = None
-        self.problem = None
+        self.n_gen = None
+        self.pop = None
+        self.off = None
 
     def _solve(self, problem, termination):
 
-        # the evaluator object which is counting the evaluations
-        self.evaluator = Evaluator()
-        self.problem = problem
-
         # generation counter
-        n_gen = 1
-
-        # always create a new function evaluator which is counting the evaluations
-        self.data = {**self.data, 'problem': problem, 'evaluator': self.evaluator,
-                     'termination': termination, 'n_gen': n_gen}
+        self.n_gen = 1
 
         # initialize the first population and evaluate it
-        pop = self._initialize()
-        self._each_iteration(self.data, first=True)
+        self.pop = self._initialize()
+        self._each_iteration(self, first=True)
 
         # while termination criterium not fulfilled
-        while termination.do_continue(self.data):
-            self.data['n_gen'] += 1
+        while termination.do_continue(self):
+            self.n_gen += 1
 
             # do the next iteration
-            pop = self._next(pop)
-            self.data = {**self.data, 'pop': pop}
+            self.pop = self._next(self.pop)
 
             # execute the callback function in the end of each generation
-            self._each_iteration(self.data)
+            self._each_iteration(self)
 
         self._finalize()
 
-        return pop
+        return self.pop
 
     def _initialize(self):
         # ! get the initial population - different ways are possible
@@ -148,37 +136,31 @@ class GeneticAlgorithm(Algorithm):
             if isinstance(self.sampling, np.ndarray):
                 pop = pop.new("X", self.sampling)
             else:
-                pop = self.sampling.sample(self.problem, pop, self.pop_size, D=self.data)
-
-        # add to the data dictionary to be used in all modules - allows access to pop over data object
-        self.data = {**self.data, 'pop': pop}
+                pop = self.sampling.sample(self.problem, pop, self.pop_size, algorithm=self)
 
         # in case the initial population was not evaluated
         if np.any(pop.collect(lambda ind: ind.F is None, as_numpy_array=True)):
-            self.evaluator.eval(self.problem, pop, D=self.data)
+            self.evaluator.eval(self.problem, pop, algorithm=self)
 
         # that call is a dummy survival to set attributes that are necessary for the mating selection
         if self.survival:
-            pop = self.survival.do(self.problem, pop, self.pop_size, D=self.data)
+            pop = self.survival.do(self.problem, pop, self.pop_size, algorithm=self)
 
         return pop
 
     def _next(self, pop):
 
         # do the mating using the current population
-        off = self._mating(pop)
+        self.off = self._mating(pop)
 
         # evaluate the offspring
-        self.evaluator.eval(self.problem, off, D=self.data)
-
-        # add to the data dictionary of algorithms
-        self.data = {**self.data, 'off': off}
+        self.evaluator.eval(self.problem, self.off, algorithm=self)
 
         # merge the offsprings with the current population
-        pop = pop.merge(off)
+        pop = pop.merge(self.off)
 
         # the do survival selection
-        pop = self.survival.do(self.problem, pop, self.pop_size, D=self.data)
+        pop = self.survival.do(self.problem, pop, self.pop_size, algorithm=self)
 
         return pop
 
@@ -197,17 +179,17 @@ class GeneticAlgorithm(Algorithm):
             n_select = math.ceil((self.n_offsprings - len(off)) / self.crossover.n_offsprings)
 
             # select the parents for the mating - just an index array
-            parents = self.selection.do(pop, n_select, self.crossover.n_parents, D=self.data)
+            parents = self.selection.do(pop, n_select, self.crossover.n_parents, algorithm=self)
 
             # do the crossover using the parents index and the population - additional data provided if necessary
-            _off = self.crossover.do(self.problem, pop, parents, D=self.data)
+            _off = self.crossover.do(self.problem, pop, parents, algorithm=self)
 
             # do the mutation on the offsprings created through crossover
-            _off = self.mutation.do(self.problem, _off, D=self.data)
+            _off = self.mutation.do(self.problem, _off, algorithm=self)
 
             # repair the individuals if necessary
             if self.func_repair is not None:
-                self.func_repair(self.problem, _off, D=self.data)
+                self.func_repair(self.problem, _off, algorithm=self)
 
             if self.eliminate_duplicates:
                 # eliminate duplicates if too close to the current population or already recombined individuals
@@ -229,7 +211,7 @@ class GeneticAlgorithm(Algorithm):
 
             # if no new offsprings can be generated within 100 trails -> return the current result
             if n_matings > 100:
-                self.data['termination'].flag = False
+                self.termination.flag = False
                 break
 
         return off

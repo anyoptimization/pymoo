@@ -2,6 +2,7 @@ import copy
 from abc import abstractmethod
 
 import numpy as np
+from pymoo.model.evaluator import Evaluator
 
 from pymoo.model.result import Result
 from pymoo.model.termination import MaximumFunctionCallTermination
@@ -21,12 +22,16 @@ class Algorithm:
 
     def __init__(self, **kwargs) -> None:
         super().__init__()
+        self.evaluator = None
+        self.problem = None
+        self.termination = None
+        self.pf = None
+
         self.disp = None
         self.func_display_attrs = None
         self.callback = None
         self.history = []
         self.save_history = None
-        self.pf = None
 
     def solve(self,
               problem,
@@ -82,13 +87,15 @@ class Algorithm:
         # set the random seed for generator
         random.seed(seed)
 
+        # the evaluator object which is counting the evaluations
+        self.evaluator = Evaluator()
+        self.problem = problem
+        self.termination = termination
+        self.pf = pf
+
         self.disp = disp
         self.callback = callback
         self.save_history = save_history
-        self.pf = pf
-
-        if isinstance(termination, int):
-            termination = MaximumFunctionCallTermination(termination)
 
         # call the algorithm to solve the problem
         pop = self._solve(problem, termination)
@@ -127,20 +134,22 @@ class Algorithm:
 
         # display the output if defined by the algorithm
         if self.disp and self.func_display_attrs is not None:
-            disp = self.func_display_attrs(D['problem'], D['evaluator'], D, self.pf)
+            disp = self.func_display_attrs(self.problem, self.evaluator, self, self.pf)
             if disp is not None:
                 self._display(disp, header=first)
 
         # if a callback function is provided it is called after each iteration
         if self.callback is not None:
+            # use the callback here without having the function itself
             self.callback(self)
 
         if self.save_history:
-            hist = self.history
-            self.history = None
+            hist, _callback = self.history, self.callback
+            self.history, self.callback = None, None
 
             obj = copy.deepcopy(self)
             self.history = hist
+            self.callback = _callback
 
             self.history.append(obj)
 

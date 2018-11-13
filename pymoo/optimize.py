@@ -1,9 +1,9 @@
-from pymoo.model.termination import MaximumFunctionCallTermination, MaximumGenerationTermination, IGDTermination
+from pymoo.model.termination import MaximumFunctionCallTermination, MaximumGenerationTermination, IGDTermination, \
+    Termination, get_termination
 from pymoo.rand import random
 
 
 def get_alorithm(name):
-
     if name == 'ga':
         from pymoo.algorithms.so_genetic_algorithm import SingleObjectiveGeneticAlgorithm
         return SingleObjectiveGeneticAlgorithm
@@ -64,15 +64,8 @@ def minimize(problem,
     """
 
     # create an evaluator defined by the termination criterium
-    termination_criterium, termination_val = termination
-    if termination_criterium == 'n_eval':
-        termination = MaximumFunctionCallTermination(termination_val)
-    elif termination_criterium == 'n_gen':
-        termination = MaximumGenerationTermination(termination_val)
-    elif termination_criterium == 'igd':
-        termination = IGDTermination(problem, termination_val)
-    else:
-        raise Exception('Unknown Termination criterium: %s' % termination_criterium)
+    if not isinstance(termination, Termination):
+        termination = get_termination(*termination, pf=kwargs.get('pf', None))
 
     # set a random random seed if not provided
     if 'seed' not in kwargs:

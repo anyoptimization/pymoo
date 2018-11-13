@@ -1,11 +1,8 @@
 import setuptools
-from setuptools import setup
 
+from setup_ext import readme
 
-def readme():
-    with open('README.rst') as f:
-        return f.read()
-
+from setup_ext import run_setup
 
 __name__ = "pymoo"
 __author__ = "Julian Blank"
@@ -29,53 +26,8 @@ kwargs = dict(
     platforms='any'
 )
 
-
-def run_setup(binary=False):
-    if binary:
-        from Cython.Build import cythonize
-        import numpy
-
-        setup(
-            include_dirs=[numpy.get_include()],
-            ext_modules=cythonize("pymoo/cython/*.pyx"),
-            language="c++",
-            **kwargs
-        ),
-
-    else:
-        setup(**kwargs)
+run_setup(kwargs, try_to_compile_first=True)
 
 
-compile_exception = None
-plain_exception = None
 
-try:
-    run_setup(True)
 
-except Exception as _compile_exception:
-    compile_exception = _compile_exception
-
-    try:
-        run_setup(False)
-    except Exception as _plain_exception:
-        plain_exception = _plain_exception
-
-if compile_exception is None:
-    print('*' * 75)
-    print("Python installation with compiled extensions succeeded.")
-    print('*' * 75)
-else:
-    print('*' * 75)
-    print("WARNING", compile_exception)
-    print("WARNING: The C extension could not be compiled, speedups are not enabled.")
-    print("WARNING: pip install cython numpy")
-    print("WARNING: Also, make sure you have a compiler for C (gcc, clang, mscpp, ..)")
-    print('*' * 75)
-
-    if plain_exception is None:
-        print("Plain Python installation succeeded.")
-        print('*' * 75)
-    else:
-        print("WARNING", plain_exception)
-        print("WARNING", "Error while installation.")
-        print('*' * 75)
