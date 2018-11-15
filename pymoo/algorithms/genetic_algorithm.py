@@ -1,5 +1,4 @@
 import math
-import types
 
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -90,6 +89,8 @@ class GeneticAlgorithm(Algorithm):
 
         # a function that returns the indices of duplicates
         self.eliminate_duplicates = eliminate_duplicates
+        if isinstance(self.eliminate_duplicates, bool):
+            self.eliminate_duplicates = default_is_duplicate
 
         # the object to be used to represent an individual - either individual or derived class
         self.individual = individual
@@ -138,6 +139,10 @@ class GeneticAlgorithm(Algorithm):
                 pop = pop.new("X", self.sampling)
             else:
                 pop = self.sampling.sample(self.problem, pop, self.pop_size, algorithm=self)
+
+        # repair in case it is necessary
+        if self.func_repair:
+            pop = self.func_repair(self.problem, pop, algorithm=self)
 
         # in case the initial population was not evaluated
         if np.any(pop.collect(lambda ind: ind.F is None, as_numpy_array=True)):
@@ -190,15 +195,10 @@ class GeneticAlgorithm(Algorithm):
 
             # repair the individuals if necessary
             if self.func_repair is not None:
-                self.func_repair(self.problem, _off, algorithm=self)
+                _off = self.func_repair(self.problem, _off, algorithm=self)
 
-            if self.eliminate_duplicates:
-                # eliminate duplicates if too close to the current population or already recombined individuals
-                if isinstance(self.eliminate_duplicates, bool):
-                    is_duplicate = default_is_duplicate(_off, pop, off, algorithm=self)
-                elif isinstance(self.eliminate_duplicates, types.FunctionType):
-                    is_duplicate = self.eliminate_duplicates(_off, pop, off, algorithm=self)
-                # filter out the duplicates from the offsprings before adding
+            if self.eliminate_duplicates is not None:
+                is_duplicate = self.eliminate_duplicates(_off, pop, off, algorithm=self)
                 _off = _off[np.logical_not(is_duplicate)]
 
             # if more offsprings than necessary - truncate them
@@ -212,7 +212,7 @@ class GeneticAlgorithm(Algorithm):
 
             # if no new offsprings can be generated within 100 trails -> return the current result
             if n_matings > 100:
-                self.termination.flag = False
+                print("WARNING: Recombination could not produce new offsprings which are not already in the population!")
                 break
 
         return off

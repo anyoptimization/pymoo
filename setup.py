@@ -1,12 +1,23 @@
+from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
+
 import setuptools
+from setuptools import Extension
 
-from setup_ext import readme
+import numpy as np
 
-from setup_ext import run_setup
+from setup_ext import readme, run_setup
+
+
+def get_extension_modules():
+    ext_modules = []
+    for f in ["info", "non_dominated_sorting_cython", "decomposition_cython", "calc_perpendicular_distance_cython"]:
+        ext_modules.append(Extension('pymoo.cython.%s' % f, sources=['pymoo/cython/%s.pyx' % f], language="c++"))
+    return ext_modules
+
 
 __name__ = "pymoo"
 __author__ = "Julian Blank"
-__version__ = '0.2.3'
+__version__ = '0.2.4-dev'
 __url__ = "https://github.com/msu-coinlab/pymoo"
 
 kwargs = dict(
@@ -14,7 +25,7 @@ kwargs = dict(
     version=__version__,
     author=__author__,
     url=__url__,
-    python_requires='>3.3.0',
+    python_requires='>3.6',
     author_email="blankjul@egr.msu.edu",
     description="Multi-Objective Optimization Algorithms",
     long_description=readme(),
@@ -22,12 +33,9 @@ kwargs = dict(
     keywords="optimization",
     packages=setuptools.find_packages(exclude=['tests', 'docs', 'experiments']),
     install_requires=['pymop==0.2.3', 'numpy', 'scipy', 'matplotlib'],
+    setup_requires=['setuptools>=18.0', 'cython>=0.28.4'],
     include_package_data=True,
     platforms='any'
 )
 
-run_setup(kwargs, try_to_compile_first=True)
-
-
-
-
+run_setup(kwargs)

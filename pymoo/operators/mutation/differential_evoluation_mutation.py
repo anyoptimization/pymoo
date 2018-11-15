@@ -6,14 +6,13 @@ from pymoo.rand import random
 
 class DifferentialEvolutionMutation(Mutation):
     def __init__(self, variant, CR):
-        super().__init__(True)
+        super().__init__()
         self.CR = CR
         self.variant = variant
 
     def _do(self, problem, pop, algorithm, **kwargs):
 
         X = pop.get("X")
-
         off = algorithm.off
         _X = off.get("X")
 

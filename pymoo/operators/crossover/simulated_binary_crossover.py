@@ -2,19 +2,19 @@ import numpy as np
 
 from pymoo.model.crossover import Crossover
 from pymoo.rand import random
+from pymoo.util.misc import covert_to_type
 
 
 class SimulatedBinaryCrossover(Crossover):
     def __init__(self, prob_cross, eta_cross):
-        super().__init__(2, 2, True)
+        super().__init__(2, 2)
         self.prob_cross = float(prob_cross)
         self.eta_cross = float(eta_cross)
 
     def _do(self, problem, pop, parents, **kwargs):
-
         n_matings = parents.shape[0]
         children = np.full((n_matings * self.n_offsprings, problem.n_var), np.inf)
-        X = pop.get("X")[parents.T]
+        X = pop.get("X")[parents.T].astype(np.double)
 
         # crossover mask that will be used in the end
         do_crossover = np.full(X[0].shape, True)
@@ -48,7 +48,8 @@ class SimulatedBinaryCrossover(Crossover):
         delta = (y2 - y1)
 
         # now just be sure not dividing by zero (these cases will be filtered later anyway)
-        delta[delta < 1.0e-14] = 1.0e-14
+        #delta[np.logical_or(delta < 1.0e-10, np.logical_not(do_crossover))] = 1.0e-10
+        delta[delta < 1.0e-10] = 1.0e-10
 
         beta = 1.0 + (2.0 * (y1 - problem.xl) / delta)
         betaq = calc_betaq(beta)
@@ -65,7 +66,7 @@ class SimulatedBinaryCrossover(Crossover):
         c2[b] = val
 
         # take the parents as template
-        c = X
+        c = X.astype(np.double)
 
         # copy the positions where the crossover was done
         c[0, do_crossover] = c1[do_crossover]
@@ -76,7 +77,10 @@ class SimulatedBinaryCrossover(Crossover):
         children[n_matings:, :] = c[1]
 
         # just be sure we are not out of bounds
-        children[children < problem.xl] = np.repeat(problem.xl[None, :], children.shape[0], axis=0)[children < problem.xl]
-        children[children > problem.xu] = np.repeat(problem.xu[None, :], children.shape[0], axis=0)[children > problem.xu]
+        children[children < problem.xl] = np.repeat(problem.xl[None, :], children.shape[0], axis=0)[
+            children < problem.xl]
+        children[children > problem.xu] = np.repeat(problem.xu[None, :], children.shape[0], axis=0)[
+            children > problem.xu]
 
+        children = covert_to_type(problem, children)
         return pop.new("X", children)

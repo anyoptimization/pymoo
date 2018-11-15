@@ -7,7 +7,7 @@ from pymoo.rand import random
 class BinaryBitflipMutation(Mutation):
 
     def __init__(self, p_mut=None):
-        super().__init__(True)
+        super().__init__()
         self.p_mut = p_mut
 
     def _do(self, problem, pop, **kwargs):

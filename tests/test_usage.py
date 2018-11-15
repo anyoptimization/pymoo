@@ -5,8 +5,8 @@ class UsageTest(unittest.TestCase):
 
     def test(self):
 
-        #USAGE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "pymoo", "usage")
-        USAGE_DIR = os.path.dirname(os.path.realpath(__file__))
+        USAGE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "pymoo", "usage")
+        #USAGE_DIR = os.path.dirname(os.path.realpath(__file__))
 
         for fname in os.listdir(USAGE_DIR):
 

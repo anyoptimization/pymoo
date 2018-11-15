@@ -1,6 +1,9 @@
 import numpy as np
 
-from pymoo.algorithms.nsga3 import NSGA3, ReferenceDirectionSurvival
+from pymoo.algorithms.nsga3 import NSGA3, ReferenceDirectionSurvival, get_extreme_points_c, get_nadir_point, \
+    associate_to_niches, calc_niche_count, niching
+from pymoo.model.survival import Survival
+from pymoo.util.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
 
 
@@ -11,27 +14,22 @@ class RNSGA3(NSGA3):
                  pop_per_ref_point,
                  mu=0.05,
                  **kwargs):
-
         print("WARNING: There is still a bug here. Will be fixed soon!")
 
         n_obj = ref_points.shape[1]
-        n_ref_points = ref_points.shape[0]
 
         # add the aspiration point lines
-        aspiration_ref_dirs = []
-        for i in range(n_ref_points):
-            ref_dirs = UniformReferenceDirectionFactory(n_dim=n_obj, n_points=pop_per_ref_point).do()
-            aspiration_ref_dirs.extend(ref_dirs)
-        aspiration_ref_dirs = np.array(aspiration_ref_dirs)
+        aspiration_ref_dirs = UniformReferenceDirectionFactory(n_dim=n_obj, n_points=pop_per_ref_point).do()
 
         kwargs['ref_dirs'] = aspiration_ref_dirs
         super().__init__(**kwargs)
 
+        self.pop_size = ref_points.shape[0] * aspiration_ref_dirs.shape[0] + aspiration_ref_dirs.shape[1]
+        
         # create the survival strategy
         self.survival = AspirationPointSurvival(ref_points, aspiration_ref_dirs, mu=mu)
 
     def _solve(self, problem, termination):
-
         if self.survival.ref_points.shape[1] != problem.n_obj:
             raise Exception("Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
                             (self.survival.ref_points.shape[1], problem.n_obj))
@@ -39,18 +37,88 @@ class RNSGA3(NSGA3):
         return super()._solve(problem, termination)
 
 
-class AspirationPointSurvival(ReferenceDirectionSurvival):
-    def __init__(self, ref_points, aspiration_ref_dirs, mu=0.1):
+class AspirationPointSurvival(Survival):
 
-        super().__init__(np.zeros((0, ref_points.shape[1])))
+    def __init__(self, ref_points, aspiration_ref_dirs, mu=0.1):
+        super().__init__(True)
+
         self.ref_points = ref_points
         self.aspiration_ref_dirs = aspiration_ref_dirs
         self.mu = mu
 
-    def get_ref_dirs(self):
+        self.extreme_points = None
+        self.intercepts = None
+        self.nadir_point = None
+        self.ideal_point = np.full(ref_points.shape[1], np.inf)
+        self.worst_point = np.full(ref_points.shape[1], -np.inf)
+
+    def _do(self, pop, n_survive, D=None, **kwargs):
+
+        # attributes to be set after the survival
+        F = pop.get("F")
+
+        # find or usually update the new ideal point - from feasible solutions
+        self.ideal_point = np.min(np.vstack((self.ideal_point, F, self.ref_points)), axis=0)
+        self.worst_point = np.max(np.vstack((self.worst_point, F, self.ref_points)), axis=0)
+
+        # calculate the fronts of the population
+        fronts, rank = NonDominatedSorting().do(F, return_rank=True, n_stop_if_ranked=n_survive)
+        non_dominated, last_front = fronts[0], fronts[-1]
+
+        # find the extreme points for normalization
+        self.extreme_points = get_extreme_points_c(
+            np.vstack([F[non_dominated], self.ref_points])
+            , self.ideal_point,
+            extreme_points=self.extreme_points)
+
+        # find the intercepts for normalization and do backup if gaussian elimination fails
+        worst_of_population = np.max(F, axis=0)
+        worst_of_front = np.max(F[non_dominated, :], axis=0)
+
+        self.nadir_point = get_nadir_point(self.extreme_points, self.ideal_point, self.worst_point,
+                                           worst_of_population, worst_of_front)
+
+        #  consider only the population until we come to the splitting front
+        I = np.concatenate(fronts)
+        pop, rank, F = pop[I], rank[I], F[I]
+
+        # update the front indices for the current population
+        counter = 0
+        for i in range(len(fronts)):
+            for j in range(len(fronts[i])):
+                fronts[i][j] = counter
+                counter += 1
+        last_front = fronts[-1]
+
         unit_ref_points = (self.ref_points - self.ideal_point) / (self.nadir_point - self.ideal_point)
         ref_dirs = get_ref_dirs_from_points(unit_ref_points, self.aspiration_ref_dirs, mu=self.mu)
-        return ref_dirs
+
+        # associate individuals to niches
+        niche_of_individuals, dist_to_niche = associate_to_niches(F, ref_dirs, self.ideal_point, self.nadir_point)
+        pop.set('rank', rank, 'niche', niche_of_individuals, 'dist_to_niche', dist_to_niche)
+
+        # if we need to select individuals to survive
+        if len(pop) > n_survive:
+
+            # if there is only one front
+            if len(fronts) == 1:
+                n_remaining = n_survive
+                until_last_front = np.array([], dtype=np.int)
+                niche_count = np.zeros(len(ref_dirs), dtype=np.int)
+
+            # if some individuals already survived
+            else:
+                until_last_front = np.concatenate(fronts[:-1])
+                niche_count = calc_niche_count(len(ref_dirs), niche_of_individuals[until_last_front])
+                n_remaining = n_survive - len(until_last_front)
+
+            S = niching(F[last_front, :], n_remaining, niche_count, niche_of_individuals[last_front],
+                        dist_to_niche[last_front])
+
+            survivors = np.concatenate((until_last_front, last_front[S].tolist()))
+            pop = pop[survivors]
+
+        return pop
 
 
 def get_ref_dirs_from_points(ref_point, ref_dirs, mu=0.1):
@@ -83,10 +151,10 @@ def get_ref_dirs_from_points(ref_point, ref_dirs, mu=0.1):
         ref_dir_for_aspiration_point += shift
 
         # If reference directions are located outside of first octant, redefine points onto the border
-        #if not (ref_dir_for_aspiration_point > 0).min():
-        #    ref_dir_for_aspiration_point[ref_dir_for_aspiration_point < 0] = 0
-        #    ref_dir_for_aspiration_point = ref_dir_for_aspiration_point / np.sum(ref_dir_for_aspiration_point, axis=1)[
-        #                                                                :, None]
+        if not (ref_dir_for_aspiration_point > 0).min():
+            ref_dir_for_aspiration_point[ref_dir_for_aspiration_point < 0] = 0
+            ref_dir_for_aspiration_point = ref_dir_for_aspiration_point / np.sum(ref_dir_for_aspiration_point, axis=1)[
+                                                                          :, None]
         val.extend(ref_dir_for_aspiration_point)
 
     val.extend(np.eye(n_obj))  # Add extreme points

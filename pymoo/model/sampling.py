@@ -2,6 +2,7 @@ from abc import abstractmethod
 
 import numpy as np
 
+from pymoo.model.population import Population
 from pymop.problem import Problem
 
 
@@ -71,5 +72,5 @@ def sample_by_bounds(clazz, n_samples, n_var, x_min, x_max, **kwargs):
             self.xl = np.full(n_var, x_min)
             self.xu = np.full(n_var, x_max)
 
-    return clazz.sample(P(), n_samples, **kwargs)
+    return clazz.sample(P(), Population(), n_samples, **kwargs).get("X")
 

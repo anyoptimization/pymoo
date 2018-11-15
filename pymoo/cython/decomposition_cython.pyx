@@ -1,5 +1,5 @@
 # distutils: language = c++
-# cython: boundscheck=False, wraparound=False, cdivision=True
+# cython: language_level=2, boundscheck=False, wraparound=False, cdivision=True
 
 
 from calc_perpendicular_distance_cython cimport c_norm

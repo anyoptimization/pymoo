@@ -1,7 +1,7 @@
 import numpy as np
 
-from pymoo.operators.crossover.bin_uniform_crossover import BinaryUniformCrossover
-from pymoo.operators.mutation.bin_bitflip_mutation import BinaryBitflipMutation
+from pymoo.operators.crossover.uniform_crossover import BinaryUniformCrossover
+from pymoo.operators.mutation.bitflip_mutation import BinaryBitflipMutation
 from pymoo.operators.sampling.bin_random_sampling import BinaryRandomSampling
 from pymoo.optimize import minimize
 from pymop import create_random_knapsack_problem

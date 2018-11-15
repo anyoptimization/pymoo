@@ -83,6 +83,15 @@ def vectorized_cdist(A, B, func_dist):
     return M
 
 
+def covert_to_type(problem, X):
+    if problem.type_var == np.double:
+        return X.astype(np.double)
+    elif problem.type_var == np.int:
+        return np.round(X).astype(np.int)
+    elif problem.type_var == np.bool:
+        return X < (problem.xu - problem.xl) / 2
+
+
 if __name__ == '__main__':
     M = np.random.random((100, 3))
 
