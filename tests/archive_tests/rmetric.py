@@ -7,7 +7,7 @@ import numpy as np
 from pymoo.algorithms.rnsga3 import RNSGA3
 from pymoo.indicators.rmetric import RMetric
 from pymoo.model.evaluator import Evaluator
-from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymop.dtlz import DTLZ2
 from pymop.zdt import ZDT1, ZDT2, ZDT3
 

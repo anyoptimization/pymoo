@@ -3,10 +3,10 @@ import numpy as np
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.model.individual import Individual
 from pymoo.model.survival import Survival
-from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.default_operators import set_if_none
-from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
+from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
+from pymoo.operators.sampling.random_sampling import RandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
 from pymoo.util.display import disp_multi_objective
 from pymoo.util.dominator import Dominator
@@ -22,7 +22,7 @@ class NSGA2(GeneticAlgorithm):
 
         # default settings for nsga2 - not overwritten if provided as kwargs
         set_if_none(kwargs, 'pop_size', pop_size)
-        set_if_none(kwargs, 'sampling', RealRandomSampling())
+        set_if_none(kwargs, 'sampling', RandomSampling())
         set_if_none(kwargs, 'selection', TournamentSelection(func_comp=binary_tournament))
         set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=15))
         set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=None, eta_mut=20))

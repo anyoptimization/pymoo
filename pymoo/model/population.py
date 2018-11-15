@@ -5,7 +5,7 @@ from pymoo.model.individual import Individual
 
 class Population(np.ndarray):
 
-    def __new__(cls, n_individuals=0, individual=Individual):
+    def __new__(cls, n_individuals=0, individual=Individual()):
         obj = super(Population, cls).__new__(cls, n_individuals, dtype=individual.__class__).view(cls)
         for i in range(n_individuals):
             obj[i] = individual.copy()
@@ -58,7 +58,7 @@ class Population(np.ndarray):
 
                 if key in self[i].__dict__:
                     self[i].__dict__[key] = values[i]
-                elif key in self[i].data:
+                else:
                     self[i].data[key] = values[i]
 
     def get(self, *args):

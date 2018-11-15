@@ -2,11 +2,12 @@ import numpy as np
 
 from pymoo.model.mutation import Mutation
 from pymoo.rand import random
+from pymoo.util.misc import covert_to_type
 
 
 class PolynomialMutation(Mutation):
     def __init__(self, eta_mut, prob_mut=None):
-        super().__init__(True)
+        super().__init__()
         self.eta_mut = float(eta_mut)
         if prob_mut is not None:
             self.prob_mut = float(prob_mut)

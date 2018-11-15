@@ -3,9 +3,8 @@ from abc import abstractmethod
 
 class Mutation:
 
-    def __init__(self, vectorized) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self.vectorized = vectorized
 
     def do(self, problem, pop, **kwargs):
         """

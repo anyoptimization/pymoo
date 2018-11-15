@@ -1,9 +1,9 @@
 import numpy as np
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.operators.crossover.real_differental_evolution_crossover import DifferentialEvolutionCrossover
+from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
 from pymoo.operators.default_operators import set_default_if_none
-from pymoo.operators.mutation.real_differential_evoluation_mutation import DifferentialEvolutionMutation
+from pymoo.operators.mutation.differential_evoluation_mutation import DifferentialEvolutionMutation
 from pymoo.operators.selection.random_selection import RandomSelection
 from pymoo.util.display import disp_single_objective
 

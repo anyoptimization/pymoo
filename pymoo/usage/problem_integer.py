@@ -1,37 +1,38 @@
 import numpy as np
-from pymop.factory import get_problem_from_func
 
-from pymoo.operators.crossover.bin_uniform_crossover import BinaryUniformCrossover
-from pymoo.operators.mutation.bin_bitflip_mutation import BinaryBitflipMutation
-from pymoo.operators.sampling.bin_random_sampling import BinaryRandomSampling
+from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.optimize import minimize
-from pymop import create_random_knapsack_problem, Problem
+from pymop import Problem
 
 
 class MyProblem(Problem):
 
     def __init__(self):
-        super().__init__(n_var=2, n_obj=1, n_constr=1, xl=0, xu=10, type_var=np.double)
+        super().__init__(n_var=2, n_obj=1, n_constr=1, xl=0, xu=10, type_var=np.int)
 
     def _evaluate(self, x, f, g, *args, **kwargs):
-        f[:, 0] = - np.sum(np.power(x, 2), axis=1)
-        g[:, 0] = 10 - 0.5 * x[:, 0] - x[:, 1]
+        f[:, 0] = - np.min(x * [3, 1], axis=1)
+        g[:, 0] = x[:, 0] + x[:, 1] - 10
 
 
-problem = MyProblem()
+def repair(problem, pop, **kwargs):
+    pop.set("X", np.round(pop.get("X")).astype(np.int))
+    return pop
 
-res = minimize(problem,
+
+res = minimize(MyProblem(),
                method='ga',
                method_args={
-                   'pop_size': 100,
-                   #'sampling': BinaryRandomSampling(),
-                   #'crossover': BinaryUniformCrossover(),
-                   #'mutation': BinaryBitflipMutation(),
+                   'pop_size': 20,
+                   'crossover': SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=3),
+                   'mutation': PolynomialMutation(eta_mut=2),
                    'eliminate_duplicates': True,
+                   'func_repair': repair
                },
-               termination=('n_gen', 20),
+               termination=('n_gen', 30),
                disp=True)
 
-print("Best solution found: %s" % res.X.astype(np.int))
+print("Best solution found: %s" % res.X)
 print("Function value: %s" % res.F)
 print("Constraint violation: %s" % res.CV)

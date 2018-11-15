@@ -11,10 +11,9 @@ class Crossover:
     This class must be inherited from to provide a crossover method to an algorithm.
     """
 
-    def __init__(self, n_parents, n_offsprings, vectorized):
+    def __init__(self, n_parents, n_offsprings):
         self.n_parents = n_parents
         self.n_offsprings = n_offsprings
-        self.vectorized = vectorized
 
     def do(self, problem, pop, parents, **kwargs):
         """
@@ -50,20 +49,3 @@ class Crossover:
 
         off = self._do(problem, pop, parents, **kwargs)
         return off
-
-    @abstractmethod
-    def _do(self, problem, parents, children, **kwargs):
-        n_children = 0
-        for k in range(parents.shape[1]):
-
-            _children = np.full((self.n_offsprings, problem.n_var), np.inf)
-
-            self._mating(problem, parents[:, k, :], _children, **kwargs)
-
-            for i in range(_children.shape[0]):
-                children[n_children + i, :] = _children[i, :]
-
-            n_children += self.n_offsprings
-
-    def _mating(self, problem, parents, children, **kwargs):
-        pass

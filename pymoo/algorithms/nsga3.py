@@ -5,10 +5,10 @@ from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.cython.function_loader import load_function
 from pymoo.model.individual import Individual
 from pymoo.model.survival import Survival
-from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.default_operators import set_if_none
-from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
+from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
+from pymoo.operators.sampling.random_sampling import RandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
 from pymoo.rand import random
 from pymoo.util.display import disp_multi_objective
@@ -21,7 +21,7 @@ class NSGA3(GeneticAlgorithm):
         self.ref_dirs = ref_dirs
         kwargs['individual'] = Individual(rank=np.inf, niche=-1, dist_to_niche=np.inf)
         set_if_none(kwargs, 'pop_size', len(ref_dirs))
-        set_if_none(kwargs, 'sampling', RealRandomSampling())
+        set_if_none(kwargs, 'sampling', RandomSampling())
         set_if_none(kwargs, 'selection', TournamentSelection(func_comp=comp_by_cv_then_random))
         set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=1.0, eta_cross=20))
         set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=None, eta_mut=30))
@@ -68,9 +68,6 @@ class ReferenceDirectionSurvival(Survival):
         self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
         self.worst_point = np.full(ref_dirs.shape[1], -np.inf)
 
-    def get_ref_dirs(self):
-        return self.ref_dirs
-
     def _do(self, pop, n_survive, D=None, **kwargs):
 
         # attributes to be set after the survival
@@ -107,11 +104,8 @@ class ReferenceDirectionSurvival(Survival):
                 counter += 1
         last_front = fronts[-1]
 
-        # get the reference direction for survival
-        ref_dirs = self.get_ref_dirs()
-
         # associate individuals to niches
-        niche_of_individuals, dist_to_niche = associate_to_niches(F, ref_dirs, self.ideal_point, self.nadir_point)
+        niche_of_individuals, dist_to_niche = associate_to_niches(F, self.ref_dirs, self.ideal_point, self.nadir_point)
         pop.set('rank', rank, 'niche', niche_of_individuals, 'dist_to_niche', dist_to_niche)
 
         # if we need to select individuals to survive
@@ -121,12 +115,12 @@ class ReferenceDirectionSurvival(Survival):
             if len(fronts) == 1:
                 n_remaining = n_survive
                 until_last_front = np.array([], dtype=np.int)
-                niche_count = np.zeros(len(ref_dirs), dtype=np.int)
+                niche_count = np.zeros(len(self.ref_dirs), dtype=np.int)
 
             # if some individuals already survived
             else:
                 until_last_front = np.concatenate(fronts[:-1])
-                niche_count = calc_niche_count(len(ref_dirs), niche_of_individuals[until_last_front])
+                niche_count = calc_niche_count(len(self.ref_dirs), niche_of_individuals[until_last_front])
                 n_remaining = n_survive - len(until_last_front)
 
             S = niching(F[last_front, :], n_remaining, niche_count, niche_of_individuals[last_front],

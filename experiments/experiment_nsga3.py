@@ -4,8 +4,8 @@ This is the experiment for nsga2.
 import os
 import pickle
 
-from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
+from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.util.reference_direction import MultiLayerReferenceDirectionFactory, UniformReferenceDirectionFactory
 from pymop.factory import get_problem
 
