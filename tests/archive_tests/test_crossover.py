@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 import numpy as np
 
 from pymoo.configuration import Configuration
-from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymop.problems.zdt import ZDT4
 
 

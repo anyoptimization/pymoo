@@ -1,4 +1,9 @@
-from setuptools import setup
+from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
+
+from setuptools import setup, Extension
+from setuptools.command.build_ext import build_ext
+
+ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError, IOError)
 
 
 def readme():
@@ -6,54 +11,69 @@ def readme():
         return f.read()
 
 
-def setup_with_compilation(kwargs):
-    from Cython.Build import cythonize
-    import numpy
-
-    setup(
-        include_dirs=[numpy.get_include()],
-        ext_modules=cythonize("pymoo/cython/*.pyx", language="c++"),
-        **kwargs
-    )
+def get_extension_modules():
+    ext_modules = []
+    for f in ["info", "non_dominated_sorting_cython", "decomposition_cython", "calc_perpendicular_distance_cython"]:
+        ext_modules.append(Extension('pymoo.cython.%s' % f, sources=['pymoo/cython/%s.pyx' % f], language="c++"))
+    return ext_modules
 
 
-def run_setup(kwargs, try_to_compile_first=True):
+class BuildFailed(Exception):
+    pass
 
-    if not try_to_compile_first:
+
+def construct_build_ext(build_ext):
+    class WrappedBuildExt(build_ext):
+        # This class allows C extension building to fail.
+        def run(self):
+            try:
+                build_ext.run(self)
+            except DistutilsPlatformError as x:
+                raise BuildFailed(x)
+
+        def build_extension(self, ext):
+            try:
+                build_ext.build_extension(self, ext)
+            except ext_errors as x:
+                raise BuildFailed(x)
+
+    return WrappedBuildExt
+
+
+def run_setup(setup_args):
+    setup_args['cmdclass'] = {}
+
+    try:
+
+        # copy the kwargs
+        kwargs = dict(setup_args)
+
+        # import numpy and cython for compilation
+        try:
+            import numpy as np
+            from Cython.Build import cythonize
+        except:
+            raise BuildFailed("For compilation cython and numpy must be installed: pip install cython numpy")
+
+        kwargs['cmdclass']['build_ext'] = construct_build_ext(build_ext)
+        kwargs['ext_modules'] = cythonize("pymoo/cython/*.pyx")
+        kwargs['include_dirs'] = [np.get_include()]
+
         setup(**kwargs)
 
-    else:
+        print('*' * 75)
+        print("Compiled installation succeeded.")
+        print('*' * 75)
 
-        compile_exception = None
-        plain_exception = None
+    except BuildFailed as ex:
 
-        try:
-            setup_with_compilation(kwargs)
+        setup(**setup_args)
 
-        except Exception as _compile_exception:
-            compile_exception = _compile_exception
-
-            try:
-                setup(**kwargs)
-            except Exception as _plain_exception:
-                plain_exception = _plain_exception
-
-        if compile_exception is None:
-            print('*' * 75)
-            print("Python installation with compiled extensions succeeded.")
-            print('*' * 75)
-        else:
-            print('*' * 75)
-            print("WARNING", compile_exception)
-            print("WARNING: The C extension could not be compiled, speedups are not enabled.")
-            print("WARNING: pip install cython numpy")
-            print("WARNING: Also, make sure you have a compiler for C (gcc, clang, mscpp, ..)")
-            print('*' * 75)
-
-            if plain_exception is None:
-                print("Plain Python installation succeeded.")
-                print('*' * 75)
-            else:
-                print("WARNING", plain_exception)
-                print("WARNING", "Error while installation.")
-                print('*' * 75)
+        print('*' * 75)
+        print("WARNING", ex)
+        print("WARNING: The C extension could not be compiled, speedups are not enabled.")
+        print("WARNING: pip install cython numpy")
+        print("WARNING: Also, make sure you have a compiler for C (gcc, clang, mscpp, ..)")
+        print('*' * 75)
+        print("Plain Python installation succeeded.")
+        print('*' * 75)

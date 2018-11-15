@@ -2,10 +2,10 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.default_operators import set_if_none
-from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.real_random_sampling import RealRandomSampling
+from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
+from pymoo.operators.sampling.random_sampling import RandomSampling
 from pymoo.rand import random
 from pymoo.util.decomposition import DoNotKnow
 from pymoo.util.display import disp_multi_objective
@@ -25,7 +25,7 @@ class MOEAD(GeneticAlgorithm):
         self.decomposition = decomposition
 
         set_if_none(kwargs, 'pop_size', len(ref_dirs))
-        set_if_none(kwargs, 'sampling', RealRandomSampling())
+        set_if_none(kwargs, 'sampling', RandomSampling())
         set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=20))
         set_if_none(kwargs, 'mutation', PolynomialMutation(eta_mut=15))
         set_if_none(kwargs, 'selection', None)

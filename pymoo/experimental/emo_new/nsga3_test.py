@@ -2,8 +2,8 @@ from pymoo.experimental.emo_new.keep_extreme import ReferenceDirectionSurvivalKe
 from pymoo.experimental.emo_new.nsga3_pbi import ReferenceDirectionSurvivalPBI
 from pymoo.algorithms.nsga3 import NSGA3
 from pymoo.model.termination import MaximumGenerationTermination
-from pymoo.operators.crossover.real_simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
+from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.util import plotting
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
 from pymop.factory import get_problem
