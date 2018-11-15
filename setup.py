@@ -25,7 +25,7 @@ kwargs = dict(
     version=__version__,
     author=__author__,
     url=__url__,
-    python_requires='>3.6',
+    python_requires='>3.3',
     author_email="blankjul@egr.msu.edu",
     description="Multi-Objective Optimization Algorithms",
     long_description=readme(),
@@ -33,7 +33,6 @@ kwargs = dict(
     keywords="optimization",
     packages=setuptools.find_packages(exclude=['tests', 'docs', 'experiments']),
     install_requires=['pymop==0.2.3', 'numpy', 'scipy', 'matplotlib'],
-    setup_requires=['setuptools>=18.0', 'cython>=0.28.4'],
     include_package_data=True,
     platforms='any'
 )
