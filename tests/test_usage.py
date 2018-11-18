@@ -1,14 +1,18 @@
 import os
 import unittest
 
+
 class UsageTest(unittest.TestCase):
 
     def test(self):
 
         USAGE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "pymoo", "usage")
-        #USAGE_DIR = os.path.dirname(os.path.realpath(__file__))
+        # USAGE_DIR = os.path.dirname(os.path.realpath(__file__))
 
         for fname in os.listdir(USAGE_DIR):
+
+            if fname != "nsga2.py":
+                continue
 
             if fname == "test_usage.py":
                 continue
@@ -18,8 +22,11 @@ class UsageTest(unittest.TestCase):
                 with open(os.path.join(USAGE_DIR, fname)) as f:
                     s = f.read()
 
-                    no_plots = "from matplotlib import pyplot as plt\n" \
-                                    "plt.ioff()\n"
+                    no_plots = "import matplotlib\n" \
+                               "from matplotlib import pyplot as plt\n" \
+                               "plt.ioff()\n" \
+                               "matplotlib.use('Agg')\n"
+
                     s = no_plots + s
 
                     try:
