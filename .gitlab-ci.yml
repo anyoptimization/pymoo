@@ -6,6 +6,6 @@ dev:
   script:
     - export PATH=/root/miniconda3/bin:$PATH
     - cd $CI_PROJECT_DIR
-    - pip install .
+    - python setup.py install
     - cd tests
     - python test_usage.py
