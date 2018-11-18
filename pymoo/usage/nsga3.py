@@ -1,3 +1,5 @@
+from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.optimize import minimize
 from pymoo.util import plotting
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
