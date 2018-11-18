@@ -227,11 +227,20 @@ def default_is_duplicate(pop, *other, epsilon=1e-20, **kwargs):
 
     X = pop.get("X")
 
+    # value to finally return
+    is_duplicate = np.full(len(pop), False)
+
+    # check for duplicates in pop itself
+    D = cdist(X, X)
+    D[np.triu_indices(len(pop))] = np.inf
+    is_duplicate = np.logical_or(is_duplicate, np.any(D < epsilon, axis=1))
+
+    # check for duplicates to all others
     _X = other[0].get("X")
     for o in other[1:]:
         if len(o) > 0:
             _X = np.concatenate([_X, o.get("X")])
 
-    is_duplicate = np.any(cdist(X, _X) < epsilon, axis=1)
+    is_duplicate = np.logical_or(is_duplicate, np.any(cdist(X, _X) < epsilon, axis=1))
 
     return is_duplicate

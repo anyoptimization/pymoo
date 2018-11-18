@@ -41,19 +41,18 @@ def construct_build_ext(build_ext):
 
 
 def run_setup(setup_args):
-    setup_args['cmdclass'] = {}
-
     try:
 
         # copy the kwargs
         kwargs = dict(setup_args)
+        kwargs['cmdclass'] = {}
 
         # import numpy and cython for compilation
         try:
             import numpy as np
             from Cython.Build import cythonize
         except:
-            raise BuildFailed("For compilation cython and numpy must be installed: pip install cython numpy")
+            raise BuildFailed("The C extension could not be compiled, speedups are not enabled")
 
         kwargs['cmdclass']['build_ext'] = construct_build_ext(build_ext)
         kwargs['ext_modules'] = cythonize("pymoo/cython/*.pyx")
@@ -62,7 +61,8 @@ def run_setup(setup_args):
         setup(**kwargs)
 
         print('*' * 75)
-        print("Compiled installation succeeded.")
+        print("Compilation Successful.")
+        print("Compiled pymoo installation succeeded.")
         print('*' * 75)
 
     except BuildFailed as ex:
@@ -71,9 +71,9 @@ def run_setup(setup_args):
 
         print('*' * 75)
         print("WARNING", ex)
-        print("WARNING: The C extension could not be compiled, speedups are not enabled.")
+        print("WARNING: For the compiled libraries cython and numpy is required. Please make sure they are installed")
         print("WARNING: pip install cython numpy")
-        print("WARNING: Also, make sure you have a compiler for C (gcc, clang, mscpp, ..)")
+        print("WARNING: Also, make sure you have a compiler for C++!")
         print('*' * 75)
         print("Plain Python installation succeeded.")
         print('*' * 75)
