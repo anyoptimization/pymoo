@@ -27,6 +27,7 @@ class UsageTest(unittest.TestCase):
                     s = f.read()
 
                     no_plots = "import matplotlib\n" \
+                               "import matplotlib.pyplot\n" \
                                "matplotlib.use('Agg')\n"
 
                     s = no_plots + s
