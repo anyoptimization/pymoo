@@ -1,9 +1,5 @@
-from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
-
 import setuptools
 from setuptools import Extension
-
-import numpy as np
 
 from setup_ext import readme, run_setup
 
