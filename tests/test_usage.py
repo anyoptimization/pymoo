@@ -11,9 +11,6 @@ class UsageTest(unittest.TestCase):
 
         for fname in os.listdir(USAGE_DIR):
 
-            if fname != "nsga2.py":
-                continue
-
             if fname == "test_usage.py":
                 continue
 
