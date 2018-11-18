@@ -7,6 +7,7 @@ from pymoo.optimize import minimize
 from pymop import create_random_knapsack_problem
 
 problem = create_random_knapsack_problem(30)
+problem.type_var = np.bool
 
 res = minimize(problem,
                method='ga',

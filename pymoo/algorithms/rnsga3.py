@@ -14,8 +14,6 @@ class RNSGA3(NSGA3):
                  pop_per_ref_point,
                  mu=0.05,
                  **kwargs):
-        print("WARNING: There is still a bug here. Will be fixed soon!")
-
         n_obj = ref_points.shape[1]
 
         # add the aspiration point lines

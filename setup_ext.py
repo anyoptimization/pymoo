@@ -70,7 +70,7 @@ def run_setup(setup_args):
         setup(**setup_args)
 
         print('*' * 75)
-        print("WARNING", ex)
+        print("WARNING:", ex)
         print("WARNING: For the compiled libraries cython and numpy is required. Please make sure they are installed")
         print("WARNING: pip install cython numpy")
         print("WARNING: Also, make sure you have a compiler for C++!")
