@@ -3,8 +3,8 @@ import pickle
 import unittest
 
 import numpy as np
+from pymoo.algorithms.nsga2 import calc_crowding_distance
 
-from pymoo.operators.survival.rank_and_crowding import RankAndCrowdingSurvival, calc_crowding_distance
 from pymoo.rand.impl.custom_random_generator import CustomRandomGenerator
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 

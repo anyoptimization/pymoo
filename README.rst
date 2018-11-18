@@ -37,7 +37,8 @@ For the current development version:
     pip install .
 
 Since for speedup some of the modules are also available compiled you can double check
-if the compilation worked:
+if the compilation worked. When executing the command be sure not already being in the local pymoo
+directory because otherwise not the in site-packages installed version will be used.
 
 .. code:: bash
 
