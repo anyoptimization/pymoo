@@ -5,6 +5,11 @@ You can find the detailed documentation here:
 https://www.egr.msu.edu/coinlab/blankjul/pymoo/
 
 
+.. image:: https://gitlab.msu.edu/blankjul/pymoo/badges/master/pipeline.svg
+   :alt: pipeline status
+   :target: https://gitlab.msu.edu/blankjul/pymoo/commits/master
+
+
 Installation
 ====================================================================
 {% include 'docs/source/_installation.rst' %}
