@@ -1,12 +1,11 @@
 import numpy as np
 
-from pymoo.experimental.emo_new.nsga3_pbi import associate_to_niches
-from pymoo.algorithms.nsga3 import get_nadir_point, calc_niche_count, niching
+from pymoo.algorithms.nsga3 import calc_niche_count, niching, get_extreme_points_c, associate_to_niches
 from pymoo.model.survival import Survival
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 
-class ReferenceDirectionSurvivalKeepExtreme(Survival):
+class ReferenceDirectionSurvivalNonDominated(Survival):
     def __init__(self, ref_dirs):
         super().__init__(True)
         self.ref_dirs = ref_dirs
@@ -15,9 +14,6 @@ class ReferenceDirectionSurvivalKeepExtreme(Survival):
         self.nadir_point = None
         self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
         self.worst_point = np.full(ref_dirs.shape[1], -np.inf)
-
-    def get_ref_dirs(self):
-        return self.ref_dirs
 
     def _do(self, pop, n_survive, D=None, **kwargs):
 
@@ -30,18 +26,7 @@ class ReferenceDirectionSurvivalKeepExtreme(Survival):
 
         # calculate the fronts of the population
         fronts, rank = NonDominatedSorting().do(F, return_rank=True, n_stop_if_ranked=n_survive)
-        non_dominated, last_front = fronts[0], fronts[-1]
-
-        # find the extreme points for normalization
-        extreme_points = get_extreme_points(F[non_dominated], self.ideal_point)
-        extreme_points = pop[non_dominated][extreme_points]
-
-        # find the intercepts for normalization and do backup if gaussian elimination fails
-        worst_of_population = np.max(F, axis=0)
-        worst_of_front = np.max(F[non_dominated, :], axis=0)
-
-        self.nadir_point = get_nadir_point(extreme_points.get("F"), self.ideal_point, self.worst_point,
-                                           worst_of_population, worst_of_front)
+        self.nadir_point = get_nadir_point_from_fronts(F, fronts, self.ideal_point)
 
         #  consider only the population until we come to the splitting front
         I = np.concatenate(fronts)
@@ -55,11 +40,8 @@ class ReferenceDirectionSurvivalKeepExtreme(Survival):
                 counter += 1
         last_front = fronts[-1]
 
-        # get the reference direction for survival
-        ref_dirs = self.get_ref_dirs()
-
         # associate individuals to niches
-        niche_of_individuals, dist_to_niche = associate_to_niches(F, ref_dirs, self.ideal_point, self.nadir_point)
+        niche_of_individuals, dist_to_niche = associate_to_niches(F, self.ref_dirs, self.ideal_point, self.nadir_point)
         pop.set('rank', rank, 'niche', niche_of_individuals, 'dist_to_niche', dist_to_niche)
 
         # if we need to select individuals to survive
@@ -69,12 +51,12 @@ class ReferenceDirectionSurvivalKeepExtreme(Survival):
             if len(fronts) == 1:
                 n_remaining = n_survive
                 until_last_front = np.array([], dtype=np.int)
-                niche_count = np.zeros(len(ref_dirs), dtype=np.int)
+                niche_count = np.zeros(len(self.ref_dirs), dtype=np.int)
 
             # if some individuals already survived
             else:
                 until_last_front = np.concatenate(fronts[:-1])
-                niche_count = calc_niche_count(len(ref_dirs), niche_of_individuals[until_last_front])
+                niche_count = calc_niche_count(len(self.ref_dirs), niche_of_individuals[until_last_front])
                 n_remaining = n_survive - len(until_last_front)
 
             S = niching(F[last_front, :], n_remaining, niche_count, niche_of_individuals[last_front],
@@ -83,25 +65,20 @@ class ReferenceDirectionSurvivalKeepExtreme(Survival):
             survivors = np.concatenate((until_last_front, last_front[S].tolist()))
             pop = pop[survivors]
 
-        # keep the extremes in case they would not survive
-        for extreme_point in extreme_points:
-            if not np.any(pop == extreme_point):
-                pop = pop.merge(np.array([extreme_point]))
-
         return pop
 
 
-def get_extreme_points(F, ideal_point):
-    # calculate the asf which is used for the extreme point decomposition
-    asf = np.eye(F.shape[1])
-    asf[asf == 0] = 1e6
+def get_nadir_point_from_fronts(F, fronts, ideal_point, epsilon=10e-3):
+    n_obj = F.shape[1]
+    nadir_point = np.full(n_obj, np.inf)
 
-    # use __F because we substitute small values to be 0
-    __F = F - ideal_point
-    __F[__F < 1e-3] = 0
+    for m in range(n_obj):
+        for k in range(len(fronts)):
+            nadir_point[m] = np.max(F[fronts[k], m])
+            # at least epsilon different OR we are in the last front already
+            if nadir_point[m] - ideal_point[m] > epsilon:
+                break
 
-    # update the extreme points for the normalization having the highest asf value each
-    F_asf = np.max(__F * asf[:, None, :], axis=2)
-    I = np.argmin(F_asf, axis=1)
+    return nadir_point
 
-    return I
+
