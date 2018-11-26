@@ -1,5 +1,3 @@
-from pymoo.experimental.emo.max_non_dominated import ReferenceDirectionSurvivalNonDominated
-from pymoo.experimental.emo.true import ReferenceDirectionSurvivalTrue
 from pymoo.optimize import minimize
 from pymoo.util import plotting
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
@@ -16,8 +14,7 @@ res = minimize(problem,
                method='nsga3',
                method_args={
                    'pop_size': 92,
-                   'ref_dirs': ref_dirs,
-                   'survival': ReferenceDirectionSurvivalTrue(ref_dirs, pf)
+                   'ref_dirs': ref_dirs
                },
                termination=('n_gen', 400),
                pf=pf,
