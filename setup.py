@@ -13,7 +13,7 @@ def get_extension_modules():
 
 __name__ = "pymoo"
 __author__ = "Julian Blank"
-__version__ = '0.2.4'
+__version__ = '0.2.5-dev'
 __url__ = "https://github.com/msu-coinlab/pymoo"
 
 kwargs = dict(

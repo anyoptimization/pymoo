@@ -1,20 +1,21 @@
 import os
-import re
 import subprocess
 import sys
+
+sys.path.insert(0, "..")
 
 
 if __name__ == '__main__':
 
     print("Parent Process: ", os.getpid())
 
-    folder = sys.argv[1]
+    run_files = sys.argv[1]
+    files = [line.rstrip('\n') for line in open(run_files)]
+
     threads = int(sys.argv[2])
-    files = [f for f in os.listdir(folder) if re.match(r'.*.run', f)]
 
     def run(file):
-        path_to_file = os.path.join(folder, file)
-        result = subprocess.run(['python', 'execute.py', path_to_file, folder], stdout=subprocess.PIPE)
+        result = subprocess.run(file.split(" "), stdout=subprocess.PIPE)
         print(result.stdout.decode('utf-8').rstrip("\n\r"))
 
     from concurrent.futures import ThreadPoolExecutor

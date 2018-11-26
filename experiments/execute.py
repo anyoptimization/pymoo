@@ -5,7 +5,7 @@ import time
 
 import numpy as np
 
-from pymoo.optimize import minimize
+
 
 if __name__ == '__main__':
 
@@ -14,11 +14,12 @@ if __name__ == '__main__':
 
     import sys
 
-    sys.path.append("/home/blankjul/workspace/pymop/")
-    sys.path.append("/Users/julesy/workspace/pymop/")
-    sys.path.append("/home/blankjul/workspace/pymoo/")
-    sys.path.append("/Users/julesy/workspace/pymoo/")
+    sys.path.insert(0, "/home/blankjul/workspace/pymop/")
+    sys.path.insert(0, "/Users/julesy/workspace/pymop/")
+    sys.path.insert(0, "/home/blankjul/workspace/pymoo/")
+    sys.path.insert(0, "/Users/julesy/workspace/pymoo/")
     import pymop
+    from pymoo.optimize import minimize
 
     # load the data for the experiments
     fname = sys.argv[1]
@@ -42,11 +43,10 @@ if __name__ == '__main__':
         elapsed = (time.time() - start_time)
         print(fname, "in --- %s seconds ---" % elapsed)
 
-        out = data['out']
-        if len(sys.argv) == 3:
-            out = os.path.join(sys.argv[2], out)
 
-        # create directory of necessary
+
+        # create directory if necessary
+        out = sys.argv[2]
         os.makedirs(os.path.dirname(out), exist_ok=True)
         np.savetxt(out, F)
 
