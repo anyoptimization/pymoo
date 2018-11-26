@@ -1,12 +1,11 @@
 import numpy as np
 
-from pymoo.cython.function_loader import load_function
-from pymoo.algorithms.nsga3 import get_nadir_point, calc_niche_count, niching, get_extreme_points_c
+from pymoo.algorithms.nsga3 import calc_niche_count, niching, get_extreme_points_c, associate_to_niches
 from pymoo.model.survival import Survival
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 
-class ReferenceDirectionSurvivalPBI(Survival):
+class ReferenceDirectionSurvivalMaxExtremes(Survival):
     def __init__(self, ref_dirs):
         super().__init__(True)
         self.ref_dirs = ref_dirs
@@ -15,9 +14,6 @@ class ReferenceDirectionSurvivalPBI(Survival):
         self.nadir_point = None
         self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
         self.worst_point = np.full(ref_dirs.shape[1], -np.inf)
-
-    def get_ref_dirs(self):
-        return self.ref_dirs
 
     def _do(self, pop, n_survive, D=None, **kwargs):
 
@@ -36,12 +32,7 @@ class ReferenceDirectionSurvivalPBI(Survival):
         self.extreme_points = get_extreme_points_c(F[non_dominated, :], self.ideal_point,
                                                    extreme_points=self.extreme_points)
 
-        # find the intercepts for normalization and do backup if gaussian elimination fails
-        worst_of_population = np.max(F, axis=0)
-        worst_of_front = np.max(F[non_dominated, :], axis=0)
-
-        self.nadir_point = get_nadir_point(self.extreme_points, self.ideal_point, self.worst_point,
-                                           worst_of_population, worst_of_front)
+        self.nadir_point = np.max(self.extreme_points, axis=0)
 
         #  consider only the population until we come to the splitting front
         I = np.concatenate(fronts)
@@ -55,11 +46,8 @@ class ReferenceDirectionSurvivalPBI(Survival):
                 counter += 1
         last_front = fronts[-1]
 
-        # get the reference direction for survival
-        ref_dirs = self.get_ref_dirs()
-
         # associate individuals to niches
-        niche_of_individuals, dist_to_niche = associate_to_niches(F, ref_dirs, self.ideal_point, self.nadir_point)
+        niche_of_individuals, dist_to_niche = associate_to_niches(F, self.ref_dirs, self.ideal_point, self.nadir_point)
         pop.set('rank', rank, 'niche', niche_of_individuals, 'dist_to_niche', dist_to_niche)
 
         # if we need to select individuals to survive
@@ -69,12 +57,12 @@ class ReferenceDirectionSurvivalPBI(Survival):
             if len(fronts) == 1:
                 n_remaining = n_survive
                 until_last_front = np.array([], dtype=np.int)
-                niche_count = np.zeros(len(ref_dirs), dtype=np.int)
+                niche_count = np.zeros(len(self.ref_dirs), dtype=np.int)
 
             # if some individuals already survived
             else:
                 until_last_front = np.concatenate(fronts[:-1])
-                niche_count = calc_niche_count(len(ref_dirs), niche_of_individuals[until_last_front])
+                niche_count = calc_niche_count(len(self.ref_dirs), niche_of_individuals[until_last_front])
                 n_remaining = n_survive - len(until_last_front)
 
             S = niching(F[last_front, :], n_remaining, niche_count, niche_of_individuals[last_front],
@@ -84,21 +72,3 @@ class ReferenceDirectionSurvivalPBI(Survival):
             pop = pop[survivors]
 
         return pop
-
-
-def associate_to_niches(F, niches, ideal_point, nadir_point, utopian_epsilon=0.0):
-    utopian_point = ideal_point - utopian_epsilon
-
-    # normalize by ideal point and intercepts
-    N = (F - utopian_point) / (nadir_point - utopian_point)
-
-    u = np.tile(niches, (len(N), 1))
-    v = np.repeat(N, len(niches), axis=0)
-
-    dist_matrix = load_function("decomposition", "pbi")(u, v, ideal_point, 2)
-    dist_matrix = np.reshape(dist_matrix, (len(N), len(niches)))
-
-    niche_of_individuals = np.argmin(dist_matrix, axis=1)
-    dist_to_niche = dist_matrix[np.arange(F.shape[0]), niche_of_individuals]
-
-    return niche_of_individuals, dist_to_niche
