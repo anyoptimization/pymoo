@@ -1,43 +1,33 @@
-pymoo - Multi-Objective Optimization
+pymoo - Multi-Objective Optimization Framework
 ====================================================================
+
+You can find the detailed documentation here:
+https://www.egr.msu.edu/coinlab/blankjul/pymoo/
+
 
 .. image:: https://gitlab.msu.edu/blankjul/pymoo/badges/master/pipeline.svg
    :alt: pipeline status
    :target: https://gitlab.msu.edu/blankjul/pymoo/commits/master
 
 
-| You can find the detailed documentation `here <http://www.research-blank.de/pymoo>`_.
-
-
-Requirements
-====================================================================
-
-Before using the installer check if the following requirements are fulfilled:
-
-Python 3
-
-.. code:: bash
-
-    python --version
-
-pip>=9.0.0
-
-.. code:: bash
-
-    pip --version
-
-Cython:
-
-.. code:: bash
-
-    pip install cython
-
-
-
 Installation
 ====================================================================
 
-The test problems are uploaded to the PyPi Repository.
+First, make sure you have a python environment installed. We recommend miniconda3 or anaconda3.
+
+.. code:: bash
+
+    conda --version
+
+Then from scratch create a virtual environment for pymoo:
+
+.. code:: bash
+
+    conda create -n pymoo -y python==3.6 cython numpy
+    conda activate pymoo
+
+
+For the current stable release please execute:
 
 .. code:: bash
 
@@ -49,102 +39,45 @@ For the current development version:
 
     git clone https://github.com/msu-coinlab/pymoo
     cd pymoo
-    python setup.py install
+    pip install .
 
-
-Just locally to be used directly in another project:
+Since for speedup some of the modules are also available compiled you can double check
+if the compilation worked. When executing the command be sure not already being in the local pymoo
+directory because otherwise not the in site-packages installed version will be used.
 
 .. code:: bash
 
-    git clone https://github.com/msu-coinlab/pymoo
-    cd pymoo
-    pyhton setup.py build_ext --inplace
+    python -c "from pymoo.cython.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
 
-Implementations
-====================================================================
 
-Algorithms
-----------
-
-**Genetic Algorithm**: A simple genetic algorithm to solve single-objective problems.
-
-**NSGA-II** : Non-dominated sorting genetic algorithm for
-bi-objective problems. The mating selection is done using the binary
-tournament by comparing the rank and the crowding distance. The crowding
-distance is a niching measure in a two-dimensional space which sums up
-the difference to the neighbours in each dimension. The non-dominated
-sorting considers the rank determined by being in the ith front and the
-crowding distance to achieve a good diversity when converging.
-
-**NSGA-III** : A referenced-based algorithm used to solve
-many-objective problems. The survival selection uses the perpendicular
-distance to the reference directions. As normalization the boundary
-intersection method is used [5].
-
-**MOEAD/D** : The classical MOEAD\D implementation using the
-Tchebichew decomposition function.
-
-**Differential Evolution** : The classical single-objective
-differential evolution algorithm where different crossover variations
-and methods can be defined. It is known for its good results for
-effective global optimization.
-
-Methods
--------
-
-**Simulated Binary Crossover** : This crossover simulates a
-single-point crossover in a binary representation by using an
-exponential distribution for real values. The polynomial mutation is
-defined accordingly which performs basically a binary bitflip for real
-numbers.
 
 Usage
-====================================================================
+==================================
+
+We refer here to our documentation for all the details.
+However, for instance executing NSGA2:
 
 .. code:: python
 
     
-    import time
+    from pymoo.optimize import minimize
+    from pymoo.util import plotting
+    from pymop.factory import get_problem
 
-    import numpy as np
+    # create the optimization problem
+    problem = get_problem("zdt1")
+    pf = problem.pareto_front()
 
-    from pymoo.util.plotting import plot, animate
-    from pymop.problems.zdt import ZDT1
-
-
-    def run():
-
-        # create the optimization problem
-        problem = ZDT1()
-
-        start_time = time.time()
-
-        # solve the given problem using an optimization algorithm (here: nsga2)
-        from pymoo.optimize import minimize
-        res = minimize(problem,
-                       method='nsga2',
-                       method_args={'pop_size': 100},
-                       termination=('n_gen', 200),
-                       seed=1,
-                       save_history=True,
-                       disp=True)
-        F = res['F']
-
-        print("--- %s seconds ---" % (time.time() - start_time))
-
-        scatter_plot = True
-        save_animation = False
-
-        if scatter_plot:
-            plot(F, problem)
-
-        if save_animation:
-            H = np.concatenate([e['pop'].F[None, :, :] for e in res['history']], axis=0)
-            animate('%s.mp4' % problem.name(), H, problem)
+    res = minimize(problem,
+                   method='nsga2',
+                   method_args={'pop_size': 100},
+                   termination=('n_gen', 200),
+                   pf=pf,
+                   save_history=False,
+                   disp=True)
+    plotting.plot(pf, res.F, labels=["Pareto-front", "F"])
 
 
-    if __name__ == '__main__':
-        run()
 
 Contact
 ====================================================================
@@ -155,19 +88,3 @@ Feel free to contact me if you have any question:
 | Computational Optimization and Innovation Laboratory (COIN)
 | East Lansing, MI 48824, USA
 
-
-
-Contributors
-====================================================================
-Julian Blank
-
-
-
-
-
-Changelog
-====================================================================
-`0.2.1`
--------------------------
-
-* First official release providing NSGA2, NSGA3 and RNSGA3

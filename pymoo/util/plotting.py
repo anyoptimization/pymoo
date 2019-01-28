@@ -3,7 +3,8 @@ import numpy as np
 from matplotlib import animation
 
 
-def plot(F, problem=None):
+def plot(*args, show=True, **kwargs):
+    F = args[0]
 
     if F.ndim == 1:
         print("Cannot plot a one dimensional array.")
@@ -12,34 +13,41 @@ def plot(F, problem=None):
     n_dim = F.shape[1]
 
     if n_dim == 2:
-        plot_2d(F, problem)
+        plot_2d(*args, **kwargs)
     elif n_dim == 3:
-        plot_3d(F)
+        plot_3d(*args, **kwargs)
     else:
         print("Cannot plot a %s dimensional array." % n_dim)
         return
 
+    plt.legend()
+    if show:
+        plt.show()
 
-def plot_3d(F):
+
+def plot_3d(*args, labels=None):
     fig = plt.figure()
     from mpl_toolkits.mplot3d import Axes3D
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(F[:, 0], F[:, 1], F[:, 2])
 
-def plot_2d(F, problem=None):
-    plt.scatter(F[:, 0], F[:, 1], label="F")
-
-    if problem is not None:
-        pf = problem.pareto_front()
-        if pf is not None:
-            plt.scatter(pf[:, 0], pf[:, 1], label='Pareto Front', s=20, facecolors='none', edgecolors='r')
-            plt.legend()
+    for i, F in enumerate(args):
+        if labels:
+            ax.scatter(F[:, 0], F[:, 1], F[:, 2], label=labels[i])
+        else:
+            ax.scatter(F[:, 0], F[:, 1], F[:, 2])
 
 
-def animate(path_to_file, history, problem=None, func_iter=None):
 
-    H = np.concatenate([e['pop'].F[None, :, :] for e in history], axis=0)
+def plot_2d(*args, labels=None):
 
+    for i, F in enumerate(args):
+        if labels:
+            plt.scatter(F[:, 0], F[:, 1], label=labels[i])
+        else:
+            plt.scatter(F[:, 0], F[:, 1])
+
+
+def animate(path_to_file, H, problem=None, func_iter=None, plot_min=None, plot_max=None):
     if H.ndim != 3 or H.shape[2] != 2:
         print("Can only animate a two dimensional set of arrays.")
         return
@@ -58,8 +66,7 @@ def animate(path_to_file, history, problem=None, func_iter=None):
     plt.title("0")
 
     if func_iter is not None:
-        func_iter(ax, history[0])
-
+        func_iter(ax, H[0])
 
     # the update method
     def update(n):
@@ -75,7 +82,7 @@ def animate(path_to_file, history, problem=None, func_iter=None):
         ax.set_ylim(min[1], max[1])
 
         if func_iter is not None:
-            func_iter(ax, history[n])
+            func_iter(ax, H[n])
 
         plt.title(n)
 
@@ -87,5 +94,4 @@ def animate(path_to_file, history, problem=None, func_iter=None):
     writer = Writer(fps=6, bitrate=1800)
     ani.save(path_to_file, writer=writer)
 
-
-
+    print("Saving: ",  path_to_file)

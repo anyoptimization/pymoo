@@ -1,6 +1,17 @@
-import scipy
-
 import numpy as np
+import scipy
+import scipy.spatial
+
+
+def parameter_less(F, CV):
+    val = np.copy(F)
+    parameter_less = np.max(F, axis=0) + CV
+
+    infeasible = CV > 0
+    val[infeasible] = parameter_less[infeasible]
+
+    return val
+
 
 
 def swap(M, a, b):
@@ -73,6 +84,24 @@ def cdist(A, B, **kwargs):
                 d = M[i].distance_to(M[j])
                 D[i, j], D[j, i] = d, d
         return D
+
+
+def vectorized_cdist(A, B, func_dist):
+    u = np.repeat(A, B.shape[0], axis=0)
+    v = np.tile(B, (A.shape[0], 1))
+
+    D = func_dist(u, v)
+    M = np.reshape(D, (A.shape[0], B.shape[0]))
+    return M
+
+
+def covert_to_type(problem, X):
+    if problem.type_var == np.double:
+        return X.astype(np.double)
+    elif problem.type_var == np.int:
+        return np.round(X).astype(np.int)
+    elif problem.type_var == np.bool:
+        return X < (problem.xu - problem.xl) / 2
 
 
 if __name__ == '__main__':

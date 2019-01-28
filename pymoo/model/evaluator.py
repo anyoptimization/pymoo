@@ -1,3 +1,9 @@
+import numpy as np
+
+from pymoo.model.individual import Individual
+from pymoo.model.population import Population
+
+
 class Evaluator:
     """
 
@@ -6,8 +12,7 @@ class Evaluator:
 
     """
 
-    def __init__(self, n_eval=1e10):
-        self.n_max_eval = n_eval
+    def __init__(self):
         self.n_eval = 0
 
     def eval(self, problem, X, **kwargs):
@@ -19,41 +24,43 @@ class Evaluator:
         ----------
         problem : class
             The problem which is used to be evaluated
-        X : np.ndarray
-            A two dimensional array where each row is a variable to evaluate
+        X : np.array or Population object
         kwargs : dict
             Additional arguments which might be necessary for the problem to evaluate.
 
-        Returns
-        -------
-        val : any
-            Returns whatever the problem used to evaluate returns. Can be only objective values or also constraints.
-
         """
-        if len(X.shape) == 1:
+
+        if isinstance(X, Individual):
+
             self.n_eval += 1
-        else:
-            self.n_eval += X.shape[0]
-        return problem.evaluate(X, **kwargs)
+            X.F, X.CV, X.G = problem.evaluate(X.X,
+                                              return_values_of=["F", "CV", "G"],
+                                              individuals=X,
+                                              **kwargs)
+            X.feasible = X.CV <= 0
 
-    def n_remaining(self):
-        """
+        elif isinstance(X, Population):
 
-        Returns
-        -------
-        n_remaining : int
-            The number of function evaluations that are left.
+            pop, _X = X, X.get("X")
+            self.n_eval += len(pop)
 
-        """
-        return self.n_max_eval - self.n_eval
+            out = problem.evaluate(_X,
+                                   return_values_of=["F", "CV", "G"],
+                                   individuals=pop,
+                                   return_as_dictionary=True,
+                                   **kwargs)
 
-    def has_remaining(self):
-        """
+            for key, val in out.items():
+                if val is None:
+                    continue
+                else:
+                    pop.set(key, val)
 
-        Returns
-        -------
-        has_remaining : bool
-            True if function evaluations are left and false otherwise
+            pop.set("feasible", (out["CV"] <= 0))
 
-        """
-        return self.n_eval < self.n_max_eval
+        elif isinstance(X, np.ndarray):
+            if len(X.shape) == 1:
+                self.n_eval += 1
+            else:
+                self.n_eval += X.shape[0]
+            return problem.evaluate(X, **kwargs)

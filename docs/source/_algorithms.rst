@@ -1,15 +1,11 @@
 
 
-GeneticAlgorithm
+Genetic Algorithm
 ----------------------------------
 A simple genetic algorithm to solve single-objective problems.
 
-.. code:: python
-
-    res = minimize(problem,
-                   method='ga',
-                   method_args={'pop_size': 100},
-                   )
+.. literalinclude:: ../../pymoo/usage/ga.py
+   :language: python
 
 
 NSGA2
@@ -18,12 +14,8 @@ NSGA2
 The algorithm is coded corresponding to :cite:`Deb:2002:FEM:2221359.2221582`.
 
 
-.. code:: python
-
-    res = minimize(problem,
-                   method='nsga2',
-                   method_args={'pop_size': 100},
-                   )
+.. literalinclude:: ../../pymoo/usage/nsga2.py
+   :language: python
 
 
 Non-dominated sorting genetic algorithm for
@@ -43,32 +35,25 @@ distance to the reference directions. As normalization the boundary
 intersection method is used.
 
 
-.. code:: python
+.. literalinclude:: ../../pymoo/usage/nsga3.py
+   :language: python
 
-    res = minimize(problem,
-                   method='nsga3',
-                   method_args={'ref_dirs': 2134124},
-                   )
+UNSGA3
+----------------------------------
 
+
+
+.. literalinclude:: ../../pymoo/usage/unsga3.py
+   :language: python
 
 
 RNSGA3
 ----------------------------------
 
 
-.. code:: python
+.. literalinclude:: ../../pymoo/usage/rnsga3.py
+   :language: python
 
-    res = minimize(problem,
-                   method='rnsga3',
-                   method_args={'ref_points' : None, 'n_ref_points' : None},
-                   )
-
-
-
-MOEAD
-----------------------------------
-:cite:`Zhang07amulti-objective` The classical MOEAD\D implementation using the
-Tchebichew decomposition function.
 
 
 
@@ -80,3 +65,7 @@ Differential Evolution
 differential evolution algorithm where different crossover variations
 and methods can be defined. It is known for its good results for
 effective global optimization.
+
+.. literalinclude:: ../../pymoo/usage/de.py
+   :language: python
+

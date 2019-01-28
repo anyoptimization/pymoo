@@ -24,6 +24,9 @@ class RandomGenerator:
     def choice(self, a):
         return a[self.randint(0, len(a))]
 
+    def shuffle(self, a):
+        return a[self.perm(a.shape[0])]
+
     def random(self, size=None):
         if size is None:
             return self._rand((1, 1))[0, 0]

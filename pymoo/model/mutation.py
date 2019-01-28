@@ -1,10 +1,12 @@
 from abc import abstractmethod
 
-import numpy as np
-
 
 class Mutation:
-    def do(self, problem, X, **kwargs):
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def do(self, problem, pop, **kwargs):
         """
 
         Mutate variables in a genetic way.
@@ -13,19 +15,20 @@ class Mutation:
         ----------
         problem : class
             The problem instance - specific information such as variable bounds might be needed.
-        X : np.ndarray
-            Two dimensional array where each row is an individual and each column represents a variable.
+        pop : Population
+            A population object
 
         Returns
         -------
-        Y : np.ndarray
-            The mutated individuals
+        Y : Population
+            The mutated population.
 
         """
-        Y = np.full(X.shape, np.inf)
-        self._do(problem, X, Y, **kwargs)
-        return Y
+
+        return self._do(problem, pop, **kwargs)
+
+
 
     @abstractmethod
-    def _do(self, problem, X, **kwargs):
+    def _do(self, problem, pop, **kwargs):
         pass

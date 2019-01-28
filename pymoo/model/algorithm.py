@@ -3,7 +3,8 @@ from abc import abstractmethod
 
 import numpy as np
 
-from pymoo.model.termination import MaximumFunctionCallTermination
+from pymoo.model.evaluator import Evaluator
+from pymoo.model.result import Result
 from pymoo.rand import random
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
@@ -20,20 +21,25 @@ class Algorithm:
 
     def __init__(self, **kwargs) -> None:
         super().__init__()
+        self.evaluator = None
+        self.problem = None
+        self.termination = None
+        self.pf = None
+
         self.disp = None
         self.func_display_attrs = None
         self.callback = None
         self.history = []
+        self.save_history = None
 
     def solve(self,
               problem,
               termination,
-              seed=1,
+              seed=None,
               disp=False,
               callback=None,
-              return_only_feasible=True,
-              return_only_non_dominated=True,
               save_history=False,
+              pf=None,
               **kwargs
               ):
         """
@@ -48,7 +54,7 @@ class Algorithm:
         problem: class
             Problem to be solved by the algorithm
 
-        evaluator: class
+        termination: class
             object that evaluates and saves the number of evaluations and determines the stopping condition
 
         seed: int
@@ -64,15 +70,11 @@ class Algorithm:
                 def callback(algorithm):
                     pass
 
-        return_only_feasible : bool
-            If true, only feasible solutions are returned.
-
-        return_only_non_dominated : bool
-            If true, only the non dominated solutions are returned. Otherwise, it might be - dependend on the
-            algorithm - the final population
-
         save_history : bool
             If true, a current snapshot of each generation is saved.
+
+        pf : np.array
+            The Pareto-front for the given problem. If provided performance metrics are printed during execution.
 
         Returns
         -------
@@ -82,28 +84,48 @@ class Algorithm:
         """
 
         # set the random seed for generator
-        random.seed(seed)
+        if seed is not None:
+            random.seed(seed)
+
+        # the evaluator object which is counting the evaluations
+        self.evaluator = Evaluator()
+        self.problem = problem
+        self.termination = termination
+        self.pf = pf
 
         self.disp = disp
         self.callback = callback
         self.save_history = save_history
 
-        if isinstance(termination, int):
-            termination = MaximumFunctionCallTermination(termination)
-
         # call the algorithm to solve the problem
-        pop = self._solve(problem, termination, **kwargs)
+        pop = self._solve(problem, termination)
 
-        if return_only_feasible:
-            feasible = np.where(pop.CV[:, 0] <= 0.0)[0]
-            pop.filter(feasible)
+        # get the optimal result by filtering feasible and non-dominated
+        opt = pop.copy()
+        opt = opt[opt.collect(lambda ind: ind.feasible)[:, 0]]
 
-        if pop.size() > 0 and return_only_non_dominated:
-            I = NonDominatedSorting().do(pop.F, only_non_dominated_front=True)
-            pop.filter(I)
+        # if at least one feasible solution was found
+        if len(opt) > 0:
 
-        res = {'problem': problem, 'history': self.history}
-        res = {**res, **pop.D}
+            if problem.n_obj > 1:
+                I = NonDominatedSorting().do(opt.get("F"), only_non_dominated_front=True)
+                opt = opt[I]
+                X, F, CV, G = opt.get("X", "F", "CV", "G")
+
+            else:
+                opt = opt[np.argmin(opt.get("F"))]
+                X, F, CV, G = opt.X, opt.F, opt.CV, opt.G
+        else:
+            opt = None
+
+        res = Result(opt, opt is None, "")
+        res.algorithm, res.problem, res.pf = self, problem, pf
+        res.pop = pop
+
+        if opt is not None:
+            res.X, res.F, res.CV, res.G = X, F, CV, G
+
+        res.history = self.history
 
         return res
 
@@ -112,20 +134,22 @@ class Algorithm:
 
         # display the output if defined by the algorithm
         if self.disp and self.func_display_attrs is not None:
-            disp = self.func_display_attrs(D['problem'], D['evaluator'], D)
+            disp = self.func_display_attrs(self.problem, self.evaluator, self, self.pf)
             if disp is not None:
                 self._display(disp, header=first)
 
         # if a callback function is provided it is called after each iteration
         if self.callback is not None:
+            # use the callback here without having the function itself
             self.callback(self)
 
         if self.save_history:
-            hist = self.history
-            self.history = None
+            hist, _callback = self.history, self.callback
+            self.history, self.callback = None, None
 
             obj = copy.deepcopy(self)
             self.history = hist
+            self.callback = _callback
 
             self.history.append(obj)
 
@@ -133,12 +157,11 @@ class Algorithm:
     def _display(self, disp, header=False):
         regex = " | ".join(["{}"] * len(disp))
         if header:
-            print("=" * 40)
+            print("=" * 50)
             print(regex.format(*[name.ljust(width) for name, _, width in disp]))
-            print("=" * 40)
+            print("=" * 50)
         print(regex.format(*[str(val).ljust(width) for _, val, width in disp]))
 
     @abstractmethod
     def _solve(self, problem, termination):
         pass
-

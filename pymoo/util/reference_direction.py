@@ -90,7 +90,6 @@ class MultiLayerReferenceDirectionFactory:
         ref_dirs = []
         for factory in self.layers:
             ref_dirs.append(factory.do())
-
         ref_dirs = np.concatenate(ref_dirs, axis=0)
 
         return unique_rows(ref_dirs)
@@ -100,9 +99,31 @@ if __name__ == '__main__':
     ref_dirs = UniformReferenceDirectionFactory(2, n_points=100).do()
     print(np.sum(ref_dirs, axis=1))
 
+    n_dim = 9
+    ref_dirs = MultiLayerReferenceDirectionFactory([
+        UniformReferenceDirectionFactory(n_dim, n_partitions=3, scaling=1.0),
+        UniformReferenceDirectionFactory(n_dim, n_partitions=4, scaling=0.9),
+        UniformReferenceDirectionFactory(n_dim, n_partitions=2, scaling=0.8),
+        UniformReferenceDirectionFactory(n_dim, n_partitions=2, scaling=0.7),
+        UniformReferenceDirectionFactory(n_dim, n_partitions=2, scaling=0.6),
+        UniformReferenceDirectionFactory(n_dim, n_partitions=2, scaling=0.5),
+        UniformReferenceDirectionFactory(n_dim, n_partitions=2, scaling=0.4),
+        UniformReferenceDirectionFactory(n_dim, n_partitions=2, scaling=0.3),
+        UniformReferenceDirectionFactory(n_dim, n_partitions=2, scaling=0.2),
+        UniformReferenceDirectionFactory(n_dim, n_partitions=2, scaling=0.1),
+    ]).do()
+
+    # ref_dirs = UniformReferenceDirectionFactory(3, n_points=100).do()
+
+    #np.savetxt('ref_dirs_9.csv', ref_dirs)
+
+    print(ref_dirs.shape)
+
+    exit(0)
+
     multi_layer = MultiLayerReferenceDirectionFactory()
-    multi_layer.add_layer(UniformReferenceDirectionFactory(3, n_partitions=12, scaling=0.5))
-    multi_layer.add_layer(UniformReferenceDirectionFactory(3, n_partitions=12, scaling=1.0))
+    multi_layer.add_layer(UniformReferenceDirectionFactory(10, n_partitions=2, scaling=0.5))
+    multi_layer.add_layer(UniformReferenceDirectionFactory(10, n_partitions=3, scaling=1.0))
 
     # multi_layer.add_layer(0.5, UniformReferenceDirectionFactory(3, n_partitions=10))
     ref_dirs = multi_layer.do()

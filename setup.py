@@ -1,38 +1,36 @@
-import numpy
 import setuptools
-from Cython.Build import cythonize
-from setuptools import setup
+from setuptools import Extension
 
-def readme():
-    with open('README.rst') as f:
-        return f.read()
+from setup_ext import readme, run_setup
+
+
+def get_extension_modules():
+    ext_modules = []
+    for f in ["info", "non_dominated_sorting_cython", "decomposition_cython", "calc_perpendicular_distance_cython"]:
+        ext_modules.append(Extension('pymoo.cython.%s' % f, sources=['pymoo/cython/%s.pyx' % f], language="c++"))
+    return ext_modules
+
 
 __name__ = "pymoo"
 __author__ = "Julian Blank"
-__version__ = '0.2.2.dev000'
+__version__ = '0.2.5.dev'
 __url__ = "https://github.com/msu-coinlab/pymoo"
 
-
-
-setup(
+kwargs = dict(
     name=__name__,
     version=__version__,
     author=__author__,
     url=__url__,
-    python_requires='>3.3.0',
+    python_requires='>3.3',
     author_email="blankjul@egr.msu.edu",
     description="Multi-Objective Optimization Algorithms",
     long_description=readme(),
     license='Apache License 2.0',
     keywords="optimization",
-    packages=setuptools.find_packages(exclude=['tests', 'docs']),
-    setup_requires=['cython'],
-    install_requires=['pymop==0.2.1', 'numpy', 'scipy', 'matplotlib'],
-    ext_modules=cythonize(
-        "pymoo/cython/*.pyx",
-        language="c++"
-    ),
-    include_dirs=[numpy.get_include()],
+    packages=setuptools.find_packages(exclude=['tests', 'docs', 'experiments']),
+    install_requires=['pymop==0.2.3', 'numpy>=1.15', 'scipy>=1.1', 'matplotlib>=3'],
     include_package_data=True,
-    platforms='any',
+    platforms='any'
 )
+
+run_setup(kwargs)

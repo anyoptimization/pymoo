@@ -1,10 +1,19 @@
+import numpy as np
+
+from pymoo.model.sampling import Sampling
 from pymoo.rand import random
 
 
-class BinaryRandomSampling:
+class BinaryRandomSampling(Sampling):
     """
-    Randomly sample a binary representation of 0's and 1's.
+    Randomly sample points in the real space by considering the lower and upper bounds of the problem.
     """
 
-    def sample(self, problem, n_samples, **kwargs):
-        return random.randint(0, 2, size=(n_samples, problem.n_var))
+    def sample(self, problem, pop, n_samples, **kwargs):
+
+        m = problem.n_var
+
+        val = random.random((n_samples, m))
+        val = (val < 0.5).astype(np.bool)
+
+        return pop.new("X", val)

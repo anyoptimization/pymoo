@@ -15,7 +15,7 @@ class NSGA3Test(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        with open(os.path.join("resources", "dtlz4.json"), encoding='utf-8') as f:
+        with open(os.path.join("..", "resources", "dtlz4.json"), encoding='utf-8') as f:
             cls.data = json.loads(f.read())
 
 

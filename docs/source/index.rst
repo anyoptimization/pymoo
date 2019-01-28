@@ -3,18 +3,11 @@
    :caption: Contents:
 
 
-Requiremnts
-==================================
-.. include:: _requirements.rst
 
 Installation
 ==================================
 .. include:: _installation.rst
 
-
-Usage
-==================================
-.. include:: _usage.rst
 
 
 Algorithms
@@ -40,7 +33,6 @@ References
 .. bibliography:: references.bib
    :style: unsrt
    :all:
-
 
 
 Changelog

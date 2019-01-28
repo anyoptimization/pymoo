@@ -1,82 +1,98 @@
-import copy
-
 import numpy as np
 
+from pymoo.model.individual import Individual
 
-class Population:
 
-    def __init__(self, **kwargs):
-        self.D = dict(kwargs)
+class Population(np.ndarray):
 
-    def __getattr__(self, name):
-
-        # if internal function method just return the one whats usually done
-        if str.startswith(name, '__'):
-            return super().__getattr__(name)
-
-        # if we really ask for the dictionary
-        if name == "D":
-            return self.__dict__.get("D", None)
-        # else we ask for an entry in the dictionary
-        else:
-            if "D" in self.__dict__:
-                return self.__dict__["D"].get(name, None)
-            else:
-                print(name)
-                return {}
-
-    def __setattr__(self, name, value):
-        if name == 'D':
-            self.__dict__['D'] = value
-        else:
-            self.__dict__['D'][name] = value
-
-    def __deepcopy__(self, a):
-        return Population(**copy.deepcopy(self.D))
+    def __new__(cls, n_individuals=0, individual=Individual()):
+        obj = super(Population, cls).__new__(cls, n_individuals, dtype=individual.__class__).view(cls)
+        for i in range(n_individuals):
+            obj[i] = individual.copy()
+        obj.individual = individual
+        return obj
 
     def merge(self, other):
-        D = {}
-        for key, value in self.D.items():
-
-            # key must be in both populations
-            if key not in other.D:
-                continue
-
-            if isinstance(value, np.ndarray):
-                try:
-                    D[key] = np.concatenate([self.D[key], other.D[key]])
-                except:
-                    D[key] = self.D[key]
-
-        # all values in other that were not present in self
-        for key, value in other.D.items():
-            if key not in self.D:
-                D[key] = other.D[key]
-
-        self.D = D
-
-    def size(self):
-        if self.X is not None:
-            return self.X.shape[0]
-        elif self.F is not None:
-            return self.F.shape[0]
-        else:
-            return None
+        obj = np.concatenate([self, other]).view(Population)
+        obj.individual = self.individual
+        return obj
 
     def copy(self):
-        pop = Population()
-        pop.D = copy.deepcopy(self.D)
+        pop = Population(n_individuals=len(self), individual=self.individual)
+        for i in range(len(self)):
+            pop[i] = self[i]
         return pop
 
-    def filter(self, v):
+    def __deepcopy__(self, memo):
+        return self.copy()
 
-        if isinstance(v, np.ndarray):
-            v = v.astype(np.int)
+    def new(self, *args):
 
-        D = {}
-        for key, value in self.D.items():
-            if value is not None and isinstance(value, np.ndarray):
-                D[key] = value[v, :]
-            else:
-                D[key] = value
-        self.D = D
+        if len(args) == 1:
+            Population(n_individuals=args[0], individual=self.individual)
+        else:
+            n = len(args[1]) if len(args) > 0 else 0
+            pop = Population(n_individuals=n, individual=self.individual)
+            if len(args) > 0:
+                pop.set(*args)
+            return pop
+
+    def collect(self, func, as_numpy_array=True):
+        val = []
+        for i in range(len(self)):
+            val.append(func(self[i]))
+        if as_numpy_array:
+            val = np.array(val)
+        return val
+
+    def set(self, *args):
+
+        for i in range(int(len(args) / 2)):
+
+            key, values = args[i * 2], args[i * 2 + 1]
+
+            if len(values) != len(self):
+                raise Exception("Population Set Attribute Error: Number of values and population size do not match!")
+
+            for i in range(len(values)):
+
+                if key in self[i].__dict__:
+                    self[i].__dict__[key] = values[i]
+                else:
+                    self[i].data[key] = values[i]
+
+    def get(self, *args):
+
+        val = {}
+        for c in args:
+            val[c] = []
+
+        for i in range(len(self)):
+
+            for c in args:
+
+                if c in self[i].__dict__:
+                    val[c].append(self[i].__dict__[c])
+                elif c in self[i].data:
+                    val[c].append(self[i].data[c])
+
+        res = [np.array(val[c]) for c in args]
+
+        if len(args) == 1:
+            return res[0]
+        else:
+            return tuple(res)
+
+
+
+    def __array_finalize__(self, obj):
+        if obj is None:
+            return
+        self.individual = getattr(obj, 'individual', None)
+
+
+if __name__ == '__main__':
+    pop = Population(10)
+    pop.get("F")
+    pop.new()
+    print("")

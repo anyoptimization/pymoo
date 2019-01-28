@@ -1,47 +1,34 @@
-pymoo - Multi-Objective Optimization
+pymoo - Multi-Objective Optimization Framework
 ====================================================================
+
+You can find the detailed documentation here:
+https://www.egr.msu.edu/coinlab/blankjul/pymoo/
+
 
 .. image:: https://gitlab.msu.edu/blankjul/pymoo/badges/master/pipeline.svg
    :alt: pipeline status
    :target: https://gitlab.msu.edu/blankjul/pymoo/commits/master
 
 
-| You can find the detailed documentation `here <http://www.research-blank.de/pymoo>`_.
-
-
-Requirements
-====================================================================
-{% include 'docs/source/_requirements.rst' %}
-
 Installation
 ====================================================================
 {% include 'docs/source/_installation.rst' %}
 
-Implementations
-====================================================================
-{% include 'docs/source/_implementations.rst' %}
 
 Usage
-====================================================================
+==================================
+
+We refer here to our documentation for all the details.
+However, for instance executing NSGA2:
 
 .. code:: python
 
-    {% macro someop() %}{% include "pymoo/usage/run_minimize.py" %}{% endmacro %}
+    {% macro someop() %}{% include "pymoo/usage/nsga2.py" %}{% endmacro %}
     {{ someop()|indent }}
+
+
 
 Contact
 ====================================================================
 {% include 'docs/source/_contact.rst' %}
 
-
-Contributors
-====================================================================
-Julian Blank
-
-
-
-
-
-Changelog
-====================================================================
-{% include 'docs/source/_changelog.rst' %}

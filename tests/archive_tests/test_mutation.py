@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 import numpy as np
 
 from pymoo.configuration import Configuration
-from pymoo.operators.mutation.real_polynomial_mutation import PolynomialMutation
+from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymop.problems.zdt import ZDT4
 
 
