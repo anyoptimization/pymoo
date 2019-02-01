@@ -1,7 +1,7 @@
 import numpy as np
 
-from pymoo.operators.crossover.uniform_crossover import BinaryUniformCrossover
-from pymoo.operators.mutation.bitflip_mutation import BinaryBitflipMutation
+from pymoo.operators.crossover.uniform_crossover import UniformCrossover
+from pymoo.operators.mutation.bitflip_mutation import BitflipMutation
 from pymoo.operators.sampling.bin_random_sampling import BinaryRandomSampling
 from pymoo.optimize import minimize
 from pymop import create_random_knapsack_problem
@@ -14,8 +14,8 @@ res = minimize(problem,
                method_args={
                    'pop_size': 100,
                    'sampling': BinaryRandomSampling(),
-                   'crossover': BinaryUniformCrossover(),
-                   'mutation': BinaryBitflipMutation(),
+                   'crossover': UniformCrossover(),
+                   'mutation': BitflipMutation(),
                    'eliminate_duplicates': True,
                },
                termination=('n_gen', 100),

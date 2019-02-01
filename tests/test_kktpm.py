@@ -33,8 +33,8 @@ class KKTPMTest(unittest.TestCase):
             #self.assertTrue(np.abs(F - _F).mean() < 1e-6)
             #self.assertTrue(np.abs(G - _G).mean() < 1e-6)
 
-            #indices = np.random.permutation(X.shape[0])[:100]
-            indices = np.arange(X.shape[0])
+            indices = np.random.permutation(X.shape[0])[:100]
+            #indices = np.arange(X.shape[0])
 
             # load the correct results
             correct = np.loadtxt(os.path.join("resources", "kktpm", "%s.kktpm" % str_problem))[indices]

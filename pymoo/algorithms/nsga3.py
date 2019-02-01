@@ -8,7 +8,7 @@ from pymoo.model.survival import Survival
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.default_operators import set_if_none
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.random_sampling import RandomSampling
+from pymoo.operators.sampling.real_random_sampling import RandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
 from pymoo.rand import random
 from pymoo.util.display import disp_multi_objective

@@ -4,7 +4,7 @@ from pymoo.model.crossover import Crossover
 from pymoo.rand import random
 
 
-class BinaryUniformCrossover(Crossover):
+class UniformCrossover(Crossover):
     def __init__(self):
         super().__init__(2, 2)
 
@@ -12,9 +12,12 @@ class BinaryUniformCrossover(Crossover):
 
         # number of parents
         n_matings = parents.shape[0]
-        off = np.full((n_matings * self.n_offsprings, problem.n_var), np.inf, dtype=problem.type_var)
 
+        # get the parents as a matrix
         X = pop.get("X")[parents.T]
+
+        # create offsprings of same type
+        off = np.full((n_matings * self.n_offsprings, problem.n_var), np.inf, dtype=X.dtype)
 
         # random matrix to do the crossover
         M = random.random((n_matings, problem.n_var))
@@ -28,4 +31,4 @@ class BinaryUniformCrossover(Crossover):
         off[n_matings:][smaller] = X[1, :, :][smaller]
         off[n_matings:][larger] = X[0, :, :][larger]
 
-        return pop.new("X", off.astype(problem.type_var))
+        return pop.new("X", off)

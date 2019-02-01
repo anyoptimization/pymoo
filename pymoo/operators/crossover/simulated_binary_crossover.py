@@ -49,7 +49,7 @@ class SimulatedBinaryCrossover(Crossover):
 
         # now just be sure not dividing by zero (these cases will be filtered later anyway)
         #delta[np.logical_or(delta < 1.0e-10, np.logical_not(do_crossover))] = 1.0e-10
-        delta[delta < 1.0e-10] = 1.0e-10
+        delta[delta <= 1.0e-14] = 1.0e-14
 
         beta = 1.0 + (2.0 * (y1 - problem.xl) / delta)
         betaq = calc_betaq(beta)

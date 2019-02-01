@@ -31,9 +31,11 @@ class KKTPM:
 
         """
 
+        n_solutions = X.shape[0]
+
         # the final result to be returned
-        kktpm = np.full((X.shape[0], 1), np.inf)
-        fval = np.full((X.shape[0], 1), np.inf)
+        kktpm = np.full((n_solutions, 1), np.inf)
+        fval = np.full((n_solutions, 1), np.inf)
 
         # set the ideal point for normalization
         z = ideal_point
@@ -47,6 +49,10 @@ class KKTPM:
         n_solutions, n_var, n_obj, n_constr = X.shape[0], problem.n_var, problem.n_obj, problem.n_constr
 
         F, CV, G, dF, dG = problem.evaluate(X, return_values_of=["F", "CV", "G", "dF", "dG"])
+
+        if G is None:
+            G = np.zeros((n_solutions, 0))
+            dG = np.zeros((n_solutions, 0, n_var))
 
         # if the measure should include points out of bounds as a constraint
         if self.var_bounds_as_constraints:
@@ -99,23 +105,26 @@ class KKTPM:
                 # calculate the lagrange multiplier
                 u = np.linalg.solve(A, b)
 
-                # make sure all lagrange multipliers are positive
-                for j in range(len(u)):
+                # optimize until all lagrange multipliers are positive
+                while np.any(u < 0):
 
-                    # if a lagrange multiplier is negative - we need to fix it
-                    if u[j] < 0:
-                        # modify the optimization problem
-                        A[j, :], A[:, j], A[j, j] = 0, 0, 1
-                        b[j] = 0
+                    # go through from the first to the last
+                    for j in range(len(u)):
 
-                        # resolve the problem and redefine u. for sure all preview u[j] are positive now
-                        u = np.linalg.solve(A, b)
+                        # if a lagrange multiplier is negative - we need to fix it
+                        if u[j] < 0:
+                            # modify the optimization problem
+                            A[j, :], A[:, j], A[j, j] = 0, 0, 1
+                            b[j] = 0
+
+                            # resolve the problem and redefine u. for sure all preview u[j] are positive now
+                            u = np.linalg.solve(A, b)
 
                 # split up the lagrange multiplier for objective and not
                 u_m, u_j = u[:n_obj], u[n_obj:]
 
                 if n_constr == 0:
-                    _kktpm = (1 - np.sum(u_m)) ** 2 + np.sum((a_m @ u) ** 2)
+                    _kktpm = (1 - np.sum(u_m)) ** 2 + np.sum((a_m.T @ u) ** 2)
                     _fval = _kktpm
                 else:
                     _kktpm = (1 - np.sum(u_m)) ** 2 + np.sum((np.vstack([a_m, a_j]).T @ u) ** 2)

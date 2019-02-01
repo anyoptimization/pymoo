@@ -2,7 +2,6 @@ import numpy as np
 
 from pymoo.model.mutation import Mutation
 from pymoo.rand import random
-from pymoo.util.misc import covert_to_type
 
 
 class PolynomialMutation(Mutation):

@@ -1,6 +1,6 @@
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.random_sampling import RandomSampling
+from pymoo.operators.sampling.real_random_sampling import RandomSampling
 from pymoo.optimize import minimize
 from pymoo.util import plotting
 from pymop.factory import get_problem
