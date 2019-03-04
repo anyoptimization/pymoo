@@ -23,7 +23,7 @@ if plot:
     plotting.plot(pf, res.F, labels=["Pareto-front", "F"])
 
 # set true if you want to save a video
-animate = True
+animate = False
 if animate:
     from pymoo.util.plotting import animate as func_animtate
     H = np.concatenate([e.pop.get("F")[None, :] for e in res.history], axis=0)
