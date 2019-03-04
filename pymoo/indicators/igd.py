@@ -21,10 +21,8 @@ class IGD(Indicator):
                 return np.sqrt(np.sum(np.square((A - B) / self.N), axis=1))
 
             D = vectorized_cdist(self.pareto_front, F, dist)
-            #_D = cdist(self.pareto_front, F, metric=lambda u, v: np.sqrt((((u - v)/self.N) ** 2).sum()))
+
         else:
             D = cdist(self.pareto_front, F)
-
-        #np.all(np.abs(cdist(self.pareto_front, F) - D) < 1e-4)
 
         return np.mean(np.min(D, axis=1))
