@@ -20,7 +20,7 @@ def plot(*args, show=True, **kwargs):
         print("Cannot plot a %s dimensional array." % n_dim)
         return
 
-    plt.legend()
+    #plt.legend()
     if show:
         plt.show()
 
@@ -47,7 +47,7 @@ def plot_2d(*args, labels=None):
             plt.scatter(F[:, 0], F[:, 1])
 
 
-def animate(path_to_file, H, problem=None, func_iter=None):
+def animate(path_to_file, H, problem=None, func_iter=None, plot_min=None, plot_max=None):
     if H.ndim != 3 or H.shape[2] != 2:
         print("Can only animate a two dimensional set of arrays.")
         return
@@ -93,3 +93,5 @@ def animate(path_to_file, H, problem=None, func_iter=None):
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=6, bitrate=1800)
     ani.save(path_to_file, writer=writer)
+
+    print("Saving: ",  path_to_file)

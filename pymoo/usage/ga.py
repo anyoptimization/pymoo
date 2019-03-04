@@ -1,7 +1,7 @@
 from pymoo.optimize import minimize
 from pymop.factory import get_problem
 
-problem = get_problem("rastrigin")
+problem = get_problem("g01")
 
 res = minimize(problem,
                method='ga',

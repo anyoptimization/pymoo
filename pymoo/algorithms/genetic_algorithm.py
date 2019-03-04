@@ -55,7 +55,7 @@ class GeneticAlgorithm(Algorithm):
                  mutation,
                  survival,
                  n_offsprings=None,
-                 eliminate_duplicates=None,
+                 eliminate_duplicates=False,
                  func_repair=None,
                  individual=Individual(),
                  **kwargs
@@ -88,9 +88,15 @@ class GeneticAlgorithm(Algorithm):
         self.n_offsprings = n_offsprings
 
         # a function that returns the indices of duplicates
-        self.eliminate_duplicates = eliminate_duplicates
-        if isinstance(self.eliminate_duplicates, bool):
-            self.eliminate_duplicates = default_is_duplicate
+        if isinstance(eliminate_duplicates, bool):
+            if eliminate_duplicates:
+                self.eliminate_duplicates = default_is_duplicate
+            else:
+                self.eliminate_duplicates = None
+        elif callable(eliminate_duplicates):
+            self.eliminate_duplicates = eliminate_duplicates
+        else:
+            raise Exception("eliminate_duplicates can be either a function or bool for default elimination function.")
 
         # the object to be used to represent an individual - either individual or derived class
         self.individual = individual
@@ -197,7 +203,7 @@ class GeneticAlgorithm(Algorithm):
             if self.func_repair is not None:
                 _off = self.func_repair(self.problem, _off, algorithm=self)
 
-            if self.eliminate_duplicates is not None:
+            if self.eliminate_duplicates:
                 is_duplicate = self.eliminate_duplicates(_off, pop, off, algorithm=self)
                 _off = _off[np.logical_not(is_duplicate)]
 

@@ -13,7 +13,7 @@ def get_extension_modules():
 
 __name__ = "pymoo"
 __author__ = "Julian Blank"
-__version__ = '0.2.5.dev'
+__version__ = '0.2.5'
 __url__ = "https://github.com/msu-coinlab/pymoo"
 
 kwargs = dict(
@@ -28,7 +28,7 @@ kwargs = dict(
     license='Apache License 2.0',
     keywords="optimization",
     packages=setuptools.find_packages(exclude=['tests', 'docs', 'experiments']),
-    install_requires=['pymop==0.2.3', 'numpy>=1.15', 'scipy>=1.1', 'matplotlib>=3'],
+    install_requires=['pymop==0.2.4', 'numpy>=1.15', 'scipy>=1.1', 'matplotlib>=3'],
     include_package_data=True,
     platforms='any'
 )

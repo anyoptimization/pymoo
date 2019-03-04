@@ -1,6 +1,3 @@
-"""
-This is the experiment for nsga2.
-"""
 import os
 import pickle
 

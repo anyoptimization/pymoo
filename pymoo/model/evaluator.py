@@ -34,10 +34,9 @@ class Evaluator:
 
             self.n_eval += 1
             X.F, X.CV, X.G = problem.evaluate(X.X,
-                                        return_constraint_violation=True,
-                                        return_constraints=True,
-                                        individuals=X,
-                                        **kwargs)
+                                              return_values_of=["F", "CV", "G"],
+                                              individuals=X,
+                                              **kwargs)
             X.feasible = X.CV <= 0
 
         elif isinstance(X, Population):
@@ -45,12 +44,19 @@ class Evaluator:
             pop, _X = X, X.get("X")
             self.n_eval += len(pop)
 
-            F, CV, G = problem.evaluate(_X,
-                                        return_constraint_violation=True,
-                                        return_constraints=True,
-                                        individuals=pop,
-                                        **kwargs)
-            pop.set("F", F, "CV", CV, "G", G, "feasible", (CV <= 0))
+            out = problem.evaluate(_X,
+                                   return_values_of=["F", "CV", "G"],
+                                   individuals=pop,
+                                   return_as_dictionary=True,
+                                   **kwargs)
+
+            for key, val in out.items():
+                if val is None:
+                    continue
+                else:
+                    pop.set(key, val)
+
+            pop.set("feasible", (out["CV"] <= 0))
 
         elif isinstance(X, np.ndarray):
             if len(X.shape) == 1:
