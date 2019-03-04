@@ -11,9 +11,9 @@ class MyProblem(Problem):
     def __init__(self):
         super().__init__(n_var=2, n_obj=1, n_constr=1, xl=0, xu=10, type_var=np.int)
 
-    def _evaluate(self, x, f, g, *args, **kwargs):
-        f[:, 0] = - np.min(x * [3, 1], axis=1)
-        g[:, 0] = x[:, 0] + x[:, 1] - 10
+    def _evaluate(self, x, out, *args, **kwargs):
+        out["F"] = - np.min(x * [3, 1], axis=1)
+        out["G"] = x[:, 0] + x[:, 1] - 10
 
 
 def repair(problem, pop, **kwargs):

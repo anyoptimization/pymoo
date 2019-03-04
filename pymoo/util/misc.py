@@ -1,5 +1,17 @@
 import numpy as np
 import scipy
+import scipy.spatial
+
+
+def parameter_less(F, CV):
+    val = np.copy(F)
+    parameter_less = np.max(F, axis=0) + CV
+
+    infeasible = CV > 0
+    val[infeasible] = parameter_less[infeasible]
+
+    return val
+
 
 
 def swap(M, a, b):

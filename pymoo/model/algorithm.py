@@ -2,10 +2,9 @@ import copy
 from abc import abstractmethod
 
 import numpy as np
-from pymoo.model.evaluator import Evaluator
 
+from pymoo.model.evaluator import Evaluator
 from pymoo.model.result import Result
-from pymoo.model.termination import MaximumFunctionCallTermination
 from pymoo.rand import random
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
@@ -36,7 +35,7 @@ class Algorithm:
     def solve(self,
               problem,
               termination,
-              seed=1,
+              seed=None,
               disp=False,
               callback=None,
               save_history=False,
@@ -85,7 +84,8 @@ class Algorithm:
         """
 
         # set the random seed for generator
-        random.seed(seed)
+        if seed is not None:
+            random.seed(seed)
 
         # the evaluator object which is counting the evaluations
         self.evaluator = Evaluator()
@@ -113,7 +113,7 @@ class Algorithm:
                 X, F, CV, G = opt.get("X", "F", "CV", "G")
 
             else:
-                opt = pop[np.argmin(pop.get("F"))]
+                opt = opt[np.argmin(opt.get("F"))]
                 X, F, CV, G = opt.X, opt.F, opt.CV, opt.G
         else:
             opt = None
