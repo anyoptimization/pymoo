@@ -13,9 +13,10 @@ from pymoo.util.misc import parameter_less
 
 class DifferentialEvolution(GeneticAlgorithm):
     def __init__(self,
-                 variant="DE/rand+best/1/exp",
+                 variant="DE/rand+best/1/bin",
                  CR=0.5,
                  F=0.75,
+                 n_replace=None,
                  **kwargs):
 
         _, self.var_selection, self.var_n, self.var_mutation, = variant.split("/")
@@ -28,6 +29,7 @@ class DifferentialEvolution(GeneticAlgorithm):
         set_if_none(kwargs, 'survival', None)
         super().__init__(**kwargs)
 
+        self.n_replace = n_replace
         self.func_display_attrs = disp_single_objective
 
     def _next(self, pop):
@@ -75,8 +77,14 @@ class DifferentialEvolution(GeneticAlgorithm):
         _F, _CV, _feasible = self.off.get("F", "CV", "feasible")
         _F = parameter_less(_F, _CV)
 
-        # replace if better
-        is_better = (_F <= F)[:, 0]
+        # find the individuals which are indeed better
+        is_better = np.where((_F <= F)[:, 0])[0]
+
+        # truncate the replacements if desired
+        if self.n_replace is not None and self.n_replace < len(is_better):
+            is_better = is_better[random.perm(len(is_better))[:self.n_replace]]
+
+        # replace the individuals in the population
         pop[is_better] = self.off[is_better]
 
         return pop
