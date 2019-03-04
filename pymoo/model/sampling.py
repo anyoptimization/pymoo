@@ -39,7 +39,7 @@ class Sampling:
         return pop
 
 
-def sample_by_bounds(clazz, n_samples, n_var, x_min, x_max, **kwargs):
+def sample_by_bounds(clazz, n_samples, n_var, x_min=0, x_max=1, **kwargs):
     """
 
     Convenience method if only the bounds are needed to create the sample points.
@@ -72,5 +72,4 @@ def sample_by_bounds(clazz, n_samples, n_var, x_min, x_max, **kwargs):
             self.xl = np.full(n_var, x_min)
             self.xu = np.full(n_var, x_max)
 
-    return clazz.sample(P(), Population(), n_samples, **kwargs).get("X")
-
+    return clazz(**kwargs).sample(P(), Population(), n_samples, **kwargs).get("X")

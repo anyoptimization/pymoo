@@ -16,7 +16,7 @@ class Survival:
     def do(self, problem, pop, n_survive, **kwargs):
 
         # if the split should be done beforehand
-        if split_by_feasibility and problem.n_constr > 0:
+        if self.filter_infeasible and problem.n_constr > 0:
             feasible, infeasible = split_by_feasibility(pop, sort_infeasbible_by_cv=True)
 
             # finally the survivors to be returned

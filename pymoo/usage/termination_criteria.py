@@ -65,7 +65,7 @@ class MyTermination(Termination):
 
     def _do_continue(self, algorithm):
         import numpy as np
-        return np.random.random() > 0.05
+        return np.random.random() > self.perc_improvement
 
 
 res = minimize(problem,

@@ -1,6 +1,11 @@
 import os
 import pickle
 
+from pymoo.model.termination import MaximumGenerationTermination
+
+from pymoo.algorithms.nsga3 import NSGA3
+from pymoo.experimental.pbi import ReferenceDirectionSurvivalPBI
+
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.util.reference_direction import MultiLayerReferenceDirectionFactory, UniformReferenceDirectionFactory
@@ -192,32 +197,44 @@ setup = {
 
 if __name__ == '__main__':
 
-    method = "nsga3"
-    n_runs = 100
+    run_files = []
+    prefix = "runs"
+    method_name = "pynsga3-pbi-10"
+    n_runs = 50
     problems = setup.keys()
 
     for e in problems:
 
         s = setup[e]
         problem = s['problem']
+        pf = problem.pareto_front(s['ref_dirs'])
+
+        algorithm = NSGA3(s['ref_dirs'],
+                          pop_size=s['pop_size'],
+                          crossover=s['crossover'],
+                          mutation=s['mutation'],
+                          survival=ReferenceDirectionSurvivalPBI(s['ref_dirs'])
+                          )
 
         for run in range(n_runs):
+            fname = "%s_%s_%s.run" % (method_name, e, (run + 1))
+
             data = {
-                'args': [problem, method],
-                'kwargs': {
-                    'method_args': {
-                        'pop_size': s['pop_size'],
-                        'ref_dirs': s['ref_dirs'],
-                        'crossover': s['crossover'],
-                        'mutation': s['mutation'],
-                    },
-                    'termination': s['termination']
-                },
-                'out': "%s/pynsga3%s_%s.out" % (e.replace("_", "/"), e, (run + 1)),
+                'problem': problem,
+                'algorithm': algorithm,
+                'seed': run,
+                'termination': MaximumGenerationTermination(s['termination'][1]),
+                'out': "results/%s/%s/%s_%s.out" % (method_name, e.replace("_", "/"), e, (run + 1)),
+                'in': os.path.join(prefix, method_name, fname),
             }
 
-            folder = "runs/pynsga3-pbi"
-            os.makedirs(folder, exist_ok=True)
-            fname = "pynsga3_%s_%s.run" % (e, (run + 1))
-            with open(os.path.join(folder, fname), 'wb') as f:
+            os.makedirs(os.path.join(prefix, method_name), exist_ok=True)
+
+            with open(data['in'], 'wb') as f:
                 pickle.dump(data, f)
+                run_files.append(data)
+
+        # create the final run.txt file
+        with open(os.path.join(prefix, method_name, "run.bat"), 'w') as f:
+            for run_file in run_files:
+                f.write("python execute.py %s %s\n" % (run_file['in'], run_file['out']))

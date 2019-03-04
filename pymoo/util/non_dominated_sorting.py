@@ -22,7 +22,7 @@ class NonDominatedSorting:
         else:
             raise Exception("Unknown non-dominated sorting method: %s" % self.method)
 
-        fronts = func(F)
+        fronts = func(F, epsilon=self.epsilon)
 
         # convert to numpy array for each front and filter by n_stop_if_ranked if desired
         _fronts = []

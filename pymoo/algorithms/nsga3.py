@@ -203,7 +203,7 @@ def niching(F, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
         if niche_count[next_niche] == 0:
             next_ind = next_ind[np.argmin(dist_to_niche[next_ind])]
         else:
-            # already randomized through shuffeling
+            # already randomized through shuffling
             next_ind = next_ind[0]
 
         mask[next_ind] = False
@@ -217,8 +217,11 @@ def niching(F, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
 def associate_to_niches(F, niches, ideal_point, nadir_point, utopian_epsilon=0.0):
     utopian_point = ideal_point - utopian_epsilon
 
+    denom = nadir_point - utopian_point
+    denom[denom == 0] = 1e-12
+
     # normalize by ideal point and intercepts
-    N = (F - utopian_point) / (nadir_point - utopian_point)
+    N = (F - utopian_point) / denom
     dist_matrix = load_function("calc_perpendicular_distance")(N, niches)
 
     niche_of_individuals = np.argmin(dist_matrix, axis=1)

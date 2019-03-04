@@ -2,10 +2,9 @@ import os
 import pickle
 import sys
 import time
+import traceback
 
 import numpy as np
-
-
 
 if __name__ == '__main__':
 
@@ -23,6 +22,7 @@ if __name__ == '__main__':
 
     # load the data for the experiments
     fname = sys.argv[1]
+
     with open(fname, 'rb') as f:
         data = pickle.load(f)
 
@@ -31,25 +31,42 @@ if __name__ == '__main__':
 
         if 'algorithm' in data:
             res = data['algorithm'].solve(data['problem'], data['termination'], seed=data['seed'])
+            problem = data['problem']
 
         else:
             res = minimize(
                 *data['args'],
                 **data['kwargs']
             )
-
-        F = res.F
+            problem = data['args'][0]
 
         elapsed = (time.time() - start_time)
         print(fname, "in --- %s seconds ---" % elapsed)
 
-
-
         # create directory if necessary
         out = sys.argv[2]
         os.makedirs(os.path.dirname(out), exist_ok=True)
-        np.savetxt(out, F)
+
+        # if a feasible solution has been found
+        """
+        if res.F is not None:
+            F = res.F
+            M = F
+            if problem.n_constr > 0:
+                M = np.hstack([F, res.CV])
+
+        # if no feasible solution was found
+        else:
+            F, CV = res.pop.get("F", "CV")
+            best = np.argmin(CV)
+            M = np.array([F[best], CV[best]])
+        """
+
+        M = np.column_stack([res.pop.get("F"), res.pop.get("CV")])
+
+        np.savetxt(out, M)
 
     except Exception as e:
+        traceback.print_exc()
         print(e)
         print("Error: %s" % fname)
