@@ -1,14 +1,10 @@
 
-image: development/python
+image: continuumio/anaconda3
 
 dev:
 
   script:
     - export PATH=/root/miniconda3/bin:$PATH
-
-    - git clone https://github.com/msu-coinlab/pymop.git
-    - cd pymop
-    - pip install .
 
     - cd $CI_PROJECT_DIR
     - python setup.py install
