@@ -1,0 +1,795 @@
+/*
+Styling to add still
+--------------------
+
+div: spc-notice (general notices: e.g. submission requested is invalid)
+
+*/
+
+/* -------------------------------------------------------------------------*/
+/* Basic layout of the document: no styling - that is applied further down. */
+/* -------------------------------------------------------------------------*/
+body {
+	/* From: http://matthewjamestaylor.com/blog/perfect-3-column.htm */
+	margin:0;
+	padding:0;
+	border:0;			/* This removes the border around the viewport in old versions of IE */
+	width:100%;
+	background:#ffffff;
+	min-width:600px;	/* Minimum width of layout - remove line if not required */
+					/* The min-width property does not work in old versions of Internet Explorer */
+}
+
+#spc-document-container{
+	position: relative;
+	min-width: 50em;
+	max-width: 90em;
+}
+#spc-header {
+	clear: both;
+	float: left;
+	width: 100%;
+	display: block;
+}
+.spc-header-row{
+	float: left;
+	width: 100%;
+	clear: both;
+}
+.spc-header-left{
+	float: left;
+	position: relative;
+	left: +1%
+}
+.spc-header-right{
+	float: right;
+	position: relative;
+	left: -1%
+}
+#spc-contentwrap{
+	display: block;
+	overflow: hidden;
+}
+#spc-content-main{
+	float: left;
+	width: 100%;
+}
+
+#spc-navigation-bottom{
+	clear: both;
+}
+#spc-footer{
+	clear: both;
+}
+
+/* -------------------------------------------- */
+/* Now we will begin styling the various blocks */
+/* -------------------------------------------- */
+
+/* Document container */
+#spc-document-container {
+    font: 13px/1.5 'Lucida Grande','Lucida Sans Unicode','Geneva','Verdana',sans-serif;
+    background: #FFFFFF;
+	margin: auto;              /* display container in the center of the page */
+	padding-top: 12px;
+}
+#spc-document-container img{
+    border: 0
+}
+#spc-document-container a:visited { /* for IE6 */
+    color: purple;
+}
+/* Header block styling */
+.spc-header-row{
+	text-align: center;
+}
+.spc-header-right{
+	float: right;
+	text-align: right;
+}
+#spc-site-notice{
+	/*display: none;*/
+	color: #aaf;
+	font-weight: bold;
+	padding: 6px 0px;
+	border-bottom: 1px dashed #aaf;
+	background: #eee;
+	/*display: none; Uncomment to remove the site notice*/
+}
+#spc-site-title{
+	border-bottom: 1px solid #aaa;
+	margin-top: -2em;
+
+}
+
+#spc-top-menu{
+	padding-top: 0.25em;
+}
+#spc-header h1 a {
+	color: black;
+	text-decoration: none;
+	text-align: center;
+	font: 36px/1.0 'Inconsolata','Lucida Grande','Lucida Sans Unicode','Geneva','Verdana',sans-serif;
+	font-weight: bold;
+}
+#spc-top-menu a {
+	text-decoration: none;
+	font-weight: bold;
+	font: 20px 'Inconsolata','Lucida Grande','Lucida Sans Unicode','Geneva','Verdana',sans-serif;
+}
+#spc-top-menu a:hover{
+	text-decoration: underline;
+}
+
+/* contentwrap block: applies to everything in the bulk of the page */
+#spc-contentwrap {
+}
+
+/* The major chunk of content (left side); the sidebar comes later */
+#spc-content-main{
+	background: #FFFFFF;
+}
+
+/* Border */
+#spc-border {
+	margin-left: 0px;
+	background: white;
+    padding-top: 0em;     /* Don't remove top and bottom padding: leads to   */
+    padding-bottom: 0em;  /* unwanted horizontal borders around the document.*/
+	padding-left: 2em;
+	padding-right: 2em;
+}
+
+/* spc-section-body: the current section of the document.  The Sphinx
+   generated HTML is inserted inside this DIV element.  Specific formatting for
+   the HTML should go here */
+/* ----------------------- */
+#spc-section-body {
+	margin-bottom: 1em;
+}
+
+/* Styling for the headers */
+div#spc-section-body h1, h2, h3, h4, h5, h6{
+	color: #20435C;
+	font-family: 'Trebuchet MS', sans-serif;
+    font-weight: normal;
+    border-bottom: 0px solid #ccc;
+	margin-bottom: 0.5em;
+}
+div#spc-section-body h1 { font-size: 200%; font-weight: bold;}
+div#spc-section-body h2 { font-size: 160%; font-weight: bold; color: #101074;}
+div#spc-section-body h3 { font-size: 140%; color: #362A13;}
+div#spc-section-body h4 { font-size: 120%; }
+div#spc-section-body h5 { font-size: 110%; }
+div#spc-section-body h6 { font-size: 100%; }
+
+.spc-title-in-span{font-size: 160%; font-weight: bold; color: #101074; float: left;}
+
+/* Styling for forms */
+input, select, textarea{
+	border:solid 1px #aacfe4;
+	padding: 4px 2px;
+	margin-bottom: 1em;
+}
+
+/* Styling for hyperlinks */
+div#spc-section-body a{
+	text-decoration: none;
+}
+div#spc-section-body a:hover{
+	text-decoration: underline;
+}
+
+/* Styling for images and figures: images are inline, figures are centered */
+div#spc-section-body .align-center{
+    text-align: center;
+}
+
+/* Styling for <tt></tt> elements */
+tt {
+	background-color:#EEE;
+	color:#000;
+	font: 16px/1.0 'Inconsolata', Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+}
+
+/* Main page */
+#spc-site-statement{
+	width: 90%;
+    margin: auto;
+	text-align: center;
+	padding-top: 1em;
+}
+#spc-search{
+	clear: both;
+	float: none;
+	display: block;
+	margin: 0 auto;
+	width: 700px;
+}
+#spc-search-form{
+	margin-top: 10pt;
+}
+#spc-search-input {
+	cursor: auto;
+	display: inline;
+	height: 31px;
+	float: left;
+	width: 580px;
+	border: 2px solid #3e5d34;
+	padding: 0;
+	padding-left: 0.5em;
+	margin: 0;
+	margin-right: 20px;
+	color: #555;
+	font-family: 'Inconsolata', 'Lucida Grande';
+	font-size: 24px;
+	text-indent: 0px;
+	text-shadow: none;
+	text-transform: none;
+	word-spacing: 0px;
+	background: none;
+}
+#spc-search-button{
+	border: 1px outset #B6A792;
+	vertical-align:middle;
+	border:none;
+	cursor:pointer;
+	padding: 0;
+	display: block;
+	float: left;
+	width: 80px;
+	height: 35px;
+	margin: 0;
+	background: #ddd;
+	display: inline-block;
+	overflow: hidden;
+}
+#spc-search-results{
+	width: 75%;
+}
+#spc-search-results li{
+	margin: 0 auto;
+	list-style-type: none;
+	padding: 0.5em 0;
+	float: left;
+}
+
+/* Submission buttons */
+.spc-button-container {
+	float: left;
+	width: 100%;
+	clear: both;
+	margin-bottom:1em;
+}
+#spc-buttonlist {
+	margin: 0 auto;
+	list-style-type: none;
+	padding: 0;
+	padding-top: 2em;
+	float: left;
+	position: relative;
+	left: 50%;
+}
+#spc-buttonlist li {
+	float: left;
+	position: relative;
+	right: 50%;
+	padding: 0em 1em;
+}
+#spc-buttonlist a {
+	text-decoration: none;
+	margin: 0 auto;
+	display: block;
+}
+.spc-button{
+	background-position: 0px 0px;
+	background-color: #DDDDDD;
+	border: 1px outset #B6A792;
+	cursor: auto;
+	display: inline-block;
+	vertical-align: middle;
+	overflow: hidden;
+	padding: 0;
+	margin: 0;
+}
+
+/* Portals */
+.spc-portal-container{
+	width: 65%;
+	clear: both;
+	padding: 0px;
+	position: relative;
+	display: block;
+	margin: 0 auto;
+}
+.spc-portal-row-container {
+	clear:both;
+	float:left;
+	width:100%;				/* width of whole page */
+	overflow:hidden;		/* This chops off any overhanging divs */
+}
+.spc-portal-row {
+	float:left;
+	width:100%;
+	position:relative;
+	right:50%;				/* right column width */
+	background:#fff;		/* left column background colour */
+	}
+.spc-portal-left,
+.spc-portal-right{
+	float:left;
+	position:relative;
+	padding:0 0 1em 0;
+	overflow:hidden;
+}
+.spc-portal-left {
+	width:46%;			/* left column content width (column width minus left and right padding) */
+	left:52%;			/* right column width plus left column left padding */
+}
+.spc-portal-right {
+	width:46%;			/* right column content width (column width minus left and right padding) */
+	left:56%;			/* (right column width) plus (left column left and right padding) plus (right column left padding) */
+}
+.spc-portal-container h3{
+	font: 14px/1.0 'Inconsolata', Monaco, Lucida Console, Sans Mono, Courier New, monospace, serif;
+	text-align: center;
+	border-bottom: 1px solid;
+}
+.spc-portal-container a{
+	text-decoration: none;
+	font-weight: bold;
+	font: 14px sans-serif;
+}
+.spc-portal-container a:hover{
+	text-decoration: underline;
+}
+.spc-portal-container ul{
+	list-style-type: square;
+}
+.spc-portal-container li{
+	margin-left: -1em;
+}
+
+
+/* Submission forms */
+#spc-form-error-message{
+	margin-bottom: 1em;
+	text-align: center;
+	border-bottom:solid 1px #000;
+}
+.errorlist{
+	list-style-type: none;
+	float: left;
+	padding: 0;
+}
+.errorlist li{
+	font-style: italic;
+}
+.spc-field-error{
+    background: #ee8888;
+	padding: 4px;
+}
+.spc-form-button{
+	padding: 5px;
+}
+
+  /* column container */
+  /* http://matthewjamestaylor.com/blog/perfect-3-column.htm */
+.colmask {
+	position:relative;	/* This fixes the IE7 overflow hidden bug */
+	clear:both;
+	float:left;
+	width:100%;			/* width of whole page */
+	overflow:hidden;	    /* This chops off any overhanging divs */
+	padding-bottom: 1em;
+}
+/* common column settings */
+.colright,
+.colmid,
+.colleft {
+	float:left;
+	width:100%;			/* width of page */
+	position:relative;
+}
+.col1,
+.col2,
+.col3 {
+	float:left;
+	position:relative;
+	padding:0;	/* no left and right padding on columns */
+	overflow:hidden;
+}
+  /* 3 Column settings */
+.threecol {
+	background:#fff;	/* right column background colour */
+}
+.threecol .colmid {
+	right:25%;		/* width of the right column */
+	background:#fff;	/* center column background colour */
+}
+.threecol .colleft {
+	right:60%;		/* width of the middle column */
+	background:#fff;	/* left column background colour */
+}
+.threecol .col1 {
+	width:58%;		/* width of center column content (column width minus padding on either side) */
+	left:101%;		/* 100% plus left padding of center column */
+}
+.threecol .col2 {
+	width:13%;		/* Width of left column content (column width minus padding on either side) */
+	left:28%;			/* width of (right column) plus (center column left and right padding) plus (left column left padding) */
+}
+.threecol .col3 {
+	width:23%;		/* Width of right column content (column width minus padding on either side) */
+	left:90%;			/* Please make note of the brackets here:
+	  (100% - left column width) plus (center column left and right padding) plus (left column left and right padding) plus (right column left padding)
+	  (100-15)+(1+1)+(1+1)+(1)*/
+}
+.form-field input, select, textarea{
+	width: 98%;
+	max-width:1000px;
+	min-width:500px;
+}
+.form-field-auto-width{
+	width: auto;
+}
+.spc-code-description{
+	height: 15em;
+}
+span.spc-helptext ul{
+	margin: 0;
+	padding-left: 20px;
+}
+.spc-odd{
+	background: #DDF;
+}
+.spc-even{
+	background: #CCF;
+}
+li.spc-odd tt{
+	background-color: #DDF;
+}
+li.spc-even tt {
+	background-color: #CCF;
+}
+
+/* Image upload */
+#spc-item-upload {
+}
+#spc-item-upload-button{
+	padding: 0.5em;
+	text-align: center;
+}
+.spc-item-upload-success{
+    background: #ffa;
+	padding: 4px;
+}
+
+/* Tagging */
+.ui-autocomplete {
+	max-height: 150px;
+	overflow-y: auto;
+	overflow-x: hidden;  /* prevent horizontal scrollbar */
+	padding-right: 20px; /* add padding to account for vertical scrollbar */
+}
+/* IE 6 doesn't support max-height
+ * we use height instead, but this forces the menu to always be this tall */
+* html .ui-autocomplete {
+	height: 100px;
+}
+.spc-tag{
+    background-color: #E0EAF1;
+    color: #3E6D8E;
+    border-bottom: 1px solid #37607D;
+    border-right: 1px solid #37607D;
+    text-decoration: none;
+    padding: 4px 4px 3px 4px;
+    margin: 2px 5px 2px 0px;
+    font-size: 90%;
+    line-height: 1.4;
+    white-space: nowrap;
+    cursor: pointer;
+	float:left;
+}
+.spc-tag:hover{
+	background-color: #3E6D8E;
+	color: #E0EAF1;
+}
+.spc-tag-cloud{
+    background-color: #FFF;
+    color: #3E6D8E;
+    border-bottom: 0px solid #37607D;
+    border-right: 0px solid #37607D;
+    text-decoration: none;
+    padding: 0px 4px 0px 4px;
+    margin: 2px 5px 2px 0px;
+    font-size: 90%;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.spc-tag-cloud:hover{
+	background-color: #FFF;
+	color: #1E4D6E;
+}
+
+#spc-preview-edit-submit{
+	clear: both;
+}
+#spc-preview-edit-submit form input{
+	display: inline;
+	padding: 5px;
+}
+#spc-item-submit{
+	margin-left:8em;
+	font-weight: bold;
+}
+#spc-item-preview{
+	width:auto;
+	min-width:0;
+	padding: 0.5em;
+	text-align:center;
+}
+
+#spc-item-header{
+	clear: both;
+	padding: 0px;
+	float: left;
+	width: 102%;
+	position: relative;
+	display: block;
+	margin: 0 auto;
+	left: -1%;
+	top: -20px;
+}
+#spc-item-header-left{
+	float: left;
+	text-align: left;
+}
+#spc-item-header-right{
+	float: right;
+	text-align: right;
+}
+
+div.spc-item-row {
+	clear: both;
+	padding-top: 10px;
+}
+
+div.spc-item-row span.spc-item-label {
+	float: left;
+	width: 200px;
+	text-align: left;
+	padding-right: 20px;
+	padding-bottom: 4px;
+	font-weight: bold;
+}
+
+div.spc-item-row span.spc-item-entry {
+	float: left;
+	min-width: 500px;
+	max-width: 1000px;
+	text-align: left;
+}
+
+div.spc-item-row span.spc-item-entry ul{
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+div.spc-item-row span.spc-50-50{
+	float: left;
+	width: 49%;
+	text-align: left;
+}
+.spc-help-section a{
+   color: #0069CC;
+   margin-top: 1em;
+}
+.spc-entries-list ul{
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+/* Unstyle certain elements in the code/link description fields */
+.spc-item-description p{
+	margin: 0;
+	margin-bottom: 1em;
+}
+.spc-item-row pre{
+  border: 0px solid #FFF;
+  overflow: auto;
+  padding: 5px;
+  background-color: #EEE;
+  border: none;
+  margin: 0;
+  font: 16px/1.0 'Inconsolata', Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+}
+
+
+/* Item display*/
+#spc-itemdisp-container{
+    clear: both;
+	padding: 0;
+	padding-top: 1em;
+	margin: 0 auto;
+	width: 85%;
+}
+
+.spc-itemdisp-row-container {
+	clear:both;
+	float:left;
+	width:100%;
+	margin: 0 0 1em 0;
+}
+.spc-itemdisp-row {
+	float:left;
+	width:100%;
+	}
+.spc-itemdisp-td{
+  float: left;
+  padding-right: 1%;
+}
+.spc-itemdisp-description{
+  width: 50%;
+}
+.spc-itemdisp-link{
+  float: right;
+  font-size: 80%;
+}
+div .spc-itemdisp-mainlink{
+	text-decoration: underline;
+	float: left;
+	width: 100%;
+}
+.spc-itemdisp-revinfo{
+  float: right;
+  font-size: 80%;
+}
+.spc-itemdisp-created{
+  width: 23%;
+}
+.spc-itemdisp-tags{
+  width: 23%;
+}
+.spc-itemdisp-odd{
+  background: #fff8f1;
+}
+.spc-itemdisp-even{
+  background: #fff;
+}
+.spc-itemdisp-header{
+  background: #f1c79d;
+  padding: 0.4em 0 0.4em 0;
+  font-weight: bold;
+}
+#spc-itemdisp-pageheader{
+  text-align: center;
+  font: 24px/1.0 'Inconsolata','Lucida Grande','Lucida Sans Unicode','Geneva','Verdana',sans-serif;
+  font-weight: bold;
+}
+.spc-itemdisp-pagination{
+	float: left;
+}
+
+div#spc-itemdisp-container h1, h2, h3, h4, h5, h6{
+    font-weight: normal;
+    border-bottom: 1px solid #ccc;}
+div#spc-itemdisp-container h1 { font-size: 130%; font-weight: bold;}
+div#spc-itemdisp-container h2 { font-size: 120%; font-weight: bold;}
+div#spc-itemdisp-container h3 { font-size: 110%;}
+div#spc-itemdisp-container h4 { font-size: 100%; }
+div#spc-itemdisp-container h5 { font-size: 100%; }
+div#spc-itemdisp-container h6 { font-size: 100%; }
+
+/* Permalinks and other minor info*/
+.spc-minor-info {
+	font-size: 80%;
+	float: left;
+	border-top: 1px solid #ddd;
+}
+.spc-minor-info p{
+	margin: 0;
+}
+.spc-minor-info a{
+	text-decoration: none;
+}
+.spc-minor-info a:hover{
+	text-decoration: underline;
+}
+
+/* User profile pages */
+#spc-profile-user-options ul{
+	margin: 0 auto;
+	padding: 0 0;
+}
+#spc-profile-user-options li{
+	margin: 0 auto;
+	list-style-type: none;
+	padding: 0 5px 0 5px;
+	float: left;
+	border-right: 1px solid;
+}
+#spc-profile-user-options li:first-child{
+	padding-left: 0px;
+}
+#spc-profile-user-options li:last-child{
+	border-right: none;
+}
+/* Styling for certain _static pages */
+#spc-static-centering{
+	display: block;
+	margin: 0 auto;
+	min-width: 30em;
+	max-width: 50em;
+}
+
+/* spc-footer: http://www.alistapart.com/articles/practicalcss/   */
+#spc-footer {
+	clear: both;
+	font-size: 90%;
+	padding: 0px;
+	float: left;
+	width: 100%;
+	position: relative;
+	display: block;
+	margin: 0 auto;
+	border-top: 1px solid #aaa;
+}
+#spc-footer a{
+	text-decoration: none;
+	font-weight: bold;
+	font: 15px sans-serif;
+}
+#spc-footer a:hover{
+	text-decoration: underline;
+}
+.spc-footer-left{
+	float: left;
+	text-align: left;
+}
+.spc-footer-right{
+	float: right;
+	text-align: right;
+}
+.spc-footer-left ul{
+	margin: 0;
+	padding: 0;
+}
+.spc-footer-left li{
+	display: inline;
+	padding-left: 3px;
+	padding-right: 7px;
+	border-right: 0px solid #aaa;
+}
+.spc-indent{
+	margin-left: 15px;
+}
+.spc-flag{
+	padding-left: 1em;
+	vertical-align: middle;
+}
+
+/* ---------------- */
+/* Form styling     */
+/* ---------------- */
+.spc-form{
+	padding-top: 2em;
+}
+
+.spc-form-label{
+	display: block;
+	font-size: 14px;
+	color: #444;
+}
+.spc-centering-div-container{
+	clear: both;
+	margin: 0 auto;
+	border: 1px;
+	padding: 1em;
+	float: left;
+}
+
+/* ---------------------- */
+/* Miscellaneous elements */
+/* ---------------------- */

@@ -4,10 +4,16 @@ pymoo - Multi-Objective Optimization Framework
 You can find the detailed documentation here:
 https://www.egr.msu.edu/coinlab/blankjul/pymoo/
 
-
 .. image:: https://gitlab.msu.edu/blankjul/pymoo/badges/master/pipeline.svg
-   :alt: pipeline status
+   :alt: build status
    :target: https://gitlab.msu.edu/blankjul/pymoo/commits/master
+
+.. image:: https://img.shields.io/badge/python-3.6-blue.svg
+   :alt: python 3.6
+
+.. image:: https://img.shields.io/badge/license-apache-blue.svg
+   :alt: license apache
+   :target: https://www.apache.org/licenses/LICENSE-2.0
 
 
 Installation
@@ -60,6 +66,10 @@ However, for instance executing NSGA2:
 .. code:: python
 
     
+    
+
+    import numpy as np
+
     from pymoo.optimize import minimize
     from pymoo.util import plotting
     from pymop.factory import get_problem
@@ -73,9 +83,19 @@ However, for instance executing NSGA2:
                    method_args={'pop_size': 100},
                    termination=('n_gen', 200),
                    pf=pf,
-                   save_history=False,
+                   save_history=True,
                    disp=True)
-    plotting.plot(pf, res.F, labels=["Pareto-front", "F"])
+
+    plot = True
+    if plot:
+        plotting.plot(pf, res.F, labels=["Pareto-front", "F"])
+
+    # set true if you want to save a video
+    animate = False
+    if animate:
+        from pymoo.util.plotting import animate as func_animtate
+        H = np.concatenate([e.pop.get("F")[None, :] for e in res.history], axis=0)
+        func_animtate('%s.mp4' % problem.name(), H, problem)
 
 
 

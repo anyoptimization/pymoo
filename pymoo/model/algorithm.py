@@ -25,6 +25,7 @@ class Algorithm:
         self.problem = None
         self.termination = None
         self.pf = None
+        self.opt = None
 
         self.disp = None
         self.func_display_attrs = None
@@ -101,7 +102,11 @@ class Algorithm:
         pop = self._solve(problem, termination)
 
         # get the optimal result by filtering feasible and non-dominated
-        opt = pop.copy()
+        if self.opt is None:
+            opt = pop.copy()
+        else:
+            opt = self.opt
+
         opt = opt[opt.collect(lambda ind: ind.feasible)[:, 0]]
 
         # if at least one feasible solution was found

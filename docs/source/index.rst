@@ -1,42 +1,30 @@
+
+pymoo
+==============================================================================
+
+
+Contents
+------------------------------------------------------------------------------
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+
+   installation
+   getting_started
+   algorithms
+   tutorial
+   api
+   versions
+   references
+   contact
+   license
 
 
 
-Installation
-==================================
-.. include:: _installation.rst
+Indices and tables
+------------------------------------------------------------------------------
 
-
-
-Algorithms
-==================================
-
-.. include:: _algorithms.rst
-
-
-Contributors
-==================================
-Julian Blank
-
-
-Contact
-==================================
-.. include:: _contact.rst
-
-
-References
-==================================
-
-
-.. bibliography:: references.bib
-   :style: unsrt
-   :all:
-
-
-Changelog
-==================================
-
-.. include:: _changelog.rst
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 

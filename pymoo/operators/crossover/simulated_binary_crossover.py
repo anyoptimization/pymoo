@@ -65,7 +65,7 @@ class SimulatedBinaryCrossover(Crossover):
         c1[b] = c2[b]
         c2[b] = val
 
-        # take the parents as template
+        # take the parents as _template
         c = X.astype(np.double)
 
         # copy the positions where the crossover was done
