@@ -1,0 +1,25 @@
+// settings for 
+// 1) .header
+//		header block is found on the top of the website
+// spc-navbar, spc-header-searchbar found inside .header
+// 2) .spc-navbar
+// 3) .spc-header-searchbar
+
+@import "spc-utils.less";
+
+.header {
+	.margin(@top: 15px, @bottom: 15px);
+}
+
+.spc-navbar {
+	.margin (@top: 15px, @bottom: 5px);
+	.nav-pills {
+		margin-bottom: 0px;
+		font-size: 12px;
+		
+		>li >a {
+			padding-top: 2.5px;
+			padding-bottom: 2.5px;
+		}
+	}
+}

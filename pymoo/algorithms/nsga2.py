@@ -4,7 +4,6 @@ from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.model.individual import Individual
 from pymoo.model.survival import Survival
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.default_operators import set_if_none
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import RandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
@@ -14,25 +13,24 @@ from pymoo.util.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.randomized_argsort import randomized_argsort
 
 
+# =========================================================================================================
+# Implementation
+# =========================================================================================================
+
+
 class NSGA2(GeneticAlgorithm):
 
-    def __init__(self, pop_size=100, **kwargs):
-        # always store the individual to store rank and crowding
+    def __init__(self, **kwargs):
         kwargs['individual'] = Individual(rank=np.inf, crowding=-1)
-
-        # default settings for nsga2 - not overwritten if provided as kwargs
-        set_if_none(kwargs, 'pop_size', pop_size)
-        set_if_none(kwargs, 'sampling', RandomSampling())
-        set_if_none(kwargs, 'selection', TournamentSelection(func_comp=binary_tournament))
-        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=15))
-        set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=None, eta_mut=20))
-        set_if_none(kwargs, 'survival', RankAndCrowdingSurvival())
-        set_if_none(kwargs, 'eliminate_duplicates', True)
-
         super().__init__(**kwargs)
 
         self.tournament_type = 'comp_by_dom_and_crowding'
         self.func_display_attrs = disp_multi_objective
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Binary Tournament Selection Function
+# ---------------------------------------------------------------------------------------------------------
 
 
 def binary_tournament(pop, P, algorithm, **kwargs):
@@ -73,6 +71,11 @@ def binary_tournament(pop, P, algorithm, **kwargs):
                                method='larger_is_better', return_random_if_equal=True)
 
     return S[:, None].astype(np.int)
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Survival Selection
+# ---------------------------------------------------------------------------------------------------------
 
 
 class RankAndCrowdingSurvival(Survival):
@@ -163,3 +166,60 @@ def calc_crowding_distance(F):
     crowding[np.isinf(crowding)] = infinity
 
     return crowding
+
+
+# =========================================================================================================
+# Interface
+# =========================================================================================================
+
+def nsga2(
+        pop_size=100,
+        sampling=RandomSampling(),
+        selection=TournamentSelection(func_comp=binary_tournament),
+        crossover=SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=15),
+        mutation=PolynomialMutation(prob_mut=None, eta_mut=20),
+        eliminate_duplicates=True,
+        **kwargs):
+    """nsga2(
+        pop_size=100,
+        sampling=RandomSampling(),
+        selection=TournamentSelection(func_comp=binary_tournament),
+        crossover=SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=15),
+        mutation=PolynomialMutation(prob_mut=None, eta_mut=20),
+        eliminate_duplicates=True)
+
+
+    Parameters
+    ----------
+    pop_size : int
+        The population size used for the genetic algorithm.
+
+    sampling : :mod:`pymoo.model.sampling.Sampling`, pymoo.model.population, np.array
+
+    selection : pymoo.model.Selection
+        Type of selection
+
+    crossover : pymoo.model.Crossover
+
+    mutation : pymoo.model.Mutation
+
+    survival : pymoo.model.Survival
+
+    eliminate_duplicates : bool
+
+
+    Returns
+    -------
+    nsga2 : pymoo.algorithms.NSGA2
+
+
+    """
+
+    return NSGA2(pop_size=pop_size,
+                 sampling=sampling,
+                 selection=selection,
+                 crossover=crossover,
+                 mutation=mutation,
+                 survival=survival,
+                 eliminate_duplicates=eliminate_duplicates,
+                 **kwargs)

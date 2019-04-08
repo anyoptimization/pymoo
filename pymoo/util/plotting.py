@@ -20,8 +20,8 @@ def plot(*args, show=True, **kwargs):
         print("Cannot plot a %s dimensional array." % n_dim)
         return
 
-    #plt.legend()
     if show:
+        plt.legend()
         plt.show()
 
 
