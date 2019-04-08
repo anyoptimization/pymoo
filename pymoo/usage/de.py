@@ -9,7 +9,6 @@ res = minimize(problem,
                    'variant': "DE/best/1/bin",
                    'CR': 2,
                    'F': 0.75,
-                   'n_replace': 5,
                    'pop_size': 200
                },
                termination=('n_gen', 1000),

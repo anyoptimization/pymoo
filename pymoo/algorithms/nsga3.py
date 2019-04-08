@@ -15,6 +15,11 @@ from pymoo.util.display import disp_multi_objective
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 
+# =========================================================================================================
+# Implementation
+# =========================================================================================================
+
+
 class NSGA3(GeneticAlgorithm):
 
     def __init__(self, ref_dirs, **kwargs):
@@ -123,7 +128,7 @@ class ReferenceDirectionSurvival(Survival):
                 niche_count = calc_niche_count(len(self.ref_dirs), niche_of_individuals[until_last_front])
                 n_remaining = n_survive - len(until_last_front)
 
-            S = niching(F[last_front, :], n_remaining, niche_count, niche_of_individuals[last_front],
+            S = niching(pop[last_front], n_remaining, niche_count, niche_of_individuals[last_front],
                         dist_to_niche[last_front])
 
             survivors = np.concatenate((until_last_front, last_front[S].tolist()))
@@ -177,39 +182,51 @@ def get_nadir_point(extreme_points, ideal_point, worst_point, worst_of_front, wo
     return nadir_point
 
 
-def niching(F, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
+def niching(pop, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
     survivors = []
 
     # boolean array of elements that are considered for each iteration
-    mask = np.full(F.shape[0], True)
+    mask = np.full(len(pop), True)
 
     while len(survivors) < n_remaining:
 
-        # all niches where new individuals can be assigned to
+        # number of individuals to select in this iteration
+        n_select = n_remaining - len(survivors)
+
+        # all niches where new individuals can be assigned to and the corresponding niche count
         next_niches_list = np.unique(niche_of_individuals[mask])
-
-        # pick a niche with minimum assigned individuals - break tie if necessary
         next_niche_count = niche_count[next_niches_list]
-        next_niche = np.where(next_niche_count == next_niche_count.min())[0]
-        next_niche = next_niches_list[next_niche]
-        next_niche = next_niche[random.randint(0, len(next_niche))]
 
-        # indices of individuals that are considered and assign to next_niche
-        next_ind = np.where(np.logical_and(niche_of_individuals == next_niche, mask))[0]
+        # the minimum niche count
+        min_niche_count = next_niche_count.min()
 
-        # shuffle to break random tie (equal perp. dist) or select randomly
-        next_ind = random.shuffle(next_ind)
+        # all niches with the minimum niche count (truncate if randomly if more niches than remaining individuals)
+        next_niches = next_niches_list[np.where(next_niche_count == min_niche_count)[0]]
+        next_niches = next_niches[random.perm(len(next_niches))[:n_select]]
 
-        if niche_count[next_niche] == 0:
-            next_ind = next_ind[np.argmin(dist_to_niche[next_ind])]
-        else:
-            # already randomized through shuffling
-            next_ind = next_ind[0]
+        for next_niche in next_niches:
 
-        mask[next_ind] = False
-        survivors.append(int(next_ind))
+            # indices of individuals that are considered and assign to next_niche
+            next_ind = np.where(np.logical_and(niche_of_individuals == next_niche, mask))[0]
 
-        niche_count[next_niche] += 1
+            # shuffle to break random tie (equal perp. dist) or select randomly
+            next_ind = random.shuffle(next_ind)
+
+            if niche_count[next_niche] == 0:
+                next_ind = next_ind[np.argmin(dist_to_niche[next_ind])]
+                is_closest = True
+            else:
+                # already randomized through shuffling
+                next_ind = next_ind[0]
+                is_closest = False
+
+            # add the selected individual to the survivors
+            mask[next_ind] = False
+            pop[next_ind].data["closest"] = is_closest
+            survivors.append(int(next_ind))
+
+            # increase the corresponding niche count
+            niche_count[next_niche] += 1
 
     return survivors
 
@@ -235,3 +252,60 @@ def calc_niche_count(n_niches, niche_of_individuals):
     index, count = np.unique(niche_of_individuals, return_counts=True)
     niche_count[index] = count
     return niche_count
+
+
+# =========================================================================================================
+# Interface
+# =========================================================================================================
+
+
+def nsga3(
+        ref_dirs,
+        pop_size=None,
+        sampling=RandomSampling(),
+        selection=TournamentSelection(func_comp=comp_by_cv_then_random),
+        crossover=SimulatedBinaryCrossover(prob_cross=1.0, eta_cross=30),
+        mutation=PolynomialMutation(prob_mut=None, eta_mut=20),
+        eliminate_duplicates=True,
+        **kwargs):
+    """
+
+    Parameters
+    ----------
+
+    ref_dirs : np.ndarray
+        References direction
+
+    pop_size : int
+        By default the pop_size is equal to the number of reference lines provided. However, if
+        desired this can be overwritten.
+
+    sampling : :class:`pymoo.model.sampling.Sampling`, pymoo.model.population, np.array
+
+    selection : pymoo.model.Selection
+        Type of selection
+
+    crossover : pymoo.model.Crossover
+
+    mutation : pymoo.model.Mutation
+
+
+    eliminate_duplicates : bool
+
+
+    Returns
+    -------
+    pymoo.algorithms.NSGA3
+
+
+    """
+
+    return NSGA3(ref_dirs,
+                 pop_size=pop_size,
+                 sampling=sampling,
+                 selection=selection,
+                 crossover=crossover,
+                 mutation=mutation,
+                 survival=ReferenceDirectionSurvival(ref_dirs),
+                 eliminate_duplicates=eliminate_duplicates,
+                 **kwargs)

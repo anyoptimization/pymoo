@@ -1,0 +1,2 @@
+sphinxcontrib.bibtex
+sphinxcontrib.napoleon
