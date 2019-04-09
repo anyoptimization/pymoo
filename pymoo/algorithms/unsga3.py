@@ -6,6 +6,10 @@ from pymoo.operators.selection.tournament_selection import TournamentSelection, 
 from pymoo.rand import random
 
 
+# =========================================================================================================
+# Implementation
+# =========================================================================================================
+
 class UNSGA3(NSGA3):
 
     def __init__(self,
@@ -41,3 +45,8 @@ def comp_by_rank_and_ref_line_dist(pop, P, **kwargs):
                 S[i] = random.choice([a, b])
 
     return S[:, None].astype(np.int)
+
+
+# =========================================================================================================
+# Interface
+# =========================================================================================================

@@ -26,9 +26,7 @@ Model
     :members:
 
 .. autoclass:: pymoo.model.population.Population
-    .. automethod:: new
-    .. automethod:: merge
-
+    :members:
 
 .. autoclass:: pymoo.model.individual.Individual
     :members:
