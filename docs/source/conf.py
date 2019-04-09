@@ -10,7 +10,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.coverage',
     'matplotlib.sphinxext.plot_directive',
-    'sphinx.ext.napoleon',
+    #'sphinx.ext.napoleon',
     'sphinx_autodoc_typehints',
    # 'sphinx.ext.autosectionlabel',
     'sphinxcontrib.bibtex',

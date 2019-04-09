@@ -3,10 +3,7 @@ import numpy as np
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.model.individual import Individual
 from pymoo.model.survival import Survival
-from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.random_sampling import RandomSampling
-from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
+from pymoo.operators.selection.tournament_selection import compare
 from pymoo.util.display import disp_multi_objective
 from pymoo.util.dominator import Dominator
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
@@ -172,54 +169,3 @@ def calc_crowding_distance(F):
 # Interface
 # =========================================================================================================
 
-def nsga2(
-        pop_size=100,
-        sampling=RandomSampling(),
-        selection=TournamentSelection(func_comp=binary_tournament),
-        crossover=SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=15),
-        mutation=PolynomialMutation(prob_mut=None, eta_mut=20),
-        eliminate_duplicates=True,
-        **kwargs):
-    """nsga2(
-        pop_size=100,
-        sampling=RandomSampling(),
-        selection=TournamentSelection(func_comp=binary_tournament),
-        crossover=SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=15),
-        mutation=PolynomialMutation(prob_mut=None, eta_mut=20),
-        eliminate_duplicates=True)
-
-
-    Parameters
-    ----------
-    pop_size : int
-        The population size used for the genetic algorithm.
-
-    sampling : :mod:`pymoo.model.sampling.Sampling`, pymoo.model.population, np.array
-
-    selection : pymoo.model.Selection
-        Type of selection
-
-    crossover : pymoo.model.Crossover
-
-    mutation : pymoo.model.Mutation
-
-    survival : pymoo.model.Survival
-
-    eliminate_duplicates : bool
-
-
-    Returns
-    -------
-    nsga2 : pymoo.algorithms.NSGA2
-
-
-    """
-
-    return NSGA2(pop_size=pop_size,
-                 sampling=sampling,
-                 selection=selection,
-                 crossover=crossover,
-                 mutation=mutation,
-                 survival=survival,
-                 eliminate_duplicates=eliminate_duplicates,
-                 **kwargs)

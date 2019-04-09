@@ -11,6 +11,10 @@ from pymoo.util.display import disp_single_objective
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.normalization import normalize
 
+# =========================================================================================================
+# Implementation
+# =========================================================================================================
+
 
 class SingleObjectiveGeneticAlgorithm(GeneticAlgorithm):
 
@@ -166,3 +170,7 @@ def comp_by_cv_and_fitness(pop, P, **kwargs):
             S[i] = compare(a, pop[a].F, b, pop[b].F, method='smaller_is_better', return_random_if_equal=True)
 
     return S[:, None].astype(np.int)
+
+# =========================================================================================================
+# Interface
+# =========================================================================================================
