@@ -87,6 +87,9 @@ class Algorithm:
         # set the random seed for generator
         if seed is not None:
             random.seed(seed)
+        else:
+            seed = random.randint(0, 10000000)
+            random.seed(seed)
 
         # the evaluator object which is counting the evaluations
         self.evaluator = Evaluator()

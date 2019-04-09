@@ -9,6 +9,17 @@ from pymop.factory import get_problem, ScaledProblem, DTLZ1
 from pymop.problem import Problem
 
 
+test = "sasfsfsf"
+
+a = 5
+b = 10
+
+print("sfsdf")
+
+for i in range(5):
+    print(i)
+
+
 class InvertedDTLZ1(DTLZ1):
 
     def _evaluate(self, x, out, *args, **kwargs):

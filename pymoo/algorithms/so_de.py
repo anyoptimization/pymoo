@@ -11,6 +11,11 @@ from pymoo.util.display import disp_single_objective
 from pymoo.util.misc import parameter_less
 
 
+# =========================================================================================================
+# Implementation
+# =========================================================================================================
+
+
 class DifferentialEvolution(GeneticAlgorithm):
     def __init__(self,
                  variant="DE/rand+best/1/bin",
@@ -88,3 +93,7 @@ class DifferentialEvolution(GeneticAlgorithm):
         pop[is_better] = self.off[is_better]
 
         return pop
+
+# =========================================================================================================
+# Interface
+# =========================================================================================================

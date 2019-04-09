@@ -7,6 +7,11 @@ from pymoo.util.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
 
 
+# =========================================================================================================
+# Implementation
+# =========================================================================================================
+
+
 class RNSGA3(NSGA3):
 
     def __init__(self,
@@ -23,7 +28,7 @@ class RNSGA3(NSGA3):
         super().__init__(**kwargs)
 
         self.pop_size = ref_points.shape[0] * aspiration_ref_dirs.shape[0] + aspiration_ref_dirs.shape[1]
-        
+
         # create the survival strategy
         self.survival = AspirationPointSurvival(ref_points, aspiration_ref_dirs, mu=mu)
 
@@ -190,3 +195,7 @@ def line_plane_intersection(l0, l1, p0, p_no, epsilon=1e-6):
         # The segment is parallel to plane then return the perpendicular projection
         ref_proj = l1 - (np.dot(l1 - p0, p_no) * p_no)
         return ref_proj
+
+# =========================================================================================================
+# Interface
+# =========================================================================================================
