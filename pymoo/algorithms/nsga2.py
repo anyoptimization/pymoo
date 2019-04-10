@@ -1,9 +1,13 @@
 import numpy as np
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
+from pymoo.docs import parse_doc_string
 from pymoo.model.individual import Individual
 from pymoo.model.survival import Survival
-from pymoo.operators.selection.tournament_selection import compare
+from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
+from pymoo.operators.sampling.random_sampling import RandomSampling
+from pymoo.operators.selection.tournament_selection import compare, TournamentSelection
 from pymoo.util.display import disp_multi_objective
 from pymoo.util.dominator import Dominator
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
@@ -169,3 +173,45 @@ def calc_crowding_distance(F):
 # Interface
 # =========================================================================================================
 
+
+def nsga2(
+        pop_size=100,
+        sampling=RandomSampling(),
+        selection=TournamentSelection(func_comp=binary_tournament),
+        crossover=SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=15),
+        mutation=PolynomialMutation(prob_mut=None, eta_mut=20),
+        eliminate_duplicates=True,
+        n_offsprings=None,
+        **kwargs):
+    """
+
+    Parameters
+    ----------
+    pop_size : {pop_size}
+    sampling : {sampling}
+    selection : {selection}
+    crossover : {crossover}
+    mutation : {mutation}
+    eliminate_duplicates : {eliminate_duplicates}
+    n_offsprings : {n_offsprings}
+
+    Returns
+    -------
+    nsga2 : :class:`~pymoo.model.algorithm.Algorithm`
+        Returns an NSGA2 algorithm object.
+
+
+    """
+
+    return NSGA2(pop_size=pop_size,
+                 sampling=sampling,
+                 selection=selection,
+                 crossover=crossover,
+                 mutation=mutation,
+                 survival=RankAndCrowdingSurvival(),
+                 eliminate_duplicates=eliminate_duplicates,
+                 n_offsprings=n_offsprings,
+                 **kwargs)
+
+
+parse_doc_string(nsga2)

@@ -5,6 +5,8 @@ class Mutation:
 
     def __init__(self) -> None:
         super().__init__()
+        self.algorithm = None
+        self.problem = None
 
     def do(self, problem, pop, **kwargs):
         """

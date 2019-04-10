@@ -10,42 +10,6 @@ from pymoo.rand import random
 
 
 class GeneticAlgorithm(Algorithm):
-    """
-    This class represents a basic genetic algorithm that can be extended and modified by
-    providing different modules or operators.
-
-    Attributes
-    ----------
-
-    pop_size: int
-        The population size for the genetic algorithm. Depending on the problem complexity and modality the
-        it makes sense to experiments with the population size.
-        Also, to create a steady state algorithm the offspring_size can be changed.
-
-    sampling : class or numpy.array
-        The sampling methodology that is used to create the initial population in the first generation. Also,
-        the initial population can be provided directly in case it is known deterministically beforehand.
-
-    selection : model.selection.Selection
-        The mating selection methodology that is used to determine the parents for the mating process.
-
-    crossover : model.selection.Crossover
-        The crossover methodology that recombines at least two parents to at least one offspring. Depending on
-        the arity the number of crossover execution might vary.
-
-    mutation : model.selection.Mutation
-        The mutation methodology that is used to perturbate an individual. After performing the crossover
-        a mutation is executed.
-
-    survival : model.selection.Survival
-        Each generation usually a survival selection is performed to follow the survival of the fittest principle.
-        However, other strategies such as niching, diversity preservation and so on can be implemented here.
-
-    n_offsprings : int
-        Number of offsprings to be generated each generation. Can be 1 to define a steady-state algorithm.
-        Default it is equal to the population size.
-
-    """
 
     def __init__(self,
                  pop_size,
@@ -218,7 +182,8 @@ class GeneticAlgorithm(Algorithm):
 
             # if no new offsprings can be generated within 100 trails -> return the current result
             if n_matings > 100:
-                print("WARNING: Recombination could not produce new offsprings which are not already in the population!")
+                print(
+                    "WARNING: Recombination could not produce new offsprings which are not already in the population!")
                 break
 
         return off

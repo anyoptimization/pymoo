@@ -1,7 +1,3 @@
-from abc import abstractmethod
-
-import numpy as np
-
 from pymoo.model.population import Population
 
 

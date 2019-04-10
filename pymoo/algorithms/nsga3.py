@@ -3,6 +3,7 @@ from numpy.linalg import LinAlgError
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.cython.function_loader import load_function
+from pymoo.docs import parse_doc_string
 from pymoo.model.individual import Individual
 from pymoo.model.survival import Survival
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
@@ -253,3 +254,54 @@ def calc_niche_count(n_niches, niche_of_individuals):
     niche_count[index] = count
     return niche_count
 
+
+# =========================================================================================================
+# Interface
+# =========================================================================================================
+
+def nsga3(
+        ref_dirs,
+        pop_size=None,
+        sampling=RandomSampling(),
+        selection=TournamentSelection(func_comp=comp_by_cv_then_random),
+        crossover=SimulatedBinaryCrossover(prob_cross=1.0, eta_cross=30),
+        mutation=PolynomialMutation(prob_mut=None, eta_mut=20),
+        eliminate_duplicates=True,
+        n_offsprings=None,
+        **kwargs):
+    """
+
+    Parameters
+    ----------
+    ref_dirs : {ref_dirs}
+    pop_size : int (default = None)
+        By default the population size is set to None which means that it will be equal to the number of reference
+        line. However, if desired this can be overwritten by providing a positve number.
+    sampling : {sampling}
+    selection : {selection}
+    crossover : {crossover}
+    mutation : {mutation}
+    eliminate_duplicates : {eliminate_duplicates}
+    n_offsprings : {n_offsprings}
+
+    Returns
+    -------
+    nsga3 : :class:`~pymoo.model.algorithm.Algorithm`
+        Returns an NSGA3 algorithm object.
+
+
+    """
+
+    return NSGA3(ref_dirs,
+                 pop_size=pop_size,
+                 sampling=sampling,
+                 selection=selection,
+                 crossover=crossover,
+                 mutation=mutation,
+                 survival=ReferenceDirectionSurvival(ref_dirs),
+                 eliminate_duplicates=eliminate_duplicates,
+                 n_offsprings=n_offsprings,
+                 **kwargs)
+
+
+parse_doc_string(nsga3)

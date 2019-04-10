@@ -28,7 +28,7 @@ def fast_non_dominated_sort(F, **kwargs):
 
     for i in range(n):
 
-        for j in range(i + 1,n n):
+        for j in range(i + 1, n):
             rel = M[i, j]
             if rel == 1:
                 is_dominating[i].append(j)
