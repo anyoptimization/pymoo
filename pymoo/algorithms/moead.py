@@ -3,6 +3,7 @@ from scipy.spatial.distance import cdist
 
 from pymoo.cython.decomposition import PenaltyBasedBoundaryIntersection, Tchebicheff
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
+from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.default_operators import set_if_none
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
@@ -108,6 +109,48 @@ class MOEAD(GeneticAlgorithm):
 
         return pop
 
+
 # =========================================================================================================
 # Interface
 # =========================================================================================================
+
+
+def moead(
+        ref_dirs,
+        n_neighbors=15,
+        decomposition='auto',
+        prob_neighbor_mating=0.7,
+        **kwargs):
+    r"""
+
+    Parameters
+    ----------
+    ref_dirs : {ref_dirs}
+
+    decomposition : {{ 'auto', 'tchebi', 'pbi' }}
+        The decomposition approach that should be used. If set to `auto` for two objectives `tchebi` and for more than
+        two `pbi` will be used.
+
+    n_neighbors : int
+        Number of neighboring reference lines to be used for selection.
+
+    prob_neighbor_mating : float
+        Probability of selecting the parents in the neighborhood.
+
+
+    Returns
+    -------
+    moead : :class:`~pymoo.model.algorithm.MOEAD`
+        Returns an MOEAD algorithm object.
+
+
+    """
+
+    return MOEAD(ref_dirs,
+                 n_neighbors=n_neighbors,
+                 decomposition=decomposition,
+                 prob_neighbor_mating=prob_neighbor_mating,
+                 **kwargs)
+
+
+parse_doc_string(moead)
