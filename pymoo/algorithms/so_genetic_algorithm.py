@@ -1,6 +1,7 @@
 import numpy as np
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
+from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.default_operators import set_if_none
@@ -10,6 +11,7 @@ from pymoo.operators.selection.tournament_selection import TournamentSelection, 
 from pymoo.util.display import disp_single_objective
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.normalization import normalize
+
 
 # =========================================================================================================
 # Implementation
@@ -171,6 +173,50 @@ def comp_by_cv_and_fitness(pop, P, **kwargs):
 
     return S[:, None].astype(np.int)
 
+
 # =========================================================================================================
 # Interface
 # =========================================================================================================
+
+
+def ga(
+        pop_size=100,
+        sampling=RandomSampling(),
+        selection=TournamentSelection(func_comp=comp_by_cv_and_fitness),
+        crossover=SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=3),
+        mutation=PolynomialMutation(prob_mut=None, eta_mut=5),
+        eliminate_duplicates=True,
+        n_offsprings=None,
+        **kwargs):
+    """
+
+    Parameters
+    ----------
+    pop_size : {pop_size}
+    sampling : {sampling}
+    selection : {selection}
+    crossover : {crossover}
+    mutation : {mutation}
+    eliminate_duplicates : {eliminate_duplicates}
+    n_offsprings : {n_offsprings}
+
+    Returns
+    -------
+    ga : :class:`~pymoo.model.algorithm.Algorithm`
+        Returns an SingleObjectiveGeneticAlgorithm algorithm object.
+
+
+    """
+
+    return SingleObjectiveGeneticAlgorithm(pop_size=pop_size,
+                                           sampling=sampling,
+                                           selection=selection,
+                                           crossover=crossover,
+                                           mutation=mutation,
+                                           survival=FitnessSurvival(),
+                                           eliminate_duplicates=eliminate_duplicates,
+                                           n_offsprings=n_offsprings,
+                                           **kwargs)
+
+
+parse_doc_string(ga)

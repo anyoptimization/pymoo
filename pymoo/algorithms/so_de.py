@@ -1,4 +1,6 @@
 import numpy as np
+
+from pymoo.docs import parse_doc_string
 from pymoo.rand import random
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
@@ -94,6 +96,46 @@ class DifferentialEvolution(GeneticAlgorithm):
 
         return pop
 
+
 # =========================================================================================================
 # Interface
 # =========================================================================================================
+
+
+def de(
+        pop_size=100,
+        sampling=LatinHypercubeSampling(criterion="maxmin", iterations=100),
+        variant="DE/rand+best/1/bin",
+        CR=0.5,
+        F=0.75,
+        **kwargs):
+    """
+
+    Parameters
+    ----------
+    pop_size : {pop_size}
+    sampling : {sampling}
+    variant : str
+
+    CR : float
+
+    F : float
+
+    Returns
+    -------
+    de : :class:`~pymoo.model.algorithm.Algorithm`
+        Returns an DifferentialEvolution algorithm object.
+
+    """
+
+    _, _selection, _n, _mutation, = variant.split("/")
+
+    return DifferentialEvolution(pop_size=pop_size,
+                                 sampling=sampling,
+                                 selection=RandomSelection(),
+                                 crossover=DifferentialEvolutionCrossover(weight=F),
+                                 mutation=DifferentialEvolutionMutation(_mutation, CR),
+                                 **kwargs)
+
+
+parse_doc_string(de)
