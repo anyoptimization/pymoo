@@ -2,6 +2,7 @@ import numpy as np
 
 from pymoo.algorithms.nsga3 import NSGA3, ReferenceDirectionSurvival, get_extreme_points_c, get_nadir_point, \
     associate_to_niches, calc_niche_count, niching
+from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
@@ -17,8 +18,9 @@ class RNSGA3(NSGA3):
     def __init__(self,
                  ref_points,
                  pop_per_ref_point,
-                 mu=0.05,
+                 mu,
                  **kwargs):
+
         n_obj = ref_points.shape[1]
 
         # add the aspiration point lines
@@ -115,7 +117,7 @@ class AspirationPointSurvival(Survival):
                 niche_count = calc_niche_count(len(ref_dirs), niche_of_individuals[until_last_front])
                 n_remaining = n_survive - len(until_last_front)
 
-            S = niching(F[last_front, :], n_remaining, niche_count, niche_of_individuals[last_front],
+            S = niching(pop[last_front], n_remaining, niche_count, niche_of_individuals[last_front],
                         dist_to_niche[last_front])
 
             survivors = np.concatenate((until_last_front, last_front[S].tolist()))
@@ -196,3 +198,49 @@ def line_plane_intersection(l0, l1, p0, p_no, epsilon=1e-6):
         ref_proj = l1 - (np.dot(l1 - p0, p_no) * p_no)
         return ref_proj
 
+
+# =========================================================================================================
+# Interface
+# =========================================================================================================
+
+def rnsga3(ref_points,
+           pop_per_ref_point,
+           mu=0.05,
+           **kwargs):
+    """
+
+    Parameters
+    ----------
+    ref_points : {ref_points}
+    pop_per_ref_point : int
+        Size of the population used for each reference point.
+
+    mu : float
+        Defines the scaling of the reference lines used during survival selection. Increasing mu will result
+        having solutions with a larger spread.
+
+    Other Parameters
+    -------
+    n_offsprings : {n_offsprings}
+    sampling : {sampling}
+    selection : {selection}
+    crossover : {crossover}
+    mutation : {mutation}
+    eliminate_duplicates : {eliminate_duplicates}
+
+
+    Returns
+    -------
+    nsga3 : :class:`~pymoo.model.algorithm.Algorithm`
+        Returns an NSGA3 algorithm object.
+
+
+    """
+
+    return RNSGA3(ref_points,
+                  pop_per_ref_point,
+                  mu,
+                  **kwargs)
+
+
+parse_doc_string(rnsga3)
