@@ -1,8 +1,7 @@
 pymoo - Multi-Objective Optimization Framework
 ====================================================================
 
-You can find the detailed documentation here:
-https://www.egr.msu.edu/coinlab/blankjul/pymoo/
+You can find the detailed documentation here: http://pymoo.org
 
 .. image:: https://gitlab.msu.edu/blankjul/pymoo/badges/master/pipeline.svg
    :alt: build status

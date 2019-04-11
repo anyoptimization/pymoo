@@ -51,6 +51,11 @@ docs = {
 
                 """,
 
+    "ref_points": """:obj:`numpy.array`
+                    Reference Points (or also called Aspiration Points) as a :obj:`numpy.array` where each row 
+                    represents a point and each column a variable (must be equal to the objective dimension of the problem)
+                """,
+
     "eliminate_duplicates": """bool
                     The genetic algorithm implementation has a built in feature that eliminates duplicates after merging
                     the parent and the offspring population. If there are duplicates with respect to the current 
