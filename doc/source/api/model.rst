@@ -1,5 +1,5 @@
 Model
-------------------------------------------------------------------------------
+==============================================================================
 
 .. autoclass:: pymoo.model.algorithm.Algorithm
     :members:
@@ -25,6 +25,8 @@ Model
 .. autoclass:: pymoo.model.indicator.Indicator
     :members:
 
+.. autoclass:: pymoo.model.population.Population
+    :members:
 
 .. autoclass:: pymoo.model.individual.Individual
     :members:

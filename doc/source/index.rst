@@ -2,6 +2,35 @@
 pymoo
 ==============================================================================
 
+This framework is developed and maintained by `Julian Blank <julian blank research>`_ who is affiliated to the
+`Computational Optimization and Innovation Laboratory (COIN) <https://www.coin-laboratory.com>`_ supervised
+by `Kalyanmoy Deb <https://www.egr.msu.edu/people/profile/kdeb>`_ at the Michigan State University in
+East Lansing, Michigan, USA.
+Each algorithms is developed as close as possible to the proposed version to the
+best of our knowledge. **NSGA-II** and **NSGA-III** have been develop collaboratively with one of the authors
+and, therefore, we recommend using them for **official** benchmarks.
+
+The framework is available on PyPi and can be installed with:
+
+::
+
+    pip install Cython>=0.29 numpy>=1.15 pymoo
+
+
+Please note, that the dependencies used in the command above must be fulfilled before compiling some modules of *pymoo*
+and can, therefore, not be ensured to be installed prior compilation with the setup script.
+More details about the installation can be found :ref:`here <installation>`.
+
+We are currently working on a paper about *pymoo*.
+Meanwhile, if you have used our framework for research purposes, please cite us with:
+
+::
+
+    @misc{pymoo,
+        author = {Julian Blank and Kalyanmoy Deb},
+        title = {pymoo - {Multi-objective Optimization in Python}},
+        howpublished = {https://pymoo.org}
+    }
 
 
 Features
@@ -12,8 +41,8 @@ Features
 
 **Performance Indicators:** :ref:`Hypervolume <nb_hv>`, :ref:`GD <nb_gd>`, :ref:`IGD <nb_igd>`
 
-**Non-Dominated Sorting:** :ref:`Naive Non-Dominated Sort <nb_nds_naive>`, :ref:`Fast Non-Dominated Sort <nb_nds_fast>`,
-:ref:`Best Non-Dominated Sort <nb_nds_best>`
+**Non-Dominated Sorting:** :ref:`Naive<nb_nds_naive>`, :ref:`Fast<nb_nds_fast>`,
+:ref:`Best Order<nb_nds_best>`
 
 **Random Generators:** :ref:`Custom <nb_numpy>`, :ref:`Python <nb_rnd>`, :ref:`Numpy <nb_rnd>`
 
@@ -37,7 +66,7 @@ News
 software documentation regarding tutorial and API.
 
 
-Contents
+Content
 ------------------------------------------------------------------------------
 
 .. toctree::

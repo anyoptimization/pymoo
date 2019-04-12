@@ -31,11 +31,10 @@ class UsageTest(unittest.TestCase):
             try:
                 nb = nbformat.read(fname, nbformat.NO_CONVERT)
                 run_path = os.path.dirname(fname)
-                ep.preprocess(nb, {'metadata': {'path': run_path}})
+                ep.preprocess(nb, {'metadata': {'path': PYMOO_DIR}})
 
             except CellExecutionError:
                 msg = 'Error executing the fname "%s".\n\n' % fname
-                msg += 'See fname "%s" for the traceback.' % (fname + ".error")
                 print(msg)
                 raise
 
