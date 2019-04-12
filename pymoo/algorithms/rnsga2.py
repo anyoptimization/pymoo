@@ -1,9 +1,9 @@
 import numpy as np
-from pymoo.operators.selection.random_selection import RandomSelection
 
 from pymoo.algorithms.nsga2 import nsga2
 from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
+from pymoo.operators.selection.random_selection import RandomSelection
 from pymoo.rand import random
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
@@ -23,13 +23,12 @@ class RankAndModifiedCrowdingSurvival(Survival):
         self.weights = weights
         if self.weights is None:
             self.weights = np.full(self.n_obj, 1 / self.n_obj)
-            # self.weights = np.full(self.n_obj, 1)
 
         self.normalization = normalization
         self.ideal_point = np.full(ref_points.shape[1], np.inf)
         self.nadir_point = np.full(ref_points.shape[1], -np.inf)
 
-    def _do(self, pop, n_survive, D=None, **kwargs):
+    def _do(self, pop, n_survive, dist_to_ref_points=None, **kwargs):
 
         # get the objective space values and objects
         F = pop.get("F")
@@ -56,18 +55,18 @@ class RankAndModifiedCrowdingSurvival(Survival):
             self.nadir_point = np.ones(self.n_obj)
 
         # calculate the distance matrix from ever solution to all reference point
-        D = calc_norm_pref_distance(F, self.ref_points, self.weights, self.ideal_point, self.nadir_point)
+        dist_to_ref_points = calc_norm_pref_distance(F, self.ref_points, self.weights, self.ideal_point, self.nadir_point)
 
         for k, front in enumerate(fronts):
+
+            # save rank attributes to the individuals - rank = front here
+            pop[front].set("rank", np.full(len(front), k))
 
             # number of individuals remaining
             n_remaining = n_survive - len(survivors)
 
-            # save rank and crowding in the individual class
-            pop[front].set("rank", np.full(len(front), k))
-
             # the ranking of each point regarding each reference point (two times argsort is necessary)
-            rank_by_distance = np.argsort(np.argsort(D[front], axis=0), axis=0)
+            rank_by_distance = np.argsort(np.argsort(dist_to_ref_points[front], axis=0), axis=0)
 
             # the reference point where the best ranking is coming from
             ref_point_of_best_rank = np.argmin(rank_by_distance, axis=1)
@@ -84,9 +83,9 @@ class RankAndModifiedCrowdingSurvival(Survival):
             else:
 
                 # Distance from solution to every other solution and set distance to itself to infinity
-                solution_dist_matrix = calc_norm_pref_distance(F[front], F[front], self.weights, self.ideal_point,
+                dist_to_others = calc_norm_pref_distance(F[front], F[front], self.weights, self.ideal_point,
                                                                self.nadir_point)
-                np.fill_diagonal(solution_dist_matrix, np.inf)
+                np.fill_diagonal(dist_to_others, np.inf)
 
                 # the crowding that will be used for selection
                 crowding = np.full(len(front), np.nan)
@@ -99,6 +98,7 @@ class RankAndModifiedCrowdingSurvival(Survival):
 
                     # randomly select an alive individual
                     idx = not_selected[random.randint(0, len(not_selected))]
+                    #idx = not_selected[np.argmin(dist_to_ref_points[front][not_selected, random.randint(0, len(self.ref_points))])]
 
                     # set crowding for that individual
                     crowding[idx] = ranking[idx]
@@ -107,7 +107,7 @@ class RankAndModifiedCrowdingSurvival(Survival):
                     to_remove = [idx]
 
                     # Group of close solutions
-                    dist = solution_dist_matrix[idx][not_selected]
+                    dist = dist_to_others[idx][not_selected]
                     group = not_selected[np.where(dist < self.epsilon)[0]]
 
                     # if there exists solution with a distance less than epsilon
