@@ -17,13 +17,15 @@ res = minimize(problem,
                method_args={
                    'pop_size': 40,
                    'ref_points': ref_points,
-                   'epsilon': 0.005,
-                   'normalization': 'ever'
+                   'epsilon': 0.001,
+                   'normalization': 'front',
+                   #'weights': np.array([0.9, 0.1])
                },
                save_history=True,
-               termination=('n_gen', 200),
+               termination=('n_gen', 400),
                seed=1,
                pf=pf,
                disp=True)
 
+print(res.pop.get("dist_to_closest"))
 plotting.plot(pf, res.pop.get("F"), ref_points, show=True, labels=['pf', 'F', 'ref_points'])
