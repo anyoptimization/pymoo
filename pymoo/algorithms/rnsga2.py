@@ -1,6 +1,7 @@
 import numpy as np
 
 from pymoo.algorithms.nsga2 import nsga2
+from pymoo.algorithms.nsga3 import get_extreme_points_c
 from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
 from pymoo.operators.selection.random_selection import RandomSelection
@@ -14,21 +15,30 @@ from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 class RankAndModifiedCrowdingSurvival(Survival):
 
-    def __init__(self, ref_points, epsilon, weights, normalization) -> None:
+    def __init__(self, ref_points,
+                 epsilon,
+                 weights,
+                 normalization,
+                 survival_type,
+                 extreme_points_as_reference_points
+                 ) -> None:
+
         super().__init__(True)
         self.n_obj = ref_points.shape[1]
         self.ref_points = ref_points
         self.epsilon = epsilon
+        self.survival_type = survival_type
+        self.extreme_points_as_reference_points = extreme_points_as_reference_points
 
         self.weights = weights
         if self.weights is None:
             self.weights = np.full(self.n_obj, 1 / self.n_obj)
 
         self.normalization = normalization
-        self.ideal_point = np.full(ref_points.shape[1], np.inf)
-        self.nadir_point = np.full(ref_points.shape[1], -np.inf)
+        self.ideal_point = np.full(self.n_obj, np.inf)
+        self.nadir_point = np.full(self.n_obj, -np.inf)
 
-    def _do(self, pop, n_survive, dist_to_ref_points=None, **kwargs):
+    def _do(self, pop, n_survive, **kwargs):
 
         # get the objective space values and objects
         F = pop.get("F")
@@ -54,8 +64,12 @@ class RankAndModifiedCrowdingSurvival(Survival):
             self.ideal_point = np.zeros(self.n_obj)
             self.nadir_point = np.ones(self.n_obj)
 
+        if self.extreme_points_as_reference_points:
+            self.ref_points = np.row_stack([self.ref_points, get_extreme_points_c(F, self.ideal_point)])
+
         # calculate the distance matrix from ever solution to all reference point
-        dist_to_ref_points = calc_norm_pref_distance(F, self.ref_points, self.weights, self.ideal_point, self.nadir_point)
+        dist_to_ref_points = calc_norm_pref_distance(F, self.ref_points, self.weights, self.ideal_point,
+                                                     self.nadir_point)
 
         for k, front in enumerate(fronts):
 
@@ -84,21 +98,25 @@ class RankAndModifiedCrowdingSurvival(Survival):
 
                 # Distance from solution to every other solution and set distance to itself to infinity
                 dist_to_others = calc_norm_pref_distance(F[front], F[front], self.weights, self.ideal_point,
-                                                               self.nadir_point)
+                                                         self.nadir_point)
                 np.fill_diagonal(dist_to_others, np.inf)
 
                 # the crowding that will be used for selection
                 crowding = np.full(len(front), np.nan)
 
-                # solutions which are not already selected
-                not_selected = np.arange(len(front))
+                # solutions which are not already selected - for
+                not_selected = np.argsort(ranking)
 
                 # until we have saved a crowding for each solution
                 while len(not_selected) > 0:
 
                     # randomly select an alive individual
-                    idx = not_selected[random.randint(0, len(not_selected))]
-                    #idx = not_selected[np.argmin(dist_to_ref_points[front][not_selected, random.randint(0, len(self.ref_points))])]
+                    if self.survival_type == "random":
+                        idx = not_selected[random.randint(0, len(not_selected))]
+                    elif self.survival_type == "closest":
+                        idx = not_selected[0]
+                    else:
+                        raise Exception("Unknown survival type.")
 
                     # set crowding for that individual
                     crowding[idx] = ranking[idx]
@@ -152,11 +170,24 @@ def rnsga2(
         epsilon=0.001,
         normalization="front",
         weights=None,
+        survival_type="closest",
+        extreme_points_as_reference_points=False,
         **kwargs):
     """
 
+
     Parameters
     ----------
+    ref_points : {ref_points}
+
+    epsilon : float
+
+    weights : np.array
+
+    normalization : {{'no', 'front', 'ever'}}
+
+    survival_type : {{'closest', 'random'}}
+
 
     Returns
     -------
@@ -172,7 +203,8 @@ def rnsga2(
     rnsga2.weights = weights
     rnsga2.normalization = normalization
     rnsga2.selection = RandomSelection()
-    rnsga2.survival = RankAndModifiedCrowdingSurvival(ref_points, epsilon, weights, normalization)
+    rnsga2.survival = RankAndModifiedCrowdingSurvival(ref_points, epsilon, weights, normalization,
+                                                      survival_type, extreme_points_as_reference_points)
 
     return rnsga2
 

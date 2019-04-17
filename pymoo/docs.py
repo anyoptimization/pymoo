@@ -9,7 +9,7 @@ import re
 
 
 docs = {
-    "pop_size": """ int, optional
+    "pop_size": """ int
                 The population sized used by the algorithm.
     """,
 
@@ -40,15 +40,23 @@ docs = {
                     pressure, ... 
                     """,
     "crossover": """:class:`~pymoo.model.crossover.Crossover`
-
+                    The crossover has the purpose of create offsprings during the evolution. After the mating selection
+                    the parents are passed to the crossover operator which will dependent on the implementation create
+                    a different number of offsprings.
                 """,
 
     "mutation": """:class:`~pymoo.model.mutation.Mutation`
-
+                    Some genetic algorithms rely only on the mutation operation. However, it has shown that increases
+                    the performance to perform a mutation after creating the offsprings through crossover as well.
+                    Usually the mutation operator needs to be initialized with a probability to be executed. 
+                    Having a high probability of mutation will most of the time increase the diversity in the population.
                 """,
 
     "survival": """:class:`~pymoo.model.survival.Survival`
-
+                    The survival selection is the key for many genetic algorithms. It is responsible to define the
+                    goal of convergence by choosing the individual to survive or be truncated each generation.
+                    For single-objective problems a selection based on the fitness is used commonly. However, for 
+                    multi-objective problems different concepts are introduced.
                 """,
 
     "ref_points": """:obj:`numpy.array`
@@ -64,14 +72,15 @@ docs = {
                 """,
 
     "n_offsprings": """int (default: None)
-                    Number of offspring that are created through mating. By default it is set to `None` which
-                    sets the number of offsprings equal to the population size.
+                    Number of offspring that are created through mating. By default *n_offsprings=None* which
+                    sets the number of offsprings equal to the population size. By setting *n_offsprings=1* a, so called,
+                    steady-state version of an algorithm can be achieved.
             """,
 
     "ref_dirs": """:obj:`numpy.array`
                     The reference direction that should be used during the optimization. Each row represents a reference line
                     and each column a variable.
-            """,
+            """
 
 }
 

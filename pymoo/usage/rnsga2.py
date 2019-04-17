@@ -17,12 +17,14 @@ res = minimize(problem,
                method_args={
                    'pop_size': 40,
                    'ref_points': ref_points,
-                   'epsilon': 0.001,
-                   'normalization': 'front',
-                   #'weights': np.array([0.9, 0.1])
+                   'epsilon': 0.02,
+                   'normalization': 'no',
+                   'survival_type': "closest",
+                   'extreme_points_as_reference_points': True
+                   # 'weights': np.array([0.9, 0.1])
                },
                save_history=True,
-               termination=('n_gen', 400),
+               termination=('n_gen', 500),
                seed=1,
                pf=pf,
                disp=True)
