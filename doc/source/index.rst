@@ -2,13 +2,7 @@
 pymoo
 ==============================================================================
 
-This framework is developed and maintained by `Julian Blank <julian blank research>`_ who is affiliated to the
-`Computational Optimization and Innovation Laboratory (COIN) <https://www.coin-laboratory.com>`_ supervised
-by `Kalyanmoy Deb <https://www.egr.msu.edu/people/profile/kdeb>`_ at the Michigan State University in
-East Lansing, Michigan, USA.
-Each algorithms is developed as close as possible to the proposed version to the
-best of our knowledge. **NSGA-II** and **NSGA-III** have been develop collaboratively with one of the authors
-and, therefore, we recommend using them for **official** benchmarks.
+
 
 The framework is available on PyPi and can be installed with:
 
@@ -37,9 +31,10 @@ Features
 ------------------------------------------------------------------------------
 
 **Algorithms:** :ref:`Genetic Algorithm <nb_ga>`, :ref:`Differential Evolution <nb_de>`, :ref:`NSGA-II <nb_nsga2>`,
+:ref:`R-NSGA-II <nb_rnsga2>`,
 :ref:`NSGA-III <nb_nsga3>`, :ref:`U-NSGA-III <nb_unsga3>`, :ref:`R-NSGA-III <nb_rnsga3>`, :ref:`MOEA/D <nb_moead>`
 
-**Performance Indicators:** :ref:`Hypervolume <nb_hv>`, :ref:`GD <nb_gd>`, :ref:`IGD <nb_igd>`
+**Performance Indicators:** :ref:`Hypervolume <nb_hv>`, :ref:`GD <nb_gd>`, :ref:`IGD <nb_igd>`, :ref:`R-Metric <nb_rmetric>`
 
 **Non-Dominated Sorting:** :ref:`Naive<nb_nds_naive>`, :ref:`Fast<nb_nds_fast>`,
 :ref:`Best Order<nb_nds_best>`
@@ -58,6 +53,17 @@ Features
 .. **Visualization:** :ref:`Scatter <nb_scatter>`, :ref:`PCP <nb_pcp>`
 
 
+About
+------------------------------------------------------------------------------
+
+This framework is developed and maintained by `Julian Blank <julian blank research>`_ who is affiliated to the
+`Computational Optimization and Innovation Laboratory (COIN) <https://www.coin-laboratory.com>`_ supervised
+by `Kalyanmoy Deb <https://www.egr.msu.edu/people/profile/kdeb>`_ at the Michigan State University in
+East Lansing, Michigan, USA.
+Each algorithms is developed as close as possible to the proposed version to the
+best of our knowledge. **NSGA-II** and **NSGA-III** have been develop collaboratively with one of the authors
+and, therefore, we recommend using them for **official** benchmarks.
+
 
 
 News
@@ -75,6 +81,7 @@ Content
    installation
    getting_started
    algorithms/index
+   components/index
    tutorial/index
    api/index
    versions

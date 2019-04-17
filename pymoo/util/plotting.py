@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import animation
 
 
-def plot(*args, show=True, **kwargs):
+def plot(*args, show=True, labels=None, **kwargs):
     F = args[0]
 
     if F.ndim == 1:
@@ -13,15 +13,17 @@ def plot(*args, show=True, **kwargs):
     n_dim = F.shape[1]
 
     if n_dim == 2:
-        plot_2d(*args, **kwargs)
+        plot_2d(*args, labels=labels, **kwargs)
     elif n_dim == 3:
-        plot_3d(*args, **kwargs)
+        plot_3d(*args, labels=labels, **kwargs)
     else:
         print("Cannot plot a %s dimensional array." % n_dim)
         return
 
-    if show:
+    if labels:
         plt.legend()
+
+    if show:
         plt.show()
 
 

@@ -5,7 +5,7 @@ Algorithms
 
 .. autofunction:: pymoo.algorithms.nsga2.nsga2
 
-.. autofunction:: pymoo.algorithms.rnsga2.rnsga2
+.. autofunction:: pymoo.algorithms.rnsga2.rnsga2p
 
 .. autofunction:: pymoo.algorithms.nsga3.nsga3
 
