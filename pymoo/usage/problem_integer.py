@@ -1,7 +1,6 @@
 import numpy as np
 
-from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
+from pymoo.factory import get_algorithm, get_crossover, get_mutation, get_sampling
 from pymoo.optimize import minimize
 from pymop import Problem
 
@@ -21,17 +20,20 @@ def repair(problem, pop, **kwargs):
     return pop
 
 
+method = get_algorithm("ga",
+                       pop_size=20,
+                       sampling=get_sampling("random"),
+                       crossover=get_crossover("real_sbx", prob_cross=1.0, eta_cross=5.0),
+                       mutation=get_mutation("real_polynomial_mutation", eta_mut=3.0),
+                       eliminate_duplicates=True,
+                       func_repair=repair,
+                       elimate_duplicates=True)
+
+# execute the optimization
 res = minimize(MyProblem(),
-               method='ga',
-               method_args={
-                   'pop_size': 20,
-                   'crossover': SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=3),
-                   'mutation': PolynomialMutation(eta_mut=2),
-                   'eliminate_duplicates': True,
-                   'func_repair': repair
-               },
-               termination=('n_gen', 30),
-               disp=True)
+               method,
+               termination=('n_gen', 200),
+               )
 
 print("Best solution found: %s" % res.X)
 print("Function value: %s" % res.F)

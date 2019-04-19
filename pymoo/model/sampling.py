@@ -37,39 +37,3 @@ class Sampling:
 
         """
         return pop
-
-
-def sample_by_bounds(clazz, n_samples, n_var, x_min=0, x_max=1, **kwargs):
-    """
-
-    Convenience method if only the bounds are needed to create the sample points.
-
-    Parameters
-    ----------
-    clazz : class
-        The sampling strategy to be used.
-    n_var : int
-        number of variables
-    n_samples : int
-        number of samples
-    x_min : np.array
-        lower bounds
-    x_max : np.array
-        upper bounds
-    kwargs : dict
-        additional arguments
-
-    Returns
-    -------
-    X : np.array
-        Samples points in a two dimensional array
-
-    """
-
-    class P(Problem):
-        def __init__(self) -> None:
-            self.n_var = n_var
-            self.xl = np.full(n_var, x_min)
-            self.xu = np.full(n_var, x_max)
-
-    return clazz(**kwargs).sample(P(), Population(), n_samples, **kwargs).get("X")

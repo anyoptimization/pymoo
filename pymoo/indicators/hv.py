@@ -1,15 +1,24 @@
+import numpy as np
+
 from pymoo.model.indicator import Indicator
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.normalization import normalize
 
-import numpy as np
-
 
 class Hypervolume(Indicator):
-    def __init__(self, pf, normalize=True):
+    def __init__(self, ref_point=None, normalize=False, ideal_point=None, nadir_point=None, pf=None):
         Indicator.__init__(self)
+        self.ref_point = ref_point
         self.normalize = normalize
-        self.pf = pf
+        self.ideal_point = ideal_point
+        self.nadir_point = nadir_point
+
+        if pf is not None:
+            self.ideal_point = np.min(self.pf, axis=0)
+            self.nadir_point = np.max(self.pf, axis=0)
+
+        if normalize and (self.ideal_point is None or self.nadir_point is None):
+            raise Exception("For the purpose of normalization provide either pf or ideal and nadir point!")
 
     def _calc(self, F):
         non_dom = NonDominatedSorting().do(F, only_non_dominated_front=True)
@@ -17,10 +26,12 @@ class Hypervolume(Indicator):
         _F = F[non_dom, :]
 
         if self.normalize:
-            hv = _HyperVolume(np.ones(F.shape[1]))
-            _F = normalize(_F, x_min=np.min(self.pf, axis=0), x_max=np.max(self.pf, axis=0))
+            # because we normalize now the reference point is (1,...1)
+            ref_point = np.ones(F.shape[1])
+            hv = _HyperVolume(ref_point)
+            _F = normalize(_F, x_min=self.ideal_point, x_max=self.nadir_point)
         else:
-            hv = _HyperVolume(np.max(self.pf, axis=0))
+            hv = _HyperVolume(self.ref_point)
 
         val = hv.compute(_F)
         return val

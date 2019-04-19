@@ -15,6 +15,8 @@ Please note, that the dependencies used in the command above must be fulfilled b
 and can, therefore, not be ensured to be installed prior compilation with the setup script.
 More details about the installation can be found :ref:`here <installation>`.
 
+This framework to be used for **any** profit-making purposes, please contact `Julian Blank <http://www.research-blank.de>`_.
+
 We are currently working on a paper about *pymoo*.
 Meanwhile, if you have used our framework for research purposes, please cite us with:
 
@@ -41,11 +43,13 @@ Features
 
 **Random Generators:** :ref:`Custom <nb_numpy>`, :ref:`Python <nb_rnd>`, :ref:`Numpy <nb_rnd>`
 
-**Sampling:** :ref:`Random <nb_random>`, :ref:`Latin Hypercube Sampling <nb_lhs>`,
+**Selection:** :ref:`Random <nb_selection_random>`, :ref:`Tournament Selection <nb_selection_tournament>`,
 
-**Crossover:** :ref:`Simulated Binary Crossover <nb_nds_naive>`, :ref:`Custom <nb_nds_fast>`,
+**Sampling:** :ref:`Random <nb_sampling_random>`, :ref:`Latin Hypercube Sampling <nb_sampling_lhs>`,
 
-**Mutation:** :ref:`Polynomial Mutation <nb_pm>`, :ref:`Bitflip Mutation<nb_bitflip>`
+**Crossover:** :ref:`Simulated Binary <nb_crossover_sbx>`, :ref:`Uniform <nb_crossover_uniform>`,
+
+**Mutation:** :ref:`Polynomial Mutation <nb_mut_pm>`, :ref:`Bitflip Mutation<nb_mut_bitflip>`
 
 
 .. **Decomposition:** :ref:`ASF <nb_asf>`, :ref:`Tchebichef <nb_thebi>`
@@ -79,7 +83,7 @@ Content
    :maxdepth: 2
 
    installation
-   getting_started
+   getting_started.ipynb
    algorithms/index
    components/index
    tutorial/index

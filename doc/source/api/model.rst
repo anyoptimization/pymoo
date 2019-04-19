@@ -31,3 +31,7 @@ Model
 .. autoclass:: pymoo.model.individual.Individual
     :members:
 
+.. autoclass:: pymoo.model.result.Result
+    :members:
+
+

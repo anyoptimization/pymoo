@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.model.sampling import Sampling, sample_by_bounds
+from pymoo.model.sampling import Sampling
 from pymoo.rand import random
 from pymoo.util.misc import cdist
 
@@ -68,14 +68,3 @@ class LatinHypercubeSampling(Sampling):
             X[:, i] = X[:, i] * (problem.xu[i] - problem.xl[i]) + problem.xl[i]
 
         return pop.new("X", X)
-
-
-if __name__ == "__main__":
-    X = sample_by_bounds(LatinHypercubeSampling, 10, 2, smooth=False, iterations=1, criterion="maxmin")
-
-    import matplotlib.pyplot as plt
-
-    plt.scatter(X[:, 0], X[:, 1])
-    plt.show()
-
-    print(X)
