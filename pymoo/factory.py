@@ -55,7 +55,7 @@ def get_from_list(l, name, kwargs):
 
         return clazz(**kwargs)
     else:
-        return None
+        raise Exception("Object '%s' for not found in %s" % (name, [e[0] for e in l]))
 
 
 def get_options(l):

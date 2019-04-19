@@ -22,7 +22,7 @@ def repair(problem, pop, **kwargs):
 
 method = get_algorithm("ga",
                        pop_size=20,
-                       sampling=get_sampling("random"),
+                       sampling=get_sampling("real_random"),
                        crossover=get_crossover("real_sbx", prob_cross=1.0, eta_cross=5.0),
                        mutation=get_mutation("real_polynomial_mutation", eta_mut=3.0),
                        eliminate_duplicates=True,
