@@ -1,44 +1,50 @@
 pymoo - Multi-Objective Optimization Framework
 ====================================================================
 
-You can find the detailed documentation here: http://pymoo.org
+You can find the detailed documentation here: https://pymoo.org
 
-.. image:: https://gitlab.msu.edu/blankjul/pymoo/badges/master/pipeline.svg
+
+|gitlab| |python| |license|
+
+
+.. |gitlab| image:: https://gitlab.msu.edu/blankjul/pymoo/badges/master/pipeline.svg
    :alt: build status
    :target: https://gitlab.msu.edu/blankjul/pymoo/commits/master
 
-.. image:: https://img.shields.io/badge/python-3.6-blue.svg
+.. |python| image:: https://img.shields.io/badge/python-3.6-blue.svg
    :alt: python 3.6
 
-.. image:: https://img.shields.io/badge/license-apache-blue.svg
+.. |license| image:: https://img.shields.io/badge/license-apache-blue.svg
    :alt: license apache
    :target: https://www.apache.org/licenses/LICENSE-2.0
+
+
+We are currently working on a paper about *pymoo*.
+Meanwhile, if you have used our framework for research purposes, please cite us with:
+
+::
+
+   @misc{pymoo,
+       author = {Julian Blank and Kalyanmoy Deb},
+       title = {pymoo - {Multi-objective Optimization in Python}},
+       howpublished = {https://pymoo.org}
+   }
+
 
 
 Installation
 ====================================================================
 
-First, make sure you have a python environment installed. We recommend miniconda3 or anaconda3.
+First, make sure you have a Python 3 environment installed. We recommend miniconda3 or anaconda3.
+
+The official release is always available at PyPi:
 
 .. code:: bash
 
-    conda --version
-
-Then from scratch create a virtual environment for pymoo:
-
-.. code:: bash
-
-    conda create -n pymoo -y python==3.6 cython numpy
-    conda activate pymoo
+    pip install Cython>=0.29 numpy>=1.15 pymoo
 
 
-For the current stable release please execute:
-
-.. code:: bash
-
-    pip install pymoo
-
-For the current development version:
+For the current developer version:
 
 .. code:: bash
 
@@ -64,8 +70,6 @@ However, for instance executing NSGA2:
 
 .. code:: python
 
-    
-    
 
     import numpy as np
 
