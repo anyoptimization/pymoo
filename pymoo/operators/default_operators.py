@@ -1,4 +1,4 @@
-from pymoo.operators.crossover.uniform_crossover import BinaryUniformCrossover
+from pymoo.operators.crossover.uniform_crossover import UniformCrossover
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.bitflip_mutation import BinaryBitflipMutation
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
@@ -24,6 +24,6 @@ def set_default_if_none(var_type, kwargs):
         set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=None, eta_mut=15))
     elif var_type == "binary":
         set_if_none(kwargs, 'sampling', RandomSampling())
-        set_if_none(kwargs, 'crossover', BinaryUniformCrossover())
+        set_if_none(kwargs, 'crossover', UniformCrossover())
         set_if_none(kwargs, 'mutation', BinaryBitflipMutation())
         set_if_none(kwargs, 'eliminate_duplicates', True)

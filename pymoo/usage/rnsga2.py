@@ -20,7 +20,7 @@ res = minimize(problem,
                    'epsilon': 0.02,
                    'normalization': 'no',
                    'survival_type': "closest",
-                   'extreme_points_as_reference_points': True
+                   'extreme_points_as_reference_points': False
                    # 'weights': np.array([0.9, 0.1])
                },
                save_history=True,

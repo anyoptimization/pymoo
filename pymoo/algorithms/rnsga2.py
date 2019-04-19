@@ -105,6 +105,7 @@ class RankAndModifiedCrowdingSurvival(Survival):
                 crowding = np.full(len(front), np.nan)
 
                 # solutions which are not already selected - for
+                #not_selected = np.arange(len(front))
                 not_selected = np.argsort(ranking)
 
                 # until we have saved a crowding for each solution
@@ -178,6 +179,7 @@ def rnsga2(
 
     Parameters
     ----------
+
     ref_points : {ref_points}
 
     epsilon : float
@@ -187,6 +189,9 @@ def rnsga2(
     normalization : {{'no', 'front', 'ever'}}
 
     survival_type : {{'closest', 'random'}}
+
+    extreme_points_as_reference_points : bool
+
 
 
     Returns
