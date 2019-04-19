@@ -89,11 +89,15 @@ docs = {
 # Util for docstrings
 # =========================================================================================================
 
-def parse_doc_string(obj):
-    D = {k: v.strip() for k, v in docs.items()}
-    _doc = obj.__doc__.format(**D)
+def parse_doc_string(source, dest=None, other={}):
 
-    lines = inspect.getsource(obj)
+    if dest is None:
+        dest = source
+
+    D = {k: v.strip() for k, v in docs.items()}
+    _doc = source.__doc__.format(**{**D, **other})
+
+    lines = inspect.getsource(source)
 
     cnt = 0
     b = False
@@ -113,6 +117,6 @@ def parse_doc_string(obj):
     signature = re.sub(r"def\s*", "", signature)
     signature = signature.strip()
 
-    obj.__doc__ = signature + "\n" + _doc
+    dest.__doc__ = signature + "\n" + _doc
 
 

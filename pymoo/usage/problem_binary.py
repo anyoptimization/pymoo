@@ -1,23 +1,22 @@
 import numpy as np
 
-from pymoo.operators.crossover.uniform_crossover import BinaryUniformCrossover
-from pymoo.operators.mutation.bitflip_mutation import BinaryBitflipMutation
-from pymoo.operators.sampling.bin_random_sampling import BinaryRandomSampling
+from pymoo.factory import get_algorithm, get_crossover, get_mutation, get_sampling
 from pymoo.optimize import minimize
 from pymop import create_random_knapsack_problem
 
 problem = create_random_knapsack_problem(30)
 problem.type_var = np.bool
 
+method = get_algorithm("ga",
+                       pop_size=20,
+                       sampling=get_sampling("bin_random"),
+                       crossover=get_crossover("bin_uniform"),
+                       mutation=get_mutation("bin_bitflip"),
+                       elimate_duplicates=True)
+
+
 res = minimize(problem,
-               method='ga',
-               method_args={
-                   'pop_size': 100,
-                   'sampling': BinaryRandomSampling(),
-                   'crossover': BinaryUniformCrossover(),
-                   'mutation': BinaryBitflipMutation(),
-                   'eliminate_duplicates': True,
-               },
+               method,
                termination=('n_gen', 100),
                disp=True)
 

@@ -27,10 +27,10 @@ class Algorithm:
         self.pf = None
         self.opt = None
 
+        self.history = None
         self.disp = None
         self.func_display_attrs = None
         self.callback = None
-        self.history = []
         self.save_history = None
 
     def solve(self,
@@ -92,6 +92,7 @@ class Algorithm:
             random.seed(seed)
 
         # the evaluator object which is counting the evaluations
+        self.history = []
         self.evaluator = Evaluator()
         self.problem = problem
         self.termination = termination

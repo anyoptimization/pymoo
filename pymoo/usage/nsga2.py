@@ -1,18 +1,23 @@
 
+from pymoo.factory import get_algorithm
 from pymoo.optimize import minimize
 from pymoo.util import plotting
 from pymop.factory import get_problem
 
-# create the optimization problem
+# create the algorithm object
+method = get_algorithm("nsga2",
+                      pop_size=100,
+                      elimate_duplicates=True)
+
+# create the test problem
 problem = get_problem("zdt1")
 pf = problem.pareto_front()
 
+# execute the optimization
 res = minimize(problem,
-               method='nsga2',
-               method_args={'pop_size': 100},
-               termination=('n_gen', 10),
+               method,
+               termination=('n_gen', 200),
                pf=pf,
-               save_history=True,
                disp=False)
 
 plotting.plot(pf, res.F, labels=["Pareto-front", "F"])
