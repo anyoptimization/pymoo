@@ -1,33 +1,22 @@
-import numpy as np
-
 from pymoo.model.crossover import Crossover
+from pymoo.operators.crossover.util import crossver_by_mask
 from pymoo.rand import random
 
 
 class UniformCrossover(Crossover):
 
-    def __init__(self, var_type=np.float):
+    def __init__(self, prob=0.5):
         super().__init__(2, 2)
-        self.var_type = var_type
+        self.prob = prob
 
     def _do(self, problem, pop, parents, **kwargs):
 
-        # number of parents
-        n_matings = parents.shape[0]
-        off = np.full((n_matings * self.n_offsprings, problem.n_var), np.inf, dtype=self.var_type)
-
+        # get the X of parents and count the matings
         X = pop.get("X")[parents.T]
+        n_matings = parents.shape[0]
 
         # random matrix to do the crossover
-        M = random.random((n_matings, problem.n_var))
-        smaller, larger = M < 0.5, M > 0.5
+        M = random.random((n_matings, problem.n_var)) < self.prob
 
-        # first possibility where first parent 0 is copied
-        off[:n_matings][smaller] = X[0, :, :][smaller]
-        off[:n_matings][larger] = X[1, :, :][larger]
-
-        # now flip the order of parents with the same random array and write the second half of off
-        off[n_matings:][smaller] = X[1, :, :][smaller]
-        off[n_matings:][larger] = X[0, :, :][larger]
-
-        return pop.new("X", off.astype(self.var_type))
+        _X = crossver_by_mask(X, M)
+        return pop.new("X", _X)

@@ -1,14 +1,15 @@
 import numpy as np
 
-from pymoo.docs import parse_doc_string
-from pymoo.rand import random
-
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
+from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
+from pymoo.operators.crossover.exponential_crossover import ExponentialCrossover
+from pymoo.operators.crossover.uniform_crossover import UniformCrossover
 from pymoo.operators.default_operators import set_if_none
-from pymoo.operators.mutation.differential_evoluation_mutation import DifferentialEvolutionMutation
+from pymoo.operators.repair.bounds_back_repair import BoundsBackRepair
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
 from pymoo.operators.selection.random_selection import RandomSelection
+from pymoo.rand import random
 from pymoo.util.display import disp_single_objective
 from pymoo.util.misc import parameter_less
 
@@ -20,10 +21,9 @@ from pymoo.util.misc import parameter_less
 
 class DifferentialEvolution(GeneticAlgorithm):
     def __init__(self,
-                 variant="DE/rand+best/1/bin",
-                 CR=0.5,
-                 F=0.75,
-                 n_replace=None,
+                 variant,
+                 CR,
+                 F,
                  **kwargs):
 
         _, self.var_selection, self.var_n, self.var_mutation, = variant.split("/")
@@ -32,11 +32,15 @@ class DifferentialEvolution(GeneticAlgorithm):
         set_if_none(kwargs, 'sampling', LatinHypercubeSampling(criterion="maxmin", iterations=100))
         set_if_none(kwargs, 'crossover', DifferentialEvolutionCrossover(weight=F))
         set_if_none(kwargs, 'selection', RandomSelection())
-        set_if_none(kwargs, 'mutation', DifferentialEvolutionMutation(self.var_mutation, CR))
+
+        if self.var_mutation == "exp":
+            set_if_none(kwargs, 'mutation', ExponentialCrossover(CR))
+        elif self.var_mutation == "bin":
+            set_if_none(kwargs, 'mutation', UniformCrossover(CR))
+
         set_if_none(kwargs, 'survival', None)
         super().__init__(**kwargs)
 
-        self.n_replace = n_replace
         self.func_display_attrs = disp_single_objective
 
     def _next(self, pop):
@@ -63,20 +67,16 @@ class DifferentialEvolution(GeneticAlgorithm):
         else:
             raise Exception("Unknown selection: %s" % self.var_selection)
 
-        self.off = self.crossover.do(self.problem, pop, P)
+        # do the first crossover which is the actual DE operation
+        self.off = self.crossover.do(self.problem, pop, P, algorithm=self)
 
-        # do the mutation by using the offsprings
-        self.off = self.mutation.do(self.problem, self.off, algorithm=self)
+        # then do the mutation (which is actually )
+        _pop = self.off.new().merge(self.pop).merge(self.off)
+        _P = np.column_stack([np.arange(len(pop)), np.arange(len(pop)) + len(pop)])
+        self.off = self.mutation.do(self.problem, _pop, _P, algorithm=self)[:len(self.pop)]
 
-        # bring back to bounds if violated through crossover - bounce back strategy
-        X = self.off.get("X")
-        xl = np.repeat(self.problem.xl[None, :], X.shape[0], axis=0)
-        xu = np.repeat(self.problem.xu[None, :], X.shape[0], axis=0)
-
-        # otherwise bounds back into the feasible space
-        X[X < xl] = (xl + (xl - X))[X < xl]
-        X[X > xu] = (xu - (X - xu))[X > xu]
-        self.off.set("X", X)
+        # bounds back if something is out of bounds
+        self.off = BoundsBackRepair().do(self.off, self.problem)
 
         # evaluate the results
         self.evaluator.eval(self.problem, self.off, algorithm=self)
@@ -86,10 +86,6 @@ class DifferentialEvolution(GeneticAlgorithm):
 
         # find the individuals which are indeed better
         is_better = np.where((_F <= F)[:, 0])[0]
-
-        # truncate the replacements if desired
-        if self.n_replace is not None and self.n_replace < len(is_better):
-            is_better = is_better[random.perm(len(is_better))[:self.n_replace]]
 
         # replace the individuals in the population
         pop[is_better] = self.off[is_better]
@@ -114,7 +110,9 @@ def de(
     Parameters
     ----------
     pop_size : {pop_size}
+
     sampling : {sampling}
+
     variant : str
 
     CR : float
@@ -130,12 +128,13 @@ def de(
 
     _, _selection, _n, _mutation, = variant.split("/")
 
-    return DifferentialEvolution(pop_size=pop_size,
-                                 sampling=sampling,
-                                 selection=RandomSelection(),
-                                 crossover=DifferentialEvolutionCrossover(weight=F),
-                                 mutation=DifferentialEvolutionMutation(_mutation, CR),
-                                 **kwargs)
+    return DifferentialEvolution(
+        variant,
+        CR,
+        F,
+        pop_size=pop_size,
+        sampling=sampling,
+        **kwargs)
 
 
 parse_doc_string(de)
