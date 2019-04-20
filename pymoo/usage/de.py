@@ -1,18 +1,17 @@
 from pymoo.optimize import minimize
 from pymop.factory import get_problem
+from pymoo.factory import get_algorithm
 
-problem = get_problem("rastrigin", n_var=10)
+problem = get_problem("rastrigin", n_var=3)
 
 res = minimize(problem,
-               method='de',
-               method_args={
-                   'variant': "DE/best/1/bin",
-                   'CR': 2,
-                   'F': 0.75,
-                   'pop_size': 200
-               },
-               termination=('n_gen', 1000),
-               disp=True)
+               method=get_algorithm('de',
+                                    variant="DE/rand/1/bin",
+                                    pop_size=100,
+                                    CR=0.7,
+                                    F=2),
+               termination=('n_gen', 200),
+               seed=1,
+               disp=False)
 
-print("Best solution found: %s" % res.X)
-print("Function value: %s" % res.F)
+print("Best solution found: \nX = %s\nF = %s" % (res.X, res.F))
