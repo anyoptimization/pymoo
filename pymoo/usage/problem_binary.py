@@ -8,9 +8,9 @@ problem = create_random_knapsack_problem(30)
 problem.type_var = np.bool
 
 method = get_algorithm("ga",
-                       pop_size=20,
+                       pop_size=200,
                        sampling=get_sampling("bin_random"),
-                       crossover=get_crossover("bin_uniform"),
+                       crossover=get_crossover("bin_hux"),
                        mutation=get_mutation("bin_bitflip"),
                        elimate_duplicates=True)
 

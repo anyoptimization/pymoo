@@ -14,7 +14,7 @@ You can find the detailed documentation here: https://pymoo.org
 .. |python| image:: https://img.shields.io/badge/python-3.6-blue.svg
    :alt: python 3.6
 
-.. |license| image:: https://img.shields.io/badge/license-apache-blue.svg
+.. |license| image:: https://img.shields.io/badge/license-apache-orange.svg
    :alt: license apache
    :target: https://www.apache.org/licenses/LICENSE-2.0
 

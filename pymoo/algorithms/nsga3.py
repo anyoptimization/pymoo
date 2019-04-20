@@ -46,6 +46,10 @@ class NSGA3(GeneticAlgorithm):
 
         return super()._solve(problem, termination)
 
+    def _finalize(self):
+        super()._finalize()
+        self.opt = self.pop[self.pop.get("is_closest")]
+
 
 def comp_by_cv_then_random(pop, P, **kwargs):
     S = np.full(P.shape[0], np.nan)
@@ -223,7 +227,7 @@ def niching(pop, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
 
             # add the selected individual to the survivors
             mask[next_ind] = False
-            pop[next_ind].data["closest"] = is_closest
+            pop[next_ind].data["is_closest"] = is_closest
             survivors.append(int(next_ind))
 
             # increase the corresponding niche count

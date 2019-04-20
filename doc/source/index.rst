@@ -3,7 +3,6 @@ pymoo
 ==============================================================================
 
 
-
 The framework is available on PyPi and can be installed with:
 
 ::
@@ -14,6 +13,18 @@ The framework is available on PyPi and can be installed with:
 Please note, that the dependencies used in the command above must be fulfilled before compiling some modules of *pymoo*
 and can, therefore, not be ensured to be installed prior compilation with the setup script.
 More details about the installation can be found :ref:`here <installation>`.
+
+.. raw:: html
+
+    <a href="/getting_started.html">
+        <button type="button" class="btn btn-success">Getting Started</button>
+    </a>
+
+|vspace|
+
+.. |vspace| raw:: latex
+
+   \vspace{5mm}
 
 This framework to be used for **any** profit-making purposes, please contact `Julian Blank <http://www.research-blank.de>`_.
 
@@ -47,7 +58,9 @@ Features
 
 **Sampling:** :ref:`Random <nb_sampling_random>`, :ref:`Latin Hypercube Sampling <nb_sampling_lhs>`,
 
-**Crossover:** :ref:`Simulated Binary <nb_crossover_sbx>`, :ref:`Uniform <nb_crossover_uniform>`,
+**Crossover:** :ref:`Simulated Binary Crossover<nb_crossover_sbx>`, :ref:`Uniform Crossover<nb_crossover_uniform>`,
+:ref:`Half Uniform Crossover<nb_crossover_half_uniform>`, :ref:`Differential Crossover<nb_crossover_differential>`,
+:ref:`Point Crossover<nb_crossover_point>`, :ref:`Exponential Crossover<nb_crossover_exponential>`
 
 **Mutation:** :ref:`Polynomial Mutation <nb_mut_pm>`, :ref:`Bitflip Mutation<nb_mut_bitflip>`
 

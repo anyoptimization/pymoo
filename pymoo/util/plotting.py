@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import animation
 
 
-def plot(*args, show=True, labels=None, **kwargs):
+def plot(*args, show=True, labels=None, no_fill=False,**kwargs):
     F = args[0]
 
     if F.ndim == 1:
@@ -13,7 +13,7 @@ def plot(*args, show=True, labels=None, **kwargs):
     n_dim = F.shape[1]
 
     if n_dim == 2:
-        plot_2d(*args, labels=labels, **kwargs)
+        plot_2d(*args, labels=labels, no_fill=no_fill, **kwargs)
     elif n_dim == 3:
         plot_3d(*args, labels=labels, **kwargs)
     else:
@@ -40,13 +40,22 @@ def plot_3d(*args, labels=None):
 
 
 
-def plot_2d(*args, labels=None):
+def plot_2d(*args, labels=None, no_fill=False):
+
+    if no_fill:
+        kwargs = dict(
+            s=20,
+            facecolors='none',
+            edgecolors='r'
+        )
+    else:
+        kwargs = {}
 
     for i, F in enumerate(args):
         if labels:
-            plt.scatter(F[:, 0], F[:, 1], label=labels[i])
+            plt.scatter(F[:, 0], F[:, 1], label=labels[i], **kwargs)
         else:
-            plt.scatter(F[:, 0], F[:, 1])
+            plt.scatter(F[:, 0], F[:, 1], **kwargs)
 
 
 def animate(path_to_file, H, problem=None, func_iter=None, plot_min=None, plot_max=None):

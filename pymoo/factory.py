@@ -5,6 +5,8 @@ The definitions for each object are purposely defined as a list and not as a dic
 
 
 """
+import re
+
 import numpy as np
 
 from pymoo.algorithms.moead import moead
@@ -17,6 +19,9 @@ from pymoo.algorithms.so_genetic_algorithm import ga
 from pymoo.algorithms.unsga3 import unsga3
 from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
+from pymoo.operators.crossover.exponential_crossover import ExponentialCrossover
+from pymoo.operators.crossover.half_uniform_crossover import HalfUniformCrossover
+from pymoo.operators.crossover.point_crossover import PointCrossover
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.crossover.uniform_crossover import UniformCrossover
 from pymoo.operators.mutation.bitflip_mutation import BinaryBitflipMutation
@@ -32,11 +37,11 @@ from pymoo.operators.selection.tournament_selection import TournamentSelection
 # =========================================================================================================
 
 
-def get_from_list(l, name, kwargs):
-
+def get_from_list(l, name, args, kwargs):
     i = None
     for k, e in enumerate(l):
-        if e[0] == name:
+
+        if re.match(e[0], name):
             i = k
             break
 
@@ -53,7 +58,7 @@ def get_from_list(l, name, kwargs):
                 default_kwargs[key] = val
             kwargs = default_kwargs
 
-        return clazz(**kwargs)
+        return clazz(*args, **kwargs)
     else:
         raise Exception("Object '%s' for not found in %s" % (name, [e[0] for e in l]))
 
@@ -100,8 +105,8 @@ ALGORITHMS = [
 ]
 
 
-def get_algorithm(name, d={}, **kwargs):
-    return get_from_list(ALGORITHMS, name, {**d, **kwargs})
+def get_algorithm(name, *args, d={}, **kwargs):
+    return get_from_list(ALGORITHMS, name, args, {**d, **kwargs})
 
 
 parse_doc_string(dummy, get_algorithm, {"type": "algorithm",
@@ -121,8 +126,8 @@ SAMPLING = [
 ]
 
 
-def get_sampling(name, d={}, **kwargs):
-    return get_from_list(SAMPLING, name, {**d, **kwargs})
+def get_sampling(name, *args, d={}, **kwargs):
+    return get_from_list(SAMPLING, name, args, {**d, **kwargs})
 
 
 parse_doc_string(dummy, get_sampling, {"type": "sampling",
@@ -140,8 +145,8 @@ SELECTION = [
 ]
 
 
-def get_selection(name, d={}, **kwargs):
-    return get_from_list(SELECTION, name, {**d, **kwargs})
+def get_selection(name, *args, d={}, **kwargs):
+    return get_from_list(SELECTION, name, args,{**d, **kwargs})
 
 
 parse_doc_string(dummy, get_selection, {"type": "selection",
@@ -156,13 +161,17 @@ parse_doc_string(dummy, get_selection, {"type": "selection",
 CROSSOVER = [
     ("real_sbx", SimulatedBinaryCrossover),
     ("real_de", DifferentialEvolutionCrossover),
-    ("real_uniform", UniformCrossover, {'var_type': np.float}),
-    ("bin_uniform", UniformCrossover, {'var_type': np.bool})
+    ("(real|bin|int)_ux", UniformCrossover),
+    ("(bin|int)_hux", HalfUniformCrossover),
+    ("(real|bin|int)_exp", ExponentialCrossover),
+    ("(real|bin|int)_one_point", PointCrossover, {'n_points': 1}),
+    ("(real|bin|int)_two_point", PointCrossover, {'n_points': 2}),
+    ("(real|bin|int)_k_point", PointCrossover)
 ]
 
 
-def get_crossover(name, d={}, **kwargs):
-    return get_from_list(CROSSOVER, name, {**d, **kwargs})
+def get_crossover(name, *args, d={}, **kwargs):
+    return get_from_list(CROSSOVER, name, args,{**d, **kwargs})
 
 
 parse_doc_string(dummy, get_crossover, {"type": "crossover",
@@ -180,8 +189,8 @@ MUTATION = [
 ]
 
 
-def get_mutation(name, d={}, **kwargs):
-    return get_from_list(MUTATION, name, {**d, **kwargs})
+def get_mutation(name, *args, d={}, **kwargs):
+    return get_from_list(MUTATION, name, args,{**d, **kwargs})
 
 
 parse_doc_string(dummy, get_mutation, {"type": "mutation",
