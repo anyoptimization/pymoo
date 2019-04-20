@@ -9,4 +9,4 @@ dev:
     - cd $CI_PROJECT_DIR
     - python setup.py install
     - cd tests
-    - python test_usage.py
+    - python test_suite.py
