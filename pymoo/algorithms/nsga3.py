@@ -28,8 +28,8 @@ class NSGA3(GeneticAlgorithm):
         kwargs['individual'] = Individual(rank=np.inf, niche=-1, dist_to_niche=np.inf)
         set_if_none(kwargs, 'pop_size', len(ref_dirs))
         set_if_none(kwargs, 'sampling', RandomSampling())
-        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=1.0, eta_cross=30))
-        set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=None, eta_mut=20))
+        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob=1.0, eta=30))
+        set_if_none(kwargs, 'mutation', PolynomialMutation(prob=None, eta=20))
         set_if_none(kwargs, 'selection', TournamentSelection(func_comp=comp_by_cv_then_random))
         set_if_none(kwargs, 'survival', ReferenceDirectionSurvival(ref_dirs))
         set_if_none(kwargs, 'eliminate_duplicates', True)
@@ -268,8 +268,8 @@ def nsga3(
         pop_size=None,
         sampling=RandomSampling(),
         selection=TournamentSelection(func_comp=comp_by_cv_then_random),
-        crossover=SimulatedBinaryCrossover(prob_cross=1.0, eta_cross=30),
-        mutation=PolynomialMutation(prob_mut=None, eta_mut=20),
+        crossover=SimulatedBinaryCrossover(prob=1.0, eta=30),
+        mutation=PolynomialMutation(prob=None, eta=20),
         eliminate_duplicates=True,
         n_offsprings=None,
         **kwargs):

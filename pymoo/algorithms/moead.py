@@ -30,8 +30,8 @@ class MOEAD(GeneticAlgorithm):
 
         set_if_none(kwargs, 'pop_size', len(ref_dirs))
         set_if_none(kwargs, 'sampling', RandomSampling())
-        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=20))
-        set_if_none(kwargs, 'mutation', PolynomialMutation(eta_mut=15))
+        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob=0.9, eta=20))
+        set_if_none(kwargs, 'mutation', PolynomialMutation(eta=15))
         set_if_none(kwargs, 'survival', None)
         set_if_none(kwargs, 'selection', None)
 

@@ -1,5 +1,5 @@
 from pymoo.model.crossover import Crossover
-from pymoo.operators.crossover.util import crossver_by_mask
+from pymoo.operators.crossover.util import crossover_mask
 from pymoo.rand import random
 
 
@@ -18,5 +18,5 @@ class UniformCrossover(Crossover):
         # random matrix to do the crossover
         M = random.random((n_matings, problem.n_var)) < self.prob
 
-        _X = crossver_by_mask(X, M)
+        _X = crossover_mask(X, M)
         return pop.new("X", _X)

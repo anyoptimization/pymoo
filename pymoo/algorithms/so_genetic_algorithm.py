@@ -24,8 +24,8 @@ class SingleObjectiveGeneticAlgorithm(GeneticAlgorithm):
         set_if_none(kwargs, 'pop_size', 100)
         set_if_none(kwargs, 'sampling', RandomSampling())
         set_if_none(kwargs, 'selection', TournamentSelection(func_comp=comp_by_cv_and_fitness))
-        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=3))
-        set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=None, eta_mut=5))
+        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob=0.9, eta=3))
+        set_if_none(kwargs, 'mutation', PolynomialMutation(prob=None, eta=5))
         set_if_none(kwargs, 'survival', FitnessSurvival())
         set_if_none(kwargs, 'eliminate_duplicates', True)
 
@@ -183,8 +183,8 @@ def ga(
         pop_size=100,
         sampling=RandomSampling(),
         selection=TournamentSelection(func_comp=comp_by_cv_and_fitness),
-        crossover=SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=3),
-        mutation=PolynomialMutation(prob_mut=None, eta_mut=5),
+        crossover=SimulatedBinaryCrossover(prob=0.9, eta=3),
+        mutation=PolynomialMutation(prob=None, eta=5),
         eliminate_duplicates=True,
         n_offsprings=None,
         **kwargs):

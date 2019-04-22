@@ -8,6 +8,7 @@ from pymoo.operators.crossover.uniform_crossover import UniformCrossover
 from pymoo.operators.default_operators import set_if_none
 from pymoo.operators.repair.bounds_back_repair import BoundsBackRepair
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
+from pymoo.operators.sampling.random_sampling import RandomSampling
 from pymoo.operators.selection.random_selection import RandomSelection
 from pymoo.rand import random
 from pymoo.util.display import disp_single_objective
@@ -24,13 +25,15 @@ class DifferentialEvolution(GeneticAlgorithm):
                  variant,
                  CR,
                  F,
+                 dither,
+                 jitter,
                  **kwargs):
 
         _, self.var_selection, self.var_n, self.var_mutation, = variant.split("/")
 
         set_if_none(kwargs, 'pop_size', 200)
         set_if_none(kwargs, 'sampling', LatinHypercubeSampling(criterion="maxmin", iterations=100))
-        set_if_none(kwargs, 'crossover', DifferentialEvolutionCrossover(weight=F))
+        set_if_none(kwargs, 'crossover', DifferentialEvolutionCrossover(weight=F, dither=dither, jitter=jitter))
         set_if_none(kwargs, 'selection', RandomSelection())
 
         if self.var_mutation == "exp":
@@ -100,15 +103,18 @@ class DifferentialEvolution(GeneticAlgorithm):
 
 def de(
         pop_size=100,
-        sampling=LatinHypercubeSampling(criterion="maxmin", iterations=100),
+        sampling=LatinHypercubeSampling(iterations=100, criterion="maxmin"),
         variant="DE/rand+best/1/bin",
         CR=0.5,
-        F=0.75,
+        F=0.3,
+        dither="vector",
+        jitter=False,
         **kwargs):
     """
 
     Parameters
     ----------
+
     pop_size : {pop_size}
 
     sampling : {sampling}
@@ -118,6 +124,11 @@ def de(
     CR : float
 
     F : float
+
+    dither : {{'no', 'scalar', 'vector'}}
+
+    jitter : bool
+
 
     Returns
     -------
@@ -132,6 +143,8 @@ def de(
         variant,
         CR,
         F,
+        dither,
+        jitter,
         pop_size=pop_size,
         sampling=sampling,
         **kwargs)
