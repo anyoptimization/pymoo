@@ -6,10 +6,11 @@ from pymoo.util.misc import covert_to_type
 
 
 class SimulatedBinaryCrossover(Crossover):
-    def __init__(self, prob_cross, eta_cross):
+    def __init__(self, prob, eta, prob_per_variable=0.5):
         super().__init__(2, 2)
-        self.prob_cross = float(prob_cross)
-        self.eta_cross = float(eta_cross)
+        self.prob = float(prob)
+        self.eta = float(eta)
+        self.prob_per_variable = prob_per_variable
 
     def _do(self, problem, pop, parents, **kwargs):
         n_matings = parents.shape[0]
@@ -20,9 +21,9 @@ class SimulatedBinaryCrossover(Crossover):
         do_crossover = np.full(X[0].shape, True)
 
         # simulating probability of doing a crossover with the parents at all
-        do_crossover[random.random(n_matings) > self.prob_cross, :] = False
+        do_crossover[random.random(n_matings) > self.prob, :] = False
         # per variable the probability is then 50%
-        do_crossover[random.random((n_matings, problem.n_var)) <= 0.5] = False
+        do_crossover[random.random((n_matings, problem.n_var)) > self.prob_per_variable] = False
         # also if values are too close no mating is done
         do_crossover[np.abs(X[0] - X[1]) <= 1.0e-14] = False
 
@@ -34,13 +35,13 @@ class SimulatedBinaryCrossover(Crossover):
         rand = random.random((n_matings, problem.n_var))
 
         def calc_betaq(beta):
-            alpha = 2.0 - np.power(beta, -(self.eta_cross + 1.0))
+            alpha = 2.0 - np.power(beta, -(self.eta + 1.0))
 
             mask, mask_not = (rand <= (1.0 / alpha)), (rand > (1.0 / alpha))
 
             betaq = np.zeros(mask.shape)
-            betaq[mask] = np.power((rand * alpha), (1.0 / (self.eta_cross + 1.0)))[mask]
-            betaq[mask_not] = np.power((1.0 / (2.0 - rand * alpha)), (1.0 / (self.eta_cross + 1.0)))[mask_not]
+            betaq[mask] = np.power((rand * alpha), (1.0 / (self.eta + 1.0)))[mask]
+            betaq[mask_not] = np.power((1.0 / (2.0 - rand * alpha)), (1.0 / (self.eta + 1.0)))[mask_not]
 
             return betaq
 

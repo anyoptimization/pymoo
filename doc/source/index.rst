@@ -1,3 +1,9 @@
+.. raw:: html
+
+    <div align="right" style="margin-bottom: -20px">
+      <b>Latest Version:</b> pymoo==0.3</b>
+    </div>
+
 
 pymoo
 ==============================================================================
@@ -17,7 +23,7 @@ More details about the installation can be found :ref:`here <installation>`.
 .. raw:: html
 
     <a href="/getting_started.html">
-        <button type="button" class="btn btn-success">Getting Started</button>
+        <img src="/_static/img/getting_started.svg" alt="Getting Started" style="max-width:40%; margin:5px 0px 5px 0px"/>
     </a>
 
 |vspace|
@@ -62,7 +68,7 @@ Features
 :ref:`Half Uniform Crossover<nb_crossover_half_uniform>`, :ref:`Differential Crossover<nb_crossover_differential>`,
 :ref:`Point Crossover<nb_crossover_point>`, :ref:`Exponential Crossover<nb_crossover_exponential>`
 
-**Mutation:** :ref:`Polynomial Mutation <nb_mut_pm>`, :ref:`Bitflip Mutation<nb_mut_bitflip>`
+**Mutation:** :ref:`Polynomial Mutation <nb_mutation_pm>`, :ref:`Bitflip Mutation<nb_mutation_bitflip>`
 
 
 .. **Decomposition:** :ref:`ASF <nb_asf>`, :ref:`Tchebichef <nb_thebi>`

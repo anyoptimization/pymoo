@@ -1,17 +1,15 @@
 import numpy as np
 
 
-def crossver_by_mask(X, M):
+def crossover_mask(X, M):
     # convert input to output by flatting along the first axis
-    _X = X.reshape(-1, X.shape[-1])
-
-    # invert the whole logical array
-    _M = np.logical_not(M)
+    _X = np.copy(X)
+    _X = _X.reshape(-1, _X.shape[-1])
 
     # first the second parent donors the to first
     _X[:len(M)][M] = X[1][M]
 
     # now the first parent donors to the second
-    _X[len(M):][_M] = X[0][_M]
+    _X[len(M):][M] = X[0][M]
 
     return _X

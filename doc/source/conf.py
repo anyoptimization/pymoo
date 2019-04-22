@@ -44,8 +44,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 project = u'pymoo'
 copyright = u'2019, Julian Blank, Computational Optimization and Innovation Laboratory (COIN), Michigan State University'
-version = '0.2.5'
-release = '0.2.5'
+version = '0.3.0'
+release = '0.3.0'
 pygments_style = 'sphinx'
 
 # =========================================================================================================
