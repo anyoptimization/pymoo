@@ -146,7 +146,7 @@ SELECTION = [
 
 
 def get_selection(name, *args, d={}, **kwargs):
-    return get_from_list(SELECTION, name, args,{**d, **kwargs})
+    return get_from_list(SELECTION, name, args, {**d, **kwargs})
 
 
 parse_doc_string(dummy, get_selection, {"type": "selection",
@@ -159,7 +159,7 @@ parse_doc_string(dummy, get_selection, {"type": "selection",
 # =========================================================================================================
 
 CROSSOVER = [
-    ("real_sbx", SimulatedBinaryCrossover),
+    ("real_sbx", SimulatedBinaryCrossover, dict(prob=1.0, eta=30)),
     ("real_de", DifferentialEvolutionCrossover),
     ("(real|bin|int)_ux", UniformCrossover),
     ("(bin|int)_hux", HalfUniformCrossover),
@@ -171,7 +171,7 @@ CROSSOVER = [
 
 
 def get_crossover(name, *args, d={}, **kwargs):
-    return get_from_list(CROSSOVER, name, args,{**d, **kwargs})
+    return get_from_list(CROSSOVER, name, args, {**d, **kwargs})
 
 
 parse_doc_string(dummy, get_crossover, {"type": "crossover",
@@ -184,13 +184,13 @@ parse_doc_string(dummy, get_crossover, {"type": "crossover",
 # =========================================================================================================
 
 MUTATION = [
-    ("real_polynomial_mutation", PolynomialMutation),
+    ("real_pm", PolynomialMutation),
     ("bin_bitflip", BinaryBitflipMutation)
 ]
 
 
 def get_mutation(name, *args, d={}, **kwargs):
-    return get_from_list(MUTATION, name, args,{**d, **kwargs})
+    return get_from_list(MUTATION, name, args, {**d, **kwargs})
 
 
 parse_doc_string(dummy, get_mutation, {"type": "mutation",

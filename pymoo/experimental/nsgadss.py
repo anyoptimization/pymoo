@@ -24,8 +24,8 @@ class NSGADSS(GeneticAlgorithm):
         set_if_none(kwargs, 'pop_size', pop_size)
         set_if_none(kwargs, 'sampling', RandomSampling())
         set_if_none(kwargs, 'selection', TournamentSelection(func_comp=binary_tournament))
-        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=15))
-        set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=None, eta_mut=20))
+        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob=0.9, eta=15))
+        set_if_none(kwargs, 'mutation', PolynomialMutation(prob=None, eta=20))
         set_if_none(kwargs, 'survival', RankAndCrowdingSurvival())
         set_if_none(kwargs, 'eliminate_duplicates', True)
 

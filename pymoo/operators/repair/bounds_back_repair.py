@@ -1,11 +1,12 @@
-from pymoo.model.repair import Repair
-
 import numpy as np
+
+from pymoo.model.repair import Repair
 
 
 class BoundsBackRepair(Repair):
 
     def _do(self, pop, problem, **kwargs):
+
         # bring back to bounds if violated through crossover - bounce back strategy
         X = pop.get("X")
         xl = np.repeat(problem.xl[None, :], X.shape[0], axis=0)

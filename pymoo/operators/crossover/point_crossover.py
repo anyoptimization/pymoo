@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.model.crossover import Crossover
-from pymoo.operators.crossover.util import crossver_by_mask
+from pymoo.operators.crossover.util import crossover_mask
 from pymoo.rand import random
 
 
@@ -34,5 +34,5 @@ class PointCrossover(Crossover):
                 M[i, a:b] = True
                 j += 2
 
-        _X = crossver_by_mask(X, M)
+        _X = crossover_mask(X, M)
         return pop.new("X", _X)

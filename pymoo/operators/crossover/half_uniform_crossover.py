@@ -1,8 +1,9 @@
-from pymoo.model.crossover import Crossover
-from pymoo.operators.crossover.util import crossver_by_mask
+import math
 
 import numpy as np
 
+from pymoo.model.crossover import Crossover
+from pymoo.operators.crossover.util import crossover_mask
 from pymoo.rand import random
 
 
@@ -25,17 +26,12 @@ class HalfUniformCrossover(Crossover):
 
         # create for each individual the crossover range
         for i in range(n_matings):
-
             I = np.where(not_equal[i])[0]
 
-            if len(I) == 0:
-                pass
-            elif len(I) == 1:
-                M[i, I[0]] = True
-            else:
-                n = int(len(I) / 2)
+            n = math.ceil(len(I) / 2)
+            if n > 0:
                 _I = I[random.perm(len(I))[:n]]
                 M[i, _I] = True
 
-        _X = crossver_by_mask(X, M)
+        _X = crossover_mask(X, M)
         return pop.new("X", _X)

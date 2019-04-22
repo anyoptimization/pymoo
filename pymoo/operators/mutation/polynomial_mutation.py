@@ -5,23 +5,23 @@ from pymoo.rand import random
 
 
 class PolynomialMutation(Mutation):
-    def __init__(self, eta_mut, prob_mut=None):
+    def __init__(self, eta, prob=None):
         super().__init__()
-        self.eta_mut = float(eta_mut)
-        if prob_mut is not None:
-            self.prob_mut = float(prob_mut)
+        self.eta = float(eta)
+        if prob is not None:
+            self.prob = float(prob)
         else:
-            self.prob_mut = None
+            self.prob = None
 
     def _do(self, problem, pop, **kwargs):
 
         X = pop.get("X")
         Y = np.full(X.shape, np.inf)
 
-        if self.prob_mut is None:
-            self.prob_mut = 1.0 / problem.n_var
+        if self.prob is None:
+            self.prob = 1.0 / problem.n_var
 
-        do_mutation = random.random(X.shape) < self.prob_mut
+        do_mutation = random.random(X.shape) < self.prob
 
         Y[:, :] = X
 
@@ -33,7 +33,7 @@ class PolynomialMutation(Mutation):
         delta1 = (X - xl) / (xu - xl)
         delta2 = (xu - X) / (xu - xl)
 
-        mut_pow = 1.0 / (self.eta_mut + 1.0)
+        mut_pow = 1.0 / (self.eta + 1.0)
 
         rand = random.random(X.shape)
         mask = rand <= 0.5
@@ -42,12 +42,12 @@ class PolynomialMutation(Mutation):
         deltaq = np.zeros(X.shape)
 
         xy = 1.0 - delta1
-        val = 2.0 * rand + (1.0 - 2.0 * rand) * (np.power(xy, (self.eta_mut + 1.0)))
+        val = 2.0 * rand + (1.0 - 2.0 * rand) * (np.power(xy, (self.eta + 1.0)))
         d = np.power(val, mut_pow) - 1.0
         deltaq[mask] = d[mask]
 
         xy = 1.0 - delta2
-        val = 2.0 * (1.0 - rand) + 2.0 * (rand - 0.5) * (np.power(xy, (self.eta_mut + 1.0)))
+        val = 2.0 * (1.0 - rand) + 2.0 * (rand - 0.5) * (np.power(xy, (self.eta + 1.0)))
         d = 1.0 - (np.power(val, mut_pow))
         deltaq[mask_not] = d[mask_not]
 

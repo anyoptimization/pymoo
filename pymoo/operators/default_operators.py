@@ -20,8 +20,8 @@ def set_default_if_none(var_type, kwargs):
     # values for mating
     if var_type == "real":
         set_if_none(kwargs, 'sampling', RandomSampling())
-        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=20))
-        set_if_none(kwargs, 'mutation', PolynomialMutation(prob_mut=None, eta_mut=15))
+        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob=0.9, eta=20))
+        set_if_none(kwargs, 'mutation', PolynomialMutation(prob=None, eta=15))
     elif var_type == "binary":
         set_if_none(kwargs, 'sampling', RandomSampling())
         set_if_none(kwargs, 'crossover', UniformCrossover())
