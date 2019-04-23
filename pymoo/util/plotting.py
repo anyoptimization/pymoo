@@ -13,9 +13,9 @@ def plot(*args, show=True, labels=None, no_fill=False,**kwargs):
     n_dim = F.shape[1]
 
     if n_dim == 2:
-        plot_2d(*args, labels=labels, no_fill=no_fill, **kwargs)
+        ret = plot_2d(*args, labels=labels, no_fill=no_fill, **kwargs)
     elif n_dim == 3:
-        plot_3d(*args, labels=labels, **kwargs)
+        ret = plot_3d(*args, labels=labels, **kwargs)
     else:
         print("Cannot plot a %s dimensional array." % n_dim)
         return
@@ -25,6 +25,8 @@ def plot(*args, show=True, labels=None, no_fill=False,**kwargs):
 
     if show:
         plt.show()
+
+    return ret
 
 
 def plot_3d(*args, labels=None):
@@ -37,6 +39,8 @@ def plot_3d(*args, labels=None):
             ax.scatter(F[:, 0], F[:, 1], F[:, 2], label=labels[i])
         else:
             ax.scatter(F[:, 0], F[:, 1], F[:, 2])
+
+    return ax
 
 
 

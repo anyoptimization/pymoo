@@ -8,7 +8,6 @@ from pymoo.operators.crossover.uniform_crossover import UniformCrossover
 from pymoo.operators.default_operators import set_if_none
 from pymoo.operators.repair.bounds_back_repair import BoundsBackRepair
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
-from pymoo.operators.sampling.random_sampling import RandomSampling
 from pymoo.operators.selection.random_selection import RandomSelection
 from pymoo.rand import random
 from pymoo.util.display import disp_single_objective
@@ -119,15 +118,25 @@ def de(
 
     sampling : {sampling}
 
-    variant : str
-
-    CR : float
+    variant : {{DE/(rand|best)/1/(bin/exp)}}
+        The different variants of DE to be used. DE/x/y/z where x how to select individuals to be pertubed,
+        y the number of difference vector to be used and z the crossover type. One of the most common variant
+        is DE/rand/1/bin.
 
     F : float
+        The weight to be used during the crossover.
+
+    CR : float
+        The probability the individual exchanges variable values from the donor vector.
 
     dither : {{'no', 'scalar', 'vector'}}
+        One strategy to introduce adaptive weights (F) during one run. The option allows
+        the same dither to be used in one iteration ('scalar') or a different one for
+        each individual ('vector).
 
     jitter : bool
+        Another strategy for adaptive weights (F). Here, only a very small value is added or
+        substracted to the weight used for the crossover for each individual.
 
 
     Returns

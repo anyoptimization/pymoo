@@ -22,9 +22,15 @@ def sample(sampling, n_samples, n_var, xl=0, xu=1, type_var=np.double, **kwargs)
     return sampling.sample(problem, Population(), n_samples, **kwargs).get("X")
 
 
-def crossover(crossover, a, b, xl=0, xu=1, type_var=np.double, **kwargs):
+def crossover(crossover, a, b, c=None, xl=0, xu=1, type_var=np.double, **kwargs):
+    n = a.shape[0]
     _pop = Population().new("X", a).merge(Population().new("X", b))
-    _P = np.column_stack([np.arange(len(a)), np.arange(len(a)) + len(a)])
+    _P = np.column_stack([np.arange(n), np.arange(n) + n])
+
+    if c is not None:
+        _pop = _pop.merge(Population().new("X", c))
+        _P = np.column_stack([_P, np.arange(n) + 2 * n])
+
     problem = get_problem_func(a.shape[1], xl, xu, type_var)(**kwargs)
     return crossover.do(problem, _pop, _P, **kwargs).get("X")
 
