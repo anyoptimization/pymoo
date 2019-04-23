@@ -1,42 +1,27 @@
 import numpy as np
-from pymop.factory import get_problem
 
-from pymop.problem import Problem
-
-
-class MyProblem(Problem):
-
-    def __init__(self):
-        super().__init__(n_var=2, n_obj=2, n_constr=1,
-                         xl=np.array([-2, -2]), xu=np.array([2, 2]))
-
-    def _evaluate(self, x, out, *args, **kwargs):
-        f1 = x[:, 0] ** 2 + x[:, 1] ** 2
-        f2 = (x[:, 0] - 1) ** 2 + x[:, 1] ** 2
-        out["F"] = np.column_stack([f1, f2])
-        out["G"] = np.full(len(x), 0)
-
-
-problem = MyProblem()
-
-
-problem = get_problem("zdt1")
-from pymoo.factory import get_algorithm
-
-method = get_algorithm("nsga2",
-                      pop_size=20,
-                      elimate_duplicates=False)
-
-
+from pymoo.algorithms.rnsga2 import rnsga2
 from pymoo.optimize import minimize
 from pymoo.util import plotting
+from pymop.factory import get_problem
+
+problem = get_problem("zdt1", n_var=30)
+pf = problem.pareto_front()
+
+# the reference point to be used during optimization
+ref_points = np.array([[0.5, 0.2], [0.1, 0.6]])
+
+method = rnsga2(pop_size=40,
+                ref_points=ref_points,
+                epsilon=0.05,
+                normalization='no',
+                extreme_points_as_reference_points=False,
+                weights=np.array([0.5, 0.5])
+                )
 
 res = minimize(problem,
                method,
-               termination=('n_gen', 1000),
-               seed=1,
-               save_history=True,
-               disp=False)
+               termination=('n_gen', 400),
+               disp=True)
 
-plotting.plot(res.F)
-
+plotting.plot(pf, res.F, ref_points, show=True, labels=['pf', 'F', 'ref_points'])

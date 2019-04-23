@@ -48,7 +48,12 @@ class NSGA3(GeneticAlgorithm):
 
     def _finalize(self):
         super()._finalize()
-        self.opt = self.pop[self.pop.get("is_closest")]
+        I = np.where(self.pop.get("rank") == 0)
+        pop = self.pop[I]
+        if len(pop) == 1:
+            self.opt = pop
+        else:
+            self.opt = pop[self.pop.get("is_closest")]
 
 
 def comp_by_cv_then_random(pop, P, **kwargs):
@@ -116,7 +121,8 @@ class ReferenceDirectionSurvival(Survival):
 
         # associate individuals to niches
         niche_of_individuals, dist_to_niche = associate_to_niches(F, self.ref_dirs, self.ideal_point, self.nadir_point)
-        pop.set('rank', rank, 'niche', niche_of_individuals, 'dist_to_niche', dist_to_niche)
+        pop.set('rank', rank, 'niche', niche_of_individuals, 'dist_to_niche',
+                dist_to_niche, "is_closest", np.full(len(pop), False))
 
         # if we need to select individuals to survive
         if len(pop) > n_survive:

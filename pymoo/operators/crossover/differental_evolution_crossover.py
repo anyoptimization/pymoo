@@ -14,7 +14,7 @@ class DifferentialEvolutionCrossover(Crossover):
         X = pop.get("X")[parents.T]
 
         if self.dither == "vector":
-            weight = (self.weight + random.random(len(pop)) * (1 - self.weight))[:, None]
+            weight = (self.weight + random.random(len(parents)) * (1 - self.weight))[:, None]
         elif self.dither == "scalar":
             weight = self.weight + random.random() * (1 - self.weight)
         else:
@@ -23,7 +23,7 @@ class DifferentialEvolutionCrossover(Crossover):
         # http://www.cs.ndsu.nodak.edu/~siludwig/Publish/papers/SSCI20141.pdf
         if self.jitter:
             gamma = 0.0001
-            weight = (self.weight * (1 + gamma * (random.random(len(pop)) - 0.5)))[:, None]
+            weight = (self.weight * (1 + gamma * (random.random(len(parents)) - 0.5)))[:, None]
 
         _X = X[0] + weight * (X[1] - X[2])
         return pop.new("X", _X)

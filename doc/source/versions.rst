@@ -1,9 +1,11 @@
 Versions
 ==============================================================================
 
-
-* 0.2.5
-
+* 0.3.0
+    - New documentation and global interface
+    - New crossovers: Point, HUX
+    - Improved version of DE
+    - New Factory Methods
 
 
 

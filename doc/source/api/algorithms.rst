@@ -3,6 +3,8 @@ Algorithms
 
 .. autofunction:: pymoo.algorithms.so_genetic_algorithm.ga
 
+.. autofunction:: pymoo.algorithms.so_de.de
+
 .. autofunction:: pymoo.algorithms.nsga2.nsga2
 
 .. autofunction:: pymoo.algorithms.rnsga2.rnsga2

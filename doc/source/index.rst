@@ -60,9 +60,9 @@ Features
 
 **Random Generators:** :ref:`Custom <nb_numpy>`, :ref:`Python <nb_rnd>`, :ref:`Numpy <nb_rnd>`
 
-**Selection:** :ref:`Random <nb_selection_random>`, :ref:`Tournament Selection <nb_selection_tournament>`,
+**Selection:** :ref:`Random <nb_selection_random>`, :ref:`Tournament Selection <nb_selection_tournament>`
 
-**Sampling:** :ref:`Random <nb_sampling_random>`, :ref:`Latin Hypercube Sampling <nb_sampling_lhs>`,
+**Sampling:** :ref:`Random <nb_sampling_random>`, :ref:`Latin Hypercube Sampling <nb_sampling_lhs>`
 
 **Crossover:** :ref:`Simulated Binary Crossover<nb_crossover_sbx>`, :ref:`Uniform Crossover<nb_crossover_uniform>`,
 :ref:`Half Uniform Crossover<nb_crossover_half_uniform>`, :ref:`Differential Crossover<nb_crossover_differential>`,
