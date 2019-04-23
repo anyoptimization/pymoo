@@ -6,7 +6,7 @@ from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
-
+from pymoo.util.normalization import denormalize
 
 # =========================================================================================================
 # Implementation
@@ -51,6 +51,7 @@ class AspirationPointSurvival(Survival):
         self.aspiration_ref_dirs = aspiration_ref_dirs
         self.mu = mu
 
+        self.ref_dirs = aspiration_ref_dirs
         self.extreme_points = None
         self.intercepts = None
         self.nadir_point = None
@@ -97,7 +98,8 @@ class AspirationPointSurvival(Survival):
 
         unit_ref_points = (self.ref_points - self.ideal_point) / (self.nadir_point - self.ideal_point)
         ref_dirs = get_ref_dirs_from_points(unit_ref_points, self.aspiration_ref_dirs, mu=self.mu)
-
+        self.ref_dirs = denormalize(ref_dirs, self.ideal_point, self.nadir_point)
+        
         # associate individuals to niches
         niche_of_individuals, dist_to_niche = associate_to_niches(F, ref_dirs, self.ideal_point, self.nadir_point)
         pop.set('rank', rank, 'niche', niche_of_individuals, 'dist_to_niche', dist_to_niche)
