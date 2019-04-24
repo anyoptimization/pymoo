@@ -19,7 +19,6 @@ class RankAndModifiedCrowdingSurvival(Survival):
                  epsilon,
                  weights,
                  normalization,
-                 survival_type,
                  extreme_points_as_reference_points
                  ) -> None:
 
@@ -27,7 +26,6 @@ class RankAndModifiedCrowdingSurvival(Survival):
         self.n_obj = ref_points.shape[1]
         self.ref_points = ref_points
         self.epsilon = epsilon
-        self.survival_type = survival_type
         self.extreme_points_as_reference_points = extreme_points_as_reference_points
 
         self.weights = weights
@@ -105,19 +103,13 @@ class RankAndModifiedCrowdingSurvival(Survival):
                 crowding = np.full(len(front), np.nan)
 
                 # solutions which are not already selected - for
-                #not_selected = np.arange(len(front))
                 not_selected = np.argsort(ranking)
 
                 # until we have saved a crowding for each solution
                 while len(not_selected) > 0:
 
-                    # randomly select an alive individual
-                    if self.survival_type == "random":
-                        idx = not_selected[random.randint(0, len(not_selected))]
-                    elif self.survival_type == "closest":
-                        idx = not_selected[0]
-                    else:
-                        raise Exception("Unknown survival type.")
+                    # select the closest solution
+                    idx = not_selected[0]
 
                     # set crowding for that individual
                     crowding[idx] = ranking[idx]
@@ -171,7 +163,6 @@ def rnsga2(
         epsilon=0.001,
         normalization="front",
         weights=None,
-        survival_type="closest",
         extreme_points_as_reference_points=False,
         **kwargs):
     """
@@ -187,8 +178,6 @@ def rnsga2(
     weights : np.array
 
     normalization : {{'no', 'front', 'ever'}}
-
-    survival_type : {{'closest', 'random'}}
 
     extreme_points_as_reference_points : bool
 
@@ -209,7 +198,7 @@ def rnsga2(
     rnsga2.normalization = normalization
     rnsga2.selection = RandomSelection()
     rnsga2.survival = RankAndModifiedCrowdingSurvival(ref_points, epsilon, weights, normalization,
-                                                      survival_type, extreme_points_as_reference_points)
+                                                      extreme_points_as_reference_points)
 
     return rnsga2
 

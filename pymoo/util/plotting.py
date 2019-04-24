@@ -29,16 +29,16 @@ def plot(*args, show=True, labels=None, no_fill=False,**kwargs):
     return ret
 
 
-def plot_3d(*args, labels=None):
+def plot_3d(*args, labels=None, **kwargs):
     fig = plt.figure()
     from mpl_toolkits.mplot3d import Axes3D
     ax = fig.add_subplot(111, projection='3d')
 
     for i, F in enumerate(args):
         if labels:
-            ax.scatter(F[:, 0], F[:, 1], F[:, 2], label=labels[i])
+            ax.scatter(F[:, 0], F[:, 1], F[:, 2], label=labels[i], **kwargs)
         else:
-            ax.scatter(F[:, 0], F[:, 1], F[:, 2])
+            ax.scatter(F[:, 0], F[:, 1], F[:, 2], **kwargs)
 
     return ax
 

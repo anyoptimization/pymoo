@@ -1,5 +1,5 @@
-from pymoo.model.termination import MaximumFunctionCallTermination, MaximumGenerationTermination, IGDTermination, \
-    Termination, get_termination
+from pymoo.factory import get_termination
+from pymoo.model.termination import Termination
 from pymoo.rand import random
 
 
@@ -38,7 +38,7 @@ def minimize(problem,
 
     # create an evaluator defined by the termination criterium
     if not isinstance(termination, Termination):
-        termination = get_termination(*termination, pf=kwargs.get('pf', None))
+        termination = get_termination(*termination)
 
     # set a random random seed if not provided
     if 'seed' not in kwargs:

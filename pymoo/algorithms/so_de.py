@@ -78,7 +78,7 @@ class DifferentialEvolution(GeneticAlgorithm):
         self.off = self.mutation.do(self.problem, _pop, _P, algorithm=self)[:len(self.pop)]
 
         # bounds back if something is out of bounds
-        self.off = BoundsBackRepair().do(self.off, self.problem)
+        self.off = BoundsBackRepair().do( self.problem, self.off)
 
         # evaluate the results
         self.evaluator.eval(self.problem, self.off, algorithm=self)
