@@ -1,27 +1,14 @@
-import numpy as np
-
-from pymoo.algorithms.rnsga2 import rnsga2
+from pymoo.algorithms.so_genetic_algorithm import ga
 from pymoo.optimize import minimize
-from pymoo.util import plotting
 from pymop.factory import get_problem
 
-problem = get_problem("zdt1", n_var=30)
-pf = problem.pareto_front()
+method = ga(
+    pop_size=100,
+    eliminate_duplicates=True)
 
-# the reference point to be used during optimization
-ref_points = np.array([[0.5, 0.2], [0.1, 0.6]])
-
-method = rnsga2(pop_size=40,
-                ref_points=ref_points,
-                epsilon=0.05,
-                normalization='no',
-                extreme_points_as_reference_points=False,
-                weights=np.array([0.5, 0.5])
-                )
-
-res = minimize(problem,
+res = minimize(get_problem("g01"),
                method,
-               termination=('n_gen', 400),
-               disp=True)
+               termination=('n_gen', 50),
+               disp=False)
 
-plotting.plot(pf, res.F, ref_points, show=True, labels=['pf', 'F', 'ref_points'])
+print("Best solution found: \nX = %s\nF = %s" % (res.X, res.F))

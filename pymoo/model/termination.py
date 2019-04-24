@@ -48,30 +48,3 @@ class IGDTermination(Termination):
         F = algorithm.pop.get("F")
         return self.obj.calc(F) > self.igd
 
-
-def get_termination(_type, *args, pf=None):
-    """
-
-    Parameters
-    ----------
-    _type : str
-        Type of termination as string
-    args : list
-        List of arguments for the termination object
-    pf : np.array
-        The pareto-front if it is known. Might be necessary for some termination criteria.
-
-    Returns
-    -------
-    The termination object to be used in the algorithm.
-
-    """
-    if _type == 'n_eval':
-        termination = MaximumFunctionCallTermination(*args)
-    elif _type == 'n_gen':
-        termination = MaximumGenerationTermination(*args)
-    elif _type == 'igd':
-        termination = IGDTermination(*args, pf=pf)
-    else:
-        raise Exception('Unknown Termination criterium: %s' % _type)
-    return termination

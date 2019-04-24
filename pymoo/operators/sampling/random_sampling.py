@@ -23,8 +23,9 @@ class RandomSampling(Sampling):
             val = random.random((n_samples, m))
             val = (val < 0.5).astype(np.bool)
         elif self.var_type == np.int:
-            val = np.round(denormalize(val, problem.xl - 0.5, problem.xu + 0.5), 0).astype(np.int)
+            val = np.rint(denormalize(val, problem.xl - 0.5, problem.xu + (0.5 - 1e-16))).astype(np.int)
         else:
             val = denormalize(val, problem.xl, problem.xu)
 
         return pop.new("X", val)
+

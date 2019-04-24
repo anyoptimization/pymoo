@@ -1,7 +1,7 @@
 .. raw:: html
 
     <div align="right" style="margin-bottom: -20px">
-      <b>Latest Version:</b> pymoo==0.3</b>
+      <b>Latest Version:</b> pymoo==0.3.0</b>
     </div>
 
 
@@ -32,9 +32,9 @@ More details about the installation can be found :ref:`here <installation>`.
 
    \vspace{5mm}
 
-This framework to be used for **any** profit-making purposes, please contact `Julian Blank <http://www.research-blank.de>`_.
+If you intend to use *pymoo* for **any** profit-making purposes, please contact `Julian Blank <http://www.research-blank.de>`_.
 
-We are currently working on a paper about *pymoo*.
+We are currently working on a paper.
 Meanwhile, if you have used our framework for research purposes, please cite us with:
 
 ::
