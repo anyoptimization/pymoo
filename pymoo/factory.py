@@ -18,6 +18,7 @@ from pymoo.algorithms.so_de import de
 from pymoo.algorithms.so_genetic_algorithm import ga
 from pymoo.algorithms.unsga3 import unsga3
 from pymoo.docs import parse_doc_string
+from pymoo.model.termination import MaximumFunctionCallTermination, MaximumGenerationTermination, IGDTermination
 from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
 from pymoo.operators.crossover.exponential_crossover import ExponentialCrossover
 from pymoo.operators.crossover.half_uniform_crossover import HalfUniformCrossover
@@ -159,7 +160,8 @@ parse_doc_string(dummy, get_selection, {"type": "selection",
 # =========================================================================================================
 
 CROSSOVER = [
-    ("real_sbx", SimulatedBinaryCrossover, dict(prob=1.0, eta=30)),
+    ("real_sbx", SimulatedBinaryCrossover, dict(prob=1.0, eta=30, var_type=np.double)),
+    ("int_sbx", SimulatedBinaryCrossover, dict(prob=1.0, eta=30, var_type=np.int)),
     ("real_de", DifferentialEvolutionCrossover),
     ("(real|bin|int)_ux", UniformCrossover),
     ("(bin|int)_hux", HalfUniformCrossover),
@@ -185,6 +187,7 @@ parse_doc_string(dummy, get_crossover, {"type": "crossover",
 
 MUTATION = [
     ("real_pm", PolynomialMutation),
+    ("int_pm", PolynomialMutation, dict(var_type=np.int)),
     ("bin_bitflip", BinaryBitflipMutation)
 ]
 
@@ -197,3 +200,24 @@ parse_doc_string(dummy, get_mutation, {"type": "mutation",
                                        "clazz": ":class:`~pymoo.model.mutation.Mutation`",
                                        "options": get_options(MUTATION)
                                        })
+
+# =========================================================================================================
+# Termination
+# =========================================================================================================
+
+
+TERMINATION = [
+    ("n_eval", MaximumFunctionCallTermination),
+    ("n_gen", MaximumGenerationTermination),
+    ("igd", IGDTermination)
+]
+
+
+def get_termination(name, *args, d={}, **kwargs):
+    return get_from_list(TERMINATION, name, args, {**d, **kwargs})
+
+
+parse_doc_string(dummy, get_termination, {"type": "termination",
+                                          "clazz": ":class:`~pymoo.model.termination.Termination`",
+                                          "options": get_options(TERMINATION)
+                                          })

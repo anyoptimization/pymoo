@@ -1,21 +1,30 @@
 import numpy as np
 
 from pymoo.model.crossover import Crossover
+from pymoo.operators.repair.out_of_bounds_repair import OutOfBoundsRepair
 from pymoo.rand import random
-from pymoo.util.misc import covert_to_type
 
 
 class SimulatedBinaryCrossover(Crossover):
-    def __init__(self, prob, eta, prob_per_variable=0.5):
+    def __init__(self, prob, eta, prob_per_variable=0.5, var_type=np.double):
         super().__init__(2, 2)
         self.prob = float(prob)
         self.eta = float(eta)
         self.prob_per_variable = prob_per_variable
+        self.var_type = var_type
 
     def _do(self, problem, pop, parents, **kwargs):
+
         n_matings = parents.shape[0]
         children = np.full((n_matings * self.n_offsprings, problem.n_var), np.inf)
         X = pop.get("X")[parents.T].astype(np.double)
+        xl, xu = problem.xl, problem.xu
+
+        # in case of an integer problem we do the same, but change the bounds slightly and
+        # round later on
+        if self.var_type == np.int:
+            xl = problem.xl - 0.5
+            xu = problem.xu + (0.5 - 1e-16)
 
         # crossover mask that will be used in the end
         do_crossover = np.full(X[0].shape, True)
@@ -52,11 +61,11 @@ class SimulatedBinaryCrossover(Crossover):
         #delta[np.logical_or(delta < 1.0e-10, np.logical_not(do_crossover))] = 1.0e-10
         delta[delta < 1.0e-10] = 1.0e-10
 
-        beta = 1.0 + (2.0 * (y1 - problem.xl) / delta)
+        beta = 1.0 + (2.0 * (y1 - xl) / delta)
         betaq = calc_betaq(beta)
         c1 = 0.5 * ((y1 + y2) - betaq * delta)
 
-        beta = 1.0 + (2.0 * (problem.xu - y2) / delta)
+        beta = 1.0 + (2.0 * (xu - y2) / delta)
         betaq = calc_betaq(beta)
         c2 = 0.5 * ((y1 + y2) + betaq * delta)
 
@@ -77,11 +86,10 @@ class SimulatedBinaryCrossover(Crossover):
         children[:n_matings, :] = c[0]
         children[n_matings:, :] = c[1]
 
-        # just be sure we are not out of bounds
-        children[children < problem.xl] = np.repeat(problem.xl[None, :], children.shape[0], axis=0)[
-            children < problem.xl]
-        children[children > problem.xu] = np.repeat(problem.xu[None, :], children.shape[0], axis=0)[
-            children > problem.xu]
+        if self.var_type == np.int:
+            children = np.rint(children).astype(np.int)
 
-        children = covert_to_type(problem, children)
-        return pop.new("X", children)
+        # now repair all the offsprings to be in bound
+        off = OutOfBoundsRepair().do(problem, pop.new("X", children))
+
+        return off

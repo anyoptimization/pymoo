@@ -5,7 +5,7 @@ from pymoo.model.repair import Repair
 
 class BoundsBackRepair(Repair):
 
-    def _do(self, pop, problem, **kwargs):
+    def _do(self, problem, pop, **kwargs):
 
         # bring back to bounds if violated through crossover - bounce back strategy
         X = pop.get("X")
