@@ -1,8 +1,15 @@
+
+.. meta::
+   :description: pymoo - Multi-objective Optimization in Python
+   :keywords: pymoo, optimization, multi-objective optimization, evolutionary optimization, nsga2, nsga3
+
+
 .. raw:: html
 
     <div align="right" style="margin-bottom: -20px">
       <b>Latest Version:</b> pymoo==0.3.0</b>
     </div>
+
 
 
 pymoo
@@ -13,7 +20,7 @@ The framework is available on PyPi and can be installed with:
 
 ::
 
-    pip install Cython>=0.29 numpy>=1.15 pymoo
+    pip install -U Cython>=0.29 numpy>=1.15 pymoo
 
 
 Please note, that the dependencies used in the command above must be fulfilled before compiling some modules of *pymoo*
