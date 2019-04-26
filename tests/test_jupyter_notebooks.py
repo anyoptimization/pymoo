@@ -4,6 +4,8 @@ import unittest
 import nbformat
 from nbconvert.preprocessors import CellExecutionError, ExecutePreprocessor
 
+OVERWRITE = True
+
 
 class UsageTest(unittest.TestCase):
 
@@ -30,17 +32,16 @@ class UsageTest(unittest.TestCase):
 
             try:
                 nb = nbformat.read(fname, nbformat.NO_CONVERT)
-                run_path = os.path.dirname(fname)
                 ep.preprocess(nb, {'metadata': {'path': PYMOO_DIR}})
 
             except CellExecutionError:
                 msg = 'Error executing the fname "%s".\n\n' % fname
                 print(msg)
                 raise
-
-            #finally:
-            #    with open((fname + ".error"), mode='wt') as f:
-            #        nbformat.write(nb, f)
+            finally:
+                if OVERWRITE:
+                    with open(fname, mode='wt') as f:
+                        nbformat.write(nb, f)
 
 
 if __name__ == '__main__':
