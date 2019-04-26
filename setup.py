@@ -30,7 +30,19 @@ kwargs = dict(
     packages=setuptools.find_packages(exclude=['tests', 'doc', 'experiments']),
     install_requires=['pymop==0.2.4', 'numpy>=1.15', 'scipy>=1.1', 'matplotlib>=3'],
     include_package_data=True,
-    platforms='any'
+    platforms='any',
+    classifiers=[
+        'Development Status :: Production/Stable',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: Apache License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Topic :: Optimization :: Multi-objective Optimization',
+    ]
 )
 
 run_setup(kwargs)
