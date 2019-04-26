@@ -20,7 +20,7 @@ class GeneticAlgorithm(Algorithm):
                  survival,
                  n_offsprings=None,
                  eliminate_duplicates=False,
-                 func_repair=None,
+                 repair=None,
                  individual=Individual(),
                  **kwargs
                  ):
@@ -43,7 +43,7 @@ class GeneticAlgorithm(Algorithm):
         self.mutation = mutation
 
         # function to repair an offspring after mutation if necessary
-        self.func_repair = func_repair
+        self.repair = repair
 
         # survival selection
         self.survival = survival
@@ -110,12 +110,14 @@ class GeneticAlgorithm(Algorithm):
             else:
                 pop = self.sampling.sample(self.problem, pop, self.pop_size, algorithm=self)
 
-        # repair in case it is necessary
-        if self.func_repair:
-            pop = self.func_repair(self.problem, pop, algorithm=self)
-
         # in case the initial population was not evaluated
         if np.any(pop.collect(lambda ind: ind.F is None, as_numpy_array=True)):
+
+            # repair first in case it is necessary
+            if self.repair:
+                pop = self.repair.do(self.problem, pop, algorithm=self)
+
+            # then evaluate using the objective function
             self.evaluator.eval(self.problem, pop, algorithm=self)
 
         # that call is a dummy survival to set attributes that are necessary for the mating selection
@@ -164,8 +166,8 @@ class GeneticAlgorithm(Algorithm):
             _off = self.mutation.do(self.problem, _off, algorithm=self)
 
             # repair the individuals if necessary
-            if self.func_repair is not None:
-                _off = self.func_repair(self.problem, _off, algorithm=self)
+            if self.repair:
+                _off = self.repair.do(self.problem, _off, algorithm=self)
 
             if self.eliminate_duplicates:
                 is_duplicate = self.eliminate_duplicates(_off, pop, off, algorithm=self)

@@ -19,7 +19,7 @@ from pymoo.util.display import disp_multi_objective
 class MOEAD(GeneticAlgorithm):
     def __init__(self,
                  ref_dirs,
-                 n_neighbors=15,
+                 n_neighbors=20,
                  decomposition='auto',
                  prob_neighbor_mating=0.7,
                  **kwargs):
@@ -30,8 +30,8 @@ class MOEAD(GeneticAlgorithm):
 
         set_if_none(kwargs, 'pop_size', len(ref_dirs))
         set_if_none(kwargs, 'sampling', RandomSampling())
-        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob=0.9, eta=20))
-        set_if_none(kwargs, 'mutation', PolynomialMutation(eta=15))
+        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob=1.0, eta=20))
+        set_if_none(kwargs, 'mutation', PolynomialMutation(prob=None, eta=20))
         set_if_none(kwargs, 'survival', None)
         set_if_none(kwargs, 'selection', None)
 

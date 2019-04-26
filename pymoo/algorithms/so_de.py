@@ -103,7 +103,7 @@ class DifferentialEvolution(GeneticAlgorithm):
 def de(
         pop_size=100,
         sampling=LatinHypercubeSampling(iterations=100, criterion="maxmin"),
-        variant="DE/rand+best/1/bin",
+        variant="DE/rand/1/bin",
         CR=0.5,
         F=0.3,
         dither="vector",
