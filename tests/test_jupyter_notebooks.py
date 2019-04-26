@@ -4,6 +4,8 @@ import unittest
 import nbformat
 from nbconvert.preprocessors import CellExecutionError, ExecutePreprocessor
 
+from pymoo.configuration import get_pymoo
+
 OVERWRITE = True
 
 
@@ -11,7 +13,7 @@ class UsageTest(unittest.TestCase):
 
     def test(self):
 
-        PYMOO_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+        PYMOO_DIR = get_pymoo()
         DOC_DIR = os.path.join(PYMOO_DIR, "doc", "source")
         ipynb = []
 

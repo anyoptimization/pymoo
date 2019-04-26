@@ -1,3 +1,4 @@
 recursive-include . *.py *.pyx *.pxd
 recursive-exclude . *.so
+recursive-exclude pymoo/experimental *.py
 include LICENSE
