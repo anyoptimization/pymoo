@@ -27,11 +27,14 @@ Please note, that the dependencies used in the command above must be fulfilled b
 and can, therefore, not be ensured to be installed prior compilation with the setup script.
 More details about the installation can be found :ref:`here <installation>`.
 
-.. raw:: html
 
-    <a href="/getting_started.html">
-        <img src="/_static/img/getting_started.svg" alt="Getting Started" style="max-width:40%; margin:5px 0px 5px 0px"/>
-    </a>
+.. image:: _static/img/getting_started.svg
+   :target: getting_started.html
+   :width: 40%
+   :alt: Getting Started
+   :align: left
+
+
 
 |vspace|
 

@@ -23,7 +23,7 @@ kwargs = dict(
     url=__url__,
     python_requires='>3.3',
     author_email="blankjul@egr.msu.edu",
-    description="Multi-Objective Optimization Algorithms",
+    description="Multi-Objective Optimization in Python",
     long_description=readme(),
     license='Apache License 2.0',
     keywords="optimization",
@@ -32,16 +32,18 @@ kwargs = dict(
     include_package_data=True,
     platforms='any',
     classifiers=[
-        'Development Status :: Production/Stable',
+        'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: Apache License',
         'Operating System :: OS Independent',
+        'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-        'Topic :: Optimization :: Multi-objective Optimization',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+        'Topic :: Scientific/Engineering :: Mathematics'
     ]
 )
 
