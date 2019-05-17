@@ -1,11 +1,9 @@
 import os
 import pickle
 
-from experiments.experiment_nsga3 import get_setup
+from experiments.experiment_nsga3_old import get_setup
 from pymoo.algorithms.nsga3 import NSGA3
-from pymoo.experimental.emo.max_non_dominated import ReferenceDirectionSurvivalNonDominated
-from pymoo.experimental.emo.max_of_extremes import ReferenceDirectionSurvivalMaxExtremes
-from pymoo.experimental.emo.true import ReferenceDirectionSurvivalTrue
+from experimental.emo import ReferenceDirectionSurvivalTrue
 from pymoo.model.termination import MaximumGenerationTermination
 from pymop import ScaledProblem
 from pymop.factory import get_problem

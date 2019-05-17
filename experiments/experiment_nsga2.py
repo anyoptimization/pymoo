@@ -4,6 +4,7 @@ This is the experiment for nsga2.
 import os
 import pickle
 
+from pymoo.algorithms.nsga2 import nsga2
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymop.factory import get_problem
@@ -74,33 +75,62 @@ setup = {
 
 if __name__ == '__main__':
 
-    test = get_problem("bnh")
-    print(test.pareto_front())
+    # all the files to be run in a list
+    run_files = []
 
-    method = "nsga2"
+    # prefix of the folder to save the files
+    prefix = "runs"
+
+    # name of the xperiment
+    name = "pynsga2"
+
+    # number of runs to execute
     n_runs = 100
-    #problems = ['zdt1', 'zdt2', 'zdt3', 'zdt4', 'zdt6']
+
+    # single to be investigated
+    # single = ['zdt1', 'zdt2', 'zdt3', 'zdt4', 'zdt6']
     problems = setup.keys()
 
-    for e in problems:
+    # path were the files for this experiment are saved
+    path = os.path.join(prefix, name)
 
-        s = setup[e]
+    for _problem in problems:
+
+        s = setup[_problem]
         problem = s['problem']
 
-        for run in range(n_runs):
+        method = nsga2(
+            pop_size=s['pop_size'],
+            crossover=s['crossover'],
+            mutation=s['mutation'],
+            eliminate_duplicates=True
+        )
+
+        termination = s['termination']
+
+        for run in range(1, n_runs+1):
+
+            fname = "%s_%s.run" % (_problem, run)
+            _in = os.path.join(path, fname)
+            _out = "results/%s/%s/%s_%s.out" % (name, _problem.replace("_", "/"), _problem, run)
+
             data = {
-                'args': [problem, "nsga2"],
+                'args': [problem, method, termination],
                 'kwargs': {
-                    'method_args': {
-                        'pop_size': s['pop_size'],
-                        'crossover': s['crossover'],
-                        'mutation': s['mutation'],
-                    },
-                    'termination': s['termination']
+                    'seed': run,
                 },
-                'out': "%s/pynsga2_%s_%s.out" % (e, e, (run + 1)),
+                'in': _in,
+                'out': _out,
             }
 
-            fname = "pynsga2_%s_%s.run" % (e, (run + 1))
-            with open(os.path.join("pynsga2", fname), 'wb') as f:
+            os.makedirs(os.path.join(os.path.dirname(_in)), exist_ok=True)
+
+            with open(_in, 'wb') as f:
                 pickle.dump(data, f)
+                run_files.append(data)
+
+        # create the final run.txt file
+        with open(os.path.join(prefix, name, "run.bat"), 'w') as f:
+            for run_file in run_files:
+                f.write("python execute.py %s %s\n" % (run_file['in'], run_file['out']))
+

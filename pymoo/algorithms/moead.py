@@ -3,20 +3,25 @@ from scipy.spatial.distance import cdist
 
 from pymoo.cython.decomposition import PenaltyBasedBoundaryIntersection, Tchebicheff
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
+from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.default_operators import set_if_none
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.real_random_sampling import RandomSampling
+from pymoo.operators.sampling.random_sampling import RandomSampling
 from pymoo.rand import random
 from pymoo.util.display import disp_multi_objective
 
 
+# =========================================================================================================
+# Implementation
+# =========================================================================================================
+
 class MOEAD(GeneticAlgorithm):
     def __init__(self,
                  ref_dirs,
-                 n_neighbors=15,
+                 n_neighbors=20,
                  decomposition='auto',
-                 prob_neighbor_mating=0.7,
+                 prob_neighbor_mating=0.9,
                  **kwargs):
 
         self.n_neighbors = n_neighbors
@@ -25,8 +30,8 @@ class MOEAD(GeneticAlgorithm):
 
         set_if_none(kwargs, 'pop_size', len(ref_dirs))
         set_if_none(kwargs, 'sampling', RandomSampling())
-        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob_cross=0.9, eta_cross=20))
-        set_if_none(kwargs, 'mutation', PolynomialMutation(eta_mut=15))
+        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob=1.0, eta=20))
+        set_if_none(kwargs, 'mutation', PolynomialMutation(prob=None, eta=20))
         set_if_none(kwargs, 'survival', None)
         set_if_none(kwargs, 'selection', None)
 
@@ -103,3 +108,49 @@ class MOEAD(GeneticAlgorithm):
             pop[N[I]] = off
 
         return pop
+
+
+# =========================================================================================================
+# Interface
+# =========================================================================================================
+
+
+def moead(
+        ref_dirs,
+        n_neighbors=15,
+        decomposition='auto',
+        prob_neighbor_mating=0.7,
+        **kwargs):
+    r"""
+
+    Parameters
+    ----------
+    ref_dirs : {ref_dirs}
+
+    decomposition : {{ 'auto', 'tchebi', 'pbi' }}
+        The decomposition approach that should be used. If set to `auto` for two objectives `tchebi` and for more than
+        two `pbi` will be used.
+
+    n_neighbors : int
+        Number of neighboring reference lines to be used for selection.
+
+    prob_neighbor_mating : float
+        Probability of selecting the parents in the neighborhood.
+
+
+    Returns
+    -------
+    moead : :class:`~pymoo.model.algorithm.MOEAD`
+        Returns an MOEAD algorithm object.
+
+
+    """
+
+    return MOEAD(ref_dirs,
+                 n_neighbors=n_neighbors,
+                 decomposition=decomposition,
+                 prob_neighbor_mating=prob_neighbor_mating,
+                 **kwargs)
+
+
+parse_doc_string(moead)

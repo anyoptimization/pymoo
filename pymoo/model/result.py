@@ -10,7 +10,7 @@ class Result:
         self.success = success
         self.message = message
 
-        #! other attributes to be set as well
+        # ! other attributes to be set as well
 
         # the problem that was solved
         self.problem = None

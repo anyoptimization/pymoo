@@ -5,7 +5,7 @@ import numpy as np
 from pymoo.model.individual import Individual
 from pymoo.model.sampling import Sampling
 from pymoo.optimize import minimize
-from pymop.problems.zdt import ZDT1, ZDT
+from pymoo.problems.multi.zdt import ZDT1, ZDT
 
 
 class CustomObjectTest(unittest.TestCase):

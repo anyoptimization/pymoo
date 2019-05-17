@@ -1,0 +1,4 @@
+sphinx
+numpydoc
+nbsphinx
+sphinxcontrib-bibtex

@@ -4,7 +4,7 @@ import pickle
 from pymoo.model.termination import MaximumGenerationTermination
 
 from pymoo.algorithms.nsga3 import NSGA3
-from pymoo.experimental.pbi import ReferenceDirectionSurvivalPBI
+from experimental.pbi import ReferenceDirectionSurvivalPBI
 
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation

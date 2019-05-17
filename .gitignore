@@ -7,6 +7,7 @@ __pycache__/
 
 *.c
 *.cpp
+*.run
 *.so
 
 
@@ -22,6 +23,8 @@ tests/resources/*
 *.dat
 
 pymoo/.DS_Store
+experimental
+
 
 .idea/
 

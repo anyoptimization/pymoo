@@ -1,22 +1,14 @@
 import numpy as np
 
 from pymoo.algorithms.nsga3 import NSGA3
-from pymoo.operators.default_operators import set_if_none
+from pymoo.docs import parse_doc_string
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
 from pymoo.rand import random
 
 
-class UNSGA3(NSGA3):
-
-    def __init__(self,
-                 ref_dirs,
-                 **kwargs):
-
-        if 'pop_size' not in kwargs:
-            kwargs['pop_size'] = ref_dirs.shape[0]
-        set_if_none(kwargs, 'selection', TournamentSelection(func_comp=comp_by_rank_and_ref_line_dist))
-        super().__init__(ref_dirs, **kwargs)
-
+# =========================================================================================================
+# Implementation
+# =========================================================================================================
 
 def comp_by_rank_and_ref_line_dist(pop, P, **kwargs):
     S = np.full(P.shape[0], np.nan)
@@ -28,16 +20,43 @@ def comp_by_rank_and_ref_line_dist(pop, P, **kwargs):
         if pop[a].CV > 0.0 or pop[b].CV > 0.0:
             S[i] = compare(a, pop[a].CV, b, pop[b].CV, method='smaller_is_better', return_random_if_equal=True)
 
-        # both solutions are feasible just set random
+        # both solutions are feasible
         else:
 
             # if in the same niche select by rank
             if pop[a].get("niche") == pop[b].get("niche"):
-                S[i] = compare(a, pop[a].get("niche"), b, pop[b].get("niche"), method='smaller_is_better',
-                               return_random_if_equal=True)
 
-            # otherwise just select random
-            else:
-                S[i] = random.choice([a, b])
+                if pop[a].get("rank") != pop[b].get("rank"):
+                    S[i] = compare(a, pop[a].get("rank"), b, pop[b].get("rank"), method='smaller_is_better')
+
+                else:
+                    S[i] = compare(a, pop[a].get("dist_to_niche"), b, pop[b].get("dist_to_niche"),
+                                   method='smaller_is_better')
+
+        if np.isnan(S[i]):
+            S[i] = random.choice([a, b])
 
     return S[:, None].astype(np.int)
+
+
+# =========================================================================================================
+# Interface
+# =========================================================================================================
+
+def unsga3(**kwargs):
+    """
+    This is an implementation of the Unified NSGA3 algorithm :cite:`unsga3`. The same options as for
+    :class:`pymoo.algorithms.nsga3.nsga3` are available.
+
+    Returns
+    -------
+    unsga3 : :class:`~pymoo.model.algorithm.Algorithm`
+        Returns an UNSGA3 algorithm object.
+
+
+    """
+
+    return NSGA3(selection=TournamentSelection(func_comp=comp_by_rank_and_ref_line_dist), **kwargs)
+
+
+parse_doc_string(unsga3)

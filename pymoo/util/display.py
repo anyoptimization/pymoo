@@ -44,7 +44,7 @@ def disp_multi_objective(problem, evaluator, algorithm, pf=None):
             attrs.append(('igd', "%.5f" % IGD(pf).calc(F[feasible]), 8))
             attrs.append(('gd', "%.5f" % GD(pf).calc(F[feasible]), 8))
             if problem.n_obj == 2:
-                attrs.append(('hv', "%.5f" % Hypervolume(pf).calc(F[feasible]), 8))
+                attrs.append(('hv', "%.5f" % Hypervolume(pf=pf).calc(F[feasible]), 8))
     else:
         attrs.append(('igd', "-", 8))
         attrs.append(('gd', "-", 8))

@@ -25,11 +25,12 @@ class Algorithm:
         self.problem = None
         self.termination = None
         self.pf = None
+        self.opt = None
 
+        self.history = None
         self.disp = None
         self.func_display_attrs = None
         self.callback = None
-        self.history = []
         self.save_history = None
 
     def solve(self,
@@ -86,8 +87,12 @@ class Algorithm:
         # set the random seed for generator
         if seed is not None:
             random.seed(seed)
+        else:
+            seed = random.randint(0, 10000000)
+            random.seed(seed)
 
         # the evaluator object which is counting the evaluations
+        self.history = []
         self.evaluator = Evaluator()
         self.problem = problem
         self.termination = termination
@@ -101,7 +106,11 @@ class Algorithm:
         pop = self._solve(problem, termination)
 
         # get the optimal result by filtering feasible and non-dominated
-        opt = pop.copy()
+        if self.opt is None:
+            opt = pop.copy()
+        else:
+            opt = self.opt
+
         opt = opt[opt.collect(lambda ind: ind.feasible)[:, 0]]
 
         # if at least one feasible solution was found

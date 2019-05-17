@@ -1,0 +1,283 @@
+/* -*- css -*-
+ *
+ * sphinxdoc.css_t
+ * ~~~~~~~~~~~~~~~
+ *
+ * Sphinx stylesheet -- sphinxdoc theme.  Originally created by
+ * Armin Ronacher for Werkzeug.
+ *
+ * :copyright: Copyright 2007-2011 by the Sphinx team, see AUTHORS.
+ * :license: BSD, see LICENSE for details.
+ *
+ */
+
+@import url("basic.css");
+
+@import url("css/scipy-central.css");
+
+
+/*
+ * General tweaks
+ */
+
+div.container-navbar-bottom {
+    margin-top: 0;
+}
+
+div.container-navbar-bottom div.spc-navbar {
+    margin-top: 0;
+}
+
+div.spc-navbar {
+    margin: 0;
+}
+
+tt {
+    color: inherit;
+    font: inherit;
+}
+
+tt.literal {
+    font-family: monospace;
+    padding-left: 2px;
+    background-color: rgb(242, 242, 242);
+}
+
+a tt.literal {
+    border: none;
+    background-color: inherit;
+}
+
+tt.xref {
+    font-family: inherit;
+    border: none;
+    background-color: inherit;
+    font-weight: normal;
+    padding-left: 0px;
+}
+
+tt.descname {
+    font-size: 16px;
+}
+
+code {
+    color: inherit;
+    font: inherit;
+    padding: inherit;
+    border: inherit;
+}
+
+code.literal {
+    font-family: monospace;
+    padding-left: 2px;
+    background-color: rgb(242, 242, 242);
+}
+
+a code.literal {
+    border: none;
+    background-color: inherit;
+}
+
+code.xref {
+    font-family: inherit;
+    border-bottom: none;
+    background-color: inherit;
+    padding-left: 0px;
+}
+
+code.descname {
+    font-size: 16px;
+}
+
+dl.class > dt > em {
+    font-weight: normal;
+}
+
+dl.function > dt > em {
+    font-weight: normal;
+}
+
+dl.method > dt > em {
+    font-weight: normal;
+}
+
+pre {
+    border-radius: 0;
+    border: none;
+    font-family: monospace;
+}
+
+
+/*
+ * Field lists
+ */
+
+table.field-list {
+    border-collapse: collapse;
+    border-spacing: 5px;
+    margin-left: 1px;
+    border-left: 5px solid rgb(238, 238, 238) !important;
+}
+
+table.field-list th.field-name {
+    display: inline-block;
+    padding: 1px 8px 1px 5px;
+    white-space: nowrap;
+    background-color: rgb(238, 238, 238);
+}
+
+table.field-list td.field-body {
+    border-left: none !important;
+}
+
+table.field-list td.field-body > p {
+    font-style: italic;
+}
+
+table.field-list td.field-body > p > strong {
+    font-style: normal;
+}
+
+td.field-body blockquote {
+    border-left: none;
+    margin: 0;
+    padding-left: 30px;
+}
+
+td.field-body blockquote p,
+dl.class blockquote p,
+dl.function blockquote p,
+dl.method blockquote p 
+{
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+}
+
+
+/*
+ * Sidebars and top logo
+ */
+
+div.sphinxsidebarwrapper {
+    overflow: hidden;
+}
+
+div.spc-rightsidebar h3 {
+    font-size: 120%;
+    line-height: inherit;
+    border-bottom: none;
+}
+
+div.spc-rightsidebar h4 {
+    font-size: 120%;
+    line-height: inherit;
+    border-bottom: none;
+}
+
+div.top-scipy-org-logo-header {
+    text-align: left;
+    background-color: rgb(217, 217, 217);
+    border-bottom: 0px solid rgb(0, 0, 0);
+    margin-top: 10px;
+    padding: 0px;
+    box-shadow: 0px 0px 3px rgb(136, 136, 136);
+}
+
+
+/*
+ * Headers
+ */
+
+h1 a { color: rgb(85, 85, 85); }
+h2 a { color: rgb(85, 85, 85); }
+h3 a { color: rgb(85, 85, 85); }
+h4 a { color: rgb(85, 85, 85); }
+h5 a { color: rgb(85, 85, 85); }
+h6 a { color: rgb(85, 85, 85); }
+
+h1 tt { font: inherit; border-bottom: none; }
+h2 tt { font: inherit; border-bottom: none; }
+h3 tt { font: inherit; border-bottom: none; }
+h4 tt { font: inherit; border-bottom: none; }
+h5 tt { font: inherit; border-bottom: none; }
+h6 tt { font: inherit; border-bottom: none; }
+
+h1 code { font: inherit; border: none; background-color: inherit; padding: inherit; }
+h2 code { font: inherit; border: none; background-color: inherit; padding: inherit; }
+h3 code { font: inherit; border: none; background-color: inherit; padding: inherit; }
+h4 code { font: inherit; border: none; background-color: inherit; padding: inherit; }
+h5 code { font: inherit; border: none; background-color: inherit; padding: inherit; }
+h6 code { font: inherit; border: none; background-color: inherit; padding: inherit; }
+
+div#spc-section-body h1 { color: rgb(85, 85, 85); }
+div#spc-section-body h2 { color: rgb(85, 85, 85); }
+div#spc-section-body h3 { color: rgb(85, 85, 85); }
+div#spc-section-body h4 { color: rgb(85, 85, 85); border-bottom: none; }
+div#spc-section-body h5 { color: rgb(85, 85, 85); border-bottom: none; }
+div#spc-section-body h6 { color: rgb(85, 85, 85); border-bottom: none; }
+
+p.rubric {
+    color: rgb(85, 85, 85);
+    font-size: 120%;
+    font-weight: normal;
+    border-bottom: 1px solid rgb(204, 204, 204);
+}
+
+
+/*
+ * Tables
+ */
+
+table.citation {
+    border: none;
+}
+
+table.docutils td, table.docutils th {
+    border: none;
+}
+
+table.docutils {
+    margin-bottom: 9.5px;
+}
+
+
+/*
+ * Admonitions
+ */
+
+p.admonition-title {
+    display: inline;
+}
+
+p.admonition-title:after {
+    content: ":";
+}
+
+div.seealso {
+    background-color: #ffc;
+    border: 1px solid #ff6;
+}
+
+div.seealso dt {
+    float: left;
+    clear: left;
+    min-width: 4em;
+    padding-right: 1em;
+}
+
+div.seealso dd {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+div.warning {
+    background-color: #ffe4e4;
+    border: 1px solid #f66;
+}
+
+div.note {
+    background-color: #eee;
+    border: 1px solid #ccc;
+}

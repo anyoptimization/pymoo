@@ -1,0 +1,13 @@
+{%- if theme_edit_link -%}
+{% block edit_link %}
+{%- if sourcename %}
+<div class="this-page-menu">
+{%- if 'generated/' in sourcename %}
+  <a href="/scipy/docs/{{ sourcename.replace('generated/', '').replace('.txt', '') |e }}">{{_('Edit page')}}</a>
+{%- else %}
+  <a href="/scipy/docs/scipy-docs/{{ sourcename.replace('.txt', '.rst') |e }}">{{_('Edit page')}}</a>
+{%- endif %}
+</div>
+{%- endif %}
+{% endblock %}
+{%- endif -%}

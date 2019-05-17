@@ -9,7 +9,11 @@ if __name__ == "__main__":
 
     testmodules = [
         'tests.test_nsga2',
-        'pymoo.usage.test_usage'
+        'tests.problems.test_correctness',
+        'tests.problems.test_gradient'
+        'tests.problems.test_hessian'
+        'tests.problems.test_usage'
+        #'pymoo.usage.test_usage'
     ]
 
     suite = unittest.TestSuite()

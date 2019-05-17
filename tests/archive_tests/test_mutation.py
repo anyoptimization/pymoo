@@ -7,7 +7,7 @@ import numpy as np
 
 from pymoo.configuration import Configuration
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymop.problems.zdt import ZDT4
+from pymoo.problems.multi.zdt import ZDT4
 
 
 class CrossoverTest(unittest.TestCase):
@@ -22,7 +22,7 @@ class CrossoverTest(unittest.TestCase):
             Configuration.rand.random = MagicMock()
             Configuration.rand.random.side_effect = e['rnd']
 
-            pm = PolynomialMutation(eta_mut=20, prob_mut=0.1)
+            pm = PolynomialMutation(eta=20, prob=0.1)
 
             parents = np.array(e['ind'])
             children = pm.do(ZDT4(), parents)

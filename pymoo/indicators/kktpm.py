@@ -31,11 +31,9 @@ class KKTPM:
 
         """
 
-        n_solutions = X.shape[0]
-
         # the final result to be returned
-        kktpm = np.full((n_solutions, 1), np.inf)
-        fval = np.full((n_solutions, 1), np.inf)
+        kktpm = np.full((X.shape[0], 1), np.inf)
+        fval = np.full((X.shape[0], 1), np.inf)
 
         # set the ideal point for normalization
         z = ideal_point
@@ -50,13 +48,8 @@ class KKTPM:
 
         F, CV, G, dF, dG = problem.evaluate(X, return_values_of=["F", "CV", "G", "dF", "dG"])
 
-        if G is None:
-            G = np.zeros((n_solutions, 0))
-            dG = np.zeros((n_solutions, 0, n_var))
-
         # if the measure should include points out of bounds as a constraint
         if self.var_bounds_as_constraints:
-
             # add the bounds constraints as well
             _G = np.zeros((n_solutions, 2 * n_var))
             _G[:, :n_var] = problem.xl - X
@@ -67,15 +60,25 @@ class KKTPM:
             _dG[:, n_var:, :] = np.eye(n_var)
 
             # increase the constraint counter to be correct and change the constraints
-            G = np.column_stack([G, _G])
-            dG = np.column_stack([dG, _dG])
+            if n_constr > 0:
+                G = np.column_stack([G, _G])
+            else:
+                G = _G
+
+            if n_constr > 0:
+                dG = np.column_stack([dG, _dG])
+            else:
+                dG = _dG
+
             n_constr = n_constr + 2 * n_var
 
         # loop through each solution to be considered
         for i in range(n_solutions):
 
             # get the corresponding values for this solution
-            x, f, cv, g, df, dg = X[i, :], F[i, :], CV[i, :], G[i, :], dF[i, :].swapaxes(1, 0), dG[i].T
+            x, f, cv, df = X[i, :], F[i, :], CV[i, :], dF[i, :].swapaxes(1, 0)
+            if n_constr > 0:
+                g, dg = G[i, :], dG[i].T
 
             # if the solution that is provided is infeasible
             if cv > 0:
@@ -105,10 +108,10 @@ class KKTPM:
                 # calculate the lagrange multiplier
                 u = np.linalg.solve(A, b)
 
-                # optimize until all lagrange multipliers are positive
+                # until all the lagrange multiplier are positive
                 while np.any(u < 0):
 
-                    # go through from the first to the last
+                    # go through one by one
                     for j in range(len(u)):
 
                         # if a lagrange multiplier is negative - we need to fix it
@@ -123,12 +126,12 @@ class KKTPM:
                 # split up the lagrange multiplier for objective and not
                 u_m, u_j = u[:n_obj], u[n_obj:]
 
-                if n_constr == 0:
-                    _kktpm = (1 - np.sum(u_m)) ** 2 + np.sum((a_m.T @ u) ** 2)
-                    _fval = _kktpm
-                else:
+                if n_constr > 0:
                     _kktpm = (1 - np.sum(u_m)) ** 2 + np.sum((np.vstack([a_m, a_j]).T @ u) ** 2)
                     _fval = _kktpm + np.sum((u_j * g.T) ** 2)
+                else:
+                    _kktpm = (1 - np.sum(u_m)) ** 2 + np.sum((a_m.T @ u) ** 2)
+                    _fval = _kktpm
 
                 ujgj = -g @ u_j
                 if np.sum(u_m) + ujgj * (1 + ujgj) > 1:

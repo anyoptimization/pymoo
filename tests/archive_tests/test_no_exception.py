@@ -2,10 +2,10 @@ import unittest
 
 from pymoo.optimize import minimize
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
-from pymop.problems.osy import OSY
-from pymop.problems.rastrigin import Rastrigin
-from pymop.problems.zdt import ZDT1, ZDT4
-from tests.test_problems import AlwaysInfeasibleProblem
+from pymoo.problems.multi.osy import OSY
+from pymoo.problems.single.rastrigin import Rastrigin
+from pymoo.problems.multi.zdt import ZDT1, ZDT4
+from tests.problems.test_problems import AlwaysInfeasibleProblem
 
 
 class NoExceptionTest(unittest.TestCase):

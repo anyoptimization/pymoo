@@ -35,13 +35,11 @@ class NSGA2Test(unittest.TestCase):
             rank = D['rank'][survivor_and_last_front].astype(np.int)
             F = D['F'][survivor_and_last_front, :]
 
-            _rank = np.full(rank.shape, -1)
-            _crowding = np.full(crowding.shape, -1.0)
-            fronts = NonDominatedSorting().do(F)
-            for k, front in enumerate(fronts):
-                cd_of_front = calc_crowding_distance(F[front, :])
-                _crowding[front] = cd_of_front
-                _rank[front] = k + 1
+            fronts, _rank = NonDominatedSorting().do(F, return_rank=True)
+            _rank += 1
+            _crowding = np.full(len(F), np.nan)
+            for front in fronts:
+                _crowding[front] = calc_crowding_distance(F[front])
 
             is_equal = np.all(rank == _rank)
             if not is_equal:

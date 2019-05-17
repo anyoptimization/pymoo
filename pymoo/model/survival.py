@@ -42,7 +42,6 @@ class Survival:
 
 
 def split_by_feasibility(pop, sort_infeasbible_by_cv=True):
-
     CV = pop.get("CV")
     b = (CV <= 0)
 
@@ -50,6 +49,6 @@ def split_by_feasibility(pop, sort_infeasbible_by_cv=True):
     infeasible = np.where(np.logical_not(b))[0]
 
     if sort_infeasbible_by_cv:
-        infeasible = infeasible[np.argsort(CV[infeasible,0])]
+        infeasible = infeasible[np.argsort(CV[infeasible, 0])]
 
     return feasible, infeasible

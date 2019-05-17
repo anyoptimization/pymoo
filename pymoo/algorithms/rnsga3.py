@@ -2,9 +2,15 @@ import numpy as np
 
 from pymoo.algorithms.nsga3 import NSGA3, ReferenceDirectionSurvival, get_extreme_points_c, get_nadir_point, \
     associate_to_niches, calc_niche_count, niching
+from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
+from pymoo.util.normalization import denormalize
+
+# =========================================================================================================
+# Implementation
+# =========================================================================================================
 
 
 class RNSGA3(NSGA3):
@@ -12,8 +18,9 @@ class RNSGA3(NSGA3):
     def __init__(self,
                  ref_points,
                  pop_per_ref_point,
-                 mu=0.05,
+                 mu,
                  **kwargs):
+
         n_obj = ref_points.shape[1]
 
         # add the aspiration point lines
@@ -23,7 +30,7 @@ class RNSGA3(NSGA3):
         super().__init__(**kwargs)
 
         self.pop_size = ref_points.shape[0] * aspiration_ref_dirs.shape[0] + aspiration_ref_dirs.shape[1]
-        
+
         # create the survival strategy
         self.survival = AspirationPointSurvival(ref_points, aspiration_ref_dirs, mu=mu)
 
@@ -44,6 +51,7 @@ class AspirationPointSurvival(Survival):
         self.aspiration_ref_dirs = aspiration_ref_dirs
         self.mu = mu
 
+        self.ref_dirs = aspiration_ref_dirs
         self.extreme_points = None
         self.intercepts = None
         self.nadir_point = None
@@ -90,7 +98,8 @@ class AspirationPointSurvival(Survival):
 
         unit_ref_points = (self.ref_points - self.ideal_point) / (self.nadir_point - self.ideal_point)
         ref_dirs = get_ref_dirs_from_points(unit_ref_points, self.aspiration_ref_dirs, mu=self.mu)
-
+        self.ref_dirs = denormalize(ref_dirs, self.ideal_point, self.nadir_point)
+        
         # associate individuals to niches
         niche_of_individuals, dist_to_niche = associate_to_niches(F, ref_dirs, self.ideal_point, self.nadir_point)
         pop.set('rank', rank, 'niche', niche_of_individuals, 'dist_to_niche', dist_to_niche)
@@ -110,7 +119,7 @@ class AspirationPointSurvival(Survival):
                 niche_count = calc_niche_count(len(ref_dirs), niche_of_individuals[until_last_front])
                 n_remaining = n_survive - len(until_last_front)
 
-            S = niching(F[last_front, :], n_remaining, niche_count, niche_of_individuals[last_front],
+            S = niching(pop[last_front], n_remaining, niche_count, niche_of_individuals[last_front],
                         dist_to_niche[last_front])
 
             survivors = np.concatenate((until_last_front, last_front[S].tolist()))
@@ -190,3 +199,50 @@ def line_plane_intersection(l0, l1, p0, p_no, epsilon=1e-6):
         # The segment is parallel to plane then return the perpendicular projection
         ref_proj = l1 - (np.dot(l1 - p0, p_no) * p_no)
         return ref_proj
+
+
+# =========================================================================================================
+# Interface
+# =========================================================================================================
+
+def rnsga3(ref_points,
+           pop_per_ref_point,
+           mu=0.05,
+           **kwargs):
+    """
+
+    Parameters
+    ----------
+    ref_points : {ref_points}
+    pop_per_ref_point : int
+        Size of the population used for each reference point.
+
+    mu : float
+        Defines the scaling of the reference lines used during survival selection. Increasing mu will result
+        having solutions with a larger spread.
+
+    Other Parameters
+    -------
+    n_offsprings : {n_offsprings}
+    sampling : {sampling}
+    selection : {selection}
+    crossover : {crossover}
+    mutation : {mutation}
+    eliminate_duplicates : {eliminate_duplicates}
+
+
+    Returns
+    -------
+    nsga3 : :class:`~pymoo.model.algorithm.Algorithm`
+        Returns an NSGA3 algorithm object.
+
+
+    """
+
+    return RNSGA3(ref_points,
+                  pop_per_ref_point,
+                  mu,
+                  **kwargs)
+
+
+parse_doc_string(rnsga3)

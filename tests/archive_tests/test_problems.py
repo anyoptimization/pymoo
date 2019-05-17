@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymop.problem import Problem
+from pymoo.model.problem import Problem
 
 
 class AlwaysInfeasibleProblem(Problem):

@@ -29,7 +29,7 @@ class Population(np.ndarray):
     def new(self, *args):
 
         if len(args) == 1:
-            Population(n_individuals=args[0], individual=self.individual)
+            return Population(n_individuals=args[0], individual=self.individual)
         else:
             n = len(args[1]) if len(args) > 0 else 0
             pop = Population(n_individuals=n, individual=self.individual)

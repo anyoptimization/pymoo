@@ -25,7 +25,7 @@ class Selection:
 
         Returns
         -------
-        P : np.array
+        np.array
             Indices of selected individuals.
 
         """

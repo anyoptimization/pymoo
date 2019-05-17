@@ -1,39 +1,50 @@
 pymoo - Multi-Objective Optimization Framework
 ====================================================================
 
-You can find the detailed documentation here:
-https://www.egr.msu.edu/coinlab/blankjul/pymoo/
+You can find the detailed documentation here: https://pymoo.org
 
 
-.. image:: https://gitlab.msu.edu/blankjul/pymoo/badges/master/pipeline.svg
-   :alt: pipeline status
+|gitlab| |python| |license|
+
+
+.. |gitlab| image:: https://gitlab.msu.edu/blankjul/pymoo/badges/master/pipeline.svg
+   :alt: build status
    :target: https://gitlab.msu.edu/blankjul/pymoo/commits/master
+
+.. |python| image:: https://img.shields.io/badge/python-3.6-blue.svg
+   :alt: python 3.6
+
+.. |license| image:: https://img.shields.io/badge/license-apache-orange.svg
+   :alt: license apache
+   :target: https://www.apache.org/licenses/LICENSE-2.0
+
+
+We are currently working on a paper about *pymoo*.
+Meanwhile, if you have used our framework for research purposes, please cite us with:
+
+::
+
+   @misc{pymoo,
+       author = {Julian Blank and Kalyanmoy Deb},
+       title = {pymoo - {Multi-objective Optimization in Python}},
+       howpublished = {https://pymoo.org}
+   }
+
 
 
 Installation
 ====================================================================
 
-First, make sure you have a python environment installed. We recommend miniconda3 or anaconda3.
+First, make sure you have a Python 3 environment installed. We recommend miniconda3 or anaconda3.
+
+The official release is always available at PyPi:
 
 .. code:: bash
 
-    conda --version
-
-Then from scratch create a virtual environment for pymoo:
-
-.. code:: bash
-
-    conda create -n pymoo -y python==3.6 cython numpy
-    conda activate pymoo
+    pip install Cython>=0.29 numpy>=1.15 pymoo
 
 
-For the current stable release please execute:
-
-.. code:: bash
-
-    pip install pymoo
-
-For the current development version:
+For the current developer version:
 
 .. code:: bash
 
@@ -59,23 +70,29 @@ However, for instance executing NSGA2:
 
 .. code:: python
 
-    
-    from pymoo.optimize import minimize
-    from pymoo.util import plotting
-    from pymop.factory import get_problem
+   from pymoo.optimize import minimize
+   from pymoo.algorithms.nsga2 import nsga2
+   from pymoo.util import plotting
+   from pymop.factory import get_problem
 
-    # create the optimization problem
-    problem = get_problem("zdt1")
-    pf = problem.pareto_front()
+   # load a test or define your own problem
+   problem = get_problem("zdt1")
 
-    res = minimize(problem,
-                   method='nsga2',
-                   method_args={'pop_size': 100},
-                   termination=('n_gen', 200),
-                   pf=pf,
-                   save_history=False,
-                   disp=True)
-    plotting.plot(pf, res.F, labels=["Pareto-front", "F"])
+   # get the optimal solution of the problem for the purpose of comparison
+   pf = problem.pareto_front()
+
+   # create the algorithm object
+   method = nsga2(pop_size=100, elimate_duplicates=True)
+
+   # execute the optimization
+   res = minimize(problem,
+                  method,
+                  termination=('n_gen', 200),
+                  pf=pf,
+                  disp=True)
+
+   # plot the results as a scatter plot
+   plotting.plot(pf, res.F, labels=["Pareto-Front", "F"])
 
 
 
