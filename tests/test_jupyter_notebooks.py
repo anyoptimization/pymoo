@@ -9,7 +9,7 @@ from pymoo.configuration import get_pymoo
 OVERWRITE = True
 
 
-class UsageTest(unittest.TestCase):
+class DocumentationTest(unittest.TestCase):
 
     def test(self):
 

@@ -28,7 +28,7 @@ class Algorithm:
         self.opt = None
 
         self.history = None
-        self.disp = None
+        self.verbose = None
         self.func_display_attrs = None
         self.callback = None
         self.save_history = None
@@ -37,7 +37,7 @@ class Algorithm:
               problem,
               termination,
               seed=None,
-              disp=False,
+              verbose=False,
               callback=None,
               save_history=False,
               pf=None,
@@ -61,7 +61,7 @@ class Algorithm:
         seed: int
             Random seed for this run. Before the algorithm starts this seed is set.
 
-        disp : bool
+        verbose : bool
             If it is true than information during the algorithm execution are displayed
 
         callback : func
@@ -98,7 +98,7 @@ class Algorithm:
         self.termination = termination
         self.pf = pf
 
-        self.disp = disp
+        self.verbose = verbose
         self.callback = callback
         self.save_history = save_history
 
@@ -142,7 +142,7 @@ class Algorithm:
     def _each_iteration(self, D, first=False, **kwargs):
 
         # display the output if defined by the algorithm
-        if self.disp and self.func_display_attrs is not None:
+        if self.verbose and self.func_display_attrs is not None:
             disp = self.func_display_attrs(self.problem, self.evaluator, self, self.pf)
             if disp is not None:
                 self._display(disp, header=first)

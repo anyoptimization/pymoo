@@ -1,6 +1,7 @@
 import autograd.numpy as anp
 
 from pymoo.model.problem import Problem
+from pymoo.util.normalization import normalize
 
 
 class ZDT(Problem):
@@ -84,6 +85,41 @@ class ZDT4(ZDT):
             g += x[:, i] * x[:, i] - 10.0 * anp.cos(4.0 * anp.pi * x[:, i])
         h = 1.0 - anp.sqrt(f1 / g)
         f2 = g * h
+
+        out["F"] = anp.column_stack([f1, f2])
+
+
+class ZDT5(ZDT):
+
+    def __init__(self, m=11, n=5, normalize=True, **kwargs):
+        self.m = m
+        self.n = n
+        self.normalize = normalize
+        super().__init__(n_var=(30 + n * (m - 1)), **kwargs)
+
+    def _calc_pareto_front(self, n_pareto_points=100):
+        x = 1 + anp.linspace(0, 1, n_pareto_points) * 30
+        pf = anp.column_stack([x, (self.m-1) / x])
+        if self.normalize:
+            pf = normalize(pf)
+        return pf
+
+    def _evaluate(self, x, out, *args, **kwargs):
+
+        _x = [x[:, :30]]
+        for i in range(self.m - 1):
+            _x.append(x[:, 30 + i * self.n: 30 + (i + 1) * self.n])
+
+        u = anp.column_stack([x_i.sum(axis=1) for x_i in _x])
+        v = (2 + u) * (u < self.n) + 1 * (u == self.n)
+        g = v[:, 1:].sum(axis=1)
+
+        f1 = 1 + u[:, 0]
+        f2 = g * (1 / f1)
+
+        if self.normalize:
+            f1 = normalize(f1, 1, 31)
+            f2 = normalize(f2, (self.m-1) * 1/31, (self.m-1))
 
         out["F"] = anp.column_stack([f1, f2])
 

@@ -1,3 +1,4 @@
+import os
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 
 from setuptools import setup, Extension
@@ -5,17 +6,11 @@ from setuptools.command.build_ext import build_ext
 
 ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError, IOError)
 
+os.environ['CFLAGS'] = '-stdlib=libc++'
 
 def readme():
     with open('README.rst') as f:
         return f.read()
-
-
-def get_extension_modules():
-    ext_modules = []
-    for f in ["info", "non_dominated_sorting_cython", "decomposition_cython", "calc_perpendicular_distance_cython"]:
-        ext_modules.append(Extension('pymoo.cython.%s' % f, sources=['pymoo/cython/%s.pyx' % f], language="c++"))
-    return ext_modules
 
 
 class BuildFailed(Exception):
@@ -55,7 +50,7 @@ def run_setup(setup_args):
             raise BuildFailed("The C extension could not be compiled, speedups are not enabled")
 
         kwargs['cmdclass']['build_ext'] = construct_build_ext(build_ext)
-        kwargs['ext_modules'] = cythonize("pymoo/cython/*.pyx")
+        kwargs['ext_modules'] = cythonize("pymoo/cython/*.pyx", language='c')
         kwargs['include_dirs'] = [np.get_include()]
 
         setup(**kwargs)

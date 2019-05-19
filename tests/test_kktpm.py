@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 
 from pymoo.indicators.kktpm import KKTPM
-from pymop.factory import get_problem
+from pymoo.factory import get_problem
 
 
 class KKTPMTest(unittest.TestCase):

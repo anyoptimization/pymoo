@@ -17,10 +17,14 @@
 - Add global tests of all optimization methods
 - IGD+
 - 0.9 prob for crossover in general
-- Termination Criteria in x space
+- Termination Criteria in x space and fspace - xtol and ftol
 - Statistics of Survival and more attributes for individuals
 - Documentation fix link issues (absolute path at localhost and on remote)
 - Add ZDT5 and show it for NSGA2
+- maybe include CMA-ES: https://github.com/CMA-ES/pycma
+- ask and tell interface
+- elementwise function evaluation gradient is not working yet
+
 
 
 # DONE

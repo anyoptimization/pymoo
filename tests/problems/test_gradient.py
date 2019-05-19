@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from pymop import ZDT, ZDT1, ZDT2, ZDT3
+from pymoo.problems.multi.zdt import ZDT, ZDT1, ZDT2, ZDT3
 
 
 class GradientTest(unittest.TestCase):

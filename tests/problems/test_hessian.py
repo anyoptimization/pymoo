@@ -3,7 +3,7 @@ import unittest
 import autograd.numpy as anp
 import numpy as np
 
-from pymop import Problem
+from pymoo.model.problem import Problem
 
 
 class HessianTest(unittest.TestCase):

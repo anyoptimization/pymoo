@@ -1,6 +1,8 @@
 import re
 
-from pymoo.problems import *
+from pymoo.problems.multi import *
+from pymoo.problems.many import *
+from pymoo.problems.single import *
 from pymoo.model.problem import at_least2d, Problem
 
 STR_TO_PROBLEM = {
@@ -45,6 +47,7 @@ STR_TO_PROBLEM = {
     'zdt2': ZDT2,
     'zdt3': ZDT3,
     'zdt4': ZDT4,
+    'zdt5': ZDT5,
     'zdt6': ZDT6,
     'g01': G1,
     'g02': G2,

@@ -161,7 +161,7 @@ html_theme_options = {
     "edit_link": "false",
     "sidebar": "right",
     "scipy_org_logo": "true",
-    "rootlinks": links_remote
+    "rootlinks": links_local
 }
 
 # html_sidebars = {'index': ['indexsidebar.html', 'searchbox.html']}

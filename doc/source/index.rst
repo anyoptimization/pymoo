@@ -42,7 +42,7 @@ More details about the installation can be found :ref:`here <installation>`.
 
    \vspace{5mm}
 
-If you intend to use *pymoo* for **any** profit-making purposes, please contact `Julian Blank <http://www.research-blank.de>`_.
+If you intend to use *pymoo* for **any** profit-making purposes, please contact `Julian Blank <http://www.cse.msu.edu/~blankjul/>`_.
 
 We are currently working on a paper.
 Meanwhile, if you have used our framework for research purposes, please cite us with:
@@ -62,6 +62,8 @@ Features
 **Algorithms:** :ref:`Genetic Algorithm <nb_ga>`, :ref:`Differential Evolution <nb_de>`, :ref:`NSGA-II <nb_nsga2>`,
 :ref:`R-NSGA-II <nb_rnsga2>`,
 :ref:`NSGA-III <nb_nsga3>`, :ref:`U-NSGA-III <nb_unsga3>`, :ref:`R-NSGA-III <nb_rnsga3>`, :ref:`MOEA/D <nb_moead>`
+
+**Test Problems:** :ref:`Overview <nb_zdt>`, :ref:`ZDT <nb_zdt>`, :ref:`Rastrigin <nb_rastrigin>`
 
 **Performance Indicators:** :ref:`Hypervolume <nb_hv>`, :ref:`GD <nb_gd>`, :ref:`IGD <nb_igd>`, :ref:`R-Metric <nb_rmetric>`
 
@@ -89,7 +91,7 @@ Features
 About
 ------------------------------------------------------------------------------
 
-This framework is developed and maintained by `Julian Blank <julian blank research>`_ who is affiliated to the
+This framework is developed and maintained by `Julian Blank <http://www.cse.msu.edu/~blankjul/>`_ who is affiliated to the
 `Computational Optimization and Innovation Laboratory (COIN) <https://www.coin-laboratory.com>`_ supervised
 by `Kalyanmoy Deb <https://www.egr.msu.edu/people/profile/kdeb>`_ at the Michigan State University in
 East Lansing, Michigan, USA.
@@ -114,6 +116,7 @@ Content
    installation
    getting_started.ipynb
    algorithms/index
+   problems/index.ipynb
    components/index
    tutorial/index
    api/index

@@ -1,4 +1,3 @@
-import multiprocessing
 import warnings
 from abc import abstractmethod
 
@@ -7,10 +6,6 @@ import autograd.numpy as anp
 import numpy as np
 
 from pymoo.problems.gradient import run_and_trace, calc_jacobian
-from pymoo.rand import random
-
-
-
 
 
 class Problem:
@@ -163,7 +158,7 @@ class Problem:
             "auto" which means depending on the problem the function values or additional the constraint violation (if
             the problem has constraints) are returned. Otherwise, you can provide a list of values to be returned.
 
-            Allowed is ["F", "CV", "G", "dF", "dG", "dCV", "feasible"] where the d stands for
+            Allowed is ["F", "CV", "G", "dF", "dG", "dCV", "hF", "hG", "hCV", "feasible"] where the d stands for
             derivative and h stands for hessian matrix.
 
 
@@ -188,34 +183,78 @@ class Problem:
             if self.n_constr > 0:
                 return_values_of.append("CV")
 
+        # create the output dictionary for _evaluate to be filled
+        out = {}
+        for val in return_values_of:
+            out[val] = None
+
         # all values that are set in the evaluation function
         values_not_set = [val for val in return_values_of if val not in self.evaluation_of]
 
         # have a look if gradients are not set and try to use autograd and calculate grading if implemented using it
         gradients_not_set = [val for val in values_not_set if val.startswith("d")]
 
-        # whether gradient calculation is necessary or not
-        calc_gradient = (len(gradients_not_set) > 0)
+        # if no autograd is necessary for evaluation just traditionally use the evaluation method
+        if len(gradients_not_set) == 0:
+            self._evaluate(X, out, *args, **kwargs)
+            at_least2d(out)
 
-        # calculate the output array - either elementwise or not. also consider the gradient
-        if self.elementwise_evaluation:
-            out = self._evaluate_elementwise(X, calc_gradient, *args, **kwargs)
+        # otherwise try to use autograd to calculate the gradient for this problem
         else:
-            out = self._evaluate_batch(X, calc_gradient, *args, **kwargs)
 
-        calc_gradient_of = [key for key, val in out.items()
-                            if "d" + key in return_values_of and
-                            out.get("d" + key) is None and
-                            (type(val) == autograd.numpy.numpy_boxes.ArrayBox)]
+            # calculate the function value by tracing all the calculations
+            root, _ = run_and_trace(self._evaluate, X, *[out])
+            at_least2d(out)
 
-        if len(calc_gradient_of) > 0:
-            deriv = self._calc_gradient(out, calc_gradient_of)
+            # the dictionary where the values are stored
+            deriv = {}
+
+            # if the result is calculated to be derivable
+            for key, val in out.items():
+
+                # if yes it is already a derivative
+                if key.startswith("d"):
+                    continue
+
+                name = "d" + key
+                is_derivable = (type(val) == autograd.numpy.numpy_boxes.ArrayBox)
+
+                # if should be returned AND was not calculated yet AND is derivable using autograd
+                if name in return_values_of and out.get(name) is None and is_derivable:
+
+                    # calculate the jacobian matrix and set it - (ignore warnings of autograd here)
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore")
+
+                        if "h" + key not in out:
+                            jac = calc_jacobian(root, val)
+                        else:
+
+                            def calc_gradient(X):
+                                _out = {}
+                                _root, _ = run_and_trace(self._evaluate, X, *[_out])
+                                at_least2d(_out)
+                                jac = calc_jacobian(_root, _out[key])
+                                return jac
+
+                            _root, jac = run_and_trace(calc_gradient, X)
+
+                            hessian = []
+                            for k in range(jac.shape[1]):
+                                _hessian = calc_jacobian(_root, jac[:, k])
+                                hessian.append(_hessian[:, None, ...])
+                            hessian = np.concatenate(hessian, axis=1)
+                            deriv["h" + key] = hessian
+
+                        deriv[name] = jac
+
+            # merge to the output
             out = {**out, **deriv}
 
-        # convert back to conventional numpy arrays - no array box as return type
-        for key in out.keys():
-            if type(out[key]) == autograd.numpy.numpy_boxes.ArrayBox:
-                out[key] = out[key]._value
+            # convert back to conventional numpy arrays - no array box as return type
+            for key in out.keys():
+                if type(out[key]) == autograd.numpy.numpy_boxes.ArrayBox:
+                    out[key] = out[key]._value
 
         # if constraint violation should be returned as well
         if self.n_constr == 0:
@@ -245,104 +284,6 @@ class Problem:
                 return out[return_values_of[0]]
             else:
                 return tuple([out[val] for val in return_values_of])
-
-    def _calc_gradient(self, out, keys):
-
-        deriv = {}
-        for key in keys:
-            val = out[key]
-
-            # calculate the jacobian matrix and set it - (ignore warnings of autograd here)
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                jac = calc_jacobian(out["__autograd__"], val)
-                deriv["d" + key] = jac
-
-        return deriv
-
-    def _evaluate_batch(self, X, calc_gradient, *args, **kwargs):
-        out = {}
-        if calc_gradient:
-            out["__autograd__"], _ = run_and_trace(self._evaluate, X, *[out])
-        else:
-            self._evaluate(X, out, *args, **kwargs)
-        at_least2d(out)
-
-        return out
-
-    def _evaluate_elementwise(self, X, calc_gradient, *args, **kwargs):
-        ret = []
-
-        def func(_x):
-            _out = {}
-            if calc_gradient:
-                _out["__autograd__"], _ = run_and_trace(self._evaluate, _x, *[_out])
-            else:
-                self._evaluate(_x, _out, *args, **kwargs)
-            return _out
-
-        parallelization = self.parallelization
-        if not isinstance(parallelization, (list, tuple)):
-            parallelization = [self.parallelization]
-
-        _type = parallelization[0]
-        if len(parallelization) >= 1:
-            _params = parallelization[1:]
-
-        # just serialize evaluation
-        if _type is None:
-            [ret.append(func(x)) for x in X]
-
-        elif _type == "threads":
-
-            if len(_params) == 0:
-                n_threads = multiprocessing.cpu_count() - 1
-            else:
-                n_threads = _params[0]
-
-            with multiprocessing.Pool(n_threads) as pool:
-                params = []
-                for k in range(len(X)):
-                    params.append([X[k], calc_gradient, self._evaluate, args, kwargs])
-
-                ret = np.array(pool.starmap(evaluate_in_parallel, params))
-
-        elif _type == "dask":
-
-            if len(_params) == 0:
-                raise Exception("A distributed client objective is need for using dask.")
-            else:
-                client = _params[0]
-
-            #client.upload_file('/Users/blankjul/workspace/pymoo/tests/problems/test_parallel.py')
-
-            self.parallelization = None
-
-            def wrapper(obj, x, args, kwargs):
-                self.evaluate()
-                out = {}
-                obj(x, out, *args, **kwargs)
-                return out
-
-
-            ret = []
-            for k in range(len(X)):
-                #ret = client.submit(evaluate_in_parallel_object, X[k], calc_gradient, self, args, kwargs)
-                ret.append(client.submit(wrapper, self, X[k], args, kwargs))
-                #ret.append(client.submit(test_in_parallel))
-
-            ret = [e.result() for e in ret]
-
-        else:
-            raise Exception("Unknown parallelization method: %s (None, threads, dask)" % self.parallelization)
-
-        # stack all the single outputs together
-        out = {}
-        for key in ret[0].keys():
-            # out["_" + key] = [_out[key] for _out in ret]
-            out[key] = anp.row_stack([ret[i][key] for i in range(len(ret))])
-
-        return out
 
     @abstractmethod
     def _evaluate(self, x, f, *args, **kwargs):
@@ -399,19 +340,3 @@ def at_least2d(d):
     for key in d.keys():
         if len(np.shape(d[key])) == 1:
             d[key] = d[key][:, None]
-
-
-
-def evaluate_in_parallel(_x, calc_gradient, func, args, kwargs):
-    _out = {}
-    if calc_gradient:
-        _out["__autograd__"], _ = run_and_trace(func, _x, *[_out])
-    else:
-        func(_x, _out, *args, **kwargs)
-    return _out
-
-
-def evaluate_in_parallel_object(_x, calc_gradient, obj, args, kwargs):
-    _out = {}
-    obj._evaluate(_x, _out, *args, **kwargs)
-    return _out
