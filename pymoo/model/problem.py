@@ -10,9 +10,6 @@ from pymoo.problems.gradient import run_and_trace, calc_jacobian
 from pymoo.rand import random
 
 
-
-
-
 class Problem:
     """
     Superclass for each problem that is defined. It provides attributes such
@@ -58,11 +55,14 @@ class Problem:
         self.n_constr = n_constr
 
         # allow just an integer for xl and xu if all bounds are equal
-        if n_var > 0 and isinstance(xl, int) and isinstance(xu, int):
-            self.xl = xl if type(xl) is np.ndarray else np.ones(n_var) * xl
-            self.xu = xu if type(xu) is np.ndarray else np.ones(n_var) * xu
+        if n_var > 0 and not isinstance(xl, np.ndarray) and xl is not None:
+            self.xl = np.ones(n_var) * xl
         else:
             self.xl = xl
+
+        if n_var > 0 and not isinstance(xu, np.ndarray) and xu is not None:
+            self.xu = np.ones(n_var) * xu
+        else:
             self.xu = xu
 
         # the pareto front will be calculated only once and is stored here
@@ -314,7 +314,7 @@ class Problem:
             else:
                 client = _params[0]
 
-            #client.upload_file('/Users/blankjul/workspace/pymoo/tests/problems/test_parallel.py')
+            # client.upload_file('/Users/blankjul/workspace/pymoo/tests/problems/test_parallel.py')
 
             self.parallelization = None
 
@@ -324,12 +324,11 @@ class Problem:
                 obj(x, out, *args, **kwargs)
                 return out
 
-
             ret = []
             for k in range(len(X)):
-                #ret = client.submit(evaluate_in_parallel_object, X[k], calc_gradient, self, args, kwargs)
+                # ret = client.submit(evaluate_in_parallel_object, X[k], calc_gradient, self, args, kwargs)
                 ret.append(client.submit(wrapper, self, X[k], args, kwargs))
-                #ret.append(client.submit(test_in_parallel))
+                # ret.append(client.submit(test_in_parallel))
 
             ret = [e.result() for e in ret]
 
@@ -399,7 +398,6 @@ def at_least2d(d):
     for key in d.keys():
         if len(np.shape(d[key])) == 1:
             d[key] = d[key][:, None]
-
 
 
 def evaluate_in_parallel(_x, calc_gradient, func, args, kwargs):

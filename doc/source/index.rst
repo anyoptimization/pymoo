@@ -7,7 +7,7 @@
 .. raw:: html
 
     <div align="right" style="margin-bottom: -20px">
-      <b>Latest Version:</b> pymoo==0.3.0</b>
+      <b>Latest Version:</b> pymoo==0.3.1</b>
     </div>
 
 
@@ -63,7 +63,7 @@ Features
 :ref:`R-NSGA-II <nb_rnsga2>`,
 :ref:`NSGA-III <nb_nsga3>`, :ref:`U-NSGA-III <nb_unsga3>`, :ref:`R-NSGA-III <nb_rnsga3>`, :ref:`MOEA/D <nb_moead>`
 
-**Test Problems:** :ref:`Overview <nb_zdt>`, :ref:`ZDT <nb_zdt>`, :ref:`Rastrigin <nb_rastrigin>`
+**Test Problems:** :ref:`Overview <nb_problems>` (single-objective, multi-objective and many-objective)
 
 **Performance Indicators:** :ref:`Hypervolume <nb_hv>`, :ref:`GD <nb_gd>`, :ref:`IGD <nb_igd>`, :ref:`R-Metric <nb_rmetric>`
 

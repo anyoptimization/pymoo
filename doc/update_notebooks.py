@@ -1,3 +1,5 @@
+import glob
+
 import nbformat
 from nbconvert.preprocessors import ExecutePreprocessor
 
@@ -53,6 +55,15 @@ def update_and_run_notebook(filename, execute=False):
 
                 cell['source'] = code
 
+    # remove trailing empty cells
+    for i in reversed(range(len(cells))):
+        if cells[i]['cell_type'] == 'code' and len(cells[i]['source']) > 0:
+            break
+    nb['cells'] = nb['cells'][:i+1]
+
+    with open(filename, 'wt') as f:
+        nbformat.write(nb, f)
+
     if execute:
         ep = ExecutePreprocessor(kernel_name='python3')
         ep.preprocess(nb, {'metadata': {'path': get_pymoo()}})
@@ -63,8 +74,9 @@ def update_and_run_notebook(filename, execute=False):
 
 if __name__ == "__main__":
 
-    files = ['source/problems/zdt.ipynb',
-             'source/problems/single.ipynb']
+    files = glob.glob('source/problems/bnh.ipynb')
+
+    # files = ['source/problems/zdt.ipynb','source/problems/single.ipynb']
 
     for fname in files:
         print(fname)

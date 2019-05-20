@@ -159,6 +159,9 @@ def plot_problem_surface(problem, n_samples, plot_type="wireframe", cmap="summer
             ax = fig.add_subplot(111, projection="3d")
             ax.plot_surface(X, Y, F, cmap=cmap, rstride=1, cstride=1)
             ax.contour(X, Y, F, 10, linestyles="solid", offset=-1)
+            ax.set_xlabel("$x_1$")
+            ax.set_ylabel("$x_2$")
+            ax.set_zlabel("$f(x)$")
             ax.view_init(45, 45)
         else:
             raise Exception("Unknown plotting method.")
@@ -168,6 +171,7 @@ def plot_problem_surface(problem, n_samples, plot_type="wireframe", cmap="summer
         raise Exception("Can only plot single with less than two variables and one objective.")
 
     if show:
+        plt.tight_layout()
         plt.show()
 
     if return_figure:

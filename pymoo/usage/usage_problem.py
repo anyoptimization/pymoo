@@ -7,7 +7,7 @@
 # START ackley
 import numpy as np
 from pymoo.factory import get_problem
-from pymoo.util.plotting import plot_problem_surface
+from pymoo.util.plotting import plot_problem_surface, plot
 
 problem = get_problem("ackley", n_var=2, a=20, b=1/5, c=2 * np.pi)
 plot_problem_surface(problem, 100, plot_type="wireframe+contour")
@@ -45,36 +45,77 @@ plot_problem_surface(problem, 100, plot_type="wireframe+contour")
 
 
 # START zdt1
+from pymoo.factory import get_problem
+from pymoo.util.plotting import plot
+
 problem = get_problem("zdt1")
 plot(problem.pareto_front(), no_fill=True)
 # END zdt1
 
 # START zdt2
+from pymoo.factory import get_problem
+from pymoo.util.plotting import plot
+
 problem = get_problem("zdt2")
 plot(problem.pareto_front(), no_fill=True)
 # END zdt2
 
 # START zdt3
+from pymoo.factory import get_problem
+from pymoo.util.plotting import plot
+
 problem = get_problem("zdt3")
 plot(problem.pareto_front(), no_fill=True)
 # END zdt3
 
 # START zdt4
+from pymoo.factory import get_problem
+from pymoo.util.plotting import plot
+
 problem = get_problem("zdt4")
 plot(problem.pareto_front(), no_fill=True)
 # END zdt4
 
+# START zdt5_no_norm
+from pymoo.factory import get_problem
+from pymoo.util.plotting import plot
+
+problem = get_problem("zdt5", normalize=False)
+plot(problem.pareto_front(), no_fill=True)
+# END zdt5_no_norm
+
 # START zdt5
+from pymoo.factory import get_problem
+from pymoo.util.plotting import plot
+
 problem = get_problem("zdt5")
 plot(problem.pareto_front(), no_fill=True)
 # END zdt5
 
 # START zdt6
+from pymoo.factory import get_problem
+from pymoo.util.plotting import plot
+
 problem = get_problem("zdt6")
 plot(problem.pareto_front(), no_fill=True)
 # END zdt6
 
+# START bnh
+from pymoo.factory import get_problem
+from pymoo.util.plotting import plot
 
+problem = get_problem("bnh")
+plot(problem.pareto_front(), no_fill=True)
+# END bnh
+
+
+# START rosenbrock
+from pymoo.factory import get_problem
+from pymoo.util.plotting import plot_problem_surface
+
+problem = get_problem("rosenbrock", n_var=2)
+plot_problem_surface(problem, 100, plot_type="wireframe+contour")
+# END rosenbrock
 
 
 
