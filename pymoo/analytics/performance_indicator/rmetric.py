@@ -170,7 +170,7 @@ class RMetric(Indicator):
             volume = -1
         else:
             # IGD Computation
-            from pymoo.indicators.igd import IGD
+            from pymoo.performance_indicator.igd import IGD
             IGD_ = IGD(final_PF)
             igd = IGD_.calc(translated)
             # HV Computation
@@ -182,7 +182,7 @@ class RMetric(Indicator):
                 if dim < 3:
                     try:
                         # Python
-                        from pymoo.indicators.hv import HyperVolume
+                        from pymoo.performance_indicator.hv import HyperVolume
                         hv = HyperVolume(nadir_point)
                         volume = hv.compute(front)
                     except TypeError:

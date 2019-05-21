@@ -6,7 +6,7 @@ can be used easily just by calling a function and providing the lower and upper 
 import numpy as np
 
 from pymoo.model.population import Population
-from pymop import Problem
+from pymoo.model.problem import Problem
 
 
 def get_problem_func(n_var, xl, xu, type_var):

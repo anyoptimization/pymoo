@@ -117,6 +117,14 @@ problem = get_problem("rosenbrock", n_var=2)
 plot_problem_surface(problem, 100, plot_type="wireframe+contour")
 # END rosenbrock
 
+# START griewank
+from pymoo.factory import get_problem
+from pymoo.util.plotting import plot_problem_surface
+
+problem = get_problem("griewank", n_var=2)
+plot_problem_surface(problem, 100, plot_type="wireframe+contour")
+# END griewank
+
 
 
 # --------------------------------------------------------------------------------------------

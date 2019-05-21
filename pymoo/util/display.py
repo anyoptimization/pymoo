@@ -1,8 +1,8 @@
 import numpy as np
 
-from pymoo.indicators.gd import GD
-from pymoo.indicators.hv import Hypervolume
-from pymoo.indicators.igd import IGD
+from pymoo.performance_indicator.gd import GD
+from pymoo.performance_indicator.hv import Hypervolume
+from pymoo.performance_indicator.igd import IGD
 
 
 def disp_single_objective(problem, evaluator, algorithm, pf=None):

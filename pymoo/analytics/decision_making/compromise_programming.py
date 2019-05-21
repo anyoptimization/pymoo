@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from pymoo.dm.decision_making import DecisionMaking, normalize
+from pymoo.decision_making.decision_making import DecisionMaking, normalize
 
 
 class CompromiseProgramming(DecisionMaking):

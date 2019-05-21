@@ -7,7 +7,6 @@ import autograd.numpy as anp
 import numpy as np
 
 from pymoo.problems.gradient import run_and_trace, calc_jacobian
-from pymoo.rand import random
 
 
 class Problem:

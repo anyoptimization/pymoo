@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from pymoo.indicators.kktpm import KKTPM
+from pymoo.performance_indicator.kktpm import KKTPM
 from pymoo.factory import get_problem
 
 

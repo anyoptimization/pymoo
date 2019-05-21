@@ -1,4 +1,4 @@
-from pymoo.indicators.igd import IGD
+from pymoo.performance_indicator.igd import IGD
 
 
 class Termination:

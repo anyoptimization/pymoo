@@ -11,12 +11,13 @@ usage = {}
 def get_usage(fname, prefix="../pymoo/usage/"):
     if fname not in usage:
         with open(prefix + fname, 'r') as f:
-            usage[fname] = f.read().split("\n")
+            usage[fname] = f.read()
     return usage[fname]
 
 
 def get_section(code, section):
     start, end = None, None
+    code = code.split("\n")
 
     for i, line in enumerate(code):
 
@@ -25,6 +26,9 @@ def get_section(code, section):
         elif "# END %s" % section in line:
             end = i
             break
+
+    if start is None:
+        raise Exception("%s not found." % section)
 
     return "\n".join(code[start + 1:end]).rstrip().lstrip()
 
@@ -39,13 +43,12 @@ def update_and_run_notebook(filename, execute=False):
         return
 
     # Loop through all cells
-    cells = nb['cells']
-    for cell in cells:
+    for k in range(len(nb['cells'])):
         # If cell is code and has usage metadata set, update the .ipynb json
-        if cell['cell_type'] == 'code':
+        if nb['cells'][k]['cell_type'] == 'code':
 
-            code = cell['metadata'].get('code')
-            section = cell['metadata'].get('section')
+            code = nb['cells'][k]['metadata'].get('code')
+            section = nb['cells'][k]['metadata'].get('section')
 
             if code:
                 code = get_usage(code)
@@ -53,13 +56,12 @@ def update_and_run_notebook(filename, execute=False):
                 if section:
                     code = get_section(code, section)
 
-                cell['source'] = code
+                nb['cells'][k]['source'] = code
 
     # remove trailing empty cells
-    for i in reversed(range(len(cells))):
-        if cells[i]['cell_type'] == 'code' and len(cells[i]['source']) > 0:
-            break
-    nb['cells'] = nb['cells'][:i+1]
+    while len(nb["cells"]) > 0 and nb["cells"][-1]['cell_type'] == 'code' and len(nb["cells"][-1]['source']) == 0\
+            and nb["cells"][-1]['execution_count'] is None:
+        nb["cells"] = nb["cells"][:-1]
 
     with open(filename, 'wt') as f:
         nbformat.write(nb, f)
@@ -74,7 +76,8 @@ def update_and_run_notebook(filename, execute=False):
 
 if __name__ == "__main__":
 
-    files = glob.glob('source/problems/bnh.ipynb')
+    #files = glob.glob('source/problems/*.ipynb')
+    files = glob.glob('source/algorithms/nsga2.ipynb')
 
     # files = ['source/problems/zdt.ipynb','source/problems/single.ipynb']
 
