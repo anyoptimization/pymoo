@@ -141,20 +141,6 @@ class ConstraintHandlingSurvival(Survival):
             _F[:, 0] = _F[:, 0] + self.params["weight"] * CV
             return pop[np.argsort(_F[:, 0])[:n_survive]]
 
-        elif self.method == "stochastic_ranking":
-
-            # first shuffle the population randomly - to be sorted again
-            I = np.random.permutation(len(pop))
-            pop, F, CV = pop[I], F[I], CV[I]
-
-            # func = load_function("stochastic_ranking", "stochastic_ranking")
-
-            from stochastic_ranking import stochastic_ranking
-            func = stochastic_ranking
-
-            index = func(F[:, 0], CV, self.params["prob"])
-
-            return pop[index[:n_survive]]
 
 
 def comp_by_cv_and_fitness(pop, P, **kwargs):

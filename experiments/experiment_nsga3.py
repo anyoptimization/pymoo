@@ -2,10 +2,10 @@ import os
 import pickle
 
 from pymoo.algorithms.nsga3 import nsga3
+from pymoo.factory import get_problem
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.util.reference_direction import MultiLayerReferenceDirectionFactory, UniformReferenceDirectionFactory
-from pymop.factory import get_problem
 
 
 def get_setup(n_obj):

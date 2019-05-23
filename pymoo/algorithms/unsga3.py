@@ -3,7 +3,7 @@ import numpy as np
 from pymoo.algorithms.nsga3 import NSGA3
 from pymoo.docs import parse_doc_string
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
-from pymoo.rand import random
+
 
 
 # =========================================================================================================
@@ -34,7 +34,7 @@ def comp_by_rank_and_ref_line_dist(pop, P, **kwargs):
                                    method='smaller_is_better')
 
         if np.isnan(S[i]):
-            S[i] = random.choice([a, b])
+            S[i] = np.random.choice([a, b])
 
     return S[:, None].astype(np.int)
 

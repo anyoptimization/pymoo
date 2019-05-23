@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.rand import random
+
 
 
 def stochastic_ranking(F, CV, prob):
@@ -29,7 +29,7 @@ def stochastic_ranking(F, CV, prob):
 
             _current, _next = index[j], index[j + 1]
 
-            if (CV[_current] == 0 and CV[_next] == 0) or (random.random() < prob):
+            if (CV[_current] == 0 and CV[_next] == 0) or (np.random.random() < prob):
 
                 if F[_current] > F[_next]:
                     func_swap(index, j, j + 1)

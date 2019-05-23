@@ -1,16 +1,23 @@
+from pymoo.algorithms.moead import moead
 from pymoo.factory import get_problem
 from pymoo.optimize import minimize
-from pymoo.algorithms.nsga2 import nsga2
 from pymoo.util import plotting
+from pymoo.util.reference_direction import UniformReferenceDirectionFactory
 
-# create the algorithm object
-method = nsga2(pop_size=100, elimate_duplicates=True)
+# create the optimization problem
+ref_dirs = UniformReferenceDirectionFactory(3, n_points=100).do()
 
-# execute the optimization
-res = minimize(get_problem("zdt1"),
+method = moead(
+    ref_dirs=ref_dirs,
+    n_neighbors=15,
+    decomposition="pbi",
+    prob_neighbor_mating=0.7
+)
+
+res = minimize(get_problem("dtlz2"),
                method,
-               ('n_gen', 200),
-               seed=1,
-               verbose=False)
+               termination=('n_gen', 200)
+               )
 
-plotting.plot(res.F, no_fill=True)
+plotting.plot(res.F)
+

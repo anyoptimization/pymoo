@@ -6,25 +6,35 @@
 - Write test suite for all algorithms (many problems just run once - no crash should occur)
 - NSGA3 - add non-dom check finally (factor out the algorithm method and reuse)
 - Remove image file from git history
+
 - Add NoCrossover and NoMutation
+
 - Rewrite integer operation with a wrapper
 - Implement an async version of algorithms
 - (mu,lambda) and (mu+lambda) difference
+
 - Add global tests of all optimization methods
 - Add mixed variable possibility
+
 - PCX as crossover
-- Visualization (PCP and more)
 - Decision Making (Pseudo Weight, ...)
+
 - IGD+
+- Implemented 1d interval and pair scatter plot
 - Termination Criteria in x space and fspace - xtol and ftol
-- 0.9 prob for crossover in general
 - Statistics of Survival and more attributes for individuals
 - Documentation fix link issues (absolute path at localhost and on remote)
-- Add ZDT5 and show it for NSGA2
+
 - maybe include CMA-ES: https://github.com/CMA-ES/pycma
 - ask and tell interface
+
 - elementwise function evaluation gradient is not working yet
+- Performance check nsga3
 
 
 
 # DONE
+- PCP values do have different ranges
+- Add ZDT5 and show it for NSGA2
+- 0.9 prob for crossover in general
+- add normalization to radar - externalize from pcp

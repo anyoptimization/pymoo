@@ -1,29 +1,31 @@
 from pymoo.model.crossover import Crossover
-from pymoo.rand import random
+
+import numpy as np
 
 
 class DifferentialEvolutionCrossover(Crossover):
 
-    def __init__(self, weight=0.8, dither=None, jitter=False):
-        super().__init__(3, 1)
+    def __init__(self, weight=0.8, dither=None, jitter=False, *args, **kwargs):
+        super().__init__(3, 1, *args, **kwargs)
         self.weight = weight
         self.dither = dither
         self.jitter = jitter
 
-    def _do(self, problem, pop, parents, **kwargs):
-        X = pop.get("X")[parents.T]
+    def _do(self, problem, X, **kwargs):
+
+        n_parents, n_matings, n_var = X.shape
 
         if self.dither == "vector":
-            weight = (self.weight + random.random(len(parents)) * (1 - self.weight))[:, None]
+            weight = (self.weight + np.random.random(n_parents) * (1 - self.weight))[:, None]
         elif self.dither == "scalar":
-            weight = self.weight + random.random() * (1 - self.weight)
+            weight = self.weight + np.random.random() * (1 - self.weight)
         else:
             weight = self.weight
 
         # http://www.cs.ndsu.nodak.edu/~siludwig/Publish/papers/SSCI20141.pdf
         if self.jitter:
             gamma = 0.0001
-            weight = (self.weight * (1 + gamma * (random.random(len(parents)) - 0.5)))[:, None]
+            weight = (self.weight * (1 + gamma * (np.random.random(n_parents) - 0.5)))[:, None]
 
         _X = X[0] + weight * (X[1] - X[2])
-        return pop.new("X", _X)
+        return _X[None, ...]

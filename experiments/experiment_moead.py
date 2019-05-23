@@ -33,7 +33,7 @@ if __name__ == '__main__':
             s['ref_dirs'],
             n_neighbors=20,
             decomposition='auto',
-            prob_neighbor_mating=1.0,
+            prob_neighbor_mating=0.9,
             eliminate_duplicates=True
         )
 

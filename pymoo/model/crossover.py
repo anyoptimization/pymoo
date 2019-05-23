@@ -1,4 +1,7 @@
 from pymoo.model.population import Population
+import numpy as np
+
+from pymoo.operators.repair.out_of_bounds_repair import OutOfBoundsRepair
 
 
 class Crossover:
@@ -7,7 +10,8 @@ class Crossover:
     This class must be inherited from to provide a crossover method to an algorithm.
     """
 
-    def __init__(self, n_parents, n_offsprings):
+    def __init__(self, n_parents, n_offsprings, prob=0.9):
+        self.prob = prob
         self.n_parents = n_parents
         self.n_offsprings = n_offsprings
 
@@ -43,5 +47,20 @@ class Crossover:
         if self.n_parents != parents.shape[1]:
             raise ValueError('Exception during crossover: Number of parents differs from defined at crossover.')
 
-        off = self._do(problem, pop, parents, **kwargs)
+        # get the design space matrix form the population and parents
+        X = pop.get("X")[parents.T].copy()
+
+        # execute the crossover
+        _X = self._do(problem, X, **kwargs)
+
+        # now apply the crossover probability
+        do_crossover = np.random.random(len(parents)) < self.prob
+        X[:, do_crossover, :] = _X[:, do_crossover, :]
+
+        # flatten the array to become a 2d-array
+        X = X.reshape(-1, X.shape[-1])
+
+        # create a population object
+        off = pop.new("X", X)
+
         return off

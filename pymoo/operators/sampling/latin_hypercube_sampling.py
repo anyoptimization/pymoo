@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.model.sampling import Sampling
-from pymoo.rand import random
+
 from pymoo.util.misc import cdist
 
 
@@ -19,11 +19,11 @@ class LatinHypercubeSampling(Sampling):
         self.criterion = criterion
 
     def _sample(self, n_samples, n_var):
-        X = random.random(size=(n_samples, n_var))
+        X = np.random.random(size=(n_samples, n_var))
         val = X.argsort(axis=0) + 1
 
         if self.smooth:
-            val = val - random.random(val.shape)
+            val = val - np.random.random(val.shape)
         else:
             val = val - 0.5
         val /= n_samples

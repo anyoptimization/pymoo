@@ -24,7 +24,7 @@ class Survival:
 
             # if feasible solution do exist
             if len(feasible) > 0:
-                survivors = self._do(pop[feasible], min(len(feasible), n_survive), **kwargs)
+                survivors = self._do(problem, pop[feasible], min(len(feasible), n_survive), **kwargs)
 
             # if infeasible solutions needs to be added
             if len(survivors) < n_survive:
@@ -32,7 +32,7 @@ class Survival:
                 survivors = survivors.merge(pop[least_infeasible])
 
         else:
-            survivors = self._do(pop, n_survive, **kwargs)
+            survivors = self._do(problem, pop, n_survive, **kwargs)
 
         return survivors
 

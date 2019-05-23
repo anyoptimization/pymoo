@@ -1,1 +1,1 @@
-__all__ = ["configuration", "cython", "decision_making", "algorithms", "model", "operators", "performance_indicator", "rand", "util"]
+__all__ = ["configuration", "cython", "analytics", "algorithms", "model", "operators", "util"]

@@ -68,13 +68,10 @@ class CTP1(CTP):
         out["F"] = anp.column_stack([f1, f2])
 
         a, b = self.a, self.b
-
         g = []
         for j in range(self.n_constr):
             _g = - (f2 - (a[j] * anp.exp(-b[j] * f1)))
             g.append(_g)
-
-        out["F"] = anp.column_stack([f1, f2])
         out["G"] = anp.column_stack(g)
 
 

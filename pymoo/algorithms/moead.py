@@ -8,7 +8,7 @@ from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinary
 from pymoo.operators.default_operators import set_if_none
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import RandomSampling
-from pymoo.rand import random
+
 from pymoo.util.display import disp_multi_objective
 
 
@@ -78,20 +78,20 @@ class MOEAD(GeneticAlgorithm):
     def _next(self, pop):
 
         # iterate for each member of the population in random order
-        for i in random.perm(len(pop)):
+        for i in np.random.permutation(len(pop)):
 
             # all neighbors of this individual and corresponding weights
             N = self.neighbors[i, :]
 
-            if random.random() < self.prob_neighbor_mating:
-                parents = N[random.perm(self.n_neighbors)][:self.crossover.n_parents]
+            if np.random.random() < self.prob_neighbor_mating:
+                parents = N[np.random.permutation(self.n_neighbors)][:self.crossover.n_parents]
             else:
-                parents = random.perm(self.pop_size)[:self.crossover.n_parents]
+                parents = np.random.permutation(self.pop_size)[:self.crossover.n_parents]
 
             # do recombination and create an offspring
-            off = self.crossover.do(self.problem, pop, parents[None, :])
-            off = self.mutation.do(self.problem, off)
-            off = off[random.randint(0, len(off))]
+            off = self.crossover._do(self.problem, pop, parents[None, :])
+            off = self.mutation._do(self.problem, off)
+            off = off[np.random.randint(0, len(off))]
 
             # evaluate the offspring
             self.evaluator.eval(self.problem, off)

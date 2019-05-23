@@ -1,8 +1,6 @@
 import numpy as np
 
 from pymoo.model.mutation import Mutation
-from pymoo.operators.repair.out_of_bounds_repair import OutOfBoundsRepair
-from pymoo.rand import random
 
 
 class PolynomialMutation(Mutation):
@@ -23,7 +21,7 @@ class PolynomialMutation(Mutation):
         if self.prob is None:
             self.prob = 1.0 / problem.n_var
 
-        do_mutation = random.random(X.shape) < self.prob
+        do_mutation = np.random.random(X.shape) < self.prob
 
         Y[:, :] = X
 
@@ -41,7 +39,7 @@ class PolynomialMutation(Mutation):
 
         mut_pow = 1.0 / (self.eta + 1.0)
 
-        rand = random.random(X.shape)
+        rand = np.random.random(X.shape)
         mask = rand <= 0.5
         mask_not = np.logical_not(mask)
 
@@ -70,6 +68,4 @@ class PolynomialMutation(Mutation):
         if self.var_type == np.int:
             Y = np.rint(Y).astype(np.int)
 
-        off = OutOfBoundsRepair().do(problem, pop.new("X", Y))
-
-        return off
+        return pop.new("X", Y)

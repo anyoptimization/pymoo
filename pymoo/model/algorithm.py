@@ -5,7 +5,7 @@ import numpy as np
 
 from pymoo.model.evaluator import Evaluator
 from pymoo.model.result import Result
-from pymoo.rand import random
+
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 
@@ -41,6 +41,7 @@ class Algorithm:
               callback=None,
               save_history=False,
               pf=None,
+              evaluator=Evaluator(),
               **kwargs
               ):
         """
@@ -77,23 +78,29 @@ class Algorithm:
         pf : np.array
             The Pareto-front for the given problem. If provided performance metrics are printed during execution.
 
+        evaluator : class
+            The evaluator which can be used to make modifications before calling the evaluate function of a problem.
+
         Returns
         -------
         res : dict
             A dictionary that saves all the results of the algorithm. Also, the history if save_history is true.
 
+
+
         """
 
-        # set the random seed for generator
+        # set the random seed for generator and save if
         if seed is not None:
-            random.seed(seed)
+            np.random.seed(seed)
         else:
-            seed = random.randint(0, 10000000)
-            random.seed(seed)
+            seed = np.random.randint(0, 10000000)
+            np.random.seed(seed)
+        self.seed = seed
 
         # the evaluator object which is counting the evaluations
         self.history = []
-        self.evaluator = Evaluator()
+        self.evaluator = evaluator
         self.problem = problem
         self.termination = termination
         self.pf = pf
@@ -137,6 +144,12 @@ class Algorithm:
         res.history = self.history
 
         return res
+
+    def next(self, pop):
+        return self._next(pop)
+
+    def initialize(self, pop):
+        return self._initialize()
 
     # method that is called each iteration to call so#me methods regularly
     def _each_iteration(self, D, first=False, **kwargs):

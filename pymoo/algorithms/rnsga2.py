@@ -5,7 +5,7 @@ from pymoo.algorithms.nsga3 import get_extreme_points_c
 from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
 from pymoo.operators.selection.random_selection import RandomSelection
-from pymoo.rand import random
+
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 

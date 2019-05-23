@@ -6,7 +6,7 @@ from scipy.spatial.distance import cdist
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
-from pymoo.rand import random
+
 
 
 class GeneticAlgorithm(Algorithm):
@@ -122,7 +122,7 @@ class GeneticAlgorithm(Algorithm):
 
         # that call is a dummy survival to set attributes that are necessary for the mating selection
         if self.survival:
-            pop = self.survival.do(self.problem, pop, self.pop_size, algorithm=self)
+            pop = self.survival.do(self.problem, pop, len(pop), algorithm=self)
 
         return pop
 
@@ -175,7 +175,7 @@ class GeneticAlgorithm(Algorithm):
 
             # if more offsprings than necessary - truncate them
             if len(_off) > self.n_offsprings - len(off):
-                I = random.perm(self.n_offsprings - len(off))
+                I = np.random.permutation(self.n_offsprings - len(off))
                 _off = _off[I]
 
             # add to the offsprings and increase the mating counter

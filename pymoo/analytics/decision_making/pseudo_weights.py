@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.decision_making.decision_making import DecisionMaking, normalize
+from pymoo.analytics.decision_making.decision_making import DecisionMaking, normalize
 
 
 class PseudoWeights(DecisionMaking):

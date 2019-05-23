@@ -6,7 +6,8 @@ from setuptools.command.build_ext import build_ext
 
 ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError, IOError)
 
-os.environ['CFLAGS'] = '-stdlib=libc++'
+
+#os.environ['CFLAGS'] = '-stdlib=libc++'
 
 def readme():
     with open('README.rst') as f:

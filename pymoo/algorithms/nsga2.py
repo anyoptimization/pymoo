@@ -85,7 +85,7 @@ class RankAndCrowdingSurvival(Survival):
     def __init__(self) -> None:
         super().__init__(True)
 
-    def _do(self, pop, n_survive, D=None, **kwargs):
+    def _do(self, problem, pop, n_survive, D=None, **kwargs):
 
         # get the objective space values and objects
         F = pop.get("F")

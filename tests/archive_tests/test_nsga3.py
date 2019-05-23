@@ -36,7 +36,7 @@ class NSGA3Test(unittest.TestCase):
             print("")
         self.assertTrue(np.all(_rank+1 == rank))
 
-        survival.do(pop, pop.size())
+        survival._do(pop, pop.size())
 
         for i, D in enumerate(self.data['hist']):
 
@@ -76,7 +76,7 @@ class NSGA3Test(unittest.TestCase):
             else:
                 survival.ideal_point = np.min(np.concatenate([survival.ideal_point[None, :], pop.F], axis=0), axis=0)
 
-            survival.do(cand, pop.size() / 2, **vars)
+            survival._do(cand, pop.size() / 2, **vars)
 
             is_equal = np.all(survival.extreme_points == np.array(D['extreme']))
             self.assertTrue(is_equal)

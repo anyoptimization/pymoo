@@ -1,5 +1,5 @@
 from pymoo.model.mutation import Mutation
-from pymoo.rand import random
+
 
 
 class PolynomialMutation(Mutation):

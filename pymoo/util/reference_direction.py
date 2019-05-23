@@ -4,7 +4,7 @@ import numpy as np
 from pymoo.util import plotting
 from scipy import special
 
-from pymoo.rand import random
+
 from pymoo.util.misc import unique_rows, cdist
 from pymoo.util.plotting import plot_3d
 
@@ -36,19 +36,19 @@ class ReferenceDirectionFactory:
         return None
 
 
-def sample_on_simplex(n_dim, n_points, method="kraemer", seed=None):
+def sample_on_simplex(n_points, n_dim, method="kraemer", seed=None):
 
     if seed is not None:
-        random.seed(seed)
+        np.random.seed(seed)
 
     if method == "random":
         # sample random points
-        rnd = random.random((n_points, n_dim))
+        rnd = np.random.random((n_points, n_dim))
         rnd = rnd / rnd.sum(axis=1)[:, None]
 
     elif method == "kraemer":
         M = sys.maxsize
-        _rnd = random.randint(0, M, (n_points, n_dim - 1))
+        _rnd = np.random.randint(0, M, (n_points, n_dim - 1))
         _rnd = np.column_stack([np.zeros(n_points), _rnd, np.full(n_points, M)])
         _rnd = np.sort(_rnd, axis=1)
 
@@ -71,7 +71,7 @@ def select_points_with_maximum_distance(X, n_select, selected=[]):
 
     # if no selection provided pick randomly in the beginning
     if len(selected) == 0:
-        selected = [random.randint(len(X))]
+        selected = [np.random.randint(len(X))]
 
     # create variables to store what selected and what not
     not_selected = [i for i in range(n_points) if i not in selected]
@@ -112,7 +112,7 @@ class SamplingReferenceDirectionFactory(ReferenceDirectionFactory):
 
     def _do(self):
 
-        rnd = sample_on_simplex(self.n_dim, self.n_sample_points, method=self.sampling, seed=self.seed)
+        rnd = sample_on_simplex(self.n_sample_points, self.n_dim, method=self.sampling, seed=self.seed)
 
         # add the corner coordinates
         X = np.row_stack([np.eye(self.n_dim), rnd])
@@ -226,7 +226,7 @@ class MultiLayerReferenceDirectionFactory:
     def do(self):
         ref_dirs = []
         for factory in self.layers:
-            ref_dirs.append(factory.do())
+            ref_dirs.append(factory._do())
         ref_dirs = np.concatenate(ref_dirs, axis=0)
 
         return unique_rows(ref_dirs)

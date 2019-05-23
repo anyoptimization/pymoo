@@ -9,7 +9,7 @@ from pymoo.operators.default_operators import set_if_none
 from pymoo.operators.repair.bounds_back_repair import BoundsBackRepair
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
 from pymoo.operators.selection.random_selection import RandomSelection
-from pymoo.rand import random
+
 from pymoo.util.display import disp_single_objective
 from pymoo.util.misc import parameter_less
 
@@ -53,29 +53,29 @@ class DifferentialEvolution(GeneticAlgorithm):
 
         # create offsprings and add it to the data of the algorithm
         if self.var_selection == "rand":
-            P = self.selection.do(pop, self.pop_size, self.crossover.n_parents)
+            P = self.selection._do(pop, self.pop_size, self.crossover.n_parents)
 
         elif self.var_selection == "best":
             best = np.argmin(F[:, 0])
-            P = self.selection.do(pop, self.pop_size, self.crossover.n_parents - 1)
+            P = self.selection._do(pop, self.pop_size, self.crossover.n_parents - 1)
             P = np.column_stack([np.full(len(pop), best), P])
 
         elif self.var_selection == "rand+best":
             best = np.argmin(F[:, 0])
-            P = self.selection.do(pop, self.pop_size, self.crossover.n_parents)
-            use_best = random.random(len(pop)) < 0.3
+            P = self.selection._do(pop, self.pop_size, self.crossover.n_parents)
+            use_best = np.random.random(len(pop)) < 0.3
             P[use_best, 0] = best
 
         else:
             raise Exception("Unknown selection: %s" % self.var_selection)
 
         # do the first crossover which is the actual DE operation
-        self.off = self.crossover.do(self.problem, pop, P, algorithm=self)
+        self.off = self.crossover._do(self.problem, pop, P, algorithm=self)
 
         # then do the mutation (which is actually )
         _pop = self.off.new().merge(self.pop).merge(self.off)
         _P = np.column_stack([np.arange(len(pop)), np.arange(len(pop)) + len(pop)])
-        self.off = self.mutation.do(self.problem, _pop, _P, algorithm=self)[:len(self.pop)]
+        self.off = self.mutation._do(self.problem, _pop, _P, algorithm=self)[:len(self.pop)]
 
         # bounds back if something is out of bounds
         self.off = BoundsBackRepair().do( self.problem, self.off)

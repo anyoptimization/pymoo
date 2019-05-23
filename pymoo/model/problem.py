@@ -229,6 +229,11 @@ class Problem:
         if "feasible" in return_values_of:
             out["feasible"] = (CV <= 0)
 
+        # if asked for a value but not set in the evaluation set to None
+        for val in return_values_of:
+            if val not in out:
+                out[val] = None
+
         # remove the first dimension of the output - in case input was a 1d- vector
         if only_single_value:
             for key in out.keys():

@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymop.factory import get_problem
+from pymoo.factory import get_problem
 
 
 class KKTPM:

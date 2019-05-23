@@ -2,7 +2,7 @@ import numpy as np
 from scipy.spatial import cKDTree
 
 from pymoo.util.normalization import normalize as normalize_by_bounds
-from pymoo.decision_making.decision_making import DecisionMaking, normalize
+from pymoo.analytics.decision_making.decision_making import DecisionMaking, normalize
 
 
 class KneeFinding(DecisionMaking):

@@ -30,7 +30,7 @@ print("NSGA3: Best solution found: \nX = %s\nF = %s" % (res.X, res.F))
 # END no_unsga3
 
 
-# START with_unsga3
+# START unsga3_comp
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -45,4 +45,4 @@ plt.xlabel("Generation")
 plt.ylabel("F")
 plt.legend()
 plt.show()
-# END with_unsga3
+# END unsga3_comp

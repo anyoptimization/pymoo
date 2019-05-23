@@ -5,9 +5,9 @@ import os
 import pickle
 
 from pymoo.algorithms.nsga2 import nsga2
+from pymoo.factory import get_sampling, get_crossover, get_mutation, get_problem
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymop.factory import get_problem
 
 setup = {
 
@@ -40,6 +40,14 @@ setup = {
         'problem': get_problem("zdt4", n_var=10),
         'crossover': SimulatedBinaryCrossover(0.9, 15),
         'mutation': PolynomialMutation(20)
+    },
+    'zdt5': {
+        'pop_size': 100,
+        'termination': ('n_gen', 400),
+        'problem': get_problem("zdt5", normalize=False),
+        'sampling': get_sampling("bin_random"),
+        'crossover': get_crossover("bin_two_point"),
+        'mutation': get_mutation("bin_bitflip")
     },
     'zdt6': {
         'pop_size': 100,
@@ -81,14 +89,14 @@ if __name__ == '__main__':
     # prefix of the folder to save the files
     prefix = "runs"
 
-    # name of the xperiment
+    # name of the experiment
     name = "pynsga2"
 
     # number of runs to execute
     n_runs = 100
 
     # single to be investigated
-    # single = ['zdt1', 'zdt2', 'zdt3', 'zdt4', 'zdt6']
+    #problems = ['zdt5']
     problems = setup.keys()
 
     # path were the files for this experiment are saved

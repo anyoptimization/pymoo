@@ -1,4 +1,5 @@
 import autograd.numpy as anp
+import numpy as np
 
 from pymoo.model.problem import Problem
 
@@ -6,10 +7,10 @@ from pymoo.model.problem import Problem
 class CantileveredBeam(Problem):
 
     def __init__(self):
-        super().__init__(n_var=4, n_obj=1, n_constr=2, type_var=anp.double)
-        self.xl = anp.array([2, 0.1, 0.1, 3.0])
-        self.xu = anp.array([12.0, 1.0, 2.0, 7.0])
-        self.h1 = anp.array([0.1, 0.25, 0.35, 0.5, 0.65, 0.75, 0.9, 1.0])
+        super().__init__(n_var=4, n_obj=1, n_constr=2, type_var=np.double)
+        self.xl = np.array([2, 0.1, 0.1, 3.0])
+        self.xu = np.array([12.0, 1.0, 2.0, 7.0])
+        self.h1 = np.array([0.1, 0.25, 0.35, 0.5, 0.65, 0.75, 0.9, 1.0])
 
     def _evaluate(self, x, out, *args, **kwargs):
         E, L, P = 1e7, 36.0, 1000.0
@@ -27,7 +28,7 @@ class CantileveredBeam(Problem):
         out["G"] = anp.column_stack([g1, g2])
 
     def _calc_pareto_front(self):
-        return 92.7693
+        return np.array([[92.7693]])
 
     def _calc_pareto_set(self):
-        return anp.array([9.4846, 0.1000, 0.1000, 7.0000])
+        return np.array([[9.4846, 0.1000, 0.1000, 7.0000]])

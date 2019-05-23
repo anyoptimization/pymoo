@@ -46,10 +46,10 @@ def parameter_less_constraints(F, CV, F_max=None):
 
 
 def random_permuations(n, l):
-    from pymoo.rand import random
+
     perms = []
     for i in range(n):
-        perms.append(random.perm(l))
+        perms.append(np.random.permutation(l))
     P = np.concatenate(perms)
     return P
 

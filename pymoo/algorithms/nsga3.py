@@ -11,7 +11,7 @@ from pymoo.operators.default_operators import set_if_none
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import RandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
-from pymoo.rand import random
+
 from pymoo.util.display import disp_multi_objective
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
@@ -68,7 +68,7 @@ def comp_by_cv_then_random(pop, P, **kwargs):
 
         # both solutions are feasible just set random
         else:
-            S[i] = random.choice([a, b])
+            S[i] = np.random.choice([a, b])
 
     return S[:, None].astype(np.int)
 
@@ -83,7 +83,7 @@ class ReferenceDirectionSurvival(Survival):
         self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
         self.worst_point = np.full(ref_dirs.shape[1], -np.inf)
 
-    def _do(self, pop, n_survive, D=None, **kwargs):
+    def _do(self, problem, pop, n_survive, D=None, **kwargs):
 
         # attributes to be set after the survival
         F = pop.get("F")
@@ -213,7 +213,7 @@ def niching(pop, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
 
         # all niches with the minimum niche count (truncate if randomly if more niches than remaining individuals)
         next_niches = next_niches_list[np.where(next_niche_count == min_niche_count)[0]]
-        next_niches = next_niches[random.perm(len(next_niches))[:n_select]]
+        next_niches = next_niches[np.random.permutation(len(next_niches))[:n_select]]
 
         for next_niche in next_niches:
 
@@ -221,7 +221,7 @@ def niching(pop, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
             next_ind = np.where(np.logical_and(niche_of_individuals == next_niche, mask))[0]
 
             # shuffle to break random tie (equal perp. dist) or select randomly
-            next_ind = random.shuffle(next_ind)
+            np.random.shuffle(next_ind)
 
             if niche_count[next_niche] == 0:
                 next_ind = next_ind[np.argmin(dist_to_niche[next_ind])]

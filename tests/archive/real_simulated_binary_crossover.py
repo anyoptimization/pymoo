@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.model.crossover import Crossover
-from pymoo.rand import random
+
 
 
 class SimulatedBinaryCrossover(Crossover):

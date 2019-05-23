@@ -33,14 +33,26 @@ def get_section(code, section):
     return "\n".join(code[start + 1:end]).rstrip().lstrip()
 
 
-# Update and run all notebooks
-def update_and_run_notebook(filename, execute=False):
-    # Try and open the .ipynb file
+def load_notebook(filename):
     try:
-        nb = nbformat.read(filename, nbformat.NO_CONVERT)
+        return nbformat.read(filename, nbformat.NO_CONVERT)
     except FileNotFoundError:
-        print(f"{filename} Not found in current directory")
-        return
+        raise Exception(f"{filename} Not found in current directory")
+
+
+def replace_usage_link(filename, old, new):
+    nb = load_notebook(filename)
+    for k in range(len(nb['cells'])):
+
+        if nb['cells'][k]['metadata'].get('code') == old:
+            nb['cells'][k]['metadata'].set('code', new)
+
+    with open(filename, 'wt') as f:
+        nbformat.write(nb, f)
+
+
+def update_and_run_notebook(filename, execute=False):
+    nb = load_notebook(filename)
 
     # Loop through all cells
     for k in range(len(nb['cells'])):
@@ -59,7 +71,7 @@ def update_and_run_notebook(filename, execute=False):
                 nb['cells'][k]['source'] = code
 
     # remove trailing empty cells
-    while len(nb["cells"]) > 0 and nb["cells"][-1]['cell_type'] == 'code' and len(nb["cells"][-1]['source']) == 0\
+    while len(nb["cells"]) > 0 and nb["cells"][-1]['cell_type'] == 'code' and len(nb["cells"][-1]['source']) == 0 \
             and nb["cells"][-1]['execution_count'] is None:
         nb["cells"] = nb["cells"][:-1]
 
@@ -76,8 +88,8 @@ def update_and_run_notebook(filename, execute=False):
 
 if __name__ == "__main__":
 
-    #files = glob.glob('source/problems/*.ipynb')
-    files = glob.glob('source/algorithms/nsga2.ipynb')
+    # files = glob.glob('source/problems/*.ipynb')
+    files = glob.glob('source/algorithms/nsga3.ipynb')
 
     # files = ['source/problems/zdt.ipynb','source/problems/single.ipynb']
 

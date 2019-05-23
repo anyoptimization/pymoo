@@ -6,6 +6,7 @@ def denormalize(x, x_min, x_max):
 
 
 def normalize(x, x_min=None, x_max=None, return_bounds=False):
+
     if x_min is None:
         x_min = np.min(x, axis=0)
     if x_max is None:

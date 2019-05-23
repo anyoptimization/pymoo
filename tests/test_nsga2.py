@@ -3,9 +3,8 @@ import pickle
 import unittest
 
 import numpy as np
-from pymoo.algorithms.nsga2 import calc_crowding_distance
 
-from pymoo.rand.impl.custom_random_generator import CustomRandomGenerator
+from pymoo.algorithms.nsga2 import calc_crowding_distance
 from pymoo.util.non_dominated_sorting import NonDominatedSorting
 
 
@@ -21,11 +20,6 @@ class NSGA2Test(unittest.TestCase):
         with open(os.path.join("resources", "cnsga2_run_zdt4.dat"), 'rb') as f:
             cls.data = pickle.load(f)
 
-    # tests whether the first number by the random generator is equal
-    def test_custom_random_generator(self):
-        rand = CustomRandomGenerator(0.1)
-        val = rand.random()
-        self.assertAlmostEqual(val, 0.337237, places=6)
 
     def test_rank_and_crowding_distance(self):
         for i, D in enumerate(self.data):
