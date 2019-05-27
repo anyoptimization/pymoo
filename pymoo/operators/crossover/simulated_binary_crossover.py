@@ -1,6 +1,7 @@
 import numpy as np
 
 from pymoo.model.crossover import Crossover
+from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds
 
 
 class SimulatedBinaryCrossover(Crossover):
@@ -66,7 +67,7 @@ class SimulatedBinaryCrossover(Crossover):
 
         # do randomly a swap of variables
         b = np.random.random((n_matings, problem.n_var)) <= 0.5
-        val = c1[b]
+        val = np.copy(c1[b])
         c1[b] = c2[b]
         c2[b] = val
 
@@ -76,6 +77,9 @@ class SimulatedBinaryCrossover(Crossover):
         # copy the positions where the crossover was done
         c[0, do_crossover] = c1[do_crossover]
         c[1, do_crossover] = c2[do_crossover]
+
+        c[0] = repair_out_of_bounds(problem, c[0])
+        c[1] = repair_out_of_bounds(problem, c[1])
 
         # round to integer if necessary
         if self.var_type == np.int:

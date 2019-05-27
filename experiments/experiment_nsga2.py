@@ -15,14 +15,14 @@ setup = {
         'pop_size': 100,
         'termination': ('n_gen', 200),
         'problem': get_problem("zdt1", n_var=30),
-        'crossover': SimulatedBinaryCrossover(0.9, 15),
+        'crossover': SimulatedBinaryCrossover(15),
         'mutation': PolynomialMutation(20),
     },
     'zdt2': {
         'pop_size': 100,
         'termination': ('n_gen', 200),
         'problem': get_problem("zdt2", n_var=30),
-        'crossover': SimulatedBinaryCrossover(0.9, 15),
+        'crossover': SimulatedBinaryCrossover(15),
         'mutation': PolynomialMutation(20)
 
     },
@@ -30,7 +30,7 @@ setup = {
         'pop_size': 100,
         'termination': ('n_gen', 200),
         'problem': get_problem("zdt3", n_var=30),
-        'crossover': SimulatedBinaryCrossover(0.9, 15),
+        'crossover': SimulatedBinaryCrossover(15),
         'mutation': PolynomialMutation(20)
 
     },
@@ -38,7 +38,7 @@ setup = {
         'pop_size': 100,
         'termination': ('n_gen', 200),
         'problem': get_problem("zdt4", n_var=10),
-        'crossover': SimulatedBinaryCrossover(0.9, 15),
+        'crossover': SimulatedBinaryCrossover(15),
         'mutation': PolynomialMutation(20)
     },
     'zdt5': {
@@ -53,21 +53,21 @@ setup = {
         'pop_size': 100,
         'termination': ('n_gen', 400),
         'problem': get_problem("zdt6", n_var=10),
-        'crossover': SimulatedBinaryCrossover(0.9, 15),
+        'crossover': SimulatedBinaryCrossover(15),
         'mutation': PolynomialMutation(20)
     },
     'kursawe': {
         'pop_size': 100,
         'termination': ('n_gen', 100),
         'problem': get_problem("kursawe"),
-        'crossover': SimulatedBinaryCrossover(0.9, 10),
+        'crossover': SimulatedBinaryCrossover(10),
         'mutation': PolynomialMutation(10)
     },
     'bnh': {
         'pop_size': 100,
         'termination': ('n_gen', 150),
         'problem': get_problem("bnh"),
-        'crossover': SimulatedBinaryCrossover(0.9, 10),
+        'crossover': SimulatedBinaryCrossover(10),
         'mutation': PolynomialMutation(20)
     }
     ,
@@ -75,7 +75,7 @@ setup = {
         'pop_size': 200,
         'termination': ('n_gen', 250),
         'problem': get_problem("osy"),
-        'crossover': SimulatedBinaryCrossover(0.9, 5),
+        'crossover': SimulatedBinaryCrossover(5),
         'mutation': PolynomialMutation(5)
     }
 
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     prefix = "runs"
 
     # name of the experiment
-    name = "pynsga2"
+    name = "pynsga2-0.3.1"
 
     # number of runs to execute
     n_runs = 100

@@ -1,7 +1,6 @@
-from pymoo.model.population import Population
 import numpy as np
 
-from pymoo.operators.repair.out_of_bounds_repair import OutOfBoundsRepair
+from pymoo.model.population import Population
 
 
 class Crossover:
@@ -50,11 +49,12 @@ class Crossover:
         # get the design space matrix form the population and parents
         X = pop.get("X")[parents.T].copy()
 
+        # now apply the crossover probability
+        do_crossover = np.random.random(len(parents)) < self.prob
+
         # execute the crossover
         _X = self._do(problem, X, **kwargs)
 
-        # now apply the crossover probability
-        do_crossover = np.random.random(len(parents)) < self.prob
         X[:, do_crossover, :] = _X[:, do_crossover, :]
 
         # flatten the array to become a 2d-array

@@ -1,62 +1,60 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pymoo.analytics.visualization.plot import Plot, number_to_text
+from pymoo.docs import parse_doc_string
+from pymoo.model.plot import Plot
 from pymoo.operators.default_operators import set_if_none
-from pymoo.problems.util import UniformReferenceDirectionFactory
 
 
 class ParallelCoordinatePlot(Plot):
 
-    def __init__(self,
-                 bounds=None,
-                 show_bounds=True,
-                 number_to_text=number_to_text,
-                 normalize_each_axis=True,
-                 axis_style={'color': "blue"},
-                 show_ticks=True,
-                 **kwargs):
-
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.show_bounds = show_bounds
-        self.show_ticks = show_ticks
-        self.axis_style = axis_style
-        self.number_to_text = number_to_text
-        self.normalize_each_axis = normalize_each_axis
-        self.bounds = bounds
+        self.show_bounds = kwargs["show_bounds"]
+        self.n_ticks = kwargs["n_ticks"]
+        self.normalize_each_axis = kwargs["normalize_each_axis"]
+
+        set_if_none(self.axis_style, "color", "red")
+        set_if_none(self.axis_style, "linewidth", 2)
+        set_if_none(self.axis_style, "alpha", 0.8)
 
     def _do(self):
         self.ax = self.fig.add_subplot(1, 1, 1)
 
-        if not self.normalize_each_axis:
+        # if no normalization of each axis the bounds are based on the overall min and max
+        if not self.normalize_each_axis and self.bounds is None:
             _F = np.row_stack([e[0] for e in self.to_plot])
             self.bounds = [_F.min(), _F.max()]
 
         self.parse_bounds()
-        self.normalize()
+        to_plot = self.normalize()
 
-        for k, (F, kwargs) in enumerate(self.to_plot):
-            set_if_none(kwargs, "color", self.cmap[k])
+        # plot for each set the lines
+        for k, (F, kwargs) in enumerate(to_plot):
+            set_if_none(kwargs, "color", self.colors[k])
 
             for i in range(len(F)):
                 plt.plot(np.arange(F.shape[1]), F[i, :], **kwargs)
 
+        # Plot the parallel coordinate axes
         for i in range(self.n_dim):
-            set_if_none(self.axis_style, "linewidth", 2)
-            set_if_none(self.axis_style, "alpha", 0.8)
             self.ax.axvline(i, **self.axis_style)
 
             bottom, top = -0.1, 1.075
             margin_left = 0.08
 
             if self.show_bounds:
-                self.ax.text(i - margin_left, bottom, self.number_to_text(self.bounds[0][i]))
-                self.ax.text(i - margin_left, top, self.number_to_text(self.bounds[1][i]))
+                self.ax.text(i - margin_left, bottom, self.func_number_to_text(self.bounds[0][i]))
+                self.ax.text(i - margin_left, top, self.func_number_to_text(self.bounds[1][i]))
 
-            if self.show_ticks:
+            if self.n_ticks is not None:
                 n_length = 0.03
-                for y in np.linspace(0, 1, 10):
+                for y in np.linspace(0, 1, self.n_ticks):
                     self.ax.hlines(y, i - n_length, i + n_length, **self.axis_style)
+
+        # if bounds are shown, then move them to the bottom
+        if self.show_bounds:
+            self.ax.tick_params(axis='x', which='major', pad=25)
 
         self.ax.spines['right'].set_visible(False)
         self.ax.spines['left'].set_visible(False)
@@ -68,19 +66,64 @@ class ParallelCoordinatePlot(Plot):
         self.ax.set_xticks(np.arange(self.n_dim))
         self.ax.set_xticklabels(self.get_labels())
 
-        if self.show_bounds:
-            self.ax.tick_params(axis='x', which='major', pad=25)
-
         return self
 
 
-if __name__ == "__main__":
-    np.random.seed(1)
+# =========================================================================================================
+# Interface
+# =========================================================================================================
 
-    X = UniformReferenceDirectionFactory(7, n_partitions=5).do()
-    X[:, 2] *= 10
 
-    ParallelCoordinatePlot(normalize_each_axis=True, bounds=[0.5, 1]) \
-        .add(X) \
-        .add(X[100], color="red", linewidth=3) \
-        .show()
+def pcp(bounds=None,
+        show_bounds=True,
+        n_ticks=5,
+        normalize_each_axis=True,
+        **kwargs):
+    """
+
+    Parallel Coordinate Plot
+
+
+    Parameters
+    ----------------
+
+    bounds : {bounds}
+
+    axis_style : {axis_style}
+
+    labels : {labels}
+
+    n_ticks : int
+        Number of ticks to be shown on each parallel axis.
+
+    show_bounds : bool
+        Whether the value of the boundaries are shown in the plot or not.
+
+    normalize_each_axis : bool
+        Whether the values should be normalized either by bounds or implictly.
+
+    Other Parameters
+    ----------------
+
+    figsize : {figsize}
+    title : {title}
+    legend : {legend}
+    tight_layout : {tight_layout}
+    cmap : {cmap}
+
+
+
+    Returns
+    -------
+    ParallelCoordinatePlot : :class:`~pymoo.model.analytics.visualization.ParallelCoordinatePlot`
+
+    """
+
+    return ParallelCoordinatePlot(bounds=bounds,
+                                  show_bounds=show_bounds,
+                                  n_ticks=n_ticks,
+                                  normalize_each_axis=normalize_each_axis,
+                                  **kwargs)
+
+
+parse_doc_string(pcp)

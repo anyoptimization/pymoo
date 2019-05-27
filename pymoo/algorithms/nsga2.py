@@ -288,7 +288,7 @@ def nsga2(
         pop_size=100,
         sampling=RandomSampling(),
         selection=TournamentSelection(func_comp=binary_tournament),
-        crossover=SimulatedBinaryCrossover(prob=0.9, eta=15),
+        crossover=SimulatedBinaryCrossover(eta=15, prob=0.9),
         mutation=PolynomialMutation(prob=None, eta=20),
         eliminate_duplicates=True,
         n_offsprings=None,

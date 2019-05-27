@@ -34,7 +34,7 @@ def get_setup(n_obj):
     return {
         'ref_dirs': ref_dirs,
         'pop_size': pop_size,
-        'crossover': SimulatedBinaryCrossover(1.0, 30),
+        'crossover': SimulatedBinaryCrossover(30, prob=1.0),
         'mutation': PolynomialMutation(20)
     }
 
@@ -201,7 +201,7 @@ if __name__ == '__main__':
     prefix = "runs"
 
     # name of the experiment
-    name = "pynsga3"
+    name = "pynsga3-0.3.1"
 
     # number of runs to execute
     n_runs = 50

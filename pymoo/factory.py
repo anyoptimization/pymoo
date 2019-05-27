@@ -17,6 +17,12 @@ from pymoo.algorithms.rnsga3 import rnsga3
 from pymoo.algorithms.so_de import de
 from pymoo.algorithms.so_genetic_algorithm import ga
 from pymoo.algorithms.unsga3 import unsga3
+from pymoo.analytics.visualization.pcp import ParallelCoordinatePlot
+from pymoo.analytics.visualization.petal_width import PetalWidth
+from pymoo.analytics.visualization.radar import Radar
+from pymoo.analytics.visualization.radviz import Radviz
+from pymoo.analytics.visualization.scatter import Scatter
+from pymoo.analytics.visualization.star import StarCoordinate
 from pymoo.docs import parse_doc_string
 from pymoo.model.termination import MaximumFunctionCallTermination, MaximumGenerationTermination, IGDTermination
 from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
@@ -32,10 +38,10 @@ from pymoo.operators.sampling.random_sampling import RandomSampling
 from pymoo.operators.selection.random_selection import RandomSelection
 from pymoo.operators.selection.tournament_selection import TournamentSelection
 
-
 # =========================================================================================================
 # Generic
 # =========================================================================================================
+from pymoo.problems.util import UniformReferenceDirectionFactory
 
 
 def get_from_list(l, name, args, kwargs):
@@ -230,3 +236,35 @@ parse_doc_string(dummy, get_termination, {"type": "termination",
 def get_problem(*args, **kwargs):
     from pymoo.problems.factory import get_problem as _get_problem
     return _get_problem(*args, **kwargs)
+
+
+# =========================================================================================================
+# Weights
+# =========================================================================================================
+
+REFERENCE_DIRECTIONS = [
+    ("uniform", UniformReferenceDirectionFactory)
+]
+
+
+def get_reference_directions(name, *args, d={}, **kwargs):
+    return get_from_list(REFERENCE_DIRECTIONS, name, args, {**d, **kwargs}).do()
+
+
+# =========================================================================================================
+# Visualization
+# =========================================================================================================
+
+VISUALIZATION = [
+    ("heat", Scatter),
+    ("pcp", ParallelCoordinatePlot),
+    ("petal", PetalWidth),
+    ("radar", Radar),
+    ("radviz", Radviz),
+    ("scatter", Scatter),
+    ("star", StarCoordinate)
+]
+
+
+def get_visualization(name, *args, d={}, **kwargs):
+    return get_from_list(VISUALIZATION, name, args, {**d, **kwargs})

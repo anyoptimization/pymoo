@@ -17,7 +17,7 @@ class RandomSampling(Sampling):
     def sample(self, problem, pop, n_samples, **kwargs):
 
         m = problem.n_var
-        val = np.random.random(size=(n_samples, m))
+        val = np.random.random((n_samples, m))
 
         if self.var_type == np.bool:
             val = np.random.random((n_samples, m))

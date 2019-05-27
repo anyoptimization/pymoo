@@ -1,7 +1,5 @@
-import numpy as np
-from matplotlib.patches import Circle
-
-from pymoo.analytics.visualization.plot import Plot
+from pymoo.analytics.visualization.util import get_circle_points
+from pymoo.model.plot import Plot
 from pymoo.operators.default_operators import set_if_none
 
 
@@ -11,25 +9,13 @@ class ProjectionPlot(Plot):
         super().__init__(figsize=(6, 6), **kwargs)
         self.V = None
 
-    def draw_axes(self):
-        extend_factor = 1.03
-        for x, y in self.V:
-            self.ax.arrow(0, 0, x * extend_factor, y * extend_factor, **self.axes_style)
-        self.ax.add_artist(Circle([0, 0], radius=0.01, color=self.axes_style["color"], alpha=0.5))
+        if self.axis_style is None:
+            self.axis_style = {
+                'color': 'grey',
+                'linewidth': 1,
+                'alpha': 0.8
+            }
 
-    def draw_axis_labels(self, labels):
-
-        for k in range(len(labels)):
-            xy = self.V[k]
-            margin = 0.035
-            if xy[0] < 0.0 and xy[1] < 0.0:
-                self.ax.text(xy[0] - margin, xy[1] - margin, labels[k], ha='right', va='top', size='small')
-            elif xy[0] < 0.0 and xy[1] >= 0.0:
-                self.ax.text(xy[0] - margin, xy[1] + margin, labels[k], ha='right', va='bottom', size='small')
-            elif xy[0] >= 0.0 and xy[1] < 0.0:
-                self.ax.text(xy[0] + margin, xy[1] - margin, labels[k], ha='left', va='top', size='small')
-            elif xy[0] >= 0.0 and xy[1] >= 0.0:
-                self.ax.text(xy[0] + margin, xy[1] + margin, labels[k], ha='left', va='bottom', size='small')
 
     def _do(self):
         _, n_obj = self.to_plot[0][0].shape
@@ -39,9 +25,7 @@ class ProjectionPlot(Plot):
         self.ax.set_ylim([-1.1, 1.1])
         self.ax.axis('equal')
 
-        t = 2 * np.pi * np.arange(n_obj) / n_obj
-        self.V = np.column_stack([np.cos(t), np.sin(t)])
-
+        self.V = get_circle_points(n_obj)
         self._plot()
 
         # Remove the ticks from the graph
@@ -50,8 +34,3 @@ class ProjectionPlot(Plot):
         self.ax.set_frame_on(False)
 
         return self
-
-    def set_default(self, kwargs):
-        set_if_none(kwargs, "s", 25)
-        set_if_none(kwargs, "facecolors", 'none')
-        set_if_none(kwargs, "alpha", 1.0)

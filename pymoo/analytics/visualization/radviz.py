@@ -1,26 +1,32 @@
-import numpy as np
-from matplotlib import patches
-
 from pymoo.analytics.visualization.projection import ProjectionPlot
-from pymoo.analytics.visualization.util import plot_radar_line
-from pymoo.problems.util import UniformReferenceDirectionFactory
+from pymoo.analytics.visualization.util import plot_circle, plot_radar_line
+from pymoo.docs import parse_doc_string
 
 
 class Radviz(ProjectionPlot):
-    """
-    Inspired by https://github.com/DistrictDataLabs/yellowbrick/blob/master/yellowbrick/features/radviz.py
-    """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if "endpoint_style" not in kwargs:
+            self.endpoint_style = {
+                "color": "black",
+                "s": 70,
+                "alpha": 0.3
+            }
+        else:
+            self.endpoint_style = kwargs["endpoint_style"]
 
     def _plot(self):
 
-        self.draw_axis_labels(self.get_labels())
+        self.draw_axis_labels(self.get_labels(), self.V)
 
-        # draw the outer circle
-        self.ax.add_patch(patches.Circle((0.0, 0.0), radius=1.0, facecolor='none', edgecolor='grey', linewidth=.5))
+        # draw the outer circle and radar lines
+        plot_circle(self.ax, **self.axis_style)
+        plot_radar_line(self.ax, self.V, **self.axis_style)
 
-        # plot the lines from each objective point
-        plot_radar_line(self.ax, self.V, {'color': "grey"})
-        self.ax.scatter(self.V[:, 0], self.V[:, 1], color="black")
+        # draw the endpoints of each objective
+        if self.endpoint_style:
+            self.ax.scatter(self.V[:, 0], self.V[:, 1], **self.endpoint_style)
 
         # plot all the points
         for k, (F, kwargs) in enumerate(self.to_plot):
@@ -28,20 +34,41 @@ class Radviz(ProjectionPlot):
             self.ax.scatter(N[:, 0], N[:, 1], **kwargs)
 
 
-def radviz_pandas(F):
-    import pandas as pd
-    df = pd.DataFrame([x for x in F], columns=["X%s" % k for k in range(F.shape[1])])
-    df["class"] = "Points"
-    return pd.plotting.radviz(df, "class")
+# =========================================================================================================
+# Interface
+# =========================================================================================================
 
 
-if __name__ == "__main__":
-    np.random.seed(1)
+def radviz(**kwargs):
+    """
 
-    # Radviz().add(np.random.random((1000, 7))).show()
-    # Radviz().add(sample_on_simplex(10000,7)).show()
+    Radviz Plot
 
-    X = UniformReferenceDirectionFactory(6, n_partitions=5).do()
+    Parameters
+    ----------------
 
-    Radviz().add(X).save("test.pdf").show()
-    # Radviz().add(np.eye(5)[[0], :]).show()
+    axis_style : {axis_style}
+    endpoint_style : dict
+        Endpoints are drawn at each extreme point of an objective. This style can be modified.
+    labels : {labels}
+
+    Other Parameters
+    ----------------
+
+    figsize : {figsize}
+    title : {title}
+    legend : {legend}
+    tight_layout : {tight_layout}
+    cmap : {cmap}
+
+
+    Returns
+    -------
+    Radviz : :class:`~pymoo.model.analytics.visualization.radviz.Radviz`
+
+    """
+
+    return Radviz(**kwargs)
+
+
+parse_doc_string(radviz)

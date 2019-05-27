@@ -1,6 +1,7 @@
 import numpy as np
 
 from pymoo.model.mutation import Mutation
+from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds
 
 
 class PolynomialMutation(Mutation):
@@ -64,6 +65,9 @@ class PolynomialMutation(Mutation):
 
         # set the values for output
         Y[do_mutation] = _Y
+
+        # in case out of bounds repair (very unlikely)
+        Y = repair_out_of_bounds(problem, Y)
 
         if self.var_type == np.int:
             Y = np.rint(Y).astype(np.int)

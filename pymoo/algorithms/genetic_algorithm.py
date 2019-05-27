@@ -8,7 +8,6 @@ from pymoo.model.individual import Individual
 from pymoo.model.population import Population
 
 
-
 class GeneticAlgorithm(Algorithm):
 
     def __init__(self,
@@ -19,7 +18,7 @@ class GeneticAlgorithm(Algorithm):
                  mutation,
                  survival,
                  n_offsprings=None,
-                 eliminate_duplicates=False,
+                 eliminate_duplicates=True,
                  repair=None,
                  individual=Individual(),
                  **kwargs

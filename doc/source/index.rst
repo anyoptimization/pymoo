@@ -85,7 +85,8 @@ Features
 
 .. **Decomposition:** :ref:`ASF <nb_asf>`, :ref:`Tchebichef <nb_thebi>`
 
-.. **Visualization:** :ref:`Scatter <nb_scatter>`, :ref:`PCP <nb_pcp>`
+**Visualization:** :ref:`Scatter <nb_scatter>`, :ref:`Parallel Coordinate Plot (PCP) <nb_pcp>`, :ref:`Heatmap <nb_heat>` , :ref:`Petal Width<nb_petal_width>`,
+:ref:`Radar <nb_radar>`, :ref:`Radviz <nb_radviz>`, :ref:`Star Coordinate <nb_star>`
 
 
 About

@@ -1,61 +1,142 @@
+import matplotlib.pyplot as plt
 import numpy as np
 
-from pymoo.analytics.visualization.star import StarCoordinate
-from pymoo.analytics.visualization.util import plot_radar_line
+from pymoo.analytics.visualization.util import plot_axes_lines, plot_axis_labels, plot_polygon, get_circle_points, \
+    plot_radar_line
+from pymoo.docs import parse_doc_string
+from pymoo.model.plot import Plot
 from pymoo.operators.default_operators import set_if_none
 
 
-class Radar(StarCoordinate):
+class Radar(Plot):
 
-    def __init__(self, n_partitions=5, **kwargs):
+    def __init__(self, **kwargs):
+
         super().__init__(**kwargs)
-        self.n_partitions = n_partitions
+        self.normalize_each_objective = kwargs["normalize_each_objective"]
+        self.n_partitions = kwargs["n_partitions"]
 
-    def _plot(self):
+        self.polygon_style = kwargs["polygon_style"]
+        set_if_none(self.polygon_style, "alpha", 0.5)
 
-        # plot the lines from each objective point
-        lines = np.row_stack([self.V, self.V[0]])
+        self.point_style = kwargs["point_style"]
+        set_if_none(self.point_style, "s", 15)
 
-        for e in np.linspace(0, 1, self.n_partitions):
-            self.ax.plot(lines[:, 0] * e, lines[:, 1] * e, color="grey", alpha=0.5)
-            # self.ax.scatter(self.V[:, 0] * e, self.V[:, 1] * e, color="grey", alpha=0.5)
+        set_if_none(self.axis_style, "color", "black")
+        set_if_none(self.axis_style, "linewidth", 0.5)
+        set_if_none(self.axis_style, "alpha", 0.8)
 
-        self.draw_axes()
-        self.draw_axis_labels(self.get_labels())
+    def _plot(self, ax, _F, inner, outer, kwargs):
 
-        # normalize in range
+        ax.set_xlim([-1.1, 1.1])
+        ax.set_ylim([-1.1, 1.1])
+        ax.axis('equal')
+
+        plot_axes_lines(ax, outer, extend_factor=1.0, **self.axis_style)
+        plot_axis_labels(ax, outer, self.get_labels(), margin=0.015)
+
+        plot_radar_line(ax, outer, **self.axis_style)
+        plot_polygon(ax, inner)
+
+        _F = inner + _F[:, None] * (outer - inner)
+
+        kwargs["alpha"] = 0.95
+        ax.scatter(_F[:, 0], _F[:, 1], **self.point_style)
+
+        kwargs["alpha"] = 0.35
+        kwargs["label"] = None
+        plot_polygon(ax, _F, **self.polygon_style)
+
+        # Remove the ticks from the graph
+        ax.set_yticks([])
+        ax.set_xticks([])
+        ax.set_frame_on(False)
+
+    def _do(self):
+
+        n_rows = len(self.to_plot)
+        n_cols = max([len(e[0]) for e in self.to_plot])
+        self.fig, axes = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=self.figsize)
+        axes = np.array(axes).reshape(n_rows, n_cols)
+
         self.parse_bounds()
-        self.normalize()
+        to_plot = self.normalize()
 
-        # plot all the points
-        for k, (F, kwargs) in enumerate(self.to_plot):
+        self.V = get_circle_points(self.n_dim)
 
-            set_if_none(kwargs, "color", self.cmap[k])
+        if self.bounds is None:
+            raise Exception("The boundaries must be provided.")
 
-            for k, F in enumerate(F):
-                N = (1 - F[:, None]) * self.V
+        _F = np.row_stack([e[0] for e in self.to_plot])
+        if np.any(_F < self.bounds[0]) or np.any(_F > self.bounds[1]):
+            raise Exception(
+                "Points out of the boundaries exist! Please make sure the boundaries are indeed boundaries.")
 
-                kwargs["alpha"] = 0.95
-                self.ax.scatter(N[:, 0], N[:, 1], **kwargs)
+        if self.normalize_each_objective:
+            inner = np.zeros((self.n_dim, 1)) * self.V
+            outer = np.ones((self.n_dim, 1)) * self.V
+        else:
+            inner = self.bounds[[0]].T * self.V
+            outer = (self.bounds[[1]].T * self.V) / self.bounds[1].max()
 
-                kwargs["alpha"] = 0.35
-                kwargs["label"] = None
-                plot_radar_line(self.ax, N, kwargs, filled=True)
+        for k, (F, kwargs) in enumerate(to_plot):
+
+            if self.reverse:
+                F = 1 - F
+
+            for j, _F in enumerate(F):
+                self._plot(axes[k, j], _F, inner, outer, kwargs)
 
 
+# =========================================================================================================
+# Interface
+# =========================================================================================================
 
 
-if __name__ == "__main__":
-    np.random.seed(2)
+def radar(normalize_each_objective=True,
+          n_partitions=3,
+          polygon_style={},
+          point_style={},
+          **kwargs):
+    """
 
-    # Radviz().add(np.random.random((1000, 7))).show()
-    # Radviz().add(sample_on_simplex(10000,7)).show()
+    Radar Plot
 
-    X = np.random.random((1, 5))
-    print(X)
+    Parameters
+    ----------------
+    normalize_each_objective : bool
+        Whether each objective is normalized. Otherwise the inner and outer bound is plotted.
 
-    Radar(legend=True, bounds=[0,1]) \
-        .add(np.array([0.1, 0.1, 0.1, 0.1, 0.1]), label="First") \
-        .add(np.array([0.6, 0.4, 0.3, 0.2, 0.6]), label="second") \
-        .show()
-    # Radviz().add(np.eye(5)[[0], :]).show()
+    polygon_style : dict
+        The style being used for the polygon
+
+    n_partitions : int
+        Number of partitions to show in the radar.
+
+    axis_style : {axis_style}
+    labels : {labels}
+
+    Other Parameters
+    ----------------
+
+    figsize : {figsize}
+    title : {title}
+    legend : {legend}
+    tight_layout : {tight_layout}
+    cmap : {cmap}
+
+
+    Returns
+    -------
+    Radar : :class:`~pymoo.model.analytics.visualization.radar.Radar`
+
+    """
+
+    return Radar(normalize_each_objective=normalize_each_objective,
+                 n_partitions=n_partitions,
+                 polygon_style=polygon_style,
+                 point_style=point_style,
+                 **kwargs)
+
+
+parse_doc_string(radar)
