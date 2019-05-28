@@ -1,5 +1,8 @@
 import unittest
 
+import autograd.numpy as anp
+from pymop.factory import get_problem
+
 from pymoo.problems import *
 import os
 
@@ -28,10 +31,10 @@ problems = [
     ('C1DTLZ1', [12, 3]), ('C2DTLZ2', [12, 3]), ('C3DTLZ4', [7, 3]),
     ('ZDT1', [10]), ('ZDT2', [10]), ('ZDT3', [10]), ('ZDT4', [10]), ('ZDT6', [10]),
     ('TNK', []), ('Rosenbrock', [10]), ('Rastrigin', [10]), ('Griewank', [10]), ('OSY', []), ('Kursawe', []),
-    ('WeldedBeam', []), ('Carside', []), ('BNH', []), ('CantileveredBeam', []), ('PressureVessel', []),
-    ('G1', []), ('G2', []), ('G3', []), ('G4', []), ('G5', []), ('G6', []), ('G7', []), ('G8', []),
-    ('G9', []), ('G10', []),
-    ('ctp1', []), ('ctp2', []), ('ctp3', []), ('ctp4', []), ('ctp5', []), ('ctp6', []), ('ctp7', []), ('ctp8', []),
+    ('Welded_Beam', []), ('Carside', []), ('BNH', []), ('Cantilevered_Beam', []), ('Pressure_Vessel', []),
+    ('G01', []), ('G02', []), ('G03', []), ('G04', []), ('G05', []), ('G06', []), ('G07', []), ('G08', []),
+    ('G09', []), ('G10', []),
+    #('ctp1', []), ('ctp2', []), ('ctp3', []), ('ctp4', []), ('ctp5', []), ('ctp6', []), ('ctp7', []), ('ctp8', []),
 
 
 ]
@@ -50,7 +53,7 @@ class CorrectnessTest(unittest.TestCase):
                 print("Warning: No correctness check for %s" % name)
                 continue
 
-            problem = globals()[name](*params)
+            problem = get_problem(name, *params)
             _F, _G, _CV, _dF, _dG = problem.evaluate(X, return_values_of=["F", "G", "CV", "dF", "dG"])
 
             if problem.n_obj == 1:

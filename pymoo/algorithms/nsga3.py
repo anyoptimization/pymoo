@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 from numpy.linalg import LinAlgError
 
@@ -166,6 +168,7 @@ def get_nadir_point(extreme_points, ideal_point, worst_point, worst_of_front, wo
         M = extreme_points - ideal_point
         b = np.ones(extreme_points.shape[1])
         plane = np.linalg.solve(M, b)
+        warnings.simplefilter("ignore")
         intercepts = 1 / plane
 
         nadir_point = ideal_point + intercepts

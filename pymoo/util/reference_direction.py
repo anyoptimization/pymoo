@@ -217,7 +217,8 @@ class UniformReferenceDirectionFactory(ReferenceDirectionFactory):
 class MultiLayerReferenceDirectionFactory:
 
     def __init__(self, *args) -> None:
-        self.layers = args
+        self.layers = []
+        self.layers.extend(args)
 
     def add_layer(self, *args):
         self.layers.extend(args)

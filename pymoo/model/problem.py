@@ -196,6 +196,11 @@ class Problem:
         # whether gradient calculation is necessary or not
         calc_gradient = (len(gradients_not_set) > 0)
 
+        # set in the dictionary if the output should be calculated - can be used for the gradient
+        out = {}
+        for val in return_values_of:
+            out[val] = None
+
         # calculate the output array - either elementwise or not. also consider the gradient
         if self.elementwise_evaluation:
             out = self._evaluate_elementwise(X, calc_gradient, *args, **kwargs)

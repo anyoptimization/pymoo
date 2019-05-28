@@ -5,10 +5,10 @@ from pymoo.model.indicator import Indicator
 
 
 class GD(Indicator):
-    def __init__(self, true_front):
+    def __init__(self, pf):
         Indicator.__init__(self)
-        self.pareto_front = true_front
+        self.pf = pf
 
     def _calc(self, F):
-        v = cdist(F, self.pareto_front)
-        return np.mean(np.min(v, axis=1))
+        D = cdist(self.pf, F)
+        return np.mean(np.min(D, axis=0))

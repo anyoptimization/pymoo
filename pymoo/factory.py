@@ -17,6 +17,12 @@ from pymoo.algorithms.rnsga3 import rnsga3
 from pymoo.algorithms.so_de import de
 from pymoo.algorithms.so_genetic_algorithm import ga
 from pymoo.algorithms.unsga3 import unsga3
+from pymoo.analytics.performance_indicator.gd import GD
+from pymoo.analytics.performance_indicator.gd_plus import GDPlus
+from pymoo.analytics.performance_indicator.hv import Hypervolume
+from pymoo.analytics.performance_indicator.igd import IGD
+from pymoo.analytics.performance_indicator.igd_plus import IGDPlus
+from pymoo.analytics.performance_indicator.rmetric import RMetric
 from pymoo.analytics.visualization.pcp import ParallelCoordinatePlot
 from pymoo.analytics.visualization.petal_width import PetalWidth
 from pymoo.analytics.visualization.radar import Radar
@@ -37,7 +43,6 @@ from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSamp
 from pymoo.operators.sampling.random_sampling import RandomSampling
 from pymoo.operators.selection.random_selection import RandomSelection
 from pymoo.operators.selection.tournament_selection import TournamentSelection
-
 # =========================================================================================================
 # Generic
 # =========================================================================================================
@@ -46,9 +51,9 @@ from pymoo.problems.util import UniformReferenceDirectionFactory
 
 def get_from_list(l, name, args, kwargs):
     i = None
-    for k, e in enumerate(l):
 
-        if re.match(e[0], name):
+    for k, e in enumerate(l):
+        if e[0] == name:
             i = k
             break
 
@@ -268,3 +273,21 @@ VISUALIZATION = [
 
 def get_visualization(name, *args, d={}, **kwargs):
     return get_from_list(VISUALIZATION, name, args, {**d, **kwargs})
+
+
+# =========================================================================================================
+# Performance Indicator
+# =========================================================================================================
+
+PERFORMANCE_INDICATOR = [
+    ("gd", GD),
+    ("igd", IGD),
+    ("gd+", GDPlus),
+    ("igd+", IGDPlus),
+    ("hv", Hypervolume),
+    ("rmetric", RMetric)
+]
+
+
+def get_performance_indicator(name, *args, d={}, **kwargs):
+    return get_from_list(PERFORMANCE_INDICATOR, name, args, {**d, **kwargs})

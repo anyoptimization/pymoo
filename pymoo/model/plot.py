@@ -38,7 +38,7 @@ class Plot:
         self.title = title
 
         # the style to be used for the axis
-        self.axis_style = axis_style
+        self.axis_style = axis_style.copy()
 
         # how numbers are represented if plotted
         self.func_number_to_text = func_number_to_text

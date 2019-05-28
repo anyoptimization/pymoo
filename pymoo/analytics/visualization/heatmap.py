@@ -54,7 +54,7 @@ class Heatmap(Plot):
 
         # no solution labels should be used
         if self.solution_labels is None:
-            self.solution_labels = ["" for _ in range(len(F))]
+            pass
 
         # in case just true just use a number for each solution
         elif isinstance(self.solution_labels, bool) and self.solution_labels:
@@ -66,11 +66,17 @@ class Heatmap(Plot):
                 raise Exception(
                     "The labels provided for each solution must be equal to the number of solutions being plotted.")
 
-        # for ordered by objective apply it to labels
-        self.solution_labels = [self.solution_labels[i] for i in I]
+        if self.solution_labels is None:
+            self.ax.set_yticks([])
+            self.ax.set_yticklabels([])
 
-        self.ax.set_yticks(np.arange(len(F)))
-        self.ax.set_yticklabels(self.solution_labels)
+        else:
+
+            # for ordered by objective apply it to labels
+            self.solution_labels = [self.solution_labels[i] for i in I]
+
+            self.ax.set_yticks(np.arange(len(F)))
+            self.ax.set_yticklabels(self.solution_labels)
 
 
 # =========================================================================================================

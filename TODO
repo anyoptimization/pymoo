@@ -1,22 +1,30 @@
 # TODO
 
 - Deliver just .c files for pip to make the build independent from Cython
+
 - Improve and write documentation for decomposition
 - Add sidebar to homepage
+
 - Write test suite for all algorithms (many problems just run once - no crash should occur)
+
 - NSGA3 - add non-dom check finally (factor out the algorithm method and reuse)
+
 - Remove image file from git history
 
 - Add NoCrossover and NoMutation
 
 - Rewrite integer operation with a wrapper
+
 - Implement an async version of algorithms
+
 - (mu,lambda) and (mu+lambda) difference
 
 - Add global tests of all optimization methods
+
 - Add mixed variable possibility
 
 - PCX as crossover
+
 - Decision Making (Pseudo Weight, ...)
 
 - IGD+
@@ -29,7 +37,7 @@
 - ask and tell interface
 
 - elementwise function evaluation gradient is not working yet
-- Performance check nsga3
+
 
 
 
@@ -38,3 +46,4 @@
 - Add ZDT5 and show it for NSGA2
 - 0.9 prob for crossover in general
 - add normalization to radar - externalize from pcp
+- Performance check nsga3
