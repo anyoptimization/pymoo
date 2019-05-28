@@ -1,11 +1,12 @@
 import numpy as np
 
-from pymoo.analytics.visualization.projection import ProjectionPlot
-from pymoo.analytics.visualization.util import plot_axes_arrow
+from pymoo.analytics.visualization.util import plot_axes_arrow, plot_axis_labels, equal_axis, no_ticks, parse_bounds, \
+    normalize, get_uniform_points_around_circle
 from pymoo.docs import parse_doc_string
+from pymoo.model.plot import Plot
 
 
-class StarCoordinate(ProjectionPlot):
+class StarCoordinate(Plot):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -20,20 +21,30 @@ class StarCoordinate(ProjectionPlot):
         else:
             self.arrow_style = kwargs["arrow_style"]
 
-    def _plot(self):
+    def _do(self):
+
+        # initial a figure with a single plot
+        self.init_figure()
+
+        # equal axis length and no ticks
+        equal_axis(self.ax)
+        no_ticks(self.ax)
+
+        # determine the overall scale of points
         _F = np.row_stack([e[0] for e in self.to_plot])
         _min, _max = _F.min(axis=0), _F.max(axis=0)
 
-        _style = {**self.axis_style, **self.arrow_style}
-        plot_axes_arrow(self.ax, self.V, extend_factor=self.axis_extension, **_style)
-        self.draw_axis_labels(self.get_labels(), self.V)
+        V = get_uniform_points_around_circle(self.n_dim)
+
+        plot_axes_arrow(self.ax, V, extend_factor=self.axis_extension, **{**self.axis_style, **self.arrow_style})
+        plot_axis_labels(self.ax, V, self.get_labels())
 
         # normalize in range for this plot - here no implicit normalization as in radviz
-        self.parse_bounds()
-        to_plot = self.normalize()
+        bounds = parse_bounds(self.bounds, self.n_dim)
+        to_plot_norm = normalize(self.to_plot, bounds)
 
-        for k, (F, kwargs) in enumerate(to_plot):
-            N = (F[..., None] * self.V).sum(axis=1)
+        for k, (F, kwargs) in enumerate(to_plot_norm):
+            N = (F[..., None] * V).sum(axis=1)
             self.ax.scatter(N[:, 0], N[:, 1], **kwargs)
 
 

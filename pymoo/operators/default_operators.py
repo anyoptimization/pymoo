@@ -1,5 +1,5 @@
-from pymoo.operators.crossover.uniform_crossover import UniformCrossover
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.crossover.uniform_crossover import UniformCrossover
 from pymoo.operators.mutation.bitflip_mutation import BinaryBitflipMutation
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import RandomSampling
@@ -9,6 +9,12 @@ from pymoo.operators.selection.random_selection import RandomSelection
 def set_if_none(kwargs, str, val):
     if str not in kwargs:
         kwargs[str] = val
+
+
+def set_if_none_from_tuples(kwargs, *args):
+    for key, val in args:
+        if key not in kwargs:
+            kwargs[key] = val
 
 
 def set_default_if_none(var_type, kwargs):

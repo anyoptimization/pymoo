@@ -1,41 +1,24 @@
-# START scatter2d_load
-from pymoo.factory import get_problem
-F = get_problem("zdt3").pareto_front()
-# END scatter2d_load
+# START load_data
 
-# START scatter2d
-from pymoo.analytics.visualization.pcp import pcp
-pcp().add(F).show()
-# END scatter2d
+from pymoo.factory import get_problem, get_reference_directions
 
+ref_dirs = get_reference_directions("uniform", 6, n_partitions=5)
+F = get_problem("dtlz1").pareto_front(ref_dirs)
+# END load_data
 
-# START pcp_highlight
-plot = pcp()
-plot.set_axis_style(color="grey", alpha=0.5)
-plot.add(F, color="grey", alpha=0.3)
-plot.add(F[50], linewidth=5, color="red")
-plot.add(F[75], linewidth=5, color="blue")
+# START radviz
+from pymoo.analytics.visualization.radviz import radviz
+radviz().add(F).show()
+# END radviz
+
+# START radviz_custom
+plot = radviz(title="Optimization",
+              legend=(True, {'loc': "upper left", 'bbox_to_anchor': (-0.1, 1.08, 0, 0)}),
+              labels=["profit", "cost", "sustainability", "environment", "satisfaction", "time"],
+              endpoint_style={"s": 70, "color": "green"})
+plot.set_axis_style(color="black", alpha=1.0)
+plot.add(F, color="grey", s=20)
+plot.add(F[65], color="red", s=70, label="Solution A")
+plot.add(F[72], color="blue", s=70, label="Solution B")
 plot.show()
-# END pcp_highlight
-
-
-# START pcp_other
-plot = pcp(title=("Run", {'pad': 30}),
-           n_ticks=10,
-           legend=(True, {'loc': "upper left"}),
-           labels=["profit", "cost", "sustainability", "environment", "satisfaction", "time"]
-           )
-
-plot.set_axis_style(color="grey", alpha=1)
-plot.add(F, color="grey", alpha=0.3)
-plot.add(F[50], linewidth=5, color="red", label="Solution A")
-plot.add(F[75], linewidth=5, color="blue", label="Solution B")
-plot.show()
-# END pcp_other
-
-# START pcp_norm
-plot.reset()
-plot.normalize_each_axis = False
-plot.bounds = [[1, 1, 1, 2, 2, 5], [32, 32, 32, 32, 32, 32]]
-plot.show()
-# END pcp_norm
+# END radviz_custom

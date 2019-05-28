@@ -73,6 +73,48 @@ def plot_axis_labels(ax, endpoints, labels, margin=0.035):
         ax.text(x, y, labels[k], ha=ha, va=va, size='small')
 
 
+def equal_axis(ax):
+    ax.set_xlim([-1.1, 1.1])
+    ax.set_ylim([-1.1, 1.1])
+    ax.axis('equal')
+
+
+def no_ticks(ax):
+    ax.set_yticks([])
+    ax.set_xticks([])
+    ax.set_frame_on(False)
+
+
+def normalize(data, bounds, reverse=False, return_bounds=False):
+    from pymoo.util.normalization import normalize as _normalize
+
+    _F = np.row_stack([e[0] for e in data])
+    if bounds is None:
+        bounds = (_F.min(axis=0), _F.max(axis=0))
+
+    to_plot = []
+    for k in range(len(data)):
+        F = _normalize(data[k][0], bounds[0], bounds[1])
+
+        if reverse:
+            F = 1 - F
+
+        to_plot.append([F, data[k][1]])
+
+    if return_bounds:
+        return to_plot, bounds
+    else:
+        return to_plot
+
+
+def parse_bounds(bounds, n_dim):
+    if bounds is not None:
+        bounds = np.array(bounds, dtype=np.float)
+        if bounds.ndim == 1:
+            bounds = bounds[None, :].repeat(n_dim, axis=0).T
+    return bounds
+
+
 def radviz_pandas(F):
     import pandas as pd
     df = pd.DataFrame([x for x in F], columns=["X%s" % k for k in range(F.shape[1])])

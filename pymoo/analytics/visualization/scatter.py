@@ -1,7 +1,3 @@
-import importlib
-
-import matplotlib.pyplot as plt
-
 from pymoo.docs import parse_doc_string
 from pymoo.model.plot import Plot
 from pymoo.operators.default_operators import set_if_none
@@ -22,21 +18,22 @@ class Scatter(Plot):
         is_3d = (self.n_dim == 3)
         more_than_3d = (self.n_dim > 3)
 
-        # create the axis object
+        # create the figure and axis objects
         if is_2d:
-            self.ax = self.fig.add_subplot(1, 1, 1)
+            self.init_figure()
         elif is_3d:
-            importlib.import_module("mpl_toolkits.mplot3d")
-            self.ax = self.fig.add_subplot(1, 1, 1, projection='3d')
+            self.init_figure(plot_3D=True)
         elif more_than_3d:
-            self.fig, self.ax = plt.subplots(nrows=self.n_dim, ncols=self.n_dim, figsize=self.figsize)
+            self.init_figure(n_rows=self.n_dim, n_cols=self.n_dim)
 
-        # plot for each entry
+        # now plot data points for each entry
         for k, (F, kwargs) in enumerate(self.to_plot):
 
+            # copy the arguments and set the default color
             _kwargs = kwargs.copy()
             set_if_none(_kwargs, "color", self.colors[k])
 
+            # determine the plotting type - scatter or line
             _type = _kwargs.get("plot_type")
             if "plot_type" in _kwargs:
                 del _kwargs["plot_type"]
@@ -46,7 +43,7 @@ class Scatter(Plot):
 
             elif is_2d:
                 self.get_plot_func(self.ax, _type)(F[:, 0], F[:, 1], **_kwargs)
-
+                self.set_labels(self.ax, self.get_labels(), False)
             elif is_3d:
                 set_if_none(_kwargs, "alpha", 1.0)
 
@@ -54,8 +51,13 @@ class Scatter(Plot):
                 self.ax.xaxis.pane.fill = False
                 self.ax.yaxis.pane.fill = False
                 self.ax.zaxis.pane.fill = False
-            else:
 
+                self.set_labels(self.ax, self.get_labels(), True)
+
+                if self.angle is not None:
+                    self.ax.view_init(45, 45)
+
+            else:
                 labels = self.get_labels()
 
                 for i in range(self.n_dim):
@@ -71,13 +73,6 @@ class Scatter(Plot):
                             ax.set_yticks([])
                             ax.scatter(0, 0, s=1, color="white")
                             ax.text(0, 0, labels[i], ha='center', va='center', fontsize=20)
-
-        if is_2d or is_3d:
-            self.set_labels(self.ax, self.get_labels(), is_3d)
-
-        if is_3d:
-            if self.angle is not None:
-                self.ax.view_init(45, 45)
 
         return self
 

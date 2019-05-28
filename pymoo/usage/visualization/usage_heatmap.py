@@ -17,7 +17,6 @@ plot = heatmap(title=("Optimization", {'pad': 15}),
                labels=["profit", "cost", "sustainability", "environment", "satisfaction", "time"])
 plot.add(F)
 plot.show()
-
 # END heatmap_custom
 
 # START heatmap_custom_more

@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pymoo.analytics.visualization.util import get_circle_points, plot_axes_lines, \
-    plot_axis_labels, plot_circle, plot_polygon
+    plot_axis_labels, plot_circle, plot_polygon, parse_bounds, normalize, equal_axis, no_ticks
 from pymoo.docs import parse_doc_string
 from pymoo.model.plot import Plot
 from pymoo.operators.default_operators import set_if_none
@@ -22,16 +22,11 @@ class PetalWidth(Plot):
 
     def _plot(self, ax, F):
 
-        ax.set_xlim([-1.1, 1.1])
-        ax.set_ylim([-1.1, 1.1])
-        ax.axis('equal')
+        # equal axis length and no ticks
+        equal_axis(ax)
+        no_ticks(ax)
 
-        self.V = get_circle_points(len(F))
-
-        # Remove the ticks from the graph
-        ax.set_yticks([])
-        ax.set_xticks([])
-        ax.set_frame_on(False)
+        V = get_circle_points(len(F))
 
         # sections to plot
         sections = np.linspace(0, 2 * np.pi, self.n_dim + 1)
@@ -51,27 +46,21 @@ class PetalWidth(Plot):
 
         # draw the outer circle
         plot_circle(ax, **self.axis_style)
-        plot_axes_lines(ax, self.V, **self.axis_style)
+        plot_axes_lines(ax, V, **self.axis_style)
 
     def _do(self):
 
-        _, n_obj = self.to_plot[0][0].shape
-
         n_rows = len(self.to_plot)
         n_cols = max([len(e[0]) for e in self.to_plot])
-        self.fig, axes = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=self.figsize)
-        axes = np.array(axes).reshape(n_rows, n_cols)
+        self.init_figure(n_rows=n_rows, n_cols=n_cols, force_axes_as_matrix=True)
 
-        self.parse_bounds()
-        to_plot = self.normalize()
+        # normalize the input
+        bounds = parse_bounds(self.bounds, self.n_dim)
+        to_plot_norm = normalize(self.to_plot, bounds, reverse=self.reverse)
 
-        for k, (F, kwargs) in enumerate(to_plot):
-
-            if self.reverse:
-                F = 1 - F
-
+        for k, (F, kwargs) in enumerate(to_plot_norm):
             for j, _F in enumerate(F):
-                self._plot(axes[k, j], _F)
+                self._plot(self.ax[k, j], _F)
 
 
 # =========================================================================================================

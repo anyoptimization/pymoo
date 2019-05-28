@@ -1,3 +1,5 @@
+import importlib
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -5,10 +7,9 @@ from matplotlib.colors import ListedColormap
 
 from pymoo.analytics.visualization.util import default_number_to_text, in_notebook
 from pymoo.operators.default_operators import set_if_none
-from pymoo.util.normalization import normalize
 
 
-class Plot():
+class Plot:
 
     def __init__(self,
                  figsize=(8, 6),
@@ -20,41 +21,67 @@ class Plot():
                  cmap="tab10",
                  axis_style={},
                  func_number_to_text=default_number_to_text,
-                 labels="f",
+                 axis_labels="f",
                  **kwargs):
 
         super().__init__()
-        self.figsize = figsize
-        self.fig = plt.figure(figsize=figsize)
 
-        self.to_plot = []
+        # change the font of plots to serif (looks better)
+        plt.rc('font', family='serif')
+
+        # the matplotlib classes
+        self.fig = None
         self.ax = None
+        self.figsize = figsize
+
+        # the title of the figure - can also be a list if subfigures
+        self.title = title
+
+        # the style to be used for the axis
+        self.axis_style = axis_style
+
+        # how numbers are represented if plotted
+        self.func_number_to_text = func_number_to_text
+
+        # if data are normalized reverse can be applied
+        self.reverse = reverse
+
+        # the labels for each axis
+        self.axis_labels = axis_labels
+
+        # the data to plot
+        self.to_plot = []
+
+        # whether to plot a legend or apply tight layout
         self.legend = legend
         self.tight_layout = tight_layout
 
+        # the colormap or the color lists to use
         if isinstance(cmap, str):
             self.cmap = matplotlib.cm.get_cmap(cmap)
         else:
             self.cmap = cmap
-
         if isinstance(self.cmap, ListedColormap):
             self.colors = self.cmap.colors
 
-        self.axis_style = axis_style
-
-        self.func_number_to_text = func_number_to_text
-
-        self.labels = labels
-        self.title = title
+        # the dimensional of the data
         self.n_dim = None
 
+        # the boundaries for normalization
         self.bounds = bounds
-        self.reverse = reverse
 
-        plt.rc('font', family='serif')
-        # plt.rc('text', usetex=True)
-        # plt.rc('xtick', labelsize='x-small')
-        # plt.rc('ytick', labelsize='x-small')
+    def init_figure(self, n_rows=1, n_cols=1, plot_3D=False, force_axes_as_matrix=False):
+
+        if not plot_3D:
+            self.fig, self.ax = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=self.figsize)
+        else:
+            importlib.import_module("mpl_toolkits.mplot3d")
+            self.fig = plt.figure()
+            self.ax = self.fig.add_subplot(1, 1, 1, projection='3d')
+
+        # if there is more than one figure we represent it as a 2D numpy array
+        if (n_rows > 1 or n_cols > 1) or force_axes_as_matrix:
+            self.ax = np.array(self.ax).reshape(n_rows, n_cols)
 
     def do(self):
 
@@ -70,25 +97,6 @@ class Plot():
         self._do()
 
         return self
-
-    def parse_bounds(self):
-        if self.bounds is not None:
-            self.bounds = np.array(self.bounds, dtype=np.float)
-            if self.bounds.ndim == 1:
-                self.bounds = self.bounds[None, :].repeat(self.n_dim, axis=0).T
-
-    def normalize(self):
-
-        _F = np.row_stack([e[0] for e in self.to_plot])
-        if self.bounds is None:
-            self.bounds = (_F.min(axis=0), _F.max(axis=0))
-
-        to_plot = []
-        for k in range(len(self.to_plot)):
-            F = normalize(self.to_plot[k][0], self.bounds[0], self.bounds[1])
-            to_plot.append([F, self.to_plot[k][1]])
-
-        return to_plot
 
     def apply(self, func):
         func(self.ax)
@@ -121,13 +129,21 @@ class Plot():
         if self.ax is None:
             self.do()
 
-            legend, kwargs = get_parameter_with_options(self.legend)
-            if legend:
-                self.ax.legend(**kwargs)
+            # convert the axes to a list
+            axes = np.array(self.ax).flatten()
 
-            if self.title:
+            for i, ax in enumerate(axes):
+
+                legend, kwargs = get_parameter_with_options(self.legend)
+                if legend:
+                    ax.legend(**kwargs)
+
                 title, kwargs = get_parameter_with_options(self.title)
-                self.ax.set_title(title, **kwargs)
+                if self.title:
+                    if isinstance(self.title, list):
+                        ax.set_title(title[i], **kwargs)
+                    else:
+                        ax.set_title(title, **kwargs)
 
             if self.tight_layout:
                 self.fig.tight_layout()
@@ -136,7 +152,7 @@ class Plot():
         self.plot_if_not_done_yet()
 
         # in a notebook the plot method need not to be called explicitly
-        if not in_notebook():
+        if not in_notebook() and matplotlib.get_backend() != "agg":
             self.fig.show(**kwargs)
 
     def save(self, fname, **kwargs):
@@ -146,20 +162,20 @@ class Plot():
         return self
 
     def get_labels(self):
-        if isinstance(self.labels, list):
-            if len(self.labels) != self.n_dim:
+        if isinstance(self.axis_labels, list):
+            if len(self.axis_labels) != self.n_dim:
                 raise Exception("Number of axes labels not equal to the number of axes.")
             else:
-                return self.labels
+                return self.axis_labels
         else:
-            return [f"${self.labels}_{{{i}}}$" for i in range(1, self.n_dim + 1)]
+            return [f"${self.axis_labels}_{{{i}}}$" for i in range(1, self.n_dim + 1)]
 
 
 def get_parameter_with_options(param):
     if param is None:
         return None, None
     else:
-        if isinstance(param, tuple) or isinstance(param, list):
+        if isinstance(param, tuple):
             val, kwargs = param
         else:
             val, kwargs = param, {}

@@ -3,6 +3,8 @@
    :description: pymoo - Multi-objective Optimization in Python
    :keywords: pymoo, optimization, multi-objective optimization, evolutionary optimization, nsga2, nsga3
 
+.. |hline| raw:: html
+    <hr>
 
 .. raw:: html
 
@@ -59,34 +61,114 @@ Meanwhile, if you have used our framework for research purposes, please cite us 
 Features
 ------------------------------------------------------------------------------
 
-**Algorithms:** :ref:`Genetic Algorithm <nb_ga>`, :ref:`Differential Evolution <nb_de>`, :ref:`NSGA-II <nb_nsga2>`,
-:ref:`R-NSGA-II <nb_rnsga2>`,
-:ref:`NSGA-III <nb_nsga3>`, :ref:`U-NSGA-III <nb_unsga3>`, :ref:`R-NSGA-III <nb_rnsga3>`, :ref:`MOEA/D <nb_moead>`
 
-**Test Problems:** :ref:`Overview <nb_problems>` (single-objective, multi-objective and many-objective)
+.. list-table::
+   :widths: 20 40
+   :header-rows: 0
+   :align: left
 
-**Performance Indicators:** :ref:`Hypervolume <nb_hv>`, :ref:`GD <nb_gd>`, :ref:`IGD <nb_igd>`, :ref:`R-Metric <nb_rmetric>`
+   * - **Algorithms**
+     - :ref:`Genetic Algorithm <nb_ga>`
+   * -
+     - :ref:`Differential Evolution <nb_de>`
+   * -
+     - :ref:`NSGA-II <nb_nsga2>`
+   * -
+     - :ref:`R-NSGA-II <nb_rnsga2>`
+   * -
+     - :ref:`NSGA-III <nb_nsga3>`
+   * -
+     - :ref:`R-NSGA-II <nb_rnsga2>`
+   * -
+     - :ref:`U-NSGA-III <nb_unsga3>`
+   * -
+     - :ref:`R-NSGA-III <nb_rnsga3>`
+   * -
+     - :ref:`MOEA/D <nb_moead>`
+   * -
+     -
+   * -
+     -
+   * -
+     -
+   * - **Test Problems**
+     - :ref:`Overview <nb_problems>` (single-objective, multi-objective and many-objective)
+   * -
+     -
+   * -
+     -
+   * -
+     -
+   * - **Visualization**
+     - :ref:`Scatter Plot (2D/3D/ND) <nb_scatter>`
+   * -
+     - :ref:`Parallel Coordinate Plot (PCP) <nb_pcp>`
+   * -
+     - :ref:`Radviz <nb_radviz>`
+   * -
+     - :ref:`Star Coordinates <nb_star>`
+   * -
+     - :ref:`Heatmap <nb_heat>`
+   * -
+     - :ref:`Petal Width<nb_petal_width>`
+   * -
+     - :ref:`Spider Web / Radar <nb_radar>`
+   * -
+     -
+   * -
+     -
+   * -
+     -
+   * - **Performance Indicator**
+     - :ref:`Hypervolume <nb_hv>`
+   * -
+     - :ref:`GD <nb_gd>`
+   * -
+     - :ref:`IGD <nb_igd>`
+   * -
+     - :ref:`R-Metric <nb_rmetric>`
+   * -
+     -
+   * -
+     -
+   * -
+     -
+   * - **Sampling**
+     - :ref:`Random <nb_sampling_random>`
+   * -
+     - :ref:`Latin Hypercube Sampling <nb_sampling_lhs>`
+   * -
+     -
+   * - **Selection**
+     - :ref:`Random <nb_selection_random>`
+   * -
+     - :ref:`Tournament Selection <nb_selection_tournament>`
+   * -
+     -
+   * -
+     -
+   * -
+     -
+   * - **Crossover**
+     - :ref:`Simulated Binary Crossover<nb_crossover_sbx>`
+   * -
+     - :ref:`Uniform Crossover<nb_crossover_uniform>`
+   * -
+     - :ref:`Half Uniform Crossover<nb_crossover_half_uniform>`
+   * -
+     - :ref:`Differential Crossover<nb_crossover_differential>`
+   * -
+     - :ref:`Point Crossover<nb_crossover_point>`
+   * -
+     - :ref:`Exponential Crossover<nb_crossover_exponential>`
+   * -
+     -
+   * -
+     -
+   * -
+     -
 
-**Non-Dominated Sorting:** :ref:`Naive<nb_nds_naive>`, :ref:`Fast<nb_nds_fast>`,
-:ref:`Best Order<nb_nds_best>`
 
-**Random Generators:** :ref:`Custom <nb_numpy>`, :ref:`Python <nb_rnd>`, :ref:`Numpy <nb_rnd>`
-
-**Selection:** :ref:`Random <nb_selection_random>`, :ref:`Tournament Selection <nb_selection_tournament>`
-
-**Sampling:** :ref:`Random <nb_sampling_random>`, :ref:`Latin Hypercube Sampling <nb_sampling_lhs>`
-
-**Crossover:** :ref:`Simulated Binary Crossover<nb_crossover_sbx>`, :ref:`Uniform Crossover<nb_crossover_uniform>`,
-:ref:`Half Uniform Crossover<nb_crossover_half_uniform>`, :ref:`Differential Crossover<nb_crossover_differential>`,
-:ref:`Point Crossover<nb_crossover_point>`, :ref:`Exponential Crossover<nb_crossover_exponential>`
-
-**Mutation:** :ref:`Polynomial Mutation <nb_mutation_pm>`, :ref:`Bitflip Mutation<nb_mutation_bitflip>`
-
-
-.. **Decomposition:** :ref:`ASF <nb_asf>`, :ref:`Tchebichef <nb_thebi>`
-
-**Visualization:** :ref:`Scatter <nb_scatter>`, :ref:`Parallel Coordinate Plot (PCP) <nb_pcp>`, :ref:`Heatmap <nb_heat>` , :ref:`Petal Width<nb_petal_width>`,
-:ref:`Radar <nb_radar>`, :ref:`Radviz <nb_radviz>`, :ref:`Star Coordinate <nb_star>`
 
 
 About
@@ -120,6 +202,7 @@ Content
    problems/index.ipynb
    components/index
    tutorial/index
+   visualization/index.rst
    api/index
    versions
    references

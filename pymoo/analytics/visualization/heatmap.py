@@ -1,8 +1,9 @@
 import numpy as np
 
+from pymoo.analytics.visualization.util import parse_bounds, normalize
 from pymoo.docs import parse_doc_string
 from pymoo.model.plot import Plot
-from pymoo.operators.default_operators import set_if_none
+from pymoo.operators.default_operators import set_if_none_from_tuples
 
 
 class Heatmap(Plot):
@@ -10,17 +11,25 @@ class Heatmap(Plot):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.order_by_objectives = kwargs["order_by_objectives"]
-        self.y_labels = kwargs["y_labels"]
+        self.solution_labels = kwargs["solution_labels"]
+
+        # set default style
+        set_if_none_from_tuples(self.axis_style, ("interpolation", "nearest"), ("vmin", 0), ("vmax", 1))
 
     def _do(self):
-        self.ax = self.fig.add_subplot(1, 1, 1)
-        self.normalize()
 
         if len(self.to_plot) != 1:
             raise Exception("Only one element can be added to a heatmap.")
 
-        (F, kwargs) = self.to_plot[0]
+        # initial a figure with a single plot
+        self.init_figure()
 
+        # normalize the input
+        bounds = parse_bounds(self.bounds, self.n_dim)
+        to_plot_norm = normalize(self.to_plot, bounds, reverse=self.reverse)
+        (F, kwargs) = to_plot_norm[0]
+
+        # dot the sorting if required
         if self.order_by_objectives is not None and self.order_by_objectives is not False:
 
             if isinstance(self.order_by_objectives, list) and len(self.order_by_objectives) == self.n_dim:
@@ -36,31 +45,32 @@ class Heatmap(Plot):
         else:
             I = np.arange(len(F))
 
-        set_if_none(kwargs, "interpolation", "nearest")
-        set_if_none(kwargs, "vmin", 0)
-        set_if_none(kwargs, "vmax", 1)
+        # plot the data
+        self.ax.imshow(F[I], cmap=self.cmap, **self.axis_style)
 
-        if self.reverse:
-            F = 1 - F
-
-        self.ax.imshow(F[I], cmap=self.cmap, **kwargs)
-
+        # set the x ticks and labels
         self.ax.set_xticks(np.arange(self.n_dim))
         self.ax.set_xticklabels(self.get_labels())
 
-        if self.y_labels is None:
-            self.y_labels = ["" for _ in range(len(F))]
-        elif isinstance(self.y_labels, bool) and self.y_labels:
-            self.y_labels = np.arange(len(F)) + 1
+        # no solution labels should be used
+        if self.solution_labels is None:
+            self.solution_labels = ["" for _ in range(len(F))]
+
+        # in case just true just use a number for each solution
+        elif isinstance(self.solution_labels, bool) and self.solution_labels:
+            self.solution_labels = np.arange(len(F)) + 1
+
+        # otherwise use directly the label provided
         else:
-            if len(self.y_labels) != len(F):
+            if len(self.solution_labels) != len(F):
                 raise Exception(
                     "The labels provided for each solution must be equal to the number of solutions being plotted.")
 
-        self.y_labels = [self.y_labels[i] for i in I]
+        # for ordered by objective apply it to labels
+        self.solution_labels = [self.solution_labels[i] for i in I]
 
         self.ax.set_yticks(np.arange(len(F)))
-        self.ax.set_yticklabels(self.y_labels)
+        self.ax.set_yticklabels(self.solution_labels)
 
 
 # =========================================================================================================
@@ -71,7 +81,7 @@ class Heatmap(Plot):
 def heatmap(cmap="Blues",
             order_by_objectives=False,
             reverse=True,
-            y_labels=True,
+            solution_labels=True,
             **kwargs):
     """
 
@@ -90,7 +100,7 @@ def heatmap(cmap="Blues",
     reverse : bool
         If true large values are white and small values the corresponding color. Otherwise, the other way around.
 
-    y_labels : bool or list
+    solution_labels : bool or list
         If False no labels are plotted in the y axis. If true just the corresponding index. Otherwise the label provided.
 
     bounds : {bounds}
@@ -113,7 +123,11 @@ def heatmap(cmap="Blues",
 
     """
 
-    return Heatmap(cmap=cmap, order_by_objectives=order_by_objectives, reverse=reverse, y_labels=y_labels, **kwargs)
+    return Heatmap(cmap=cmap,
+                   order_by_objectives=order_by_objectives,
+                   reverse=reverse,
+                   solution_labels=solution_labels,
+                   **kwargs)
 
 
 parse_doc_string(heatmap)

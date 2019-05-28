@@ -91,7 +91,7 @@ if __name__ == "__main__":
     # files = glob.glob('source/problems/*.ipynb')
     #files = glob.glob('source/algorithms/nsga3.ipynb')
     #files = glob.glob('source/visualization/radviz.ipynb')
-    files = glob.glob('source/visualization/radar.ipynb')
+    files = glob.glob('source/visualization/*.ipynb')
 
     # files = ['source/problems/zdt.ipynb','source/problems/single.ipynb']
 
