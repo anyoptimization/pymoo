@@ -17,19 +17,19 @@ def get_setup(n_obj):
         ref_dirs = UniformReferenceDirectionFactory(n_obj, n_partitions=6).do()
     elif n_obj == 8:
         pop_size = 156
-        ref_dirs = MultiLayerReferenceDirectionFactory([
+        ref_dirs = MultiLayerReferenceDirectionFactory(
             UniformReferenceDirectionFactory(n_obj, n_partitions=3, scaling=1.0),
-            UniformReferenceDirectionFactory(n_obj, n_partitions=2, scaling=0.5)]).do()
+            UniformReferenceDirectionFactory(n_obj, n_partitions=2, scaling=0.5)).do()
     elif n_obj == 10:
         pop_size = 276
-        ref_dirs = MultiLayerReferenceDirectionFactory([
+        ref_dirs = MultiLayerReferenceDirectionFactory(
             UniformReferenceDirectionFactory(n_obj, n_partitions=3, scaling=1.0),
-            UniformReferenceDirectionFactory(n_obj, n_partitions=2, scaling=0.5)]).do()
+            UniformReferenceDirectionFactory(n_obj, n_partitions=2, scaling=0.5)).do()
     elif n_obj == 15:
         pop_size = 136
-        ref_dirs = MultiLayerReferenceDirectionFactory([
+        ref_dirs = MultiLayerReferenceDirectionFactory(
             UniformReferenceDirectionFactory(n_obj, n_partitions=2, scaling=1.0),
-            UniformReferenceDirectionFactory(n_obj, n_partitions=1, scaling=0.5)]).do()
+            UniformReferenceDirectionFactory(n_obj, n_partitions=1, scaling=0.5)).do()
 
     return {
         'ref_dirs': ref_dirs,

@@ -116,7 +116,10 @@ class Plot:
         return self
 
     def add(self, F, **kwargs):
-        if F.ndim == 1:
+
+        if F is None:
+            return self
+        elif F.ndim == 1:
             self.to_plot.append([F[None, :], kwargs])
         elif F.ndim == 2:
             self.to_plot.append([F, kwargs])
