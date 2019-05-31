@@ -1,10 +1,10 @@
 import sys
 
 import numpy as np
-from pymoo.util import plotting
 from scipy import special
 
-from pymoo.util.misc import unique_rows, cdist
+from pymoo.util import plotting
+from pymoo.util.misc import cdist, filter_duplicate
 from pymoo.util.plotting import plot_3d
 
 
@@ -228,8 +228,12 @@ class MultiLayerReferenceDirectionFactory:
         for factory in self.layers:
             ref_dirs.append(factory.do())
         ref_dirs = np.concatenate(ref_dirs, axis=0)
+        is_duplicate = filter_duplicate(ref_dirs)
+        return ref_dirs[np.logical_not(is_duplicate)]
 
-        return unique_rows(ref_dirs)
+
+def get_uniform_weights(n_points, n_dim):
+    return UniformReferenceDirectionFactory(n_dim, n_points=n_points).do()
 
 
 if __name__ == '__main__':

@@ -1,12 +1,17 @@
 import numpy as np
 
-from pymoo.algorithms.nsga3 import NSGA3, ReferenceDirectionSurvival, get_extreme_points_c, get_nadir_point, \
-    associate_to_niches, calc_niche_count, niching
+from pymoo.algorithms.nsga3 import NSGA3, get_extreme_points_c, get_nadir_point, \
+    associate_to_niches, calc_niche_count, niching, comp_by_cv_then_random
 from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
-from pymoo.util.non_dominated_sorting import NonDominatedSorting
-from pymoo.util.reference_direction import UniformReferenceDirectionFactory
+from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
+from pymoo.operators.sampling.random_sampling import RandomSampling
+from pymoo.operators.selection.tournament_selection import TournamentSelection
+from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.normalization import denormalize
+from pymoo.util.reference_direction import UniformReferenceDirectionFactory
+
 
 # =========================================================================================================
 # Implementation
@@ -20,19 +25,15 @@ class RNSGA3(NSGA3):
                  pop_per_ref_point,
                  mu,
                  **kwargs):
-
         n_obj = ref_points.shape[1]
 
         # add the aspiration point lines
         aspiration_ref_dirs = UniformReferenceDirectionFactory(n_dim=n_obj, n_points=pop_per_ref_point).do()
 
-        kwargs['ref_dirs'] = aspiration_ref_dirs
+        kwargs['survival'] = AspirationPointSurvival(ref_points, aspiration_ref_dirs, mu=mu)
+        kwargs['ref_dirs'] = None
+        kwargs['pop_size'] = ref_points.shape[0] * aspiration_ref_dirs.shape[0] + aspiration_ref_dirs.shape[1]
         super().__init__(**kwargs)
-
-        self.pop_size = ref_points.shape[0] * aspiration_ref_dirs.shape[0] + aspiration_ref_dirs.shape[1]
-
-        # create the survival strategy
-        self.survival = AspirationPointSurvival(ref_points, aspiration_ref_dirs, mu=mu)
 
     def _solve(self, problem, termination):
         if self.survival.ref_points.shape[1] != problem.n_obj:
@@ -58,7 +59,7 @@ class AspirationPointSurvival(Survival):
         self.ideal_point = np.full(ref_points.shape[1], np.inf)
         self.worst_point = np.full(ref_points.shape[1], -np.inf)
 
-    def _do(self, pop, n_survive, D=None, **kwargs):
+    def _do(self, problem, pop, n_survive, D=None, **kwargs):
 
         # attributes to be set after the survival
         F = pop.get("F")
@@ -99,7 +100,7 @@ class AspirationPointSurvival(Survival):
         unit_ref_points = (self.ref_points - self.ideal_point) / (self.nadir_point - self.ideal_point)
         ref_dirs = get_ref_dirs_from_points(unit_ref_points, self.aspiration_ref_dirs, mu=self.mu)
         self.ref_dirs = denormalize(ref_dirs, self.ideal_point, self.nadir_point)
-        
+
         # associate individuals to niches
         niche_of_individuals, dist_to_niche = associate_to_niches(F, ref_dirs, self.ideal_point, self.nadir_point)
         pop.set('rank', rank, 'niche', niche_of_individuals, 'dist_to_niche', dist_to_niche)
@@ -208,6 +209,13 @@ def line_plane_intersection(l0, l1, p0, p_no, epsilon=1e-6):
 def rnsga3(ref_points,
            pop_per_ref_point,
            mu=0.05,
+           pop_size=None,
+           sampling=RandomSampling(),
+           selection=TournamentSelection(func_comp=comp_by_cv_then_random),
+           crossover=SimulatedBinaryCrossover(eta=30, prob=1.0),
+           mutation=PolynomialMutation(eta=20, prob=None),
+           eliminate_duplicates=True,
+           n_offsprings=None,
            **kwargs):
     """
 
@@ -239,10 +247,18 @@ def rnsga3(ref_points,
 
     """
 
-    return RNSGA3(ref_points,
-                  pop_per_ref_point,
-                  mu,
-                  **kwargs)
+    return RNSGA3(
+        ref_points,
+        pop_per_ref_point,
+        mu,
+        pop_size=pop_size,
+        sampling=sampling,
+        selection=selection,
+        crossover=crossover,
+        mutation=mutation,
+        eliminate_duplicates=eliminate_duplicates,
+        n_offsprings=n_offsprings,
+        **kwargs)
 
 
 parse_doc_string(rnsga3)

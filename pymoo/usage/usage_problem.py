@@ -127,7 +127,7 @@ plot_problem_surface(problem, 100, plot_type="wireframe+contour")
 
 # START truss2d
 from pymoo.factory import get_problem
-from pymoo.analytics.visualization.scatter import scatter
+from pymoo.visualization.scatter import scatter
 
 pf = get_problem("truss2d").pareto_front()
 
@@ -179,7 +179,7 @@ p = get_problem("dtlz1_-1", n_var=20, n_obj=5)
 import numpy as np
 
 # this will be the evaluation function that is called each time
-from pymoo.problems.factory import get_problem_from_func
+from pymoo.model.problem import get_problem_from_func
 
 
 def my_evaluate_func(x, out, *args, **kwargs):

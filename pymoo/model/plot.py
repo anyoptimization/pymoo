@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import ListedColormap
 
-from pymoo.analytics.visualization.util import default_number_to_text, in_notebook
 from pymoo.operators.default_operators import set_if_none
+from pymoo.visualization.util import default_number_to_text, in_notebook
 
 
 class Plot:
@@ -19,7 +19,7 @@ class Plot:
                  bounds=None,
                  reverse=False,
                  cmap="tab10",
-                 axis_style={},
+                 axis_style=None,
                  func_number_to_text=default_number_to_text,
                  axis_labels="f",
                  **kwargs):
@@ -38,7 +38,10 @@ class Plot:
         self.title = title
 
         # the style to be used for the axis
-        self.axis_style = axis_style.copy()
+        if axis_style is None:
+            self.axis_style = {}
+        else:
+            self.axis_style = axis_style.copy()
 
         # how numbers are represented if plotted
         self.func_number_to_text = func_number_to_text
@@ -94,7 +97,27 @@ class Plot:
 
         self.n_dim = unique_dim[0]
 
+        # actually call the class
         self._do()
+
+        # convert the axes to a list
+        axes = np.array(self.ax).flatten()
+
+        for i, ax in enumerate(axes):
+
+            legend, kwargs = get_parameter_with_options(self.legend)
+            if legend:
+                ax.legend(**kwargs)
+
+            title, kwargs = get_parameter_with_options(self.title)
+            if self.title:
+                if isinstance(self.title, list):
+                    ax.set_title(title[i], **kwargs)
+                else:
+                    ax.set_title(title, **kwargs)
+
+        if self.tight_layout:
+            self.fig.tight_layout()
 
         return self
 
@@ -131,25 +154,6 @@ class Plot:
     def plot_if_not_done_yet(self):
         if self.ax is None:
             self.do()
-
-            # convert the axes to a list
-            axes = np.array(self.ax).flatten()
-
-            for i, ax in enumerate(axes):
-
-                legend, kwargs = get_parameter_with_options(self.legend)
-                if legend:
-                    ax.legend(**kwargs)
-
-                title, kwargs = get_parameter_with_options(self.title)
-                if self.title:
-                    if isinstance(self.title, list):
-                        ax.set_title(title[i], **kwargs)
-                    else:
-                        ax.set_title(title, **kwargs)
-
-            if self.tight_layout:
-                self.fig.tight_layout()
 
     def show(self, **kwargs):
         self.plot_if_not_done_yet()

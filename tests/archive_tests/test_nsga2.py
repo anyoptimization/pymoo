@@ -6,7 +6,7 @@ import numpy as np
 
 from pymoo.operators.survival.rank_and_crowding import RankAndCrowdingSurvival, calc_crowding_distance
 from pymoo.rand.impl.custom_random_generator import CustomRandomGenerator
-from pymoo.util.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.nds import NonDominatedSorting
 
 
 class NSGA2Test(unittest.TestCase):

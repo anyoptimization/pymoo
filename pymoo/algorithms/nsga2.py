@@ -11,7 +11,7 @@ from pymoo.operators.selection.tournament_selection import compare, TournamentSe
 from pymoo.util.display import disp_multi_objective
 from pymoo.util.dominator import Dominator
 from pymoo.util.mathematics import Mathematics
-from pymoo.util.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.randomized_argsort import randomized_argsort
 
 

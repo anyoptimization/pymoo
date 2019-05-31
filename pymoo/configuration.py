@@ -2,7 +2,9 @@ import os
 
 
 class Configuration:
-    pass
+
+    show_compile_hint = True
+    parse_custom_docs = False
 
 
 # returns the directory to be used for imports

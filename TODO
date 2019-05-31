@@ -3,6 +3,7 @@
 - Deliver just .c files for pip to make the build independent from Cython
 
 - Improve and write documentation for decomposition
+
 - Add sidebar to homepage
 
 - Write test suite for all algorithms (many problems just run once - no crash should occur)
@@ -27,16 +28,18 @@
 
 - Decision Making (Pseudo Weight, ...)
 
-- IGD+
-- Implemented 1d interval and pair scatter plot
 - Termination Criteria in x space and fspace - xtol and ftol
+
 - Statistics of Survival and more attributes for individuals
+
 - Documentation fix link issues (absolute path at localhost and on remote)
 
 - maybe include CMA-ES: https://github.com/CMA-ES/pycma
 - ask and tell interface
 
 - elementwise function evaluation gradient is not working yet
+
+- report None of infeasible or feasible
 
 
 

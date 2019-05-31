@@ -4,7 +4,7 @@ from pymoo.model.termination import Termination
 
 def minimize(problem,
              method,
-             termination,
+             termination=get_termination('ftol', tol=0.001, n_last=20, n_max_gen=None, nth_gen=5),
              **kwargs):
     """
 
@@ -35,9 +35,12 @@ def minimize(problem,
 
     """
 
-    # create an evaluator defined by the termination criterium
+    # create an evaluator defined by the termination criterion
     if not isinstance(termination, Termination):
-        termination = get_termination(*termination)
+        if isinstance(termination, str):
+            termination = get_termination(termination)
+        else:
+            termination = get_termination(*termination)
 
     res = method.solve(problem, termination, **kwargs)
 

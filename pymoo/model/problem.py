@@ -7,6 +7,7 @@ import autograd.numpy as anp
 import numpy as np
 
 from pymoo.problems.gradient import run_and_trace, calc_jacobian
+from pymoo.util.misc import at_least_2d_array
 
 
 class Problem:
@@ -108,7 +109,7 @@ class Problem:
         """
         return np.min(self.pareto_front(), axis=0)
 
-    def pareto_front(self, *args, **kwargs):
+    def pareto_front(self, *args, use_cache=True, **kwargs):
         """
         Returns
         -------
@@ -116,20 +117,20 @@ class Problem:
             The Pareto front of a given problem. It is only loaded or calculate the first time and then cached.
             For a single-objective problem only one point is returned but still in a two dimensional array.
         """
-        if self._pareto_front is None:
-            self._pareto_front = self._calc_pareto_front(*args, **kwargs)
+        if not use_cache or self._pareto_front is None:
+            self._pareto_front = at_least_2d_array(self._calc_pareto_front(*args, **kwargs))
 
         return self._pareto_front
 
-    def pareto_set(self, *args, **kwargs):
+    def pareto_set(self, *args, use_cache=True, **kwargs):
         """
         Returns
         -------
         S : np.array
             Returns the pareto set for a problem. Points in the X space to be known to be optimal!
         """
-        if self._pareto_set is None:
-            self._pareto_set = self._calc_pareto_set(*args, **kwargs)
+        if not use_cache or self._pareto_set is None:
+            self._pareto_set = at_least_2d_array(self._calc_pareto_set(*args, **kwargs))
 
         return self._pareto_set
 
@@ -422,3 +423,40 @@ def evaluate_in_parallel_object(_x, calc_gradient, obj, args, kwargs):
     _out = {}
     obj._evaluate(_x, _out, *args, **kwargs)
     return _out
+
+
+def get_problem_from_func(func, xl=None, xu=None, n_var=None, func_args={}):
+    if xl is None or xu is None:
+        raise Exception("Please provide lower and upper bounds for the problem.")
+    if isinstance(xl, (int, float)):
+        xl = xl * anp.ones(n_var)
+    if isinstance(xu, (int, float)):
+        xu = xu * anp.ones(n_var)
+
+    # determine through a test evaluation details about the problem
+    n_var = xl.shape[0]
+    n_obj = -1
+    n_constr = 0
+
+    out = {}
+    func(xl[None, :], out, **func_args)
+    at_least2d(out)
+
+    n_obj = out["F"].shape[1]
+    if out.get("G") is not None:
+        n_constr = out["G"].shape[1]
+
+    class MyProblem(Problem):
+        def __init__(self):
+            Problem.__init__(self)
+            self.n_var = n_var
+            self.n_constr = n_constr
+            self.n_obj = n_obj
+            self.func = self._evaluate
+            self.xl = xl
+            self.xu = xu
+
+        def _evaluate(self, x, out, *args, **kwargs):
+            func(x, out, *args, **kwargs)
+
+    return MyProblem()

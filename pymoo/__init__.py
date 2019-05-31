@@ -1,1 +1,11 @@
-__all__ = ["configuration", "cython", "analytics", "algorithms", "model", "operators", "util"]
+__all__ = ["algorithms",
+           "cython",
+           "decision_making",
+           "model",
+           "operators",
+           "performance_indicator",
+           "problems",
+           "util",
+           "vendor",
+           "visualization",
+           ]

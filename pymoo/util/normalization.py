@@ -2,24 +2,43 @@ import numpy as np
 
 
 def denormalize(x, x_min, x_max):
-    return x * (x_max - x_min) + x_min
 
-
-def normalize(x, x_min=None, x_max=None, return_bounds=False):
-
-    if x_min is None:
-        x_min = np.min(x, axis=0)
     if x_max is None:
+        _range = 1
+    else:
+        _range = (x_max - x_min)
+
+    return x * _range + x_min
+
+
+def normalize(x, x_min=None, x_max=None, return_bounds=False, estimate_bounds_if_none=True):
+
+    # if the bounds should be estimated if none do it for both
+    if estimate_bounds_if_none and x_min is None:
+        x_min = np.min(x, axis=0)
+    if estimate_bounds_if_none and x_max is None:
         x_max = np.max(x, axis=0)
 
+    # if they are still none set them to default to avoid exception
+    if x_min is None:
+        x_min = np.zeros()
+    if x_max is None:
+        x_max = np.ones()
+
+    # calculate the denominator
     denom = x_max - x_min
+
+    # we can not divide by zero -> plus small epsilon
     denom += 1e-30
 
-    res = (x - x_min) / denom
+    # normalize the actual values
+    N = (x - x_min) / denom
+
+    # return with or without bounds
     if not return_bounds:
-        return res
+        return N
     else:
-        return res, x_min, x_max
+        return N, x_min, x_max
 
 
 def standardize(x, return_bounds=False):

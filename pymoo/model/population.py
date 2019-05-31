@@ -61,6 +61,8 @@ class Population(np.ndarray):
                 else:
                     self[i].data[key] = values[i]
 
+        return self
+
     def get(self, *args):
 
         val = {}

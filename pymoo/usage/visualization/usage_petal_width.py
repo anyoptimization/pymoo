@@ -7,7 +7,7 @@ print(F)
 # END load_data
 
 # START petal_width
-from pymoo.analytics.visualization.petal_width import petal_width
+from pymoo.visualization.petal_width import petal_width
 
 petal_width(bounds=[0, 1]).add(F).show()
 # END petal_width

@@ -82,7 +82,7 @@ class GeneticAlgorithm(Algorithm):
         self.pop = self._initialize()
         self._each_iteration(self, first=True)
 
-        # while termination criterium not fulfilled
+        # while termination criterion not fulfilled
         while termination.do_continue(self):
             self.n_gen += 1
 

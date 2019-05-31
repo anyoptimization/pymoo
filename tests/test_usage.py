@@ -1,59 +1,59 @@
 import os
 import sys
 import unittest
+from pathlib import Path
 from subprocess import run, PIPE
 
 from pymoo.configuration import get_pymoo
 
 
-class UsageTest(unittest.TestCase):
+def test_usage(usages):
+    SCRIPT_NAME = "test.py"
+    usages = [f for f in usages if f != "__init__.py"]
 
-    def test(self):
+    print(usages)
 
-        USAGE_DIR = os.path.join(get_pymoo(), "pymoo", "usage", "visualization")
-        SCRIPT_NAME = "test.py"
-        usages = os.listdir(USAGE_DIR)
-        print(usages)
+    for path_to_file in usages:
 
-        for fname in usages:
+        fname = os.path.basename(path_to_file)
 
-            with self.subTest(msg="Checking %s" % fname, fname=fname):
+        if fname == "__init__.py":
+            continue
 
-                if fname == "__init__.py":
-                    continue
+        print(fname)
 
-                # if fname != "usage_heatmap.py":
-                #    continue
+        with open(path_to_file) as f:
+            s = f.read()
 
-                if fname == "usage_heatmap.py":
-                    print("test")
+            no_plots = "import matplotlib\n" \
+                       "import matplotlib.pyplot\n" \
+                       "matplotlib.use('Agg')\n"
 
-                print(fname)
+            s = no_plots + s + "\nmatplotlib.pyplot.close()\n"
 
-                with open(os.path.join(USAGE_DIR, fname)) as f:
-                    s = f.read()
+            if os.path.exists(SCRIPT_NAME):
+                os.remove(SCRIPT_NAME)
 
-                    no_plots = "import matplotlib\n" \
-                               "import matplotlib.pyplot\n" \
-                               "matplotlib.use('Agg')\n"
+            with open(SCRIPT_NAME, 'a') as out:
+                out.write(s)
 
-                    s = no_plots + s + "\nmatplotlib.pyplot.close()\n"
+            command = ["python", "test.py"]
+            result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+            os.remove(SCRIPT_NAME)
 
-                    if os.path.exists(SCRIPT_NAME):
-                        os.remove(SCRIPT_NAME)
+            if result.returncode == 1:
+                print(result.stderr, file=sys.stderr)
+                raise Exception("Error")
+            else:
+                print("OK\n")
 
-                    with open(SCRIPT_NAME, 'a') as out:
-                        out.write(s)
 
-                    command = ["python", "test.py"]
-                    result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-                    os.remove(SCRIPT_NAME)
+class AllUsageTest(unittest.TestCase):
 
-                    if result.returncode == 1:
-                        print(result.stderr, file=sys.stderr)
-                        raise Exception("Error")
-                    else:
-                        print("OK\n")
+    def test_usages(self):
+        folder = os.path.join(get_pymoo(), "pymoo", "usage")
+        test_usage([os.path.join(folder, fname) for fname in Path(folder).glob('**/*.py')])
+
 
 
 if __name__ == '__main__':

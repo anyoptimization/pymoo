@@ -1,5 +1,5 @@
 # START scatter2d
-from pymoo.analytics.visualization.scatter import scatter
+from pymoo.visualization.scatter import scatter
 from pymoo.factory import get_problem, get_reference_directions
 
 F = get_problem("zdt3").pareto_front()

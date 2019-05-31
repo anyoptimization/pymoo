@@ -7,7 +7,7 @@ F = get_problem("dtlz1").pareto_front(ref_dirs)
 # END load_data
 
 # START radviz
-from pymoo.analytics.visualization.radviz import radviz
+from pymoo.visualization.radviz import radviz
 radviz().add(F).show()
 # END radviz
 

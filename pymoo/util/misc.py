@@ -13,7 +13,6 @@ def parameter_less(F, CV):
     return val
 
 
-
 def swap(M, a, b):
     tmp = M[a]
     M[a] = M[b]
@@ -46,7 +45,6 @@ def parameter_less_constraints(F, CV, F_max=None):
 
 
 def random_permuations(n, l):
-
     perms = []
     for i in range(n):
         perms.append(np.random.permutation(l))
@@ -74,6 +72,10 @@ def get_duplicates(M):
     return res
 
 
+def euclidean_distance(a, b):
+    return np.sqrt((a - b) ** 2)
+
+
 def cdist(A, B, **kwargs):
     if A.dtype != np.object:
         return scipy.spatial.distance.cdist(A, B, **kwargs)
@@ -86,7 +88,7 @@ def cdist(A, B, **kwargs):
         return D
 
 
-def vectorized_cdist(A, B, func_dist):
+def vectorized_cdist(A, B, func_dist=euclidean_distance):
     u = np.repeat(A, B.shape[0], axis=0)
     v = np.tile(B, (A.shape[0], 1))
 
@@ -104,7 +106,59 @@ def covert_to_type(problem, X):
         return X < (problem.xu - problem.xl) / 2
 
 
+def filter_duplicate(X, epsilon=1e-16):
+    # value to finally return
+    is_duplicate = np.full(len(X), False)
+
+    # check for duplicates in pop itself
+    D = cdist(X, X)
+    D[np.triu_indices(len(X))] = np.inf
+    is_duplicate = np.logical_or(is_duplicate, np.any(D < epsilon, axis=1))
+
+    return is_duplicate
+
+
+def at_least_2d_array(x, extend_as="row"):
+    if not isinstance(x, np.ndarray):
+        x = np.array([x])
+
+    if x.ndim == 1:
+        if extend_as == "row":
+            x = x[None, :]
+        elif extend_as == "column":
+            x = x[:, None]
+
+    return x
+
+
+def to_1d_array_if_possible(x):
+    if not isinstance(x, np.ndarray):
+        x = np.array([x])
+
+    if x.ndim == 2:
+        if x.shape[0] == 1 or x.shape[1] == 1:
+            x = x.flatten()
+
+    return x
+
+
+def stack(*args, flatten=True):
+    if not flatten:
+        ps = np.concatenate([e[None, ...] for e in args])
+    else:
+        ps = np.row_stack(args)
+    return ps
+
+
+def all_combinations(A, B):
+    u = np.repeat(A, B.shape[0], axis=0)
+    v = np.tile(B, A.shape[0])
+    return np.column_stack([u,v])
+
 if __name__ == '__main__':
+    x = np.linspace(0, 5, 50)
+    X = all_combinations(x, x)
+
     M = np.random.random((100, 3))
 
     M[3, :] = M[55, :]

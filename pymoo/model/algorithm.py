@@ -5,8 +5,9 @@ import numpy as np
 
 from pymoo.model.evaluator import Evaluator
 from pymoo.model.result import Result
+from pymoo.util.function_loader import FunctionLoader
 
-from pymoo.util.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
 
 class Algorithm:
@@ -26,6 +27,7 @@ class Algorithm:
         self.termination = None
         self.pf = None
         self.opt = None
+        self.seed = None
 
         self.history = None
         self.verbose = None
@@ -41,7 +43,7 @@ class Algorithm:
               callback=None,
               save_history=False,
               pf=None,
-              evaluator=Evaluator(),
+              evaluator=None,
               **kwargs
               ):
         """
@@ -86,9 +88,10 @@ class Algorithm:
         res : dict
             A dictionary that saves all the results of the algorithm. Also, the history if save_history is true.
 
-
-
         """
+
+        # prints the compile warning if enabled
+        FunctionLoader.get_instance()
 
         # set the random seed for generator and save if
         if seed is not None:
@@ -100,9 +103,17 @@ class Algorithm:
 
         # the evaluator object which is counting the evaluations
         self.history = []
+
         self.evaluator = evaluator
+        if self.evaluator is None:
+            self.evaluator = Evaluator()
+
         self.problem = problem
+
         self.termination = termination
+        if self.termination is not None:
+            self.termination.reset()
+
         self.pf = pf
 
         self.verbose = verbose
@@ -179,9 +190,9 @@ class Algorithm:
     def _display(self, disp, header=False):
         regex = " | ".join(["{}"] * len(disp))
         if header:
-            print("=" * 50)
+            print("=" * 70)
             print(regex.format(*[name.ljust(width) for name, _, width in disp]))
-            print("=" * 50)
+            print("=" * 70)
         print(regex.format(*[str(val).ljust(width) for _, val, width in disp]))
 
     @abstractmethod

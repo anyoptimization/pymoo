@@ -28,7 +28,7 @@ class CantileveredBeam(Problem):
         out["G"] = anp.column_stack([g1, g2])
 
     def _calc_pareto_front(self):
-        return np.array([[92.7693]])
+        return 92.7693
 
     def _calc_pareto_set(self):
-        return np.array([[9.4846, 0.1000, 0.1000, 7.0000]])
+        return [9.4846, 0.1000, 0.1000, 7.0000]

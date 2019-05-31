@@ -11,3 +11,9 @@ class Rastrigin(Problem):
     def _evaluate(self, x, out, *args, **kwargs):
         z = anp.power(x, 2) - self.A * anp.cos(2 * anp.pi * x)
         out["F"] = self.A * self.n_var + anp.sum(z, axis=1)
+
+    def _calc_pareto_front(self):
+        return 0
+
+    def _calc_pareto_set(self):
+        return anp.full(self.n_var, 0)

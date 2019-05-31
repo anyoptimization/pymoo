@@ -4,7 +4,7 @@ import numpy as np
 from numpy.linalg import LinAlgError
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.cython.function_loader import load_function
+from pymoo.decomposition.perpendicular_distance import PerpendicularDistance
 from pymoo.docs import parse_doc_string
 from pymoo.model.individual import Individual
 from pymoo.model.survival import Survival
@@ -13,7 +13,7 @@ from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import RandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
 from pymoo.util.display import disp_multi_objective
-from pymoo.util.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
 
 # =========================================================================================================
@@ -30,7 +30,7 @@ class NSGA3(GeneticAlgorithm):
         self.func_display_attrs = disp_multi_objective
 
     def _solve(self, problem, termination):
-        if self.ref_dirs.shape[1] != problem.n_obj:
+        if self.ref_dirs is not None and self.ref_dirs.shape[1] != problem.n_obj:
             raise Exception(
                 "Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
                 (self.ref_dirs.shape[1], problem.n_obj))
@@ -141,8 +141,8 @@ class ReferenceDirectionSurvival(Survival):
 
 def get_extreme_points_c(F, ideal_point, extreme_points=None):
     # calculate the asf which is used for the extreme point decomposition
-    asf = np.eye(F.shape[1])
-    asf[asf == 0] = 1e6
+    weights = np.eye(F.shape[1])
+    weights[weights == 0] = 1e6
 
     # add the old extreme points to never loose them for normalization
     _F = F
@@ -154,7 +154,7 @@ def get_extreme_points_c(F, ideal_point, extreme_points=None):
     __F[__F < 1e-3] = 0
 
     # update the extreme points for the normalization having the highest asf value each
-    F_asf = np.max(__F * asf[:, None, :], axis=2)
+    F_asf = np.max(__F * weights[:, None, :], axis=2)
     I = np.argmin(F_asf, axis=1)
     extreme_points = _F[I, :]
 
@@ -242,9 +242,10 @@ def associate_to_niches(F, niches, ideal_point, nadir_point, utopian_epsilon=0.0
 
     # normalize by ideal point and intercepts
     N = (F - utopian_point) / denom
-    dist_matrix = load_function("calc_perpendicular_distance")(N, niches)
+    dist_matrix = PerpendicularDistance(eps=0.0).do(N, niches, _type="many_to_many")
 
-    niche_of_individuals = np.argmin(dist_matrix, axis=1)
+    niche_of_individuals\
+        = np.argmin(dist_matrix, axis=1)
     dist_to_niche = dist_matrix[np.arange(F.shape[0]), niche_of_individuals]
 
     return niche_of_individuals, dist_to_niche

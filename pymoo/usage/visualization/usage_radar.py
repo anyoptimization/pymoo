@@ -12,7 +12,7 @@ print(F)
 
 
 # START radar
-from pymoo.analytics.visualization.radar import radar
+from pymoo.visualization.radar import radar
 
 plot = radar(bounds=[ideal_point, nadir_point], normalize_each_objective=False)
 plot.add(F)
@@ -21,8 +21,6 @@ plot.show()
 
 
 # START radar_norm
-from pymoo.analytics.visualization.radar import radar
-
 plot = radar(bounds=[ideal_point, nadir_point])
 plot.add(F)
 plot.show()

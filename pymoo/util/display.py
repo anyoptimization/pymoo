@@ -1,8 +1,29 @@
 import numpy as np
 
-from pymoo.analytics.performance_indicator.gd import GD
-from pymoo.analytics.performance_indicator.hv import Hypervolume
-from pymoo.analytics.performance_indicator.igd import IGD
+from pymoo.performance_indicator.distance_indicator import IGD, GD
+from pymoo.performance_indicator.hv import Hypervolume
+
+width = 8
+
+
+def format_float(f):
+    if f >= 10:
+        return f"%.{width - 6}E" % f
+    else:
+        return f"%.{width - 2}f" % f
+
+
+def pareto_front_if_possible(problem):
+    try:
+        return problem.pareto_front()
+    except:
+        return None
+
+
+def disp_cv(CV):
+    min_constr = format_float(np.min(CV))
+    mean_constr = format_float(np.mean(CV))
+    return "cv (min/avg)", f"{min_constr} / {mean_constr}", width * 2 + 3
 
 
 def disp_single_objective(problem, evaluator, algorithm, pf=None):
@@ -12,13 +33,16 @@ def disp_single_objective(problem, evaluator, algorithm, pf=None):
     F, CV, feasible = algorithm.pop.get("F", "CV", "feasible")
     feasible = np.where(feasible[:, 0])[0]
 
+    if pf is None:
+        pf = pareto_front_if_possible(problem)
+
     if problem.n_constr > 0:
-        attrs.append(('cv (min/avg)', "%.5f / %.5f" % (np.min(CV), np.mean(CV)), 13))
+        attrs.append(disp_cv(CV))
 
     if len(feasible) > 0:
         attrs.extend([
-            ('favg', "%.5f" % np.mean(F[feasible]), 5),
-            ('fopt', "%.10f" % np.min(F[feasible]), 5)
+            ('favg', format_float(np.mean(F[feasible])), width),
+            ('fopt', format_float(np.min(F[feasible])), width)
         ])
     else:
         attrs.extend([
@@ -36,19 +60,22 @@ def disp_multi_objective(problem, evaluator, algorithm, pf=None):
     F, CV, feasible = algorithm.pop.get("F", "CV", "feasible")
     feasible = np.where(feasible[:, 0])[0]
 
+    if pf is None:
+        pf = pareto_front_if_possible(problem)
+
     if problem.n_constr > 0:
-        attrs.append(('cv (min/avg)', "%.5f / %.5f" % (np.min(CV), np.mean(CV)), 13))
+        attrs.append(disp_cv(CV))
 
     if len(feasible) > 0:
         if pf is not None:
-            attrs.append(('igd', "%.5f" % IGD(pf).calc(F[feasible]), 8))
-            attrs.append(('gd', "%.5f" % GD(pf).calc(F[feasible]), 8))
+            attrs.append(('igd', format_float(IGD(pf).calc(F[feasible])), width))
+            attrs.append(('gd', format_float(GD(pf).calc(F[feasible])), width))
             if problem.n_obj == 2:
-                attrs.append(('hv', "%.5f" % Hypervolume(pf=pf).calc(F[feasible]), 8))
+                attrs.append(('hv', format_float(Hypervolume(pf=pf).calc(F[feasible])), width))
     else:
-        attrs.append(('igd', "-", 8))
-        attrs.append(('gd', "-", 8))
+        attrs.append(('igd', "-", width))
+        attrs.append(('gd', "-", width))
         if problem.n_obj == 2:
-            attrs.append(('hv', "-", 8))
+            attrs.append(('hv', "-", width))
 
     return attrs

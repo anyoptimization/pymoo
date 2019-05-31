@@ -7,7 +7,7 @@ F = get_problem("dtlz1").pareto_front(ref_dirs)
 # END load_data
 
 # START star
-from pymoo.analytics.visualization.star import star_coordinate
+from pymoo.visualization.star import star_coordinate
 star_coordinate().add(F).show()
 # END star
 

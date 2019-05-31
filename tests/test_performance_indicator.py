@@ -1,8 +1,11 @@
+import os
 import unittest
 
 import numpy as np
 
+from pymoo.configuration import get_pymoo
 from pymoo.factory import get_performance_indicator
+from tests.test_usage import test_usage
 
 
 def get_indicators(pf):
@@ -14,6 +17,9 @@ def get_indicators(pf):
 
 
 class PerformanceIndicatorTest(unittest.TestCase):
+
+    def test_usages(self):
+        test_usage([os.path.join(get_pymoo(), "pymoo", "usage", "usage_performance_indicator.py")])
 
     def test_performance_indicator_1(self):
         A = np.array([2, 5])

@@ -26,4 +26,4 @@ class PressureVessel(Problem):
         return 5.8853e+03
 
     def _calc_pareto_set(self):
-        return anp.array([13, 7, 42.0984456, 176.6366])
+        return [13, 7, 42.0984456, 176.6366]

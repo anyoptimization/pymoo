@@ -16,7 +16,7 @@ class DifferentialEvolutionCrossover(Crossover):
         n_parents, n_matings, n_var = X.shape
 
         if self.dither == "vector":
-            weight = (self.weight + np.random.random(n_parents) * (1 - self.weight))[:, None]
+            weight = (self.weight + np.random.random(n_matings) * (1 - self.weight))[:, None]
         elif self.dither == "scalar":
             weight = self.weight + np.random.random() * (1 - self.weight)
         else:
@@ -25,7 +25,7 @@ class DifferentialEvolutionCrossover(Crossover):
         # http://www.cs.ndsu.nodak.edu/~siludwig/Publish/papers/SSCI20141.pdf
         if self.jitter:
             gamma = 0.0001
-            weight = (self.weight * (1 + gamma * (np.random.random(n_parents) - 0.5)))[:, None]
+            weight = (self.weight * (1 + gamma * (np.random.random(n_matings) - 0.5)))[:, None]
 
         _X = X[0] + weight * (X[1] - X[2])
         return _X[None, ...]

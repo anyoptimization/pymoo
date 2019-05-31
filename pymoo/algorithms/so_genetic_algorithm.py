@@ -9,7 +9,7 @@ from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import RandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
 from pymoo.util.display import disp_single_objective
-from pymoo.util.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.normalization import normalize
 
 
@@ -38,7 +38,7 @@ class FitnessSurvival(Survival):
     def __init__(self) -> None:
         super().__init__(True)
 
-    def _do(self, pop, n_survive, out=None, **kwargs):
+    def _do(self, problem, pop, n_survive, out=None, **kwargs):
         F = pop.get("F")
 
         if F.shape[1] != 1:
@@ -140,7 +140,6 @@ class ConstraintHandlingSurvival(Survival):
             # add for each constraint violation a penalty
             _F[:, 0] = _F[:, 0] + self.params["weight"] * CV
             return pop[np.argsort(_F[:, 0])[:n_survive]]
-
 
 
 def comp_by_cv_and_fitness(pop, P, **kwargs):

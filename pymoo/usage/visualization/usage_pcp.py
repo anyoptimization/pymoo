@@ -7,7 +7,7 @@ F = get_problem("dtlz1").pareto_front(ref_dirs)
 # END load_data
 
 # START pcp
-from pymoo.analytics.visualization.pcp import pcp
+from pymoo.visualization.pcp import pcp
 pcp().add(F).show()
 # END pcp
 

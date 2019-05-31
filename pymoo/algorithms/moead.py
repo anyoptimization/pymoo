@@ -1,14 +1,13 @@
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from pymoo.cython.decomposition import PenaltyBasedBoundaryIntersection, Tchebicheff
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
+from pymoo.factory import get_decomposition
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.default_operators import set_if_none
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import RandomSampling
-
 from pymoo.util.display import disp_multi_objective
 
 
@@ -53,19 +52,18 @@ class MOEAD(GeneticAlgorithm):
 
         if isinstance(self.decomposition, str):
 
-            # for one or two objectives use tchebi otherwise pbi
-            if self.decomposition == 'auto':
-                if self.problem.n_obj <= 2:
-                    str_decomposition = 'tchebi'
-                else:
-                    str_decomposition = 'pbi'
-            else:
-                str_decomposition = self.decomposition
+            # set a string
+            decomp = self.decomposition
 
-            if str_decomposition == 'tchebi':
-                self._decomposition = Tchebicheff()
-            elif str_decomposition == 'pbi':
-                self._decomposition = PenaltyBasedBoundaryIntersection(5)
+            # for one or two objectives use tchebi otherwise pbi
+            if decomp == 'auto':
+                if self.problem.n_obj <= 2:
+                    decomp = 'tchebi'
+                else:
+                    decomp = 'pbi'
+
+            # set the decomposition object
+            self._decomposition = get_decomposition(decomp)
 
         else:
             self._decomposition = self.decomposition
@@ -89,8 +87,8 @@ class MOEAD(GeneticAlgorithm):
                 parents = np.random.permutation(self.pop_size)[:self.crossover.n_parents]
 
             # do recombination and create an offspring
-            off = self.crossover._do(self.problem, pop, parents[None, :])
-            off = self.mutation._do(self.problem, off)
+            off = self.crossover.do(self.problem, pop, parents[None, :])
+            off = self.mutation.do(self.problem, off)
             off = off[np.random.randint(0, len(off))]
 
             # evaluate the offspring

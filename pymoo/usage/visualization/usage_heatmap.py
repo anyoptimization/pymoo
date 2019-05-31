@@ -6,7 +6,7 @@ F = np.random.random((4, 6))
 # END load_data
 
 # START heatmap
-from pymoo.analytics.visualization.heatmap import heatmap
+from pymoo.visualization.heatmap import heatmap
 heatmap().add(F).show()
 # END heatmap
 

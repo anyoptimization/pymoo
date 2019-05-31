@@ -1,7 +1,7 @@
 from pymoo.algorithms.nsga2 import nsga2
-from pymoo.analytics.visualization.scatter import Scatter
 from pymoo.factory import get_problem
 from pymoo.optimize import minimize
+from pymoo.visualization.scatter import scatter
 
 problem = get_problem("zdt3")
 
@@ -14,7 +14,7 @@ res = minimize(problem,
                seed=1,
                verbose=False)
 
-scatter = Scatter()
-scatter.add(problem.pareto_front(n_points=200, flatten=False), plot_type="line", color="black", alpha=0.7)
-scatter.add(res.F, color="red")
-scatter.show()
+plot = scatter()
+plot.add(problem.pareto_front(n_points=200, flatten=False), plot_type="line", color="black", alpha=0.7)
+plot.add(res.F, color="red")
+plot.show()

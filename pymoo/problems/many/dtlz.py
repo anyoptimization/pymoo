@@ -142,6 +142,9 @@ class DTLZ7(DTLZ):
     def __init__(self, n_var=10, n_obj=3, **kwargs):
         super().__init__(n_var, n_obj, **kwargs)
 
+    def _calc_pareto_front(self):
+        raise Exception("Not implemented yet.")
+
     def _evaluate(self, x, out, *args, **kwargs):
         f = []
         for i in range(0, self.n_obj - 1):
@@ -155,6 +158,9 @@ class DTLZ7(DTLZ):
 
 
 class InvertedDTLZ1(DTLZ1):
+
+    def _calc_pareto_front(self):
+        raise Exception("Not implemented yet.")
 
     def _evaluate(self, x, out, *args, **kwargs):
         X_, X_M = x[:, :self.n_obj - 1], x[:, self.n_obj - 1:]
@@ -207,3 +213,9 @@ class ConvexProblem(Problem):
     def _calc_pareto_front(self, ref_dirs, *args, **kwargs):
         F = self.problem.pareto_front(ref_dirs)
         return anp.power(F, ConvexProblem.get_power(self.n_obj))
+
+
+class ScaledDTLZ1(ScaledProblem):
+
+    def __init__(self, n_var=7, n_obj=3, scale_factor=10, **kwargs):
+        super().__init__(DTLZ1(n_var=n_var, n_obj=n_obj, **kwargs), scale_factor=scale_factor)

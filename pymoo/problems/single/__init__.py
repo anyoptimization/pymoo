@@ -9,3 +9,4 @@ from pymoo.problems.single.schwefel import *
 from pymoo.problems.single.sphere import *
 from pymoo.problems.single.zakharov import *
 from pymoo.problems.single.g import *
+from pymoo.problems.single.himmelblau import *

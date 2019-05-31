@@ -27,3 +27,4 @@ class OSY(Problem):
 
     def _calc_pareto_front(self):
         return load_pareto_front_from_file("osy.pf")
+

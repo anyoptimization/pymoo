@@ -3,8 +3,6 @@
    :description: pymoo - Multi-objective Optimization in Python
    :keywords: pymoo, optimization, multi-objective optimization, evolutionary optimization, nsga2, nsga3
 
-.. |hline| raw:: html
-    <hr>
 
 .. raw:: html
 
@@ -47,7 +45,7 @@ More details about the installation can be found :ref:`here <installation>`.
 If you intend to use *pymoo* for **any** profit-making purposes, please contact `Julian Blank <http://www.cse.msu.edu/~blankjul/>`_.
 
 We are currently working on a paper.
-Meanwhile, if you have used our framework for research purposes, please cite us with:
+Meanwhile, if you have used our framework for research purposes, please cite us:
 
 ::
 
@@ -120,13 +118,31 @@ Features
    * -
      -
    * - **Performance Indicator**
+     - :ref:`Generational Distance (GD) <nb_gd>`
+   * -
+     - :ref:`Inverted Generational Distance (IGD) <nb_igd>`
+   * -
+     - :ref:`GD+ <nb_gd_plus>`
+   * -
+     - :ref:`IGD+ <nb_igd_plus>`
+   * -
      - :ref:`Hypervolume <nb_hv>`
    * -
-     - :ref:`GD <nb_gd>`
+     -
    * -
-     - :ref:`IGD <nb_igd>`
+     -
    * -
-     - :ref:`R-Metric <nb_rmetric>`
+     -
+   * - **Termination Criterion**
+     - :ref:`Number of Evaluations <nb_n_eval>`
+   * -
+     - :ref:`Number of Generations<nb_n_gen>`
+   * -
+     - :ref:`Design Space Tolerance<nb_xtol>`
+   * -
+     - :ref:`Objective Space Tolerance <nb_ftol>`
+   * -
+     - :ref:`Performance Indicator Bound<nb_pi_bound>`
    * -
      -
    * -

@@ -6,7 +6,7 @@ from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
 from pymoo.operators.selection.random_selection import RandomSelection
 
-from pymoo.util.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
 
 # =========================================================================================================
@@ -36,7 +36,7 @@ class RankAndModifiedCrowdingSurvival(Survival):
         self.ideal_point = np.full(self.n_obj, np.inf)
         self.nadir_point = np.full(self.n_obj, -np.inf)
 
-    def _do(self, pop, n_survive, **kwargs):
+    def _do(self, problem, pop, n_survive, **kwargs):
 
         # get the objective space values and objects
         F = pop.get("F")

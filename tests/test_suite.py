@@ -9,9 +9,14 @@ if __name__ == "__main__":
 
     testmodules = [
         'tests.test_nsga2',
+        'tests.test_algorithms',
+        'tests.test_problems',
+        'tests.test_crossover',
         'tests.test_performance_indicator',
+        'tests.test_visualization',
         'tests.problems.test_correctness',
-       # 'tests.problems.test_gradient',
+        'tests.test_termination_criterion'
+        #'tests.problems.test_gradient',
         #'tests.problems.test_hessian',
         #'tests.problems.test_usage'
         #'pymoo.usage.test_usage'

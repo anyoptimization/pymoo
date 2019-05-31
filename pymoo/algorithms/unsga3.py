@@ -1,9 +1,8 @@
 import numpy as np
 
-from pymoo.algorithms.nsga3 import NSGA3
+from pymoo.algorithms.nsga3 import nsga3
 from pymoo.docs import parse_doc_string
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
-
 
 
 # =========================================================================================================
@@ -56,7 +55,7 @@ def unsga3(**kwargs):
 
     """
 
-    return NSGA3(selection=TournamentSelection(func_comp=comp_by_rank_and_ref_line_dist), **kwargs)
+    return nsga3(selection=TournamentSelection(func_comp=comp_by_rank_and_ref_line_dist), **kwargs)
 
 
 parse_doc_string(unsga3)

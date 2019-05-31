@@ -8,7 +8,7 @@ import numpy as np
 from pymoo.configuration import Configuration
 from pymoo.model.population import Population
 from pymoo.operators.survival.reference_line_survival import ReferenceLineSurvival, associate_to_niches
-from pymoo.util.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.nds import NonDominatedSorting
 
 
 class NSGA3Test(unittest.TestCase):

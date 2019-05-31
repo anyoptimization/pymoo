@@ -19,12 +19,13 @@ class BNH(Problem):
         out["F"] = anp.column_stack([f1, f2])
         out["G"] = anp.column_stack([g1, g2])
 
-    def _calc_pareto_front(self, n_pareto_points=100):
-        x1 = anp.linspace(0, 5, n_pareto_points)
-        x2 = anp.copy(x1)
+    def _calc_pareto_front(self, n_points=100):
+        x1 = anp.linspace(0, 5, n_points)
+        x2 = anp.linspace(0, 5, n_points)
         x2[x1 >= 3] = 3
-        return anp.vstack((4 * anp.square(x1) + 4 * anp.square(x2), anp.square(x1 - 5) + anp.square(x2 - 5))).T
 
+        X = anp.column_stack([x1, x2])
+        return self.evaluate(X, return_values_of=["F"])
 
 
 
