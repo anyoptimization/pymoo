@@ -47,7 +47,8 @@ copyright = u'2019, Julian Blank, Michigan State University'
 version = '0.3.1'
 release = '0.3.1'
 pygments_style = 'sphinx'
-html_title = 'pymoo %s' % version
+html_title = 'pymoo'
+#html_title = 'pymoo %s' % version
 
 # =========================================================================================================
 # sphinx.ext.intersphinx - Mappings to other projects

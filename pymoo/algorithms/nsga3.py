@@ -4,7 +4,7 @@ import numpy as np
 from numpy.linalg import LinAlgError
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.decomposition.perpendicular_distance import PerpendicularDistance
+from pymoo.decomposition.perp_dist import PerpendicularDistance
 from pymoo.docs import parse_doc_string
 from pymoo.model.individual import Individual
 from pymoo.model.survival import Survival

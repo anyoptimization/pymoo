@@ -353,13 +353,15 @@ def get_decomposition_options():
     from pymoo.decomposition.weighted_sum import WeightedSum
     from pymoo.decomposition.asf import ASF
     from pymoo.decomposition.aasf import AASF
+    from pymoo.decomposition.perp_dist import PerpendicularDistance
 
     DECOMPOSITION = [
         ("weighted_sum", WeightedSum),
         ("tchebi", Tchebicheff),
         ("pbi", PBI),
         ("asf", ASF),
-        ("aasf", AASF)
+        ("aasf", AASF),
+        ("perp_dist", PerpendicularDistance)
     ]
 
     return DECOMPOSITION

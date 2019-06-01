@@ -4,7 +4,7 @@ import unittest
 import numpy as np
 
 from pymoo.configuration import get_pymoo
-from pymoo.decomposition.perpendicular_distance import PerpendicularDistance
+from pymoo.decomposition.perp_dist import PerpendicularDistance
 from pymoo.decomposition.weighted_sum import WeightedSum
 from tests.test_usage import test_usage
 
