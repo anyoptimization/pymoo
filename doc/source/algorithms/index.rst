@@ -4,7 +4,7 @@ Algorithms
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    differential_evolution
    genetic_algorithm

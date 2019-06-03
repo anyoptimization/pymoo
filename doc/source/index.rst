@@ -1,32 +1,53 @@
 
+
+
+
+
 .. meta::
    :description: pymoo - Multi-objective Optimization in Python
    :keywords: pymoo, optimization, multi-objective optimization, evolutionary optimization, nsga2, nsga3
 
 
-.. raw:: html
 
-    <div align="right" style="margin-bottom: -20px">
-      <b>Latest Version:</b> pymoo==0.3.1</b>
-    </div>
+.. |blankjul| raw:: html
+
+   <a href="http://www.cse.msu.edu/~blankjul/" target="_blank">Julian Blank</a>
+
+.. |kdeb| raw:: html
+
+   <a href="https://www.egr.msu.edu/people/profile/kdeb" target="_blank">Kalyanmoy Deb</a>
+
+.. |github| raw:: html
+
+   <a href="https://github.com/msu-coinlab/pymoo" target="_blank">GitHub</a>
+
+.. |issues| raw:: html
+
+   <a href="https://github.com/msu-coinlab/pymoo/issues" target="_blank">Issue Tracker</a>
+
+
+.. |coin| raw:: html
+
+   <a href="https://www.coin-laboratory.com" target="_blank">Computational Optimization and Innovation Laboratory (COIN)</a>
 
 
 
-pymoo
-==============================================================================
 
 
 The framework is available on PyPi and can be installed with:
 
 ::
 
-    pip install -U Cython>=0.29 numpy>=1.15 pymoo
+    pip install -U pymoo
 
 
-Please note, that the dependencies used in the command above must be fulfilled before compiling some modules of *pymoo*
-and can, therefore, not be ensured to be installed prior compilation with the setup script.
-More details about the installation can be found :ref:`here <installation>`.
+Please note, that some modules can be compiled to speed up compuations (optional). By using the command
+above, an attempt is made to compile the modules, however, if unsucessful the
+plain python version is installed. More information are available in our 
+:ref:`Installation Guide <installation>`.
 
+To get familiar with our framework we recommended having a look at our
+getting started guide:
 
 .. image:: resources/images/getting_started.svg
    :target: getting_started.html
@@ -36,16 +57,20 @@ More details about the installation can be found :ref:`here <installation>`.
 
 
 
-|vspace|
+Features
+------------------------------------------------------------------------------
 
-.. |vspace| raw:: latex
+Furthermore, our frameworks offers a variety of different features which cover various facets of multi-objecitve optimization:
 
-   \vspace{5mm}
+.. include:: portfolio.rst
 
-If you intend to use *pymoo* for **any** profit-making purposes, please contact `Julian Blank <http://www.cse.msu.edu/~blankjul/>`_.
+
+
+Reference
+------------------------------------------------------------------------------
 
 We are currently working on a paper.
-Meanwhile, if you have used our framework for research purposes, please cite us:
+Meanwhile, if you have used our framework for research purposes, you can cite us with:
 
 ::
 
@@ -56,154 +81,71 @@ Meanwhile, if you have used our framework for research purposes, please cite us:
     }
 
 
-Features
+
+News
 ------------------------------------------------------------------------------
-
-
-.. list-table::
-   :widths: 20 40
-   :header-rows: 0
-   :align: left
-
-   * - **Algorithms**
-     - :ref:`Genetic Algorithm <nb_ga>`
-   * -
-     - :ref:`Differential Evolution <nb_de>`
-   * -
-     - :ref:`NSGA-II <nb_nsga2>`
-   * -
-     - :ref:`R-NSGA-II <nb_rnsga2>`
-   * -
-     - :ref:`NSGA-III <nb_nsga3>`
-   * -
-     - :ref:`R-NSGA-II <nb_rnsga2>`
-   * -
-     - :ref:`U-NSGA-III <nb_unsga3>`
-   * -
-     - :ref:`R-NSGA-III <nb_rnsga3>`
-   * -
-     - :ref:`MOEA/D <nb_moead>`
-   * -
-     -
-   * -
-     -
-   * -
-     -
-   * - **Test Problems**
-     - :ref:`Overview <nb_problems>` (single-objective, multi-objective and many-objective)
-   * -
-     -
-   * -
-     -
-   * -
-     -
-   * - **Visualization**
-     - :ref:`Scatter Plot (2D/3D/ND) <nb_scatter>`
-   * -
-     - :ref:`Parallel Coordinate Plot (PCP) <nb_pcp>`
-   * -
-     - :ref:`Radviz <nb_radviz>`
-   * -
-     - :ref:`Star Coordinates <nb_star>`
-   * -
-     - :ref:`Heatmap <nb_heat>`
-   * -
-     - :ref:`Petal Width<nb_petal_width>`
-   * -
-     - :ref:`Spider Web / Radar <nb_radar>`
-   * -
-     -
-   * -
-     -
-   * -
-     -
-   * - **Performance Indicator**
-     - :ref:`Generational Distance (GD) <nb_gd>`
-   * -
-     - :ref:`Inverted Generational Distance (IGD) <nb_igd>`
-   * -
-     - :ref:`GD+ <nb_gd_plus>`
-   * -
-     - :ref:`IGD+ <nb_igd_plus>`
-   * -
-     - :ref:`Hypervolume <nb_hv>`
-   * -
-     -
-   * -
-     -
-   * -
-     -
-   * - **Termination Criterion**
-     - :ref:`Number of Evaluations <nb_n_eval>`
-   * -
-     - :ref:`Number of Generations<nb_n_gen>`
-   * -
-     - :ref:`Design Space Tolerance<nb_xtol>`
-   * -
-     - :ref:`Objective Space Tolerance <nb_ftol>`
-   * -
-     - :ref:`Performance Indicator Bound<nb_pi_bound>`
-   * -
-     -
-   * -
-     -
-   * -
-     -
-   * - **Sampling**
-     - :ref:`Random <nb_sampling_random>`
-   * -
-     - :ref:`Latin Hypercube Sampling <nb_sampling_lhs>`
-   * -
-     -
-   * - **Selection**
-     - :ref:`Random <nb_selection_random>`
-   * -
-     - :ref:`Tournament Selection <nb_selection_tournament>`
-   * -
-     -
-   * -
-     -
-   * -
-     -
-   * - **Crossover**
-     - :ref:`Simulated Binary Crossover<nb_crossover_sbx>`
-   * -
-     - :ref:`Uniform Crossover<nb_crossover_uniform>`
-   * -
-     - :ref:`Half Uniform Crossover<nb_crossover_half_uniform>`
-   * -
-     - :ref:`Differential Crossover<nb_crossover_differential>`
-   * -
-     - :ref:`Point Crossover<nb_crossover_point>`
-   * -
-     - :ref:`Exponential Crossover<nb_crossover_exponential>`
-   * -
-     -
-   * -
-     -
-   * -
-     -
-
-
+.. include:: news_current.rst
+:ref:`More News<news>`
 
 
 About
 ------------------------------------------------------------------------------
 
-This framework is developed and maintained by `Julian Blank <http://www.cse.msu.edu/~blankjul/>`_ who is affiliated to the
-`Computational Optimization and Innovation Laboratory (COIN) <https://www.coin-laboratory.com>`_ supervised
-by `Kalyanmoy Deb <https://www.egr.msu.edu/people/profile/kdeb>`_ at the Michigan State University in
+This framework is developed and maintained by |blankjul| who is affiliated to the
+|coin| supervised
+by |kdeb| at the Michigan State University in
 East Lansing, Michigan, USA.
-Each algorithms is developed as close as possible to the proposed version to the
-best of our knowledge. **NSGA-II** and **NSGA-III** have been develop collaboratively with one of the authors
-and, therefore, we recommend using them for **official** benchmarks.
+
+We have developed the framework for research purposes and hope to contribute to the research area by delivering tools
+for solving and analyzing multi-objective problems. Each algorithms is developed as close as possible to the proposed
+version to the best of our knowledge.
+**NSGA-II** and **NSGA-III** have been developed collaboratively with one of the authors and, therefore, we recommend
+using them for **official** benchmarks.
+
+If you intend to use our framework for **any** profit-making purposes, please contact us. Also, be aware that even
+state of the art algorithms are just the starting point for many optimization problems.
+The full potential of genetic algorithms requires customization and the incorporation of domain knowledge.
+We have more than 20 years experience in the optimization field and are eager to tackle challenging problems.
+Let us know if you are interested in working with experienced collaborators in optimization. Please keep in mind
+that only through such projects we are able to keep developing and improving our framework and make sure
+it meets the current needs of the industry.
+
+Moreover, any kind of **contribution** is more than welcome:
+
+.. |star| image:: resources/images/star.png
+  :height: 25
+  :target: https://github.com/msu-coinlab/pymoo
+
+.. raw:: html
+
+  <div style="margin-left: 10px;">
+
+**(i)** Give us a |star| on |github|.
+This makes not only our framework but in general multi-objective optimization more 
+popular by being listed with a higher rank regarding specific keywords.
+
+**(ii)** In order to offer more and more new algorithms and features, we are more than 
+happy if somebody wants to contribute by developing code. You can see it as a 
+win-win situations, because your development will be linked to your publication(s) which
+can significantly increase the awareness of your work. Please note that, we aim to keep 
+a high-level of code quality and some refactorings might be suggested. 
+
+**(iii)** You like our framework and you would like to use it for profit-making purposes?
+We are always searching for industrial collaborations because they help to direct research to meet 
+the needs the of the industry. In our laboratory solving practical problems has a high priority 
+for every student and can help you to benefit from our research experience we have gained
+over the last years.
+
+.. raw:: html
+
+  <div>
 
 
 
-News
-------------------------------------------------------------------------------
-**April 10, 2019:** The framework has reached a new degree of professionality by improving the
-software documentation regarding tutorial and API.
+If you find a bug or you have any kind of concern regarding correctness please use 
+our |issues| Nobody is perfect
+and only if we are aware of issues we can start to investigate them.
+
 
 
 Content
@@ -212,6 +154,7 @@ Content
 .. toctree::
    :maxdepth: 2
 
+   news_all
    installation
    getting_started.ipynb
    algorithms/index
@@ -224,6 +167,7 @@ Content
    references
    contact
    license
+
 
 
 Indices and tables

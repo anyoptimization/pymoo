@@ -1,0 +1,212 @@
+{#
+
+    Customized SciPy Layout.
+    https://github.com/scipy/scipy-sphinx-theme
+
+    :copyright: Copyright 2007-2011 by the Sphinx team, see AUTHORS.
+    :license: BSD, see LICENSE for details.
+#}
+
+
+{%- set url_root = pathto('', 1) %}
+
+
+<html>
+
+<head>
+
+
+
+    <!--
+    ---------------------------------------
+    CSS
+    ---------------------------------------
+    -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ pathto('_static/css/spc-bootstrap.css', 1) }}">
+    <link rel="stylesheet" type="text/css" href="{{ pathto('_static/css/spc-extend.css', 1) }}">
+    <link rel="stylesheet" type="text/css" href="{{ pathto('_static/css/custom.css', 1) }}">
+    <link rel="stylesheet" href="{{ pathto('_static/' + style, 1) }}" type="text/css">
+    <link rel="stylesheet" href="{{ pathto('_static/pygments.css', 1) }}" type="text/css">
+    
+    {%- for cssfile in css_files %}
+        <link rel="stylesheet" href="{{ pathto(cssfile, 1) }}" type="text/css">
+    {%- endfor %}
+
+
+    
+    <!--
+    ---------------------------------------
+    JavaScript
+    ---------------------------------------
+    -->
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT: '{{ url_root }}',
+            VERSION: '{{ release|e }}',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '{{ '' if no_search_suffix else file_suffix }}',
+            HAS_SOURCE: {{ has_source| lower }}
+          };
+
+
+    </script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="{{ pathto('_static/js/copybutton.js', 1) }}"></script>
+    {%- for scriptfile in script_files %}
+        <script type="text/javascript" src="{{ pathto(scriptfile, 1) }}"></script>
+    {%- endfor %}
+    
+    {%- if favicon %}
+        <link rel="shortcut icon" href="{{ pathto('_static/' + favicon, 1) }}">
+    {%- endif %}
+
+    <meta charset="{{ encoding }}">
+    {{ metatags }}
+
+
+
+	<title>pymoo</title>
+
+
+</head>
+
+
+
+<body>
+
+
+    <!--
+    ---------------------------------------
+    HEADER
+    ---------------------------------------
+    -->
+
+    {%- block header %}
+    <div class="container">
+        <div class="top-scipy-org-logo-header">
+            <a href="{{ pathto('index') }}">
+                <img style="border: 0;" alt="pymoo" src="{{ pathto('_static/img/pymoo.svg', 1) }}"></a>
+        </div>
+    </div>
+    {% endblock %}
+
+
+    <!--
+    ---------------------------------------
+    CONTENT
+    ---------------------------------------
+    -->
+
+    {%- block content %}
+    <div class="container">
+        <div class="main">
+
+
+            <div class="row-fluid">
+                <div class="span9">
+
+                    <!-- Navigation Bar-->
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <div class="spc-navbar">
+                                <ul class="nav nav-pills pull-left">
+
+                                    {%- for link in theme_rootlinks %}
+                                    <li class="active"><a href="{{ link[0] }}">{{ link[1] }}</a></li>
+                                    {%- endfor %}
+
+                                    {%- block rootrellink %}
+                                    {% if pagename != master_doc %}
+                                    <li class="active"><a href="{{ pathto(master_doc) }}">{{ shorttitle|e }}</a></li>
+                                    {% endif %}
+                                    {%- endblock %}
+
+                                    {%- for parent in parents %}
+                                    <li class="active"><a href="{{ parent.link|e }}"
+                                            {% if loop.last %}{{ accesskey("U") }}{% endif %}>{{ parent.title }}</a>
+                                    </li>
+                                    {%- endfor %}
+                                    {%- block relbaritems %} {% endblock %}
+
+                                </ul>
+
+                                <div align="right">
+                                  <b>Latest Version: </b>{{"pymoo==%s" % version }}</b>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {%- block document %}
+                    <div class="bodywrapper">
+                        <div class="body" id="spc-section-body">
+                            {% block body %} 
+                            {% endblock %}
+                        </div>
+                    </div>
+                    {%- endblock %}
+
+                </div>
+
+                <div class="spc-rightsidebar span3">
+                    <div class="sphinxsidebarwrapper">
+                        {%- for sidebartemplate in sidebars %}
+                        {%- include sidebartemplate %}
+                        {%- endfor %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {%- endblock %}
+
+
+
+
+    <!--
+---------------------------------------
+FOOTER
+---------------------------------------
+-->
+
+    {%- block footer %}
+    <div class="container">
+        <div class="footer">
+            <div class="row-fluid">
+                <ul class="inline pull-left">
+                    {%- if show_copyright %}
+                    <li>
+                        {%- if hasdoc('copyright') %}
+                        {% trans path=pathto('copyright'), copyright=copyright|e %}&copy; <a
+                            href="{{ path }}">Copyright</a> {{ copyright }}.{% endtrans %}
+                        {%- else %}
+                        {% trans copyright=copyright|e %}&copy; Copyright {{ copyright }}.{% endtrans %}
+                        {%- endif %}
+                    </li>
+                    {%- endif %}
+                    {%- if last_updated %}
+                    <li>
+                        {% trans last_updated=last_updated|e %}Last updated on {{ last_updated }}.{% endtrans %}
+                    </li>
+                    {%- endif %}
+                    {%- if show_sphinx %}
+                    <li>
+                        {% trans sphinx_version=sphinx_version|e %}Created using <a
+                            href="http://sphinx.pocoo.org/">Sphinx</a> {{ sphinx_version }}.{% endtrans %}
+                    </li>
+                    {%- endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {%- endblock %}
+</body>
+
+</html>

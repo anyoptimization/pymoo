@@ -6,6 +6,7 @@ import re
 # =========================================================================================================
 # Docstrings Dictionary
 # =========================================================================================================
+from pymoo.configuration import Configuration
 
 algorithms = {
     "pop_size": """ int
@@ -149,6 +150,10 @@ docs = {**algorithms, **visualization}
 # =========================================================================================================
 
 def parse_doc_string(source, dest=None, other={}):
+
+    if not Configuration.parse_custom_docs:
+        return
+
     if dest is None:
         dest = source
 
@@ -178,65 +183,3 @@ def parse_doc_string(source, dest=None, other={}):
     dest.__doc__ = signature + "\n" + _doc
 
 
-def dummy(name, kwargs):
-    """
-    A convenience method to get an {type} object just by providing a string.
-
-    Parameters
-    ----------
-
-    name : {{ {options} }}
-        Name of the {type}.
-
-    kwargs : dict
-        Dictionary that should be used to call the method mapped to the {type} factory function.
-
-    Returns
-    -------
-    algorithm : {clazz}
-        An {type} object based on the string. `None` if the {type} was not found.
-
-    """
-    pass
-
-
-def options_to_string(l):
-    return ", ".join(["'%s'" % k[0] for k in l])
-
-
-
-def parse_custom_docs():
-
-    from pymoo.factory import get_algorithm_options, get_selection_options, get_crossover_options, \
-        get_mutation_options, get_termination_options, get_algorithm, get_selection, get_crossover, get_mutation, \
-        get_termination, get_sampling, get_sampling_options
-
-    parse_doc_string(dummy, get_algorithm, {"type": "algorithm",
-                                            "clazz": ":class:`~pymoo.model.algorithm.Algorithm`",
-                                            "options": options_to_string(get_algorithm_options())
-                                            })
-
-    parse_doc_string(dummy, get_sampling, {"type": "sampling",
-                                           "clazz": ":class:`~pymoo.model.sampling.Sampling`",
-                                           "options": options_to_string(get_sampling_options())
-                                           })
-
-    parse_doc_string(dummy, get_selection, {"type": "selection",
-                                            "clazz": ":class:`~pymoo.model.selection.Selection`",
-                                            "options": options_to_string(get_selection_options())
-                                            })
-
-    parse_doc_string(dummy, get_crossover, {"type": "crossover",
-                                            "clazz": ":class:`~pymoo.model.crossover.Crossover`",
-                                            "options": options_to_string(get_crossover_options())
-                                            })
-
-    parse_doc_string(dummy, get_mutation, {"type": "mutation",
-                                           "clazz": ":class:`~pymoo.model.mutation.Mutation`",
-                                           "options": options_to_string(get_mutation_options())
-                                           })
-
-    parse_doc_string(dummy, get_termination, {"type": "termination",
-                                              "clazz": ":class:`~pymoo.model.termination.termination`",
-                                              "options": options_to_string(get_termination_options())
-                                              })

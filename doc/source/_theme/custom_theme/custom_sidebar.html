@@ -1,0 +1,28 @@
+<style>
+#custom_sidebar {padding: 15px 0px 15px 0px}
+#custom_sidebar ul {list-style: none;}
+
+
+#custom_sidebar ul a {
+  padding: 2px 4px 2px 4px;
+  text-decoration: none;
+  font-size: 13px;
+  display: block;
+}
+
+#custom_sidebar ul ul a {
+  padding: 1px 4px 1px 4px;
+  font-size: 11px;
+}
+
+
+#custom_sidebar ul li a:hover {
+  color: black;
+}
+
+
+</style>
+
+<div id="custom_sidebar" class="well sidebar-nav">
+{{ toctree() }}
+</div>

@@ -1,22 +1,15 @@
 {#
-    scipy/layout.html
-    ~~~~~~~~~~~~~~~~~
 
-    Master layout template for Sphinx themes.
+    Customized SciPy Layout.
+    https://github.com/scipy/scipy-sphinx-theme
 
     :copyright: Copyright 2007-2011 by the Sphinx team, see AUTHORS.
     :license: BSD, see LICENSE for details.
 #}
-{%- block doctype -%}
-<!DOCTYPE html>
-{%- endblock %}
-{%- set url_root = pathto('', 1) %}
-{%- if url_root == '#' %}{% set url_root = '' %}{% endif %}
-{%- if not embedded and docstitle %}
-  {%- set titlesuffix = " &mdash; "|safe + docstitle|e %}
-{%- else %}
-  {%- set titlesuffix = "" %}
-{%- endif %}
+
+
+
+
 
 {%- macro relbar_top() %}
     <ul class="nav nav-pills pull-left">
@@ -35,6 +28,8 @@
     </ul>
 {%- endmacro %}
 
+
+
 {%- macro relbar_top_right() %}
     <ul class="nav nav-pills pull-right">
       {%- for rellink in rellinks %}
@@ -49,6 +44,10 @@
 {%- macro relbar_bottom() %}
 {%- endmacro %}
 
+
+
+
+
 {%- macro sidebar() %}
       <div class="spc-rightsidebar span3">
         <div class="sphinxsidebarwrapper">
@@ -59,32 +58,47 @@
             </a></p>
           {%- endif %}
           {%- endblock %}
+
+
           {%- if sidebars != None %}
             {#- new style sidebar: explicitly include/exclude templates #}
             {%- for sidebartemplate in sidebars %}
             {%- include sidebartemplate %}
             {%- endfor %}
+
+
           {%- else %}
+
             {#- old style sidebars: using blocks -- should be deprecated #}
             {%- block sidebartoc %}
             {%- include "localtoc.html" %}
             {%- endblock %}
+
             {%- block sidebarrel %}
             {%- include "relations.html" %}
             {%- endblock %}
+
             {%- block sidebarsourcelink %}
             {%- include "sourcelink.html" %}
             {%- endblock %}
+
             {%- if customsidebar %}
             {%- include customsidebar %}
             {%- endif %}
+
             {%- block sidebarsearch %}
             {%- include "searchbox.html" %}
             {%- endblock %}
+
           {%- endif %}
         </div>
       </div>
 {%- endmacro %}
+
+
+
+
+
 
 {%- macro script() %}
     <script type="text/javascript">
@@ -111,6 +125,11 @@
     <link rel="stylesheet" href="{{ pathto(cssfile, 1) }}" type="text/css" >
     {%- endfor %}
 {%- endmacro %}
+
+
+
+
+
 
 <html>
   <head>
@@ -195,6 +214,9 @@
         {% endif %}
 {% endblock %}
 	<div class="row-fluid">
+
+
+
 	  {%- if theme_sidebar == 'left' -%}
             {{ sidebar() }}
           {%- endif %}

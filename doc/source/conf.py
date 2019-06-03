@@ -1,7 +1,18 @@
 import sys, os
 
+# =========================================================================================================
+# Import pymoo
+# =========================================================================================================
+
+sys.path.insert(0, os.path.abspath('../../../pymoo'))
+import pymoo
+from pymoo.configuration import Configuration
+
 # sphinx version what should be used to compiling the documentation
 needs_sphinx = '2.0'
+Configuration.parse_custom_docs = True
+
+only_base = True
 
 # =========================================================================================================
 # Extensions
@@ -44,11 +55,10 @@ source_suffix = '.rst'
 master_doc = 'index'
 project = u'pymoo'
 copyright = u'2019, Julian Blank, Michigan State University'
-version = '0.3.1'
-release = '0.3.1'
+version = pymoo.__version__
+release = version
 pygments_style = 'sphinx'
 html_title = 'pymoo'
-#html_title = 'pymoo %s' % version
 
 # =========================================================================================================
 # sphinx.ext.intersphinx - Mappings to other projects
@@ -57,7 +67,7 @@ html_title = 'pymoo'
 intersphinx_mapping = {'python': ('http://docs.python.org/2', None),
                        'numpy': ('http://docs.scipy.org/doc/numpy', "http://docs.scipy.org/doc/numpy/objects.inv"),
                        'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
-                       'matplotlib': ('http://matplotlib.sourceforge.net', None)}
+                       'matplo tlib': ('http://matplotlib.sourceforge.net', None)}
 
 # =========================================================================================================
 # nbsphinx - Using jupyter notebooks in this documentation
@@ -124,7 +134,7 @@ numpydoc_class_members_toctree = False
 
 # A regular expression matching citations which should be mangled to avoid conflicts due to duplication across
 # the documentation. Defaults to [\w-]+.
-#numpydoc_citation_re = False
+# numpydoc_citation_re = False
 
 # Until version 0.8, parameter definitions were shown as blockquotes, rather than in a definition list.
 # If your styling requires blockquotes, switch this config option to True. This option will be removed in version 0.10.
@@ -134,16 +144,10 @@ numpydoc_use_blockquotes = False
 numpydoc_edit_link = False
 
 # =========================================================================================================
-# autodoc - import the library
-# =========================================================================================================
-
-sys.path.insert(0, os.path.abspath('../../../pymoo'))
-
-# =========================================================================================================
 # html
 # =========================================================================================================
 
-html_theme = 'scipy'
+html_theme = 'custom_theme'
 html_theme_path = ['_theme']
 html_static_path = ['_static']
 
@@ -166,4 +170,5 @@ html_theme_options = {
     "rootlinks": links_local
 }
 
-# html_sidebars = {'index': ['indexsidebar.html', 'searchbox.html']}
+html_sidebars = {'**': ['custom_sidebar.html']}
+

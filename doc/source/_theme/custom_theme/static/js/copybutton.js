@@ -2,6 +2,7 @@
 // File originates from the cpython source found in Doc/tools/sphinxext/_static/copybutton.js
 
 $(document).ready(function() {
+
     /* Add a [>>>] button on the top-right corner of code samples to hide
      * the >>> and ... prompts and the output and thus make the code
      * copyable. */

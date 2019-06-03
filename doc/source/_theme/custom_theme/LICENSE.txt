@@ -1,3 +1,9 @@
+We are using the SciPy Template. It looks awesome.
+https://github.com/scipy/scipy-sphinx-theme
+
+We customized it where necessary. Thanks!
+
+
 The following copyright statement applies to all files, excluding
 exceptions mentioned explicitly below:
 
