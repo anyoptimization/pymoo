@@ -44,7 +44,7 @@ class NSGA3(GeneticAlgorithm):
         if len(pop) == 1:
             self.opt = pop
         else:
-            self.opt = pop[self.pop.get("is_closest")]
+            self.opt = pop[self.pop.get("is_closest")[I]]
 
 
 def comp_by_cv_then_random(pop, P, **kwargs):

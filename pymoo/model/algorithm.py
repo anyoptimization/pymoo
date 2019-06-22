@@ -129,10 +129,11 @@ class Algorithm:
         else:
             opt = self.opt
 
-        opt = opt[opt.collect(lambda ind: ind.feasible)[:, 0]]
-
+        I = opt.collect(lambda ind: ind.feasible)
+        
         # if at least one feasible solution was found
-        if len(opt) > 0:
+        if I.size != 0:
+            opt = opt[I[:, 0]]
 
             if problem.n_obj > 1:
                 I = NonDominatedSorting().do(opt.get("F"), only_non_dominated_front=True)
