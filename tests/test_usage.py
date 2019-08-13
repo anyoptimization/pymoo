@@ -1,43 +1,44 @@
 import os
 import unittest
+from pathlib import Path
+
+from pymoo.configuration import get_pymoo
 
 
-class UsageTest(unittest.TestCase):
+def test_usage(usages):
+    usages = [f for f in usages if f != "__init__.py"]
 
-    def test(self):
+    print(usages)
 
-        USAGE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "pymoo", "usage")
-        # USAGE_DIR = os.path.dirname(os.path.realpath(__file__))
+    for path_to_file in usages:
 
-        usages = os.listdir(USAGE_DIR)
-        print(usages)
+        fname = os.path.basename(path_to_file)
 
-        for fname in usages:
+        if fname == "__init__.py":
+            continue
 
-            if fname == "test_usage.py":
-                continue
+        print(fname)
 
-            with self.subTest(msg="Checking %s" % fname, fname=fname):
+        with open(path_to_file) as f:
+            s = f.read()
 
-                print("=" * 50)
-                print(fname)
-                print("=" * 50)
+            no_plots = "import matplotlib\n" \
+                       "import matplotlib.pyplot\n" \
+                       "matplotlib.use('Agg')\n"
 
-                with open(os.path.join(USAGE_DIR, fname)) as f:
-                    s = f.read()
+            s = no_plots + s + "\nmatplotlib.pyplot.close()\n"
 
-                    no_plots = "import matplotlib\n" \
-                               "import matplotlib.pyplot\n" \
-                               "matplotlib.use('Agg')\n"
+            try:
+                exec(s, globals())
+            except:
+                raise Exception("Usage %s failed." % fname)
 
-                    s = no_plots + s
 
-                    s += "\nmatplotlib.pyplot.close()\n"
+class AllUsageTest(unittest.TestCase):
 
-                    try:
-                        exec(s, globals())
-                    except:
-                        raise Exception("Usage %s failed." % fname)
+    def test_usages(self):
+        folder = os.path.join(get_pymoo(), "pymoo", "usage")
+        test_usage([os.path.join(folder, fname) for fname in Path(folder).glob('**/*.py')])
 
 
 if __name__ == '__main__':

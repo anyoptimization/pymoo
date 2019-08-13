@@ -2,6 +2,9 @@ import numpy as np
 import scipy
 import scipy.spatial
 
+from pymoo.model.population import Population
+from pymoo.model.sampling import Sampling
+
 
 def parameter_less(F, CV):
     val = np.copy(F)
@@ -11,7 +14,6 @@ def parameter_less(F, CV):
     val[infeasible] = parameter_less[infeasible]
 
     return val
-
 
 
 def swap(M, a, b):
@@ -46,10 +48,9 @@ def parameter_less_constraints(F, CV, F_max=None):
 
 
 def random_permuations(n, l):
-    from pymoo.rand import random
     perms = []
     for i in range(n):
-        perms.append(random.perm(l))
+        perms.append(np.random.permutation(l))
     P = np.concatenate(perms)
     return P
 
@@ -74,6 +75,14 @@ def get_duplicates(M):
     return res
 
 
+def euclidean_distance(a, b):
+    return np.sqrt(((a - b) ** 2).sum(axis=1))
+
+
+def norm_euclidean_distance(problem):
+    return lambda a, b: np.sqrt((((a - b) / (problem.xu - problem.xl)) ** 2).sum(axis=1))
+
+
 def cdist(A, B, **kwargs):
     if A.dtype != np.object:
         return scipy.spatial.distance.cdist(A, B, **kwargs)
@@ -86,11 +95,11 @@ def cdist(A, B, **kwargs):
         return D
 
 
-def vectorized_cdist(A, B, func_dist):
+def vectorized_cdist(A, B, func_dist=euclidean_distance, **kwargs):
     u = np.repeat(A, B.shape[0], axis=0)
     v = np.tile(B, (A.shape[0], 1))
 
-    D = func_dist(u, v)
+    D = func_dist(u, v, **kwargs)
     M = np.reshape(D, (A.shape[0], B.shape[0]))
     return M
 
@@ -104,10 +113,125 @@ def covert_to_type(problem, X):
         return X < (problem.xu - problem.xl) / 2
 
 
+def find_duplicates(X, epsilon=1e-16):
+    # calculate the distance matrix from each point to another
+    D = cdist(X, X)
+
+    # set the diagonal to infinity
+    D[np.triu_indices(len(X))] = np.inf
+
+    # set as duplicate if a point is really close to this one
+    is_duplicate = np.any(D < epsilon, axis=1)
+
+    return is_duplicate
+
+
+def at_least_2d_array(x, extend_as="row"):
+    if not isinstance(x, np.ndarray):
+        x = np.array([x])
+
+    if x.ndim == 1:
+        if extend_as == "row":
+            x = x[None, :]
+        elif extend_as == "column":
+            x = x[:, None]
+
+    return x
+
+
+def to_1d_array_if_possible(x):
+    if not isinstance(x, np.ndarray):
+        x = np.array([x])
+
+    if x.ndim == 2:
+        if x.shape[0] == 1 or x.shape[1] == 1:
+            x = x.flatten()
+
+    return x
+
+
+def stack(*args, flatten=True):
+    if not flatten:
+        ps = np.concatenate([e[None, ...] for e in args])
+    else:
+        ps = np.row_stack(args)
+    return ps
+
+
+def all_combinations(A, B):
+    u = np.repeat(A, B.shape[0], axis=0)
+    v = np.tile(B, A.shape[0])
+    return np.column_stack([u, v])
+
+
+def pop_from_sampling(problem, sampling, n_initial_samples, pop=None):
+    # the population type can be different - (different type of individuals)
+    if pop is None:
+        pop = Population()
+
+    # provide a whole population object - (individuals might be already evaluated)
+    if isinstance(sampling, Population):
+        pop = sampling
+
+    else:
+        # if just an X array create a pop
+        if isinstance(sampling, np.ndarray):
+            pop = pop.new("X", sampling)
+
+        elif isinstance(sampling, Sampling):
+            # use the sampling
+            pop = sampling.do(problem, pop, n_initial_samples)
+
+        else:
+            return None
+
+    return pop
+
+
+def evaluate_if_not_done_yet(evaluator, problem, pop, algorithm=None):
+    I = np.where(pop.get("F") == None)[0]
+    if len(I) > 0:
+        pop[I] = evaluator.eval(problem, pop[I], algorithm=algorithm)
+
+
 if __name__ == '__main__':
+    x = np.linspace(0, 5, 50)
+    X = all_combinations(x, x)
+
     M = np.random.random((100, 3))
 
     M[3, :] = M[55, :]
     M[10, :] = M[55, :]
 
     print(get_duplicates(M))
+
+
+def set_if_none(kwargs, str, val):
+    if str not in kwargs:
+        kwargs[str] = val
+
+
+def set_if_none_from_tuples(kwargs, *args):
+    for key, val in args:
+        if key not in kwargs:
+            kwargs[key] = val
+
+
+def calc_perpendicular_distance(N, ref_dirs):
+    u = np.tile(ref_dirs, (len(N), 1))
+    v = np.repeat(N, len(ref_dirs), axis=0)
+
+    norm_u = np.linalg.norm(u, axis=1)
+
+    scalar_proj = np.sum(v * u, axis=1) / norm_u
+    proj = scalar_proj[:, None] * u / norm_u[:, None]
+    val = np.linalg.norm(proj - v, axis=1)
+    matrix = np.reshape(val, (len(N), len(ref_dirs)))
+
+    return matrix
+
+
+def distance_of_closest_points_to_others(X):
+    D = vectorized_cdist(X, X)
+    np.fill_diagonal(D, np.inf)
+    return D.argmin(axis=1), D.min(axis=1)

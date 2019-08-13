@@ -2,29 +2,27 @@ import numpy as np
 
 from pymoo.model.crossover import Crossover
 from pymoo.operators.crossover.util import crossover_mask
-from pymoo.rand import random
 
 
 class ExponentialCrossover(Crossover):
 
-    def __init__(self, prob):
-        super().__init__(2, 2)
-        self.prob = prob
+    def __init__(self, prob_exp=0.75, **kwargs):
+        super().__init__(2, 2, **kwargs)
+        self.prob_exp = prob_exp
 
-    def _do(self, problem, pop, parents, **kwargs):
+    def _do(self, problem, X, **kwargs):
 
         # get the X of parents and count the matings
-        X = pop.get("X")[parents.T]
         _, n_matings, n_var = X.shape
 
         # the mask do to the crossover
         M = np.full((n_matings, n_var), False)
 
         # start point of crossover
-        n = random.randint(0, n_var, size=len(pop))
+        n = np.random.randint(0, n_var, size=X.shape[1])
 
         # the probabilities are calculated beforehand
-        r = random.random((n_matings, n_var)) < self.prob
+        r = np.random.random((n_matings, n_var)) < self.prob_exp
 
         # create for each individual the crossover range
         for i in range(n_matings):
@@ -43,4 +41,4 @@ class ExponentialCrossover(Crossover):
                     break
 
         _X = crossover_mask(X, M)
-        return pop.new("X", _X)
+        return _X

@@ -1,0 +1,45 @@
+
+# TODO
+
+
+- Write test suite for all algorithms (many problems just run once - no crash should occur)
+- Add global tests of all optimization methods
+- Elementwise function evaluation gradient is not working yet
+- Report None of infeasible or feasible
+
+
+
+
+####################################################################
+
+# DONE
+- NSGA3 - add non-dom check finally (factor out the algorithm method and reuse)
+- !!! NDS and crowding cast to np.float
+- !!! Rewrite integer operation with a wrapper - check if casting is working for different types
+- copy of algorithm object when minimize is called
+- Add sidebar to homepage
+- Decision Making (Pseudo Weight, ...)
+- Termination Criteria in x space and fspace - xtol and ftol
+- PCP values do have different ranges
+- Add ZDT5 and show it for NSGA2
+- 0.9 prob for crossover in general
+- add normalization to radar - externalize from pcp
+- Performance check nsga3
+- Deliver just .c files for pip to make the build independent from Cython
+- Compilation issue with MacOSX Macoave
+- NSGA3 worst swap of arguments
+
+
+####################################################################
+
+# Future
+
+- Add mixed variable possibility
+- PCX as crossover
+- Remove image file from git history
+- (mu,lambda) and (mu+lambda) difference
+- Add NoCrossover and NoMutation
+- Statistics of Survival and more attributes for individuals
+- ask and tell interface Documentation
+- maybe include CMA-ES: https://github.com/CMA-ES/pycma
+- Implement an async version of algorithms
