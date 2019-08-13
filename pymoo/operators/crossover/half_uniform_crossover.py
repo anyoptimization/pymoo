@@ -4,19 +4,15 @@ import numpy as np
 
 from pymoo.model.crossover import Crossover
 from pymoo.operators.crossover.util import crossover_mask
-from pymoo.rand import random
 
 
 class HalfUniformCrossover(Crossover):
 
-    def __init__(self, prob=0.5):
-        super().__init__(2, 2)
-        self.prob = prob
+    def __init__(self, prob_hux=0.5, **kwargs):
+        super().__init__(2, 2, **kwargs)
+        self.prob_hux = prob_hux
 
-    def _do(self, problem, pop, parents, **kwargs):
-
-        # get the X of parents and count the matings
-        X = pop.get("X")[parents.T]
+    def _do(self, problem, X, **kwargs):
         _, n_matings, n_var = X.shape
 
         # the mask do to the crossover
@@ -30,8 +26,8 @@ class HalfUniformCrossover(Crossover):
 
             n = math.ceil(len(I) / 2)
             if n > 0:
-                _I = I[random.perm(len(I))[:n]]
+                _I = I[np.random.permutation(len(I))[:n]]
                 M[i, _I] = True
 
         _X = crossover_mask(X, M)
-        return pop.new("X", _X)
+        return _X

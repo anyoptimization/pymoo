@@ -1,17 +1,48 @@
 import numpy as np
 
-from pymoo.algorithms.nsga2 import nsga2
+from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.algorithms.nsga3 import get_extreme_points_c
 from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
 from pymoo.operators.selection.random_selection import RandomSelection
-from pymoo.rand import random
-from pymoo.util.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
 
 # =========================================================================================================
 # Implementation
 # =========================================================================================================
+
+class RNSGA2(NSGA2):
+
+    def __init__(self,
+                 ref_points,
+                 epsilon=0.001,
+                 normalization="front",
+                 weights=None,
+                 extreme_points_as_reference_points=False,
+                 **kwargs):
+        """
+
+        Parameters
+        ----------
+
+        ref_points : {ref_points}
+        epsilon : float
+        weights : np.array
+        normalization : {{'no', 'front', 'ever'}}
+        extreme_points_as_reference_points : bool
+
+        """
+
+        self.epsilon = epsilon
+        self.weights = weights
+        self.normalization = normalization
+        self.selection = RandomSelection()
+        self.survival = RankAndModifiedCrowdingSurvival(ref_points, epsilon, weights, normalization,
+                                                        extreme_points_as_reference_points)
+
+        super().__init__(**kwargs)
+
 
 class RankAndModifiedCrowdingSurvival(Survival):
 
@@ -36,7 +67,7 @@ class RankAndModifiedCrowdingSurvival(Survival):
         self.ideal_point = np.full(self.n_obj, np.inf)
         self.nadir_point = np.full(self.n_obj, -np.inf)
 
-    def _do(self, pop, n_survive, **kwargs):
+    def _do(self, problem, pop, n_survive, **kwargs):
 
         # get the objective space values and objects
         F = pop.get("F")
@@ -158,49 +189,8 @@ def calc_norm_pref_distance(A, B, weights, ideal, nadir):
 # =========================================================================================================
 
 
-def rnsga2(
-        ref_points,
-        epsilon=0.001,
-        normalization="front",
-        weights=None,
-        extreme_points_as_reference_points=False,
-        **kwargs):
-    """
+def rnsga2(*args, **kwargs):
+    return RNSGA2(*args, **kwargs)
 
 
-    Parameters
-    ----------
-
-    ref_points : {ref_points}
-
-    epsilon : float
-
-    weights : np.array
-
-    normalization : {{'no', 'front', 'ever'}}
-
-    extreme_points_as_reference_points : bool
-
-
-
-    Returns
-    -------
-    rnsga2 : :class:`~pymoo.model.algorithm.Algorithm`
-        Returns an RNSGA2 algorithm object.
-
-
-    """
-
-    rnsga2 = nsga2(**kwargs)
-
-    rnsga2.epsilon = epsilon
-    rnsga2.weights = weights
-    rnsga2.normalization = normalization
-    rnsga2.selection = RandomSelection()
-    rnsga2.survival = RankAndModifiedCrowdingSurvival(ref_points, epsilon, weights, normalization,
-                                                      extreme_points_as_reference_points)
-
-    return rnsga2
-
-
-parse_doc_string(rnsga2)
+parse_doc_string(RNSGA2.__init__)

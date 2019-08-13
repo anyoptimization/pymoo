@@ -1,7 +1,6 @@
 import numpy as np
 
 from pymoo.model.mutation import Mutation
-from pymoo.rand import random
 
 
 class BinaryBitflipMutation(Mutation):
@@ -10,17 +9,17 @@ class BinaryBitflipMutation(Mutation):
         super().__init__()
         self.prob = prob
 
-    def _do(self, problem, pop, **kwargs):
+    def _do(self, problem, X, **kwargs):
         if self.prob is None:
             self.prob = 1.0 / problem.n_var
 
-        X = pop.get("X")
+        X = X.astype(np.bool)
         _X = np.full(X.shape, np.inf)
 
-        M = random.random(X.shape)
-        flip, not_flip = M < self.prob, M > self.prob
+        M = np.random.random(X.shape)
+        flip, no_flip = M < self.prob, M >= self.prob
 
         _X[flip] = np.logical_not(X[flip])
-        _X[not_flip] = X[not_flip]
+        _X[no_flip] = X[no_flip]
 
-        return pop.new("X", _X.astype(np.bool))
+        return _X.astype(np.bool)

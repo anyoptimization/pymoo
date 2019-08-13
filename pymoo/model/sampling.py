@@ -9,8 +9,7 @@ class Sampling:
 
     """
 
-    @abstractmethod
-    def sample(self, problem, pop, n_samples, **kwargs):
+    def do(self, problem, pop, n_samples, **kwargs):
         """
         Sample new points with problem information if necessary.
 
@@ -31,4 +30,11 @@ class Sampling:
             Samples points in a two dimensional array
 
         """
-        return pop
+        val = self._do(problem, n_samples, **kwargs)
+        return pop.new("X", val)
+
+    @abstractmethod
+    def _do(self, problem, n_samples, **kwargs):
+        pass
+
+

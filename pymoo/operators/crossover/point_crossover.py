@@ -2,23 +2,21 @@ import numpy as np
 
 from pymoo.model.crossover import Crossover
 from pymoo.operators.crossover.util import crossover_mask
-from pymoo.rand import random
 
 
 class PointCrossover(Crossover):
 
-    def __init__(self, n_points):
-        super().__init__(2, 2)
+    def __init__(self, n_points, **kwargs):
+        super().__init__(2, 2, **kwargs)
         self.n_points = n_points
 
-    def _do(self, problem, pop, parents, **kwargs):
+    def _do(self, problem, X, **kwargs):
 
         # get the X of parents and count the matings
-        X = pop.get("X")[parents.T]
         _, n_matings, n_var = X.shape
 
         # start point of crossover
-        r = np.row_stack([random.perm(n_var-1) + 1 for _ in range(n_matings)])[:, :self.n_points]
+        r = np.row_stack([np.random.permutation(n_var - 1) + 1 for _ in range(n_matings)])[:, :self.n_points]
         r.sort(axis=1)
         r = np.column_stack([r, np.full(n_matings, n_var)])
 
@@ -35,4 +33,5 @@ class PointCrossover(Crossover):
                 j += 2
 
         _X = crossover_mask(X, M)
-        return pop.new("X", _X)
+
+        return _X

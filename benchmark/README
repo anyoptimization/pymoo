@@ -1,0 +1,42 @@
+-------------------------------------------------------------------------------------------------
+Benchmark
+-------------------------------------------------------------------------------------------------
+
+This folder contains an example benchmark setup for algorithms. It is constructed to be executed
+on a single-machine with many cores. Since most of the algorithm execute pretty fast we did
+not setup a distributed system for our benchmarking yet.
+
+
+1. Run the corresponding benchmark file which will create the configuration into the
+pymoo/benchmark/runs folder. You will find for a run a persisted configuration and a batch file
+run.bat that contains a line to run each configuration.
+
+2. The framework must be available where you execute the benchmark. Either you use the globally
+installed pymoo through pip or if you are developing a new algorithm you need to import the
+local project. To do so, open pymoo/benchmark/execute.py and make sure that the folder to
+pymoo is imported correctly. E.g.
+
+sys.path.insert(0, "/home/blankjul/workspace/pymoo/")
+
+
+
+Serialized
+========================
+
+In order to run all algorithms serialized you can now simply execute:
+
+cd pymoo/benchmark
+sh runs/<algorithm>/run.bat
+
+This will run all algorithms in a row. Be careful to be in the benchmark folder.
+
+
+Multi Processes
+========================
+
+For parallelization you can use the runner.py by provided the path to the run.bat and the number
+processes to be used.
+
+python runner.py runs/<algorithm>/run.bat 32
+
+To run it on 32 processes.

@@ -1,7 +1,6 @@
 import numpy as np
 
 from pymoo.model.sampling import Sampling
-from pymoo.rand import random
 from pymoo.util.misc import cdist
 
 
@@ -12,18 +11,21 @@ class LatinHypercubeSampling(Sampling):
     Implementation is similar to the Matlab lhsdesign method and offers the same options for the sampling.
     """
 
-    def __init__(self, smooth=True, iterations=5, criterion="maxmin") -> None:
+    def __init__(self,
+                 smooth=True,
+                 iterations=20,
+                 criterion="maxmin") -> None:
         super().__init__()
         self.smooth = smooth
         self.iterations = iterations
         self.criterion = criterion
 
     def _sample(self, n_samples, n_var):
-        X = random.random(size=(n_samples, n_var))
+        X = np.random.random(size=(n_samples, n_var))
         val = X.argsort(axis=0) + 1
 
         if self.smooth:
-            val = val - random.random(val.shape)
+            val = val - np.random.random(val.shape)
         else:
             val = val - 0.5
         val /= n_samples
@@ -32,19 +34,26 @@ class LatinHypercubeSampling(Sampling):
 
     def _calc_score(self, X):
 
-        if self.criterion == "maxmin":
-            D = cdist(X, X)
-            np.fill_diagonal(D, np.inf)
-            return np.min(D)
+        if isinstance(self.criterion, str):
 
-        elif self.criterion == "correlation":
-            M = np.corrcoef(X.T, rowvar=True)
-            return -np.sum(np.tril(M, -1) ** 2)
+            if self.criterion == "maxmin":
+                D = cdist(X, X)
+                np.fill_diagonal(D, np.inf)
+                return np.min(D)
+
+            elif self.criterion == "correlation":
+                M = np.corrcoef(X.T, rowvar=True)
+                return -np.sum(np.tril(M, -1) ** 2)
+
+            else:
+                raise Exception("Unknown criterion.")
+        elif callable(self.criterion):
+            return self.criterion(X)
 
         else:
-            raise Exception("Unknown criterium.")
+            raise Exception("Either provide a str or a function as a criterion!")
 
-    def sample(self, problem, pop, n_samples, **kwargs):
+    def do(self, problem, pop, n_samples, **kwargs):
 
         # sample for the first time -
         X = self._sample(n_samples, problem.n_var)

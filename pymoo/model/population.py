@@ -26,6 +26,12 @@ class Population(np.ndarray):
     def __deepcopy__(self, memo):
         return self.copy()
 
+    @classmethod
+    def create(cls, *args):
+        pop = np.concatenate([pop_from_array_or_individual(arg) for arg in args]).view(Population)
+        pop.individual = Individual()
+        return pop
+
     def new(self, *args):
 
         if len(args) == 1:
@@ -61,6 +67,8 @@ class Population(np.ndarray):
                 else:
                     self[i].data[key] = values[i]
 
+        return self
+
     def get(self, *args):
 
         val = {}
@@ -83,13 +91,29 @@ class Population(np.ndarray):
         else:
             return tuple(res)
 
-
-
     def __array_finalize__(self, obj):
         if obj is None:
             return
         self.individual = getattr(obj, 'individual', None)
 
+
+def pop_from_array_or_individual(array, pop=None):
+    # the population type can be different - (different type of individuals)
+    if pop is None:
+        pop = Population()
+
+    # provide a whole population object - (individuals might be already evaluated)
+    if isinstance(array, Population):
+        pop = array
+    elif isinstance(array, np.ndarray):
+        pop = pop.new("X", [array])
+    elif isinstance(array, Individual):
+        pop = Population(1)
+        pop[0] = array
+    else:
+        return None
+
+    return pop
 
 if __name__ == '__main__':
     pop = Population(10)

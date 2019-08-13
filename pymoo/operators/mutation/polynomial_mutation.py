@@ -1,38 +1,33 @@
 import numpy as np
 
 from pymoo.model.mutation import Mutation
-from pymoo.operators.repair.out_of_bounds_repair import OutOfBoundsRepair
-from pymoo.rand import random
+from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds
 
 
 class PolynomialMutation(Mutation):
-    def __init__(self, eta, prob=None, var_type=np.double):
+    def __init__(self, eta, prob=None):
         super().__init__()
         self.eta = float(eta)
-        self.var_type = var_type
+
         if prob is not None:
             self.prob = float(prob)
         else:
             self.prob = None
 
-    def _do(self, problem, pop, **kwargs):
+    def _do(self, problem, X, **kwargs):
 
-        X = pop.get("X").astype(np.double)
+        X = X.astype(np.float)
         Y = np.full(X.shape, np.inf)
 
         if self.prob is None:
             self.prob = 1.0 / problem.n_var
 
-        do_mutation = random.random(X.shape) < self.prob
+        do_mutation = np.random.random(X.shape) < self.prob
 
         Y[:, :] = X
 
         xl = np.repeat(problem.xl[None, :], X.shape[0], axis=0)[do_mutation]
         xu = np.repeat(problem.xu[None, :], X.shape[0], axis=0)[do_mutation]
-
-        if self.var_type == np.int:
-            xl -= 0.5
-            xu += (0.5 - 1e-16)
 
         X = X[do_mutation]
 
@@ -41,7 +36,7 @@ class PolynomialMutation(Mutation):
 
         mut_pow = 1.0 / (self.eta + 1.0)
 
-        rand = random.random(X.shape)
+        rand = np.random.random(X.shape)
         mask = rand <= 0.5
         mask_not = np.logical_not(mask)
 
@@ -67,9 +62,7 @@ class PolynomialMutation(Mutation):
         # set the values for output
         Y[do_mutation] = _Y
 
-        if self.var_type == np.int:
-            Y = np.rint(Y).astype(np.int)
+        # in case out of bounds repair (very unlikely)
+        Y = repair_out_of_bounds(problem, Y)
 
-        off = OutOfBoundsRepair().do(problem, pop.new("X", Y))
-
-        return off
+        return Y

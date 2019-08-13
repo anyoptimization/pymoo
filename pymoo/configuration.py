@@ -1,9 +1,9 @@
-from pymoo.rand.impl.numpy_random_generator import NumpyRandomGenerator
 import os
 
 
 class Configuration:
-    rand = NumpyRandomGenerator()
+    show_compile_hint = True
+    parse_custom_docs = False
 
 
 # returns the directory to be used for imports
