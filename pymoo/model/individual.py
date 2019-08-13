@@ -3,12 +3,12 @@ import copy
 
 class Individual:
 
-    def __init__(self, **kwargs) -> None:
-        self.X = None
-        self.F = None
-        self.CV = None
-        self.G = None
-        self.feasible = None
+    def __init__(self, X=None, F=None, CV=None, G=None, feasible=None, **kwargs) -> None:
+        self.X = X
+        self.F = F
+        self.CV = CV
+        self.G = G
+        self.feasible = feasible
         self.data = kwargs
 
     def set(self, key, value):

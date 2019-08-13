@@ -1,36 +1,29 @@
-.DS_Store
+**/.DS_Store
+**/.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-
-*.c
-*.cpp
+*.run
 *.so
 
-pymoo/experimental
 
+# files which are in tests
+tests/!archive/*
+tests/!archive_tests/*
+tests/!experimental/*
 
-README.html
+benchmark/runs/*
 
-pymoo/cython/*html
-
-experiments/runs
-
-
-tests/resources/*
-
+# any video or other output file
 *.mp4
 *.out
 *.dat
 
-pymoo/.DS_Store
-
+# pycharm folder
 .idea/
 
-# C extensions
-*.so
 
 # Distribution / packaging
 .Python

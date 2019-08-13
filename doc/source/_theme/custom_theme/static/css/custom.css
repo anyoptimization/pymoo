@@ -1,0 +1,14 @@
+.bodywrapper {
+  margin-top:20px;
+}
+
+.my-table {
+  margin: 10px 0px;
+  font-size:12.5px;
+  width: 80%;
+}
+
+.new-flag {
+  height: 2em;
+  display: inline;
+}

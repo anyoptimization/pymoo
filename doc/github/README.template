@@ -41,7 +41,7 @@ The official release is always available at PyPi:
 
 .. code:: bash
 
-    pip install Cython>=0.29 numpy>=1.15 pymoo
+    pip install -U pymoo
 
 
 For the current developer version:
@@ -70,12 +70,18 @@ However, for instance executing NSGA2:
 
 .. code:: python
 
-    {% macro someop() %}{% include "pymoo/usage/nsga2.py" %}{% endmacro %}
+    {% macro someop() %}{% include "pymoo/usage/algorithms/usage_nsga2.py" %}{% endmacro %}
     {{ someop()|indent }}
 
 
 
 Contact
 ====================================================================
-{% include 'docs/source/_contact.rst' %}
+
+Feel free to contact me if you have any question:
+
+| Julian Blank (blankjul [at] egr.msu.edu)
+| Michigan State University
+| Computational Optimization and Innovation Laboratory (COIN)
+| East Lansing, MI 48824, USA
 

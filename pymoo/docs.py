@@ -6,9 +6,9 @@ import re
 # =========================================================================================================
 # Docstrings Dictionary
 # =========================================================================================================
+from pymoo.configuration import Configuration
 
-
-docs = {
+algorithms = {
     "pop_size": """ int
                 The population sized used by the algorithm.
     """,
@@ -36,7 +36,7 @@ docs = {
                     This object defines the mating selection to be used. 
                     In an evolutionary algorithm each generation parents need to be selected to produce new offsprings using 
                     different recombination and mutation operators. Different strategies for selecting parents are possible e.g. 
-                    selecting them just randomly, only in the neighbourhood, using a tournament selection to introduce some seletion 
+                    selecting them just randomly, only in the neighborhood, using a tournament selection to introduce some selection 
                     pressure, ... 
                     """,
     "crossover": """:class:`~pymoo.model.crossover.Crossover`
@@ -55,8 +55,8 @@ docs = {
     "survival": """:class:`~pymoo.model.survival.Survival`
                     The survival selection is the key for many genetic algorithms. It is responsible to define the
                     goal of convergence by choosing the individual to survive or be truncated each generation.
-                    For single-objective problems a selection based on the fitness is used commonly. However, for 
-                    multi-objective problems different concepts are introduced.
+                    For single-objective single a selection based on the fitness is used commonly. However, for 
+                    multi-objective single different concepts are introduced.
                 """,
 
     "ref_points": """:obj:`numpy.array`
@@ -84,12 +84,69 @@ docs = {
 
 }
 
+visualization = {
+    "figsize": """tuple
+                The figure size. Default (figsize=(8, 6)). For some plots changing the size might have side-effects for position.
+                """,
+
+    "title": """str or tuple
+                The title of the figure. If some additional kwargs should be provided this can be achieved by providing a tuple
+                ("name", {"key" : val}).
+                """,
+
+    "legend": """str
+                Whether a legend should be shown or not.
+                """,
+
+    "tight_layout": """bool
+                        Whether tight layout should be used.
+                        """,
+
+    "bounds": """tuple
+                If plot requires normalization, it might be necessary to supply the boundaries. (Otherwise they might be
+                approximate by the minimum and maximum of the provided data). The boundaries should be provided as a list/tuple or
+                2D numpy array, where the first element represents the minimum, second the second the maximum values.
+                If only an integer or float is supplied, the boundaries apply for each variable.
+                """,
+
+    "reverse": """bool
+                    If plot requires normalization, then the reverse values can be plotted (1 - Input). For some plots
+                    it can be useful to interpret a larger area as better regarding a value. If minimization applies, a smaller
+                    area means better, which can be misleading.
+                    """,
+
+    "axis_style": """dict
+                        Most of the plots consists of an axis. The style of the axis, e.g. color, alpha, ..., can be changed to
+                        further modify the plot appealing.
+                        """,
+
+    "cmap": """colormap
+                    For some plots different kind of colors are used. The colormap can be changed to modify the color sequence
+                    for the plots.
+                    """,
+
+    "labels": """str or list
+                    The labels to be used for each variable provided in the plot. If a string is used, then they will
+                    be enumerated. Otherwise, a list equal to the number of variables can be provided directly.
+                    """,
+
+    "func_number_to_text": """func
+                                A function which defines how numerical values should be represented if present in the plot 
+                                for instance scientific notation, rounding and so on.
+                                """,
+
+}
+
+docs = {**algorithms, **visualization}
+
 
 # =========================================================================================================
 # Util for docstrings
 # =========================================================================================================
 
 def parse_doc_string(source, dest=None, other={}):
+    if not Configuration.parse_custom_docs:
+        return
 
     if dest is None:
         dest = source
@@ -118,5 +175,3 @@ def parse_doc_string(source, dest=None, other={}):
     signature = signature.strip()
 
     dest.__doc__ = signature + "\n" + _doc
-
-

@@ -1,0 +1,248 @@
+from pymoo.model.problem import Problem
+from pymoo.vendor.go_benchmark_functions import *
+
+
+class GlobalOptimizationProblem(Problem):
+
+    def __init__(self, n_var=None, clazz=None, **kwargs):
+        if clazz is None:
+            raise Exception("Implementation must be provided.")
+
+        self.object = clazz()
+
+        if n_var is not None:
+            self.object.change_dimensions(n_var)
+
+        super().__init__(n_var=self.object.N,
+                         n_obj=1,
+                         n_constr=0,
+                         xl=self.object.xmin,
+                         xu=self.object.xmax,
+                         elementwise_evaluation=True,
+                         **kwargs)
+
+    def _calc_pareto_set(self, *args, **kwargs):
+        return np.array(self.object.global_optimum)
+
+    def _calc_pareto_front(self, *args, **kwargs):
+        return self.object.fglob
+
+    def _evaluate(self, x, out, *args, **kwargs):
+        F = np.array([self.object.fun(x)])
+        F[np.isnan(F)] = np.inf
+        out["F"] = F
+
+
+    def success(self, x, **kwargs):
+        return self.object.success(x, **kwargs)
+
+
+def get_global_optimization_problem_options():
+    PROBLEMS = [
+        ("go-amgm", GlobalOptimizationProblem, {"clazz": AMGM}),
+        ("go-ackley01", GlobalOptimizationProblem, {"clazz": Ackley01}),
+        ("go-ackley02", GlobalOptimizationProblem, {"clazz": Ackley02}),
+        ("go-ackley03", GlobalOptimizationProblem, {"clazz": Ackley03}),
+        ("go-adjiman", GlobalOptimizationProblem, {"clazz": Adjiman}),
+        ("go-alpine01", GlobalOptimizationProblem, {"clazz": Alpine01}),
+        ("go-alpine02", GlobalOptimizationProblem, {"clazz": Alpine02}),
+        ("go-bartelsconn", GlobalOptimizationProblem, {"clazz": BartelsConn}),
+        ("go-beale", GlobalOptimizationProblem, {"clazz": Beale}),
+        ("go-biggsexp02", GlobalOptimizationProblem, {"clazz": BiggsExp02}),
+        ("go-biggsexp03", GlobalOptimizationProblem, {"clazz": BiggsExp03}),
+        ("go-biggsexp04", GlobalOptimizationProblem, {"clazz": BiggsExp04}),
+        ("go-biggsexp05", GlobalOptimizationProblem, {"clazz": BiggsExp05}),
+        ("go-bird", GlobalOptimizationProblem, {"clazz": Bird}),
+        ("go-bohachevsky1", GlobalOptimizationProblem, {"clazz": Bohachevsky1}),
+        ("go-bohachevsky2", GlobalOptimizationProblem, {"clazz": Bohachevsky2}),
+        ("go-bohachevsky3", GlobalOptimizationProblem, {"clazz": Bohachevsky3}),
+        ("go-boxbetts", GlobalOptimizationProblem, {"clazz": BoxBetts}),
+        ("go-branin01", GlobalOptimizationProblem, {"clazz": Branin01}),
+        ("go-branin02", GlobalOptimizationProblem, {"clazz": Branin02}),
+        ("go-brent", GlobalOptimizationProblem, {"clazz": Brent}),
+        ("go-brown", GlobalOptimizationProblem, {"clazz": Brown}),
+        ("go-bukin02", GlobalOptimizationProblem, {"clazz": Bukin02}),
+        ("go-bukin04", GlobalOptimizationProblem, {"clazz": Bukin04}),
+        ("go-bukin06", GlobalOptimizationProblem, {"clazz": Bukin06}),
+        ("go-carromtable", GlobalOptimizationProblem, {"clazz": CarromTable}),
+        ("go-chichinadze", GlobalOptimizationProblem, {"clazz": Chichinadze}),
+        ("go-cigar", GlobalOptimizationProblem, {"clazz": Cigar}),
+        ("go-cola", GlobalOptimizationProblem, {"clazz": Cola}),
+        ("go-colville", GlobalOptimizationProblem, {"clazz": Colville}),
+        ("go-corana", GlobalOptimizationProblem, {"clazz": Corana}),
+        ("go-cosinemixture", GlobalOptimizationProblem, {"clazz": CosineMixture}),
+        ("go-crossintray", GlobalOptimizationProblem, {"clazz": CrossInTray}),
+        ("go-crosslegtable", GlobalOptimizationProblem, {"clazz": CrossLegTable}),
+        ("go-crownedcross", GlobalOptimizationProblem, {"clazz": CrownedCross}),
+        ("go-csendes", GlobalOptimizationProblem, {"clazz": Csendes}),
+        ("go-cube", GlobalOptimizationProblem, {"clazz": Cube}),
+        ("go-damavandi", GlobalOptimizationProblem, {"clazz": Damavandi}),
+        ("go-devilliersglasser01", GlobalOptimizationProblem, {"clazz": DeVilliersGlasser01}),
+        ("go-devilliersglasser02", GlobalOptimizationProblem, {"clazz": DeVilliersGlasser02}),
+        ("go-deb01", GlobalOptimizationProblem, {"clazz": Deb01}),
+        ("go-deb03", GlobalOptimizationProblem, {"clazz": Deb03}),
+        ("go-decanomial", GlobalOptimizationProblem, {"clazz": Decanomial}),
+        ("go-deceptive", GlobalOptimizationProblem, {"clazz": Deceptive}),
+        ("go-deckkersaarts", GlobalOptimizationProblem, {"clazz": DeckkersAarts}),
+        ("go-deflectedcorrugatedspring", GlobalOptimizationProblem, {"clazz": DeflectedCorrugatedSpring}),
+        ("go-dixonprice", GlobalOptimizationProblem, {"clazz": DixonPrice}),
+        ("go-dolan", GlobalOptimizationProblem, {"clazz": Dolan}),
+        ("go-dropwave", GlobalOptimizationProblem, {"clazz": DropWave}),
+        ("go-easom", GlobalOptimizationProblem, {"clazz": Easom}),
+        ("go-eckerle4", GlobalOptimizationProblem, {"clazz": Eckerle4}),
+        ("go-eggcrate", GlobalOptimizationProblem, {"clazz": EggCrate}),
+        ("go-eggholder", GlobalOptimizationProblem, {"clazz": EggHolder}),
+        ("go-elattarvidyasagardutta", GlobalOptimizationProblem, {"clazz": ElAttarVidyasagarDutta}),
+        ("go-exp2", GlobalOptimizationProblem, {"clazz": Exp2}),
+        ("go-exponential", GlobalOptimizationProblem, {"clazz": Exponential}),
+        ("go-freudensteinroth", GlobalOptimizationProblem, {"clazz": FreudensteinRoth}),
+        ("go-gear", GlobalOptimizationProblem, {"clazz": Gear}),
+        ("go-giunta", GlobalOptimizationProblem, {"clazz": Giunta}),
+        ("go-goldsteinprice", GlobalOptimizationProblem, {"clazz": GoldsteinPrice}),
+        ("go-griewank", GlobalOptimizationProblem, {"clazz": Griewank}),
+        ("go-gulf", GlobalOptimizationProblem, {"clazz": Gulf}),
+        ("go-hansen", GlobalOptimizationProblem, {"clazz": Hansen}),
+        ("go-hartmann3", GlobalOptimizationProblem, {"clazz": Hartmann3}),
+        ("go-hartmann6", GlobalOptimizationProblem, {"clazz": Hartmann6}),
+        ("go-helicalvalley", GlobalOptimizationProblem, {"clazz": HelicalValley}),
+        ("go-himmelblau", GlobalOptimizationProblem, {"clazz": HimmelBlau}),
+        ("go-holdertable", GlobalOptimizationProblem, {"clazz": HolderTable}),
+        ("go-hosaki", GlobalOptimizationProblem, {"clazz": Hosaki}),
+        ("go-infinity", GlobalOptimizationProblem, {"clazz": Infinity}),
+        ("go-jennrichsampson", GlobalOptimizationProblem, {"clazz": JennrichSampson}),
+        ("go-judge", GlobalOptimizationProblem, {"clazz": Judge}),
+        ("go-katsuura", GlobalOptimizationProblem, {"clazz": Katsuura}),
+        ("go-keane", GlobalOptimizationProblem, {"clazz": Keane}),
+        ("go-kowalik", GlobalOptimizationProblem, {"clazz": Kowalik}),
+        ("go-langermann", GlobalOptimizationProblem, {"clazz": Langermann}),
+        ("go-lennardjones", GlobalOptimizationProblem, {"clazz": LennardJones}),
+        ("go-leon", GlobalOptimizationProblem, {"clazz": Leon}),
+        ("go-levy03", GlobalOptimizationProblem, {"clazz": Levy03}),
+        ("go-levy05", GlobalOptimizationProblem, {"clazz": Levy05}),
+        ("go-levy13", GlobalOptimizationProblem, {"clazz": Levy13}),
+        ("go-matyas", GlobalOptimizationProblem, {"clazz": Matyas}),
+        ("go-mccormick", GlobalOptimizationProblem, {"clazz": McCormick}),
+        ("go-meyer", GlobalOptimizationProblem, {"clazz": Meyer}),
+        ("go-michalewicz", GlobalOptimizationProblem, {"clazz": Michalewicz}),
+        ("go-mielecantrell", GlobalOptimizationProblem, {"clazz": MieleCantrell}),
+        ("go-mishra01", GlobalOptimizationProblem, {"clazz": Mishra01}),
+        ("go-mishra02", GlobalOptimizationProblem, {"clazz": Mishra02}),
+        ("go-mishra03", GlobalOptimizationProblem, {"clazz": Mishra03}),
+        ("go-mishra04", GlobalOptimizationProblem, {"clazz": Mishra04}),
+        ("go-mishra05", GlobalOptimizationProblem, {"clazz": Mishra05}),
+        ("go-mishra06", GlobalOptimizationProblem, {"clazz": Mishra06}),
+        ("go-mishra07", GlobalOptimizationProblem, {"clazz": Mishra07}),
+        ("go-mishra08", GlobalOptimizationProblem, {"clazz": Mishra08}),
+        ("go-mishra09", GlobalOptimizationProblem, {"clazz": Mishra09}),
+        ("go-mishra10", GlobalOptimizationProblem, {"clazz": Mishra10}),
+        ("go-mishra11", GlobalOptimizationProblem, {"clazz": Mishra11}),
+        ("go-multimodal", GlobalOptimizationProblem, {"clazz": MultiModal}),
+        ("go-needleeye", GlobalOptimizationProblem, {"clazz": NeedleEye}),
+        ("go-newfunction01", GlobalOptimizationProblem, {"clazz": NewFunction01}),
+        ("go-newfunction02", GlobalOptimizationProblem, {"clazz": NewFunction02}),
+        ("go-oddsquare", GlobalOptimizationProblem, {"clazz": OddSquare}),
+        ("go-parsopoulos", GlobalOptimizationProblem, {"clazz": Parsopoulos}),
+        ("go-pathological", GlobalOptimizationProblem, {"clazz": Pathological}),
+        ("go-paviani", GlobalOptimizationProblem, {"clazz": Paviani}),
+        ("go-penholder", GlobalOptimizationProblem, {"clazz": PenHolder}),
+        ("go-penalty01", GlobalOptimizationProblem, {"clazz": Penalty01}),
+        ("go-penalty02", GlobalOptimizationProblem, {"clazz": Penalty02}),
+        ("go-permfunction01", GlobalOptimizationProblem, {"clazz": PermFunction01}),
+        ("go-permfunction02", GlobalOptimizationProblem, {"clazz": PermFunction02}),
+        ("go-pinter", GlobalOptimizationProblem, {"clazz": Pinter}),
+        ("go-plateau", GlobalOptimizationProblem, {"clazz": Plateau}),
+        ("go-powell", GlobalOptimizationProblem, {"clazz": Powell}),
+        ("go-powersum", GlobalOptimizationProblem, {"clazz": PowerSum}),
+        ("go-price01", GlobalOptimizationProblem, {"clazz": Price01}),
+        ("go-price02", GlobalOptimizationProblem, {"clazz": Price02}),
+        ("go-price03", GlobalOptimizationProblem, {"clazz": Price03}),
+        ("go-price04", GlobalOptimizationProblem, {"clazz": Price04}),
+        ("go-qing", GlobalOptimizationProblem, {"clazz": Qing}),
+        ("go-quadratic", GlobalOptimizationProblem, {"clazz": Quadratic}),
+        ("go-quintic", GlobalOptimizationProblem, {"clazz": Quintic}),
+        ("go-rana", GlobalOptimizationProblem, {"clazz": Rana}),
+        ("go-rastrigin", GlobalOptimizationProblem, {"clazz": Rastrigin}),
+        ("go-ratkowsky01", GlobalOptimizationProblem, {"clazz": Ratkowsky01}),
+        ("go-ratkowsky02", GlobalOptimizationProblem, {"clazz": Ratkowsky02}),
+        ("go-ripple01", GlobalOptimizationProblem, {"clazz": Ripple01}),
+        ("go-ripple25", GlobalOptimizationProblem, {"clazz": Ripple25}),
+        ("go-rosenbrock", GlobalOptimizationProblem, {"clazz": Rosenbrock}),
+        ("go-rosenbrockmodified", GlobalOptimizationProblem, {"clazz": RosenbrockModified}),
+        ("go-rotatedellipse01", GlobalOptimizationProblem, {"clazz": RotatedEllipse01}),
+        ("go-rotatedellipse02", GlobalOptimizationProblem, {"clazz": RotatedEllipse02}),
+        ("go-salomon", GlobalOptimizationProblem, {"clazz": Salomon}),
+        ("go-sargan", GlobalOptimizationProblem, {"clazz": Sargan}),
+        ("go-schaffer01", GlobalOptimizationProblem, {"clazz": Schaffer01}),
+        ("go-schaffer02", GlobalOptimizationProblem, {"clazz": Schaffer02}),
+        ("go-schaffer03", GlobalOptimizationProblem, {"clazz": Schaffer03}),
+        ("go-schaffer04", GlobalOptimizationProblem, {"clazz": Schaffer04}),
+        ("go-schwefel01", GlobalOptimizationProblem, {"clazz": Schwefel01}),
+        ("go-schwefel02", GlobalOptimizationProblem, {"clazz": Schwefel02}),
+        ("go-schwefel04", GlobalOptimizationProblem, {"clazz": Schwefel04}),
+        ("go-schwefel06", GlobalOptimizationProblem, {"clazz": Schwefel06}),
+        ("go-schwefel20", GlobalOptimizationProblem, {"clazz": Schwefel20}),
+        ("go-schwefel21", GlobalOptimizationProblem, {"clazz": Schwefel21}),
+        ("go-schwefel22", GlobalOptimizationProblem, {"clazz": Schwefel22}),
+        ("go-schwefel26", GlobalOptimizationProblem, {"clazz": Schwefel26}),
+        ("go-schwefel36", GlobalOptimizationProblem, {"clazz": Schwefel36}),
+        ("go-shekel05", GlobalOptimizationProblem, {"clazz": Shekel05}),
+        ("go-shekel07", GlobalOptimizationProblem, {"clazz": Shekel07}),
+        ("go-shekel10", GlobalOptimizationProblem, {"clazz": Shekel10}),
+        ("go-shubert01", GlobalOptimizationProblem, {"clazz": Shubert01}),
+        ("go-shubert03", GlobalOptimizationProblem, {"clazz": Shubert03}),
+        ("go-shubert04", GlobalOptimizationProblem, {"clazz": Shubert04}),
+        ("go-sineenvelope", GlobalOptimizationProblem, {"clazz": SineEnvelope}),
+        ("go-sixhumpcamel", GlobalOptimizationProblem, {"clazz": SixHumpCamel}),
+        ("go-sodp", GlobalOptimizationProblem, {"clazz": Sodp}),
+        ("go-sphere", GlobalOptimizationProblem, {"clazz": Sphere}),
+        ("go-step", GlobalOptimizationProblem, {"clazz": Step}),
+        ("go-step2", GlobalOptimizationProblem, {"clazz": Step2}),
+        ("go-stochastic", GlobalOptimizationProblem, {"clazz": Stochastic}),
+        ("go-stretchedv", GlobalOptimizationProblem, {"clazz": StretchedV}),
+        ("go-styblinskitang", GlobalOptimizationProblem, {"clazz": StyblinskiTang}),
+        ("go-testtubeholder", GlobalOptimizationProblem, {"clazz": TestTubeHolder}),
+        ("go-threehumpcamel", GlobalOptimizationProblem, {"clazz": ThreeHumpCamel}),
+        ("go-thurber", GlobalOptimizationProblem, {"clazz": Thurber}),
+        ("go-treccani", GlobalOptimizationProblem, {"clazz": Treccani}),
+        ("go-trefethen", GlobalOptimizationProblem, {"clazz": Trefethen}),
+        ("go-trid", GlobalOptimizationProblem, {"clazz": Trid}),
+        ("go-trigonometric01", GlobalOptimizationProblem, {"clazz": Trigonometric01}),
+        ("go-trigonometric02", GlobalOptimizationProblem, {"clazz": Trigonometric02}),
+        ("go-tripod", GlobalOptimizationProblem, {"clazz": Tripod}),
+        ("go-ursem01", GlobalOptimizationProblem, {"clazz": Ursem01}),
+        ("go-ursem03", GlobalOptimizationProblem, {"clazz": Ursem03}),
+        ("go-ursem04", GlobalOptimizationProblem, {"clazz": Ursem04}),
+        ("go-ursemwaves", GlobalOptimizationProblem, {"clazz": UrsemWaves}),
+        ("go-ventersobiezcczanskisobieski", GlobalOptimizationProblem, {"clazz": VenterSobiezcczanskiSobieski}),
+        ("go-vincent", GlobalOptimizationProblem, {"clazz": Vincent}),
+        ("go-watson", GlobalOptimizationProblem, {"clazz": Watson}),
+        ("go-wavy", GlobalOptimizationProblem, {"clazz": Wavy}),
+        ("go-wayburnseader01", GlobalOptimizationProblem, {"clazz": WayburnSeader01}),
+        ("go-wayburnseader02", GlobalOptimizationProblem, {"clazz": WayburnSeader02}),
+        ("go-weierstrass", GlobalOptimizationProblem, {"clazz": Weierstrass}),
+        ("go-whitley", GlobalOptimizationProblem, {"clazz": Whitley}),
+        ("go-wolfe", GlobalOptimizationProblem, {"clazz": Wolfe}),
+        ("go-xinsheyang01", GlobalOptimizationProblem, {"clazz": XinSheYang01}),
+        ("go-xinsheyang02", GlobalOptimizationProblem, {"clazz": XinSheYang02}),
+        ("go-xinsheyang03", GlobalOptimizationProblem, {"clazz": XinSheYang03}),
+        ("go-xinsheyang04", GlobalOptimizationProblem, {"clazz": XinSheYang04}),
+        ("go-xor", GlobalOptimizationProblem, {"clazz": Xor}),
+        ("go-yaoliu04", GlobalOptimizationProblem, {"clazz": YaoLiu04}),
+        ("go-yaoliu09", GlobalOptimizationProblem, {"clazz": YaoLiu09}),
+        ("go-zacharov", GlobalOptimizationProblem, {"clazz": Zacharov}),
+        ("go-zerosum", GlobalOptimizationProblem, {"clazz": ZeroSum}),
+        ("go-zettl", GlobalOptimizationProblem, {"clazz": Zettl}),
+        ("go-zimmerman", GlobalOptimizationProblem, {"clazz": Zimmerman}),
+        ("go-zirilli", GlobalOptimizationProblem, {"clazz": Zirilli})
+    ]
+
+    return PROBLEMS
+
+
+if __name__ == "__main__":
+    for key, clazz in dict(globals()).items():
+        if isinstance(clazz, type) and issubclass(clazz, Benchmark):
+            name = clazz.__name__
+            print(f"\"go-{name.lower()}\",")
+            #print(f"(\"go-{name.lower()}\", GlobalOptimizationProblem, {{\"clazz\":{name}}}),")
+    print("done")

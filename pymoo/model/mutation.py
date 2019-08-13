@@ -27,10 +27,9 @@ class Mutation:
 
         """
 
-        return self._do(problem, pop, **kwargs)
-
-
+        Y = self._do(problem, pop.get("X"), **kwargs)
+        return pop.new("X", Y)
 
     @abstractmethod
-    def _do(self, problem, pop, **kwargs):
+    def _do(self, problem, X, **kwargs):
         pass

@@ -1,12 +1,17 @@
 import numpy as np
 
-from pymoo.algorithms.nsga3 import NSGA3, ReferenceDirectionSurvival, get_extreme_points_c, get_nadir_point, \
-    associate_to_niches, calc_niche_count, niching
+from pymoo.algorithms.nsga3 import NSGA3, get_extreme_points_c, get_nadir_point, \
+    associate_to_niches, calc_niche_count, niching, comp_by_cv_then_random
 from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
-from pymoo.util.non_dominated_sorting import NonDominatedSorting
-from pymoo.util.reference_direction import UniformReferenceDirectionFactory
+from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
+from pymoo.operators.sampling.random_sampling import FloatRandomSampling
+from pymoo.operators.selection.tournament_selection import TournamentSelection
+from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.normalization import denormalize
+from pymoo.util.reference_direction import UniformReferenceDirectionFactory
+
 
 # =========================================================================================================
 # Implementation
@@ -18,28 +23,66 @@ class RNSGA3(NSGA3):
     def __init__(self,
                  ref_points,
                  pop_per_ref_point,
-                 mu,
+                 mu=0.05,
+                 sampling=FloatRandomSampling(),
+                 selection=TournamentSelection(func_comp=comp_by_cv_then_random),
+                 crossover=SimulatedBinaryCrossover(eta=30, prob=1.0),
+                 mutation=PolynomialMutation(eta=20, prob=None),
+                 eliminate_duplicates=True,
+                 n_offsprings=None,
                  **kwargs):
+        """
 
+        Parameters
+        ----------
+
+        ref_points : {ref_points}
+        pop_per_ref_point : int
+            Size of the population used for each reference point.
+
+        mu : float
+            Defines the scaling of the reference lines used during survival selection. Increasing mu will result
+            having solutions with a larger spread.
+
+        Other Parameters
+        -------
+
+        n_offsprings : {n_offsprings}
+        sampling : {sampling}
+        selection : {selection}
+        crossover : {crossover}
+        mutation : {mutation}
+        eliminate_duplicates : {eliminate_duplicates}
+
+        """
+
+        # number of objectives the reference lines have
         n_obj = ref_points.shape[1]
 
         # add the aspiration point lines
         aspiration_ref_dirs = UniformReferenceDirectionFactory(n_dim=n_obj, n_points=pop_per_ref_point).do()
 
-        kwargs['ref_dirs'] = aspiration_ref_dirs
-        super().__init__(**kwargs)
+        survival = AspirationPointSurvival(ref_points, aspiration_ref_dirs, mu=mu)
+        pop_size = ref_points.shape[0] * aspiration_ref_dirs.shape[0] + aspiration_ref_dirs.shape[1]
+        ref_dirs = None
 
-        self.pop_size = ref_points.shape[0] * aspiration_ref_dirs.shape[0] + aspiration_ref_dirs.shape[1]
+        super().__init__(ref_dirs,
+                         pop_size=pop_size,
+                         sampling=sampling,
+                         selection=selection,
+                         crossover=crossover,
+                         mutation=mutation,
+                         survival=survival,
+                         eliminate_duplicates=eliminate_duplicates,
+                         n_offsprings=n_offsprings,
+                         **kwargs)
 
-        # create the survival strategy
-        self.survival = AspirationPointSurvival(ref_points, aspiration_ref_dirs, mu=mu)
-
-    def _solve(self, problem, termination):
+    def _solve(self, problem):
         if self.survival.ref_points.shape[1] != problem.n_obj:
             raise Exception("Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
                             (self.survival.ref_points.shape[1], problem.n_obj))
 
-        return super()._solve(problem, termination)
+        return super()._solve(problem)
 
 
 class AspirationPointSurvival(Survival):
@@ -58,7 +101,7 @@ class AspirationPointSurvival(Survival):
         self.ideal_point = np.full(ref_points.shape[1], np.inf)
         self.worst_point = np.full(ref_points.shape[1], -np.inf)
 
-    def _do(self, pop, n_survive, D=None, **kwargs):
+    def _do(self, problem, pop, n_survive, D=None, **kwargs):
 
         # attributes to be set after the survival
         F = pop.get("F")
@@ -99,9 +142,9 @@ class AspirationPointSurvival(Survival):
         unit_ref_points = (self.ref_points - self.ideal_point) / (self.nadir_point - self.ideal_point)
         ref_dirs = get_ref_dirs_from_points(unit_ref_points, self.aspiration_ref_dirs, mu=self.mu)
         self.ref_dirs = denormalize(ref_dirs, self.ideal_point, self.nadir_point)
-        
+
         # associate individuals to niches
-        niche_of_individuals, dist_to_niche = associate_to_niches(F, ref_dirs, self.ideal_point, self.nadir_point)
+        niche_of_individuals, dist_to_niche, _ = associate_to_niches(F, ref_dirs, self.ideal_point, self.nadir_point)
         pop.set('rank', rank, 'niche', niche_of_individuals, 'dist_to_niche', dist_to_niche)
 
         # if we need to select individuals to survive
@@ -205,44 +248,9 @@ def line_plane_intersection(l0, l1, p0, p_no, epsilon=1e-6):
 # Interface
 # =========================================================================================================
 
-def rnsga3(ref_points,
-           pop_per_ref_point,
-           mu=0.05,
-           **kwargs):
-    """
 
-    Parameters
-    ----------
-    ref_points : {ref_points}
-    pop_per_ref_point : int
-        Size of the population used for each reference point.
-
-    mu : float
-        Defines the scaling of the reference lines used during survival selection. Increasing mu will result
-        having solutions with a larger spread.
-
-    Other Parameters
-    -------
-    n_offsprings : {n_offsprings}
-    sampling : {sampling}
-    selection : {selection}
-    crossover : {crossover}
-    mutation : {mutation}
-    eliminate_duplicates : {eliminate_duplicates}
+def rnsga3(*args, **kwargs):
+    return RNSGA3(*args, **kwargs)
 
 
-    Returns
-    -------
-    nsga3 : :class:`~pymoo.model.algorithm.Algorithm`
-        Returns an NSGA3 algorithm object.
-
-
-    """
-
-    return RNSGA3(ref_points,
-                  pop_per_ref_point,
-                  mu,
-                  **kwargs)
-
-
-parse_doc_string(rnsga3)
+parse_doc_string(RNSGA3.__init__)

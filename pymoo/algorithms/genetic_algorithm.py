@@ -6,7 +6,6 @@ from scipy.spatial.distance import cdist
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
-from pymoo.rand import random
 
 
 class GeneticAlgorithm(Algorithm):
@@ -19,7 +18,7 @@ class GeneticAlgorithm(Algorithm):
                  mutation,
                  survival,
                  n_offsprings=None,
-                 eliminate_duplicates=False,
+                 eliminate_duplicates=True,
                  repair=None,
                  individual=Individual(),
                  **kwargs
@@ -74,29 +73,6 @@ class GeneticAlgorithm(Algorithm):
         self.pop = None
         self.off = None
 
-    def _solve(self, problem, termination):
-
-        # generation counter
-        self.n_gen = 1
-
-        # initialize the first population and evaluate it
-        self.pop = self._initialize()
-        self._each_iteration(self, first=True)
-
-        # while termination criterium not fulfilled
-        while termination.do_continue(self):
-            self.n_gen += 1
-
-            # do the next iteration
-            self.pop = self._next(self.pop)
-
-            # execute the callback function in the end of each generation
-            self._each_iteration(self)
-
-        self._finalize()
-
-        return self.pop
-
     def _initialize(self):
         # ! get the initial population - different ways are possible
 
@@ -108,7 +84,7 @@ class GeneticAlgorithm(Algorithm):
             if isinstance(self.sampling, np.ndarray):
                 pop = pop.new("X", self.sampling)
             else:
-                pop = self.sampling.sample(self.problem, pop, self.pop_size, algorithm=self)
+                pop = self.sampling.do(self.problem, pop, self.pop_size, algorithm=self)
 
         # in case the initial population was not evaluated
         if np.any(pop.collect(lambda ind: ind.F is None, as_numpy_array=True)):
@@ -122,25 +98,23 @@ class GeneticAlgorithm(Algorithm):
 
         # that call is a dummy survival to set attributes that are necessary for the mating selection
         if self.survival:
-            pop = self.survival.do(self.problem, pop, self.pop_size, algorithm=self)
+            pop = self.survival.do(self.problem, pop, len(pop), algorithm=self)
 
-        return pop
+        self.pop = pop
 
-    def _next(self, pop):
+    def _next(self):
 
         # do the mating using the current population
-        self.off = self._mating(pop)
+        self.off = self._mating(self.pop)
 
         # evaluate the offspring
         self.evaluator.eval(self.problem, self.off, algorithm=self)
 
         # merge the offsprings with the current population
-        pop = pop.merge(self.off)
+        self.pop = self.pop.merge(self.off)
 
         # the do survival selection
-        pop = self.survival.do(self.problem, pop, self.pop_size, algorithm=self)
-
-        return pop
+        self.pop = self.survival.do(self.problem, self.pop, self.pop_size, algorithm=self)
 
     def _mating(self, pop):
 
@@ -175,7 +149,7 @@ class GeneticAlgorithm(Algorithm):
 
             # if more offsprings than necessary - truncate them
             if len(_off) > self.n_offsprings - len(off):
-                I = random.perm(self.n_offsprings - len(off))
+                I = np.random.permutation(self.n_offsprings - len(off))
                 _off = _off[I]
 
             # add to the offsprings and increase the mating counter

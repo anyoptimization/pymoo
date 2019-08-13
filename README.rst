@@ -41,7 +41,7 @@ The official release is always available at PyPi:
 
 .. code:: bash
 
-    pip install Cython>=0.29 numpy>=1.15 pymoo
+    pip install -U pymoo
 
 
 For the current developer version:
@@ -52,6 +52,7 @@ For the current developer version:
     cd pymoo
     pip install .
 
+
 Since for speedup some of the modules are also available compiled you can double check
 if the compilation worked. When executing the command be sure not already being in the local pymoo
 directory because otherwise not the in site-packages installed version will be used.
@@ -59,7 +60,6 @@ directory because otherwise not the in site-packages installed version will be u
 .. code:: bash
 
     python -c "from pymoo.cython.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
-
 
 
 Usage
@@ -70,38 +70,36 @@ However, for instance executing NSGA2:
 
 .. code:: python
 
-   from pymoo.optimize import minimize
-   from pymoo.algorithms.nsga2 import nsga2
-   from pymoo.util import plotting
-   from pymop.factory import get_problem
+    
+    from pymoo.algorithms.nsga2 import NSGA2
+    from pymoo.factory import get_problem
+    from pymoo.optimize import minimize
+    from pymoo.visualization.scatter import Scatter
 
-   # load a test or define your own problem
-   problem = get_problem("zdt1")
+    problem = get_problem("zdt3")
+    pf = problem.pareto_front(n_points=200, flatten=False, use_cache=False)
 
-   # get the optimal solution of the problem for the purpose of comparison
-   pf = problem.pareto_front()
+    algorithm = NSGA2(pop_size=100, elimate_duplicates=True)
 
-   # create the algorithm object
-   method = nsga2(pop_size=100, elimate_duplicates=True)
+    res = minimize(problem,
+                   algorithm,
+                   ('n_gen', 200),
+                   seed=1,
+                   verbose=False)
 
-   # execute the optimization
-   res = minimize(problem,
-                  method,
-                  termination=('n_gen', 200),
-                  pf=pf,
-                  disp=True)
-
-   # plot the results as a scatter plot
-   plotting.plot(pf, res.F, labels=["Pareto-Front", "F"])
+    plot = Scatter()
+    plot.add(pf, plot_type="line", color="black", alpha=0.7)
+    plot.add(res.F, color="red")
+    plot.show()
 
 
 
 Contact
 ====================================================================
+
 Feel free to contact me if you have any question:
 
 | Julian Blank (blankjul [at] egr.msu.edu)
 | Michigan State University
 | Computational Optimization and Innovation Laboratory (COIN)
 | East Lansing, MI 48824, USA
-

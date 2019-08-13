@@ -7,30 +7,11 @@ The definitions for each object are purposely defined as a list and not as a dic
 """
 import re
 
-import numpy as np
+from pymoo.configuration import Configuration
 
-from pymoo.algorithms.moead import moead
-from pymoo.algorithms.nsga2 import nsga2
-from pymoo.algorithms.nsga3 import nsga3
-from pymoo.algorithms.rnsga2 import rnsga2
-from pymoo.algorithms.rnsga3 import rnsga3
-from pymoo.algorithms.so_de import de
-from pymoo.algorithms.so_genetic_algorithm import ga
-from pymoo.algorithms.unsga3 import unsga3
-from pymoo.docs import parse_doc_string
-from pymoo.model.termination import MaximumFunctionCallTermination, MaximumGenerationTermination, IGDTermination
-from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
-from pymoo.operators.crossover.exponential_crossover import ExponentialCrossover
-from pymoo.operators.crossover.half_uniform_crossover import HalfUniformCrossover
-from pymoo.operators.crossover.point_crossover import PointCrossover
-from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.crossover.uniform_crossover import UniformCrossover
-from pymoo.operators.mutation.bitflip_mutation import BinaryBitflipMutation
-from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
-from pymoo.operators.sampling.random_sampling import RandomSampling
-from pymoo.operators.selection.random_selection import RandomSelection
-from pymoo.operators.selection.tournament_selection import TournamentSelection
+from pymoo.problems.many import *
+from pymoo.problems.multi import *
+from pymoo.problems.single import *
 
 
 # =========================================================================================================
@@ -40,11 +21,17 @@ from pymoo.operators.selection.tournament_selection import TournamentSelection
 
 def get_from_list(l, name, args, kwargs):
     i = None
-    for k, e in enumerate(l):
 
-        if re.match(e[0], name):
+    for k, e in enumerate(l):
+        if e[0] == name:
             i = k
             break
+
+    if i is None:
+        for k, e in enumerate(l):
+            if re.match(e[0], name):
+                i = k
+                break
 
     if i is not None:
 
@@ -64,13 +51,376 @@ def get_from_list(l, name, args, kwargs):
         raise Exception("Object '%s' for not found in %s" % (name, [e[0] for e in l]))
 
 
-def get_options(l):
-    return ", ".join(["'%s'" % k[0] for k in l])
+# =========================================================================================================
+# Algorithms
+# =========================================================================================================
+
+def get_algorithm_options():
+    from pymoo.algorithms.moead import moead
+    from pymoo.algorithms.nsga2 import nsga2
+    from pymoo.algorithms.nsga3 import nsga3
+    from pymoo.algorithms.rnsga2 import rnsga2
+    from pymoo.algorithms.rnsga3 import rnsga3
+    from pymoo.algorithms.so_de import de
+    from pymoo.algorithms.so_genetic_algorithm import ga
+    from pymoo.algorithms.unsga3 import unsga3
+    from pymoo.algorithms.so_nelder_mead import nelder_mead
+
+    ALGORITHMS = [
+        ("ga", ga),
+        ("de", de),
+        ("nelder-mead", nelder_mead),
+        ("nsga2", nsga2),
+        ("rnsga2", rnsga2),
+        ("nsga3", nsga3),
+        ("unsga3", unsga3),
+        ("rnsga3", rnsga3),
+        ("moead", moead),
+    ]
+
+    return ALGORITHMS
+
+
+def get_algorithm(name, *args, d={}, **kwargs):
+    return get_from_list(get_algorithm_options(), name, args, {**d, **kwargs})
+
+
+# =========================================================================================================
+# Sampling
+# =========================================================================================================
+
+def get_sampling_options():
+    from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
+    from pymoo.operators.sampling.random_sampling import FloatRandomSampling
+    from pymoo.operators.integer_from_float_operator import IntegerFromFloatSampling
+    from pymoo.operators.sampling.random_sampling import BinaryRandomSampling
+
+    SAMPLING = [
+        ("real_random", FloatRandomSampling),
+        ("real_lhs", LatinHypercubeSampling),
+        ("bin_random", BinaryRandomSampling),
+        ("int_random", IntegerFromFloatSampling, {'clazz': FloatRandomSampling}),
+        ("int_lhs", IntegerFromFloatSampling, {'clazz': LatinHypercubeSampling})
+    ]
+
+    return SAMPLING
+
+
+def get_sampling(name, *args, d={}, **kwargs):
+    return get_from_list(get_sampling_options(), name, args, {**d, **kwargs})
+
+
+# =========================================================================================================
+# Selection
+# =========================================================================================================
+
+def get_selection_options():
+    from pymoo.operators.selection.random_selection import RandomSelection
+    from pymoo.operators.selection.tournament_selection import TournamentSelection
+
+    SELECTION = [
+        ("random", RandomSelection),
+        ("tournament", TournamentSelection)
+    ]
+
+    return SELECTION
+
+
+def get_selection(name, *args, d={}, **kwargs):
+    return get_from_list(get_selection_options(), name, args, {**d, **kwargs})
+
+
+# =========================================================================================================
+# Crossover
+# =========================================================================================================
+
+def get_crossover_options():
+    from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
+    from pymoo.operators.crossover.exponential_crossover import ExponentialCrossover
+    from pymoo.operators.crossover.half_uniform_crossover import HalfUniformCrossover
+    from pymoo.operators.crossover.point_crossover import PointCrossover
+    from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
+    from pymoo.operators.crossover.uniform_crossover import UniformCrossover
+    from pymoo.operators.integer_from_float_operator import IntegerFromFloatCrossover
+
+    CROSSOVER = [
+        ("real_sbx", SimulatedBinaryCrossover, dict(prob=0.9, eta=30)),
+        ("int_sbx", IntegerFromFloatCrossover, dict(clazz=SimulatedBinaryCrossover, prob=0.9, eta=30)),
+        ("real_de", DifferentialEvolutionCrossover),
+        ("(real|bin|int)_ux", UniformCrossover),
+        ("(bin|int)_hux", HalfUniformCrossover),
+        ("(real|bin|int)_exp", ExponentialCrossover),
+        ("(real|bin|int)_one_point", PointCrossover, {'n_points': 1}),
+        ("(real|bin|int)_two_point", PointCrossover, {'n_points': 2}),
+        ("(real|bin|int)_k_point", PointCrossover)
+    ]
+
+    return CROSSOVER
+
+
+def get_crossover(name, *args, d={}, **kwargs):
+    return get_from_list(get_crossover_options(), name, args, {**d, **kwargs})
+
+
+# =========================================================================================================
+# Mutation
+# =========================================================================================================
+
+def get_mutation_options():
+    from pymoo.operators.mutation.bitflip_mutation import BinaryBitflipMutation
+    from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
+    from pymoo.operators.integer_from_float_operator import IntegerFromFloatMutation
+
+    MUTATION = [
+        ("real_pm", PolynomialMutation, dict(eta=20)),
+        ("int_pm", IntegerFromFloatMutation, dict(clazz=PolynomialMutation, eta=20)),
+        ("bin_bitflip", BinaryBitflipMutation)
+    ]
+
+    return MUTATION
+
+
+def get_mutation(name, *args, d={}, **kwargs):
+    return get_from_list(get_mutation_options(), name, args, {**d, **kwargs})
+
+
+# =========================================================================================================
+# Termination
+# =========================================================================================================
+
+def get_termination_options():
+    from pymoo.model.termination import MaximumFunctionCallTermination, MaximumGenerationTermination, IGDTermination, \
+        DesignSpaceToleranceTermination, ObjectiveSpaceToleranceTermination
+
+    TERMINATION = [
+        ("n_eval", MaximumFunctionCallTermination),
+        ("n_gen", MaximumGenerationTermination),
+        ("igd", IGDTermination),
+        ("x_tol", DesignSpaceToleranceTermination),
+        ("f_tol", ObjectiveSpaceToleranceTermination)
+    ]
+
+    return TERMINATION
+
+
+def get_termination(name, *args, d={}, **kwargs):
+    return get_from_list(get_termination_options(), name, args, {**d, **kwargs})
+
+
+# =========================================================================================================
+# Problems
+# =========================================================================================================
+
+def get_problem_options():
+    PROBLEM = [
+        ('ackley', Ackley),
+        ('bnh', BNH),
+        ('carside', Carside),
+        ('ctp1', CTP1),
+        ('ctp2', CTP2),
+        ('ctp3', CTP3),
+        ('ctp4', CTP4),
+        ('ctp5', CTP5),
+        ('ctp6', CTP6),
+        ('ctp7', CTP7),
+        ('ctp8', CTP8),
+        ('dtlz1^-1', InvertedDTLZ1),
+        ('dtlz1', DTLZ1),
+        ('dtlz2', DTLZ2),
+        ('dtlz3', DTLZ3),
+        ('dtlz4', DTLZ4),
+        ('dtlz5', DTLZ5),
+        ('dtlz6', DTLZ6),
+        ('dtlz7', DTLZ7),
+        ('convex_dtlz2', ConvexDTLZ2),
+        ('convex_dtlz4', ConvexDTLZ4),
+        ('sdtlz1', ScaledDTLZ1),
+        ('c1dtlz1', C1DTLZ1),
+        ('c1dtlz3', C1DTLZ3),
+        ('c2dtlz2', C2DTLZ2),
+        ('c3dtlz4', C3DTLZ4),
+        ('cantilevered_beam', CantileveredBeam),
+        ('griewank', Griewank),
+        ('himmelblau', Himmelblau),
+        ('knp', Knapsack),
+        ('kursawe', Kursawe),
+        ('osy', OSY),
+        ('pressure_vessel', PressureVessel),
+        ('rastrigin', Rastrigin),
+        ('rosenbrock', Rosenbrock),
+        ('schwefel', Schwefel),
+        ('sphere', Sphere),
+        ('tnk', TNK),
+        ('truss2d', Truss2D),
+        ('welded_beam', WeldedBeam),
+        ('zakharov', Zakharov),
+        ('zdt1', ZDT1),
+        ('zdt2', ZDT2),
+        ('zdt3', ZDT3),
+        ('zdt4', ZDT4),
+        ('zdt5', ZDT5),
+        ('zdt6', ZDT6),
+        ('g01', G1),
+        ('g02', G2),
+        ('g03', G3),
+        ('g04', G4),
+        ('g05', G5),
+        ('g06', G6),
+        ('g07', G7),
+        ('g08', G8),
+        ('g09', G9),
+        ('g10', G10)
+    ]
+
+    return PROBLEM
+
+
+def get_problem(name, *args, d={}, **kwargs):
+    if name.startswith("go-"):
+        from pymoo.vendor.global_opt import get_global_optimization_problem_options
+        return get_from_list(get_global_optimization_problem_options(), name.lower(), args, {**d, **kwargs})
+    else:
+        return get_from_list(get_problem_options(), name.lower(), args, {**d, **kwargs})
+
+
+# =========================================================================================================
+# Weights
+# =========================================================================================================
+
+def get_reference_direction_options():
+    from pymoo.util.reference_direction import UniformReferenceDirectionFactory
+    from pymoo.util.reference_direction import ReductionBasedReferenceDirectionFactory
+    from pymoo.util.reference_direction import MultiLayerReferenceDirectionFactory
+
+    REFERENCE_DIRECTIONS = [
+        ("(das-dennis|uniform)", UniformReferenceDirectionFactory),
+        ("multi-layer", MultiLayerReferenceDirectionFactory),
+        ("red", ReductionBasedReferenceDirectionFactory)
+    ]
+
+    return REFERENCE_DIRECTIONS
+
+
+def get_reference_directions(name, *args, d={}, **kwargs):
+    return get_from_list(get_reference_direction_options(), name, args, {**d, **kwargs}).do()
+
+
+# =========================================================================================================
+# Visualization
+# =========================================================================================================
+
+def get_visualization_options():
+    from pymoo.visualization.pcp import PCP
+    from pymoo.visualization.petal import Petal
+    from pymoo.visualization.radar import Radar
+    from pymoo.visualization.radviz import Radviz
+    from pymoo.visualization.scatter import Scatter
+    from pymoo.visualization.star_coordinate import StarCoordinate
+    from pymoo.visualization.heatmap import Heatmap
+    from pymoo.visualization.fitness_landscape import FitnessLandscape
+
+    VISUALIZATION = [
+        ("scatter", Scatter),
+        ("heatmap", Heatmap),
+        ("pcp", PCP),
+        ("petal", Petal),
+        ("radar", Radar),
+        ("radviz", Radviz),
+        ("star", StarCoordinate),
+        ("fitness-landscape", FitnessLandscape)
+    ]
+
+    return VISUALIZATION
+
+
+def get_visualization(name, *args, d={}, **kwargs):
+    return get_from_list(get_visualization_options(), name, args, {**d, **kwargs})
+
+
+# =========================================================================================================
+# Performance Indicator
+# =========================================================================================================
+
+
+def get_performance_indicator_options():
+    from pymoo.performance_indicator.gd import GD
+    from pymoo.performance_indicator.gd_plus import GDPlus
+    from pymoo.performance_indicator.igd import IGD
+    from pymoo.performance_indicator.igd_plus import IGDPlus
+    from pymoo.performance_indicator.hv import Hypervolume
+    from pymoo.performance_indicator.rmetric import RMetric
+
+    PERFORMANCE_INDICATOR = [
+        ("gd", GD),
+        ("gd+", GDPlus),
+        ("igd", IGD),
+        ("igd+", IGDPlus),
+        ("hv", Hypervolume),
+        ("rmetric", RMetric)
+    ]
+    return PERFORMANCE_INDICATOR
+
+
+def get_performance_indicator(name, *args, d={}, **kwargs):
+    return get_from_list(get_performance_indicator_options(), name, args, {**d, **kwargs})
+
+
+# =========================================================================================================
+# DECOMPOSITION
+# =========================================================================================================
+
+def get_decomposition_options():
+    from pymoo.decomposition.pbi import PBI
+    from pymoo.decomposition.tchebicheff import Tchebicheff
+    from pymoo.decomposition.weighted_sum import WeightedSum
+    from pymoo.decomposition.asf import ASF
+    from pymoo.decomposition.aasf import AASF
+    from pymoo.decomposition.perp_dist import PerpendicularDistance
+
+    DECOMPOSITION = [
+        ("weighted-sum", WeightedSum),
+        ("tchebi", Tchebicheff),
+        ("pbi", PBI),
+        ("asf", ASF),
+        ("aasf", AASF),
+        ("perp_dist", PerpendicularDistance)
+    ]
+
+    return DECOMPOSITION
+
+
+def get_decomposition(name, *args, d={}, **kwargs):
+    return get_from_list(get_decomposition_options(), name, args, {**d, **kwargs})
+
+
+# =========================================================================================================
+# DECOMPOSITION
+# =========================================================================================================
+
+def get_decision_making_options():
+    from pymoo.decision_making.high_tradeoff import HighTradeoffPoints
+    from pymoo.decision_making.pseudo_weights import PseudoWeights
+
+    DECISION_MAKING = [
+        ("high-tradeoff", HighTradeoffPoints),
+        ("pseudo-weights", PseudoWeights)
+    ]
+
+    return DECISION_MAKING
+
+
+def get_decision_making(name, *args, d={}, **kwargs):
+    return get_from_list(get_decision_making_options(), name, args, {**d, **kwargs})
+
+
+# =========================================================================================================
+# Documentation
+# =========================================================================================================
 
 
 def dummy(name, kwargs):
     """
-    A convenience method to get an {type} object just by providing a string.
+    A convenience method to get a {type} object just by providing a string.
 
     Parameters
     ----------
@@ -83,141 +433,50 @@ def dummy(name, kwargs):
 
     Returns
     -------
-    algorithm : {clazz}
+    class : {clazz}
         An {type} object based on the string. `None` if the {type} was not found.
 
     """
     pass
 
 
-# =========================================================================================================
-# Algorithms
-# =========================================================================================================
-
-ALGORITHMS = [
-    ("ga", ga),
-    ("de", de),
-    ("nsga2", nsga2),
-    ("rnsga2", rnsga2),
-    ("nsga3", nsga3),
-    ("unsga3", unsga3),
-    ("rnsga3", rnsga3),
-    ("moead", moead),
-]
+def options_to_string(l):
+    return ", ".join(["'%s'" % k[0] for k in l])
 
 
-def get_algorithm(name, *args, d={}, **kwargs):
-    return get_from_list(ALGORITHMS, name, args, {**d, **kwargs})
+if Configuration.parse_custom_docs:
+    from pymoo.docs import parse_doc_string
 
+    from pymoo.factory import get_algorithm_options, get_selection_options, get_crossover_options, \
+        get_mutation_options, get_termination_options, get_algorithm, get_selection, get_crossover, get_mutation, \
+        get_termination, get_sampling, get_sampling_options
 
-parse_doc_string(dummy, get_algorithm, {"type": "algorithm",
-                                        "clazz": ":class:`~pymoo.model.algorithm.Algorithm`",
-                                        "options": get_options(ALGORITHMS)
-                                        })
+    parse_doc_string(dummy, get_algorithm, {"type": "algorithm",
+                                            "clazz": ":class:`~pymoo.model.algorithm.Algorithm`",
+                                            "options": options_to_string(get_algorithm_options())
+                                            })
 
-# =========================================================================================================
-# Sampling
-# =========================================================================================================
+    parse_doc_string(dummy, get_sampling, {"type": "sampling",
+                                           "clazz": ":class:`~pymoo.model.sampling.Sampling`",
+                                           "options": options_to_string(get_sampling_options())
+                                           })
 
-SAMPLING = [
-    ("real_random", RandomSampling, {'var_type': np.real}),
-    ("real_lhs", LatinHypercubeSampling),
-    ("bin_random", RandomSampling, {'var_type': np.bool}),
-    ("int_random", RandomSampling, {'var_type': np.int})
-]
+    parse_doc_string(dummy, get_selection, {"type": "selection",
+                                            "clazz": ":class:`~pymoo.model.selection.Selection`",
+                                            "options": options_to_string(get_selection_options())
+                                            })
 
+    parse_doc_string(dummy, get_crossover, {"type": "crossover",
+                                            "clazz": ":class:`~pymoo.model.crossover.Crossover`",
+                                            "options": options_to_string(get_crossover_options())
+                                            })
 
-def get_sampling(name, *args, d={}, **kwargs):
-    return get_from_list(SAMPLING, name, args, {**d, **kwargs})
+    parse_doc_string(dummy, get_mutation, {"type": "mutation",
+                                           "clazz": ":class:`~pymoo.model.mutation.Mutation`",
+                                           "options": options_to_string(get_mutation_options())
+                                           })
 
-
-parse_doc_string(dummy, get_sampling, {"type": "sampling",
-                                       "clazz": ":class:`~pymoo.model.sampling.Sampling`",
-                                       "options": get_options(SAMPLING)
-                                       })
-
-# =========================================================================================================
-# Selection
-# =========================================================================================================
-
-SELECTION = [
-    ("random", RandomSelection),
-    ("tournament", TournamentSelection)
-]
-
-
-def get_selection(name, *args, d={}, **kwargs):
-    return get_from_list(SELECTION, name, args, {**d, **kwargs})
-
-
-parse_doc_string(dummy, get_selection, {"type": "selection",
-                                        "clazz": ":class:`~pymoo.model.selection.Selection`",
-                                        "options": get_options(SELECTION)
-                                        })
-
-# =========================================================================================================
-# Crossover
-# =========================================================================================================
-
-CROSSOVER = [
-    ("real_sbx", SimulatedBinaryCrossover, dict(prob=1.0, eta=30, var_type=np.double)),
-    ("int_sbx", SimulatedBinaryCrossover, dict(prob=1.0, eta=30, var_type=np.int)),
-    ("real_de", DifferentialEvolutionCrossover),
-    ("(real|bin|int)_ux", UniformCrossover),
-    ("(bin|int)_hux", HalfUniformCrossover),
-    ("(real|bin|int)_exp", ExponentialCrossover),
-    ("(real|bin|int)_one_point", PointCrossover, {'n_points': 1}),
-    ("(real|bin|int)_two_point", PointCrossover, {'n_points': 2}),
-    ("(real|bin|int)_k_point", PointCrossover)
-]
-
-
-def get_crossover(name, *args, d={}, **kwargs):
-    return get_from_list(CROSSOVER, name, args, {**d, **kwargs})
-
-
-parse_doc_string(dummy, get_crossover, {"type": "crossover",
-                                        "clazz": ":class:`~pymoo.model.crossover.Crossover`",
-                                        "options": get_options(CROSSOVER)
-                                        })
-
-# =========================================================================================================
-# Mutation
-# =========================================================================================================
-
-MUTATION = [
-    ("real_pm", PolynomialMutation),
-    ("int_pm", PolynomialMutation, dict(var_type=np.int)),
-    ("bin_bitflip", BinaryBitflipMutation)
-]
-
-
-def get_mutation(name, *args, d={}, **kwargs):
-    return get_from_list(MUTATION, name, args, {**d, **kwargs})
-
-
-parse_doc_string(dummy, get_mutation, {"type": "mutation",
-                                       "clazz": ":class:`~pymoo.model.mutation.Mutation`",
-                                       "options": get_options(MUTATION)
-                                       })
-
-# =========================================================================================================
-# Termination
-# =========================================================================================================
-
-
-TERMINATION = [
-    ("n_eval", MaximumFunctionCallTermination),
-    ("n_gen", MaximumGenerationTermination),
-    ("igd", IGDTermination)
-]
-
-
-def get_termination(name, *args, d={}, **kwargs):
-    return get_from_list(TERMINATION, name, args, {**d, **kwargs})
-
-
-parse_doc_string(dummy, get_termination, {"type": "termination",
-                                          "clazz": ":class:`~pymoo.model.termination.Termination`",
-                                          "options": get_options(TERMINATION)
-                                          })
+    parse_doc_string(dummy, get_termination, {"type": "termination",
+                                              "clazz": ":class:`~pymoo.model.termination.termination`",
+                                              "options": options_to_string(get_termination_options())
+                                              })

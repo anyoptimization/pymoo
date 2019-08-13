@@ -6,28 +6,13 @@ from pymoo.model.individual import Individual
 from pymoo.model.survival import Survival
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.random_sampling import RandomSampling
+from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.operators.selection.tournament_selection import compare, TournamentSelection
 from pymoo.util.display import disp_multi_objective
 from pymoo.util.dominator import Dominator
-from pymoo.util.mathematics import Mathematics
-from pymoo.util.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.misc import find_duplicates
+from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.randomized_argsort import randomized_argsort
-
-
-# =========================================================================================================
-# Implementation
-# =========================================================================================================
-
-
-class NSGA2(GeneticAlgorithm):
-
-    def __init__(self, **kwargs):
-        kwargs['individual'] = Individual(rank=np.inf, crowding=-1)
-        super().__init__(**kwargs)
-
-        self.tournament_type = 'comp_by_dom_and_crowding'
-        self.func_display_attrs = disp_multi_objective
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -72,7 +57,52 @@ def binary_tournament(pop, P, algorithm, **kwargs):
                 S[i] = compare(a, pop[a].get("crowding"), b, pop[b].get("crowding"),
                                method='larger_is_better', return_random_if_equal=True)
 
-    return S[:, None].astype(np.int)
+    return S[:, None].astype(np.int, copy=False)
+
+
+# =========================================================================================================
+# Implementation
+# =========================================================================================================
+
+
+class NSGA2(GeneticAlgorithm):
+
+    def __init__(self,
+                 pop_size=100,
+                 sampling=FloatRandomSampling(),
+                 selection=TournamentSelection(func_comp=binary_tournament),
+                 crossover=SimulatedBinaryCrossover(eta=15, prob=0.9),
+                 mutation=PolynomialMutation(prob=None, eta=20),
+                 eliminate_duplicates=True,
+                 n_offsprings=None,
+                 **kwargs):
+        """
+
+        Parameters
+        ----------
+        pop_size : {pop_size}
+        sampling : {sampling}
+        selection : {selection}
+        crossover : {crossover}
+        mutation : {mutation}
+        eliminate_duplicates : {eliminate_duplicates}
+        n_offsprings : {n_offsprings}
+
+        """
+
+        kwargs['individual'] = Individual(rank=np.inf, crowding=-1)
+        super().__init__(pop_size=pop_size,
+                         sampling=sampling,
+                         selection=selection,
+                         crossover=crossover,
+                         mutation=mutation,
+                         survival=RankAndCrowdingSurvival(),
+                         eliminate_duplicates=eliminate_duplicates,
+                         n_offsprings=n_offsprings,
+                         **kwargs)
+
+        self.tournament_type = 'comp_by_dom_and_crowding'
+        self.func_display_attrs = disp_multi_objective
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -85,10 +115,10 @@ class RankAndCrowdingSurvival(Survival):
     def __init__(self) -> None:
         super().__init__(True)
 
-    def _do(self, pop, n_survive, D=None, **kwargs):
+    def _do(self, problem, pop, n_survive, D=None, **kwargs):
 
         # get the objective space values and objects
-        F = pop.get("F")
+        F = pop.get("F").astype(np.float, copy=False)
 
         # the final indices of surviving individuals
         survivors = []
@@ -99,8 +129,7 @@ class RankAndCrowdingSurvival(Survival):
         for k, front in enumerate(fronts):
 
             # calculate the crowding distance of the front
-            crowding_of_front = calc_crowding_distance_vectorized(F[front, :])
-            _crowding_of_front = calc_crowding_distance_vectorized(F[front, :])
+            crowding_of_front = calc_crowding_distance(F[front, :])
 
             # save rank and crowding in the individual class
             for j, i in enumerate(front):
@@ -122,160 +151,54 @@ class RankAndCrowdingSurvival(Survival):
         return pop[survivors]
 
 
-def calc_crowding_distance(F):
-    n_points = F.shape[0]
-    n_obj = F.shape[1]
+def calc_crowding_distance(F, filter_out_duplicates=True):
+    n_points, n_obj = F.shape
 
     if n_points <= 2:
-        return np.full(n_points, Mathematics.INF)
+        return np.full(n_points, np.inf)
+
     else:
 
-        # the final crowding distance result
-        crowding = np.zeros(n_points)
+        if filter_out_duplicates:
+            # filter out solutions which are duplicates - duplicates get a zero finally
+            is_unique = np.where(np.logical_not(find_duplicates(F, epsilon=1e-24)))[0]
+        else:
+            # set every point to be unique without checking it
+            is_unique = np.arange(n_points)
 
-        # for each objective
-        for m in range(n_obj):
-
-            # sort by objective randomize if they are equal
-            I = np.argsort(F[:, m], kind='mergesort')
-            # I = randomized_argsort(F[:, m], order='ascending')
-
-            # norm which will be used for distance normalization
-            norm = np.max(F[:, m]) - np.min(F[:, m])
-
-            # set crowding to infinity of extreme point
-            crowding[I[0]] = np.inf
-            crowding[I[-1]] = np.inf
-
-            # if norm is zero -> next objective
-            if norm != 0.0:
-
-                # add up the crowding measure for all points in between
-                for i in range(1, n_points - 1):
-
-                    # the current values to have a look at
-                    _current, _last, _next = i, i - 1, i + 1
-
-                    # if the current entry is already infinity the values will not change
-                    if not np.isinf(crowding[I[_current]]):
-                        crowding[I[_current]] += (F[I[_next], m] - F[I[_last], m]) / norm
-
-    # divide by the number of objectives
-    crowding = crowding / n_obj
-
-    # replace infinity with a large number
-    crowding[np.isinf(crowding)] = Mathematics.INF
-
-    return crowding
-
-
-def calc_crowding_distance_loop(F):
-    n_points = F.shape[0]
-    n_obj = F.shape[1]
-
-    if n_points <= 2:
-        return np.full(n_points, Mathematics.INF)
-    else:
-
-        # the final crowding distance result
-        crowding = np.zeros(n_points)
-
-        # for each objective
-        for m in range(n_obj):
-
-            # sort by objective randomize if they are equal
-            I = np.argsort(F[:, m], kind='mergesort')
-            # I = randomized_argsort(F[:, m], order='ascending')
-
-            # norm which will be used for distance normalization
-            norm = np.max(F[:, m]) - np.min(F[:, m])
-
-            # set crowding to infinity of extreme point
-            crowding[I[0]] = np.inf
-            crowding[I[-1]] = np.inf
-
-            # if norm is zero -> next objective
-            if norm != 0.0:
-
-                # add up the crowding measure for all points in between
-                for i in range(1, n_points - 1):
-
-                    # the current values to have a look at
-                    _current, _last, _next = i, i - 1, i + 1
-
-                    # if the current entry is already infinity the values will not change
-                    if not np.isinf(crowding[I[_current]]):
-                        # crowding[I[_current]] += (F[I[_next], m] - F[I[_last], m]) / norm
-
-                        # search for last and next value that are not equal
-                        while _last >= 0 and F[I[_last], m] == F[I[_current], m]:
-                            _last -= 1
-
-                        while _next < n_points and F[I[_next], m] == F[I[_current], m]:
-                            _next += 1
-
-                        # if the point is in fact also an extreme point
-                        if _last < 0 or _next == n_points:
-                            crowding[I[_current]] = np.inf
-
-                        # otherwise, which will be usually the case
-                        else:
-                            crowding[I[_current]] += (F[I[_next], m] - F[I[_last], m]) / norm
-
-    # divide by the number of objectives
-    crowding = crowding / n_obj
-
-    # replace infinity with a large number
-    crowding[np.isinf(crowding)] = Mathematics.INF
-
-    return crowding
-
-
-def calc_crowding_distance_vectorized(F, same_crowding_if_same_objective_value=False):
-    infinity = 1e+14
-
-    n_points = F.shape[0]
-    n_obj = F.shape[1]
-
-    if n_points <= 2:
-        return np.full(n_points, infinity)
-    else:
+        # index the unique points of the array
+        _F = F[is_unique]
 
         # sort each column and get index
-        I = np.argsort(F, axis=0, kind='mergesort')
+        I = np.argsort(_F, axis=0, kind='mergesort')
 
-        # now really sort the whole array
-        F = F[I, np.arange(n_obj)]
+        # sort the objective space values for the whole matrix
+        _F = _F[I, np.arange(n_obj)]
 
-        # get the distance to the last element in sorted list and replace zeros with actual values
-        dist = np.concatenate([F, np.full((1, n_obj), np.inf)]) \
-               - np.concatenate([np.full((1, n_obj), -np.inf), F])
+        # calculate the distance from each point to the last and next
+        dist = np.row_stack([_F, np.full(n_obj, np.inf)]) - np.row_stack([np.full(n_obj, -np.inf), _F])
 
-        dist_to_last, dist_to_next = np.copy(dist), np.copy(dist)
-
-        if same_crowding_if_same_objective_value:
-            index_dist_is_zero = np.where(dist == 0)
-            for i, j in zip(*index_dist_is_zero):
-                dist_to_last[i, j] = dist_to_last[i - 1, j]
-            for i, j in reversed(list(zip(*index_dist_is_zero))):
-                dist_to_next[i, j] = dist_to_next[i + 1, j]
-
-        # normalize all the distances
-        norm = np.max(F, axis=0) - np.min(F, axis=0)
+        # calculate the norm for each objective - set to NaN if all values are equal
+        norm = np.max(_F, axis=0) - np.min(_F, axis=0)
         norm[norm == 0] = np.nan
+
+        # prepare the distance to last and next vectors
+        dist_to_last, dist_to_next = dist, np.copy(dist)
         dist_to_last, dist_to_next = dist_to_last[:-1] / norm, dist_to_next[1:] / norm
 
-        # if we divided by zero because all values in one columns are equal replace by none
+        # if we divide by zero because all values in one columns are equal replace by none
         dist_to_last[np.isnan(dist_to_last)] = 0.0
         dist_to_next[np.isnan(dist_to_next)] = 0.0
 
         # sum up the distance to next and last and norm by objectives - also reorder from sorted list
         J = np.argsort(I, axis=0)
-        crowding = np.sum(dist_to_last[J, np.arange(n_obj)] + dist_to_next[J, np.arange(n_obj)], axis=1) / n_obj
+        _cd = np.sum(dist_to_last[J, np.arange(n_obj)] + dist_to_next[J, np.arange(n_obj)], axis=1) / n_obj
 
-    # replace infinity with a large number
-    crowding[np.isinf(crowding)] = infinity
+        # save the final vector which sets the crowding distance for duplicates to zero to be eliminated
+        crowding = np.zeros(n_points)
+        crowding[is_unique] = _cd
 
+    crowding[np.isinf(crowding)] = 1e+14
     return crowding
 
 
@@ -283,45 +206,8 @@ def calc_crowding_distance_vectorized(F, same_crowding_if_same_objective_value=F
 # Interface
 # =========================================================================================================
 
-
-def nsga2(
-        pop_size=100,
-        sampling=RandomSampling(),
-        selection=TournamentSelection(func_comp=binary_tournament),
-        crossover=SimulatedBinaryCrossover(prob=0.9, eta=15),
-        mutation=PolynomialMutation(prob=None, eta=20),
-        eliminate_duplicates=True,
-        n_offsprings=None,
-        **kwargs):
-    """
-
-    Parameters
-    ----------
-    pop_size : {pop_size}
-    sampling : {sampling}
-    selection : {selection}
-    crossover : {crossover}
-    mutation : {mutation}
-    eliminate_duplicates : {eliminate_duplicates}
-    n_offsprings : {n_offsprings}
-
-    Returns
-    -------
-    nsga2 : :class:`~pymoo.model.algorithm.Algorithm`
-        Returns an NSGA2 algorithm object.
+def nsga2(*args, **kwargs):
+    return NSGA2(*args, **kwargs)
 
 
-    """
-
-    return NSGA2(pop_size=pop_size,
-                 sampling=sampling,
-                 selection=selection,
-                 crossover=crossover,
-                 mutation=mutation,
-                 survival=RankAndCrowdingSurvival(),
-                 eliminate_duplicates=eliminate_duplicates,
-                 n_offsprings=n_offsprings,
-                 **kwargs)
-
-
-parse_doc_string(nsga2)
+parse_doc_string(NSGA2.__init__)

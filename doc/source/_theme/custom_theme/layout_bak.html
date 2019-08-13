@@ -1,0 +1,292 @@
+{#
+
+    Customized SciPy Layout.
+    https://github.com/scipy/scipy-sphinx-theme
+
+    :copyright: Copyright 2007-2011 by the Sphinx team, see AUTHORS.
+    :license: BSD, see LICENSE for details.
+#}
+
+
+
+
+
+{%- macro relbar_top() %}
+    <ul class="nav nav-pills pull-left">
+        {%- for link in theme_rootlinks %}
+        <li class="active"><a href="{{ link[0] }}">{{ link[1] }}</a></li>
+        {%- endfor %}
+        {%- block rootrellink %}
+	{% if pagename != master_doc %}
+        <li class="active"><a href="{{ pathto(master_doc) }}">{{ shorttitle|e }}</a></li>
+	{% endif %}
+        {%- endblock %}
+        {%- for parent in parents %}
+          <li class="active"><a href="{{ parent.link|e }}" {% if loop.last %}{{ accesskey("U") }}{% endif %}>{{ parent.title }}</a></li>
+        {%- endfor %}
+        {%- block relbaritems %} {% endblock %}
+    </ul>
+{%- endmacro %}
+
+
+
+{%- macro relbar_top_right() %}
+    <ul class="nav nav-pills pull-right">
+      {%- for rellink in rellinks %}
+      <li class="active">
+        <a href="{{ pathto(rellink[0]) }}" title="{{ rellink[1]|striptags|e }}"
+           {{ accesskey(rellink[2]) }}>{{ rellink[3] }}</a>
+      </li>
+      {%- endfor %}
+    </ul>
+{%- endmacro %}
+
+{%- macro relbar_bottom() %}
+{%- endmacro %}
+
+
+
+
+
+{%- macro sidebar() %}
+      <div class="spc-rightsidebar span3">
+        <div class="sphinxsidebarwrapper">
+          {%- block sidebarlogo %}
+          {%- if logo %}
+            <p class="logo"><a href="{{ pathto(master_doc) }}">
+              <img class="logo" src="{{ pathto('_static/' + logo, 1) }}" alt="Logo">
+            </a></p>
+          {%- endif %}
+          {%- endblock %}
+
+
+          {%- if sidebars != None %}
+            {#- new style sidebar: explicitly include/exclude templates #}
+            {%- for sidebartemplate in sidebars %}
+            {%- include sidebartemplate %}
+            {%- endfor %}
+
+
+          {%- else %}
+
+            {#- old style sidebars: using blocks -- should be deprecated #}
+            {%- block sidebartoc %}
+            {%- include "localtoc.html" %}
+            {%- endblock %}
+
+            {%- block sidebarrel %}
+            {%- include "relations.html" %}
+            {%- endblock %}
+
+            {%- block sidebarsourcelink %}
+            {%- include "sourcelink.html" %}
+            {%- endblock %}
+
+            {%- if customsidebar %}
+            {%- include customsidebar %}
+            {%- endif %}
+
+            {%- block sidebarsearch %}
+            {%- include "searchbox.html" %}
+            {%- endblock %}
+
+          {%- endif %}
+        </div>
+      </div>
+{%- endmacro %}
+
+
+
+
+
+
+{%- macro script() %}
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '{{ url_root }}',
+        VERSION:     '{{ release|e }}',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '{{ '' if no_search_suffix else file_suffix }}',
+        HAS_SOURCE:  {{ has_source|lower }}
+      };
+    </script>
+    {%- for scriptfile in script_files %}
+    <script type="text/javascript" src="{{ pathto(scriptfile, 1) }}"></script>
+    {%- endfor %}
+    <script type="text/javascript" src="{{ pathto('_static/js/copybutton.js', 1) }}"></script>
+{%- endmacro %}
+
+{%- macro css() %}
+    <link rel="stylesheet" type="text/css" href="{{ pathto('_static/css/spc-bootstrap.css', 1) }}">
+    <link rel="stylesheet" type="text/css" href="{{ pathto('_static/css/spc-extend.css', 1) }}">
+    <link rel="stylesheet" href="{{ pathto('_static/' + style, 1) }}" type="text/css" >
+    <link rel="stylesheet" href="{{ pathto('_static/pygments.css', 1) }}" type="text/css" >
+    {%- for cssfile in css_files %}
+    <link rel="stylesheet" href="{{ pathto(cssfile, 1) }}" type="text/css" >
+    {%- endfor %}
+{%- endmacro %}
+
+
+
+
+
+
+<html>
+  <head>
+    <meta charset="{{ encoding }}">
+    {{ metatags }}
+    {%- block htmltitle %}
+    <title>{{ title|striptags|e }}{{ titlesuffix }}</title>
+    {%- endblock %}
+    {{ css() }}
+    {%- if not embedded %}
+    {%- block scripts %}
+    {{ script() }}
+    {%- endblock %}
+    {%- if use_opensearch %}
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="{% trans docstitle=docstitle|e %}Search within {{ docstitle }}{% endtrans %}"
+          href="{{ pathto('_static/opensearch.xml', 1) }}">
+    {%- endif %}
+    {%- if favicon %}
+    <link rel="shortcut icon" href="{{ pathto('_static/' + favicon, 1) }}">
+    {%- endif %}
+    {%- endif %}
+{%- block linktags %}
+    {%- if hasdoc('about') %}
+    <link rel="author" title="{{ _('About these documents') }}" href="{{ pathto('about') }}" >
+    {%- endif %}
+    {%- if hasdoc('genindex') %}
+    <link rel="index" title="{{ _('Index') }}" href="{{ pathto('genindex') }}" >
+    {%- endif %}
+    {%- if hasdoc('search') %}
+    <link rel="search" title="{{ _('Search') }}" href="{{ pathto('search') }}" >
+    {%- endif %}
+    {%- if hasdoc('copyright') %}
+    <link rel="copyright" title="{{ _('Copyright') }}" href="{{ pathto('copyright') }}" >
+    {%- endif %}
+    <link rel="top" title="{{ docstitle|e }}" href="{{ pathto('index') }}" >
+    {%- if parents %}
+    <link rel="up" title="{{ parents[-1].title|striptags|e }}" href="{{ parents[-1].link|e }}" >
+    {%- endif %}
+    {%- if next %}
+    <link rel="next" title="{{ next.title|striptags|e }}" href="{{ next.link|e }}" >
+    {%- endif %}
+    {%- if prev %}
+    <link rel="prev" title="{{ prev.title|striptags|e }}" href="{{ prev.link|e }}" >
+    {%- endif %}
+{%- endblock %}
+{%- block extrahead %} {% endblock %}
+  </head>
+  <body>
+{%- block header %}
+{% if theme_scipy_org_logo %}
+<div class="container">
+  <div class="top-scipy-org-logo-header">
+    <a href="{{ pathto('index') }}">
+      <img style="border: 0;" alt="pymoo" src="{{ pathto('_static/img/pymoo.svg', 1) }}"></a>
+    </div>
+  </div>
+</div>
+{% else %}
+  <div class="container">
+    <div class="header">
+    </div>
+  </div>
+{% endif %}
+{% endblock %}
+
+{%- block content %}
+    <div class="container">
+      <div class="main">
+{%- block navbar %}
+        {% if theme_navigation_links or sidebar == 'left' %}
+	<div class="row-fluid">
+	  <div class="span12">
+	    <div class="spc-navbar">
+              {{ relbar_top() }}
+              {% if theme_navigation_links %}
+              {{ relbar_top_right() }}
+              {% endif %}
+	    </div>
+	  </div>
+	</div>
+        {% endif %}
+{% endblock %}
+	<div class="row-fluid">
+
+
+
+	  {%- if theme_sidebar == 'left' -%}
+            {{ sidebar() }}
+          {%- endif %}
+	  {%- if theme_sidebar == 'none' -%}
+          <div class="span1"></div>
+          <div class="span10">
+	  {% else %}
+          <div class="span9">
+	  {%- endif %}
+            {% if not theme_navigation_links and sidebar != 'left' %}
+	      <div class="row-fluid">
+		<div class="span9">
+  		  <div class="spc-navbar">
+		    {{ relbar_top() }}
+		  </div>
+		</div>
+	      </div>
+            {% endif %}
+  {%- block document %}
+        <div class="bodywrapper">
+          <div class="body" id="spc-section-body">
+            {% block body %} {% endblock %}
+          </div>
+        </div>
+  {%- endblock %}
+          </div>
+	  {%- if theme_sidebar == 'right' -%}
+          {{ sidebar() }}
+	  {%- elif theme_sidebar == 'none' -%}
+          <div class="span1"></div>
+	  {%- endif %}
+        </div>
+      </div>
+    </div>
+{%- endblock %}
+
+    <div class="container container-navbar-bottom">
+      <div class="spc-navbar">
+        {{ relbar_bottom() }}
+      </div>
+    </div>
+
+{%- block footer %}
+    <div class="container">
+    <div class="footer">
+    <div class="row-fluid">
+    <ul class="inline pull-left">
+    {%- if show_copyright %}
+      <li>
+      {%- if hasdoc('copyright') %}
+        {% trans path=pathto('copyright'), copyright=copyright|e %}&copy; <a href="{{ path }}">Copyright</a> {{ copyright }}.{% endtrans %}
+      {%- else %}
+        {% trans copyright=copyright|e %}&copy; Copyright {{ copyright }}.{% endtrans %}
+      {%- endif %}
+      </li>
+    {%- endif %}
+    {%- if last_updated %}
+      <li>
+      {% trans last_updated=last_updated|e %}Last updated on {{ last_updated }}.{% endtrans %}
+      </li>
+    {%- endif %}
+    {%- if show_sphinx %}
+      <li>
+      {% trans sphinx_version=sphinx_version|e %}Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> {{ sphinx_version }}.{% endtrans %}
+      </li>
+    {%- endif %}
+    </ul>
+    </div>
+    </div>
+    </div>
+{%- endblock %}
+  </body>
+</html>

@@ -34,12 +34,11 @@ Otherwise, create a new python environment and activate it:
     conda activate pymoo
 
 
-Furthermore, make sure Cython ann NumPy is installed in that environment, because
-both are needed for the compilation.
+Furthermore, make sure NumPy is installed:
 
 .. code:: bash
 
-    pip install cython numpy
+    pip install numpy
 
 
 If the environment is not setup correct, the installation will NOT fail and you
@@ -54,7 +53,7 @@ To use the current stable release of *pymoo* use
 
 .. code:: bash
 
-    pip install pymoo
+    pip install -U pymoo
 
 If you have already installed an older version of the framework you can force
 an update by using the *-U* option.
@@ -73,6 +72,16 @@ our framework you can install the current version on GitHub by
     pip install .
 
 
+To compile the modules or see an output log:
+
+.. code:: bash
+
+    pip install Cython
+    make compile-with-cython
+
+This translates the pyx files to cpp files and then compiles them. If anything fails
+this will provide more details about why this has happened.
+    
 
 Plain/Compiled Modules
 ------------------------------------------------------------------------------
@@ -83,5 +92,5 @@ has worked during the installation, you can use the following command:
 
 .. code:: bash
 
-    python -c "from pymoo.cython.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
+    python -c "from pymoo.util.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
 

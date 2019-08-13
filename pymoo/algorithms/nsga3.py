@@ -1,60 +1,26 @@
+import warnings
+
 import numpy as np
 from numpy.linalg import LinAlgError
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.cython.function_loader import load_function
 from pymoo.docs import parse_doc_string
+from pymoo.model.algorithm import filter_optimum
 from pymoo.model.individual import Individual
+from pymoo.model.population import Population
 from pymoo.model.survival import Survival
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.default_operators import set_if_none
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.random_sampling import RandomSampling
+from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
-from pymoo.rand import random
 from pymoo.util.display import disp_multi_objective
-from pymoo.util.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.function_loader import load_function
+from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
 
 # =========================================================================================================
 # Implementation
 # =========================================================================================================
-
-
-class NSGA3(GeneticAlgorithm):
-
-    def __init__(self, ref_dirs, **kwargs):
-        self.ref_dirs = ref_dirs
-        kwargs['individual'] = Individual(rank=np.inf, niche=-1, dist_to_niche=np.inf)
-        set_if_none(kwargs, 'pop_size', len(ref_dirs))
-        set_if_none(kwargs, 'sampling', RandomSampling())
-        set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob=1.0, eta=30))
-        set_if_none(kwargs, 'mutation', PolynomialMutation(prob=None, eta=20))
-        set_if_none(kwargs, 'selection', TournamentSelection(func_comp=comp_by_cv_then_random))
-        set_if_none(kwargs, 'survival', ReferenceDirectionSurvival(ref_dirs))
-        set_if_none(kwargs, 'eliminate_duplicates', True)
-
-        super().__init__(**kwargs)
-
-        self.func_display_attrs = disp_multi_objective
-
-    def _solve(self, problem, termination):
-        if self.ref_dirs.shape[1] != problem.n_obj:
-            raise Exception(
-                "Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
-                (self.ref_dirs.shape[1], problem.n_obj))
-
-        return super()._solve(problem, termination)
-
-    def _finalize(self):
-        super()._finalize()
-        I = np.where(self.pop.get("rank") == 0)
-        pop = self.pop[I]
-        if len(pop) == 1:
-            self.opt = pop
-        else:
-            self.opt = pop[self.pop.get("is_closest")]
-
 
 def comp_by_cv_then_random(pop, P, **kwargs):
     S = np.full(P.shape[0], np.nan)
@@ -68,12 +34,104 @@ def comp_by_cv_then_random(pop, P, **kwargs):
 
         # both solutions are feasible just set random
         else:
-            S[i] = random.choice([a, b])
+            S[i] = np.random.choice([a, b])
 
     return S[:, None].astype(np.int)
 
 
+class NSGA3(GeneticAlgorithm):
+
+    def __init__(self,
+                 ref_dirs,
+                 pop_size=None,
+                 sampling=FloatRandomSampling(),
+                 selection=TournamentSelection(func_comp=comp_by_cv_then_random),
+                 crossover=SimulatedBinaryCrossover(eta=30, prob=1.0),
+                 mutation=PolynomialMutation(eta=20, prob=None),
+                 eliminate_duplicates=True,
+                 n_offsprings=None,
+                 **kwargs):
+        """
+
+        Parameters
+        ----------
+
+        ref_dirs : {ref_dirs}
+        pop_size : int (default = None)
+            By default the population size is set to None which means that it will be equal to the number of reference
+            line. However, if desired this can be overwritten by providing a positive number.
+        sampling : {sampling}
+        selection : {selection}
+        crossover : {crossover}
+        mutation : {mutation}
+        eliminate_duplicates : {eliminate_duplicates}
+        n_offsprings : {n_offsprings}
+
+        """
+
+        self.ref_dirs = ref_dirs
+
+        if pop_size is None:
+            pop_size = len(ref_dirs)
+
+        kwargs['individual'] = Individual(rank=np.inf, niche=-1, dist_to_niche=np.inf)
+
+        if 'survival' in kwargs:
+            survival = kwargs['survival']
+            del kwargs['survival']
+        else:
+            survival = ReferenceDirectionSurvival(ref_dirs)
+
+        super().__init__(pop_size=pop_size,
+                         sampling=sampling,
+                         selection=selection,
+                         crossover=crossover,
+                         mutation=mutation,
+                         survival=survival,
+                         eliminate_duplicates=eliminate_duplicates,
+                         n_offsprings=n_offsprings,
+                         **kwargs)
+
+        self.func_display_attrs = disp_multi_objective
+
+    def _solve(self, problem):
+
+        if self.ref_dirs is not None and self.ref_dirs.shape[1] != problem.n_obj:
+            raise Exception(
+                "Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
+                (self.ref_dirs.shape[1], problem.n_obj))
+
+        return super()._solve(problem)
+
+    def _finalize(self):
+        super()._finalize()
+        opt = filter_optimum(self.pop.copy())
+
+        # if population object then only keep closest to reference lines
+        if isinstance(opt, Population):
+
+            # find the closest individual to each niche
+            niches, ideal_point, nadir_point = self.survival.ref_dirs, self.survival.ideal_point, self.survival.nadir_point
+
+            # now find the non-empty niches - only those we used during optimization
+            non_empty_niches = niches[np.unique(opt.get("niche"))]
+
+            # calculate the distance matrix - perp dist of each solution to all those niches
+            _, _, dist_matrix = associate_to_niches(opt.get("F"), non_empty_niches,
+                                                    ideal_point, nadir_point, utopian_epsilon=0.0)
+
+            # find the solution closest to the niche
+            I = np.unique(dist_matrix.argmin(axis=0))
+
+            # filter out all others
+            if len(I) > 0:
+                opt = opt[I]
+
+        self.opt = opt
+
+
 class ReferenceDirectionSurvival(Survival):
+
     def __init__(self, ref_dirs):
         super().__init__(True)
         self.ref_dirs = ref_dirs
@@ -83,7 +141,7 @@ class ReferenceDirectionSurvival(Survival):
         self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
         self.worst_point = np.full(ref_dirs.shape[1], -np.inf)
 
-    def _do(self, pop, n_survive, D=None, **kwargs):
+    def _do(self, problem, pop, n_survive, D=None, **kwargs):
 
         # attributes to be set after the survival
         F = pop.get("F")
@@ -120,9 +178,12 @@ class ReferenceDirectionSurvival(Survival):
         last_front = fronts[-1]
 
         # associate individuals to niches
-        niche_of_individuals, dist_to_niche = associate_to_niches(F, self.ref_dirs, self.ideal_point, self.nadir_point)
-        pop.set('rank', rank, 'niche', niche_of_individuals, 'dist_to_niche',
-                dist_to_niche, "is_closest", np.full(len(pop), False))
+        niche_of_individuals, dist_to_niche, dist_matrix = \
+            associate_to_niches(F, self.ref_dirs, self.ideal_point, self.nadir_point)
+
+        pop.set('rank', rank,
+                'niche', niche_of_individuals,
+                'dist_to_niche', dist_to_niche)
 
         # if we need to select individuals to survive
         if len(pop) > n_survive:
@@ -150,8 +211,8 @@ class ReferenceDirectionSurvival(Survival):
 
 def get_extreme_points_c(F, ideal_point, extreme_points=None):
     # calculate the asf which is used for the extreme point decomposition
-    asf = np.eye(F.shape[1])
-    asf[asf == 0] = 1e6
+    weights = np.eye(F.shape[1])
+    weights[weights == 0] = 1e6
 
     # add the old extreme points to never loose them for normalization
     _F = F
@@ -163,7 +224,8 @@ def get_extreme_points_c(F, ideal_point, extreme_points=None):
     __F[__F < 1e-3] = 0
 
     # update the extreme points for the normalization having the highest asf value each
-    F_asf = np.max(__F * asf[:, None, :], axis=2)
+    F_asf = np.max(__F * weights[:, None, :], axis=2)
+
     I = np.argmin(F_asf, axis=1)
     extreme_points = _F[I, :]
 
@@ -177,16 +239,27 @@ def get_nadir_point(extreme_points, ideal_point, worst_point, worst_of_front, wo
         M = extreme_points - ideal_point
         b = np.ones(extreme_points.shape[1])
         plane = np.linalg.solve(M, b)
+
+        warnings.simplefilter("ignore")
         intercepts = 1 / plane
 
         nadir_point = ideal_point + intercepts
 
-        if not np.allclose(np.dot(M, plane), b) or np.any(intercepts <= 1e-6) or np.any(nadir_point > worst_point):
+        # check if the hyperplane makes sense
+        if not np.allclose(np.dot(M, plane), b) or np.any(intercepts <= 1e-6):
             raise LinAlgError()
 
+        # if the nadir point should be larger than any value discovered so far set it to that value
+        # NOTE: different to the proposed version in the paper
+        b = nadir_point > worst_point
+        nadir_point[b] = worst_point[b]
+
     except LinAlgError:
+
+        # fall back to worst of front otherwise
         nadir_point = worst_of_front
 
+    # if the range is too small set it to worst of population
     b = nadir_point - ideal_point <= 1e-6
     nadir_point[b] = worst_of_population[b]
 
@@ -213,7 +286,7 @@ def niching(pop, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
 
         # all niches with the minimum niche count (truncate if randomly if more niches than remaining individuals)
         next_niches = next_niches_list[np.where(next_niche_count == min_niche_count)[0]]
-        next_niches = next_niches[random.perm(len(next_niches))[:n_select]]
+        next_niches = next_niches[np.random.permutation(len(next_niches))[:n_select]]
 
         for next_niche in next_niches:
 
@@ -221,19 +294,16 @@ def niching(pop, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
             next_ind = np.where(np.logical_and(niche_of_individuals == next_niche, mask))[0]
 
             # shuffle to break random tie (equal perp. dist) or select randomly
-            next_ind = random.shuffle(next_ind)
+            np.random.shuffle(next_ind)
 
             if niche_count[next_niche] == 0:
                 next_ind = next_ind[np.argmin(dist_to_niche[next_ind])]
-                is_closest = True
             else:
                 # already randomized through shuffling
                 next_ind = next_ind[0]
-                is_closest = False
 
             # add the selected individual to the survivors
             mask[next_ind] = False
-            pop[next_ind].data["is_closest"] = is_closest
             survivors.append(int(next_ind))
 
             # increase the corresponding niche count
@@ -255,7 +325,7 @@ def associate_to_niches(F, niches, ideal_point, nadir_point, utopian_epsilon=0.0
     niche_of_individuals = np.argmin(dist_matrix, axis=1)
     dist_to_niche = dist_matrix[np.arange(F.shape[0]), niche_of_individuals]
 
-    return niche_of_individuals, dist_to_niche
+    return niche_of_individuals, dist_to_niche, dist_matrix
 
 
 def calc_niche_count(n_niches, niche_of_individuals):
@@ -269,49 +339,8 @@ def calc_niche_count(n_niches, niche_of_individuals):
 # Interface
 # =========================================================================================================
 
-def nsga3(
-        ref_dirs,
-        pop_size=None,
-        sampling=RandomSampling(),
-        selection=TournamentSelection(func_comp=comp_by_cv_then_random),
-        crossover=SimulatedBinaryCrossover(prob=1.0, eta=30),
-        mutation=PolynomialMutation(prob=None, eta=20),
-        eliminate_duplicates=True,
-        n_offsprings=None,
-        **kwargs):
-    """
-
-    Parameters
-    ----------
-    ref_dirs : {ref_dirs}
-    pop_size : int (default = None)
-        By default the population size is set to None which means that it will be equal to the number of reference
-        line. However, if desired this can be overwritten by providing a positve number.
-    sampling : {sampling}
-    selection : {selection}
-    crossover : {crossover}
-    mutation : {mutation}
-    eliminate_duplicates : {eliminate_duplicates}
-    n_offsprings : {n_offsprings}
-
-    Returns
-    -------
-    nsga3 : :class:`~pymoo.model.algorithm.Algorithm`
-        Returns an NSGA3 algorithm object.
+def nsga3(*args, **kwargs):
+    return NSGA3(*args, **kwargs)
 
 
-    """
-
-    return NSGA3(ref_dirs,
-                 pop_size=pop_size,
-                 sampling=sampling,
-                 selection=selection,
-                 crossover=crossover,
-                 mutation=mutation,
-                 survival=ReferenceDirectionSurvival(ref_dirs),
-                 eliminate_duplicates=eliminate_duplicates,
-                 n_offsprings=n_offsprings,
-                 **kwargs)
-
-
-parse_doc_string(nsga3)
+parse_doc_string(NSGA3.__init__)

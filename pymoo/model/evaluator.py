@@ -39,6 +39,8 @@ class Evaluator:
                                               **kwargs)
             X.feasible = X.CV <= 0
 
+            return X
+
         elif isinstance(X, Population):
 
             pop, _X = X, X.get("X")
@@ -57,6 +59,8 @@ class Evaluator:
                     pop.set(key, val)
 
             pop.set("feasible", (out["CV"] <= 0))
+
+            return pop
 
         elif isinstance(X, np.ndarray):
             if len(X.shape) == 1:
