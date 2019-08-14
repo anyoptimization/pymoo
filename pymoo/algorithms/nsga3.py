@@ -108,7 +108,7 @@ class NSGA3(GeneticAlgorithm):
         opt = filter_optimum(self.pop.copy())
 
         # if population object then only keep closest to reference lines
-        if isinstance(opt, Population):
+        if isinstance(opt, Population) and len(opt) > 0:
 
             # find the closest individual to each niche
             niches, ideal_point, nadir_point = self.survival.ref_dirs, self.survival.ideal_point, self.survival.nadir_point
