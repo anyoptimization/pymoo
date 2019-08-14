@@ -44,7 +44,8 @@ class FunctionLoader:
         if Configuration.show_compile_hint and not self.is_compiled:
             print("\nCompiled modules for significant speedup can not be used!")
             print("https://pymoo.org/installation.html#installation")
-            print("Disable this warning:")
+            print()
+            print("To disable this warning:")
             print("from pymoo.configuration import Configuration")
             print("Configuration.show_compile_hint = False\n")
 
