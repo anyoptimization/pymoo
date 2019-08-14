@@ -59,7 +59,7 @@ directory because otherwise not the in site-packages installed version will be u
 
 .. code:: bash
 
-    python -c "from pymoo.cython.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
+    python -c "from pymoo.util.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
 
 
 Usage

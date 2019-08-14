@@ -4,9 +4,9 @@ python:
 
 install:
   - pip install numpy
-  - pip install . 
-  - python setup.py sdist
-  - pip install dist/*
+  - pip install .
+  - python -c "from pymoo.util.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
+
 
 script:
   - python tests/test_suite.py
