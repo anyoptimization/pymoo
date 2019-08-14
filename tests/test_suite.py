@@ -23,4 +23,7 @@ if __name__ == "__main__":
     for t in testmodules:
         suite.addTest(unittest.defaultTestLoader.loadTestsFromName(t))
 
-    unittest.TextTestRunner().run(suite)
+    ret = unittest.TextTestRunner().run(suite)
+
+    if len(ret.failures) + len(ret.errors) > 0:
+        exit(1)

@@ -4,7 +4,7 @@ from pymoo.factory import get_decomposition, get_algorithm, ZDT
 from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds
 from pymoo.optimize import minimize
 from pymoo.problems.util import decompose
-from pymoo.visualization.scatter import scatter
+from pymoo.visualization.scatter import Scatter
 
 
 class ModifiedZDT1(ZDT):
@@ -67,7 +67,7 @@ opt = decomp.do(pf, weights).argmin()
 print(pf[opt])
 print(decomp.do(pf, weights).min())
 
-plot = scatter()
+plot = Scatter()
 plot.add(pf)
 plot.add(F)
 plot.add(np.row_stack([np.zeros(2), weights]), plot_type="line")

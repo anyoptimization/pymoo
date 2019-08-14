@@ -1,4 +1,4 @@
 recursive-include pymoo *.py *.cpp
 recursive-exclude pymoo *.so *.pyx *.pxd
 
-include LICENSE Makefile
+include setup.py setup_ext.py LICENSE Makefile
