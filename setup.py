@@ -1,9 +1,22 @@
-from setup_ext import readme, run_setup
+import distutils
+import os
+import sys
+import traceback
+from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
+
+import setuptools
+from setuptools import setup, Extension
+from setuptools.command.build_ext import build_ext
+
+from pymoo.version import __version__
+
+# ---------------------------------------------------------------------------------------------------------
+# SETUP
+# ---------------------------------------------------------------------------------------------------------
 
 
 __name__ = "pymoo"
 __author__ = "Julian Blank"
-__version__ = '0.3.1.dev'
 __url__ = "https://pymoo.org"
 
 kwargs = dict(
@@ -11,14 +24,13 @@ kwargs = dict(
     version=__version__,
     author=__author__,
     url=__url__,
-    python_requires='>3.5',
+    python_requires='>=3.6',
     author_email="blankjul@egr.msu.edu",
     description="Multi-Objective Optimization in Python",
-    long_description=readme(),
     license='Apache License 2.0',
     keywords="optimization",
     install_requires=['numpy>=1.15', 'scipy>=1.1', 'matplotlib>=3', 'autograd>=1.3'],
-    include_package_data=True,
+    packages=["pymoo"] + ["pymoo." + e for e in setuptools.find_packages(where='pymoo')],
     platforms='any',
     classifiers=[
         'Intended Audience :: Developers',
@@ -27,7 +39,6 @@ kwargs = dict(
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Topic :: Scientific/Engineering',
@@ -35,5 +46,147 @@ kwargs = dict(
         'Topic :: Scientific/Engineering :: Mathematics'
     ]
 )
+
+
+# update the readme.rst to be part of setup
+def readme():
+    with open('README.rst') as f:
+        return f.read()
+
+kwargs['long_description'] = readme()
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Extensions
+# ---------------------------------------------------------------------------------------------------------
+
+
+
+ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError, IOError)
+
+
+def is_new_osx():
+    name = distutils.util.get_platform()
+    if sys.platform != "darwin":
+        return False
+    elif name.startswith("macosx-10"):
+        minor_version = int(name.split("-")[1].split(".")[1])
+        if minor_version >= 7:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
+# fix compiling for new macosx!
+if is_new_osx():
+    os.environ['CFLAGS'] = '-stdlib=libc++'
+
+
+class BuildFailed(Exception):
+    pass
+
+
+# try to compile, if not possible throw exception
+def construct_build_ext(build_ext):
+    class WrappedBuildExt(build_ext):
+        def run(self):
+            try:
+                build_ext.run(self)
+            except DistutilsPlatformError as x:
+                raise BuildFailed(x)
+
+        def build_extension(self, ext):
+            try:
+                build_ext.build_extension(self, ext)
+            except ext_errors as x:
+                raise BuildFailed(x)
+
+    return WrappedBuildExt
+
+
+def run_setup(setup_args):
+    # try to add compilation to the setup - if fails just do default
+    try:
+
+        do_cythonize = False
+        if "--cythonize" in sys.argv:
+            do_cythonize = True
+            sys.argv.remove("--cythonize")
+
+        # copy the kwargs
+        kwargs = dict(setup_args)
+        kwargs['cmdclass'] = {}
+
+        try:
+            import numpy as np
+            kwargs['include_dirs'] = [np.get_include()]
+        except:
+            raise BuildFailed("NumPy libraries must be installed for compiled extensions! Speedups are not enabled.")
+
+        # return the object for building which allows installation with no compilation
+        kwargs['cmdclass']['build_ext'] = construct_build_ext(build_ext)
+
+        # all the modules must be finally added here
+        kwargs['ext_modules'] = []
+        cython_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pymoo", "cython")
+        files = os.listdir(cython_folder)
+
+        if do_cythonize:
+            from Cython.Build import cythonize
+            kwargs['ext_modules'] = cythonize("pymoo/cython/*.pyx")
+        else:
+            cpp_files = [f for f in files if f.endswith(".cpp")]
+
+            if len(cpp_files) == 0:
+                print('*' * 75)
+                print("WARNING: No modules for compilation available. To compile pyx files, execute:")
+                print("make compile-with-cython")
+                print('*' * 75)
+                return
+
+            else:
+
+                for source in cpp_files:
+                    kwargs['ext_modules'].append(
+                        Extension("pymoo.cython.%s" % source[:-4], [os.path.join(cython_folder, source)]))
+
+        print("==========================")
+
+        if len(kwargs['ext_modules']) == 0:
+            print('*' * 75)
+            print("WARNING: No modules for compilation available. To compile pyx files, add --cythonize.")
+            print('*' * 75)
+
+        else:
+            # print(kwargs['ext_modules'])
+            setup(**kwargs)
+            print('*' * 75)
+            print("Compilation Successful.")
+            print("Installation with Compilation succeeded.")
+            print('*' * 75)
+
+    except BaseException as e:
+
+        setup(**setup_args)
+        ex_type, ex_value, ex_traceback = sys.exc_info()
+
+        print('*' * 75)
+        print("WARNING: Compilation Failed.")
+        print("WARNING:", ex_type)
+        print("WARNING:", ex_value)
+        print()
+        print("=" * 75)
+        traceback.print_exc()
+        print("=" * 75)
+        print()
+        print("WARNING: For the compiled libraries numpy is required. Please make sure they are installed")
+        print("WARNING: pip install numpy")
+        print("WARNING: Also, make sure you have a compiler for C++!")
+        print('*' * 75)
+        print("Plain Python installation succeeded.")
+        print('*' * 75)
+
 
 run_setup(kwargs)
