@@ -4,9 +4,10 @@ python:
 
 install:
   - pip install numpy
-  - python setup.py install
-  - python test.py
+  - python setup.py sdist
+  - pip install dist/*.tar.gz
 
 
 script:
-  - python tests/test_suite.py
+  - cd tests
+  - python test_suite.py

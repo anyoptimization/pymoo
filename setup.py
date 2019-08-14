@@ -53,13 +53,12 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
-kwargs['long_description'] = readme()
 
+kwargs['long_description'] = readme()
 
 # ---------------------------------------------------------------------------------------------------------
 # Extensions
 # ---------------------------------------------------------------------------------------------------------
-
 
 
 ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError, IOError)
