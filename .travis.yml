@@ -1,0 +1,11 @@
+language: python
+python:
+  - "3.7"
+
+install:
+  - pip install numpy
+  - python setup.py sdist
+  - pip install dist/*
+
+script:
+  - python tests/test_suite.py

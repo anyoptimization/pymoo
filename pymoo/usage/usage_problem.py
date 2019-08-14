@@ -128,11 +128,11 @@ plot_problem_surface(problem, 100, plot_type="wireframe+contour")
 
 # START truss2d
 from pymoo.factory import get_problem
-from pymoo.visualization.scatter import scatter
+from pymoo.visualization.scatter import Scatter
 
 pf = get_problem("truss2d").pareto_front()
 
-plot = scatter(title="Pareto-front")
+plot = Scatter(title="Pareto-front")
 plot.add(pf, s=80, facecolors='none', edgecolors='r')
 plot.add(pf, plot_type="line", color="black", linewidth=2)
 plot.show()

@@ -1,5 +1,5 @@
 clean:
-	rm -rf build dist pymoo.egg-info
+	rm -rf build builds dist pymoo.egg-info
 
 clean-ext:
 	rm -f pymoo/cython/*.c
@@ -18,4 +18,6 @@ dist:
 
 install:
 	python setup.py install
-	
+
+test:
+	gitlab-runner exec shell default
