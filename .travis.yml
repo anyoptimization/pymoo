@@ -5,7 +5,7 @@ python:
 install:
   - pip install numpy
   - pip install .
-  - python -c "from pymoo.util.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
+  - python test.py
 
 
 script:
