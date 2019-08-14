@@ -4,7 +4,7 @@ python:
 
 install:
   - pip install numpy
-  - python setup.py install
+  - pip install . 
   - python setup.py sdist
   - pip install dist/*
 
