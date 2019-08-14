@@ -4,12 +4,12 @@ pymoo - Multi-Objective Optimization Framework
 You can find the detailed documentation here: https://pymoo.org
 
 
-|gitlab| |python| |license|
+|travis| |python| |license|
 
 
-.. |gitlab| image:: https://gitlab.msu.edu/blankjul/pymoo/badges/master/pipeline.svg
+.. |travis| image:: https://travis-ci.com/msu-coinlab/pymoo.svg?branch=master
    :alt: build status
-   :target: https://gitlab.msu.edu/blankjul/pymoo/commits/master
+   :target: https://travis-ci.com/msu-coinlab/pymoo
 
 .. |python| image:: https://img.shields.io/badge/python-3.6-blue.svg
    :alt: python 3.6
