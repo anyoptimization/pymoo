@@ -76,8 +76,7 @@ However, for instance executing NSGA2:
     from pymoo.optimize import minimize
     from pymoo.visualization.scatter import Scatter
 
-    problem = get_problem("zdt3")
-    pf = problem.pareto_front(n_points=200, flatten=False, use_cache=False)
+    problem = get_problem("zdt2")
 
     algorithm = NSGA2(pop_size=100, elimate_duplicates=True)
 
@@ -85,10 +84,10 @@ However, for instance executing NSGA2:
                    algorithm,
                    ('n_gen', 200),
                    seed=1,
-                   verbose=False)
+                   verbose=True)
 
     plot = Scatter()
-    plot.add(pf, plot_type="line", color="black", alpha=0.7)
+    plot.add(problem.pareto_front(), plot_type="line", color="black", alpha=0.7)
     plot.add(res.F, color="red")
     plot.show()
 
