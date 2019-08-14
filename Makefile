@@ -1,5 +1,5 @@
 clean:
-	rm -rf build builds dist pymoo.egg-info
+	rm -rf build dist pymoo.egg-info
 
 clean-ext:
 	rm -f pymoo/cython/*.c
