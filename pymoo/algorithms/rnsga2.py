@@ -38,10 +38,11 @@ class RNSGA2(NSGA2):
         self.weights = weights
         self.normalization = normalization
         self.selection = RandomSelection()
-        self.survival = RankAndModifiedCrowdingSurvival(ref_points, epsilon, weights, normalization,
-                                                        extreme_points_as_reference_points)
 
         super().__init__(**kwargs)
+
+        self.survival = RankAndModifiedCrowdingSurvival(ref_points, epsilon, weights, normalization,
+                                                        extreme_points_as_reference_points)
 
 
 class RankAndModifiedCrowdingSurvival(Survival):
