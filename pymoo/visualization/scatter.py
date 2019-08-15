@@ -1,3 +1,5 @@
+import numpy as np
+
 from pymoo.docs import parse_doc_string
 from pymoo.model.plot import Plot
 from pymoo.util.misc import set_if_none
@@ -36,12 +38,13 @@ class Scatter(Plot):
 
     def _do(self):
 
+        is_1d = (self.n_dim == 1)
         is_2d = (self.n_dim == 2)
         is_3d = (self.n_dim == 3)
         more_than_3d = (self.n_dim > 3)
 
         # create the figure and axis objects
-        if is_2d:
+        if is_1d or is_2d:
             self.init_figure()
         elif is_3d:
             self.init_figure(plot_3D=True)
@@ -60,12 +63,17 @@ class Scatter(Plot):
             if "plot_type" in _kwargs:
                 del _kwargs["plot_type"]
 
-            if self.n_dim == 1:
-                raise Exception("1D Interval not implemented yet.")
+            if is_1d:
+                F = np.column_stack([F, np.zeros(len(F))])
+                labels = self.get_labels() + [""]
+
+                self.plot(self.ax, _type, F, **_kwargs)
+                self.set_labels(self.ax, labels, False)
 
             elif is_2d:
                 self.plot(self.ax, _type, F, **_kwargs)
                 self.set_labels(self.ax, self.get_labels(), False)
+
             elif is_3d:
                 set_if_none(_kwargs, "alpha", 1.0)
 

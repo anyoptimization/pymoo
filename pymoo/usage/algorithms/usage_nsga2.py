@@ -11,7 +11,7 @@ res = minimize(problem,
                algorithm,
                ('n_gen', 200),
                seed=1,
-               verbose=True)
+               verbose=False)
 
 plot = Scatter()
 plot.add(problem.pareto_front(), plot_type="line", color="black", alpha=0.7)
