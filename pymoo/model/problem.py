@@ -368,7 +368,6 @@ class Problem:
 
             ret = [job.result() for job in jobs]
 
-
         else:
             raise Exception("Unknown parallelization method: %s (None, threads, dask)" % self.parallelization)
 

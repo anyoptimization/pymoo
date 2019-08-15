@@ -5,6 +5,8 @@ import numpy as np
 
 from pymoo.configuration import get_pymoo
 from pymoo.factory import get_performance_indicator
+from pymoo.performance_indicator.gd import GD
+from pymoo.performance_indicator.igd import IGD
 from tests.test_usage import test_usage
 
 
@@ -20,6 +22,23 @@ class PerformanceIndicatorTest(unittest.TestCase):
 
     def test_usages(self):
         test_usage([os.path.join(get_pymoo(), "pymoo", "usage", "usage_performance_indicator.py")])
+
+    # test whether they return the same as values from jmetalpy
+    def test_values_of_indicators(self):
+        l = [
+            (GD, "gd"),
+            (IGD, "igd")
+        ]
+        pf = np.loadtxt("performance_indicators.pf")
+
+        for indicator, ext in l:
+
+            for i in range(1, 5):
+                F = np.loadtxt("performance_indicators_%s.f" % i)
+
+                val = indicator(pf).calc(F)
+                correct = np.loadtxt("performance_indicators_%s.%s" % (i, ext))
+                self.assertTrue(correct == val)
 
     def test_performance_indicator_1(self):
         A = np.array([2, 5])

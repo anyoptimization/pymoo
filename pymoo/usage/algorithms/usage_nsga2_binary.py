@@ -1,7 +1,7 @@
+from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.factory import get_problem, get_sampling, get_crossover, get_mutation
 from pymoo.optimize import minimize
-from pymoo.algorithms.nsga2 import NSGA2
-from pymoo.util import plotting
+from pymoo.visualization.scatter import Scatter
 
 problem = get_problem("zdt5")
 
@@ -13,8 +13,10 @@ algorithm = NSGA2(pop_size=100,
 
 res = minimize(problem,
                algorithm,
-               ('n_gen', 300),
+               ('n_gen', 500),
                seed=1,
                verbose=False)
 
-plotting.plot(res.F, no_fill=True)
+
+Scatter().add(res.F).show()
+

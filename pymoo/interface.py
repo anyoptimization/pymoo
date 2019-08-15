@@ -5,12 +5,19 @@ can be used easily just by calling a function and providing the lower and upper 
 """
 import copy
 import types
+
 import numpy as np
 
-from pymoo.factory import get_problem
-from pymoo.model.evaluator import Evaluator
+from pymoo.algorithms.nsga2 import NSGA2
+from pymoo.model.algorithm import filter_optimum
+from pymoo.model.individual import Individual
 from pymoo.model.population import Population
 from pymoo.model.problem import Problem
+
+
+# =========================================================================================================
+# A global interface for some features
+# =========================================================================================================
 
 
 def get_problem_func(n_var, xl, xu, type_var):
@@ -44,140 +51,121 @@ def mutation(mutation, X, xl=0, xu=1, type_var=np.double, **kwargs):
     return mutation.do(problem, Population().new("X", X), **kwargs).get("X")
 
 
-# below implements the ask&tell api
-class AskAndTell:
-    """ ask&tell api wrapper of pymoo"""
-    def __init__(self,
-                 problem,
-                 method,
-                 popsize=100,  # population size
-                 ):
-        self.method = method
-        # hacky approach
-        def aux_func(self, x, out, *args, **kwargs):
-            out["F"] = np.full((x.shape[0], self.n_obj), np.nan)
-            if self.n_constr > 0:
-                out["G"] = np.full((x.shape[0], self.n_constr), np.nan)
+# =========================================================================================================
+# Ask And Tell Interface
+# =========================================================================================================
 
-        self.method.evaluator = Evaluator()
-        self.method.problem = copy.deepcopy(problem)
-        self.method.problem._evaluate = types.MethodType(aux_func, self.method.problem)
-        self.popsize = popsize
-        self.pop = None
-        self.off = None
+
+def evaluate_to_nan(self, x, out, *args, **kwargs):
+    n_points, _ = x.shape
+    out["F"] = np.full((n_points, self.n_obj), np.nan)
+    if self.n_constr > 0:
+        out["G"] = np.full((n_points, self.n_constr), 0.0)
+
+
+def evaluate_to_value(F, G=None):
+    def eval(self, x, out, *args, **kwargs):
+        n_points, _ = x.shape
+        out["F"] = F
+        if G is not None:
+            out["G"] = G
+
+    return eval
+
+
+class AskAndTell:
+
+    def __init__(self, algorithm, problem=None, **kwargs):
+
+        if problem is not None:
+            self.problem = copy.deepcopy(problem)
+        else:
+            self.problem = Problem(**kwargs)
+
+        self.algorithm = copy.deepcopy(algorithm)
+
+    def get_population(self):
+        return self.algorithm.pop
+
+    def set_population(self, pop):
+        self.algorithm.pop = pop
+
+    def get_offsprings(self):
+        return self.algorithm.off
+
+    def set_offsprings(self, off):
+        self.algorithm.off = off
 
     def ask(self):
-        """ return a group of solution candidates of size popsize"""
-        if self.pop is None:
-            self.pop = self.method._initialize()
-            return self.pop.get("X")
+
+        # if the initial population has not been generated yet
+        if self.get_population() is None:
+
+            self.algorithm.initialize(self.problem)
+
+            # deactivate the survival because no values have been set yet
+            survival = self.algorithm.survival
+            self.algorithm.survival = None
+
+            self.problem._evaluate = types.MethodType(evaluate_to_nan, self.problem)
+            self.algorithm._initialize()
+
+            # activate the survival for the further runs
+            self.algorithm.survival = survival
+
+            return self.get_population().get("X")
+
+        # usually the case - create the next output
         else:
-            # survival -> mating
-            if self.off is not None:
-                pop = self.pop.merge(self.off)
-            else:
-                pop = self.pop
-            self.pop = self.method.survival.do(self.method.problem, pop, self.popsize, algorithm=self.method)
-            self.off = self.method._mating(self.pop)
-            # has to call to set a few required attributes
-            self.method.evaluator.eval(self.method.problem, self.off, algorithm=self.method)
-            return self.off.get('X')
 
-    def tell(self, obj, constr=None):
-        """ setting the user provided f back to """
-        assert (len(obj) == self.popsize), "Inconsistent objective size reported."
-        # always make a copy of f and g to prevent bug
-        f = np.copy(obj)
+            # if offsprings do not exist set the pop - otherwise always offsprings
+            if self.get_offsprings() is not None:
+                self.set_population(self.get_population().merge(self.get_offsprings()))
 
-        if self.off is None:
-            self.pop.set("F", f)
-            if constr is not None:
-                g = np.copy(constr)
-                cv = Problem.calc_constraint_violation(g)
-                self.pop.set("G", g)
-                self.pop.set("CV", cv)
-                self.pop.set("feasible", (cv <= 0))
+            # execute a survival of the algorithm
+            survivors = self.algorithm.survival.do(self.problem, self.get_population(),
+                                                   self.algorithm.pop_size, algorithm=self.algorithm)
+            self.set_population(survivors)
+
+            # execute the mating using the population
+            off = self.algorithm._mating(self.get_population())
+
+            # execute the fake evaluation of the individuals
+            self.problem._evaluate = types.MethodType(evaluate_to_nan, self.problem)
+            self.algorithm.evaluator.eval(self.problem, off, algorithm=self.algorithm)
+            self.set_offsprings(off)
+
+            return off.get("X")
+
+    def tell(self, F, G=None, X=None):
+
+        # if offsprings do not exist set the pop - otherwise always offsprings
+        pop_to_evaluate = self.get_offsprings() if self.get_offsprings() is not None else self.get_population()
+
+        # if the user changed the design space values for whatever reason
+        if X is not None:
+            pop_to_evaluate.set("X")
+
+        # do the function evaluations
+        self.problem._evaluate = types.MethodType(evaluate_to_value(F.copy(), G.copy()), self.problem)
+        self.algorithm.evaluator.eval(self.problem, pop_to_evaluate, algorithm=self.algorithm)
+
+    def result(self, only_optimum=True, return_values_of="auto"):
+
+        if return_values_of == "auto":
+            return_values_of = ["X", "F"]
+            if self.problem.n_constr > 0:
+                return_values_of.append("CV")
+
+        if only_optimum:
+            self.algorithm.finalize()
+            pop, opt = self.algorithm.pop, self.algorithm.opt
+            res = filter_optimum(pop.copy()) if opt is None else opt.copy()
+
+            if isinstance(res, Individual):
+                res = Population.create(res)
+
         else:
-            self.off.set("F", f)
-            if constr is not None:
-                g = np.copy(constr)
-                cv = Problem.calc_constraint_violation(g)
-                self.off.set("G", g)
-                self.off.set("CV", cv)
-                self.off.set("feasible", (cv <= 0))
+            res = self.algorithm.pop
 
-    def result(self):
-        """ report the current best solutions """
-        if self.method.problem.n_obj > 1:
-            non_dominated = self.pop.get("rank") == 0
-            return (self.pop.get("X")[non_dominated, :],
-                    self.pop.get("F")[non_dominated, :])
-        else:
-            if self.method.problem.n_constr > 0:
-                feasible = self.pop.get("feasible")
-            else:
-                feasible = np.ones(self.popsize, dtype=np.bool)
-            elite = np.argmin(self.pop.get("F")[feasible, 0])
-            return (self.pop.get("X")[feasible, :][elite, :],
-                    self.pop.get("F")[feasible, 0][elite])
-
-if __name__ == "__main__":
-    # ----- debug for ask&tell API ----------
-    from pymoo.algorithms.so_genetic_algorithm import ga
-
-    method = ga(pop_size=200, eliminate_duplicates=True)
-    problem = get_problem('g01')
-    api = AskAndTell(problem=problem, method=method, popsize=200)
-
-    f = np.full((api.popsize, problem.n_obj), np.full)
-    g = np.full((api.popsize, problem.n_constr), np.full)
-
-    for gen in range(1, 201):
-        candidates = api.ask()
-        res = {}
-        problem._evaluate(candidates, out=res)
-        f[:, 0] = res["F"]
-        g[:, :] = res["G"]
-        api.tell(f, g)
-        print(np.min(api.pop.get("F")))
-
-
-
-    # ----- end of debug --------------------
-
-    #
-    # from pymoo.interface import crossover
-    # from pymoo.factory import get_crossover
-    # import numpy as np
-    # import matplotlib.pyplot as plt
-    #
-    #
-    # def example_parents(n_matings, n_var):
-    #     a = np.arange(n_var)[None, :].repeat(n_matings, axis=0)
-    #     b = a + n_var
-    #     return a, b
-    #
-    #
-    # def show(M):
-    #     plt.figure(figsize=(4, 4))
-    #     plt.imshow(M, cmap='Greys', interpolation='nearest')
-    #     plt.show()
-    #
-    #
-    # n_matings, n_var = 100, 100
-    # a, b = example_parents(n_matings, n_var)
-    #
-    # print("One Point Crossover")
-    # off = crossover(get_crossover("bin_one_point"), a, b)
-    # show((off[:n_matings] != a[0]))
-    #
-    # print("Two Point Crossover")
-    # off = crossover(get_crossover("bin_two_point"), a, b)
-    # show((off[:n_matings] != a[0]))
-    # show((off[n_matings:] != b[0]))
-    # print(off[n_matings:])
-    #
-    # print("K Point Crossover (k=4)")
-    # off = crossover(get_crossover("bin_k_point", n_points=4), a, b)
-    # show((off[:n_matings] != a[0]))
-    #
+        return res.get(*return_values_of)
