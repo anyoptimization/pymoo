@@ -2,8 +2,6 @@ import copy
 import distutils
 import os
 import sys
-import traceback
-from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 
 import setuptools
 from setuptools import setup, Extension
