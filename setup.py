@@ -2,6 +2,7 @@ import copy
 import distutils
 import os
 import sys
+import traceback
 
 import setuptools
 from setuptools import setup, Extension
@@ -198,7 +199,7 @@ def run_setup(setup_args):
         print("WARNING:", ex_value)
         print()
         print("=" * 75)
-        # traceback.print_exc()
+        traceback.print_exc()
         print("=" * 75)
         print()
         print("WARNING: For the compiled libraries numpy is required. Please make sure they are installed")
