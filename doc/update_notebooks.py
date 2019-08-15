@@ -51,32 +51,31 @@ def replace_usage_link(filename, old, new):
         nbformat.write(nb, f)
 
 
-def update_and_run_notebook(filename, execute=False):
+def update_and_run_notebook(filename, replace=True, execute=False):
     nb = load_notebook(filename)
 
-    # Loop through all cells
-    for k in range(len(nb['cells'])):
-        # If cell is code and has usage metadata set, update the .ipynb json
-        if nb['cells'][k]['cell_type'] == 'code':
+    if replace:
 
-            code = nb['cells'][k]['metadata'].get('code')
-            section = nb['cells'][k]['metadata'].get('section')
+        # Loop through all cells
+        for k in range(len(nb['cells'])):
+            # If cell is code and has usage metadata set, update the .ipynb json
+            if nb['cells'][k]['cell_type'] == 'code':
 
-            if code:
-                code = get_usage(code)
+                code = nb['cells'][k]['metadata'].get('code')
+                section = nb['cells'][k]['metadata'].get('section')
 
-                if section:
-                    code = get_section(code, section)
+                if code:
+                    code = get_usage(code)
 
-                nb['cells'][k]['source'] = code
+                    if section:
+                        code = get_section(code, section)
 
-    # remove trailing empty cells
-    while len(nb["cells"]) > 0 and nb["cells"][-1]['cell_type'] == 'code' and len(nb["cells"][-1]['source']) == 0 \
-            and nb["cells"][-1]['execution_count'] is None:
-        nb["cells"] = nb["cells"][:-1]
+                    nb['cells'][k]['source'] = code
 
-    with open(filename, 'wt') as f:
-        nbformat.write(nb, f)
+        # remove trailing empty cells
+        while len(nb["cells"]) > 0 and nb["cells"][-1]['cell_type'] == 'code' and len(nb["cells"][-1]['source']) == 0 \
+                and nb["cells"][-1]['execution_count'] is None:
+            nb["cells"] = nb["cells"][:-1]
 
     if execute:
         ep = ExecutePreprocessor(kernel_name='python3')
@@ -89,12 +88,12 @@ def update_and_run_notebook(filename, execute=False):
 if __name__ == "__main__":
 
     files = glob.glob('source/**/*.ipynb')
-    #files = glob.glob('source/problems/*.ipynb')
-    #files = glob.glob('source/algorithms/*.ipynb')
-    #files = glob.glob('source/visualization/star.ipynb')
-    #files = glob.glob('source/visualization/*.ipynb')
-    #files = glob.glob('source/components/performance_indicator.ipynb')
-    #files = glob.glob('source/components/termination_criterion.ipynb')
+    # files = glob.glob('source/problems/*.ipynb')
+    # files = glob.glob('source/algorithms/*.ipynb')
+    # files = glob.glob('source/visualization/star.ipynb')
+    # files = glob.glob('source/visualization/*.ipynb')
+    # files = glob.glob('source/components/performance_indicator.ipynb')
+    # files = glob.glob('source/components/termination_criterion.ipynb')
 
     STARTING_AT = None
     # STARTING_AT = "source/problems/parallelization.ipynb"

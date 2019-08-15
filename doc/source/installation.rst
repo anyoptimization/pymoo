@@ -26,19 +26,13 @@ If you are already familiar with conda you might want to use an environment you 
 already created, or you might need *pymoo* in an existing one.
 
 
-Otherwise, create a new python environment and activate it:
+Otherwise, create a new python environment with NumPy preinstalled and activate it:
 
 .. code:: bash
 
-    conda create -n pymoo -y python==3.6
+    conda create -n pymoo -y python==3.7 numpy
     conda activate pymoo
 
-
-Furthermore, make sure NumPy is installed:
-
-.. code:: bash
-
-    pip install numpy
 
 
 If the environment is not setup correct, the installation will NOT fail and you
@@ -56,7 +50,7 @@ To use the current stable release of *pymoo* use
     pip install -U pymoo
 
 If you have already installed an older version of the framework you can force
-an update by using the *-U* option.
+an update by using the *-U* option as shown above.
 
 
 Development

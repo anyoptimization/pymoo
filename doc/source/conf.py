@@ -169,7 +169,7 @@ html_theme_options = {
     "edit_link": "false",
     "sidebar": "right",
     "scipy_org_logo": "true",
-    "rootlinks": links_local
+    "rootlinks": links_remote
 }
 
 html_sidebars = {'**': ['custom_sidebar.html']}

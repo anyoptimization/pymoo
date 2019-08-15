@@ -29,15 +29,16 @@ class PerformanceIndicatorTest(unittest.TestCase):
             (GD, "gd"),
             (IGD, "igd")
         ]
-        pf = np.loadtxt("performance_indicators.pf")
+        folder = os.path.join(get_pymoo(), "tests", "performance_indicator")
+        pf = np.loadtxt(os.path.join(folder, "performance_indicators.pf"))
 
         for indicator, ext in l:
 
             for i in range(1, 5):
-                F = np.loadtxt("performance_indicators_%s.f" % i)
+                F = np.loadtxt(os.path.join(folder, "performance_indicators_%s.f" % i))
 
                 val = indicator(pf).calc(F)
-                correct = np.loadtxt("performance_indicators_%s.%s" % (i, ext))
+                correct = np.loadtxt(os.path.join(folder, "performance_indicators_%s.%s" % (i, ext)))
                 self.assertTrue(correct == val)
 
     def test_performance_indicator_1(self):
