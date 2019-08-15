@@ -97,7 +97,7 @@ if __name__ == "__main__":
     #files = glob.glob('source/components/termination_criterion.ipynb')
 
     STARTING_AT = None
-    # STARTING_AT = "source/decision_making/index.ipynb"
+    # STARTING_AT = "source/problems/parallelization.ipynb"
 
     # files = ['source/problems/zdt.ipynb','source/problems/single.ipynb']
 
