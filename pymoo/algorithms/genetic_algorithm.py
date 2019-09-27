@@ -68,7 +68,7 @@ class GeneticAlgorithm(Algorithm):
         if self.n_offsprings is None:
             self.n_offsprings = pop_size
 
-        # other run specific data updated whenever solve is called - to share them in all methods
+        # other run specific data updated whenever solve is called - to share them in all algorithms
         self.n_gen = None
         self.pop = None
         self.off = None
@@ -84,7 +84,7 @@ class GeneticAlgorithm(Algorithm):
             if isinstance(self.sampling, np.ndarray):
                 pop = pop.new("X", self.sampling)
             else:
-                pop = self.sampling.do(self.problem, pop, self.pop_size, algorithm=self)
+                pop = self.sampling.do(self.problem, self.pop_size, pop=pop, algorithm=self)
 
         # in case the initial population was not evaluated
         if np.any(pop.collect(lambda ind: ind.F is None, as_numpy_array=True)):
@@ -147,9 +147,10 @@ class GeneticAlgorithm(Algorithm):
                 is_duplicate = self.eliminate_duplicates(_off, pop, off, algorithm=self)
                 _off = _off[np.logical_not(is_duplicate)]
 
-            # if more offsprings than necessary - truncate them
-            if len(_off) > self.n_offsprings - len(off):
-                I = np.random.permutation(self.n_offsprings - len(off))
+            # if more offsprings than necessary - truncate them randomly
+            if len(off) + len(_off) > self.n_offsprings:
+                n_remaining = self.n_offsprings - len(off)
+                I = np.random.permutation(len(_off))[:n_remaining]
                 _off = _off[I]
 
             # add to the offsprings and increase the mating counter

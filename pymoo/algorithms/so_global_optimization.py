@@ -131,7 +131,7 @@ class SingleObjectiveGlobalOptimization(Algorithm):
             if not current_best and (has_finished or too_close_to_others):
                 # find a suitable x0 which is far from other or has good expectations
                 self.sampling.criterion = lambda X: vectorized_cdist(X, _X).min()
-                X = self.sampling.do(self.problem, Population(), self.n_initial_samples).get("X")
+                X = self.sampling.do(self.problem, self.n_initial_samples).get("X")
 
                 # distance in x space to other existing points
                 x_dist = vectorized_cdist(X, _X, func_dist=norm_euclidean_distance(self.problem)).min(axis=1)

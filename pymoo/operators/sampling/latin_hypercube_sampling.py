@@ -53,7 +53,7 @@ class LatinHypercubeSampling(Sampling):
         else:
             raise Exception("Either provide a str or a function as a criterion!")
 
-    def do(self, problem, pop, n_samples, **kwargs):
+    def _do(self, problem, n_samples, **kwargs):
 
         # sample for the first time -
         X = self._sample(n_samples, problem.n_var)
@@ -76,4 +76,4 @@ class LatinHypercubeSampling(Sampling):
         for i in range(problem.n_var):
             X[:, i] = X[:, i] * (problem.xu[i] - problem.xl[i]) + problem.xl[i]
 
-        return pop.new("X", X)
+        return X

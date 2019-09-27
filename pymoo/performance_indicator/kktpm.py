@@ -62,12 +62,9 @@ class KKTPM:
             # increase the constraint counter to be correct and change the constraints
             if n_constr > 0:
                 G = np.column_stack([G, _G])
-            else:
-                G = _G
-
-            if n_constr > 0:
                 dG = np.column_stack([dG, _dG])
             else:
+                G = _G
                 dG = _dG
 
             n_constr = n_constr + 2 * n_var
@@ -105,8 +102,8 @@ class KKTPM:
                     A = np.vstack([np.hstack([A, a_m @ a_j.T]), np.hstack([a_j @ a_m.T, a_j @ a_j.T + gsq])])
                     b = np.hstack([b, np.zeros(n_constr)])
 
-                # calculate the lagrange multiplier
-                u = np.linalg.solve(A, b)
+                method = "qr"
+                u = solve(A, b, method=method)
 
                 # until all the lagrange multiplier are positive
                 while np.any(u < 0):
@@ -121,7 +118,7 @@ class KKTPM:
                             b[j] = 0
 
                             # resolve the problem and redefine u. for sure all preview u[j] are positive now
-                            u = np.linalg.solve(A, b)
+                            u = solve(A, b, method=method)
 
                 # split up the lagrange multiplier for objective and not
                 u_m, u_j = u[:n_obj], u[n_obj:]
@@ -144,6 +141,21 @@ class KKTPM:
             fval[i] = _fval
 
         return kktpm, fval
+
+
+def solve(A, b, method="elim"):
+    if method == "elim":
+        return np.linalg.solve(A, b)
+
+    elif method == "qr":
+        Q, R = np.linalg.qr(A)
+        y = np.dot(Q.T, b)
+        return np.linalg.solve(R, y)
+
+    elif method == "svd":
+        U, s, V = np.linalg.svd(A)  # SVD decomposition of A
+        A_inv = np.dot(np.dot(V.T, np.linalg.inv(np.diag(s))), U.T)
+        return A_inv @ b
 
 
 if __name__ == '__main__':

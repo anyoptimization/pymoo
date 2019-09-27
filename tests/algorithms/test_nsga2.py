@@ -11,7 +11,7 @@ from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
 class NSGA2Test(unittest.TestCase):
     """
-    Some methods compare with one test run from the C code (200 generations) and
+    Some algorithms compare with one test run from the C code (200 generations) and
     tests if the rank is always equal.
 
     """
@@ -20,6 +20,11 @@ class NSGA2Test(unittest.TestCase):
     def setUpClass(cls):
         with open(os.path.join(get_pymoo(), "tests", "resources", "cnsga2_run_zdt4.dat"), 'rb') as f:
             cls.data = pickle.load(f)
+
+    def test_normalization(self):
+        F = np.array([[0,0], [0.5, 50], [1.0, 100]])
+        cd = calc_crowding_distance(F)
+        self.assertEqual(cd[1], 1)
 
     def test_rank_and_crowding_distance(self):
         for i, D in enumerate(self.data):
