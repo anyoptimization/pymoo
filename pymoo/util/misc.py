@@ -90,7 +90,7 @@ def cdist(A, B, **kwargs):
         D = np.full((A.shape[0], B.shape[1]), np.inf, dtype=np.float)
         for i in range(A.shape[0]):
             for j in range(i + 1, B.shape[1]):
-                d = M[i].distance_to(M[j])
+                d = A[i].distance_to(B[j])
                 D[i, j], D[j, i] = d, d
         return D
 
@@ -165,6 +165,7 @@ def all_combinations(A, B):
 
 
 def pop_from_sampling(problem, sampling, n_initial_samples, pop=None):
+
     # the population type can be different - (different type of individuals)
     if pop is None:
         pop = Population()
@@ -180,7 +181,7 @@ def pop_from_sampling(problem, sampling, n_initial_samples, pop=None):
 
         elif isinstance(sampling, Sampling):
             # use the sampling
-            pop = sampling.do(problem, pop, n_initial_samples)
+            pop = sampling.do(problem, n_initial_samples, pop=pop)
 
         else:
             return None
@@ -192,18 +193,6 @@ def evaluate_if_not_done_yet(evaluator, problem, pop, algorithm=None):
     I = np.where(pop.get("F") == None)[0]
     if len(I) > 0:
         pop[I] = evaluator.eval(problem, pop[I], algorithm=algorithm)
-
-
-if __name__ == '__main__':
-    x = np.linspace(0, 5, 50)
-    X = all_combinations(x, x)
-
-    M = np.random.random((100, 3))
-
-    M[3, :] = M[55, :]
-    M[10, :] = M[55, :]
-
-    print(get_duplicates(M))
 
 
 def set_if_none(kwargs, str, val):
@@ -235,3 +224,4 @@ def distance_of_closest_points_to_others(X):
     D = vectorized_cdist(X, X)
     np.fill_diagonal(D, np.inf)
     return D.argmin(axis=1), D.min(axis=1)
+

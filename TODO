@@ -2,10 +2,17 @@
 # TODO
 
 
+- Algorithm workflow - initialize, run, finalize --  solve does everything
+
 - Write test suite for all algorithms (many problems just run once - no crash should occur)
+
+- Infill Criteria Class  and Mating inherits from it
+
 - Add global tests of all optimization methods
-- Elementwise function evaluation gradient is not working yet
+
 - Report None of infeasible or feasible
+
+- 1+1 and archive
 
 
 

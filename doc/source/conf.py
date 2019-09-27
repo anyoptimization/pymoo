@@ -130,7 +130,7 @@ numpydoc_show_class_members = True
 # If it’s false, inherited members won’t shown. True by default.
 numpydoc_show_inherited_class_members = False
 
-# Whether to create a Sphinx table of contents for the lists of class methods and attributes.
+# Whether to create a Sphinx table of contents for the lists of class algorithms and attributes.
 # If a table of contents is made, Sphinx expects each entry to have a separate page. True by default.
 numpydoc_class_members_toctree = False
 
@@ -156,13 +156,13 @@ html_static_path = ['_static']
 links_local = [
     ("http://localhost:8001", "pymoo.org"),
     ("https://github.com/msu-coinlab/pymoo", "GitHub"),
-    ("/api/index.html", "API")
+    ("/api/simulation.html", "API")
 ]
 
 links_remote = [
     ("http://pymoo.org/", "pymoo.org"),
     ("https://github.com/msu-coinlab/pymoo", "GitHub"),
-    ("/api/index.html", "API")
+    ("/api/simulation.html", "API")
 ]
 
 html_theme_options = {
