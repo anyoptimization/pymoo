@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial import cKDTree
 
-from pymoo.model.decision_making import DecisionMaking, normalize
+from pymoo.model.decision_making import DecisionMaking, normalize, find_outliers_upper_tail, NeighborFinder
 
 
 class HighTradeoffPoints(DecisionMaking):
@@ -11,13 +11,12 @@ class HighTradeoffPoints(DecisionMaking):
         self.epsilon = epsilon
 
     def _do(self, F, **kwargs):
-
         n, m = F.shape
 
         if self.normalize:
             F = normalize(F, self.ideal_point, self.nadir_point, estimate_bounds_if_none=True)
 
-        tree = cKDTree(F)
+        neighbors_finder = NeighborFinder(F, epsilon=0.125, n_min_neigbors="auto", consider_2d=False)
 
         mu = np.full(n, - np.inf)
 
@@ -25,38 +24,19 @@ class HighTradeoffPoints(DecisionMaking):
         for i in range(n):
 
             # for each neighbour in a specific radius of that solution
-            neighbours = tree.query_ball_point([F[i]], self.epsilon).tolist()[0]
-
-            # consider at least m+1 neighbours - if not found force it
-            if len(neighbours) < 2 * m + 1:
-                neighbours = tree.query([F[i]], k=m + 1)[1].tolist()[0]
+            neighbors = neighbors_finder.find(i)
 
             # calculate the trade-off to all neighbours
-            diff = F[neighbours] - F[i]
+            diff = F[neighbors] - F[i]
+
+            # calculate sacrifice and gain
+            sacrifice = np.maximum(0, diff).sum(axis=1)
+            gain = np.maximum(0, -diff).sum(axis=1)
 
             np.warnings.filterwarnings('ignore')
-            tradeoff = np.maximum(0, diff).sum(axis=1) / np.maximum(0, -diff).sum(axis=1)
+            tradeoff = sacrifice / gain
 
             # otherwise find the one with the smalled one
             mu[i] = np.nanmin(tradeoff)
 
-        # remove values that are nan
-        I = np.where(np.logical_not(np.isnan(mu)))[0]
-        mu = mu[I]
-
-        # calculate mean and sigma
-        mean, sigma = mu.mean(), mu.std()
-
-        # calculate the deviation in terms of sigma
-        deviation = (mu - mean) / sigma
-
-        # 2 * sigma is considered as an outlier
-        S = I[np.where(deviation >= 2)[0]]
-
-        if len(S) == 0 and deviation.max() > 1:
-            S = I[np.argmax(mu)]
-
-        if len(S) == 0:
-            return None
-        else:
-            return S
+        return find_outliers_upper_tail(mu)

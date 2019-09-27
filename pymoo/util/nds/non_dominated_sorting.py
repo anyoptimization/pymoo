@@ -13,7 +13,7 @@ class NonDominatedSorting:
 
     def do(self, F, return_rank=False, only_non_dominated_front=False, n_stop_if_ranked=None):
 
-        # if not set just set it to a very large values because the cython methods do not take None
+        # if not set just set it to a very large values because the cython algorithms do not take None
         if n_stop_if_ranked is None:
             n_stop_if_ranked = int(1e8)
 

@@ -210,7 +210,7 @@ class Algorithm:
         # finalize the algorithm and do postprocessing of desired
         self.finalize()
 
-    # method that is called each iteration to call some methods regularly
+    # method that is called each iteration to call some algorithms regularly
     def _each_iteration(self, D, first=False, **kwargs):
 
         # display the output if defined by the algorithm

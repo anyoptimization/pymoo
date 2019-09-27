@@ -8,7 +8,6 @@ import types
 
 import numpy as np
 
-from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.model.algorithm import filter_optimum
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
@@ -24,13 +23,12 @@ def get_problem_func(n_var, xl, xu, type_var):
     class P(Problem):
         def __init__(self) -> None:
             super().__init__(n_var=n_var, n_obj=1, n_constr=0, xl=xl, xu=xu, type_var=type_var)
-
     return P
 
 
-def sample(sampling, n_samples, n_var, xl=0, xu=1, type_var=np.double, **kwargs):
-    problem = get_problem_func(n_var, xl, xu, type_var)(**kwargs)
-    return sampling.do(problem, Population(), n_samples, **kwargs).get("X")
+def sample(sampling, n_samples, n_var, xl=0, xu=1, **kwargs):
+    problem = get_problem_func(n_var, xl, xu, None)(**kwargs)
+    return sampling.do(problem, n_samples, pop=None, **kwargs)
 
 
 def crossover(crossover, a, b, c=None, xl=0, xu=1, type_var=np.double, **kwargs):

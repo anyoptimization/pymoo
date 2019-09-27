@@ -1,18 +1,18 @@
-from pymoo.algorithms.nsga2 import NSGA2
-from pymoo.factory import get_problem
-from pymoo.optimize import minimize
+import os
 
 import numpy as np
 
-problem = get_problem("zdt2")
+from pymoo.configuration import get_pymoo
+from pymoo.decision_making.high_tradeoff import HighTradeoffPoints
+from pymoo.decision_making.high_tradeoff_inverted import HighTradeoffPointsInverted
+from pymoo.visualization.scatter import Scatter
 
-algorithm = NSGA2(pop_size=100, elimate_duplicates=True)
+pf = np.loadtxt(os.path.join(get_pymoo(), "pymoo", "usage", "decision_making", "knee-2d.out"))
+dm = HighTradeoffPoints()
 
-res = minimize(problem,
-               algorithm,
-               ('n_gen', 200),
-               seed=1,
-               verbose=True)
+I = dm.do(pf)
 
-np.savetxt("performance_indicators_4.f", res.F)
-np.savetxt("performance_indicators.pf", problem.pareto_front())
+plot = Scatter(angle=(0, 0))
+plot.add(pf, alpha=0.2)
+plot.add(pf[I], color="red", s=100)
+plot.show()

@@ -19,12 +19,18 @@ class ReferenceDirectionFactory:
         self.scaling = scaling
         self.lexsort = lexsort
 
-    def do(self):
+    def do(self, seed=None):
+
+        # set the random seed if it is provided
+        if seed is not None:
+            np.random.seed(seed)
 
         if self.n_dim == 1:
             return np.array([[1.0]])
         else:
+
             ref_dirs = self._do()
+
             if self.scaling is not None:
                 ref_dirs = scale_reference_directions(ref_dirs, self.scaling)
 
@@ -144,6 +150,39 @@ class MultiLayerReferenceDirectionFactory:
 # Reduction Based Reference Directions
 # =========================================================================================================
 
+def kmeans(X, centroids, n_max_iter, a_tol):
+
+    for i in range(n_max_iter):
+
+        # assign all points to one of the centroids
+        points_to_centroid = cdist(X, centroids).argmin(axis=1)
+
+        centroids_to_points = [[] for _ in range(len(centroids))]
+        for j, k in enumerate(points_to_centroid):
+            centroids_to_points[k].append(j)
+
+        last_centroids = np.copy(centroids)
+        for j in range(len(centroids_to_points)):
+            centroids[j] = np.mean(X[centroids_to_points[j]], axis=0)
+
+        if np.abs(centroids - last_centroids).sum(axis=1).mean() < a_tol:
+            break
+
+
+def stretch(centroids):
+
+    # because the centroids went inside, we need to stretch the points finally
+    index_of_extreme = centroids.argmax(axis=0)
+
+    # for each dimension of the simplex
+    for i in range(centroids.shape[1]):
+
+        ext = np.copy(centroids[index_of_extreme[i]])
+        ext[i] = 0
+        centroids -= ext
+
+        centroids[centroids < 0] = 0
+
 
 class ReductionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
 
@@ -168,7 +207,7 @@ class ReductionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
 
     def _do(self):
 
-        rnd = sample_on_unit_simplex(self.n_sample_points, self.n_dim, unit_simplex_mapping=self.sampling, seed=self.seed)
+        rnd = sample_on_unit_simplex(self.n_sample_points, self.n_dim, unit_simplex_mapping=self.sampling)
 
         # add the corner coordinates
         X = np.row_stack([np.eye(self.n_dim), rnd])
@@ -178,37 +217,11 @@ class ReductionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
 
         centroids = X[I]
 
-        # now execute some iterations of k-means to refine the points
-        n_max_iter = 10000
-        a_tol = 1e-12
-
         # if clustering should be performed after this algorithm
         if self.kmeans:
+            kmeans(X, centroids, 10000, 1e-8)
 
-            for i in range(n_max_iter):
-
-                # assign all points to one of the centroids
-                points_to_centroid = cdist(X, centroids).argmin(axis=1)
-
-                centroids_to_points = [[] for _ in range(len(centroids))]
-                for j, k in enumerate(points_to_centroid):
-                    centroids_to_points[k].append(j)
-
-                last_centroids = np.copy(centroids)
-                for j in range(self.n_dim, len(centroids_to_points)):
-                    centroids[j] = np.mean(X[centroids_to_points[j]], axis=0)
-
-                if np.abs(centroids - last_centroids).sum(axis=1).mean() < a_tol:
-                    break
-
-            # because the centroids went inside, we need to stretch the points finally
-            index_of_extreme = centroids.argmax(axis=0)
-            for i in range(self.n_dim):
-                ext = np.copy(centroids[index_of_extreme[i]])
-                ext[i] = 0
-                centroids -= ext
-
-                centroids[centroids < 0] = 0
+        stretch(centroids)
 
         # make sure the sum is one after stretching
         centroids = centroids / centroids.sum(axis=1)[:, None]
@@ -221,9 +234,7 @@ class ReductionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
 # =========================================================================================================
 
 
-def sample_on_unit_simplex(n_points, n_dim, unit_simplex_mapping="kraemer", seed=None):
-    if seed is not None:
-        np.random.seed(seed)
+def sample_on_unit_simplex(n_points, n_dim, unit_simplex_mapping="kraemer"):
 
     if unit_simplex_mapping == "sum":
         rnd = map_onto_unit_simplex(np.random.random((n_points, n_dim)), "sum")

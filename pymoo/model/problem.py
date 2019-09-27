@@ -146,9 +146,14 @@ class Problem:
         """
         if not use_cache or self._pareto_front is None:
             try:
-                self._pareto_front = at_least_2d_array(self._calc_pareto_front(*args, **kwargs))
-                self._ideal_point = np.min(self._pareto_front, axis=0)
-                self._nadir_point = np.max(self._pareto_front, axis=0)
+                pf = self._calc_pareto_front(*args, **kwargs)
+                if pf is not None:
+                    self._pareto_front = at_least_2d_array(pf)
+                    self._ideal_point = np.min(self._pareto_front, axis=0)
+                    self._nadir_point = np.max(self._pareto_front, axis=0)
+                else:
+                    self._pareto_front, self._ideal_point, self._nadir_point = None, None, None
+
             except Exception as e:
                 if exception_if_failing:
                     raise e
