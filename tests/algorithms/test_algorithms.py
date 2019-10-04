@@ -2,8 +2,11 @@ import unittest
 
 import numpy as np
 
+from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.algorithms.nsga2 import nsga2
 from pymoo.factory import get_problem, Problem, ZDT
+from pymoo.factory import get_sampling, get_crossover, get_mutation
+from pymoo.factory import get_termination
 from pymoo.optimize import minimize
 
 
@@ -29,6 +32,39 @@ class AlgorithmTest(unittest.TestCase):
 
         algorithm = nsga2(pop_size=100, elimate_duplicates=True)
         minimize(ZDT1NoPF(), algorithm, ('n_gen', 20), seed=1, verbose=True)
+
+    def test_no_feasible_solution_found(self):
+        class MyProblem(Problem):
+
+            def __init__(self):
+                super().__init__(n_var=2,
+                                 n_obj=1,
+                                 n_constr=36,
+                                 xl=np.array([0, 0]),
+                                 xu=np.array([100, 100]))
+
+            def _evaluate(self, x, out, *args, **kwargs):
+                f1 = x[:, 0] + x[:, 1]
+                out["F"] = np.column_stack([f1])
+                out["G"] = np.ones(len(x))
+
+        res = minimize(MyProblem(),
+                       NSGA2(),
+                       ("n_gen", 10),
+                       seed=1,
+                       save_history=True)
+
+        self.assertEqual(res.X, None)
+        self.assertEqual(res.F, None)
+        self.assertEqual(res.G, None)
+
+        res = minimize(MyProblem(),
+                       NSGA2(return_least_infeasible=True),
+                       ("n_gen", 10),
+                       seed=1,
+                       save_history=True)
+
+        self.assertEqual(res.CV, 1)
 
 
 if __name__ == '__main__':

@@ -3,6 +3,7 @@ import copy
 import numpy as np
 
 from pymoo.model.evaluator import Evaluator
+from pymoo.model.individual import Individual
 from pymoo.model.population import Population
 from pymoo.model.result import Result
 from pymoo.util.function_loader import FunctionLoader
@@ -47,6 +48,9 @@ class Algorithm:
     pf : np.array
         The Pareto-front for the given problem. If provided performance metrics are printed during execution.
 
+    return_least_infeasible : bool
+        Whether the algorithm should return the least infeasible solution, if no solution was found.
+
     evaluator : class
         The evaluator which can be used to make modifications before calling the evaluate function of a problem.
 
@@ -55,6 +59,7 @@ class Algorithm:
 
     def __init__(self,
                  callback=None,
+                 return_least_infeasible=False,
                  **kwargs):
 
         # !
@@ -72,6 +77,7 @@ class Algorithm:
         # other attributes of the algorithm
         self.callback = callback
         self.func_display_attrs = None
+        self.return_least_infeasible = return_least_infeasible
 
         # !
         # Attributes to be set later on for each problem run
@@ -158,7 +164,7 @@ class Algorithm:
 
         # if the algorithm already set the optimum just return it, else filter it by default
         if self.opt is None:
-            opt = filter_optimum(res.pop.copy())
+            opt = filter_optimum(res.pop.copy(), least_infeasible=self.return_least_infeasible)
         else:
             opt = self.opt
 
@@ -167,11 +173,13 @@ class Algorithm:
 
         if isinstance(opt, Population):
             X, F, CV, G = opt.get("X", "F", "CV", "G")
-        else:
+        elif isinstance(opt, Individual):
             X, F, CV, G = opt.X, opt.F, opt.CV, opt.G
+        else:
+            X, F, CV, G = None, None, None, None
 
-        if opt is not None:
-            res.X, res.F, res.CV, res.G = X, F, CV, G
+        # set all the individual values
+        res.X, res.F, res.CV, res.G = X, F, CV, G
 
         # create the result object
         res.problem, res.pf = self.problem, self.pf
@@ -247,25 +255,31 @@ class Algorithm:
         pass
 
 
-def filter_optimum(pop):
+def filter_optimum(pop, least_infeasible=False):
 
     # first only choose feasible solutions
-    pop = pop[pop.collect(lambda ind: ind.feasible)[:, 0]]
+    ret = pop[pop.collect(lambda ind: ind.feasible)[:, 0]]
 
     # if at least one feasible solution was found
-    if len(pop) > 0:
+    if len(ret) > 0:
 
         # then check the objective values
-        F = pop.get("F")
+        F = ret.get("F")
 
         if F.shape[1] > 1:
-            I = NonDominatedSorting().do(pop.get("F"), only_non_dominated_front=True)
-            pop = pop[I]
+            I = NonDominatedSorting().do(ret.get("F"), only_non_dominated_front=True)
+            ret = ret[I]
 
         else:
-            pop = pop[np.argmin(F)]
+            ret = ret[np.argmin(F)]
 
+    # no feasible solution was found
     else:
-        pop = None
+        # if flag enable report the least infeasible
+        if least_infeasible:
+            ret = pop[np.argmin(pop.get("CV"))]
+        # otherwise just return none
+        else:
+            ret = None
 
-    return pop
+    return ret
