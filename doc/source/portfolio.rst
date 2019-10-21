@@ -38,12 +38,12 @@
                         </div>
                         <div class="desc col-10">
                                 <h4>Algorithms</h4>
-                                <b>SO:</b>
+                                <b>Single-objective:</b>
                                 <a href="algorithms/genetic_algorithm.html">Genetic Algorithm</a>,
                                 <a href="algorithms/differential_evolution.html">Differential Evolution</a>,
                                 <a href="algorithms/nelder_mead.html">Nelder Mead</a><img class="new-flag" src="_static/img/new_flag.svg">
                                 <br>
-                                <b>MO:</b>
+                                <b>Multi-objective:</b>
                                 <a href="algorithms/nsga2.html">NSGA-II</a>,
                                 <a href="algorithms/rnsga2.html">R-NSGA-II</a>,
                                 <a href="algorithms/nsga3.html">NSGA-III</a>,
