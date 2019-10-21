@@ -33,8 +33,17 @@ problems = [
     ('Welded_Beam', []), ('Carside', []), ('BNH', []), ('Cantilevered_Beam', []), ('Pressure_Vessel', []),
     ('G01', []), ('G02', []), ('G03', []), ('G04', []), ('G05', []), ('G06', []), ('G07', []), ('G08', []),
     ('G09', []), ('G10', []),
-    #('ctp1', []), ('ctp2', []), ('ctp3', []), ('ctp4', []), ('ctp5', []), ('ctp6', []), ('ctp7', []), ('ctp8', []),
+    # ('ctp1', []), ('ctp2', []), ('ctp3', []), ('ctp4', []), ('ctp5', []), ('ctp6', []), ('ctp7', []), ('ctp8', []),
 ]
+
+
+# Uncomment to check WFG problems
+"""
+problems = [
+    ('WFG1', [2,4,2]), ('WFG2', [2,4,2]), ('WFG3', [2,4,2]), ('WFG4', [2,4,2]), ('WFG5', [2,4,2]), ('WFG6', [2,4,2]),
+    ('WFG7', [2,4,2]), ('WFG8', [2,4,2]), ('WFG9', [2,4,2])
+]
+"""
 
 
 class CorrectnessTest(unittest.TestCase):

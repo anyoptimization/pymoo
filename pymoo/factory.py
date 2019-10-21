@@ -269,7 +269,16 @@ def get_problem_options():
         ('g07', G7),
         ('g08', G8),
         ('g09', G9),
-        ('g10', G10)
+        ('g10', G10),
+        ('wfg1', WFG1),
+        ('wfg2', WFG2),
+        ('wfg3', WFG3),
+        ('wfg4', WFG4),
+        ('wfg5', WFG5),
+        ('wfg6', WFG6),
+        ('wfg7', WFG7),
+        ('wfg8', WFG8),
+        ('wfg9', WFG9)
     ]
 
     return PROBLEM
