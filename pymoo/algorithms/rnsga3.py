@@ -244,13 +244,4 @@ def line_plane_intersection(l0, l1, p0, p_no, epsilon=1e-6):
         return ref_proj
 
 
-# =========================================================================================================
-# Interface
-# =========================================================================================================
-
-
-def rnsga3(*args, **kwargs):
-    return RNSGA3(*args, **kwargs)
-
-
 parse_doc_string(RNSGA3.__init__)

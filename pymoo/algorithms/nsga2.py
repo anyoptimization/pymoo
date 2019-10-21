@@ -202,12 +202,4 @@ def calc_crowding_distance(F, filter_out_duplicates=True):
     return crowding
 
 
-# =========================================================================================================
-# Interface
-# =========================================================================================================
-
-def nsga2(*args, **kwargs):
-    return NSGA2(*args, **kwargs)
-
-
 parse_doc_string(NSGA2.__init__)

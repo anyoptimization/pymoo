@@ -185,13 +185,4 @@ def calc_norm_pref_distance(A, B, weights, ideal, nadir):
     return np.reshape(N, (A.shape[0], B.shape[0]))
 
 
-# =========================================================================================================
-# Interface
-# =========================================================================================================
-
-
-def rnsga2(*args, **kwargs):
-    return RNSGA2(*args, **kwargs)
-
-
 parse_doc_string(RNSGA2.__init__)

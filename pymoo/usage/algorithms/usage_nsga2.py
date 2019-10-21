@@ -5,7 +5,7 @@ from pymoo.visualization.scatter import Scatter
 
 problem = get_problem("zdt2")
 
-algorithm = NSGA2(pop_size=100, elimate_duplicates=True)
+algorithm = NSGA2(pop_size=100, eliminate_duplicates=True)
 
 res = minimize(problem,
                algorithm,

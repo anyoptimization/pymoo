@@ -1,10 +1,10 @@
 from pymoo.algorithms.so_nelder_mead import NelderMead
-from pymoo.factory import get_problem, get_algorithm
+from pymoo.factory import get_problem
 from pymoo.optimize import minimize
 
-problem = get_problem("go-xinsheyang04")
+problem = get_problem("sphere")
 
-algorithm = NelderMead(n_max_restarts=100)
+algorithm = NelderMead(n_max_restarts=10)
 
 res = minimize(problem,
                algorithm,

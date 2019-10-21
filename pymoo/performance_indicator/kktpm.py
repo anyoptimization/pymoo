@@ -140,7 +140,7 @@ class KKTPM:
             kktpm[i] = _kktpm
             fval[i] = _fval
 
-        return kktpm, fval
+        return kktpm
 
 
 def solve(A, b, method="elim"):

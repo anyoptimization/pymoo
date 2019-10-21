@@ -32,7 +32,6 @@ class GlobalOptimizationProblem(Problem):
         F[np.isnan(F)] = np.inf
         out["F"] = F
 
-
     def success(self, x, **kwargs):
         return self.object.success(x, **kwargs)
 
@@ -244,5 +243,5 @@ if __name__ == "__main__":
         if isinstance(clazz, type) and issubclass(clazz, Benchmark):
             name = clazz.__name__
             print(f"\"go-{name.lower()}\",")
-            #print(f"(\"go-{name.lower()}\", GlobalOptimizationProblem, {{\"clazz\":{name}}}),")
+            # print(f"(\"go-{name.lower()}\", GlobalOptimizationProblem, {{\"clazz\":{name}}}),")
     print("done")
