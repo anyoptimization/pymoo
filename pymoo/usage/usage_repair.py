@@ -49,7 +49,7 @@ algorithm = GA(
     crossover=get_crossover("bin_hux"),
     mutation=get_mutation("bin_bitflip"),
     repair=ConsiderMaximumWeightRepair(),
-    elimate_duplicates=True)
+    eliminate_duplicates=True)
 
 res = minimize(problem,
                algorithm,

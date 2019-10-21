@@ -335,12 +335,4 @@ def calc_niche_count(n_niches, niche_of_individuals):
     return niche_count
 
 
-# =========================================================================================================
-# Interface
-# =========================================================================================================
-
-def nsga3(*args, **kwargs):
-    return NSGA3(*args, **kwargs)
-
-
 parse_doc_string(NSGA3.__init__)

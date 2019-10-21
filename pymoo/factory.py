@@ -56,26 +56,26 @@ def get_from_list(l, name, args, kwargs):
 # =========================================================================================================
 
 def get_algorithm_options():
-    from pymoo.algorithms.moead import moead
-    from pymoo.algorithms.nsga2 import nsga2
-    from pymoo.algorithms.nsga3 import nsga3
-    from pymoo.algorithms.rnsga2 import rnsga2
-    from pymoo.algorithms.rnsga3 import rnsga3
-    from pymoo.algorithms.so_de import de
-    from pymoo.algorithms.so_genetic_algorithm import ga
-    from pymoo.algorithms.unsga3 import unsga3
-    from pymoo.algorithms.so_nelder_mead import nelder_mead
+    from pymoo.algorithms.moead import MOEAD
+    from pymoo.algorithms.nsga2 import NSGA2
+    from pymoo.algorithms.nsga3 import NSGA3
+    from pymoo.algorithms.rnsga2 import RNSGA2
+    from pymoo.algorithms.rnsga3 import RNSGA3
+    from pymoo.algorithms.so_de import DE
+    from pymoo.algorithms.so_genetic_algorithm import GA
+    from pymoo.algorithms.unsga3 import UNSGA3
+    from pymoo.algorithms.so_nelder_mead import NelderMead
 
     ALGORITHMS = [
-        ("ga", ga),
-        ("de", de),
-        ("nelder-mead", nelder_mead),
-        ("nsga2", nsga2),
-        ("rnsga2", rnsga2),
-        ("nsga3", nsga3),
-        ("unsga3", unsga3),
-        ("rnsga3", rnsga3),
-        ("moead", moead),
+        ("ga", GA),
+        ("de", DE),
+        ("nelder-mead", NelderMead),
+        ("nsga2", NSGA2),
+        ("rnsga2", RNSGA2),
+        ("nsga3", NSGA3),
+        ("unsga3", UNSGA3),
+        ("rnsga3", RNSGA3),
+        ("moead", MOEAD),
     ]
 
     return ALGORITHMS
@@ -194,7 +194,7 @@ def get_termination_options():
 
     TERMINATION = [
         ("n_eval", MaximumFunctionCallTermination),
-        ("n_gen", MaximumGenerationTermination),
+        ("(n_gen|n_iter)", MaximumGenerationTermination),
         ("igd", IGDTermination),
         ("x_tol", DesignSpaceToleranceTermination),
         ("f_tol", ObjectiveSpaceToleranceTermination)

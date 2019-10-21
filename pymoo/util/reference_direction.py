@@ -13,17 +13,19 @@ from pymoo.util.misc import cdist, find_duplicates
 
 class ReferenceDirectionFactory:
 
-    def __init__(self, n_dim, scaling=None, lexsort=True) -> None:
+    def __init__(self, n_dim, scaling=None, lexsort=True, verbose=False, seed=None, **kwargs) -> None:
         super().__init__()
         self.n_dim = n_dim
         self.scaling = scaling
         self.lexsort = lexsort
+        self.verbose = verbose
+        self.seed = seed
 
     def do(self, seed=None):
 
         # set the random seed if it is provided
-        if seed is not None:
-            np.random.seed(seed)
+        if self.seed is not None:
+            np.random.seed(self.seed)
 
         if self.n_dim == 1:
             return np.array([[1.0]])

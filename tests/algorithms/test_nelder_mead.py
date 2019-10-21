@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from scipy.optimize import minimize as scipy_minimize
 
-from pymoo.algorithms.so_nelder_mead import nelder_mead
+from pymoo.algorithms.so_nelder_mead import NelderMead
 from pymoo.factory import get_problem, get_termination
 from pymoo.optimize import minimize
 
@@ -14,22 +14,22 @@ class NelderAndMeadTestTest(unittest.TestCase):
         problem = get_problem("rastrigin")
         problem.xl = None
         problem.xu = None
-        method = nelder_mead(x0=np.array([1, 1]), max_restarts=0)
+        method = NelderMead(X=np.array([1, 1]), max_restarts=0)
         minimize(problem, method, verbose=False)
 
     def test_with_bounds_no_restart(self):
         problem = get_problem("rastrigin")
-        method = nelder_mead(x0=np.array([1, 1]), max_restarts=0)
+        method = NelderMead(X=np.array([1, 1]), max_restarts=0)
         minimize(problem, method, verbose=False)
 
     def test_with_bounds_no_initial_point(self):
         problem = get_problem("rastrigin")
-        method = nelder_mead(max_restarts=0)
+        method = NelderMead(max_restarts=0)
         minimize(problem, method, verbose=False)
 
     def test_with_bounds_with_restart(self):
         problem = get_problem("rastrigin")
-        method = nelder_mead(x0=np.array([1, 1]), max_restarts=2)
+        method = NelderMead(X=np.array([1, 1]), max_restarts=2)
         minimize(problem, method, verbose=False)
 
     def test_against_scipy(self):
@@ -56,7 +56,7 @@ class NelderAndMeadTestTest(unittest.TestCase):
                 hist.append(x)
 
         problem.callback = callback
-        minimize(problem, nelder_mead(x0=x0, max_restarts=0, termination=get_termination("n_eval", len(hist_scipy))))
+        minimize(problem, NelderMead(X=x0, max_restarts=0, termination=get_termination("n_eval", len(hist_scipy))))
         hist = np.row_stack(hist)[:len(hist_scipy)]
 
         self.assertTrue(np.all(hist - hist_scipy < 1e-7))

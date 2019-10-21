@@ -8,7 +8,8 @@ algorithm = MOEAD(
     get_reference_directions("das-dennis", 3, n_partitions=12),
     n_neighbors=15,
     decomposition="pbi",
-    prob_neighbor_mating=0.7
+    prob_neighbor_mating=0.7,
+    seed=1
 )
 
 res = minimize(problem, algorithm, termination=('n_gen', 200))

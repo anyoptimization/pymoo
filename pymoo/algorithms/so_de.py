@@ -2,6 +2,7 @@ import numpy as np
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
+from pymoo.model.termination import SingleObjectiveToleranceBasedTermination
 from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
 from pymoo.operators.crossover.exponential_crossover import ExponentialCrossover
 from pymoo.operators.crossover.uniform_crossover import UniformCrossover
@@ -77,6 +78,7 @@ class DE(GeneticAlgorithm):
                          survival=None,
                          **kwargs)
 
+        self.default_termination = SingleObjectiveToleranceBasedTermination()
         self.func_display_attrs = disp_single_objective
 
     def _next(self):
@@ -130,14 +132,6 @@ class DE(GeneticAlgorithm):
         pop[is_better] = self.off[is_better]
 
         return pop
-
-
-# =========================================================================================================
-# Interface
-# =========================================================================================================
-
-def de(*args, **kwargs):
-    return DE(*args, **kwargs)
 
 
 parse_doc_string(DE.__init__)

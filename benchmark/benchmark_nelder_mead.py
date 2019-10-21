@@ -4,10 +4,9 @@ This is the experiment for nsga2.
 import os
 import pickle
 
-from pymoo.algorithms.so_genetic_algorithm import ga
-from pymoo.algorithms.so_nelder_mead import nelder_mead
-from pymoo.factory import get_problem, get_termination
-from pymoo.operators.crossover.nelder_mead_crossover import NelderMeadCrossover
+from pymoo.algorithms.so_nelder_mead import NelderMead
+
+from pymoo.factory import get_problem
 
 setup = [
     "go-amgm",
@@ -222,7 +221,7 @@ if __name__ == '__main__':
     prefix = "runs"
 
     # name of the experiment
-    name = "nelder-mead-0.3.1"
+    name = "nelder-mead-0.3.2"
 
     # number of runs to execute
     n_runs = 10
@@ -234,7 +233,7 @@ if __name__ == '__main__':
 
         problem = get_problem(_problem)
 
-        method = nelder_mead(n_max_restarts=100)
+        method = NelderMead(n_max_local_restarts=2)
 
         for run in range(1, n_runs + 1):
             fname = "%s_%s.run" % (_problem, run)

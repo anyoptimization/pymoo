@@ -106,7 +106,7 @@ def pop_from_array_or_individual(array, pop=None):
     if isinstance(array, Population):
         pop = array
     elif isinstance(array, np.ndarray):
-        pop = pop.new("X", [array])
+        pop = pop.new("X", np.atleast_2d(array))
     elif isinstance(array, Individual):
         pop = Population(1)
         pop[0] = array

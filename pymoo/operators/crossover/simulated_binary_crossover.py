@@ -18,6 +18,9 @@ class SimulatedBinaryCrossover(Crossover):
         # boundaries of the problem
         xl, xu = problem.xl, problem.xu
 
+        #if np.any(X < xl) or np.any(X > xu):
+        #    raise Exception("Simulated binary crossover requires all variables to be in bounds!")
+
         # crossover mask that will be used in the end
         do_crossover = np.full(X[0].shape, True)
 

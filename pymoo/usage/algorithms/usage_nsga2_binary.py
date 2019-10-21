@@ -9,7 +9,7 @@ algorithm = NSGA2(pop_size=100,
                   sampling=get_sampling("bin_random"),
                   crossover=get_crossover("bin_two_point"),
                   mutation=get_mutation("bin_bitflip"),
-                  elimate_duplicates=True)
+                  eliminate_duplicates=True)
 
 res = minimize(problem,
                algorithm,

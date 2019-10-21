@@ -1,4 +1,5 @@
 import copy
+from abc import abstractmethod
 
 import numpy as np
 
@@ -59,6 +60,7 @@ class Algorithm:
 
     def __init__(self,
                  callback=None,
+                 termination=None,
                  return_least_infeasible=False,
                  **kwargs):
 
@@ -86,7 +88,9 @@ class Algorithm:
         # the optimization problem as an instance
         self.problem = None
         # the termination criterion of the algorithm
-        self.termination = None
+        self.termination = termination
+        # an algorithm can defined the default termination which can be overwritten
+        self.default_termination = None
         # the random seed that was used
         self.seed = None
         # the pareto-front of the problem - if it exist or passed
@@ -129,6 +133,10 @@ class Algorithm:
         # the termination criterion to be used to stop the algorithm
         if self.termination is None:
             self.termination = termination
+
+        # if nothing given fall back to default
+        if self.termination is None:
+            self.termination = self.default_termination
 
         # set the random seed in the algorithm object
         self.seed = seed
@@ -252,6 +260,14 @@ class Algorithm:
         print(regex.format(*[str(val).ljust(width) for _, val, width in disp]))
 
     def _finalize(self):
+        pass
+
+    @abstractmethod
+    def _initialize(self):
+        pass
+
+    @abstractmethod
+    def _next(self):
         pass
 
 
