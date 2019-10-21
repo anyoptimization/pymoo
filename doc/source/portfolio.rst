@@ -38,8 +38,12 @@
                         </div>
                         <div class="desc col-10">
                                 <h4>Algorithms</h4>
+                                <b>SO:</b>
                                 <a href="algorithms/genetic_algorithm.html">Genetic Algorithm</a>,
                                 <a href="algorithms/differential_evolution.html">Differential Evolution</a>,
+                                <a href="algorithms/nelder_mead.html">Nelder Mead</a><img class="new-flag" src="_static/img/new_flag.svg">
+                                <br>
+                                <b>MO:</b>
                                 <a href="algorithms/nsga2.html">NSGA-II</a>,
                                 <a href="algorithms/rnsga2.html">R-NSGA-II</a>,
                                 <a href="algorithms/nsga3.html">NSGA-III</a>,
@@ -92,7 +96,7 @@
                                 </br>
                             
                             <a href="operators/mutation.html">Mutation:</a>
-                                Polynomial, Bitlfip
+                                Polynomial, Bitflip
                                 </br>
 
                     </div>
@@ -107,14 +111,14 @@
                         <i class="fas fa-chart-line fa-2x"></i>
                     </div>
                     <div class="desc col-10">
-                            <h4>Visualization<img class="new-flag" src="_static/img/new_flag.svg"></h4>
-                            <a href="/visualization/scatter.html">Scatter Plot (2D/3D/ND)</a>,
-                            <a href="/visualization/pcp.html">Parallel Coordinate Plot (PCP) </a>,
-                            <a href="/visualization/radviz.html">Radviz</a>,
-                            <a href="/visualization/star.html">Star Coordinates</a>,
-                            <a href="/visualization/heatmap.html">Heatmap</a>,
-                            <a href="/visualization/petal.html">Petal Diagram</a>,
-                            <a href="/visualization/radar.html">Spider Web / Radar</a>
+                            <h4>Visualization</h4>
+                            <a href="visualization/scatter.html">Scatter Plot (2D/3D/ND)</a>,
+                            <a href="visualization/pcp.html">Parallel Coordinate Plot (PCP) </a>,
+                            <a href="visualization/radviz.html">Radviz</a>,
+                            <a href="visualization/star.html">Star Coordinates</a>,
+                            <a href="visualization/heatmap.html">Heatmap</a>,
+                            <a href="visualization/petal.html">Petal Diagram</a>,
+                            <a href="visualization/radar.html">Spider Web / Radar</a>
 
                     </div>
                 </div>
@@ -134,7 +138,7 @@
                         <i class="fas fa-balance-scale fa-2x"></i>
                     </div>
                     <div class="desc col-10">
-                            <h4>Decision Making<img class="new-flag" src="_static/img/new_flag.svg"></h4>
+                            <h4>Decision Making</h4>
                             <a href="decision_making/index.html#nb-compromise">Compromise Programming</a>,
                             <a href="decision_making/index.html#nb-pseudo-weights">Pseudo Weights</a>,
                             <a href="decision_making/index.html#nb-high-tradeoff">High Trade-off Points</a>
@@ -154,7 +158,8 @@
                             <a href="misc/performance_indicator.html#nb-gd-plus">GD+</a>,
                             <a href="misc/performance_indicator.html#nb-igd">IGD</a>,
                             <a href="misc/performance_indicator.html#nb-igd-plus">IGD+</a>,
-                            <a href="misc/performance_indicator.html#nb-hv">Hypervolume</a>
+                            <a href="misc/performance_indicator.html#nb-hv">Hypervolume</a>,
+                            <a href="tutorial/kktpm.html">KKTPM</a><img class="new-flag" src="_static/img/new_flag.svg">
                     </div>
                 </div>
             </div>
@@ -192,7 +197,9 @@
                             <h4>Miscellaneous</h4>
                             <a href="misc/termination_criterion.html">Termination Criterion</a>, 
                             <a href="misc/reference_directions.html">Reference Directions</a>, 
-                            <a href="misc/constraint_handling.html">Constraint Handling</a>
+                            <a href="misc/constraint_handling.html">Constraint Handling</a><img class="new-flag" src="_static/img/new_flag.svg">,
+                            <a href="misc/callback.html">Callback</a><img class="new-flag" src="_static/img/new_flag.svg">,
+                            <a href="misc/results.html">Results</a><img class="new-flag" src="_static/img/new_flag.svg">
                     </div>
                 </div>
             </div>
@@ -213,9 +220,12 @@
                             Other Variable Types:
                             <a href="tutorial/binary_problem.html">Binary</a>,
                             <a href="tutorial/discrete_problem.html">Discrete</a>,
-                            <a href="tutorial/mixed_variable_problem.html">Mixed</a>
+                            <a href="tutorial/mixed_variable_problem.html">Mixed</a>,
+                            <a href="tutorial/custom.html">Custom</a><img class="new-flag" src="_static/img/new_flag.svg">
                             </br>
-                            More: <a href="problems/parallelization.html">Parallelization of Function Evaluations</a>
+                            More: <a href="problems/parallelization.html">Parallelization of Function Evaluations</a>, <a href="tutorial/repair.html">Repair</a>
+                            </br>
+                            Examples: <a href="tutorial/subset_selection.html">Subset Selection</a><img class="new-flag" src="_static/img/new_flag.svg">
                     </div>
 
                 </div>

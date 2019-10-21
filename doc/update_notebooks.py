@@ -96,11 +96,14 @@ if __name__ == "__main__":
     # files = glob.glob('source/components/termination_criterion.ipynb')
 
     STARTING_AT = None
-    # STARTING_AT = "source/problems/parallelization.ipynb"
+    #STARTING_AT = "source/misc/results.ipynb"
 
     # files = ['source/problems/zdt.ipynb','source/problems/single.ipynb']
 
     for fname in files:
+
+        if fname == "source/problems/parallelization.ipynb":
+            continue
 
         if STARTING_AT is not None and fname in STARTING_AT:
             STARTING_AT = None

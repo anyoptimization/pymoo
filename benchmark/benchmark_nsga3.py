@@ -1,7 +1,7 @@
 import os
 import pickle
 
-from pymoo.algorithms.nsga3 import nsga3
+from pymoo.algorithms.nsga3 import NSGA3
 from pymoo.factory import get_problem, get_reference_directions
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
@@ -206,7 +206,7 @@ if __name__ == '__main__':
     prefix = "runs"
 
     # name of the experiment
-    name = "pynsga3-0.3.1"
+    name = "pynsga3-0.3.2"
 
     # number of runs to execute
     n_runs = 50
@@ -222,7 +222,7 @@ if __name__ == '__main__':
         s = setup[_problem]
         problem = s['problem']
 
-        method = nsga3(
+        method = NSGA3(
             s['ref_dirs'],
             pop_size=s['pop_size'],
             crossover=s['crossover'],

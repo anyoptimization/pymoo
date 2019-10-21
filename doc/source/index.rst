@@ -59,7 +59,7 @@ getting started guide:
 Features
 ------------------------------------------------------------------------------
 
-Furthermore, our frameworks offers a variety of different features which cover various facets of multi-objective optimization:
+Furthermore, our framework offers a variety of different features which cover various facets of multi-objective optimization:
 
 .. include:: portfolio.rst
 
@@ -96,15 +96,15 @@ by |kdeb| at the Michigan State University in
 East Lansing, Michigan, USA.
 
 We have developed the framework for research purposes and hope to contribute to the research area by delivering tools
-for solving and analyzing multi-objective problems. Each algorithms is developed as close as possible to the proposed
+for solving and analyzing multi-objective problems. Each algorithm is developed as close as possible to the proposed
 version to the best of our knowledge.
 **NSGA-II** and **NSGA-III** have been developed collaboratively with one of the authors and, therefore, we recommend
 using them for **official** benchmarks.
 
 If you intend to use our framework for **any** profit-making purposes, please contact us. Also, be aware that even
-state of the art algorithms are just the starting point for many optimization problems.
+state-of-the-art algorithms are just the starting point for many optimization problems.
 The full potential of genetic algorithms requires customization and the incorporation of domain knowledge.
-We have more than 20 years experience in the optimization field and are eager to tackle challenging problems.
+We have experience for more than 20 years in the optimization field and are eager to tackle challenging problems.
 Let us know if you are interested in working with experienced collaborators in optimization. Please keep in mind
 that only through such projects we are able to keep developing and improving our framework and make sure
 it meets the current needs of the industry.
@@ -125,9 +125,9 @@ popular by being listed with a higher rank regarding specific keywords.
 
 **(ii)** In order to offer more and more new algorithms and features, we are more than 
 happy if somebody wants to contribute by developing code. You can see it as a 
-win-win situations, because your development will be linked to your publication(s) which
+win-win situation, because your development will be linked to your publication(s) which
 can significantly increase the awareness of your work. Please note that, we aim to keep 
-a high-level of code quality and some refactorings might be suggested. We have prepared
+a high-level of code quality and some refactoring might be suggested. We have prepared
 a list of `suggested contributions <contributions.html>`_.
 
 

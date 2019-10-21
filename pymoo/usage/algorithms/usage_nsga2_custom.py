@@ -41,24 +41,38 @@ class MySampling(Sampling):
 
 class MyCrossover(Crossover):
     def __init__(self):
+
+        # define the crossover: number of parents and number of offsprings
         super().__init__(2, 2)
 
     def _do(self, problem, X, **kwargs):
+
+        # The input of has the following shape (n_parents, n_matings, n_var)
         _, n_matings, n_var = X.shape
+
+        # The output owith the shape (n_offsprings, n_matings, n_var)
+        # Because there the number of parents and offsprings are equal it keeps the shape of X
         Y = np.full_like(X, None, dtype=np.object)
 
+        # for each mating provided
         for k in range(n_matings):
-            a, b = X[0, k], X[1, k]
-            off_a, off_b = np.full(problem.n_characters, "_"), np.full(problem.n_characters, "_")
 
-            rand = np.random.random(problem.n_characters)
+            # get the first and the second parent
+            a, b = X[0, k, 0], X[1, k, 0]
 
-            off_a[rand < 0.5] = a
-            off_a[rand >= 0.5] = b
+            # prepare the offsprings
+            off_a = ["_"] * problem.n_characters
+            off_b = ["_"] * problem.n_characters
 
-            off_b[rand < 0.5] = b
-            off_b[rand >= 0.5] = a
+            for i in range(problem.n_characters):
+                if np.random.random() < 0.5:
+                    off_a[i] = a[i]
+                    off_b[i] = b[i]
+                else:
+                    off_a[i] = b[i]
+                    off_b[i] = a[i]
 
+            # join the character list and set the output
             Y[0, k, 0], Y[1, k, 0] = "".join(off_a), "".join(off_b)
 
         return Y
@@ -71,9 +85,7 @@ class MyMutation(Mutation):
     def _do(self, problem, X, **kwargs):
         for i in range(len(X)):
             if np.random.random() < 0.5:
-                mut = [c if np.random.random() > 1 / problem.n_characters else np.random.choice(problem.ALPHABET) for c
-                       in X[i, 0]]
-                X[i, 0] = "".join(mut)
+                X[i, 0] = "".join(np.array([e for e in X[i, 0]])[np.random.permutation(problem.n_characters)])
 
         return X
 
@@ -90,7 +102,7 @@ def func_is_duplicate(pop, *other, epsilon=1e-20, **kwargs):
         for val in e:
             H.add(val.X[0])
 
-    for i, (val, ) in enumerate(pop.get("X")):
+    for i, (val,) in enumerate(pop.get("X")):
         if val in H:
             is_duplicate[i] = True
         H.add(val)

@@ -211,6 +211,9 @@ class Gulf(Benchmark):
 
         self._bounds = list(zip([0.0] * self.N, [50.0] * self.N))
 
+        # we have added this line because otherwise you might divide by zero
+        self._bounds[0] = (1e-120, 50.0)
+
         self.global_optimum = [[50.0, 25.0, 1.5]]
         self.fglob = 0.0
 

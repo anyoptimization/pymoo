@@ -52,6 +52,13 @@ To use the current stable release of *pymoo* use
 If you have already installed an older version of the framework you can force
 an update by using the *-U* option as shown above.
 
+To forcefully fetch and recompile the package is might be necessary to disable
+the local cache created by pip.
+
+.. code:: bash
+
+    pip install -U --no-cache-dir pymoo
+
 
 Development
 ------------------------------------------------------------------------------
@@ -87,4 +94,14 @@ has worked during the installation, you can use the following command:
 .. code:: bash
 
     python -c "from pymoo.util.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
+
+
+If no compilation is available, we recommend pulling the latest stable release from GitHub and to execute
+
+.. code:: bash
+
+    make compile
+    
+This shows detailed error messages why the compilation was not successful.
+
 

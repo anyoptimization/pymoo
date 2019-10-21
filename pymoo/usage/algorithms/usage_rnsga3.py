@@ -4,7 +4,6 @@ import numpy as np
 from pymoo.algorithms.rnsga3 import RNSGA3
 from pymoo.factory import get_problem
 from pymoo.optimize import minimize
-from pymoo.util.reference_direction import UniformReferenceDirectionFactory
 from pymoo.visualization.scatter import Scatter
 
 problem = get_problem("zdt1")
@@ -23,6 +22,7 @@ res = minimize(problem,
                algorithm=algorithm,
                termination=('n_gen', 300),
                pf=pf,
+               seed=1,
                verbose=False)
 
 reference_directions = res.algorithm.survival.ref_dirs
@@ -37,6 +37,7 @@ plot.show()
 # END rnsga3
 
 # START rnsga3_3d
+from pymoo.util.reference_direction import UniformReferenceDirectionFactory
 
 # Get problem
 problem = get_problem("dtlz4", n_var=12, n_obj=3)
@@ -56,6 +57,7 @@ res = minimize(problem,
                algorithm,
                termination=('n_gen', 300),
                pf=pf,
+               seed=1,
                verbose=False)
 
 

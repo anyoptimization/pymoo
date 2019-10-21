@@ -1,19 +1,19 @@
 Algorithms
 ==============================================================================
 
-.. autofunction:: pymoo.algorithms.so_genetic_algorithm.ga
+.. autoclass:: pymoo.algorithms.so_genetic_algorithm.GA
 
-.. autofunction:: pymoo.algorithms.so_de.de
+.. autoclass:: pymoo.algorithms.so_de.DE
 
-.. autofunction:: pymoo.algorithms.nsga2.nsga2
+.. autoclass:: pymoo.algorithms.nsga2.NSGA2
 
-.. autofunction:: pymoo.algorithms.rnsga2.rnsga2
+.. autoclass:: pymoo.algorithms.rnsga2.RNSGA2
 
-.. autofunction:: pymoo.algorithms.nsga3.nsga3
+.. autoclass:: pymoo.algorithms.nsga3.NSGA3
 
-.. autofunction:: pymoo.algorithms.unsga3.unsga3
+.. autoclass:: pymoo.algorithms.unsga3.UNSGA3
 
-.. autofunction:: pymoo.algorithms.rnsga3.rnsga3
+.. autoclass:: pymoo.algorithms.rnsga3.RNSGA3
 
-.. autofunction:: pymoo.algorithms.moead.moead
+.. autoclass:: pymoo.algorithms.moead.MOEAD
 

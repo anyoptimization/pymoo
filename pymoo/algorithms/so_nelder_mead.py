@@ -1,4 +1,5 @@
 import numpy as np
+from pymoo.docs import parse_doc_string
 
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.individual import Individual
@@ -114,12 +115,43 @@ def max_expansion_factor(point, direction, xl, xu):
 class NelderMead(Algorithm):
 
     def __init__(self,
-                 x0=None,
+                 X=None,
                  func_params=adaptive_params,
-                 termination=NelderAndMeadTermination(xtol=1e-6, ftol=1e-6, n_max_iter=1e6, n_max_evals=1e6),
-                 criterion_local_restart=NelderAndMeadTermination(xtol=1e-2, ftol=1e-2),
                  n_max_local_restarts=0,
+                 criterion_local_restart=NelderAndMeadTermination(xtol=1e-2, ftol=1e-2),
                  **kwargs):
+        """
+
+        Parameters
+        ----------
+        X : np.array or Population
+            The initial point where the search should be based on or the complete initial simplex (number of
+            dimensions plus 1 points). The population objective can be already evaluated with objective
+            space values. If a numpy array is provided it is evaluated by the algorithm.
+            By default it is None which means the search starts at a random point.
+
+        func_params : func
+            A function that returns the parameters alpha, beta, gamma, delta for the search. By default:
+
+            >>>  def adaptive_params(problem):
+            ...     n = problem.n_var
+            ...
+            ...     alpha = 1
+            ...     beta = 1 + 2 / n
+            ...     gamma = 0.75 - 1 / (2 * n)
+            ...     delta = 1 - 1 / n
+            ...     return alpha, beta, gamma, delta
+
+            It can be overwritten if necessary.
+
+        n_max_local_restarts : int
+            This algorithm employs local restarts by starting with a new initial simplex. This can be turned of
+            by setting it to 0.
+
+        criterion_local_restart : Termination
+            Provide a termination object which decides whether a local restart should be performed or not.
+
+        """
 
         super().__init__(**kwargs)
 
@@ -132,14 +164,12 @@ class NelderMead(Algorithm):
         # the scaling used for the initial simplex
         self.simplex_scaling = None
 
-        # the specified termination criterion
-        self.termination = termination
-
         # the initial point to be used to build the simplex
-        self.x0 = x0
+        self.x0 = X
         self.opt = None
 
         self.func_display_attrs = disp_single_objective
+        self.default_termination = NelderAndMeadTermination(xtol=1e-6, ftol=1e-6, n_max_iter=1e6, n_max_evals=1e6)
 
         # everything needed for local restarts
         self.n_max_local_restarts = n_max_local_restarts
@@ -379,9 +409,4 @@ class NelderMead(Algorithm):
         return X
 
 
-# =========================================================================================================
-# Interface
-# =========================================================================================================
-
-def nelder_mead(**kwargs):
-    return NelderMead(**kwargs)
+parse_doc_string(NelderMead.__init__)

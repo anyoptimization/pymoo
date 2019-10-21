@@ -74,9 +74,10 @@ def disp_multi_objective(problem, evaluator, algorithm, pf=None):
             if problem.n_obj == 2:
                 attrs.append(('hv', format_float(Hypervolume(pf=pf).calc(F[feasible])), width))
     else:
-        attrs.append(('igd', "-", width))
-        attrs.append(('gd', "-", width))
-        if problem.n_obj == 2:
-            attrs.append(('hv', "-", width))
+        if pf is not None:
+            attrs.append(('igd', "-", width))
+            attrs.append(('gd', "-", width))
+            if problem.n_obj == 2:
+                attrs.append(('hv', "-", width))
 
     return attrs

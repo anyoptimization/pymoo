@@ -4,7 +4,8 @@ This is the experiment for nsga2.
 import os
 import pickle
 
-from pymoo.algorithms.nsga2 import nsga2
+from pymoo.algorithms.nsga2 import NSGA2
+
 from pymoo.factory import get_sampling, get_crossover, get_mutation, get_problem
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
@@ -90,7 +91,7 @@ if __name__ == '__main__':
     prefix = "runs"
 
     # name of the experiment
-    name = "pynsga2-0.3.1"
+    name = "pynsga2-0.3.2"
 
     # number of runs to execute
     n_runs = 100
@@ -107,7 +108,7 @@ if __name__ == '__main__':
         s = setup[_problem]
         problem = s['problem']
 
-        method = nsga2(
+        method = NSGA2(
             pop_size=s['pop_size'],
             crossover=s['crossover'],
             mutation=s['mutation'],

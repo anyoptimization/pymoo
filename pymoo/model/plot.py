@@ -158,7 +158,8 @@ class Plot:
 
         # in a notebook the plot method need not to be called explicitly
         if not in_notebook() and matplotlib.get_backend() != "agg":
-            self.fig.show(**kwargs)
+            plt.show(**kwargs)
+            plt.close()
 
     def save(self, fname, **kwargs):
         self.plot_if_not_done_yet()

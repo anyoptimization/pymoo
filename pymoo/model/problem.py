@@ -1,6 +1,7 @@
 import multiprocessing
 import warnings
 from abc import abstractmethod
+from multiprocessing.pool import ThreadPool
 
 import autograd
 import autograd.numpy as anp
@@ -80,9 +81,6 @@ class Problem:
         self._pareto_set = None
         self._ideal_point, self._nadir_point = None, None
 
-        # calculate the boundary points
-        self.pareto_front(exception_if_failing=False)
-
         # actually defines what _evaluate is setting during the evaluation
         if evaluation_of == "auto":
             # by default F is set, and G if the problem does have constraints
@@ -101,7 +99,6 @@ class Problem:
         # store the callback if defined
         self.callback = callback
 
-    # return the maximum objective values of the pareto front
     def nadir_point(self):
         """
         Returns
@@ -111,9 +108,19 @@ class Problem:
             If single-objective, it returns the best possible solution which is equal to the ideal point.
 
         """
+        # if the ideal point has not been calculated yet
+        if self._nadir_point is None:
+
+            # calculate the pareto front if not happened yet
+            if self._pareto_front is None:
+                self.pareto_front()
+
+            # if already done or it was successful - calculate the ideal point
+            if self._pareto_front is not None:
+                self._ideal_point = np.max(self._pareto_front, axis=0)
+
         return self._nadir_point
 
-    # return the minimum values of the pareto front
     def ideal_point(self):
         """
         Returns
@@ -122,6 +129,18 @@ class Problem:
             The ideal point for a multi-objective problem. If single-objective
             it returns the best possible solution.
         """
+
+        # if the ideal point has not been calculated yet
+        if self._ideal_point is None:
+
+            # calculate the pareto front if not happened yet
+            if self._pareto_front is None:
+                self.pareto_front()
+
+            # if already done or it was successful - calculate the ideal point
+            if self._pareto_front is not None:
+                self._ideal_point = np.min(self._pareto_front, axis=0)
+
         return self._ideal_point
 
     def pareto_front(self, *args, use_cache=True, exception_if_failing=True, **kwargs):
@@ -149,10 +168,6 @@ class Problem:
                 pf = self._calc_pareto_front(*args, **kwargs)
                 if pf is not None:
                     self._pareto_front = at_least_2d_array(pf)
-                    self._ideal_point = np.min(self._pareto_front, axis=0)
-                    self._nadir_point = np.max(self._pareto_front, axis=0)
-                else:
-                    self._pareto_front, self._ideal_point, self._nadir_point = None, None, None
 
             except Exception as e:
                 if exception_if_failing:
@@ -352,7 +367,7 @@ class Problem:
             else:
                 n_threads = _params[0]
 
-            with multiprocessing.Pool(n_threads) as pool:
+            with ThreadPool(n_threads) as pool:
                 params = []
                 for k in range(len(X)):
                     params.append([X[k], calc_gradient, self._evaluate, args, kwargs])

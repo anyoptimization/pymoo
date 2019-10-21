@@ -3,6 +3,7 @@ import numpy as np
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
+from pymoo.model.termination import SingleObjectiveToleranceBasedTermination
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
@@ -67,6 +68,7 @@ class GA(GeneticAlgorithm):
                          **kwargs)
 
         self.func_display_attrs = disp_single_objective
+        self.default_termination = SingleObjectiveToleranceBasedTermination()
 
 
 class FitnessSurvival(Survival):
@@ -83,14 +85,4 @@ class FitnessSurvival(Survival):
         return pop[np.argsort(F[:, 0])[:n_survive]]
 
 
-# =========================================================================================================
-# Interface
-# =========================================================================================================
-
-
-def ga(*args, **kwargs):
-    return GA(*args, **kwargs)
-
-
 parse_doc_string(GA.__init__)
-
