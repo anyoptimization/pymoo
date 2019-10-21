@@ -4,12 +4,12 @@ Versions
 .. _version_0_3_2:
 * 0.3.2
 
-  - New Algorithm: Nealder Mead with box constraint handling in the design space
+  - New Algorithm: Nelder Mead with box constraint handling in the design space
   - New Performance indicator: Karush Kuhn Tucker Proximity Measure (KKTPM)
   - Added Tutorial: Equality constraint handling through customized repair
-  - Added Tutorial: Subset selection throuh GAs
+  - Added Tutorial: Subset selection through GAs
   - Added Tutorial: How to use custom variables 
-  - Bugfixes: No pf given for problem, no feasible solutions found
+  - Bugfix: No pf given for problem, no feasible solutions found
   
 .. _version_0_3_1:
 * 0.3.1 [`Documentation <https://www.egr.msu.edu/coinlab/blankjul/pymoo-0.3.1-doc.zip>`_]
