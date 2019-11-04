@@ -202,9 +202,14 @@ class SingleObjectiveToleranceBasedTermination(DesignSpaceToleranceTermination):
         return algorithm.pop.get("X"), F
 
     def _decide(self):
+
         # get the beginning and the end of the window
-        current = normalize(self.history[0][0], x_min=self.xl, x_max=self.xu)
-        last = normalize(self.history[-1][0], x_min=self.xl, x_max=self.xu)
+        current = self.history[0][0]
+        last = self.history[-1][0]
+
+        if self.xl is not None and self.xu is not None:
+            current = normalize(current, x_min=self.xl, x_max=self.xu)
+            last = normalize(last, x_min=self.xl, x_max=self.xu)
 
         # now analyze the change in X space always from the closest two solutions
         I = vectorized_cdist(current, last).argmin(axis=1)
