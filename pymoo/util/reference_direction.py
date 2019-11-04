@@ -31,7 +31,11 @@ class ReferenceDirectionFactory:
             return np.array([[1.0]])
         else:
 
-            ref_dirs = self._do()
+            val = self._do()
+            if isinstance(val, tuple):
+                ref_dirs, other = val[0], val[1:]
+            else:
+                ref_dirs = val
 
             if self.scaling is not None:
                 ref_dirs = scale_reference_directions(ref_dirs, self.scaling)
@@ -41,7 +45,7 @@ class ReferenceDirectionFactory:
                 I = np.lexsort([ref_dirs[:, j] for j in range(ref_dirs.shape[1])][::-1])
                 ref_dirs = ref_dirs[I]
 
-            return ref_dirs
+            return val
 
     def _do(self):
         return None
