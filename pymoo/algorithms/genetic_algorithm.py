@@ -105,7 +105,16 @@ class GeneticAlgorithm(Algorithm):
     def _next(self):
 
         # do the mating using the current population
-        self.off = self._mating(self.pop)
+        self.off = self._mating(self.pop, n_max_iterations=100)
+
+        # if the mating could not generate any new offspring (duplicate elimination might make that happen)
+        if len(self.off) == 0:
+            self.termination.force_termination = True
+            return
+        # if not the desired number of offspring could be created
+        elif len(self.off) < self.n_offsprings:
+            if self.verbose:
+                print("WARNING: Mating could not produce the required number of (unique) offsprings!")
 
         # evaluate the offspring
         self.evaluator.eval(self.problem, self.off, algorithm=self)
@@ -116,7 +125,7 @@ class GeneticAlgorithm(Algorithm):
         # the do survival selection
         self.pop = self.survival.do(self.problem, self.pop, self.pop_size, algorithm=self)
 
-    def _mating(self, pop):
+    def _mating(self, pop, n_max_iterations=100):
 
         # the population object to be used
         off = pop.new()
@@ -157,10 +166,8 @@ class GeneticAlgorithm(Algorithm):
             off = off.merge(_off)
             n_matings += 1
 
-            # if no new offsprings can be generated within 100 trails -> return the current result
-            if n_matings > 100:
-                print(
-                    "WARNING: Recombination could not produce new offsprings which are not already in the population!")
+            # if no new offsprings can be generated within a pre-specified number of generations
+            if n_matings > n_max_iterations:
                 break
 
         return off
