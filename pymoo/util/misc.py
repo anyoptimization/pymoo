@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import numpy as np
 import scipy
 import scipy.spatial
@@ -165,7 +167,6 @@ def all_combinations(A, B):
 
 
 def pop_from_sampling(problem, sampling, n_initial_samples, pop=None):
-
     # the population type can be different - (different type of individuals)
     if pop is None:
         pop = Population()
@@ -225,3 +226,7 @@ def distance_of_closest_points_to_others(X):
     np.fill_diagonal(D, np.inf)
     return D.argmin(axis=1), D.min(axis=1)
 
+
+def time_to_int(t):
+    td = datetime.strptime(t, '%H:%M:%S') - datetime(1900, 1, 1)
+    return td.total_seconds()

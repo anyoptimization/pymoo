@@ -65,11 +65,13 @@ def get_algorithm_options():
     from pymoo.algorithms.so_genetic_algorithm import GA
     from pymoo.algorithms.unsga3 import UNSGA3
     from pymoo.algorithms.so_nelder_mead import NelderMead
+    from pymoo.algorithms.so_cmaes import CMAES
 
     ALGORITHMS = [
         ("ga", GA),
         ("de", DE),
         ("nelder-mead", NelderMead),
+        ("cmaes", CMAES),
         ("nsga2", NSGA2),
         ("rnsga2", RNSGA2),
         ("nsga3", NSGA3),
@@ -167,11 +169,13 @@ def get_crossover(name, *args, d={}, **kwargs):
 # =========================================================================================================
 
 def get_mutation_options():
+    from pymoo.operators.mutation.no_mutation import NoMutation
     from pymoo.operators.mutation.bitflip_mutation import BinaryBitflipMutation
     from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
     from pymoo.operators.integer_from_float_operator import IntegerFromFloatMutation
 
     MUTATION = [
+        ("none", NoMutation, {}),
         ("real_pm", PolynomialMutation, dict(eta=20)),
         ("int_pm", IntegerFromFloatMutation, dict(clazz=PolynomialMutation, eta=20)),
         ("bin_bitflip", BinaryBitflipMutation)
@@ -190,12 +194,13 @@ def get_mutation(name, *args, d={}, **kwargs):
 
 def get_termination_options():
     from pymoo.model.termination import MaximumFunctionCallTermination, MaximumGenerationTermination, IGDTermination, \
-        DesignSpaceToleranceTermination, ObjectiveSpaceToleranceTermination
+        DesignSpaceToleranceTermination, ObjectiveSpaceToleranceTermination, TimeBasedTermination
 
     TERMINATION = [
         ("n_eval", MaximumFunctionCallTermination),
         ("(n_gen|n_iter)", MaximumGenerationTermination),
         ("igd", IGDTermination),
+        ("time", TimeBasedTermination),
         ("x_tol", DesignSpaceToleranceTermination),
         ("f_tol", ObjectiveSpaceToleranceTermination)
     ]
