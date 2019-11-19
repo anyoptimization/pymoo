@@ -69,7 +69,7 @@ class Population(np.ndarray):
 
         return self
 
-    def get(self, *args):
+    def get(self, *args, to_numpy=True):
 
         val = {}
         for c in args:
@@ -84,7 +84,9 @@ class Population(np.ndarray):
                 elif c in self[i].data:
                     val[c].append(self[i].data[c])
 
-        res = [np.array(val[c]) for c in args]
+        res = [val[c] for c in args]
+        if to_numpy:
+            res = [np.array(e) for e in res]
 
         if len(args) == 1:
             return res[0]

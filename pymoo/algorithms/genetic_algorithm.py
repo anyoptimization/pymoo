@@ -73,6 +73,9 @@ class GeneticAlgorithm(Algorithm):
         self.pop = None
         self.off = None
 
+        # this can be used to store additional data in submodules e.g. survival, recombination and so on
+        self.data = {}
+
     def _initialize(self):
         # ! get the initial population - different ways are possible
 
