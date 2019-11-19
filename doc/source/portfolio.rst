@@ -41,7 +41,8 @@
                                 <b>Single-objective:</b>
                                 <a href="algorithms/genetic_algorithm.html">Genetic Algorithm</a>,
                                 <a href="algorithms/differential_evolution.html">Differential Evolution</a>,
-                                <a href="algorithms/nelder_mead.html">Nelder Mead</a><img class="new-flag" src="_static/img/new_flag.svg">
+                                <a href="algorithms/nelder_mead.html">Nelder Mead</a>,
+                                <a href="algorithms/cmaes.html">CMAES</a><img class="new-flag" src="_static/img/new_flag.svg">
                                 <br>
                                 <b>Multi-objective:</b>
                                 <a href="algorithms/nsga2.html">NSGA-II</a>,
@@ -197,9 +198,9 @@
                             <h4>Miscellaneous</h4>
                             <a href="misc/termination_criterion.html">Termination Criterion</a>, 
                             <a href="misc/reference_directions.html">Reference Directions</a>, 
-                            <a href="misc/constraint_handling.html">Constraint Handling</a><img class="new-flag" src="_static/img/new_flag.svg">,
-                            <a href="misc/callback.html">Callback</a><img class="new-flag" src="_static/img/new_flag.svg">,
-                            <a href="misc/results.html">Results</a><img class="new-flag" src="_static/img/new_flag.svg">
+                            <a href="misc/constraint_handling.html">Constraint Handling</a>,
+                            <a href="misc/callback.html">Callback</a>,
+                            <a href="misc/results.html">Results</a>
                     </div>
                 </div>
             </div>

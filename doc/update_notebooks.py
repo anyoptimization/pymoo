@@ -98,7 +98,7 @@ if __name__ == "__main__":
     STARTING_AT = None
     #STARTING_AT = "source/misc/results.ipynb"
 
-    # files = ['source/problems/zdt.ipynb','source/problems/single.ipynb']
+    files = ['source/misc/termination_criterion.ipynb']
 
     for fname in files:
 

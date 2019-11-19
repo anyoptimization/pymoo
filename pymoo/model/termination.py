@@ -1,5 +1,7 @@
+import time
+
 import numpy as np
-from pymoo.util.misc import vectorized_cdist
+from pymoo.util.misc import vectorized_cdist, time_to_int
 
 from pymoo.performance_indicator.igd import IGD
 from pymoo.performance_indicator.igd_plus import IGDPlus
@@ -17,6 +19,12 @@ class Termination:
 
     def has_finished(self, D):
         return not self.do_continue(D)
+
+
+class NoTermination(Termination):
+
+    def do_continue(self, D):
+        return (not self.force_termination) and True
 
 
 class MaximumFunctionCallTermination(Termination):
@@ -37,6 +45,28 @@ class MaximumGenerationTermination(Termination):
 
     def _do_continue(self, algorithm):
         return algorithm.n_gen < self.n_max_gen
+
+
+class TimeBasedTermination(Termination):
+
+    def __init__(self, max_time) -> None:
+        super().__init__()
+        self.start = None
+        self.now = None
+
+        if isinstance(max_time, str):
+            self.max_time = time_to_int(max_time)
+        elif isinstance(max_time, int) or isinstance(max_time, float):
+            self.max_time = max_time
+        else:
+            raise Exception("Either provide the time as a string or an integer.")
+
+    def do_continue(self, D):
+        if self.start is None:
+            self.start = time.time()
+
+        self.now = time.time()
+        return self.now - self.start < self.max_time
 
 
 class ToleranceBasedTermination(Termination):

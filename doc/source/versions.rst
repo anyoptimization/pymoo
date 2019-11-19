@@ -1,6 +1,14 @@
 Versions
 ==============================================================================
 
+
+.. _version_0_3_3:
+* 0.3.3
+
+  - New Algorithm: CMAES (by making use of the implementation published by the author)
+  - New Termination Criterion: Stop an algorithm based on time 
+
+
 .. _version_0_3_2:
 * 0.3.2
 

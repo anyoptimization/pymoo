@@ -131,7 +131,8 @@ class DE(GeneticAlgorithm):
         # replace the individuals in the population
         pop[is_better] = self.off[is_better]
 
-        return pop
+        # store the population in the algorithm object
+        self.pop = pop
 
 
 parse_doc_string(DE.__init__)
