@@ -1,6 +1,8 @@
 import numpy as np
 from operator import mul
 from functools import reduce
+
+
 from pymoo.model.problem import Problem
 from math import fabs, ceil, floor, sin, cos, pi
 
@@ -344,8 +346,8 @@ class WFG9(WFG):
             aux = _reduction_weighted_sum(copy_ind[:, i + 1:], [1.0] * (self.n_var - i - 1))
             ind[:, i] = _transformation_param_dependent(ind[:, i], aux)
 
-        a = [_transformation_shift_deceptive(ind[:, i]) for i in range(self.k)]
-        b = [_transformation_shift_multi_modal(ind[:, i], 5.0, 10.0, 0.35) for i in range(self.k, self.n_var)]
+        a = [_transformation_shift_deceptive(ind[:, i], 0.35, 0.001, 0.05) for i in range(self.k)]
+        b = [_transformation_shift_multi_modal(ind[:, i], 30.0, 95.0, 0.35) for i in range(self.k, self.n_var)]
         ind = np.array(a + b).T
 
         # set of last transition values
