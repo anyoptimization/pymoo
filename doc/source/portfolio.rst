@@ -199,8 +199,9 @@
                             <a href="misc/termination_criterion.html">Termination Criterion</a>, 
                             <a href="misc/reference_directions.html">Reference Directions</a>, 
                             <a href="misc/constraint_handling.html">Constraint Handling</a>,
-                            <a href="misc/callback.html">Callback</a>,
-                            <a href="misc/results.html">Results</a>
+                            <a href="misc/results.html">Results</a>,
+                            <a href="misc/callback.html">Callback</a><img class="new-flag" src="_static/img/new_flag.svg">,
+                            <a href="misc/display.html">Display</a><img class="new-flag" src="_static/img/new_flag.svg">
                     </div>
                 </div>
             </div>

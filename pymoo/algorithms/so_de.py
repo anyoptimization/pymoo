@@ -3,15 +3,14 @@ import numpy as np
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
 from pymoo.model.termination import SingleObjectiveToleranceBasedTermination
+from pymoo.operators.crossover.biased_crossover import BiasedCrossover
 from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
 from pymoo.operators.crossover.exponential_crossover import ExponentialCrossover
-from pymoo.operators.crossover.uniform_crossover import UniformCrossover
 from pymoo.operators.repair.bounds_back_repair import BoundsBackRepair
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
 from pymoo.operators.selection.random_selection import RandomSelection
-
-from pymoo.util.display import disp_single_objective
-from pymoo.util.misc import parameter_less, set_if_none
+from pymoo.util.display import SingleObjectiveDisplay
+from pymoo.util.misc import parameter_less
 
 
 # =========================================================================================================
@@ -28,6 +27,7 @@ class DE(GeneticAlgorithm):
                  F=0.3,
                  dither="vector",
                  jitter=False,
+                 display=SingleObjectiveDisplay(),
                  **kwargs
                  ):
 
@@ -68,7 +68,7 @@ class DE(GeneticAlgorithm):
         if self.var_mutation == "exp":
             mutation = ExponentialCrossover(CR)
         elif self.var_mutation == "bin":
-            mutation = UniformCrossover(CR)
+            mutation = BiasedCrossover(CR)
 
         super().__init__(pop_size=pop_size,
                          sampling=sampling,
@@ -76,10 +76,10 @@ class DE(GeneticAlgorithm):
                          crossover=DifferentialEvolutionCrossover(weight=F, dither=dither, jitter=jitter),
                          mutation=mutation,
                          survival=None,
+                         display=display,
                          **kwargs)
 
         self.default_termination = SingleObjectiveToleranceBasedTermination()
-        self.func_display_attrs = disp_single_objective
 
     def _next(self):
 

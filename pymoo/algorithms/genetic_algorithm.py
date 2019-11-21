@@ -1,9 +1,9 @@
 import math
 
 import numpy as np
-from scipy.spatial.distance import cdist
 
 from pymoo.model.algorithm import Algorithm
+from pymoo.model.duplicate import DefaultDuplicateElimination
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
 
@@ -18,7 +18,7 @@ class GeneticAlgorithm(Algorithm):
                  mutation,
                  survival,
                  n_offsprings=None,
-                 eliminate_duplicates=True,
+                 eliminate_duplicates=DefaultDuplicateElimination(),
                  repair=None,
                  individual=Individual(),
                  **kwargs
@@ -50,16 +50,14 @@ class GeneticAlgorithm(Algorithm):
         # number of offsprings to generate through recombination
         self.n_offsprings = n_offsprings
 
-        # a function that returns the indices of duplicates
+        # set the duplicate detection class - a boolean value chooses the default duplicate detection
         if isinstance(eliminate_duplicates, bool):
             if eliminate_duplicates:
-                self.eliminate_duplicates = default_is_duplicate
+                self.eliminate_duplicates = DefaultDuplicateElimination()
             else:
                 self.eliminate_duplicates = None
-        elif callable(eliminate_duplicates):
-            self.eliminate_duplicates = eliminate_duplicates
         else:
-            raise Exception("eliminate_duplicates can be either a function or bool for default elimination function.")
+            self.eliminate_duplicates = eliminate_duplicates
 
         # the object to be used to represent an individual - either individual or derived class
         self.individual = individual
@@ -155,9 +153,8 @@ class GeneticAlgorithm(Algorithm):
             if self.repair:
                 _off = self.repair.do(self.problem, _off, algorithm=self)
 
-            if self.eliminate_duplicates:
-                is_duplicate = self.eliminate_duplicates(_off, pop, off, algorithm=self)
-                _off = _off[np.logical_not(is_duplicate)]
+            if self.eliminate_duplicates is not None:
+                _off = self.eliminate_duplicates.do(_off, pop, off)
 
             # if more offsprings than necessary - truncate them randomly
             if len(off) + len(_off) > self.n_offsprings:
@@ -177,28 +174,3 @@ class GeneticAlgorithm(Algorithm):
 
     def _finalize(self):
         pass
-
-
-def default_is_duplicate(pop, *other, epsilon=1e-20, **kwargs):
-    if len(other) == 0:
-        return np.full(len(pop), False)
-
-    X = pop.get("X")
-
-    # value to finally return
-    is_duplicate = np.full(len(pop), False)
-
-    # check for duplicates in pop itself
-    D = cdist(X, X)
-    D[np.triu_indices(len(pop))] = np.inf
-    is_duplicate = np.logical_or(is_duplicate, np.any(D < epsilon, axis=1))
-
-    # check for duplicates to all others
-    _X = other[0].get("X")
-    for o in other[1:]:
-        if len(o) > 0:
-            _X = np.concatenate([_X, o.get("X")])
-
-    is_duplicate = np.logical_or(is_duplicate, np.any(cdist(X, _X) < epsilon, axis=1))
-
-    return is_duplicate

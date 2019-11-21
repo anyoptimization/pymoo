@@ -95,10 +95,10 @@ if __name__ == "__main__":
     # files = glob.glob('source/components/performance_indicator.ipynb')
     # files = glob.glob('source/components/termination_criterion.ipynb')
 
-    STARTING_AT = None
+    STARTING_AT = "source/algorithms/cmaes.ipynb"
     #STARTING_AT = "source/misc/results.ipynb"
 
-    files = ['source/misc/termination_criterion.ipynb']
+    #files = ['source/misc/custom_output.ipynb']
 
     for fname in files:
 

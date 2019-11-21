@@ -78,11 +78,7 @@ class Population(np.ndarray):
         for i in range(len(self)):
 
             for c in args:
-
-                if c in self[i].__dict__:
-                    val[c].append(self[i].__dict__[c])
-                elif c in self[i].data:
-                    val[c].append(self[i].data[c])
+                val[c].append(self[i].get(c))
 
         res = [val[c] for c in args]
         if to_numpy:

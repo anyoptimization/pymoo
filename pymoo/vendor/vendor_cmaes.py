@@ -23,230 +23,6 @@ def my_fmin(
          noise_kappa_exponent=0,  # TODO: add max kappa value as parameter
          bipop=False,
          callback=None):
-    """functional interface to the stochastic optimizer CMA-ES
-    for non-convex function minimization.
-
-    Calling Sequences
-    =================
-    ``fmin(objective_function, x0, sigma0)``
-        minimizes ``objective_function`` starting at ``x0`` and with
-        standard deviation ``sigma0`` (step-size)
-    ``fmin(objective_function, x0, sigma0, options={'ftarget': 1e-5})``
-        minimizes ``objective_function`` up to target function value 1e-5,
-        which is typically useful for benchmarking.
-    ``fmin(objective_function, x0, sigma0, args=('f',))``
-        minimizes ``objective_function`` called with an additional
-        argument ``'f'``.
-    ``fmin(objective_function, x0, sigma0, options={'ftarget':1e-5, 'popsize':40})``
-        uses additional options ``ftarget`` and ``popsize``
-    ``fmin(objective_function, esobj, None, options={'maxfevals': 1e5})``
-        uses the `CMAEvolutionStrategy` object instance ``esobj`` to
-        optimize ``objective_function``, similar to ``esobj.optimize()``.
-
-    Arguments
-    =========
-    ``objective_function``
-        called as ``objective_function(x, *args)`` to be minimized.
-        ``x`` is a one-dimensional `numpy.ndarray`. See also the
-        `parallel_objective` argument.
-        ``objective_function`` can return `numpy.NaN`, which is
-        interpreted as outright rejection of solution ``x`` and invokes
-        an immediate resampling and (re-)evaluation of a new solution
-        not counting as function evaluation. The attribute
-        ``variable_annotations`` is passed into the
-        ``CMADataLogger.persistent_communication_dict``.
-    ``x0``
-        list or `numpy.ndarray`, initial guess of minimum solution
-        before the application of the geno-phenotype transformation
-        according to the ``transformation`` option.  It can also be
-        a string holding a Python expression that is evaluated
-        to yield the initial guess - this is important in case
-        restarts are performed so that they start from different
-        places.  Otherwise ``x0`` can also be a `cma.CMAEvolutionStrategy`
-        object instance, in that case ``sigma0`` can be ``None``.
-    ``sigma0``
-        scalar, initial standard deviation in each coordinate.
-        ``sigma0`` should be about 1/4th of the search domain width
-        (where the optimum is to be expected). The variables in
-        ``objective_function`` should be scaled such that they
-        presumably have similar sensitivity.
-        See also `ScaleCoordinates`.
-    ``options``
-        a dictionary with additional options passed to the constructor
-        of class ``CMAEvolutionStrategy``, see ``cma.CMAOptions`` ()
-        for a list of available options.
-    ``args=()``
-        arguments to be used to call the ``objective_function``
-    ``gradf=None``
-        gradient of f, where ``len(gradf(x, *args)) == len(x)``.
-        ``gradf`` is called once in each iteration if
-        ``gradf is not None``.
-    ``restarts=0``
-        number of restarts with increasing population size, see also
-        parameter ``incpopsize``, implementing the IPOP-CMA-ES restart
-        strategy, see also parameter ``bipop``; to restart from
-        different points (recommended), pass ``x0`` as a string.
-    ``restart_from_best=False``
-        which point to restart from
-    ``incpopsize=2``
-        multiplier for increasing the population size ``popsize`` before
-        each restart
-    ``parallel_objective``
-        an objective function that accepts a list of `numpy.ndarray` as
-        input and returns a `list`, which is mostly used instead of
-        `objective_function`, but for the initial (also initial
-        elitist) and the final evaluations. If ``parallel_objective``
-        is given, the ``objective_function`` (first argument) may be
-        ``None``.
-    ``eval_initial_x=None``
-        evaluate initial solution, for ``None`` only with elitist option
-    ``noise_handler=None``
-        a ``NoiseHandler`` class or instance or ``None``. Example:
-        ``cma.fmin(f, 6 * [1], 1, noise_handler=cma.NoiseHandler(6))``
-        see ``help(cma.NoiseHandler)``.
-    ``noise_change_sigma_exponent=1``
-        exponent for the sigma increment provided by the noise handler for
-        additional noise treatment. 0 means no sigma change.
-    ``noise_evaluations_as_kappa=0``
-        instead of applying reevaluations, the "number of evaluations"
-        is (ab)used as scaling factor kappa (experimental).
-    ``bipop=False``
-        if `True`, run as BIPOP-CMA-ES; BIPOP is a special restart
-        strategy switching between two population sizings - small
-        (like the default CMA, but with more focused search) and
-        large (progressively increased as in IPOP). This makes the
-        algorithm perform well both on functions with many regularly
-        or irregularly arranged local optima (the latter by frequently
-        restarting with small populations).  For the `bipop` parameter
-        to actually take effect, also select non-zero number of
-        (IPOP) restarts; the recommended setting is ``restarts<=9``
-        and `x0` passed as a string using `numpy.rand` to generate
-        initial solutions. Note that small-population restarts
-        do not count into the total restart count.
-    ``callback=None``
-        `callable` or list of callables called at the end of each
-        iteration with the current `CMAEvolutionStrategy` instance
-        as argument.
-
-    Optional Arguments
-    ==================
-    All values in the `options` dictionary are evaluated if they are of
-    type `str`, besides `verb_filenameprefix`, see class `CMAOptions` for
-    details. The full list is available by calling ``cma.CMAOptions()``.
-
-    >>> import cma
-    >>> cma.CMAOptions()  #doctest: +ELLIPSIS
-    {...
-
-    Subsets of options can be displayed, for example like
-    ``cma.CMAOptions('tol')``, or ``cma.CMAOptions('bound')``,
-    see also class `CMAOptions`.
-
-    Return
-    ======
-    Return the list provided in `CMAEvolutionStrategy.result` appended
-    with termination conditions, an `OOOptimizer` and a `BaseDataLogger`::
-
-        res = es.result + (es.stop(), es, logger)
-
-    where
-        - ``res[0]`` (``xopt``) -- best evaluated solution
-        - ``res[1]`` (``fopt``) -- respective function value
-        - ``res[2]`` (``evalsopt``) -- respective number of function evaluations
-        - ``res[3]`` (``evals``) -- number of overall conducted objective function evaluations
-        - ``res[4]`` (``iterations``) -- number of overall conducted iterations
-        - ``res[5]`` (``xmean``) -- mean of the final sample distribution
-        - ``res[6]`` (``stds``) -- effective stds of the final sample distribution
-        - ``res[-3]`` (``stop``) -- termination condition(s) in a dictionary
-        - ``res[-2]`` (``cmaes``) -- class `CMAEvolutionStrategy` instance
-        - ``res[-1]`` (``logger``) -- class `CMADataLogger` instance
-
-    Details
-    =======
-    This function is an interface to the class `CMAEvolutionStrategy`. The
-    latter class should be used when full control over the iteration loop
-    of the optimizer is desired.
-
-    Examples
-    ========
-    The following example calls `fmin` optimizing the Rosenbrock function
-    in 10-D with initial solution 0.1 and initial step-size 0.5. The
-    options are specified for the usage with the `doctest` module.
-
-    >>> import cma
-    >>> # cma.CMAOptions()  # returns all possible options
-    >>> options = {'CMA_diagonal':100, 'seed':1234, 'verb_time':0}
-    >>>
-    >>> res = cma.fmin(cma.ff.rosen, [0.1] * 10, 0.3, options)  #doctest: +ELLIPSIS
-    (5_w,10)-aCMA-ES (mu_w=3.2,w_1=45%) in dimension 10 (seed=1234...)
-       Covariance matrix is diagonal for 100 iterations (1/ccov=26...
-    Iterat #Fevals   function value  axis ratio  sigma ...
-        1     10 ...
-    termination on tolfun=1e-11 ...
-    final/bestever f-value = ...
-    >>> assert res[1] < 1e-12  # f-value of best found solution
-    >>> assert res[2] < 8000  # evaluations
-
-    The above call is pretty much equivalent with the slightly more
-    verbose call::
-
-        res = cma.CMAEvolutionStrategy([0.1] * 10, 0.3,
-                    options=options).optimize(cma.ff.rosen).result
-
-    where `optimize` returns a `CMAEvolutionStrategy` instance. The
-    following example calls `fmin` optimizing the Rastrigin function
-    in 3-D with random initial solution in [-2,2], initial step-size 0.5
-    and the BIPOP restart strategy (that progressively increases population).
-    The options are specified for the usage with the `doctest` module.
-
-    >>> import cma
-    >>> # cma.CMAOptions()  # returns all possible options
-    >>> options = {'seed':12345, 'verb_time':0, 'ftarget': 1e-8}
-    >>>
-    >>> res = cma.fmin(cma.ff.rastrigin, '2. * np.random.rand(3) - 1', 0.5,
-    ...                options, restarts=9, bipop=True)  #doctest: +ELLIPSIS
-    (3_w,7)-aCMA-ES (mu_w=2.3,w_1=58%) in dimension 3 (seed=12345...
-
-    In either case, the method::
-
-        cma.plot();
-
-    (based on `matplotlib.pyplot`) produces a plot of the run and, if
-    necessary::
-
-        cma.s.figshow()
-
-    shows the plot in a window. Finally::
-
-        cma.s.figsave('myfirstrun')  # figsave from matplotlib.pyplot
-
-    will save the figure in a png.
-
-    We can use the gradient like
-
-    >>> import cma
-    >>> res = cma.fmin(cma.ff.rosen, np.zeros(10), 0.1,
-    ...             options = {'ftarget':1e-8,},
-    ...             gradf=cma.ff.grad_rosen,
-    ...         )  #doctest: +ELLIPSIS
-    (5_w,...
-    >>> assert cma.ff.rosen(res[0]) < 1e-8
-    >>> assert res[2] < 3600  # 1% are > 3300
-    >>> assert res[3] < 3600  # 1% are > 3300
-
-    If solution can only be comparatively ranked, either use
-    `CMAEvolutionStrategy` directly or the objective accepts a list
-    of solutions as input:
-
-    >>> def parallel_sphere(X): return [cma.ff.sphere(x) for x in X]
-    >>> x, es = cma.fmin2(None, 3 * [0], 0.1, {'verbose': -9},
-    ...                   parallel_objective=parallel_sphere)
-    >>> assert es.result[1] < 1e-9
-
-    :See also: `CMAEvolutionStrategy`, `OOOptimizer.optimize`, `plot`,
-        `CMAOptions`, `scipy.optimize.fmin`
-
-    """  # style guides say there should be the above empty line
 
     if 1 < 3:  # try: # pass on KeyboardInterrupt
 
@@ -345,7 +121,7 @@ def my_fmin(
                     x = es.gp.pheno(es.mean,
                                     into_bounds=es.boundary_handler.repair,
                                     archive=es.sent_solutions)
-                    es.f0 = yield es, x
+                    es.f0 = yield x
                     es.best.update([x], es.sent_solutions,
                                    [es.f0], 1)
                     es.countevals += 1
@@ -400,7 +176,7 @@ def my_fmin(
                         # use option check_point = [0]
                         if 0 * np.random.randn() >= 0:
                             X[0] = 0 + opts['vv'] * es.sigma**0 * np.random.randn(es.N)
-                            fit[0] = yield es, X[0]
+                            fit[0] = yield X[0]
                             # print fit[0]
                     if es.opts['verbose'] > 4:
                         if es.countiter > 1 and min(fit) > es.best.last.f:
@@ -441,7 +217,7 @@ def my_fmin(
                 mean_pheno = es.gp.pheno(es.mean,
                                          into_bounds=es.boundary_handler.repair,
                                          archive=es.sent_solutions)
-                fmean = yield es, mean_pheno
+                fmean = yield mean_pheno
                 es.countevals += 1
                 es.best.update([mean_pheno], es.sent_solutions, [fmean], es.countevals)
 
@@ -529,7 +305,7 @@ class MyCMAEvolutionStrategy(CMAEvolutionStrategy):
             xmean = self.mean  # might have changed in self.ask
         X = []
         if parallel_mode:
-            fit_first = yield self, X_first
+            fit_first = yield X_first
 
             # the rest is only book keeping and warnings spitting
             """
@@ -587,18 +363,18 @@ class MyCMAEvolutionStrategy(CMAEvolutionStrategy):
                     # self.more_to_write += [length_normalizer * 1e-3, length_normalizer * self.mahalanobis_norm(x - xmean) * 1e2]
 
                 if kappa == 1:
-                    f = yield self, x
+                    f = yield x
                 else:
-                    f = yield self, xmean + kappa * length_normalizer * (x - xmean)
+                    f = yield xmean + kappa * length_normalizer * (x - xmean)
 
                 if is_feasible(x, f) and evaluations > 1:
 
                     _f = []
                     for _i in range(int(evaluations - 1)):
                         if kappa == 1:
-                            __f = yield self, x
+                            __f = yield x
                         else:
-                            __f = yield self, xmean + kappa * length_normalizer * (x - xmean)
+                            __f = yield xmean + kappa * length_normalizer * (x - xmean)
 
                         _f.append(__f)
 
