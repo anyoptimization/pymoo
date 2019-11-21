@@ -13,7 +13,7 @@ from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinary
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
-from pymoo.util.display import disp_multi_objective
+from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.function_loader import load_function
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
@@ -50,6 +50,7 @@ class NSGA3(GeneticAlgorithm):
                  mutation=PolynomialMutation(eta=20, prob=None),
                  eliminate_duplicates=True,
                  n_offsprings=None,
+                 display=MultiObjectiveDisplay(),
                  **kwargs):
         """
 
@@ -90,9 +91,8 @@ class NSGA3(GeneticAlgorithm):
                          survival=survival,
                          eliminate_duplicates=eliminate_duplicates,
                          n_offsprings=n_offsprings,
+                         display=display,
                          **kwargs)
-
-        self.func_display_attrs = disp_multi_objective
 
     def _solve(self, problem):
 

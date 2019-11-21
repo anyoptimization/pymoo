@@ -1,17 +1,50 @@
 import numpy as np
 
 from pymoo.docs import parse_doc_string
-from pymoo.model.algorithm import Algorithm
+from pymoo.model.algorithm import Algorithm, filter_optimum
 from pymoo.model.population import Population
 from pymoo.model.termination import NoTermination, MaximumGenerationTermination, MaximumFunctionCallTermination
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
-from pymoo.util.display import disp_single_objective
+from pymoo.util.display import Display
 from pymoo.vendor.vendor_cmaes import my_fmin
 
 
 # =========================================================================================================
 # Implementation
 # =========================================================================================================
+
+
+class CMAESDisplay(Display):
+
+    def _do(self, problem, evaluator, algorithm):
+
+        if algorithm.es.gi_frame is None:
+            return
+
+        super()._do(problem, evaluator, algorithm)
+
+        fmin = algorithm.es.gi_frame.f_locals
+        cma = fmin["es"]
+
+        self.output.append("fopt", algorithm.opt.F[0])
+
+        if fmin["restarts"] > 0:
+            self.output.append("run", int(fmin["irun"]) + 1, width=4)
+            self.output.append("fpop", algorithm.pop.get("F").min())
+            self.output.append("n_pop", cma.opts['popsize'], width=5)
+
+        self.output.append("sigma", cma.sigma)
+
+        val = cma.sigma_vec * cma.dC ** 0.5
+        self.output.append("min std", (cma.sigma * min(val)), width=8)
+        self.output.append("max std", (cma.sigma * max(val)), width=8)
+
+        axis = (cma.D.max() / cma.D.min()
+                if not cma.opts['CMA_diagonal'] or cma.countiter > cma.opts['CMA_diagonal']
+                else max(cma.sigma_vec * 1) / min(cma.sigma_vec * 1))
+        self.output.append("axis", axis, width=8)
+
+        cma.sigma
 
 
 class CMAES(Algorithm):
@@ -33,6 +66,7 @@ class CMAES(Algorithm):
                  bipop=False,
                  cmaes_verbose=-9,
                  verb_log=0,
+                 display=CMAESDisplay(),
                  **kwargs
                  ):
         """
@@ -269,7 +303,7 @@ class CMAES(Algorithm):
         updatecovwait : None 
             Number of iterations without distribution update, name is subject to future changes
 
-        verbose : 3  
+        cmaes_verbose : 3  
             Verbosity e.g. of initial/final message, -1 is very quiet, -9 maximally quiet, may not be fully implemented
               
         verb_append : 0  
@@ -300,9 +334,10 @@ class CMAES(Algorithm):
               for a list of available options.
 
         """
-        super().__init__(**kwargs)
+        super().__init__(display=display, **kwargs)
 
         self.es = None
+        self.cma = None
 
         self.x0 = x0
         self.sigma = sigma
@@ -325,8 +360,6 @@ class CMAES(Algorithm):
         )
 
         self.default_termination = NoTermination()
-        self.func_display_attrs = disp_single_objective
-
         self.send_array_to_yield = True
         self.parallelize = parallelize
 
@@ -370,7 +403,7 @@ class CMAES(Algorithm):
     def _next(self):
 
         if self.pop is None:
-            es, X = next(self.es)
+            X = next(self.es)
 
         else:
             F = self.pop.get("F")[:, 0].tolist()
@@ -378,7 +411,7 @@ class CMAES(Algorithm):
                 F = F[0]
 
             try:
-                es, X = self.es.send(F)
+                X = self.es.send(F)
             except StopIteration:
                 X = None
                 self.termination.force_termination = True
@@ -391,6 +424,11 @@ class CMAES(Algorithm):
             # evaluate the population
             self.pop = Population().new("X", X)
             self.evaluator.eval(self.problem, self.pop, algorithm=self)
+
+            val = self.pop
+            if self.opt is not None:
+                val = val.merge([self.opt])
+            self.opt = filter_optimum(val, least_infeasible=True)
 
             # set infeasible individual's objective values to np.nan - then CMAES can handle it
             for ind in self.pop:

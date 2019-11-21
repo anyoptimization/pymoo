@@ -22,5 +22,7 @@ class Individual:
     def get(self, key):
         if key in self.data:
             return self.data[key]
+        elif key in self.__dict__:
+            return self.__dict__[key]
         else:
             return None

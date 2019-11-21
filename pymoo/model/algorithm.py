@@ -3,6 +3,7 @@ from abc import abstractmethod
 
 import numpy as np
 
+from pymoo.model.callback import Callback
 from pymoo.model.evaluator import Evaluator
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
@@ -60,6 +61,7 @@ class Algorithm:
 
     def __init__(self,
                  callback=None,
+                 display=None,
                  termination=None,
                  return_least_infeasible=False,
                  **kwargs):
@@ -78,7 +80,7 @@ class Algorithm:
 
         # other attributes of the algorithm
         self.callback = callback
-        self.func_display_attrs = None
+        self.display = None
         self.return_least_infeasible = return_least_infeasible
 
         # !
@@ -109,6 +111,8 @@ class Algorithm:
         self.opt = None
         # whether the algorithm should print output in this run or not
         self.verbose = None
+        # set the display variable supplied to the algorithm
+        self.display = display
 
     # =========================================================================================================
     # PUBLIC
@@ -230,15 +234,15 @@ class Algorithm:
     def _each_iteration(self, D, first=False, **kwargs):
 
         # display the output if defined by the algorithm
-        if self.verbose and self.func_display_attrs is not None:
-            disp = self.func_display_attrs(self.problem, self.evaluator, self, self.pf)
-            if disp is not None:
-                self._display(disp, header=first)
+        if self.verbose and self.display is not None:
+            self.display.do(self.problem, self.evaluator, self, pf=self.pf)
 
         # if a callback function is provided it is called after each iteration
         if self.callback is not None:
-            # use the callback here without having the function itself
-            self.callback(self)
+            if isinstance(self.callback, Callback):
+                self.callback.notify(self)
+            else:
+                self.callback(self)
 
         if self.save_history:
             hist, _callback = self.history, self.callback
@@ -249,15 +253,6 @@ class Algorithm:
             self.callback = _callback
 
             self.history.append(obj)
-
-    # attributes are a list of tuples of length 3: (name, val, width)
-    def _display(self, disp, header=False):
-        regex = " | ".join(["{}"] * len(disp))
-        if header:
-            print("=" * 70)
-            print(regex.format(*[name.ljust(width) for name, _, width in disp]))
-            print("=" * 70)
-        print(regex.format(*[str(val).ljust(width) for _, val, width in disp]))
 
     def _finalize(self):
         pass

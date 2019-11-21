@@ -86,15 +86,7 @@ def norm_euclidean_distance(problem):
 
 
 def cdist(A, B, **kwargs):
-    if A.dtype != np.object:
-        return scipy.spatial.distance.cdist(A, B, **kwargs)
-    else:
-        D = np.full((A.shape[0], B.shape[1]), np.inf, dtype=np.float)
-        for i in range(A.shape[0]):
-            for j in range(i + 1, B.shape[1]):
-                d = A[i].distance_to(B[j])
-                D[i, j], D[j, i] = d, d
-        return D
+    return scipy.spatial.distance.cdist(A, B, **kwargs)
 
 
 def vectorized_cdist(A, B, func_dist=euclidean_distance, **kwargs):

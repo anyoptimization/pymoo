@@ -4,6 +4,7 @@ import numpy as np
 
 from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.model.crossover import Crossover
+from pymoo.model.duplicate import ElementwiseDuplicateElimination
 from pymoo.model.mutation import Mutation
 from pymoo.model.problem import Problem
 from pymoo.model.sampling import Sampling
@@ -90,31 +91,18 @@ class MyMutation(Mutation):
         return X
 
 
-def func_is_duplicate(pop, *other, epsilon=1e-20, **kwargs):
-    if len(other) == 0:
-        return np.full(len(pop), False)
+class MyDuplicateElimination(ElementwiseDuplicateElimination):
 
-    # value to finally return
-    is_duplicate = np.full(len(pop), False)
-
-    H = set()
-    for e in other:
-        for val in e:
-            H.add(val.X[0])
-
-    for i, (val,) in enumerate(pop.get("X")):
-        if val in H:
-            is_duplicate[i] = True
-        H.add(val)
-
-    return is_duplicate
+    def compare(self, a, b):
+        return a.X[0] == b.X[0]
 
 
 algorithm = NSGA2(pop_size=100,
                   sampling=MySampling(),
                   crossover=MyCrossover(),
                   mutation=MyMutation(),
-                  eliminate_duplicates=func_is_duplicate)
+                  eliminate_duplicates=MyDuplicateElimination()
+                  )
 
 res = minimize(MyProblem(),
                algorithm,
