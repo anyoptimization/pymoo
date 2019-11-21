@@ -5,10 +5,10 @@ from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
 from pymoo.factory import get_decomposition
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
+from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.misc import set_if_none
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
-from pymoo.util.display import disp_multi_objective
 
 
 # =========================================================================================================
@@ -22,6 +22,7 @@ class MOEAD(GeneticAlgorithm):
                  n_neighbors=20,
                  decomposition='auto',
                  prob_neighbor_mating=0.9,
+                 display=MultiObjectiveDisplay(),
                  **kwargs):
         """
 
@@ -53,9 +54,7 @@ class MOEAD(GeneticAlgorithm):
         set_if_none(kwargs, 'survival', None)
         set_if_none(kwargs, 'selection', None)
 
-        super().__init__(**kwargs)
-
-        self.func_display_attrs = disp_multi_objective
+        super().__init__(display=display, **kwargs)
 
         # initialized when problem is known
         self.ref_dirs = ref_dirs

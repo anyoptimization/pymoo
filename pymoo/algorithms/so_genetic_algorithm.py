@@ -8,12 +8,13 @@ from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinary
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
-from pymoo.util.display import disp_single_objective
+from pymoo.util.display import SingleObjectiveDisplay
 
 
 # =========================================================================================================
 # Implementation
 # =========================================================================================================
+
 
 def comp_by_cv_and_fitness(pop, P, **kwargs):
     S = np.full(P.shape[0], np.nan)
@@ -42,6 +43,7 @@ class GA(GeneticAlgorithm):
                  mutation=PolynomialMutation(prob=None, eta=5),
                  eliminate_duplicates=True,
                  n_offsprings=None,
+                 display=SingleObjectiveDisplay(),
                  **kwargs):
         """
 
@@ -65,9 +67,9 @@ class GA(GeneticAlgorithm):
                          survival=FitnessSurvival(),
                          eliminate_duplicates=eliminate_duplicates,
                          n_offsprings=n_offsprings,
+                         display=display,
                          **kwargs)
 
-        self.func_display_attrs = disp_single_objective
         self.default_termination = SingleObjectiveToleranceBasedTermination()
 
 

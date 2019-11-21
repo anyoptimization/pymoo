@@ -8,7 +8,7 @@ from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinary
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.operators.selection.tournament_selection import compare, TournamentSelection
-from pymoo.util.display import disp_multi_objective
+from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.dominator import Dominator
 from pymoo.util.misc import find_duplicates
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
@@ -75,6 +75,7 @@ class NSGA2(GeneticAlgorithm):
                  mutation=PolynomialMutation(prob=None, eta=20),
                  eliminate_duplicates=True,
                  n_offsprings=None,
+                 display=MultiObjectiveDisplay(),
                  **kwargs):
         """
 
@@ -99,10 +100,10 @@ class NSGA2(GeneticAlgorithm):
                          survival=RankAndCrowdingSurvival(),
                          eliminate_duplicates=eliminate_duplicates,
                          n_offsprings=n_offsprings,
+                         display=display,
                          **kwargs)
 
         self.tournament_type = 'comp_by_dom_and_crowding'
-        self.func_display_attrs = disp_multi_objective
 
 
 # ---------------------------------------------------------------------------------------------------------

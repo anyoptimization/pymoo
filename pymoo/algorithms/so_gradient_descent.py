@@ -4,14 +4,19 @@ from pymoo.model.algorithm import Algorithm
 from pymoo.model.population import Population
 from pymoo.model.termination import SingleObjectiveToleranceBasedTermination
 from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds
-from pymoo.util.display import disp_single_objective
+from pymoo.util.display import SingleObjectiveDisplay
 
 
 class GradientBasedAlgorithm(Algorithm):
 
-    def __init__(self, X, dX=None, objective=0, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.func_display_attrs = disp_single_objective
+    def __init__(self,
+                 X,
+                 dX=None,
+                 objective=0,
+                 display=SingleObjectiveDisplay(),
+                 **kwargs) -> None:
+        super().__init__(display=display, **kwargs)
+
         self.objective = objective
         self.n_restarts = 0
         self.default_termination = SingleObjectiveToleranceBasedTermination()

@@ -6,7 +6,7 @@ from pymoo.model.individual import Individual
 from pymoo.model.population import Population, pop_from_array_or_individual
 from pymoo.model.termination import Termination
 from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds
-from pymoo.util.display import disp_single_objective
+from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.misc import vectorized_cdist, evaluate_if_not_done_yet
 from pymoo.util.normalization import denormalize
 
@@ -119,6 +119,7 @@ class NelderMead(Algorithm):
                  func_params=adaptive_params,
                  n_max_local_restarts=0,
                  criterion_local_restart=NelderAndMeadTermination(xtol=1e-2, ftol=1e-2),
+                 display=SingleObjectiveDisplay(),
                  **kwargs):
         """
 
@@ -153,7 +154,7 @@ class NelderMead(Algorithm):
 
         """
 
-        super().__init__(**kwargs)
+        super().__init__(display=display, **kwargs)
 
         # the function to return the parameter
         self.func_params = func_params
@@ -168,7 +169,6 @@ class NelderMead(Algorithm):
         self.x0 = X
         self.opt = None
 
-        self.func_display_attrs = disp_single_objective
         self.default_termination = NelderAndMeadTermination(xtol=1e-6, ftol=1e-6, n_max_iter=1e6, n_max_evals=1e6)
 
         # everything needed for local restarts
