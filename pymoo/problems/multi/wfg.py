@@ -8,15 +8,13 @@ from math import fabs, ceil, floor, sin, cos, pi
 class WFG(Problem):
 
     def __init__(self, l, k, n_obj, **kwargs):
-        super().__init__(n_var=k+l, n_obj=n_obj, n_constr=0, xl=0, xu=1, type_var=np.double, **kwargs)
+        super().__init__(n_var=k + l, n_obj=n_obj, n_constr=0, xl=0, xu=1, type_var=np.double, **kwargs)
 
         self.l = l  # number of distance-related parameters
         self.k = k  # number of position-related parameters
 
         self.S = range(2, 2 * n_obj + 1, 2)  # scaling constants vector
-        self.A = [1.0] * (n_obj - 1)         # degeneracy constants vector
-
-
+        self.A = [1.0] * (n_obj - 1)  # degeneracy constants vector
 
     def validate_wfg_parameters(self, n_dist, n_pos, n_obj):
         if n_obj < 2:
@@ -27,7 +25,6 @@ class WFG(Problem):
             raise ValueError('Position parameter (k) must be greater or equal than 4.')
         if (n_pos + n_dist) < n_obj:
             raise ValueError('Sum of distance and position parameters must be greater than num. of objs. (k + l >= M).')
-
 
     def destep(self, vec):
         'Removes the [2, 4, 6,...] steps.'
@@ -44,8 +41,8 @@ class WFG(Problem):
     def estimate_vec_x(self, t, a):
         x = []
         ones = np.ones(t.shape)
-        for i in range(t.shape[1]-1):
-            x.append(np.max(np.row_stack([t[:, -1], ones[:, i]]), axis=0) * (t[:, i] - 0.5) + 0.5 )
+        for i in range(t.shape[1] - 1):
+            x.append(np.max(np.row_stack([t[:, -1], ones[:, i]]), axis=0) * (t[:, i] - 0.5) + 0.5)
         # x = [max(t[-1], a[i]) * (t[i] - 0.5) + 0.5 for i in range(len(t) - 1)]
         x.append(t[:, -1])
         x = np.vstack(x).T
@@ -62,16 +59,18 @@ class WFG1(WFG):
         #               [1.142805189379827, 1.7155562187004585, 3.4685478068068223, 1.6487858571160139, 8.1332125135732, 9.883066470401346, 9.148615474616461, 2.5636729043011144, 9.372048473518642, 6.555456232441863, 5.499926887100807, 22.86760581950188, 25.910481806025835, 1.2475787086121248, 25.80483111858873, 19.30209955098192, 12.974603521250007, 10.210255844641745, 25.648664191128326, 18.273246042332225, 28.806182389932978, 29.12123808230345, 6.116994656761789, 36.856215069311546]])
         ind = self.destep(x)
 
-
-        ind[:, list(range(self.k, self.n_var))] = _transformation_shift_linear(ind[:, list(range(self.k, self.n_var))], 0.35)
+        ind[:, list(range(self.k, self.n_var))] = _transformation_shift_linear(ind[:, list(range(self.k, self.n_var))],
+                                                                               0.35)
         # for i in range(self.k, self.n_var):
         #     test0[i] = _transformation_shift_linear(ind[i], 0.35)
 
-        ind[:, list(range(self.k, self.n_var))] = _transformation_bias_flat(ind[:, list(range(self.k, self.n_var))], 0.8, 0.75, 0.85)
+        ind[:, list(range(self.k, self.n_var))] = _transformation_bias_flat(ind[:, list(range(self.k, self.n_var))],
+                                                                            0.8, 0.75, 0.85)
         # for i in range(self.k, self.n_var):
         #     ind[i] = _transformation_bias_flat(ind[i], 0.8, 0.75, 0.85)
 
-        ind[:, list(range(self.n_var))] = np.nan_to_num(_transformation_bias_poly(ind[:, list(range(self.n_var))], 0.02))
+        ind[:, list(range(self.n_var))] = np.nan_to_num(
+            _transformation_bias_poly(ind[:, list(range(self.n_var))], 0.02))
         # for i in range(self.n_var):
         #     ind[i] = np.nan_to_num(_transformation_bias_poly(ind[i], 0.02))
 
@@ -108,8 +107,8 @@ class WFG2(WFG):
         ind_non_sep = self.k + self.l // 2
         ind_r_sum = ind_non_sep
 
-
-        ind[:, list(range(self.k, self.n_var))] = _transformation_shift_linear(ind[:, list(range(self.k, self.n_var))], 0.35)
+        ind[:, list(range(self.k, self.n_var))] = _transformation_shift_linear(ind[:, list(range(self.k, self.n_var))],
+                                                                               0.35)
         # for i in range(self.k, self.num_vars):
         #     ind[i] = _transformation_shift_linear(ind[i], 0.35)
 
@@ -151,6 +150,7 @@ class WFG2(WFG):
         if not n_dist % 2 == 0:
             raise ValueError('In WFG2/WFG3 the distance-related parameter (l) must be divisible by 2.')
         return True
+
 
 class WFG3(WFG):
 
@@ -203,7 +203,6 @@ class WFG3(WFG):
         # computation of shape vector
         # h = [_shape_linear(x[:-1], m + 1) for m in range(self.n_obj)]
 
-
         out["F"] = self.calculate_objectives(_x, self.S, h)
         # return self.calculate_objectives(x, self.S, h)
 
@@ -230,12 +229,11 @@ class WFG4(WFG):
         # t.append(_reduction_weighted_sum(ind[self.k:], [1.0] * (self.num_vars - self.k)))
         t = []
         for m in range(1, self.n_obj):
-            _y = ind[:, (m - 1) * gap : (m * gap)]
+            _y = ind[:, (m - 1) * gap: (m * gap)]
             _w = [1.0] * gap
             t.append(_reduction_weighted_sum(_y, _w))
         t.append(_reduction_weighted_sum(ind[:, self.k:], [1.0] * (self.n_var - self.k)))
         t = np.vstack(t).T
-
 
         # x = self.estimate_vec_x(t, self.A)
         _x = self.estimate_vec_x(t, self.A)
@@ -266,27 +264,114 @@ class WFG6(WFG):
 class WFG7(WFG):
 
     def _evaluate(self, x, out, *args, **kwargs):
-        out["F"] = np.random.random((len(x), self.n_obj))
+
+        ind = self.destep(x)
+        copy_ind = np.copy(ind)
+        ones = [1.0] * self.n_var
+
+        for i in range(self.k):
+            aux = _reduction_weighted_sum(copy_ind[:, i + 1:], ones[i + 1:])
+            ind[:, i] = _transformation_param_dependent(ind[:, i], aux)
+
+        for i in range(self.k, self.n_var):
+            ind[:, i] = _transformation_shift_linear(ind[:, i], 0.35)
+
+        # set of last transition values
+        gap = self.k // (self.n_obj - 1)
+
+        t = []
+        for m in range(1, self.n_obj):
+            _y = ind[:, (m - 1) * gap: (m * gap)]
+            _w = [1.0] * gap
+            t.append(_reduction_weighted_sum(_y, _w))
+        t.append(_reduction_weighted_sum(ind[:, self.k:], [1.0] * (self.n_var - self.k)))
+        t = np.vstack(t).T
+
+        x = self.estimate_vec_x(t, self.A)
+
+        # computation of shape vector
+        h = []
+        for m in range(self.n_obj):
+            h.append(_shape_concave(x[:, :-1], m + 1))
+        h = np.column_stack(h)
+
+        out["F"] = self.calculate_objectives(x, self.S, h)
 
 
 class WFG8(WFG):
 
     def _evaluate(self, x, out, *args, **kwargs):
-        out["F"] = np.random.random((len(x), self.n_obj))
+
+        ind = self.destep(x)
+        copy_ind = np.copy(ind)
+        ones = [1.0] * self.n_var
+
+        for i in range(self.k, self.n_var):
+            aux = _reduction_weighted_sum(copy_ind[:, :i], ones[:i])
+            ind[:, i] = _transformation_param_dependent(ind[:, i], aux)
+
+        for i in range(self.k, self.n_var):
+            ind[:, i] = _transformation_shift_linear(ind[:, i], 0.35)
+
+        # set of last transition values
+        gap = self.k // (self.n_obj - 1)
+
+        t = []
+        for m in range(1, self.n_obj):
+            _y = ind[:, (m - 1) * gap: (m * gap)]
+            _w = [1.0] * gap
+            t.append(_reduction_weighted_sum(_y, _w))
+        t.append(_reduction_weighted_sum(ind[:, self.k:], [1.0] * (self.n_var - self.k)))
+        t = np.vstack(t).T
+
+        x = self.estimate_vec_x(t, self.A)
+
+        h = []
+        for m in range(self.n_obj):
+            h.append(_shape_concave(x[:, :-1], m + 1))
+        h = np.column_stack(h)
+
+        out["F"] = self.calculate_objectives(x, self.S, h)
 
 
 class WFG9(WFG):
 
     def _evaluate(self, x, out, *args, **kwargs):
-        out["F"] = np.random.random((len(x), self.n_obj))
+        ind = self.destep(x)
+        copy_ind = np.copy(ind)
 
+        for i in range(0, self.n_var - 1):
+            aux = _reduction_weighted_sum(copy_ind[:, i + 1:], [1.0] * (self.n_var - i - 1))
+            ind[:, i] = _transformation_param_dependent(ind[:, i], aux)
 
+        a = [_transformation_shift_deceptive(ind[:, i]) for i in range(self.k)]
+        b = [_transformation_shift_multi_modal(ind[:, i], 5.0, 10.0, 0.35) for i in range(self.k, self.n_var)]
+        ind = np.array(a + b).T
 
+        # set of last transition values
+        gap = self.k // (self.n_obj - 1)
+
+        t = []
+        for m in range(1, self.n_obj):
+            _y = ind[:, (m - 1) * gap: (m * gap)]
+            t.append(_reduction_non_sep(_y.T, gap))
+        t.append(_reduction_non_sep(ind[:, self.k:].T, self.l))
+        t = np.vstack(t).T
+
+        x = self.estimate_vec_x(t, self.A)
+
+        h = []
+        for m in range(self.n_obj):
+            h.append(_shape_concave(x[:, :-1], m + 1))
+        h = np.column_stack(h)
+
+        out["F"] = self.calculate_objectives(x, self.S, h)
 
 
 def _transformation_shift_linear(value, shift=0.35):
     'Linear shift transformation.'
     return np.fabs(value - shift) / np.fabs(np.floor(shift - value) + shift)
+
 
 def _transformation_shift_deceptive(y, A=0.35, B=0.005, C=0.05):
     'Shift: Parameter Deceptive Transformation.'
@@ -294,11 +379,13 @@ def _transformation_shift_deceptive(y, A=0.35, B=0.005, C=0.05):
     tmp2 = np.floor(A + B - y) * (1.0 - C + (1.0 - A - B) / B) / (1.0 - A - B)
     return 1.0 + (np.fabs(y - A) - B) * (tmp1 + tmp2 + 1.0 / B)
 
+
 def _transformation_shift_multi_modal(y, A, B, C):
     'Shift: Parameter Multi-Modal Transformation.'
     tmp1 = np.fabs(y - C) / (2.0 * (np.floor(C - y) + C))
     tmp2 = (4.0 * A + 2.0) * np.pi * (0.5 - tmp1)
     return (1.0 + np.cos(tmp2) + 4.0 * B * np.power(tmp1, 2.0)) / (B + 2.0)
+
 
 def _transformation_bias_flat(value, a, b, c):
     'Flat bias region transformation.'
@@ -309,16 +396,19 @@ def _transformation_bias_flat(value, a, b, c):
     # tmp2 = min(0.0, np.floor(c - value)) * ((1.0 - a) * (value - c) / (1.0 - c))
     return a + tmp1 - tmp2
 
+
 def _transformation_bias_poly(y, alpha):
     'Polynomial bias transformation.'
     aux = np.power(y, alpha)
     # aux = y ** alpha
     return aux
 
-def _transformation_param_dependent(y, y_deg, A=0.98/49.98, B=0.02, C=50.0):
+
+def _transformation_param_dependent(y, y_deg, A=0.98 / 49.98, B=0.02, C=50.0):
     'Parameter dependent bias transformation.'
     aux = A - (1.0 - 2.0 * y_deg) * np.fabs(np.floor(0.5 - y_deg) + A)
     return pow(y, B + (C - B) * aux)
+
 
 def _transformation_param_deceptive(y, A=0.35, B=0.001, C=0.05):
     'Shift: Parameter Deceptive Transformation.'
@@ -326,9 +416,11 @@ def _transformation_param_deceptive(y, A=0.35, B=0.001, C=0.05):
     tmp2 = np.floor(A + B - y) * (1.0 - C + (1.0 - A - B) / B) / (1.0 - A - B)
     return 1.0 + (np.fabs(y - A) - B) * (tmp1 + tmp2 + 1.0 / B)
 
+
 def _reduction_weighted_sum(y, w):
     'Weighted sum reduction transformation.'
     return np.dot(y, w) / sum(w)
+
 
 def _reduction_non_sep(y, A):
     'Non-Separable reduction transformation.'
@@ -340,6 +432,7 @@ def _reduction_non_sep(y, A):
     tmp = np.ceil(A / 2.0)
     denominator = len(y) * tmp * (1.0 + 2.0 * A - 2 * tmp) / A
     return numerator / denominator
+
 
 def _shape_convex(x, m):
     'Convex Pareto front shape function.'
@@ -353,15 +446,18 @@ def _shape_convex(x, m):
         result = 1.0 - np.sin(0.5 * x[0] * np.pi)
     return result
 
+
 def _shape_mixed(x, A=5.0, alpha=1.0):
     'Convex/concave mixed Pareto front shape function.'
     aux = 2.0 * A * np.pi
     return np.array(pow(1.0 - x - (np.cos(aux * x + 0.5 * np.pi) / aux), alpha))[:, None]
 
+
 def _shape_disconnected(x, alpha=1.0, beta=1.0, A=5.0):
     'Disconnected Pareto front shape function.'
     aux = np.cos(A * np.pi * pow(x, beta))
     return 1.0 - pow(x, alpha) * pow(aux, 2)
+
 
 def _shape_linear(x, m):
     'Linear Pareto optimal front shape function.'
@@ -369,8 +465,8 @@ def _shape_linear(x, m):
         result = np.array(list(xi for xi in x[:, :x.shape[1]])) * 1.0
         # result = reduce(mul, (xi for xi in x[:len(x)]), 1.0)
     elif 1 < m <= x.shape[1]:
-    # elif 1 < m <= len(x):
-        result = np.array(list(xi for xi in x[:, :x.shape[1]-m+1])) * 1.0
+        # elif 1 < m <= len(x):
+        result = np.array(list(xi for xi in x[:, :x.shape[1] - m + 1])) * 1.0
         result *= (1.0 - x[x.shape[1] - m + 1])
         # result = reduce(mul, (xi for xi in x[:len(x) - m + 1]), 1.0)
         # result *= (1.0 - x[len(x) - m + 1])
@@ -378,6 +474,7 @@ def _shape_linear(x, m):
         result = 1.0 - x[:, 0]
         # result = 1.0 - x[0]
     return result
+
 
 def _shape_concave(x, m):
     'Concave Pareto optimal shape function.'
@@ -392,5 +489,3 @@ def _shape_concave(x, m):
     else:
         result = np.cos(0.5 * x[:, 0] * np.pi)
     return result
-
-
