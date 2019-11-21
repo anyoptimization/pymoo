@@ -252,13 +252,46 @@ class WFG4(WFG):
 class WFG5(WFG):
 
     def _evaluate(self, x, out, *args, **kwargs):
-        out["F"] = np.random.random((len(x), self.n_obj))
+        ind = self.destep(x)
+        ind = _transformation_param_deceptive(ind)
+
+        # set of last transition values
+        gap = self.k // (self.n_obj - 1)
+        t = [_reduction_weighted_sum(ind[:, (m - 1) * gap : (m * gap)], [1.0] * gap) for m in range(1, self.n_obj)]
+        t.append(_reduction_weighted_sum(ind[:, self.k:], [1.0] * (self.n_var - self.k)))
+        t = np.vstack(t).T
+
+        _x = self.estimate_vec_x(t, self.A)
+
+        # computation of shape vector
+        h = [_shape_concave(_x[:, :-1], m + 1) for m in range(self.n_obj)]
+        h = np.column_stack(h)
+
+        # return self.calculate_objectives(x, self.S, h)
+        out["F"] = self.calculate_objectives(_x, self.S, h)
 
 
 class WFG6(WFG):
 
     def _evaluate(self, x, out, *args, **kwargs):
-        out["F"] = np.random.random((len(x), self.n_obj))
+        ind = self.destep(x)
+
+        for i in range(self.k, self.n_var):
+            ind[:, i] = _transformation_shift_linear(ind[:, i], 0.35)
+
+        # set of last transition values
+        gap = self.k // (self.n_obj - 1)
+        t = [_reduction_non_sep(ind[:, (m - 1) * gap : (m * gap)].T, gap) for m in range(1, self.n_obj)]
+        t.append(_reduction_non_sep(ind[:, self.k:].T, self.l))
+        t = np.vstack(t).T
+
+        _x = self.estimate_vec_x(t, self.A)
+
+        # computation of shape vector
+        h = [_shape_concave(_x[:, :-1], m + 1) for m in range(self.n_obj)]
+        h = np.column_stack(h)
+
+        out["F"] = self.calculate_objectives(_x, self.S, h)
 
 
 class WFG7(WFG):
