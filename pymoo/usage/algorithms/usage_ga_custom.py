@@ -88,7 +88,7 @@ algorithm = GA(
 
 res = minimize(problem,
                algorithm,
-               ('n_gen', 60),
+               ('n_gen', 75),
                seed=1,
                verbose=True)
 

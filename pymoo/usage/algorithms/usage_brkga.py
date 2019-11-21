@@ -20,8 +20,8 @@ class MyProblem(Problem):
 
 class MyElementwiseDuplicateElimination(ElementwiseDuplicateElimination):
 
-    def compare(self, a, b):
-        super().compare(a, b)
+    def is_equal(self, a, b):
+        return np.all(a.get("pheno") == b.get("pheno"))
 
 
 np.random.seed(2)

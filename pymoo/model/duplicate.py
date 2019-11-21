@@ -25,7 +25,6 @@ class DuplicateElimination:
                 else:
                     pop = pop[~self._do(pop, None, np.full(len(pop), False))]
 
-
         if return_indices:
 
             H = {}
@@ -71,34 +70,39 @@ class DefaultDuplicateElimination(DuplicateElimination):
 
 class ElementwiseDuplicateElimination(DefaultDuplicateElimination):
 
-    def __init__(self, cmp=None, epsilon=1e-16, **kwargs) -> None:
+    def __init__(self, cmp_func=None, epsilon=1e-16, **kwargs) -> None:
         super().__init__(epsilon, **kwargs)
-        self.cmp = cmp
+        self.cmp = cmp_func
         if self.cmp is None:
-            self.cmp = lambda a, b: self.compare(a, b)
+            self.cmp = lambda a, b: self.is_equal(a, b)
 
-    def compare(self, a, b):
+    def is_equal(self, a, b):
         pass
 
-    def calc_dist(self, pop, other=None):
+    def _do(self, pop, other, is_duplicate):
+
+        def to_float(val):
+            if isinstance(val, bool) or isinstance(val, np.bool_):
+                return 0.0 if val else 1.0
+            else:
+                return val
+
         if other is None:
-            D = np.full((len(pop), len(pop)), np.inf)
             for i in range(len(pop)):
                 for j in range(i + 1, len(pop)):
-                    val = self.cmp(pop[i], pop[j])
-                    if isinstance(val, bool):
-                        val = 0.0 if val else 1.0
-                    D[i, j] = val
-            D = D.T
-
+                    val = to_float(self.cmp(pop[i], pop[j]))
+                    if val < self.epsilon:
+                        is_duplicate[i] = True
+                        break
         else:
-            D = np.full((len(pop), len(other)), np.inf)
             for i in range(len(pop)):
                 for j in range(len(other)):
-                    val = self.cmp(pop[i], other[j])
-                    D[i, j] = val
+                    val = to_float(self.cmp(pop[i], other[j]))
+                    if val < self.epsilon:
+                        is_duplicate[i] = True
+                        break
 
-        return D
+        return is_duplicate
 
 
 def to_hash(x):

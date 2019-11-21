@@ -93,7 +93,7 @@ class MyMutation(Mutation):
 
 class MyDuplicateElimination(ElementwiseDuplicateElimination):
 
-    def compare(self, a, b):
+    def is_equal(self, a, b):
         return a.X[0] == b.X[0]
 
 

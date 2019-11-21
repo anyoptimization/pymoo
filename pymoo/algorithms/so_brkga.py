@@ -3,7 +3,7 @@ import numpy as np
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.algorithms.so_genetic_algorithm import FitnessSurvival
 from pymoo.docs import parse_doc_string
-from pymoo.model.duplicate import ElementwiseDuplicateElimination, DefaultDuplicateElimination
+from pymoo.model.duplicate import ElementwiseDuplicateElimination, DefaultDuplicateElimination, DuplicateElimination
 from pymoo.model.selection import Selection
 from pymoo.model.survival import Survival
 from pymoo.model.termination import SingleObjectiveToleranceBasedTermination
@@ -20,22 +20,6 @@ from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 # =========================================================================================================
 
 
-class PhenotypeDuplicateElimination(ElementwiseDuplicateElimination):
-
-    def __init__(self, cmp=None, **kwargs) -> None:
-        super().__init__(cmp, **kwargs)
-
-    def compare(self, a, b):
-        pheno_a, pheno_b = a.get("pheno"), b.get("pheno")
-        if pheno_a is not None and pheno_b is not None:
-            eq = pheno_a == pheno_b
-            if isinstance(eq, np.ndarray):
-                eq = np.all(eq)
-            return 0.0 if eq else 1.0
-        else:
-            return 1.0
-
-
 class EliteSurvival(Survival):
 
     def __init__(self, n_elites, eliminate_duplicates=None) -> None:
@@ -48,10 +32,10 @@ class EliteSurvival(Survival):
         if isinstance(self.eliminate_duplicates, bool) and self.eliminate_duplicates:
             pop = DefaultDuplicateElimination(func=lambda p: p.get("F")).do(pop)
 
-        elif isinstance(self.eliminate_duplicates, PhenotypeDuplicateElimination):
+        elif isinstance(self.eliminate_duplicates, DuplicateElimination):
             _, _, candidates = DefaultDuplicateElimination(func=lambda pop: pop.get("F")).do(pop, return_indices=True)
             _, _, is_duplicate = self.eliminate_duplicates.do(pop[candidates], return_indices=True)
-            elim = candidates[is_duplicate]
+            elim = np.array(candidates)[is_duplicate]
             pop = pop[[k for k in range(len(pop)) if k not in elim]]
 
         if problem.n_obj == 1:
