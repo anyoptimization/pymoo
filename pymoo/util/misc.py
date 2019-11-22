@@ -1,4 +1,5 @@
 from datetime import datetime
+from itertools import combinations
 
 import numpy as np
 import scipy
@@ -222,3 +223,8 @@ def distance_of_closest_points_to_others(X):
 def time_to_int(t):
     td = datetime.strptime(t, '%H:%M:%S') - datetime(1900, 1, 1)
     return td.total_seconds()
+
+
+def powerset(iterable):
+    for n in range(len(iterable) + 1):
+        yield from combinations(iterable, n)
