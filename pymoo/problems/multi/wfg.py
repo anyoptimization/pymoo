@@ -4,17 +4,18 @@ from operator import mul
 import numpy as np
 
 from pymoo.model.problem import Problem
+from pymoo.util.misc import powerset
 
 
 class WFG(Problem):
 
     def __init__(self, n_var, n_obj, k=None, **kwargs):
-        super().__init__(n_var=n_var, 
-                         n_obj=n_obj, 
-                         n_constr=0, 
-                         xl=0, 
-                         xu=2 * np.arange(1, n_var+1),
-                         type_var=np.double, 
+        super().__init__(n_var=n_var,
+                         n_obj=n_obj,
+                         n_constr=0,
+                         xl=0,
+                         xu=2 * np.arange(1, n_var + 1),
+                         type_var=np.double,
                          **kwargs)
 
         if k:
@@ -25,18 +26,21 @@ class WFG(Problem):
             else:
                 self.k = 2 * (n_obj - 1)
 
-        self.l = n_var - k  # number of distance-related parameters
+        self.l = n_var - self.k  # number of distance-related parameters
+
+        self.validate_wfg_parameters(self.l, self.k, self.n_obj)
+
         self.S = range(2, 2 * n_obj + 1, 2)  # scaling constants vector
         self.A = [1.0] * (n_obj - 1)  # degeneracy constants vector
 
-    def validate_wfg_parameters(self, n_dist, n_pos, n_obj):
+    def validate_wfg_parameters(self, l, k, n_obj):
         if n_obj < 2:
             raise ValueError('WFG problems must have two or more objectives.')
-        if not n_pos % (n_obj - 1) == 0:
+        if not k % (n_obj - 1) == 0:
             raise ValueError('Position parameter (k) must be divisible by number of objectives minus one.')
-        if n_pos < 4:
+        if k < 4:
             raise ValueError('Position parameter (k) must be greater or equal than 4.')
-        if (n_pos + n_dist) < n_obj:
+        if (k + l) < n_obj:
             raise ValueError('Sum of distance and position parameters must be greater than num. of objs. (k + l >= M).')
 
     def destep(self, vec):
@@ -63,6 +67,28 @@ class WFG(Problem):
 
     def calculate_objectives(self, x, s, h):
         return np.vstack([x[:, -1] + s[i] * h[:, i] for i in range(len(s))]).T
+
+    def _rand_optimal_position(self, n):
+        return np.random.random((n, self.k))
+
+    def _positional_to_optimal(self, K):
+        suffix = np.full((len(K), self.l), 0.35)
+        X = np.column_stack([K, suffix])
+        return X * (2 * (np.arange(self.n_var) + 1))
+
+    def _calc_pareto_set(self, n_pareto_points=500, *args, **kwargs):
+        ps = np.ones((2 ** self.k, self.k))
+        for i, s in enumerate(powerset(np.arange(self.k))):
+            ps[i, s] = 0
+
+        rnd = self._rand_optimal_position(n_pareto_points - len(ps))
+        ps = np.row_stack([ps, rnd])
+        ps = self._positional_to_optimal(ps)
+        return ps
+
+    def _calc_pareto_front(self, *args, n_pareto_points=500, **kwargs):
+        ps = self.pareto_set(n_pareto_points=n_pareto_points)
+        return self.evaluate(ps, return_values_of=["F"])
 
 
 class WFG1(WFG):
@@ -109,6 +135,9 @@ class WFG1(WFG):
         h = np.column_stack(h)
         out["F"] = self.calculate_objectives(_x, self.S, h)
         # out["F"] = np.random.random((len(x), self.n_obj))
+
+    def _rand_optimal_position(self, n):
+        return np.power(np.random.random((n, self.k)), 50.0)
 
 
 class WFG2(WFG):
@@ -158,9 +187,9 @@ class WFG2(WFG):
         h = np.column_stack(h)
         out["F"] = self.calculate_objectives(_x, self.S, h)
 
-    def validate_wfg_parameters(self, n_dist, n_pos, n_obj):
-        super().validate_wfg_parameters(n_dist, n_pos, n_obj)
-        if not n_dist % 2 == 0:
+    def validate_wfg_parameters(self, l, k, n_obj):
+        super().validate_wfg_parameters(l, k, n_obj)
+        if not l % 2 == 0:
             raise ValueError('In WFG2/WFG3 the distance-related parameter (l) must be divisible by 2.')
         return True
 
@@ -219,9 +248,9 @@ class WFG3(WFG):
         out["F"] = self.calculate_objectives(_x, self.S, h)
         # return self.calculate_objectives(x, self.S, h)
 
-    def validate_wfg_parameters(self, n_dist, n_pos, n_obj):
-        super().validate_wfg_parameters(n_dist, n_pos, n_obj)
-        if not n_dist % 2 == 0:
+    def validate_wfg_parameters(self, l, k, n_obj):
+        super().validate_wfg_parameters(l, k, n_obj)
+        if not l % 2 == 0:
             raise ValueError('In WFG2/WFG3 the distance-related parameter (l) must be divisible by 2.')
         return True
 
@@ -346,6 +375,20 @@ class WFG8(WFG):
 
         out["F"] = self.calculate_objectives(x, self.S, h)
 
+    def _positional_to_optimal(self, K):
+        k, l = self.k, self.l
+
+        for i in range(k, k + l):
+            u = K.sum(axis=1) / K.shape[1]
+            tmp1 = np.abs(np.floor(0.5 - u) + 0.98 / 49.98)
+            tmp2 = 0.02 + 49.98 * (0.98 / 49.98 - (1.0 - 2.0 * u) * tmp1)
+            suffix = np.power(0.35, np.power(tmp2, -1.0))
+
+            K = np.column_stack([K, suffix[:, None]])
+
+        ret = K * (2 * (np.arange(self.n_var) + 1))
+        return ret
+
 
 class WFG9(WFG):
 
@@ -379,6 +422,21 @@ class WFG9(WFG):
         h = np.column_stack(h)
 
         out["F"] = self.calculate_objectives(x, self.S, h)
+
+    def _positional_to_optimal(self, K):
+        k, l = self.k, self.l
+
+        suffix = np.full((len(K), self.l), 0.0)
+        X = np.column_stack([K, suffix])
+        X[:, self.k + self.l - 1] = 0.35
+
+        for i in range(self.k + self.l - 2, self.k - 1, -1):
+            m = X[:, i + 1:k + l]
+            val = m.sum(axis=1) / m.shape[1]
+            X[:, i] = 0.35 ** ((0.02 + 1.96 * val) ** -1)
+
+        ret = X * (2 * (np.arange(self.n_var) + 1))
+        return ret
 
 
 def _transformation_shift_linear(value, shift=0.35):
