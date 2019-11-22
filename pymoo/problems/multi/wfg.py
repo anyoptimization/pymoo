@@ -1,6 +1,3 @@
-from functools import reduce
-from operator import mul
-
 import numpy as np
 
 from pymoo.model.problem import Problem
@@ -9,7 +6,7 @@ from pymoo.util.misc import powerset
 
 class WFG(Problem):
 
-    def __init__(self, n_var, n_obj, k=None, **kwargs):
+    def __init__(self, n_var, n_obj, k=None, l=None, **kwargs):
         super().__init__(n_var=n_var,
                          n_obj=n_obj,
                          n_constr=0,
@@ -26,7 +23,10 @@ class WFG(Problem):
             else:
                 self.k = 2 * (n_obj - 1)
 
-        self.l = n_var - self.k  # number of distance-related parameters
+        if l:
+            self.l = l
+        else:
+            self.l = n_var - self.k  # number of distance-related parameters
 
         self.validate_wfg_parameters(self.l, self.k, self.n_obj)
 
@@ -57,9 +57,9 @@ class WFG(Problem):
 
     def estimate_vec_x(self, t, a):
         x = []
-        ones = np.ones(t.shape)
         for i in range(t.shape[1] - 1):
-            x.append(np.max(np.row_stack([t[:, -1], ones[:, i]]), axis=0) * (t[:, i] - 0.5) + 0.5)
+            val = np.full(len(t), a[i])
+            x.append(np.max(np.column_stack([t[:, -1], val]), axis=1) * (t[:, i] - 0.5) + 0.5)
         # x = [max(t[-1], a[i]) * (t[i] - 0.5) + 0.5 for i in range(len(t) - 1)]
         x.append(t[:, -1])
         x = np.vstack(x).T
@@ -143,7 +143,6 @@ class WFG1(WFG):
 class WFG2(WFG):
 
     def _evaluate(self, x, out, *args, **kwargs):
-
         ind = self.destep(x)
 
         ind_non_sep = self.k + self.l // 2
@@ -171,6 +170,7 @@ class WFG2(WFG):
             _y = ind[:, (m - 1) * gap: (m * gap)]
             _w = [1.0] * gap
             t.append(_reduction_weighted_sum(_y, _w))
+
         t.append(_reduction_weighted_sum(ind[:, self.k:ind_r_sum], [1.0] * (ind_r_sum - self.k)))
         # t = [_reduction_weighted_sum(ind[(m - 1) * gap : (m * gap)], [1.0] * gap) for m in range(1, self.num_objs)]
         # t.append(_reduction_weighted_sum(ind[self.k:ind_r_sum], [1.0] * (ind_r_sum - self.k)))
@@ -208,20 +208,42 @@ class WFG3(WFG):
         ind_non_sep = self.k + self.l // 2
         ind_r_sum = ind_non_sep
 
-        _i = list(range(self.k, self.n_var))
-        ind[:, _i] = _transformation_shift_linear(ind[:, _i], 0.35)
+        for i in range(self.k, self.n_var):
+            ind[:, i] = _transformation_shift_linear(ind[:, i], 0.35)
+
         # for i in range(self.k, self.n_var):
         #     ind[i] = _transformation_shift_linear(ind[i], 0.35)
 
-        _i = list(range(self.k, ind_non_sep - 1))
-        head = lambda i: (2 * i) - self.k
-        tail = lambda i: head(i) + 1
-        if _i:
-            ind[:, _i] = _reduction_non_sep((ind[list(map(head, _i))], ind[list(map(tail, _i))]), 2)
+        # _i = list(range(self.k, ind_non_sep - 1))
+        # head = lambda i: (2 * i) - self.k
+        # tail = lambda i: head(i) + 1
+        # if _i:
+        #     ind[:, _i] = _reduction_non_sep((ind[list(map(head, _i))], ind[list(map(tail, _i))]), 2)
+        #
         # for i in range(self.k, ind_non_sep - 1):
         #     head = (2 * i) - self.k
         #     tail = head + 1
-        #     ind[i] = _reduction_non_sep((ind[head], ind[tail]), 2)
+        #     ind[:, i] = _reduction_non_sep((ind[:, head], ind[:, tail]), 2)
+
+        # cpy = ind.copy()
+        # i = self.k+1
+        # while i <= ind_non_sep:
+        #     head = self.k + 2 * (i - self.k) - 2
+        #     tail = self.k + 2 * (i - self.k)
+        #     ind[:, i] = _reduction_non_sep(cpy[:, head:tail], 2)
+        #     i += 1
+
+        prefix = ind[:, :self.k]
+
+        i = self.k+1
+        while i <= ind_non_sep:
+            head = self.k + 2 * (i - self.k) - 2
+            tail = self.k + 2 * (i - self.k)
+            reduct = _reduction_non_sep([ind[:, j] for j in range(head, tail)], 2)
+            prefix = np.column_stack([prefix, reduct])
+            i += 1
+
+        ind = prefix
 
         # set of last transition values
         gap = self.k // (self.n_obj - 1)
@@ -240,13 +262,13 @@ class WFG3(WFG):
 
         h = []
         for m in range(self.n_obj):
-            h.append(_shape_linear(_x[:, :-1], m + 1))
+            h.append(_shape_linear(_x, m + 1))
         h = np.column_stack(h)
         # computation of shape vector
         # h = [_shape_linear(x[:-1], m + 1) for m in range(self.n_obj)]
 
         out["F"] = self.calculate_objectives(_x, self.S, h)
-        # return self.calculate_objectives(x, self.S, h)
+
 
     def validate_wfg_parameters(self, l, k, n_obj):
         super().validate_wfg_parameters(l, k, n_obj)
@@ -538,16 +560,34 @@ def _reduction_non_sep(y, A):
     return numerator / denominator
 
 
+def _shape_concave(x, m):
+    n = x.shape[1]
+
+    'Concave Pareto optimal shape function.'
+    if m == 1:
+        # _result = reduce(mul, (np.sin(0.5 * xi * np.pi) for xi in x[:len(x)]), 1.0)
+        result = np.prod(np.sin(0.5 * x[:, :n] * np.pi), axis=1)
+
+    elif 1 < m <= n:
+        # result = reduce(mul, (np.sin(0.5 * xi * np.pi) for xi in x[:len(x) - m + 1]), 1.0)
+        result = np.prod(np.sin(0.5 * x[:, :n - m + 1] * np.pi), axis=1)
+        result *= np.cos(0.5 * x[:, n - m + 1] * np.pi)
+    else:
+        result = np.cos(0.5 * x[:, 0] * np.pi)
+    return result
+
+
 def _shape_convex(x, m):
+    n = x.shape[1]
+
     'Convex Pareto front shape function.'
     if m == 1:
-        result = np.array(list(1.0 - np.cos(0.5 * xi * np.pi) for xi in x[:, :x.shape[1]])) * 1.0
-        # result = reduce(mul, (1.0 - np.cos(0.5 * xi[:] * np.pi) for xi in x[:x.shape[1]]), 1.0)
-    elif 1 < m <= len(x):
-        result = reduce(mul, (1.0 - np.cos(0.5 * xi * np.pi) for xi in x[:len(x) - m + 1]), 1.0)
-        result *= 1.0 - np.sin(0.5 * x[len(x) - m + 1] * np.pi)
+        result = np.prod(1.0 - np.cos(0.5 * x[:, :n] * np.pi), axis=1)
+    elif 1 < m <= n:
+        result = np.prod(1.0 - np.cos(0.5 * x[:, :n - m + 1] * np.pi), axis=1)
+        result *= 1.0 - np.sin(0.5 * x[:, n - m + 1] * np.pi)
     else:
-        result = 1.0 - np.sin(0.5 * x[0] * np.pi)
+        result = 1.0 - np.sin(0.5 * x[:, 0] * np.pi)
     return result
 
 
@@ -564,32 +604,28 @@ def _shape_disconnected(x, alpha=1.0, beta=1.0, A=5.0):
 
 
 def _shape_linear(x, m):
+    M = x.shape[1]
+    ret = np.prod(x[:, :M-m], axis=1)
+    if m != 1:
+        ret *= 1 - x[:, M-m]
+    return ret
+
+
+def _shape_linea2r(x, m):
+    n = x.shape[1]
+
     'Linear Pareto optimal front shape function.'
     if m == 1:
-        result = np.array(list(xi for xi in x[:, :x.shape[1]])) * 1.0
+        result = np.prod(x, axis=1)
+        # result = np.array(list(xi for xi in x[:, :n])) * 1.0
         # result = reduce(mul, (xi for xi in x[:len(x)]), 1.0)
-    elif 1 < m <= x.shape[1]:
+    elif 1 < m <= n:
         # elif 1 < m <= len(x):
-        result = np.array(list(xi for xi in x[:, :x.shape[1] - m + 1])) * 1.0
-        result *= (1.0 - x[x.shape[1] - m + 1])
+        result = np.prod(x[:, :n - m + 1])
+        result *= (1.0 - x[:, n - m + 1])
         # result = reduce(mul, (xi for xi in x[:len(x) - m + 1]), 1.0)
         # result *= (1.0 - x[len(x) - m + 1])
     else:
         result = 1.0 - x[:, 0]
         # result = 1.0 - x[0]
-    return result
-
-
-def _shape_concave(x, m):
-    'Concave Pareto optimal shape function.'
-    if m == 1:
-        # _result = reduce(mul, (np.sin(0.5 * xi * np.pi) for xi in x[:len(x)]), 1.0)
-        result = np.prod(np.sin(0.5 * x[:, :x.shape[1]] * np.pi), axis=1)
-
-    elif 1 < m <= len(x):
-        # result = reduce(mul, (np.sin(0.5 * xi * np.pi) for xi in x[:len(x) - m + 1]), 1.0)
-        result = np.prod(np.sin(0.5 * x[:, :x.shape[1] - m + 1] * np.pi), axis=1)
-        result *= np.cos(0.5 * x[:, x.shape[1] - m + 1] * np.pi)
-    else:
-        result = np.cos(0.5 * x[:, 0] * np.pi)
     return result
