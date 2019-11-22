@@ -1,9 +1,10 @@
 import numpy as np
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
+from pymoo.algorithms.nsga2 import RankAndCrowdingSurvival
 from pymoo.algorithms.so_genetic_algorithm import FitnessSurvival
 from pymoo.docs import parse_doc_string
-from pymoo.model.duplicate import ElementwiseDuplicateElimination, DefaultDuplicateElimination, DuplicateElimination
+from pymoo.model.duplicate import DefaultDuplicateElimination, DuplicateElimination
 from pymoo.model.selection import Selection
 from pymoo.model.survival import Survival
 from pymoo.model.termination import SingleObjectiveToleranceBasedTermination
