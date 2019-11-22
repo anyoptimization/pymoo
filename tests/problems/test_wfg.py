@@ -2,12 +2,14 @@ import unittest
 
 import autograd.numpy as anp
 
-from pymoo.factory import get_problem
+from pymoo.factory import get_problem, WFG3
 import os
 
+import numpy as np
 
-def load(name):
-    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources")
+
+def load(name, n_obj):
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "WFG", "%sobj" % n_obj)
 
     X = anp.loadtxt(os.path.join(path, "%s.x" % name))
 
@@ -23,44 +25,46 @@ def load(name):
 
     return X, F, CV
 
-# Uncomment to check WFG problems
-problems = [
-    ('WFG1', [6, 2, 4]),
-    ('WFG2', [6, 2, 4]),
-    ('WFG3', [6, 2, 4]),
-    ('WFG4', [6, 2, 4]),
-    ('WFG5', [6, 2, 4]),
-    ('WFG6', [6, 2, 4]),
-    ('WFG7', [6, 2, 4]),
-    ('WFG8', [6, 2, 4]),
-    ('WFG9', [6, 2, 4])
-]
-
-
 
 class CorrectnessTest(unittest.TestCase):
 
     def test_problems(self):
-        for entry in problems:
-            name, params = entry
-            print("Testing: " + name)
 
-            X, F, CV = load(name)
+        for n_obj, n_var, k in [(2, 6, 4), (3, 6, 4), (10, 20, 18)]:
 
-            if F is None:
-                print("Warning: No correctness check for %s" % name)
-                continue
+            problems = [
+                get_problem("wfg1", n_var, n_obj, k),
+                get_problem("wfg2", n_var, n_obj, k),
+                get_problem("wfg3", n_var, n_obj, k),
+                get_problem("wfg4", n_var, n_obj, k),
+                get_problem("wfg5", n_var, n_obj, k),
+                get_problem("wfg6", n_var, n_obj, k),
+                get_problem("wfg7", n_var, n_obj, k),
+                get_problem("wfg8", n_var, n_obj, k),
+                get_problem("wfg9", n_var, n_obj, k)
+            ]
 
-            problem = get_problem(name, *params)
-            _F, _G, _CV = problem.evaluate(X, return_values_of=["F", "G", "CV"])
+            for problem in problems:
 
-            if problem.n_obj == 1:
-                F = F[:, None]
+                name = str(problem.__class__.__name__)
 
-            self.assertTrue(anp.all(anp.abs(_F - F) < 0.00001))
+                print("Testing: " + name + "-" + str(n_obj))
 
-            if problem.n_constr > 0:
-                self.assertTrue(anp.all(anp.abs(_CV[:, 0] - CV) < 0.0001))
+                X, F, CV = load(name, n_obj)
+
+                if F is None:
+                    print("Warning: No correctness check for %s" % name)
+                    continue
+
+                _F, _G, _CV = problem.evaluate(X, return_values_of=["F", "G", "CV"])
+
+                if problem.n_obj == 1:
+                    F = F[:, None]
+
+                self.assertTrue(anp.all(anp.abs(_F - F) < 0.00001))
+
+                if problem.n_constr > 0:
+                    self.assertTrue(anp.all(anp.abs(_CV[:, 0] - CV) < 0.0001))
 
 
 if __name__ == '__main__':
