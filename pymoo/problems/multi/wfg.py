@@ -1,20 +1,31 @@
-import numpy as np
-from operator import mul
 from functools import reduce
+from operator import mul
 
+import numpy as np
 
 from pymoo.model.problem import Problem
-from math import fabs, ceil, floor, sin, cos, pi
 
 
 class WFG(Problem):
 
-    def __init__(self, l, k, n_obj, **kwargs):
-        super().__init__(n_var=k + l, n_obj=n_obj, n_constr=0, xl=0, xu=1, type_var=np.double, **kwargs)
+    def __init__(self, n_var, n_obj, k=None, **kwargs):
+        super().__init__(n_var=n_var, 
+                         n_obj=n_obj, 
+                         n_constr=0, 
+                         xl=0, 
+                         xu=2 * np.arange(1, n_var+1),
+                         type_var=np.double, 
+                         **kwargs)
 
-        self.l = l  # number of distance-related parameters
-        self.k = k  # number of position-related parameters
+        if k:
+            self.k = k  # number of position-related parameters
+        else:
+            if n_obj == 2:
+                self.k = 4
+            else:
+                self.k = 2 * (n_obj - 1)
 
+        self.l = n_var - k  # number of distance-related parameters
         self.S = range(2, 2 * n_obj + 1, 2)  # scaling constants vector
         self.A = [1.0] * (n_obj - 1)  # degeneracy constants vector
 
