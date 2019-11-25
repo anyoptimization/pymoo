@@ -43,7 +43,7 @@ class WFG(Problem):
         if (k + l) < n_obj:
             raise ValueError('Sum of distance and position parameters must be greater than num. of objs. (k + l >= M).')
 
-    def destep(self, vec):
+    def denormalize(self, vec):
         'Removes the [2, 4, 6,...] steps.'
         return np.divide(vec, [2.0 * (i + 1) for i in range(vec.shape[1])])
         # return vec/[2.0 * (i + 1) for i in range(vec.shape[1])]
@@ -96,7 +96,7 @@ class WFG1(WFG):
     def _evaluate(self, x, out, *args, **kwargs):
         # x = np.array([[1.142805189379827, 1.7155562187004585, 3.4685478068068223, 1.6487858571160139, 8.1332125135732, 9.883066470401346, 9.148615474616461, 2.5636729043011144, 9.372048473518642, 6.555456232441863, 5.499926887100807, 22.86760581950188, 25.910481806025835, 1.2475787086121248, 25.80483111858873, 19.30209955098192, 12.974603521250007, 10.210255844641745, 25.648664191128326, 18.273246042332225, 28.806182389932978, 29.12123808230345, 6.116994656761789, 36.856215069311546],
         #               [1.142805189379827, 1.7155562187004585, 3.4685478068068223, 1.6487858571160139, 8.1332125135732, 9.883066470401346, 9.148615474616461, 2.5636729043011144, 9.372048473518642, 6.555456232441863, 5.499926887100807, 22.86760581950188, 25.910481806025835, 1.2475787086121248, 25.80483111858873, 19.30209955098192, 12.974603521250007, 10.210255844641745, 25.648664191128326, 18.273246042332225, 28.806182389932978, 29.12123808230345, 6.116994656761789, 36.856215069311546]])
-        ind = self.destep(x)
+        ind = self.denormalize(x)
 
         ind[:, list(range(self.k, self.n_var))] = _transformation_shift_linear(ind[:, list(range(self.k, self.n_var))],
                                                                                0.35)
@@ -143,7 +143,7 @@ class WFG1(WFG):
 class WFG2(WFG):
 
     def _evaluate(self, x, out, *args, **kwargs):
-        ind = self.destep(x)
+        ind = self.denormalize(x)
 
         ind_non_sep = self.k + self.l // 2
         ind_r_sum = ind_non_sep
@@ -197,41 +197,13 @@ class WFG2(WFG):
 class WFG3(WFG):
 
     def _evaluate(self, x, out, *args, **kwargs):
-        # ind = self.destep(individual)
-        ind = self.destep(x)
-
-        wfg3_a = [1.0] * (self.n_obj - 1)
-
-        if self.n_obj > 2:
-            wfg3_a[1:] = [0.0] * (self.n_obj - 2)
+        ind = self.denormalize(x)
 
         ind_non_sep = self.k + self.l // 2
         ind_r_sum = ind_non_sep
 
         for i in range(self.k, self.n_var):
             ind[:, i] = _transformation_shift_linear(ind[:, i], 0.35)
-
-        # for i in range(self.k, self.n_var):
-        #     ind[i] = _transformation_shift_linear(ind[i], 0.35)
-
-        # _i = list(range(self.k, ind_non_sep - 1))
-        # head = lambda i: (2 * i) - self.k
-        # tail = lambda i: head(i) + 1
-        # if _i:
-        #     ind[:, _i] = _reduction_non_sep((ind[list(map(head, _i))], ind[list(map(tail, _i))]), 2)
-        #
-        # for i in range(self.k, ind_non_sep - 1):
-        #     head = (2 * i) - self.k
-        #     tail = head + 1
-        #     ind[:, i] = _reduction_non_sep((ind[:, head], ind[:, tail]), 2)
-
-        # cpy = ind.copy()
-        # i = self.k+1
-        # while i <= ind_non_sep:
-        #     head = self.k + 2 * (i - self.k) - 2
-        #     tail = self.k + 2 * (i - self.k)
-        #     ind[:, i] = _reduction_non_sep(cpy[:, head:tail], 2)
-        #     i += 1
 
         prefix = ind[:, :self.k]
 
@@ -257,6 +229,11 @@ class WFG3(WFG):
         # t = [_reduction_weighted_sum(ind[(m - 1) * gap : (m * gap)], [1.0] * gap) for m in range(1, self.num_objs)]
         # t.append(_reduction_weighted_sum(ind[self.k:ind_r_sum], [1.0] * (ind_r_sum - self.k)))
 
+
+        wfg3_a = [1.0] * (self.n_obj - 1)
+        if self.n_obj > 2:
+            wfg3_a[1:] = [0.0] * (self.n_obj - 2)
+
         _x = self.estimate_vec_x(t, wfg3_a)
         # x = self.estimate_vec_x(t, wfg3_a)
 
@@ -281,7 +258,7 @@ class WFG4(WFG):
 
     def _evaluate(self, x, out, *args, **kwargs):
         # ind = self.destep(individual)
-        ind = self.destep(x)
+        ind = self.denormalize(x)
 
         # ind = [_transformation_shift_multi_modal(item, 30.0, 10.0, 0.35) for item in ind]#5.0, 10.0, 0.35
         ind = _transformation_shift_multi_modal(ind, 30.0, 10.0, 0.35)
@@ -316,7 +293,7 @@ class WFG4(WFG):
 class WFG5(WFG):
 
     def _evaluate(self, x, out, *args, **kwargs):
-        ind = self.destep(x)
+        ind = self.denormalize(x)
         ind = _transformation_param_deceptive(ind)
 
         # set of last transition values
@@ -338,7 +315,7 @@ class WFG5(WFG):
 class WFG6(WFG):
 
     def _evaluate(self, x, out, *args, **kwargs):
-        ind = self.destep(x)
+        ind = self.denormalize(x)
 
         for i in range(self.k, self.n_var):
             ind[:, i] = _transformation_shift_linear(ind[:, i], 0.35)
@@ -362,7 +339,7 @@ class WFG7(WFG):
 
     def _evaluate(self, x, out, *args, **kwargs):
 
-        ind = self.destep(x)
+        ind = self.denormalize(x)
         copy_ind = np.copy(ind)
         ones = [1.0] * self.n_var
 
@@ -399,7 +376,7 @@ class WFG8(WFG):
 
     def _evaluate(self, x, out, *args, **kwargs):
 
-        ind = self.destep(x)
+        ind = self.denormalize(x)
         copy_ind = np.copy(ind)
         ones = [1.0] * self.n_var
 
@@ -448,7 +425,7 @@ class WFG8(WFG):
 class WFG9(WFG):
 
     def _evaluate(self, x, out, *args, **kwargs):
-        ind = self.destep(x)
+        ind = self.denormalize(x)
         copy_ind = np.copy(ind)
 
         for i in range(0, self.n_var - 1):
