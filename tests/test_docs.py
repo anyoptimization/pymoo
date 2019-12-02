@@ -7,11 +7,11 @@ from nbconvert.preprocessors import CellExecutionError, ExecutePreprocessor
 
 from pymoo.configuration import get_pymoo
 
-OVERWRITE = True
+OVERWRITE = False
 
 STARTING_AT = None
 
-SKIP = []
+SKIP = ["parallelization.ipynb"]
 
 
 class DocumentationTest(unittest.TestCase):

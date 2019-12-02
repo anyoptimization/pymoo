@@ -10,19 +10,26 @@ class Individual:
         self.G = G
         self.feasible = feasible
         self.data = kwargs
+        self.attr = set(self.__dict__.keys())
+
+    def has(self, key):
+        return key in self.attr or key in self.data
 
     def set(self, key, value):
-        self.data[key] = value
+        if key in self.attr:
+            self.__dict__[key] = value
+        else:
+            self.data[key] = value
 
     def copy(self):
         ind = copy.copy(self)
         ind.data = self.data.copy()
         return ind
 
-    def get(self, key):
-        if key in self.data:
-            return self.data[key]
-        elif key in self.__dict__:
-            return self.__dict__[key]
+    def get(self, keys):
+        if keys in self.data:
+            return self.data[keys]
+        elif keys in self.attr:
+            return self.__dict__[keys]
         else:
             return None

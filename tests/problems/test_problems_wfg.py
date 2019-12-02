@@ -1,11 +1,9 @@
+import os
 import unittest
 
 import autograd.numpy as anp
 
-from pymoo.factory import get_problem, WFG3
-import os
-
-import numpy as np
+from pymoo.factory import get_problem, WFG1, WFG2, WFG3, WFG4, WFG5, WFG6, WFG7, WFG8, WFG9
 
 
 def load(name, n_obj):
@@ -24,6 +22,8 @@ def load(name, n_obj):
         return X, None, None
 
     return X, F, CV
+
+
 
 
 class CorrectnessTest(unittest.TestCase):
@@ -45,12 +45,13 @@ class CorrectnessTest(unittest.TestCase):
             ]
 
             for problem in problems:
-
                 name = str(problem.__class__.__name__)
-
                 print("Testing: " + name + "-" + str(n_obj))
 
                 X, F, CV = load(name, n_obj)
+
+                # other = from_optproblems(problem)
+                # F = np.row_stack([other.objective_function(x) for x in X])
 
                 if F is None:
                     print("Warning: No correctness check for %s" % name)
@@ -67,5 +68,39 @@ class CorrectnessTest(unittest.TestCase):
                     self.assertTrue(anp.all(anp.abs(_CV[:, 0] - CV) < 0.0001))
 
 
+
+def from_optproblems(wfg):
+    from optproblems.wfg import WFG1 as WFG1opt
+    from optproblems.wfg import WFG2 as WFG2opt
+    from optproblems.wfg import WFG3 as WFG3opt
+    from optproblems.wfg import WFG4 as WFG4opt
+    from optproblems.wfg import WFG5 as WFG5opt
+    from optproblems.wfg import WFG6 as WFG6opt
+    from optproblems.wfg import WFG7 as WFG7opt
+    from optproblems.wfg import WFG8 as WFG8opt
+    from optproblems.wfg import WFG9 as WFG9opt
+
+    if isinstance(wfg, WFG1):
+        return WFG1opt(wfg.n_obj, wfg.n_var, wfg.k)
+    elif isinstance(wfg, WFG2):
+        return WFG2opt(wfg.n_obj, wfg.n_var, wfg.k)
+    elif isinstance(wfg, WFG3):
+        return WFG3opt(wfg.n_obj, wfg.n_var, wfg.k)
+    elif isinstance(wfg, WFG4):
+        return WFG4opt(wfg.n_obj, wfg.n_var, wfg.k)
+    elif isinstance(wfg, WFG5):
+        return WFG5opt(wfg.n_obj, wfg.n_var, wfg.k)
+    elif isinstance(wfg, WFG6):
+        return WFG6opt(wfg.n_obj, wfg.n_var, wfg.k)
+    elif isinstance(wfg, WFG7):
+        return WFG7opt(wfg.n_obj, wfg.n_var, wfg.k)
+    elif isinstance(wfg, WFG8):
+        return WFG8opt(wfg.n_obj, wfg.n_var, wfg.k)
+    elif isinstance(wfg, WFG9):
+        return WFG9opt(wfg.n_obj, wfg.n_var, wfg.k)
+
+
 if __name__ == '__main__':
     unittest.main()
+
+
