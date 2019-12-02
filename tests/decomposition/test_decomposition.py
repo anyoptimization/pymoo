@@ -3,17 +3,12 @@ import unittest
 
 import numpy as np
 
-from pymoo.configuration import get_pymoo
 from pymoo.decomposition.perp_dist import PerpendicularDistance
 from pymoo.decomposition.weighted_sum import WeightedSum
-from tests.test_usage import test_usage
+from tests import path_to_test_resources
 
 
 class DecompositionTest(unittest.TestCase):
-
-    def test_decomposition(self):
-        folder = os.path.join(get_pymoo(), "pymoo", "usage", "decomposition")
-        test_usage([os.path.join(folder, fname) for fname in os.listdir(folder)])
 
     def test_one_to_one(self):
         F = np.random.random((2, 2))
@@ -53,11 +48,10 @@ class DecompositionTest(unittest.TestCase):
         weights = np.random.random((10, 3))
 
         D = PerpendicularDistance(_type="python").do(F, weights, _type="many_to_many")
-        self.assertTrue(np.all(np.abs(np.loadtxt("../resources/perp_dist") - D) < 1e-6))
+        np.testing.assert_allclose(D, np.loadtxt(path_to_test_resources("perp_dist")))
 
         D = PerpendicularDistance(_type="cython").do(F, weights, _type="many_to_many")
-        self.assertTrue(np.all(np.abs(np.loadtxt("../resources/perp_dist") - D) < 1e-6))
-
+        np.testing.assert_allclose(D, np.loadtxt(path_to_test_resources("perp_dist")))
 
 
 if __name__ == '__main__':

@@ -56,9 +56,9 @@ def mutation(mutation, X, xl=0, xu=1, type_var=np.double, **kwargs):
 
 def evaluate_to_nan(self, x, out, *args, **kwargs):
     n_points, _ = x.shape
-    out["F"] = np.full((n_points, self.n_obj), np.nan)
+    out["F"] = None
     if self.n_constr > 0:
-        out["G"] = np.full((n_points, self.n_constr), 0.0)
+        out["G"] = None
 
 
 def evaluate_to_value(F, G=None):

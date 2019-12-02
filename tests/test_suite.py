@@ -1,27 +1,29 @@
 import os
 import sys
 import unittest
+from pathlib import Path
+
+
+DISABLED = ['test_docs']
 
 if __name__ == "__main__":
 
     # add the path to be execute in the main directory
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-    testmodules = [
-        'tests.algorithms.test_nsga2',
-        'tests.algorithms.test_algorithms',
-        'tests.problems.test_problems',
-        'tests.operators.test_crossover',
-        'tests.performance_indicator.test_performance_indicator',
-        'tests.visualization.test_visualization',
-        'tests.problems.test_correctness',
-        'tests.termination_criterion.test_termination_criterion'
-    ]
-
     suite = unittest.TestSuite()
+    
+    for test in Path('.').rglob('test_*.py'):
 
-    for t in testmodules:
-        suite.addTest(unittest.defaultTestLoader.loadTestsFromName(t))
+        name = str(test)[:-3].replace('/', '.')
+
+        if name not in DISABLED:
+
+            print(name)
+
+            entry = unittest.defaultTestLoader.loadTestsFromName(name)
+            suite.addTest(entry)
+
 
     ret = unittest.TextTestRunner().run(suite)
 

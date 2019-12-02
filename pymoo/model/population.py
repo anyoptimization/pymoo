@@ -43,11 +43,11 @@ class Population(np.ndarray):
                 pop.set(*args)
             return pop
 
-    def collect(self, func, as_numpy_array=True):
+    def collect(self, func, to_numpy=True):
         val = []
         for i in range(len(self)):
             val.append(func(self[i]))
-        if as_numpy_array:
+        if to_numpy:
             val = np.array(val)
         return val
 
@@ -56,16 +56,14 @@ class Population(np.ndarray):
         for i in range(int(len(args) / 2)):
 
             key, values = args[i * 2], args[i * 2 + 1]
+            is_iterable = hasattr(values, '__len__')
 
-            if len(values) != len(self):
+            if is_iterable and len(values) != len(self):
                 raise Exception("Population Set Attribute Error: Number of values and population size do not match!")
 
-            for i in range(len(values)):
-
-                if key in self[i].__dict__:
-                    self[i].__dict__[key] = values[i]
-                else:
-                    self[i].data[key] = values[i]
+            for i in range(len(self)):
+                val = values[i] if is_iterable else values
+                self[i].set(key, val)
 
         return self
 

@@ -23,16 +23,17 @@ class DuplicateElimination:
                 elif len(arg) == 0:
                     continue
                 else:
-                    pop = pop[~self._do(pop, None, np.full(len(pop), False))]
+                    pop = pop[~self._do(pop, arg, np.full(len(pop), False))]
 
         if return_indices:
+            no_duplicate, is_duplicate = [], []
+            H = set(pop)
 
-            H = {}
-            for k, ind in enumerate(original):
-                H[ind] = k
-
-            no_duplicate = [H[ind] for ind in pop]
-            is_duplicate = [i for i in range(len(original)) if i not in no_duplicate]
+            for i, ind in enumerate(original):
+                if ind in H:
+                    no_duplicate.append(i)
+                else:
+                    is_duplicate.append(i)
 
             return pop, no_duplicate, is_duplicate
         else:
@@ -70,8 +71,8 @@ class DefaultDuplicateElimination(DuplicateElimination):
 
 class ElementwiseDuplicateElimination(DefaultDuplicateElimination):
 
-    def __init__(self, cmp_func=None, epsilon=1e-16, **kwargs) -> None:
-        super().__init__(epsilon, **kwargs)
+    def __init__(self, cmp_func=None, **kwargs) -> None:
+        super().__init__(**kwargs)
         self.cmp = cmp_func
         if self.cmp is None:
             self.cmp = lambda a, b: self.is_equal(a, b)

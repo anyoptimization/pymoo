@@ -82,6 +82,9 @@ class Display:
                     # see if you can get it and set the boolean for the future
                     self.pf = pareto_front_if_possible(problem)
                     self.pareto_front_is_available = self.pf is not None
+            else:
+                self.pf = pf
+                self.pareto_front_is_available = True
 
             self.output.clear()
 

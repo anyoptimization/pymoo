@@ -261,18 +261,18 @@ class Problem:
 
         # calculate the output array - either elementwise or not. also consider the gradient
         if self.elementwise_evaluation:
-            out = self._evaluate_elementwise(X, calc_gradient, *args, **kwargs)
+            out = self._evaluate_elementwise(X, calc_gradient, out, *args, **kwargs)
         else:
-            out = self._evaluate_batch(X, calc_gradient, *args, **kwargs)
+            out = self._evaluate_batch(X, calc_gradient, out, *args, **kwargs)
 
-        calc_gradient_of = [key for key, val in out.items()
-                            if "d" + key in return_values_of and
-                            out.get("d" + key) is None and
-                            (type(val) == autograd.numpy.numpy_boxes.ArrayBox)]
+            calc_gradient_of = [key for key, val in out.items()
+                                if "d" + key in return_values_of and
+                                out.get("d" + key) is None and
+                                (type(val) == autograd.numpy.numpy_boxes.ArrayBox)]
 
-        if len(calc_gradient_of) > 0:
-            deriv = self._calc_gradient(out, calc_gradient_of)
-            out = {**out, **deriv}
+            if len(calc_gradient_of) > 0:
+                deriv = self._calc_gradient(out, calc_gradient_of)
+                out = {**out, **deriv}
 
         # convert back to conventional numpy arrays - no array box as return type
         for key in out.keys():
@@ -327,8 +327,7 @@ class Problem:
 
         return deriv
 
-    def _evaluate_batch(self, X, calc_gradient, *args, **kwargs):
-        out = {}
+    def _evaluate_batch(self, X, calc_gradient, out, *args, **kwargs):
         if calc_gradient:
             out["__autograd__"], _ = run_and_trace(self._evaluate, X, *[out])
         else:
@@ -337,13 +336,14 @@ class Problem:
 
         return out
 
-    def _evaluate_elementwise(self, X, calc_gradient, *args, **kwargs):
+    def _evaluate_elementwise(self, X, calc_gradient, out, *args, **kwargs):
         ret = []
 
         def func(_x):
             _out = {}
             if calc_gradient:
-                _out["dF"], _ = run_and_trace(self._evaluate, _x, *[_out])
+                grad, _ = run_and_trace(self._evaluate, _x, *[_out])
+                _out["__autograd__"] = grad
             else:
                 self._evaluate(_x, _out, *args, **kwargs)
             return _out
@@ -392,7 +392,6 @@ class Problem:
             raise Exception("Unknown parallelization method: %s (None, threads, dask)" % self.parallelization)
 
         # stack all the single outputs together
-        out = {}
         for key in ret[0].keys():
             out[key] = anp.row_stack([ret[i][key] for i in range(len(ret))])
 
