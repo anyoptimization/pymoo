@@ -12,7 +12,7 @@ algorithm = Adam(X)
 
 res = minimize(problem,
                algorithm,
-               ("n_evals", 1000),
+               ("n_evals", 100),
                seed=2,
                verbose=True)
 

@@ -1,13 +1,13 @@
 import numpy as np
-from pymoo.docs import parse_doc_string
 
+from pymoo.docs import parse_doc_string
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population, pop_from_array_or_individual
 from pymoo.model.termination import Termination
 from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds
 from pymoo.util.display import SingleObjectiveDisplay
-from pymoo.util.misc import vectorized_cdist, evaluate_if_not_done_yet
+from pymoo.util.misc import vectorized_cdist
 from pymoo.util.normalization import denormalize
 
 
@@ -278,7 +278,7 @@ class NelderMead(Algorithm):
             pop = pop.merge(Population().new("X", X))
 
             # evaluate the values that are not already evaluated
-            evaluate_if_not_done_yet(self.evaluator, self.problem, pop, algorithm=self)
+            self.evaluator.eval(self.problem, pop, algorithm=self)
 
         elif len(pop) != self.problem.n_var + 1:
 

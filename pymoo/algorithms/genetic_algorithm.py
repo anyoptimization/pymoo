@@ -87,15 +87,13 @@ class GeneticAlgorithm(Algorithm):
             else:
                 pop = self.sampling.do(self.problem, self.pop_size, pop=pop, algorithm=self)
 
-        # in case the initial population was not evaluated
-        if np.any(pop.collect(lambda ind: ind.F is None, as_numpy_array=True)):
+        # repair all solutions that are not already evaluated
+        if self.repair:
+            I = [k for k in range(len(pop)) if pop[k].F is None]
+            pop = self.repair.do(self.problem, pop[I], algorithm=self)
 
-            # repair first in case it is necessary
-            if self.repair:
-                pop = self.repair.do(self.problem, pop, algorithm=self)
-
-            # then evaluate using the objective function
-            self.evaluator.eval(self.problem, pop, algorithm=self)
+        # then evaluate using the objective function
+        self.evaluator.eval(self.problem, pop, algorithm=self)
 
         # that call is a dummy survival to set attributes that are necessary for the mating selection
         if self.survival:

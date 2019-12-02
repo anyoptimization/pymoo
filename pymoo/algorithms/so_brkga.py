@@ -28,15 +28,15 @@ class EliteSurvival(Survival):
         self.n_elites = n_elites
         self.eliminate_duplicates = eliminate_duplicates
 
-    def _do(self, problem, pop, n_survive, **kwargs):
+    def _do(self, problem, pop, n_survive, algorithm=None, **kwargs):
 
         if isinstance(self.eliminate_duplicates, bool) and self.eliminate_duplicates:
             pop = DefaultDuplicateElimination(func=lambda p: p.get("F")).do(pop)
 
         elif isinstance(self.eliminate_duplicates, DuplicateElimination):
-            _, _, candidates = DefaultDuplicateElimination(func=lambda pop: pop.get("F")).do(pop, return_indices=True)
-            _, _, is_duplicate = self.eliminate_duplicates.do(pop[candidates], return_indices=True)
-            elim = np.array(candidates)[is_duplicate]
+            _, no_candidates, candidates = DefaultDuplicateElimination(func=lambda pop: pop.get("F")).do(pop, return_indices=True)
+            _, _, is_duplicate = self.eliminate_duplicates.do(pop[candidates], pop[no_candidates], return_indices=True, to_itself=False)
+            elim = set(np.array(candidates)[is_duplicate])
             pop = pop[[k for k in range(len(pop)) if k not in elim]]
 
         if problem.n_obj == 1:
