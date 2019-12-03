@@ -3,11 +3,18 @@ import numpy as np
 from pymoo.util.misc import cdist
 
 
+def default_attr(pop):
+    return pop.get("X")
+
+
 class DuplicateElimination:
 
-    def __init__(self, func=lambda pop: pop.get("X")) -> None:
+    def __init__(self, func=None) -> None:
         super().__init__()
         self.func = func
+
+        if self.func is None:
+            self.func = default_attr
 
     def do(self, pop, *args, return_indices=False, to_itself=True):
         original = pop
