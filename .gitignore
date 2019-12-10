@@ -18,7 +18,6 @@ benchmark/runs/*
 
 # any video or other output file
 *.mp4
-*.out
 
 # pycharm folder
 .idea/
