@@ -49,7 +49,7 @@ class Evaluator:
 
         # actually evaluate all solutions using the function that can be overwritten
         if len(I) > 0:
-            self._eval(problem, pop[I])
+            self._eval(problem, pop[I], **kwargs)
 
             # set the feasibility attribute if cv exists
             for ind in pop[I]:
