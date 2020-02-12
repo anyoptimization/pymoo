@@ -3,9 +3,11 @@ import numpy as np
 from pymoo.docs import parse_doc_string
 from pymoo.model.algorithm import Algorithm, filter_optimum
 from pymoo.model.population import Population
-from pymoo.model.termination import NoTermination, MaximumGenerationTermination, MaximumFunctionCallTermination
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.util.display import Display
+from pymoo.util.termination.max_eval import MaximumFunctionCallTermination
+from pymoo.util.termination.max_gen import MaximumGenerationTermination
+from pymoo.util.termination.no_termination import NoTermination
 from pymoo.vendor.vendor_cmaes import my_fmin
 
 
@@ -26,7 +28,7 @@ class CMAESDisplay(Display):
         fmin = algorithm.es.gi_frame.f_locals
         cma = fmin["es"]
 
-        self.output.append("fopt", algorithm.opt.F[0])
+        self.output.append("fopt", algorithm.opt[0].F[0])
 
         if fmin["restarts"] > 0:
             self.output.append("run", int(fmin["irun"]) + 1, width=4)
@@ -43,8 +45,6 @@ class CMAESDisplay(Display):
                 if not cma.opts['CMA_diagonal'] or cma.countiter > cma.opts['CMA_diagonal']
                 else max(cma.sigma_vec * 1) / min(cma.sigma_vec * 1))
         self.output.append("axis", axis, width=8)
-
-        cma.sigma
 
 
 class CMAES(Algorithm):
@@ -425,15 +425,16 @@ class CMAES(Algorithm):
             self.pop = Population().new("X", X)
             self.evaluator.eval(self.problem, self.pop, algorithm=self)
 
-            val = self.pop
-            if self.opt is not None:
-                val = val.merge([self.opt])
-            self.opt = filter_optimum(val, least_infeasible=True)
-
             # set infeasible individual's objective values to np.nan - then CMAES can handle it
             for ind in self.pop:
                 if not ind.feasible[0]:
                     ind.F[0] = np.nan
+
+    def _set_optimum(self):
+        val = self.pop
+        if self.opt is not None:
+            val = val.merge(self.opt)
+        self.opt = filter_optimum(val, least_infeasible=True)
 
 
 parse_doc_string(CMAES.__init__)

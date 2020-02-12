@@ -2,9 +2,9 @@ import numpy as np
 
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.population import Population
-from pymoo.model.termination import SingleObjectiveToleranceBasedTermination
 from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds
 from pymoo.util.display import SingleObjectiveDisplay
+from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 
 class GradientBasedAlgorithm(Algorithm):
@@ -19,7 +19,7 @@ class GradientBasedAlgorithm(Algorithm):
 
         self.objective = objective
         self.n_restarts = 0
-        self.default_termination = SingleObjectiveToleranceBasedTermination()
+        self.default_termination = SingleObjectiveDefaultTermination()
 
         self.X, self.dX = X, dX
         self.F, self.CV = None, None

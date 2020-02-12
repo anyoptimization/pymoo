@@ -1,4 +1,3 @@
-
 #    This file is part of DEAP.
 #
 #    Copyright (C) 2010 Simon Wessing
@@ -22,6 +21,18 @@
 #
 #    You should have received a copy of the GNU Lesser General Public
 #    License along with DEAP. If not, see <http://www.gnu.org/licenses/>.
+
+import warnings
+
+
+def hypervolume(pointset, ref):
+    """Compute the absolute hypervolume of a *pointset* according to the
+    reference point *ref*.
+    """
+    warnings.warn("Falling back to the python version of hypervolume "
+                  "module. Expect this to be very slow.", RuntimeWarning)
+    hv = HyperVolume(ref)
+    return hv.compute(pointset)
 
 
 class HyperVolume:
@@ -50,22 +61,30 @@ class HyperVolume:
                     return False
             return True
 
+        relevantPoints = []
         referencePoint = self.referencePoint
         dimensions = len(referencePoint)
-
-        l = []
-        for i in range(len(front)):
-            # only consider points that dominate the reference point
-            if weaklyDominates(front[i, :], referencePoint):
-                l.append(i)
-
-        if len(l) == 0:
-            return 0
-
-        relevantPoints = front[l, :]
-
+        #######
+        # fmder: Here it is assumed that every point dominates the reference point
+        # for point in front:
+        #     # only consider points that dominate the reference point
+        #     if weaklyDominates(point, referencePoint):
+        #         relevantPoints.append(point)
+        relevantPoints = front
+        # fmder
+        #######
         if any(referencePoint):
+            # shift points so that referencePoint == [0, ..., 0]
+            # this way the reference point doesn't have to be explicitly used
+            # in the HV computation
+
+            #######
+            # fmder: Assume relevantPoints are numpy array
+            # for j in range(len(relevantPoints)):
+            #     relevantPoints[j] = [relevantPoints[j][i] - referencePoint[i] for i in range(dimensions)]
             relevantPoints -= referencePoint
+            # fmder
+            #######
 
         self.preProcess(relevantPoints)
         bounds = [-1.0e308] * dimensions
@@ -121,7 +140,7 @@ class HyperVolume:
             qPrevDimIndex = q.prev[dimIndex]
             if length > 1:
                 hvol = qPrevDimIndex.volume[dimIndex] + qPrevDimIndex.area[dimIndex] * (
-                        qCargo[dimIndex] - qPrevDimIndex.cargo[dimIndex])
+                            qCargo[dimIndex] - qPrevDimIndex.cargo[dimIndex])
             else:
                 qArea[0] = 1
                 qArea[1:dimIndex + 1] = [qArea[i] * -qCargo[i] for i in range(dimIndex)]

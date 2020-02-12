@@ -23,6 +23,9 @@ class Population(np.ndarray):
             pop[i] = self[i]
         return pop
 
+    def has(self, key):
+        return all([ind.has(key) for ind in self])
+
     def __deepcopy__(self, memo):
         return self.copy()
 

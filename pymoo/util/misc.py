@@ -228,3 +228,20 @@ def time_to_int(t):
 def powerset(iterable):
     for n in range(len(iterable) + 1):
         yield from combinations(iterable, n)
+
+
+def intersect(a, b):
+    H = set()
+    for entry in b:
+        H.add(entry)
+
+    ret = []
+    for entry in a:
+        if entry in H:
+            ret.append(entry)
+
+    return ret
+
+
+def has_feasible(pop):
+    return np.any(pop.get("feasible"))

@@ -24,11 +24,14 @@ Meanwhile, if you have used our framework for research purposes, please cite us 
 
 ::
 
-   @misc{pymoo,
-       author = {Julian Blank and Kalyanmoy Deb},
-       title = {pymoo - {Multi-objective Optimization in Python}},
-       howpublished = {https://pymoo.org}
-   }
+    @misc{pymoo,
+        title={pymoo: Multi-objective Optimization in Python},
+        author={Julian Blank and Kalyanmoy Deb},
+        year={2020},
+        eprint={2002.04504},
+        archivePrefix={arXiv},
+        primaryClass={cs.NE}
+    }
 
 
 
@@ -76,15 +79,15 @@ However, for instance executing NSGA2:
     from pymoo.optimize import minimize
     from pymoo.visualization.scatter import Scatter
 
-    problem = get_problem("zdt2")
+    problem = get_problem("zdt1")
 
-    algorithm = NSGA2(pop_size=100, eliminate_duplicates=True)
+    algorithm = NSGA2(pop_size=100)
 
     res = minimize(problem,
                    algorithm,
                    ('n_gen', 200),
                    seed=1,
-                   verbose=True)
+                   verbose=False)
 
     plot = Scatter()
     plot.add(problem.pareto_front(), plot_type="line", color="black", alpha=0.7)

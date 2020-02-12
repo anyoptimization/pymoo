@@ -8,6 +8,7 @@ from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinary
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection
+from pymoo.util.misc import intersect
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.normalization import denormalize
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
@@ -84,11 +85,14 @@ class RNSGA3(NSGA3):
 
         return super()._solve(problem)
 
+    def _finalize(self):
+        pass
+
 
 class AspirationPointSurvival(Survival):
 
     def __init__(self, ref_points, aspiration_ref_dirs, mu=0.1):
-        super().__init__(True)
+        super().__init__()
 
         self.ref_points = ref_points
         self.aspiration_ref_dirs = aspiration_ref_dirs
@@ -98,6 +102,7 @@ class AspirationPointSurvival(Survival):
         self.extreme_points = None
         self.intercepts = None
         self.nadir_point = None
+        self.opt = None
         self.ideal_point = np.full(ref_points.shape[1], np.inf)
         self.worst_point = np.full(ref_points.shape[1], -np.inf)
 
@@ -144,8 +149,12 @@ class AspirationPointSurvival(Survival):
         self.ref_dirs = denormalize(ref_dirs, self.ideal_point, self.nadir_point)
 
         # associate individuals to niches
-        niche_of_individuals, dist_to_niche, _ = associate_to_niches(F, ref_dirs, self.ideal_point, self.nadir_point)
+        niche_of_individuals, dist_to_niche, dist_matrix = associate_to_niches(F, ref_dirs, self.ideal_point, self.nadir_point)
         pop.set('rank', rank, 'niche', niche_of_individuals, 'dist_to_niche', dist_to_niche)
+
+        # set the optimum, first front and closest to all reference directions
+        closest = np.unique(dist_matrix[:, np.unique(niche_of_individuals)].argmin(axis=0))
+        self.opt = pop[intersect(fronts[0], closest)]
 
         # if we need to select individuals to survive
         if len(pop) > n_survive:
@@ -169,6 +178,8 @@ class AspirationPointSurvival(Survival):
             pop = pop[survivors]
 
         return pop
+    
+    
 
 
 def get_ref_dirs_from_points(ref_point, ref_dirs, mu=0.1):

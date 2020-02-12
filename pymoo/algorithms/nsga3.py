@@ -5,9 +5,7 @@ from numpy.linalg import LinAlgError
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
-from pymoo.model.algorithm import filter_optimum
 from pymoo.model.individual import Individual
-from pymoo.model.population import Population
 from pymoo.model.survival import Survival
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
@@ -15,6 +13,7 @@ from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.function_loader import load_function
+from pymoo.util.misc import intersect, has_feasible
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
 
@@ -103,46 +102,26 @@ class NSGA3(GeneticAlgorithm):
 
         return super()._solve(problem)
 
-    def _finalize(self):
-        super()._finalize()
-        opt = filter_optimum(self.pop.copy())
-
-        # if population object then only keep closest to reference lines
-        if isinstance(opt, Population) and len(opt) > 0:
-
-            # find the closest individual to each niche
-            niches, ideal_point, nadir_point = self.survival.ref_dirs, self.survival.ideal_point, self.survival.nadir_point
-
-            # now find the non-empty niches - only those we used during optimization
-            non_empty_niches = niches[np.unique(opt.get("niche"))]
-
-            # calculate the distance matrix - perp dist of each solution to all those niches
-            _, _, dist_matrix = associate_to_niches(opt.get("F"), non_empty_niches,
-                                                    ideal_point, nadir_point, utopian_epsilon=0.0)
-
-            # find the solution closest to the niche
-            I = np.unique(dist_matrix.argmin(axis=0))
-
-            # filter out all others
-            if len(I) > 0:
-                opt = opt[I]
-
-        self.opt = opt
+    def _set_optimum(self, **kwargs):
+        if not has_feasible(self.pop):
+            self.opt = self.pop[[np.argmin(self.pop.get("CV"))]]
+        else:
+            self.opt = self.survival.opt
 
 
 class ReferenceDirectionSurvival(Survival):
 
     def __init__(self, ref_dirs):
-        super().__init__(True)
+        super().__init__(filter_infeasible=True)
         self.ref_dirs = ref_dirs
         self.extreme_points = None
         self.intercepts = None
         self.nadir_point = None
+        self.opt = None
         self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
         self.worst_point = np.full(ref_dirs.shape[1], -np.inf)
 
     def _do(self, problem, pop, n_survive, D=None, **kwargs):
-
         # attributes to be set after the survival
         F = pop.get("F")
 
@@ -181,9 +160,14 @@ class ReferenceDirectionSurvival(Survival):
         niche_of_individuals, dist_to_niche, dist_matrix = \
             associate_to_niches(F, self.ref_dirs, self.ideal_point, self.nadir_point)
 
+        # attributes of a population
         pop.set('rank', rank,
                 'niche', niche_of_individuals,
                 'dist_to_niche', dist_to_niche)
+
+        # set the optimum, first front and closest to all reference directions
+        closest = np.unique(dist_matrix[:, np.unique(niche_of_individuals)].argmin(axis=0))
+        self.opt = pop[intersect(fronts[0], closest)]
 
         # if we need to select individuals to survive
         if len(pop) > n_survive:

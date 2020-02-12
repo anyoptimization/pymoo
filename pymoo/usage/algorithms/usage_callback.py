@@ -24,10 +24,11 @@ problem = get_problem("sphere")
 algorithm = GA(pop_size=100, callback=MyCallback())
 
 res = minimize(problem,
-         algorithm,
-         ('n_gen', 20),
-         seed=1,
-         verbose=True)
+               algorithm,
+               ('n_gen', 20),
+               seed=1,
+               save_history=True,
+               verbose=True)
 
 val = res.algorithm.callback.data["best"]
 plt.plot(np.arange(len(val)), val)

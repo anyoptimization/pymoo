@@ -2,6 +2,7 @@ import copy
 
 from pymoo.factory import get_termination
 from pymoo.model.termination import Termination
+from pymoo.util.termination.default import MultiObjectiveDefaultTermination, SingleObjectiveDefaultTermination
 
 
 def minimize(problem,
@@ -53,6 +54,12 @@ def minimize(problem,
     algorithm.initialize(problem,
                          termination=termination,
                          **kwargs)
+
+    if algorithm.termination is None:
+        if problem.n_obj > 1:
+            algorithm.termination = MultiObjectiveDefaultTermination()
+        else:
+            algorithm.termination = SingleObjectiveDefaultTermination()
 
     # actually execute the algorithm
     res = algorithm.solve()

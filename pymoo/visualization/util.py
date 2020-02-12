@@ -52,7 +52,7 @@ def plot_polygon(ax, x, **kwargs):
     ax.add_collection(PatchCollection([patches.Polygon(x, True)], **kwargs))
 
 
-def plot_axis_labels(ax, endpoints, labels, margin=0.035):
+def plot_axis_labels(ax, endpoints, labels, margin=0.035, size='small', **kwargs):
     for k in range(len(labels)):
         xy = endpoints[k]
 
@@ -70,7 +70,7 @@ def plot_axis_labels(ax, endpoints, labels, margin=0.035):
             y = xy[1] + margin
             va = "bottom"
 
-        ax.text(x, y, labels[k], ha=ha, va=va, size='small')
+        ax.text(x, y, labels[k], ha=ha, va=va, size=size, **kwargs)
 
 
 def equal_axis(ax):

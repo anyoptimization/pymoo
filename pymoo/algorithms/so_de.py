@@ -2,7 +2,6 @@ import numpy as np
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
-from pymoo.model.termination import SingleObjectiveToleranceBasedTermination
 from pymoo.operators.crossover.biased_crossover import BiasedCrossover
 from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
 from pymoo.operators.crossover.exponential_crossover import ExponentialCrossover
@@ -11,6 +10,7 @@ from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSamp
 from pymoo.operators.selection.random_selection import RandomSelection
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.misc import parameter_less
+from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 
 # =========================================================================================================
@@ -79,7 +79,7 @@ class DE(GeneticAlgorithm):
                          display=display,
                          **kwargs)
 
-        self.default_termination = SingleObjectiveToleranceBasedTermination()
+        self.default_termination = SingleObjectiveDefaultTermination()
 
     def _next(self):
 
