@@ -63,8 +63,7 @@ class AlgorithmTest(unittest.TestCase):
         res = minimize(MyProblem(),
                        NSGA2(),
                        ("n_gen", 10),
-                       seed=1,
-                       save_history=True)
+                       seed=1)
 
         self.assertEqual(res.X, None)
         self.assertEqual(res.F, None)
@@ -74,6 +73,7 @@ class AlgorithmTest(unittest.TestCase):
                        NSGA2(return_least_infeasible=True),
                        ("n_gen", 10),
                        seed=1,
+                       verbose=True,
                        save_history=True)
 
         self.assertEqual(res.CV, 1)

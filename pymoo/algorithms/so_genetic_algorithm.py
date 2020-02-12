@@ -3,12 +3,12 @@ import numpy as np
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
-from pymoo.model.termination import SingleObjectiveToleranceBasedTermination
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
 from pymoo.util.display import SingleObjectiveDisplay
+from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 
 # =========================================================================================================
@@ -70,7 +70,7 @@ class GA(GeneticAlgorithm):
                          display=display,
                          **kwargs)
 
-        self.default_termination = SingleObjectiveToleranceBasedTermination()
+        self.default_termination = SingleObjectiveDefaultTermination()
 
 
 class FitnessSurvival(Survival):

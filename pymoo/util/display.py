@@ -3,6 +3,7 @@ import numpy as np
 from pymoo.performance_indicator.gd import GD
 from pymoo.performance_indicator.igd import IGD
 from pymoo.performance_indicator.hv import Hypervolume
+from pymoo.util.termination.f_tol import MultiObjectiveSpaceToleranceTermination
 
 
 def pareto_front_if_possible(problem):
@@ -74,17 +75,21 @@ class Display:
 
         try:
 
-            # if pf is false nothing happens, otherwise we try to get the pareto front from the problem
-            if pf is None or (isinstance(pf, bool) and pf):
+            # if this runs for the first time - executed only once!
+            if self.pareto_front_is_available is None:
 
-                # if we have not tried it before
-                if self.pareto_front_is_available is None:
-                    # see if you can get it and set the boolean for the future
+                if isinstance(pf, bool) and not pf:
+                    self.pf, self.pareto_front_is_available = None, False
+
+                # try to get the pareto front from the problem
+                elif pf is None or (isinstance(pf, bool) and pf):
                     self.pf = pareto_front_if_possible(problem)
                     self.pareto_front_is_available = self.pf is not None
-            else:
-                self.pf = pf
-                self.pareto_front_is_available = True
+
+                # the pf should be given directly
+                else:
+                    self.pf = pf
+                    self.pf, self.pareto_front_is_available = pf, True
 
             self.output.clear()
 
@@ -115,22 +120,27 @@ class SingleObjectiveDisplay(Display):
     def _do(self, problem, evaluator, algorithm):
         super()._do(problem, evaluator, algorithm)
 
+        opt = algorithm.opt[0]
         F, CV, feasible = algorithm.pop.get("F", "CV", "feasible")
         feasible = np.where(feasible[:, 0])[0]
 
         if problem.n_constr > 0:
-            self.output.append("cv (min)", CV.min())
+            self.output.append("cv (min)", opt.CV[0])
             self.output.append("cv (avg)", np.mean(CV))
 
         if len(feasible) > 0:
             _F = F[feasible]
             self.output.append("favg", np.mean(_F))
-            self.output.append("fopt", np.min(_F))
+            self.output.append("fopt", opt.F[0])
         else:
             self.output.extend(*[('favg', "-"), ('fopt', "-")])
 
 
 class MultiObjectiveDisplay(Display):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.term = MultiObjectiveSpaceToleranceTermination()
 
     def _do(self, problem, evaluator, algorithm):
         super()._do(problem, evaluator, algorithm)
@@ -142,15 +152,42 @@ class MultiObjectiveDisplay(Display):
             self.output.append("cv (min)", CV.min())
             self.output.append("cv (avg)", np.mean(CV))
 
-        if len(feasible) > 0:
-            if self.pareto_front_is_available:
-                _F = F[feasible]
-                self.output.append("igd", IGD(self.pf).calc(_F))
-                self.output.append("gd", GD(self.pf).calc(_F))
+        if self.pareto_front_is_available:
+            igd, gd, hv = "-", "-", "-"
+            if len(feasible) > 0:
+                _F = algorithm.opt.get("F")
+                igd, gd = IGD(self.pf).calc(_F), GD(self.pf).calc(_F)
                 if problem.n_obj == 2:
-                    self.output.append("hv", Hypervolume(pf=self.pf).calc(_F))
+                    hv = Hypervolume(pf=self.pf).calc(_F)
+
+            self.output.extend(*[('igd', igd), ('gd', gd)])
+            if problem.n_obj == 2:
+                self.output.append("hv", hv)
+
         else:
-            if self.pareto_front_is_available:
-                self.output.extend(*[('igd', "-"), ('gd', "-")])
-                if problem.n_obj == 2:
-                    self.output.append("hv", "-")
+            self.output.append("n_nds", len(algorithm.opt), width=7)
+
+            self.term.do_continue(algorithm)
+
+            delta_ideal, delta_nadir, delta_f, hist_delta_max = "-", "-", "-", "-"
+            metric = self.term.metric()
+            if metric is not None:
+                delta_ideal = metric["delta_ideal"]
+                delta_nadir = metric["delta_nadir"]
+                delta_f = metric["delta_f"]
+                hist_delta_max = metric["max_delta_all"]
+
+            self.output.append("delta_ideal", delta_ideal)
+            self.output.append("delta_nadir", delta_nadir)
+            self.output.append("delta_f", delta_f)
+            self.output.append("delta_max", max(delta_ideal, delta_nadir, delta_f))
+            self.output.append("hist_delta_max", hist_delta_max, width=13)
+
+
+
+
+
+
+
+
+

@@ -49,7 +49,7 @@ class Radviz(Plot):
         no_ticks(self.ax)
 
         V = get_uniform_points_around_circle(self.n_dim)
-        plot_axis_labels(self.ax, V, self.get_labels())
+        plot_axis_labels(self.ax, V, self.get_labels(), **self.axis_label_style)
 
         # draw the outer circle and radar lines
         plot_circle(self.ax, **self.axis_style)

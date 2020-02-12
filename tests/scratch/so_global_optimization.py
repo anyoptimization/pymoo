@@ -117,7 +117,7 @@ class SingleObjectiveGlobalOptimization(Algorithm):
             _pop = algorithm.pop
 
             # if the algorithm has terminated or not
-            has_finished = algorithm.termination.has_finished(algorithm)
+            has_finished = algorithm.termination.has_terminated(algorithm)
 
             # if the area was already explored before
             closest_dist_to_others = vectorized_cdist(_pop.get("X"), _X[_evaluated_by_algorithm != algorithm],

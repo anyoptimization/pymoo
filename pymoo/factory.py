@@ -18,7 +18,6 @@ from pymoo.problems.single import *
 # Generic
 # =========================================================================================================
 
-
 def get_from_list(l, name, args, kwargs):
     i = None
 
@@ -193,16 +192,25 @@ def get_mutation(name, *args, d={}, **kwargs):
 # =========================================================================================================
 
 def get_termination_options():
-    from pymoo.model.termination import MaximumFunctionCallTermination, MaximumGenerationTermination, IGDTermination, \
-        DesignSpaceToleranceTermination, ObjectiveSpaceToleranceTermination, TimeBasedTermination
+    from pymoo.util.termination.max_eval import MaximumFunctionCallTermination
+    from pymoo.util.termination.max_gen import MaximumGenerationTermination
+    from pymoo.util.termination.max_time import TimeBasedTermination
+    from pymoo.util.termination.min_igd import IGDTermination
+    from pymoo.util.termination.x_tol import DesignSpaceToleranceTermination
+    from pymoo.util.termination.f_tol import MultiObjectiveSpaceToleranceTermination
+    from pymoo.util.termination.f_tol import SingleObjectiveSpaceToleranceTermination
+    from pymoo.util.termination.default import MultiObjectiveDefaultTermination, SingleObjectiveDefaultTermination
 
     TERMINATION = [
         ("n_eval", MaximumFunctionCallTermination),
         ("(n_gen|n_iter)", MaximumGenerationTermination),
         ("igd", IGDTermination),
         ("time", TimeBasedTermination),
-        ("x_tol", DesignSpaceToleranceTermination),
-        ("f_tol", ObjectiveSpaceToleranceTermination)
+        ("(x_tol|xtol)", DesignSpaceToleranceTermination),
+        ("(f_tol$|ftol$)", MultiObjectiveSpaceToleranceTermination),
+        ("(f_tol_s|ftol_s)", SingleObjectiveSpaceToleranceTermination),
+        ("(default$|default_multi)", MultiObjectiveDefaultTermination),
+        ("default_single$", SingleObjectiveDefaultTermination)
     ]
 
     return TERMINATION

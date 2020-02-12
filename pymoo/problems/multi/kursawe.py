@@ -18,5 +18,5 @@ class Kursawe(Problem):
 
         out["F"] = anp.column_stack([f1, f2])
 
-    def _calc_pareto_front(self):
+    def _calc_pareto_front(self, *args, **kwargs):
         return load_pareto_front_from_file("kursawe.pf")

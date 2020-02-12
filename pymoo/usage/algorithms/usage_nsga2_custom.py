@@ -97,7 +97,7 @@ class MyDuplicateElimination(ElementwiseDuplicateElimination):
         return a.X[0] == b.X[0]
 
 
-algorithm = NSGA2(pop_size=100,
+algorithm = NSGA2(pop_size=20,
                   sampling=MySampling(),
                   crossover=MyCrossover(),
                   mutation=MyMutation(),
@@ -106,7 +106,6 @@ algorithm = NSGA2(pop_size=100,
 
 res = minimize(MyProblem(),
                algorithm,
-               ('n_gen', 500),
                seed=1,
                verbose=True)
 

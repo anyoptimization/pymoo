@@ -1,27 +1,25 @@
-from pymoo.algorithms.nsga2 import NSGA2
-from pymoo.factory import get_problem
+from pymoo.algorithms.nsga3 import NSGA3
+from pymoo.factory import get_problem, get_reference_directions
 from pymoo.optimize import minimize
-import numpy as np
+from pymoo.util.normalization import normalize
+from pymoo.visualization.scatter import Scatter
 
-problem = get_problem("zdt3", n_var=5)
+ref_dirs = get_reference_directions("das-dennis", 3, n_partitions=12)
 
-np.random.seed(10)
-print(np.random.random())
+problem = get_problem("dtlz1")
+pf = problem.pareto_front(ref_dirs)
 
-
-def my_callback(method):
-    X = np.loadtxt("gen_%s.csv" % method.n_gen)
-    _X = method.pop.get("X")
-    if np.any(np.abs(X - _X) > 1e-8):
-        print("test")
-
-
-algorithm = NSGA2(pop_size=100,
-                  callback=my_callback,
-                  eliminate_duplicates=False)
+algorithm = NSGA3(ref_dirs)
 
 res = minimize(problem,
                algorithm,
-               ('n_gen', 20),
+               ('n_gen', 400),
                seed=1,
                verbose=True)
+
+plot = Scatter()
+plot.add(pf, plot_type="line", color="black", alpha=0.7)
+plot.add(res.F, color="red")
+plot.show()
+
+

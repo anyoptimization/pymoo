@@ -60,8 +60,10 @@ if __name__ == '__main__':
         """
 
         M = np.column_stack([res.pop.get("F"), res.pop.get("CV"), res.pop.get("X")])
-
         np.savetxt(out, M)
+
+        np.savetxt(out + ".gen", np.array([res.algorithm.n_gen]))
+
 
     except Exception as e:
         traceback.print_exc()

@@ -96,7 +96,7 @@ class Scatter(Plot):
                         ax = self.ax[i, j]
 
                         if i != j:
-                            self.plot(ax, _type, F, **_kwargs)
+                            self.plot(ax, _type, F[:, [i, j]], **_kwargs)
                             self.set_labels(ax, [labels[i], labels[j]], is_3d)
                         else:
                             ax.set_xticks([])
