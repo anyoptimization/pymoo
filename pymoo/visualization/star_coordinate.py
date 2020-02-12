@@ -61,7 +61,7 @@ class StarCoordinate(Plot):
         V = get_uniform_points_around_circle(self.n_dim)
 
         plot_axes_arrow(self.ax, V, extend_factor=self.axis_extension, **{**self.axis_style, **self.arrow_style})
-        plot_axis_labels(self.ax, V, self.get_labels())
+        plot_axis_labels(self.ax, V, self.get_labels(), **self.axis_label_style)
 
         # normalize in range for this plot - here no implicit normalization as in radviz
         bounds = parse_bounds(self.bounds, self.n_dim)

@@ -10,7 +10,7 @@ from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.operators.selection.tournament_selection import compare, TournamentSelection
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.dominator import Dominator
-from pymoo.util.misc import find_duplicates
+from pymoo.util.misc import find_duplicates, has_feasible
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.randomized_argsort import randomized_argsort
 
@@ -105,6 +105,12 @@ class NSGA2(GeneticAlgorithm):
 
         self.tournament_type = 'comp_by_dom_and_crowding'
 
+    def _set_optimum(self, **kwargs):
+        if not has_feasible(self.pop):
+            self.opt = self.pop[[np.argmin(self.pop.get("CV"))]]
+        else:
+            self.opt = self.pop[self.pop.get("rank") == 0]
+
 
 # ---------------------------------------------------------------------------------------------------------
 # Survival Selection
@@ -114,7 +120,7 @@ class NSGA2(GeneticAlgorithm):
 class RankAndCrowdingSurvival(Survival):
 
     def __init__(self) -> None:
-        super().__init__(True)
+        super().__init__(filter_infeasible=True)
 
     def _do(self, problem, pop, n_survive, D=None, **kwargs):
 

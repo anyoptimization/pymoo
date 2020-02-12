@@ -1,13 +1,11 @@
 import numpy as np
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.algorithms.nsga2 import RankAndCrowdingSurvival
 from pymoo.algorithms.so_genetic_algorithm import FitnessSurvival
 from pymoo.docs import parse_doc_string
 from pymoo.model.duplicate import DefaultDuplicateElimination, DuplicateElimination
 from pymoo.model.selection import Selection
 from pymoo.model.survival import Survival
-from pymoo.model.termination import SingleObjectiveToleranceBasedTermination
 from pymoo.operators.crossover.biased_crossover import BiasedCrossover
 from pymoo.operators.mutation.no_mutation import NoMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
@@ -19,6 +17,7 @@ from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 # =========================================================================================================
 # Implementation
 # =========================================================================================================
+from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 
 class EliteSurvival(Survival):
@@ -118,7 +117,7 @@ class BRKGA(GeneticAlgorithm):
         self.n_elites = n_elites
         self.n_mutants = n_mutants
         self.bias = bias
-        self.default_termination = SingleObjectiveToleranceBasedTermination()
+        self.default_termination = SingleObjectiveDefaultTermination()
 
     def _next(self):
         pop = self.pop

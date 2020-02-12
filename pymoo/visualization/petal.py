@@ -58,7 +58,7 @@ class Petal(Plot):
 
         t = [(sections[i] + sections[i + 1]) / 2 for i in range(len(sections) - 1)]
         endpoints = np.column_stack([np.cos(t), np.sin(t)])
-        plot_axis_labels(ax, endpoints, self.get_labels())
+        plot_axis_labels(ax, endpoints, self.get_labels(), **self.axis_label_style)
 
         center = np.zeros(2)
 

@@ -75,7 +75,7 @@ class NelderAndMeadTermination(Termination):
         return not (ftol or xtol or max_iter or max_evals or is_degenerated)
 
     def do_restart(self, algorithm):
-        return self.has_finished(algorithm)
+        return self.has_terminated(algorithm)
 
 
 def max_expansion_factor(point, direction, xl, xu):

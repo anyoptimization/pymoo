@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.spatial import cKDTree
 
 from pymoo.model.decision_making import DecisionMaking, normalize, find_outliers_upper_tail, NeighborFinder
 

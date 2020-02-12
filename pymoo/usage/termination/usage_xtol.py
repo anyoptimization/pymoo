@@ -4,7 +4,7 @@ from pymoo.optimize import minimize
 
 problem = get_problem("zdt3")
 algorithm = NSGA2(pop_size=100)
-termination = get_termination("x_tol", tol=0.001, n_last=20, n_max_gen=None, nth_gen=10)
+termination = get_termination("x_tol", tol=0.001, n_last=20, nth_gen=10)
 
 res = minimize(problem,
                algorithm,

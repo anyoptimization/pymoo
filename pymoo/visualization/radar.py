@@ -66,7 +66,7 @@ class Radar(Plot):
 
         # draw the axis lines and labels
         plot_axes_lines(ax, outer, extend_factor=1.0, **self.axis_style)
-        plot_axis_labels(ax, outer, self.get_labels(), margin=0.015)
+        plot_axis_labels(ax, outer, self.get_labels(), margin=0.015, **self.axis_label_style)
 
         # plot the outer radar line and the inner polygon
         plot_radar_line(ax, outer, **self.axis_style)

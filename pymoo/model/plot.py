@@ -20,6 +20,7 @@ class Plot:
                  reverse=False,
                  cmap="tab10",
                  axis_style=None,
+                 axis_label_style=None,
                  func_number_to_text=default_number_to_text,
                  labels="f",
                  **kwargs):
@@ -42,6 +43,12 @@ class Plot:
             self.axis_style = {}
         else:
             self.axis_style = axis_style.copy()
+
+        # the style of the axes
+        if axis_label_style is None:
+            self.axis_label_style = {}
+        else:
+            self.axis_label_style = axis_label_style.copy()
 
         # how numbers are represented if plotted
         self.func_number_to_text = func_number_to_text

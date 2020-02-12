@@ -5,14 +5,14 @@ from pymoo.visualization.scatter import Scatter
 
 problem = get_problem("zdt3")
 algorithm = NSGA2(pop_size=100)
-termination = get_termination("f_tol", tol=0.0005, n_last=20, n_max_gen=1000, nth_gen=10)
+termination = get_termination("f_tol")
 
 res = minimize(problem,
                algorithm,
                termination,
-               pf=problem.pareto_front(),
+               pf=True,
                seed=1,
-               verbose=False)
+               verbose=True)
 
 print(res.algorithm.n_gen)
 plot = Scatter(title="ZDT3")

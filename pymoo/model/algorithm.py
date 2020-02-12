@@ -1,4 +1,5 @@
 import copy
+import time
 from abc import abstractmethod
 
 import numpy as np
@@ -113,6 +114,8 @@ class Algorithm:
         self.verbose = None
         # set the display variable supplied to the algorithm
         self.display = display
+        # can be used to store additional data in submodules
+        self.data = {}
 
     # =========================================================================================================
     # PUBLIC
@@ -168,27 +171,47 @@ class Algorithm:
         # the result object to be finally returned
         res = Result()
 
+        # set the timer in the beginning of the call
+        res.start_time = time.time()
+
         # call the algorithm to solve the problem
         self._solve(self.problem)
+
+        # store the time when the algorithm as finished
+        res.end_time = time.time()
+        res.exec_time = res.end_time - res.start_time
 
         # store the resulting population
         res.pop = self.pop
 
-        # if the algorithm already set the optimum just return it, else filter it by default
-        if self.opt is None:
-            opt = filter_optimum(res.pop.copy(), least_infeasible=self.return_least_infeasible)
-        else:
-            opt = self.opt
+        # get the optimal solution found
+        opt = self.opt
 
-        # get the vectors and matrices
+        # if optimum is not set
+        if len(opt) == 0:
+            opt = None
+
+        # if no feasible solution has been found
+        elif not np.any(opt.get("feasible")):
+            if self.return_least_infeasible:
+                opt = filter_optimum(opt, least_infeasible=True)
+            else:
+                opt = None
+
+        # set the optimum to the result object
         res.opt = opt
 
-        if isinstance(opt, Population):
-            X, F, CV, G = opt.get("X", "F", "CV", "G")
-        elif isinstance(opt, Individual):
-            X, F, CV, G = opt.X, opt.F, opt.CV, opt.G
-        else:
+        # if optimum is set to none to not report anything
+        if opt is None:
             X, F, CV, G = None, None, None, None
+
+        # otherwise get the values from the population
+        else:
+            X, F, CV, G = self.opt.get("X", "F", "CV", "G")
+
+            # if single-objective problem and only one solution was found - create a 1d array
+            if self.problem.n_obj == 1 and len(X) == 1:
+                X, F, CV, G = X[0], F[0], CV[0], G[0]
 
         # set all the individual values
         res.X, res.F, res.CV, res.G = X, F, CV, G
@@ -200,9 +223,17 @@ class Algorithm:
         return res
 
     def next(self):
+        # increase the generation counter
         self.n_gen += 1
+
+        # call next of the implementation of the algorithm
         self._next()
-        self._each_iteration(self)
+
+        # set the optimum - only done if the algorithm did not do it yet
+        self._set_optimum()
+
+        # do what needs to be done each generation
+        self._each_iteration()
 
     def finalize(self):
         return self._finalize()
@@ -220,18 +251,18 @@ class Algorithm:
         # initialize the first population and evaluate it
         self.n_gen = 1
         self._initialize()
-        self._each_iteration(self, first=True)
+        self._set_optimum()
+        self._each_iteration()
 
         # while termination criterion not fulfilled
         while self.termination.do_continue(self):
-            # do the next iteration
             self.next()
 
         # finalize the algorithm and do postprocessing of desired
         self.finalize()
 
     # method that is called each iteration to call some algorithms regularly
-    def _each_iteration(self, D, first=False, **kwargs):
+    def _each_iteration(self, *args, **kwargs):
 
         # display the output if defined by the algorithm
         if self.verbose and self.display is not None:
@@ -254,6 +285,9 @@ class Algorithm:
 
             self.history.append(obj)
 
+    def _set_optimum(self, force=False):
+        self.opt = filter_optimum(self.pop, least_infeasible=True)
+
     def _finalize(self):
         pass
 
@@ -267,9 +301,8 @@ class Algorithm:
 
 
 def filter_optimum(pop, least_infeasible=False):
-
     # first only choose feasible solutions
-    ret = pop[pop.collect(lambda ind: ind.feasible)[:, 0]]
+    ret = pop[pop.get("feasible")[:, 0]]
 
     # if at least one feasible solution was found
     if len(ret) > 0:
@@ -278,7 +311,7 @@ def filter_optimum(pop, least_infeasible=False):
         F = ret.get("F")
 
         if F.shape[1] > 1:
-            I = NonDominatedSorting().do(ret.get("F"), only_non_dominated_front=True)
+            I = NonDominatedSorting().do(F, only_non_dominated_front=True)
             ret = ret[I]
 
         else:
@@ -292,5 +325,8 @@ def filter_optimum(pop, least_infeasible=False):
         # otherwise just return none
         else:
             ret = None
+
+    if isinstance(ret, Individual):
+        ret = Population().create(ret)
 
     return ret
