@@ -14,7 +14,8 @@ class ConstraintViolationToleranceTermination(ToleranceBasedTermination):
         self.tol = tol
 
     def _store(self, algorithm):
-        return algorithm.opt.get("CV")[:, 0].min(axis=0)
+        # return algorithm.opt.get("CV")[:, 0].min(axis=0)
+        return algorithm.pop.get("CV")[:, 0].mean()
 
     def _calc_metric(self):
         CV = np.array([e for e in self.history])

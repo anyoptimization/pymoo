@@ -3,7 +3,7 @@ from pymoo.factory import get_problem, get_termination
 from pymoo.optimize import minimize
 from pymoo.visualization.scatter import Scatter
 
-problem = get_problem("zdt5")
+problem = get_problem("zdt3")
 algorithm = NSGA2(pop_size=100)
 
 res = minimize(problem,

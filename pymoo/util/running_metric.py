@@ -17,6 +17,7 @@ class RunningMetric(Callback):
 
     def notify(self, algorithm):
         self.term.do_continue(algorithm)
+
         t = algorithm.n_gen
 
         def press(event):
@@ -44,7 +45,7 @@ class RunningMetric(Callback):
 
             self.hist.append((t, _delta_f))
             if self.n_hist is not None:
-                self.hist = self.hist[-(self.n_hist-1):]
+                self.hist = self.hist[-(self.n_hist - 1):]
 
             plt.yscale("symlog")
             plt.legend()
@@ -57,5 +58,3 @@ class RunningMetric(Callback):
 
             fig.clf()
             plt.close(fig)
-
-
