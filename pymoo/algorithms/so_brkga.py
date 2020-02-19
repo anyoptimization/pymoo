@@ -124,7 +124,7 @@ class BRKGA(GeneticAlgorithm):
         elites = np.where(pop.get("type") == "elite")[0]
 
         # actually do the mating given the elite selection and biased crossover
-        off = self._mating(pop)
+        off = self.mating.do(self.problem, self.pop, n_offsprings=self.n_offsprings, algorithm=self)
 
         # create the mutants randomly to fill the population with
         mutants = FloatRandomSampling().do(self.problem, self.n_mutants, algorithm=self)
