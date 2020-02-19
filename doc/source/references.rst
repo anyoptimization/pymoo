@@ -7,9 +7,12 @@ Meanwhile, if you have used our framework for research purposes, you can cite us
 ::
 
     @misc{pymoo,
-        author = {Julian Blank and Kalyanmoy Deb},
-        title = {pymoo - {Multi-objective Optimization in Python}},
-        howpublished = {https://pymoo.org}
+        title={pymoo: Multi-objective Optimization in Python},
+        author={Julian Blank and Kalyanmoy Deb},
+        year={2020},
+        eprint={2002.04504},
+        archivePrefix={arXiv},
+        primaryClass={cs.NE}
     }
 
 The reference made in our framework are listed below.

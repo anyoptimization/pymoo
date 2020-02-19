@@ -68,15 +68,18 @@ Furthermore, our framework offers a variety of different features which cover va
 Reference
 ------------------------------------------------------------------------------
 
-We are currently working on a paper.
+We are currently working on a journal paper.
 Meanwhile, if you have used our framework for research purposes, you can cite us with:
 
 ::
 
     @misc{pymoo,
-        author = {Julian Blank and Kalyanmoy Deb},
-        title = {pymoo - {Multi-objective Optimization in Python}},
-        howpublished = {https://pymoo.org}
+        title={pymoo: Multi-objective Optimization in Python},
+        author={Julian Blank and Kalyanmoy Deb},
+        year={2020},
+        eprint={2002.04504},
+        archivePrefix={arXiv},
+        primaryClass={cs.NE}
     }
 
 

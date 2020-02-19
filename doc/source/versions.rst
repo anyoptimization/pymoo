@@ -7,8 +7,11 @@ Versions
 
   - New Algorithm: CMAES (by making use of the implementation published by the author)
   - New Termination Criterion: Stop an algorithm based on time 
-  - New Display: Now based on a class and easy to modify
-  - New Callback: Now based on a class and data during the run can be stored or the algorithm object can be modified inplace.
+  - New Display: Based on a class and easy to modify
+  - New Callback: Based on a class and data during the run can be stored or the algorithm object can be modified inplace.
+  - Bugfix: NDScatter Plot
+  - Bugfix: Hypervolume Calculations (Vendor Library)
+
 
 
 .. _version_0_3_2:
