@@ -1,38 +1,21 @@
-#    This file is part of DEAP.
-#
 #    Copyright (C) 2010 Simon Wessing
 #    TU Dortmund University
 #
-#    In personal communication, the original authors authorized DEAP team
-#    to use this file under the Lesser General Public License.
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
 #
-#    You can find the original library here :
-#    http://ls11-www.cs.uni-dortmund.de/_media/rudolph/hypervolume/hv_python.zip
-#
-#    DEAP is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Lesser General Public License as
-#    published by the Free Software Foundation, either version 3 of
-#    the License, or (at your option) any later version.
-#
-#    DEAP is distributed in the hope that it will be useful,
+#    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#    GNU Lesser General Public License for more details.
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
 #
-#    You should have received a copy of the GNU Lesser General Public
-#    License along with DEAP. If not, see <http://www.gnu.org/licenses/>.
-
-import warnings
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-def hypervolume(pointset, ref):
-    """Compute the absolute hypervolume of a *pointset* according to the
-    reference point *ref*.
-    """
-    warnings.warn("Falling back to the python version of hypervolume "
-                  "module. Expect this to be very slow.", RuntimeWarning)
-    hv = HyperVolume(ref)
-    return hv.compute(pointset)
+__author__ = "Simon Wessing"
 
 
 class HyperVolume:
@@ -41,7 +24,9 @@ class HyperVolume:
     C. M. Fonseca, L. Paquete, and M. Lopez-Ibanez. An improved dimension-sweep
     algorithm for the hypervolume indicator. In IEEE Congress on Evolutionary
     Computation, pages 1157-1163, Vancouver, Canada, July 2006.
+
     Minimization is implicitly assumed here!
+
     """
 
     def __init__(self, referencePoint):
@@ -51,8 +36,10 @@ class HyperVolume:
 
     def compute(self, front):
         """Returns the hypervolume that is dominated by a non-dominated front.
+
         Before the HV computation, front and reference point are translated, so
         that the reference point is [0, ..., 0].
+
         """
 
         def weaklyDominates(point, other):
@@ -64,28 +51,16 @@ class HyperVolume:
         relevantPoints = []
         referencePoint = self.referencePoint
         dimensions = len(referencePoint)
-        #######
-        # fmder: Here it is assumed that every point dominates the reference point
-        # for point in front:
-        #     # only consider points that dominate the reference point
-        #     if weaklyDominates(point, referencePoint):
-        #         relevantPoints.append(point)
-        relevantPoints = front
-        # fmder
-        #######
+        for point in front:
+            # only consider points that dominate the reference point
+            if weaklyDominates(point, referencePoint):
+                relevantPoints.append(point)
         if any(referencePoint):
             # shift points so that referencePoint == [0, ..., 0]
             # this way the reference point doesn't have to be explicitly used
             # in the HV computation
-
-            #######
-            # fmder: Assume relevantPoints are numpy array
-            # for j in range(len(relevantPoints)):
-            #     relevantPoints[j] = [relevantPoints[j][i] - referencePoint[i] for i in range(dimensions)]
-            relevantPoints -= referencePoint
-            # fmder
-            #######
-
+            for j in range(len(relevantPoints)):
+                relevantPoints[j] = [relevantPoints[j][i] - referencePoint[i] for i in range(dimensions)]
         self.preProcess(relevantPoints)
         bounds = [-1.0e308] * dimensions
         hyperVolume = self.hvRecursive(dimensions - 1, len(relevantPoints), bounds)
@@ -93,8 +68,10 @@ class HyperVolume:
 
     def hvRecursive(self, dimIndex, length, bounds):
         """Recursive call to hypervolume calculation.
+
         In contrast to the paper, the code assumes that the reference point
         is [0, ..., 0]. This allows the avoidance of a few operations.
+
         """
         hvol = 0.0
         sentinel = self.list.sentinel
@@ -140,7 +117,7 @@ class HyperVolume:
             qPrevDimIndex = q.prev[dimIndex]
             if length > 1:
                 hvol = qPrevDimIndex.volume[dimIndex] + qPrevDimIndex.area[dimIndex] * (
-                            qCargo[dimIndex] - qPrevDimIndex.cargo[dimIndex])
+                        qCargo[dimIndex] - qPrevDimIndex.cargo[dimIndex])
             else:
                 qArea[0] = 1
                 qArea[1:dimIndex + 1] = [qArea[i] * -qCargo[i] for i in range(dimIndex)]
@@ -172,8 +149,8 @@ class HyperVolume:
     def preProcess(self, front):
         """Sets up the list data structure needed for calculation."""
         dimensions = len(self.referencePoint)
-        nodeList = _MultiList(dimensions)
-        nodes = [_MultiList.Node(dimensions, point) for point in front]
+        nodeList = MultiList(dimensions)
+        nodes = [MultiList.Node(dimensions, point) for point in front]
         for i in range(dimensions):
             self.sortByDimension(nodes, i)
             nodeList.extend(nodes, i)
@@ -182,18 +159,19 @@ class HyperVolume:
     def sortByDimension(self, nodes, i):
         """Sorts the list of nodes by the i-th value of the contained points."""
         # build a list of tuples of (point[i], node)
-        decorated = [(node.cargo[i], node) for node in nodes]
+        decorated = [(node.cargo[i], index, node) for index, node in enumerate(nodes)]
         # sort by this value
         decorated.sort()
         # write back to original list
-        nodes[:] = [node for (_, node) in decorated]
+        nodes[:] = [node for (_, _, node) in decorated]
 
 
-class _MultiList:
+class MultiList:
     """A special data structure needed by FonsecaHyperVolume.
 
     It consists of several doubly linked lists that share common nodes. So,
     every node has multiple predecessors and successors, one in every list.
+
     """
 
     class Node:
@@ -209,16 +187,14 @@ class _MultiList:
         def __str__(self):
             return str(self.cargo)
 
-        def __lt__(self, other):
-            return all(self.cargo < other.cargo)
-
     def __init__(self, numberLists):
         """Constructor.
 
         Builds 'numberLists' doubly linked lists.
+
         """
         self.numberLists = numberLists
-        self.sentinel = _MultiList.Node(numberLists)
+        self.sentinel = MultiList.Node(numberLists)
         self.sentinel.next = [self.sentinel] * numberLists
         self.sentinel.prev = [self.sentinel] * numberLists
 
@@ -237,7 +213,7 @@ class _MultiList:
         return stringRepr
 
     def __len__(self):
-        """Returns the number of lists that are included in this _MultiList."""
+        """Returns the number of lists that are included in this MultiList."""
         return self.numberLists
 
     def getLength(self, i):
@@ -286,9 +262,18 @@ class _MultiList:
         Inserts 'node' at the position it had in all lists in [0, 'index'[
         before it was removed. This method assumes that the next and previous
         nodes of the node that is reinserted are in the list.
+
         """
         for i in range(index):
             node.prev[i].next[i] = node
             node.next[i].prev[i] = node
             if bounds[i] > node.cargo[i]:
                 bounds[i] = node.cargo[i]
+
+
+if __name__ == "__main__":
+    # Example:
+    referencePoint = [2, 2, 2]
+    hv = HyperVolume(referencePoint)
+    front = [[1, 0, 1], [0, 1, 0]]
+    volume = hv.compute(front)
