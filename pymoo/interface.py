@@ -126,8 +126,9 @@ class AskAndTell:
             self.set_population(survivors)
 
             # execute the mating using the population
-            off = self.algorithm._mating(self.get_population())
-
+            off = self.algorithm.mating.do(self.algorithm.problem, self.get_population(),
+                                                n_offsprings=self.algorithm.n_offsprings, algorithm=self.algorithm)
+            
             # execute the fake evaluation of the individuals
             self.problem._evaluate = types.MethodType(evaluate_to_nan, self.problem)
             self.algorithm.evaluator.eval(self.problem, off, algorithm=self.algorithm)
