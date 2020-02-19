@@ -35,7 +35,7 @@ class InterfaceTest(unittest.TestCase):
         X, F, CV = api.result(only_optimum=False, return_values_of=["X", "F", "CV"])
 
         self.assertTrue(np.allclose(CV, 0))
-        self.assertTrue(np.allclose(F[:10], 1, atol=1.e-5))
+        self.assertTrue(np.allclose(F[:10], 1, atol=1.e-4))
 
 
 
