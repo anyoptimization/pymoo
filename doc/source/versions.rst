@@ -2,13 +2,14 @@ Versions
 ==============================================================================
 
 
-.. _version_0_3_3:
-* 0.3.3
-
-  - New Algorithm: CMAES (by making use of the implementation published by the author)
+.. _version_0_4_0:
+* 0.4.0
+  - New Test Problems: WFG
   - New Termination Criterion: Stop an algorithm based on time 
-  - New Display: Based on a class and easy to modify
+  - New Display: Modify the printout each generation to keep track of information (more customizable now)
   - New Callback: Based on a class and data during the run can be stored or the algorithm object can be modified inplace.
+  - New Algorithm: CMA-ES (by making use of the implementation published by the author)
+  - New Visualization: Videos can be recorded to follow the algorithm's progress.
   - Bugfix: NDScatter Plot
   - Bugfix: Hypervolume Calculations (Vendor Library)
 

@@ -2,15 +2,9 @@
 # TODO
 
 
-- Algorithm workflow - initialize, run, finalize --  solve does everything
-
 - Write test suite for all algorithms (many problems just run once - no crash should occur)
 
-- Infill Criteria Class  and Mating inherits from it
-
 - Add global tests of all optimization methods
-
-- Report None of infeasible or feasible
 
 - 1+1 and archive
 
@@ -20,6 +14,9 @@
 ####################################################################
 
 # DONE
+- Report None of infeasible or feasible
+- Algorithm workflow - initialize, run, finalize --  solve does everything
+- Infill Criteria Class  and Mating inherits from it
 - NSGA3 - add non-dom check finally (factor out the algorithm method and reuse)
 - !!! NDS and crowding cast to np.float
 - !!! Rewrite integer operation with a wrapper - check if casting is working for different types
@@ -35,18 +32,19 @@
 - Deliver just .c files for pip to make the build independent from Cython
 - Compilation issue with MacOSX Macoave
 - NSGA3 worst swap of arguments
+- maybe include CMA-ES: https://github.com/CMA-ES/pycma
+- Add NoCrossover and NoMutation
+- Add mixed variable possibility
 
 
 ####################################################################
 
 # Future
 
-- Add mixed variable possibility
+
 - PCX as crossover
 - Remove image file from git history
 - (mu,lambda) and (mu+lambda) difference
-- Add NoCrossover and NoMutation
 - Statistics of Survival and more attributes for individuals
 - ask and tell interface Documentation
-- maybe include CMA-ES: https://github.com/CMA-ES/pycma
 - Implement an async version of algorithms

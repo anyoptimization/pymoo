@@ -398,7 +398,7 @@ class Problem:
         return out
 
     @abstractmethod
-    def _evaluate(self, x, f, *args, **kwargs):
+    def _evaluate(self, x, out, *args, **kwargs):
         pass
 
     def has_bounds(self):

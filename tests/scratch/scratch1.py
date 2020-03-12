@@ -1,9 +1,7 @@
 import autograd.numpy as anp
-
 import numpy as np
 
 from pymoo.algorithms.moead import MOEAD
-from pymoo.algorithms.nsga3 import NSGA3
 from pymoo.factory import get_reference_directions
 from pymoo.model.problem import Problem
 from pymoo.optimize import minimize

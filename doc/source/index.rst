@@ -48,11 +48,32 @@ plain python version is installed. More information are available in our
 To get familiar with our framework we recommended having a look at our
 getting started guide:
 
+
+
+.. raw:: html
+
+  <style>
+  #pymoo-banner:hover {
+      transform: scale(1.05);
+  }
+  </style>
+  <div>
+  
+
 .. image:: resources/images/getting_started.svg
+   :name: pymoo-banner
    :target: getting_started.html
    :width: 40%
    :alt: Getting Started
    :align: left
+   
+
+.. raw:: html
+
+  </div>
+  <div style="clear:both; visibility: hidden;"></div>
+
+
 
 
 
@@ -68,7 +89,7 @@ Furthermore, our framework offers a variety of different features which cover va
 Reference
 ------------------------------------------------------------------------------
 
-We are currently working on a journal paper.
+We are currently working on a journal publication.
 Meanwhile, if you have used our framework for research purposes, you can cite us with:
 
 ::

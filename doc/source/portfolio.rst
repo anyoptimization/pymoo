@@ -42,11 +42,14 @@
                                 <a href="algorithms/genetic_algorithm.html">Genetic Algorithm</a>,
                                 <a href="algorithms/differential_evolution.html">Differential Evolution</a>,
                                 <a href="algorithms/nelder_mead.html">Nelder Mead</a>,
-                                <a href="algorithms/cmaes.html">CMAES</a><img class="new-flag" src="_static/img/new_flag.svg">
+                                <a href="algorithms/brkga.html">BRKGA</a><img class="new-flag" src="_static/img/new_flag.svg">,
+                                <a href="algorithms/cmaes.html">CMA-ES</a><img class="new-flag" src="_static/img/new_flag.svg">
                                 <br>
                                 <b>Multi-objective:</b>
                                 <a href="algorithms/nsga2.html">NSGA-II</a>,
-                                <a href="algorithms/rnsga2.html">R-NSGA-II</a>,
+                                <a href="algorithms/rnsga2.html">R-NSGA-II</a>
+                                <br>
+                                <b>Many-objective:</b>
                                 <a href="algorithms/nsga3.html">NSGA-III</a>,
                                 <a href="algorithms/rnsga3.html">R-NSGA-III</a>,
                                 <a href="algorithms/unsga3.html">U-NSGA-III</a>,
@@ -119,7 +122,8 @@
                             <a href="visualization/star.html">Star Coordinates</a>,
                             <a href="visualization/heatmap.html">Heatmap</a>,
                             <a href="visualization/petal.html">Petal Diagram</a>,
-                            <a href="visualization/radar.html">Spider Web / Radar</a>
+                            <a href="visualization/radar.html">Spider Web / Radar</a>,
+                            <a href="visualization/video.html">Video</a><img class="new-flag" src="_static/img/new_flag.svg">
 
                     </div>
                 </div>
@@ -199,7 +203,7 @@
                             <a href="misc/termination_criterion.html">Termination Criterion</a>, 
                             <a href="misc/reference_directions.html">Reference Directions</a>, 
                             <a href="misc/constraint_handling.html">Constraint Handling</a>,
-                            <a href="misc/results.html">Results</a>,
+                            <a href="misc/results.html">Results</a><img class="new-flag" src="_static/img/new_flag.svg">,
                             <a href="misc/callback.html">Callback</a><img class="new-flag" src="_static/img/new_flag.svg">,
                             <a href="misc/display.html">Display</a><img class="new-flag" src="_static/img/new_flag.svg">
                     </div>
@@ -223,11 +227,12 @@
                             <a href="tutorial/binary_problem.html">Binary</a>,
                             <a href="tutorial/discrete_problem.html">Discrete</a>,
                             <a href="tutorial/mixed_variable_problem.html">Mixed</a>,
-                            <a href="tutorial/custom.html">Custom</a><img class="new-flag" src="_static/img/new_flag.svg">
+                            <a href="tutorial/custom.html">Custom</a>
                             </br>
-                            More: <a href="problems/parallelization.html">Parallelization of Function Evaluations</a>, <a href="tutorial/repair.html">Repair</a>
+                            More: <a href="problems/parallelization.html">Parallelization of Function Evaluations</a>, 
+                            <a href="tutorial/repair.html">Repair</a>
                             </br>
-                            Examples: <a href="tutorial/subset_selection.html">Subset Selection</a><img class="new-flag" src="_static/img/new_flag.svg">
+                            Examples: <a href="tutorial/subset_selection.html">Subset Selection</a>
                     </div>
 
                 </div>
