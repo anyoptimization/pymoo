@@ -12,17 +12,18 @@ from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.operators.selection.random_selection import RandomSelection
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 
 # =========================================================================================================
 # Implementation
 # =========================================================================================================
-from pymoo.util.termination.default import SingleObjectiveDefaultTermination
+
 
 
 class EliteSurvival(Survival):
 
-    def __init__(self, n_elites, eliminate_duplicates=None) -> None:
+    def __init__(self, n_elites, eliminate_duplicates=None):
         super().__init__(False)
         self.n_elites = n_elites
         self.eliminate_duplicates = eliminate_duplicates
@@ -60,6 +61,10 @@ class EliteBiasedSelection(Selection):
         elites = np.where(_type == "elite")[0]
         non_elites = np.where(_type == "non_elite")[0]
 
+        # if through duplicate elimination no non-elites exist
+        if len(non_elites) == 0:
+            non_elites = elites
+
         # do the mating selection - always one elite and one non-elites
         s_elite = elites[RandomSelection().do(elites, n_select, 1)[:, 0]]
         s_non_elite = non_elites[RandomSelection().do(non_elites, n_select, 1)[:, 0]]
@@ -70,9 +75,9 @@ class EliteBiasedSelection(Selection):
 class BRKGA(GeneticAlgorithm):
 
     def __init__(self,
-                 n_elites=20,
-                 n_offsprings=70,
-                 n_mutants=10,
+                 n_elites=200,
+                 n_offsprings=700,
+                 n_mutants=100,
                  bias=0.7,
                  sampling=FloatRandomSampling(),
                  survival=None,
@@ -87,16 +92,23 @@ class BRKGA(GeneticAlgorithm):
         ----------
 
         n_elites : int
-            Population size
+            Number of elite individuals
 
         n_offsprings : int
-            Fraction of elite items into each population
+            Number of offsprings to be generated through mating of an elite and a non-elite individual
 
         n_mutants : int
-            Fraction of mutants introduced at each generation into the population
+            Number of mutations to be introduced each generation
 
         bias : float
-            Probability that an offspring inherits the allele of its elite parent
+            Bias of an offspring inheriting the allele of its elite parent
+
+        eliminate_duplicates : bool or class
+            The duplicate elimination is more important if a decoding is used. The duplicate check has to be
+            performed on the decoded variable and not on the real values. Therefore, we recommend passing
+            a DuplicateElimination object.
+            If eliminate_duplicates is simply set to `True`, then duplicates are filtered out whenever the
+            objective values are equal.
 
         """
 
@@ -124,7 +136,7 @@ class BRKGA(GeneticAlgorithm):
         elites = np.where(pop.get("type") == "elite")[0]
 
         # actually do the mating given the elite selection and biased crossover
-        off = self.mating.do(self.problem, self.pop, n_offsprings=self.n_offsprings, algorithm=self)
+        off = self.mating.do(self.problem, pop, n_offsprings=self.n_offsprings, algorithm=self)
 
         # create the mutants randomly to fill the population with
         mutants = FloatRandomSampling().do(self.problem, self.n_mutants, algorithm=self)

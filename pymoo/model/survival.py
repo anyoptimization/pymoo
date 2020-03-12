@@ -57,6 +57,7 @@ class Survival:
 
 def split_by_feasibility(pop, sort_infeasbible_by_cv=True):
     CV = pop.get("CV")
+
     b = (CV <= 0)
 
     feasible = np.where(b)[0]
