@@ -13,9 +13,12 @@ class Population(np.ndarray):
         return obj
 
     def merge(self, other):
-        obj = np.concatenate([self, other]).view(Population)
-        obj.individual = self.individual
-        return obj
+        if len(self) == 0:
+            return other
+        else:
+            obj = np.concatenate([self, other]).view(Population)
+            obj.individual = self.individual
+            return obj
 
     def copy(self):
         pop = Population(n_individuals=len(self), individual=self.individual)
@@ -59,7 +62,7 @@ class Population(np.ndarray):
         for i in range(int(len(args) / 2)):
 
             key, values = args[i * 2], args[i * 2 + 1]
-            is_iterable = hasattr(values, '__len__')
+            is_iterable = hasattr(values, '__len__') and not isinstance(values, str)
 
             if is_iterable and len(values) != len(self):
                 raise Exception("Population Set Attribute Error: Number of values and population size do not match!")

@@ -4,9 +4,11 @@ from pathlib import Path
 
 from pymoo.configuration import get_pymoo
 
+SKIP = ["__init__.py", "usage_video.py", "usage_stream.py"]
+
 
 def test_usage(usages):
-    usages = [f for f in usages if f != "__init__.py"]
+    usages = [f for f in usages if not any([f.endswith(s) for s in SKIP])]
 
     print(usages)
 

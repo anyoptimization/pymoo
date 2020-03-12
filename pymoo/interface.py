@@ -23,6 +23,7 @@ def get_problem_func(n_var, xl, xu, type_var):
     class P(Problem):
         def __init__(self) -> None:
             super().__init__(n_var=n_var, n_obj=1, n_constr=0, xl=xl, xu=xu, type_var=type_var)
+
     return P
 
 
@@ -127,8 +128,8 @@ class AskAndTell:
 
             # execute the mating using the population
             off = self.algorithm.mating.do(self.algorithm.problem, self.get_population(),
-                                                n_offsprings=self.algorithm.n_offsprings, algorithm=self.algorithm)
-            
+                                           n_offsprings=self.algorithm.n_offsprings, algorithm=self.algorithm)
+
             # execute the fake evaluation of the individuals
             self.problem._evaluate = types.MethodType(evaluate_to_nan, self.problem)
             self.algorithm.evaluator.eval(self.problem, off, algorithm=self.algorithm)

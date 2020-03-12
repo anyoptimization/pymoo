@@ -8,12 +8,12 @@ from pymoo.model.mating import Mating
 class GeneticAlgorithm(Algorithm):
 
     def __init__(self,
-                 pop_size,
-                 sampling,
-                 selection,
-                 crossover,
-                 mutation,
-                 survival,
+                 pop_size=None,
+                 sampling=None,
+                 selection=None,
+                 crossover=None,
+                 mutation=None,
+                 survival=None,
                  n_offsprings=None,
                  eliminate_duplicates=DefaultDuplicateElimination(),
                  repair=None,
@@ -23,8 +23,14 @@ class GeneticAlgorithm(Algorithm):
 
         super().__init__(**kwargs)
 
-        # population size of the genetic algorithm
+        # store the genetic operators
         self.pop_size = pop_size
+        self.sampling = sampling
+        self.selection = selection
+        self.crossover = crossover
+        self.mutation = mutation
+        self.repair = repair
+        self.survival = survival
 
         # number of offsprings to generate through recombination
         self.n_offsprings = n_offsprings
@@ -32,14 +38,6 @@ class GeneticAlgorithm(Algorithm):
         # if the number of offspring is not set - equal to population size
         if self.n_offsprings is None:
             self.n_offsprings = pop_size
-
-        # store the genetic operators
-        self.sampling = sampling
-        self.selection = selection
-        self.crossover = crossover
-        self.mutation = mutation
-        self.repair = repair
-        self.survival = survival
 
         # the object to be used to represent an individual - either individual or derived class
         self.individual = individual

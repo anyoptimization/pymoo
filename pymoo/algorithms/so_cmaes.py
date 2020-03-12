@@ -436,5 +436,14 @@ class CMAES(Algorithm):
             val = val.merge(self.opt)
         self.opt = filter_optimum(val, least_infeasible=True)
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state["es"]
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.ers = None
+
 
 parse_doc_string(CMAES.__init__)

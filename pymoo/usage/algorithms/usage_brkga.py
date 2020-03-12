@@ -1,9 +1,6 @@
+# START perm_prob
 import numpy as np
-
-from pymoo.algorithms.so_brkga import BRKGA
-from pymoo.model.duplicate import ElementwiseDuplicateElimination
 from pymoo.model.problem import Problem
-from pymoo.optimize import minimize
 
 
 class MyProblem(Problem):
@@ -16,28 +13,51 @@ class MyProblem(Problem):
         pheno = np.argsort(x)
         out["F"] = - float((self.correct == pheno).sum())
         out["pheno"] = pheno
+        out["hash"] = hash(str(pheno))
+
+
+# END perm_prob
+
+
+# START dupl
+from pymoo.model.duplicate import ElementwiseDuplicateElimination
 
 
 class MyElementwiseDuplicateElimination(ElementwiseDuplicateElimination):
 
     def is_equal(self, a, b):
-        return np.all(a.get("pheno") == b.get("pheno"))
+        return a.get("hash")[0] == b.get("hash")[0]
 
 
+# END dupl
+
+
+# START problem
 np.random.seed(2)
 list_to_sort = np.random.random(20)
 problem = MyProblem(list_to_sort)
+print("Sorted by", np.argsort(list_to_sort))
+# END problem
 
-algorithm = BRKGA(eliminate_duplicates=MyElementwiseDuplicateElimination())
 
+# START solve
+from pymoo.algorithms.so_brkga import BRKGA
+from pymoo.optimize import minimize
+
+algorithm = BRKGA(
+    n_elites=200,
+    n_offsprings=700,
+    n_mutants=100,
+    bias=0.7,
+    eliminate_duplicates=MyElementwiseDuplicateElimination())
 
 res = minimize(problem,
                algorithm,
-               ("n_gen", 200),
+               ("n_gen", 75),
                seed=1,
-               verbose=True)
+               verbose=False)
 
 print("Best solution found: \nX = %s\nF = %s" % (res.X, res.F))
-print("Solution", res.opt.get("pheno"))
-print("Optimum", np.argsort(list_to_sort))
-
+print("Solution", res.opt.get("pheno")[0])
+print("Optimum ", np.argsort(list_to_sort))
+# END solve

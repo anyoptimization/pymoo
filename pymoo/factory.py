@@ -65,9 +65,11 @@ def get_algorithm_options():
     from pymoo.algorithms.unsga3 import UNSGA3
     from pymoo.algorithms.so_nelder_mead import NelderMead
     from pymoo.algorithms.so_cmaes import CMAES
+    from pymoo.algorithms.so_brkga import BRKGA
 
     ALGORITHMS = [
         ("ga", GA),
+        ("brkga", BRKGA),
         ("de", DE),
         ("nelder-mead", NelderMead),
         ("cmaes", CMAES),
