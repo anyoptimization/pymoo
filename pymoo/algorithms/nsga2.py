@@ -205,6 +205,7 @@ def calc_crowding_distance(F, filter_out_duplicates=True):
         crowding = np.zeros(n_points)
         crowding[is_unique] = _cd
 
+    crowding[np.isinf(crowding)] = 1e+14
     return crowding
 
 

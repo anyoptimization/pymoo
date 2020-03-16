@@ -90,6 +90,7 @@ class MOEAD(GeneticAlgorithm):
         self.ideal_point = np.min(self.pop.get("F"), axis=0)
 
     def _next(self):
+        repair, crossover, mutation = self.mating.repair, self.mating.crossover, self.mating.mutation
 
         # retrieve the current population
         pop = self.pop
@@ -101,17 +102,17 @@ class MOEAD(GeneticAlgorithm):
             N = self.neighbors[i, :]
 
             if np.random.random() < self.prob_neighbor_mating:
-                parents = N[np.random.permutation(self.n_neighbors)][:self.crossover.n_parents]
+                parents = N[np.random.permutation(self.n_neighbors)][:crossover.n_parents]
             else:
-                parents = np.random.permutation(self.pop_size)[:self.crossover.n_parents]
+                parents = np.random.permutation(self.pop_size)[:crossover.n_parents]
 
             # do recombination and create an offspring
-            off = self.crossover.do(self.problem, pop, parents[None, :])
-            off = self.mutation.do(self.problem, off)
+            off = crossover.do(self.problem, pop, parents[None, :])
+            off = mutation.do(self.problem, off)
             off = off[np.random.randint(0, len(off))]
 
             # repair first in case it is necessary
-            if self.repair:
+            if repair:
                 off = self.repair.do(self.problem, off, algorithm=self)
 
             # evaluate the offspring

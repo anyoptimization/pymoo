@@ -59,10 +59,11 @@ if __name__ == '__main__':
             M = np.array([F[best], CV[best]])
         """
 
-        M = np.column_stack([res.pop.get("F"), res.pop.get("CV"), res.pop.get("X")])
+        # M = np.column_stack([res.pop.get("F"), res.pop.get("CV"), res.pop.get("X")])
+        M = res.pop.get("F")
         np.savetxt(out, M)
 
-        np.savetxt(out + ".gen", np.array([res.algorithm.n_gen]))
+        # np.savetxt(out + ".gen", np.array([res.algorithm.n_gen]))
 
 
     except Exception as e:
