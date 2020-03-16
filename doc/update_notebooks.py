@@ -87,10 +87,10 @@ def update_and_run_notebook(filename, replace=True, execute=False):
 
 if __name__ == "__main__":
 
-    # files = glob.glob('source/**/*.ipynb')
+    files = glob.glob('source/**/*.ipynb')
     # files = glob.glob('source/problems/*.ipynb')
     # files = glob.glob('source/algorithms/brkga.ipynb')
-    files = glob.glob('source/visualization/video.ipynb')
+    # files = glob.glob('source/visualization/video.ipynb')
     # files = glob.glob('source/visualization/*.ipynb')
     # files = glob.glob('source/components/performance_indicator.ipynb')
     # files = glob.glob('source/components/termination_criterion.ipynb')
