@@ -1,6 +1,3 @@
-import numpy as np
-
-
 class InfillCriterion:
 
     def __init__(self,
@@ -31,14 +28,18 @@ class InfillCriterion:
             # do the mating
             _off = self._do(problem, pop, n_remaining, **kwargs)
 
+            # repair the individuals if necessary
+            if self.repair:
+                _off = self.repair.do(problem, _off, **kwargs)
+
             if self.eliminate_duplicates is not None:
                 _off = self.eliminate_duplicates.do(_off, pop, off)
 
             # if more offsprings than necessary - truncate them randomly
             if len(off) + len(_off) > n_offsprings:
+                # IMPORTANT: Interestingly, this makes a difference in performance
                 n_remaining = n_offsprings - len(off)
-                I = np.random.permutation(len(_off))[:n_remaining]
-                _off = _off[I]
+                _off = _off[:n_remaining]
 
             # add to the offsprings and increase the mating counter
             off = off.merge(_off)

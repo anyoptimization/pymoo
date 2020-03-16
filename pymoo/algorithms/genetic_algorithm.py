@@ -23,13 +23,10 @@ class GeneticAlgorithm(Algorithm):
 
         super().__init__(**kwargs)
 
-        # store the genetic operators
+        # the population size used
         self.pop_size = pop_size
-        self.sampling = sampling
-        self.selection = selection
-        self.crossover = crossover
-        self.mutation = mutation
-        self.repair = repair
+
+        # the survival for the genetic algorithm
         self.survival = survival
 
         # number of offsprings to generate through recombination
@@ -104,7 +101,8 @@ class GeneticAlgorithm(Algorithm):
         self.pop = self.pop.merge(self.off)
 
         # the do survival selection
-        self.pop = self.survival.do(self.problem, self.pop, self.pop_size, algorithm=self)
+        if self.survival:
+            self.pop = self.survival.do(self.problem, self.pop, self.pop_size, algorithm=self)
 
     def _finalize(self):
         pass

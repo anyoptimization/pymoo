@@ -82,6 +82,7 @@ class DE(GeneticAlgorithm):
         self.default_termination = SingleObjectiveDefaultTermination()
 
     def _next(self):
+        selection, crossover, mutation = self.mating.selection, self.mating.crossover, self.mating.mutation
 
         # retrieve the current population
         pop = self.pop
@@ -92,16 +93,16 @@ class DE(GeneticAlgorithm):
 
         # create offsprings and add it to the data of the algorithm
         if self.var_selection == "rand":
-            P = self.selection.do(pop, self.pop_size, self.crossover.n_parents)
+            P = selection.do(pop, self.pop_size, crossover.n_parents)
 
         elif self.var_selection == "best":
             best = np.argmin(F[:, 0])
-            P = self.selection.do(pop, self.pop_size, self.crossover.n_parents - 1)
+            P = selection.do(pop, self.pop_size, crossover.n_parents - 1)
             P = np.column_stack([np.full(len(pop), best), P])
 
         elif self.var_selection == "rand+best":
             best = np.argmin(F[:, 0])
-            P = self.selection.do(pop, self.pop_size, self.crossover.n_parents)
+            P = selection.do(pop, self.pop_size, crossover.n_parents)
             use_best = np.random.random(len(pop)) < 0.3
             P[use_best, 0] = best
 
@@ -109,12 +110,12 @@ class DE(GeneticAlgorithm):
             raise Exception("Unknown selection: %s" % self.var_selection)
 
         # do the first crossover which is the actual DE operation
-        self.off = self.crossover.do(self.problem, pop, P, algorithm=self)
+        self.off = crossover.do(self.problem, pop, P, algorithm=self)
 
         # then do the mutation (which is actually )
         _pop = self.off.new().merge(self.pop).merge(self.off)
         _P = np.column_stack([np.arange(len(pop)), np.arange(len(pop)) + len(pop)])
-        self.off = self.mutation.do(self.problem, _pop, _P, algorithm=self)[:len(self.pop)]
+        self.off = mutation.do(self.problem, _pop, _P, algorithm=self)[:len(self.pop)]
 
         # bounds back if something is out of bounds
         self.off = BoundsBackRepair().do(self.problem, self.off)

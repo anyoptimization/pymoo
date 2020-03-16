@@ -1,16 +1,17 @@
 # START example
 import numpy as np
+from pyrecorder.recorders.file import File
+from pyrecorder.video import Video
 
 from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.visualization.scatter import Scatter
-from pymoo.visualization.video import Video
 
-vid = Video("example.mp4")
+vid = Video(File("example.mp4"))
 
 for k in range(10):
     X = np.random.random((100, 2))
     Scatter(title=str(k)).add(X).do()
-    vid.snap(duration=1)
+    vid.record()
 
 vid.close()
 # END example
@@ -31,11 +32,18 @@ ret = minimize(problem,
                save_history=True,
                verbose=False)
 
+# use the video writer as a resource
+with Video(File("ga.mp4")) as vid:
 
-def my_plot(algorithm):
-    Scatter(title=("Gen %s" % algorithm.n_gen)).add(algorithm.pop.get("F")).do()
+    # for each algorithm object in the history
+    for entry in ret.history:
+        sc = Scatter(title=("Gen %s" % entry.n_gen))
+        sc.add(entry.pop.get("F"))
+        sc.add(entry.problem.pareto_front(), plot_type="line", color="black", alpha=0.7)
+        sc.do()
 
-Video.from_iteratable("ga.mp4", ret.history, my_plot)
+        # finally record the current visualization to the video
+        vid.record()
 # END ga
 
 
