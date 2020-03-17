@@ -20,7 +20,6 @@ from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 # =========================================================================================================
 
 
-
 class EliteSurvival(Survival):
 
     def __init__(self, n_elites, eliminate_duplicates=None):
@@ -34,8 +33,10 @@ class EliteSurvival(Survival):
             pop = DefaultDuplicateElimination(func=lambda p: p.get("F")).do(pop)
 
         elif isinstance(self.eliminate_duplicates, DuplicateElimination):
-            _, no_candidates, candidates = DefaultDuplicateElimination(func=lambda pop: pop.get("F")).do(pop, return_indices=True)
-            _, _, is_duplicate = self.eliminate_duplicates.do(pop[candidates], pop[no_candidates], return_indices=True, to_itself=False)
+            _, no_candidates, candidates = DefaultDuplicateElimination(func=lambda pop: pop.get("F")).do(pop,
+                                                                                                         return_indices=True)
+            _, _, is_duplicate = self.eliminate_duplicates.do(pop[candidates], pop[no_candidates], return_indices=True,
+                                                              to_itself=False)
             elim = set(np.array(candidates)[is_duplicate])
             pop = pop[[k for k in range(len(pop)) if k not in elim]]
 

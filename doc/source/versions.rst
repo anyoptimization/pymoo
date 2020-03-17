@@ -4,11 +4,13 @@ Versions
 
 .. _version_0_4_0:
 * 0.4.0
+
   - New Test Problems: WFG
   - New Termination Criterion: Stop an algorithm based on time 
   - New Display: Modify the printout each generation to keep track of information (more customizable now)
   - New Callback: Based on a class and data during the run can be stored or the algorithm object can be modified inplace.
   - New Algorithm: CMA-ES (by making use of the implementation published by the author)
+  - New Algorithm: Biased-Random Key Genetic Algorithm (BRKGA)
   - New Visualization: Videos can be recorded to follow the algorithm's progress.
   - Bugfix: NDScatter Plot
   - Bugfix: Hypervolume Calculations (Vendor Library)
@@ -16,7 +18,7 @@ Versions
 
 
 .. _version_0_3_2:
-* 0.3.2
+* 0.3.2 [`Documentation <https://www.egr.msu.edu/coinlab/blankjul/pymoo-0.3.2-doc.zip>`_]
 
   - New Algorithm: Nelder Mead with box constraint handling in the design space
   - New Performance indicator: Karush Kuhn Tucker Proximity Measure (KKTPM)
