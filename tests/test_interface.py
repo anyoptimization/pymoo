@@ -10,6 +10,9 @@ class InterfaceTest(unittest.TestCase):
 
     def test_ask_and_tell(self):
 
+        # set the random seed for this test
+        np.random.seed(1)
+
         # create the algorithm object to be used
         algorithm = GA(pop_size=100, eliminate_duplicates=True)
 
@@ -17,7 +20,7 @@ class InterfaceTest(unittest.TestCase):
         api = AskAndTell(algorithm, n_var=2, n_obj=1, n_constr=1, xl=-10, xu=10)
 
         # this loop runs always one step of the algorithm
-        for gen in range(100):
+        for gen in range(200):
 
             # ask the algorithm for values to be evaluated
             X = api.ask()
@@ -35,7 +38,7 @@ class InterfaceTest(unittest.TestCase):
         X, F, CV = api.result(only_optimum=False, return_values_of=["X", "F", "CV"])
 
         self.assertTrue(np.allclose(CV, 0))
-        self.assertTrue(np.allclose(F[:10], 1, atol=1.e-4))
+        self.assertTrue(np.allclose(F[:10], 1, atol=1.e-3))
 
 
 
