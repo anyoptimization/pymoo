@@ -83,7 +83,7 @@ class Plot:
         self.bounds = bounds
 
     def init_figure(self, n_rows=1, n_cols=1, plot_3D=False, force_axes_as_matrix=False):
-        if self.fig is not None or self.ax is not None:
+        if self.ax is not None:
             return
 
         if not plot_3D:
