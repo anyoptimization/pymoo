@@ -1,12 +1,3 @@
-pymoo - Multi-Objective Optimization Framework
-====================================================================
-
-You can find the detailed documentation here: https://pymoo.org
-
-
-|travis| |python| |license|
-
-
 .. |travis| image:: https://travis-ci.com/msu-coinlab/pymoo.svg?branch=master
    :alt: build status
    :target: https://travis-ci.com/msu-coinlab/pymoo
@@ -19,22 +10,27 @@ You can find the detailed documentation here: https://pymoo.org
    :target: https://www.apache.org/licenses/LICENSE-2.0
 
 
-We are currently working on a paper about *pymoo*.
-Meanwhile, if you have used our framework for research purposes, please cite us with:
+.. _Github: https://github.com/msu-coinlab/pymoo
+.. _Documentation: https://www.pymoo.org/
+.. _Paper: https://arxiv.org/abs/2002.04504
 
-::
 
-    @misc{pymoo,
-        title={pymoo: Multi-objective Optimization in Python},
-        author={Julian Blank and Kalyanmoy Deb},
-        year={2020},
-        eprint={2002.04504},
-        archivePrefix={arXiv},
-        primaryClass={cs.NE}
-    }
+.. raw:: html
+
+   <div>
+   <a href="https://pymoo.org"><img src="https://pymoo.org/_static/img/pymoo_banner_github.png" alt="pymoo"></a>
+   </div>
 
 
 
+|travis| |python| |license|
+
+
+Documentation_ / Paper_ / Installation_ / Usage_ / `Cite Us`_ / Contact_
+
+
+
+.. _Installation:
 Installation
 ====================================================================
 
@@ -65,6 +61,7 @@ directory because otherwise not the in site-packages installed version will be u
     python -c "from pymoo.util.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
 
 
+.. _Usage:
 Usage
 ==================================
 
@@ -78,6 +75,28 @@ However, for instance executing NSGA2:
 
 
 
+
+.. _Cite Us:
+Cite Us
+====================================================================
+
+We are currently working on a journal publication for *pymoo*.
+Meanwhile, if you have used our framework for research purposes, please cite us with:
+
+::
+
+    @misc{pymoo,
+        title={pymoo: Multi-objective Optimization in Python},
+        author={Julian Blank and Kalyanmoy Deb},
+        year={2020},
+        eprint={2002.04504},
+        archivePrefix={arXiv},
+        primaryClass={cs.NE}
+    }
+
+
+
+.. _Contact:
 Contact
 ====================================================================
 
@@ -87,4 +106,5 @@ Feel free to contact me if you have any question:
 | Michigan State University
 | Computational Optimization and Innovation Laboratory (COIN)
 | East Lansing, MI 48824, USA
+
 
