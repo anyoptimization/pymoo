@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 
 from pymoo.docs import parse_doc_string
@@ -77,7 +76,7 @@ class PCP(Plot):
             set_if_none(_kwargs, "color", self.colors[k])
 
             for i in range(len(F)):
-                plt.plot(np.arange(F.shape[1]), F[i, :], **_kwargs)
+                self.ax.plot(np.arange(F.shape[1]), F[i, :], **_kwargs)
 
         # Plot the parallel coordinate axes
         for i in range(self.n_dim):

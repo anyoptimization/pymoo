@@ -90,13 +90,21 @@ def cdist(A, B, **kwargs):
     return scipy.spatial.distance.cdist(A, B, **kwargs)
 
 
-def vectorized_cdist(A, B, func_dist=euclidean_distance, **kwargs):
+def vectorized_cdist(A, B, func_dist=euclidean_distance, fill_diag_with_inf=False, **kwargs):
     u = np.repeat(A, B.shape[0], axis=0)
     v = np.tile(B, (A.shape[0], 1))
 
     D = func_dist(u, v, **kwargs)
     M = np.reshape(D, (A.shape[0], B.shape[0]))
+
+    if fill_diag_with_inf:
+        np.fill_diagonal(M, np.inf)
+
     return M
+
+
+def norm_eucl_dist(problem, A, B, **kwargs):
+    return vectorized_cdist(A, B, func_dist=norm_euclidean_distance(problem), **kwargs)
 
 
 def covert_to_type(problem, X):

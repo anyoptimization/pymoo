@@ -10,23 +10,32 @@
    :target: https://www.apache.org/licenses/LICENSE-2.0
 
 
+.. |logo| image:: doc/source/_theme/custom_theme/static/img/pymoo_banner_github.png
+  :target: https://pymoo.org
+  :alt: pymoo
+
+
+.. |animation| image:: doc/source/_theme/custom_theme/static/img/animation.gif
+  :target: https://pymoo.org
+  :alt: pymoo
+
+
 .. _Github: https://github.com/msu-coinlab/pymoo
 .. _Documentation: https://www.pymoo.org/
 .. _Paper: https://arxiv.org/abs/2002.04504
 
-
-.. raw:: html
-
-   <div>
-   <a href="https://pymoo.org"><img src="https://pymoo.org/_static/img/pymoo_banner_github.png" alt="pymoo"></a>
-   </div>
 
 
 
 |travis| |python| |license|
 
 
-Documentation_ / Paper_ / Installation_ / Usage_ / `Cite Us`_ / Contact_
+|logo|
+
+
+
+Documentation_ / Paper_ / Installation_ / Usage_ / Citation_ / Contact_
+
 
 
 
@@ -76,8 +85,12 @@ However, for instance executing NSGA2:
 
 
 
-.. _Cite Us:
-Cite Us
+|animation|
+
+
+
+.. _Citation:
+Citation
 ====================================================================
 
 We are currently working on a journal publication for *pymoo*.
@@ -106,5 +119,6 @@ Feel free to contact me if you have any question:
 | Michigan State University
 | Computational Optimization and Innovation Laboratory (COIN)
 | East Lansing, MI 48824, USA
+
 
 
