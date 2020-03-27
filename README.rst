@@ -102,6 +102,7 @@ However, for instance executing NSGA2:
 
 
 
+A representative run of NSGA2 looks as follows:
 
 |animation|
 
