@@ -12,6 +12,8 @@ from pymoo.visualization.util import default_number_to_text, in_notebook
 class Plot:
 
     def __init__(self,
+                 fig=None,
+                 ax=None,
                  figsize=(8, 6),
                  title=None,
                  legend=False,
@@ -31,8 +33,8 @@ class Plot:
         plt.rc('font', family='serif')
 
         # the matplotlib classes
-        self.fig = None
-        self.ax = None
+        self.fig = fig
+        self.ax = ax
         self.figsize = figsize
 
         # the title of the figure - can also be a list if subfigures
@@ -81,6 +83,8 @@ class Plot:
         self.bounds = bounds
 
     def init_figure(self, n_rows=1, n_cols=1, plot_3D=False, force_axes_as_matrix=False):
+        if self.fig is not None or self.ax is not None:
+            return
 
         if not plot_3D:
             self.fig, self.ax = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=self.figsize)

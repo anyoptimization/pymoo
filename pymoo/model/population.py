@@ -12,6 +12,10 @@ class Population(np.ndarray):
         obj.individual = individual
         return obj
 
+    @classmethod
+    def merge(cls, a, b):
+        return a.merge(b)
+
     def merge(self, other):
         if len(self) == 0:
             return other
