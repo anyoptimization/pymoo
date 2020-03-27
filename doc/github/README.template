@@ -10,12 +10,12 @@
    :target: https://www.apache.org/licenses/LICENSE-2.0
 
 
-.. |logo| image:: doc/source/_theme/custom_theme/static/img/pymoo_banner_github.png
+.. |logo| image:: https://github.com/msu-coinlab/pymoo//raw/master/doc/source/_theme/custom_theme/static/img/pymoo_banner_github.png
   :target: https://pymoo.org
   :alt: pymoo
 
 
-.. |animation| image:: doc/source/_theme/custom_theme/static/img/animation.gif
+.. |animation| image:: https://github.com/msu-coinlab/pymoo//raw/master/doc/source/_theme/custom_theme/static/img/animation.gif
   :target: https://pymoo.org
   :alt: pymoo
 
