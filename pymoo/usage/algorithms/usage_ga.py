@@ -13,6 +13,3 @@ res = minimize(problem,
                termination=('n_gen', 50),
                seed=1,
                verbose=False)
-
-print("Best solution found: \nX = %s\nF = %s" % (res.X, res.F))
-
