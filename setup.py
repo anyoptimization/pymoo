@@ -63,6 +63,7 @@ def packages():
 
 
 data['long_description'] = readme()
+data['long_description_content_type'] = 'text/x-rst'
 data['packages'] = packages()
 
 
