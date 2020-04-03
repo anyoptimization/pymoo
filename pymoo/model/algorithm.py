@@ -94,6 +94,8 @@ class Algorithm:
         self.termination = termination
         # an algorithm can defined the default termination which can be overwritten
         self.default_termination = None
+        # whether the algorithm as terminated or not
+        self.has_terminated = None
         # the random seed that was used
         self.seed = None
         # the pareto-front of the problem - if it exist or passed
@@ -144,6 +146,9 @@ class Algorithm:
         # if nothing given fall back to default
         if self.termination is None:
             self.termination = self.default_termination
+
+        # by default the algorithm as not terminated
+        self.has_terminated = False
 
         # set the random seed in the algorithm object
         self.seed = seed
@@ -258,6 +263,9 @@ class Algorithm:
         while self.termination.do_continue(self):
             self.next()
 
+        # set the algorithm to be terminated from now on
+        self.has_terminated = True
+
         # finalize the algorithm and do postprocessing of desired
         self.finalize()
 
@@ -286,7 +294,10 @@ class Algorithm:
             self.history.append(obj)
 
     def _set_optimum(self, force=False):
-        self.opt = filter_optimum(self.pop, least_infeasible=True)
+        pop = self.pop
+        # if self.opt is not None:
+        #     pop = Population.merge(pop, self.opt)
+        self.opt = filter_optimum(pop, least_infeasible=True)
 
     def _finalize(self):
         pass

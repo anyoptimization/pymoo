@@ -108,6 +108,7 @@ class Display:
         # catch any exception to make sure the algorithm does not fail because of printing
         except:
             print("WARNING: Error while preparing the output to be printed.")
+            self._do(problem, evaluator, algorithm)
 
         self.display_header = False
 
@@ -166,22 +167,19 @@ class MultiObjectiveDisplay(Display):
 
         else:
             self.output.append("n_nds", len(algorithm.opt), width=7)
-
             self.term.do_continue(algorithm)
 
             delta_ideal, delta_nadir, delta_f, hist_delta_max = "-", "-", "-", "-"
-            metric = self.term.metric()
-            if metric is not None:
+
+            if len(self.term.metrics) > 0:
+                metric = self.term.metrics[-1]
                 delta_ideal = metric["delta_ideal"]
                 delta_nadir = metric["delta_nadir"]
                 delta_f = metric["delta_f"]
-                hist_delta_max = metric["max_delta_all"]
 
             self.output.append("delta_ideal", delta_ideal)
             self.output.append("delta_nadir", delta_nadir)
             self.output.append("delta_f", delta_f)
-            self.output.append("delta_max", max(delta_ideal, delta_nadir, delta_f))
-            self.output.append("hist_delta_max", hist_delta_max, width=13)
 
 
 

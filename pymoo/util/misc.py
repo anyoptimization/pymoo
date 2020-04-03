@@ -253,3 +253,6 @@ def intersect(a, b):
 
 def has_feasible(pop):
     return np.any(pop.get("feasible"))
+
+def to_numpy(a):
+    return np.array(a)

@@ -93,17 +93,19 @@ if __name__ == "__main__":
     # files = glob.glob('source/visualization/video.ipynb')
     # files = glob.glob('source/visualization/*.ipynb')
     # files = glob.glob('source/components/performance_indicator.ipynb')
-    # files = glob.glob('source/components/termination_criterion.ipynb')
+    # files = glob.glob('source/misc/termination_criterion.ipynb')
 
     # STARTING_AT = "source/algorithms/cmaes.ipynb"
     #STARTING_AT = "source/misc/results.ipynb"
     STARTING_AT = None
 
+    SKIP = ["source/problems/parallelization.ipynb", "source/visualization/video.ipynb"]
+
     #files = ['source/misc/custom_output.ipynb']
 
     for fname in files:
 
-        if fname == "source/problems/parallelization.ipynb":
+        if fname in SKIP:
             continue
 
         if STARTING_AT is not None and fname in STARTING_AT:

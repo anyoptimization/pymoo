@@ -1,21 +1,16 @@
-import numpy as np
-
-from pymoo.performance_indicator.igd import IGD
 from pymoo.util.misc import to_numpy
-from pymoo.util.normalization import normalize
 from pymoo.util.termination.sliding_window_termination import SlidingWindowTermination
 
 
-class DesignSpaceToleranceTermination(SlidingWindowTermination):
+class SingleObjectiveSpaceToleranceTermination(SlidingWindowTermination):
 
     def __init__(self,
-                 n_last=20,
                  tol=1e-6,
+                 n_last=20,
                  nth_gen=1,
                  n_max_gen=None,
                  n_max_evals=None,
-                 **kwargs):
-
+                 **kwargs) -> None:
         super().__init__(metric_window_size=n_last,
                          data_window_size=2,
                          min_data_for_metric=2,
@@ -26,17 +21,12 @@ class DesignSpaceToleranceTermination(SlidingWindowTermination):
         self.tol = tol
 
     def _store(self, algorithm):
-        problem = algorithm.problem
-        X = algorithm.opt.get("X")
-
-        if X.dtype != np.object:
-            if problem.xl is not None and problem.xu is not None:
-                X = normalize(X, x_min=problem.xl, x_max=problem.xu)
-            return X
+        return algorithm.opt.get("F").min()
 
     def _metric(self, data):
         last, current = data[-2], data[-1]
-        return IGD(current).calc(last)
+        return last - current
 
     def _decide(self, metrics):
-        return to_numpy(metrics).mean() > self.tol
+        delta_f = to_numpy(metrics)
+        return delta_f.max() > self.tol

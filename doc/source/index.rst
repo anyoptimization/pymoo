@@ -11,7 +11,7 @@
 
 .. |blankjul| raw:: html
 
-   <a href="http://www.cse.msu.edu/~blankjul/" target="_blank">Julian Blank</a>
+   <a href="http://julianblank.com" target="_blank">Julian Blank</a>
 
 .. |kdeb| raw:: html
 
@@ -173,6 +173,7 @@ and only if we are aware of issues we can start to investigate them.
 
 
 
+
 Content
 ------------------------------------------------------------------------------
 
@@ -206,5 +207,15 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+
+Contact
+------------------------------------------------------------------------------
+
+| `Julian Blank <http://julianblank.com>`_  (blankjul [at] egr.msu.edu)
+| Michigan State University
+| Computational Optimization and Innovation Laboratory (COIN)
+| East Lansing, MI 48824, USA
 
 

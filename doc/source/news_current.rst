@@ -1,8 +1,8 @@
-**March 20, 2020:** We are glad to announce pymoo **0.4.0** has been released.
+
+**April 3, 2020:** We are glad to announce pymoo **0.4.0** has been released.
 We have added two new algorithms (BRKGA, CMAES) and added the test problem suite WFG.
 Additionally, we have improved the Display Module to create custom printouts and developed
 a new termination criterion for multi-objective algorithms. (:ref:`Release Notes<version_0_4_0>`)
-
 
 
 
@@ -10,4 +10,5 @@ a new termination criterion for multi-objective algorithms. (:ref:`Release Notes
 a performance metric called KKTPM and some new tutorials. (:ref:`Release Notes<version_0_3_2>`)
 
 
-
+**August 16, 2019:** We are glad to announce pymoo **0.3.1** has been released. Many new features were added, for instance
+visualization and decision making. (:ref:`Release Notes<version_0_3_1>`)
