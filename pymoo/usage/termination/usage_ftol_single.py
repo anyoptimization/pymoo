@@ -1,10 +1,11 @@
 from pymoo.algorithms.so_genetic_algorithm import GA
-from pymoo.factory import get_problem, get_termination
+from pymoo.factory import get_problem
 from pymoo.optimize import minimize
+from pymoo.util.termination.f_tol_single import SingleObjectiveSpaceToleranceTermination
 
 problem = get_problem("rastrigin")
 algorithm = GA(pop_size=100)
-termination = get_termination("f_tol_s")
+termination = SingleObjectiveSpaceToleranceTermination()
 
 res = minimize(problem,
                algorithm,

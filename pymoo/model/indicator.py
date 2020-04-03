@@ -44,7 +44,7 @@ class Indicator:
             self.ideal_point = np.zeros(self.n_dim)
             self.nadir_point = np.ones(self.n_dim)
 
-        self.range = np.ones(self.n_dim)
+        self.range = self.nadir_point - self.ideal_point
 
         return self._calc(F)
 

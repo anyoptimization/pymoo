@@ -63,8 +63,6 @@ if __name__ == '__main__':
                 eliminate_duplicates=True
             )
 
-        termination = get_termination("ftol")
-
         for run in range(1, n_runs+1):
 
             fname = "%s_%s.run" % (_problem, run)
@@ -72,7 +70,7 @@ if __name__ == '__main__':
             _out = "results/%s/%s/%s_%s.out" % (name, _problem.replace("_", "/"), _problem, run)
 
             data = {
-                'args': [problem, method, termination],
+                'args': [problem, method],
                 'kwargs': {
                     'seed': run,
                 },

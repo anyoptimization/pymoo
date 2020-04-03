@@ -1,48 +1,50 @@
-import numpy as np
-
 from pymoo.model.termination import Termination
-from pymoo.util.termination.tolerance import ToleranceBasedTermination
+from pymoo.util.misc import to_numpy
+from pymoo.util.termination.sliding_window_termination import SlidingWindowTermination
 
 
-class ConstraintViolationToleranceTermination(ToleranceBasedTermination):
+class ConstraintViolationToleranceTermination(SlidingWindowTermination):
 
     def __init__(self,
-                 tol=0.0001,
-                 **kwargs) -> None:
+                 n_last=20,
+                 tol=1e-6,
+                 nth_gen=1,
+                 n_max_gen=None,
+                 n_max_evals=None,
+                 **kwargs):
 
-        super().__init__(n_hist_at_least=2, n_hist=kwargs["n_last"], **kwargs)
+        super().__init__(metric_window_size=n_last,
+                         data_window_size=2,
+                         min_data_for_metric=2,
+                         nth_gen=nth_gen,
+                         n_max_gen=n_max_gen,
+                         n_max_evals=n_max_evals,
+                         **kwargs)
         self.tol = tol
 
     def _store(self, algorithm):
-        # return algorithm.opt.get("CV")[:, 0].min(axis=0)
-        return algorithm.pop.get("CV")[:, 0].mean()
+        return algorithm.opt.get("CV").max()
 
-    def _calc_metric(self):
-        CV = np.array([e for e in self.history])
+    def _metric(self, data):
+        last, current = data[-2], data[-1]
+        return {"cv": current,
+                "delta_cv": last - current
+                }
 
-        # calculate the improvement regarding the CV in each transition
-        delta_CV = np.array([CV[k] - CV[k + 1] for k in range(len(CV) - 1)])
+    def _decide(self, metrics):
+        cv = to_numpy([e["cv"] for e in metrics])
+        delta_cv = to_numpy([e["delta_cv"] for e in metrics])
+        n_feasible = (cv <= 0).sum()
 
-        return {
-            "some_feasible": CV.min() == 0,
-            "all_feasible": CV.max() == 0,
-            "delta_cv": delta_CV.max()
-        }
-
-    def _decide(self):
-        metric = self.metrics[-1]
-
-        # if all are feasible then no need to continue
-        if metric["all_feasible"]:
+        # if the whole window had only feasible solutions
+        if n_feasible == len(metrics):
             return False
-
-        # if not all feasible, but some are feasible in the window - just a matter of time until all are feasible
-        elif metric["some_feasible"]:
+        # transition period - some were feasible some were not
+        elif 0 < n_feasible < len(metrics):
             return True
-
-        # otherwise look at the improvement from the last generations
+        # all solutions are infeasible
         else:
-            return metric["delta_cv"] > self.tol
+            return delta_cv.max() > self.tol
 
 
 class FeasibleSolutionFoundTermination(Termination):
