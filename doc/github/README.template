@@ -40,6 +40,7 @@ Documentation_ / Paper_ / Installation_ / Usage_ / Citation_ / Contact_
 
 
 .. _Installation:
+
 Installation
 ====================================================================
 
@@ -71,6 +72,7 @@ directory because otherwise not the in site-packages installed version will be u
 
 
 .. _Usage:
+
 Usage
 ==================================
 
@@ -91,6 +93,7 @@ A representative run of NSGA2 looks as follows:
 
 
 .. _Citation:
+
 Citation
 ====================================================================
 
@@ -111,6 +114,7 @@ Meanwhile, if you have used our framework for research purposes, please cite us 
 
 
 .. _Contact:
+
 Contact
 ====================================================================
 
