@@ -26,7 +26,9 @@ def normalize(x, x_min=None, x_max=None, return_bounds=False, estimate_bounds_if
         x_max = np.ones()
 
     # calculate the denominator
-    denom = x_max - x_min
+    denom = (x_max - x_min)
+    if isinstance(denom, np.ndarray):
+        denom = denom.astype(np.float)
 
     # we can not divide by zero -> plus small epsilon
     denom += 1e-30

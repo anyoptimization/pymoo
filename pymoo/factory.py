@@ -200,7 +200,7 @@ def get_termination_options():
     from pymoo.util.termination.min_igd import IGDTermination
     from pymoo.util.termination.x_tol import DesignSpaceToleranceTermination
     from pymoo.util.termination.f_tol import MultiObjectiveSpaceToleranceTermination
-    from pymoo.util.termination.f_tol import SingleObjectiveSpaceToleranceTermination
+    from pymoo.util.termination.f_tol_single import SingleObjectiveSpaceToleranceTermination
     from pymoo.util.termination.default import MultiObjectiveDefaultTermination, SingleObjectiveDefaultTermination
 
     TERMINATION = [

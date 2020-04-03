@@ -1,10 +1,11 @@
 from pymoo.algorithms.nsga2 import NSGA2
-from pymoo.factory import get_problem, get_termination
+from pymoo.factory import get_problem
 from pymoo.optimize import minimize
+from pymoo.util.termination.x_tol import DesignSpaceToleranceTermination
 
 problem = get_problem("zdt3")
 algorithm = NSGA2(pop_size=100)
-termination = get_termination("x_tol", tol=0.001, n_last=20, nth_gen=10)
+termination = DesignSpaceToleranceTermination(tol=0.0025, n_last=20)
 
 res = minimize(problem,
                algorithm,
