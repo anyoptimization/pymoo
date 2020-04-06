@@ -5,12 +5,13 @@ Versions
 .. _version_0_4_0:
 * 0.4.0
 
-  - New Test Problems: WFG
-  - New Termination Criterion: Stop an algorithm based on time 
-  - New Display: Modify the printout each generation to keep track of information (more customizable now)
-  - New Callback: Based on a class and data during the run can be stored or the algorithm object can be modified inplace.
-  - New Algorithm: CMA-ES (by making use of the implementation published by the author)
+  - New Algorithm: CMA-ES (Implementation published by the Author)
   - New Algorithm: Biased-Random Key Genetic Algorithm (BRKGA)
+  - New Test Problems: WFG
+  - New Termination Criterion: Stop an Algorithm based on Time
+  - New Termination Criterion: Objective Space Tolerance for Multi-objective Problems
+  - New Display: Easily modify the Printout in each Generation
+  - New Callback: Based on a class now to allow to store data in the object.
   - New Visualization: Videos can be recorded to follow the algorithm's progress.
   - Bugfix: NDScatter Plot
   - Bugfix: Hypervolume Calculations (Vendor Library)
