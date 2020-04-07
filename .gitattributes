@@ -1,1 +1,6 @@
-doc/* linguist-documentation
+* linguist-vendored
+*.rst linguist-vendored=false
+*.ipynb linguist-vendored=false
+*.gif linguist-vendored=false
+*.mp4 linguist-vendored=false
+*.html linguist-vendored=false
