@@ -1,4 +1,5 @@
-* linguist-vendored
+* linguist-vendored=true
+*.py linguist-vendored=true
 *.rst linguist-vendored=false
 *.ipynb linguist-vendored=false
 *.gif linguist-vendored=false
