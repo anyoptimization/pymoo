@@ -1,7 +1,2 @@
-* linguist-vendored=true
-*.py linguist-vendored=true
-*.rst linguist-vendored=false
-*.ipynb linguist-vendored=false
-*.gif linguist-vendored=false
-*.mp4 linguist-vendored=false
-*.html linguist-vendored=false
+* linguist-detectable=false
+*.py linguist-detectable=true
