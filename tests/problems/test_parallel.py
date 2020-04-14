@@ -1,5 +1,8 @@
 import unittest
 
+import multiprocessing
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+
 import numpy as np
 
 from pymoo.model.problem import Problem
@@ -21,6 +24,18 @@ class ParallelEvaluationTest(unittest.TestCase):
     def test_evaluation_in_threads_number(self):
         X, F = self.get_data()
         _F = MyProblemElementwise(parallelization=("threads", 2)).evaluate(X)
+        self.assertTrue(np.all(np.abs(_F - F) < 0.00001))
+
+    def test_evaluation_with_multiprocessing_process_pool_starmap(self):
+        X, F = self.get_data()
+        with multiprocessing.Pool() as pool:
+            _F = MyProblemElementwise(parallelization = ("starmap", pool.starmap)).evaluate(X)
+        self.assertTrue(np.all(np.abs(_F - F) < 0.00001))
+
+    def test_evaluation_with_multiprocessing_thread_pool_starmap(self):
+        X, F = self.get_data()
+        with multiprocessing.pool.ThreadPool() as pool:
+            _F = MyProblemElementwise(parallelization = ("starmap", pool.starmap)).evaluate(X)
         self.assertTrue(np.all(np.abs(_F - F) < 0.00001))
 
 
