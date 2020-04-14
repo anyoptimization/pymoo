@@ -368,7 +368,7 @@ class Problem:
             params = [[X[k], calc_gradient, self._evaluate, args, kwargs] for k in range(len(X))]
 
             starmapper = _params[0]
-            ret = starmapper(evaluate_in_parallel, params)
+            ret = list(starmapper(evaluate_in_parallel, params))
 
         elif _type == "threads":
 
