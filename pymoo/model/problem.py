@@ -360,6 +360,16 @@ class Problem:
         if _type is None:
             [ret.append(func(x)) for x in X]
 
+        elif _type is "starmap":
+
+            if len(_params) != 1:
+                raise Exception("The starmap parallelization method must be accompanied by a starmapping callable")
+
+            params = [[X[k], calc_gradient, self._evaluate, args, kwargs] for k in range(len(X))]
+
+            starmapper = _params[0]
+            ret = list(starmapper(evaluate_in_parallel, params))
+
         elif _type == "threads":
 
             if len(_params) == 0:
@@ -368,11 +378,9 @@ class Problem:
                 n_threads = _params[0]
 
             with ThreadPool(n_threads) as pool:
-                params = []
-                for k in range(len(X)):
-                    params.append([X[k], calc_gradient, self._evaluate, args, kwargs])
+                params = [[X[k], calc_gradient, self._evaluate, args, kwargs] for k in range(len(X))]
 
-                ret = np.array(pool.starmap(evaluate_in_parallel, params))
+                ret = pool.starmap(evaluate_in_parallel, params)
 
         elif _type == "dask":
 
@@ -389,7 +397,7 @@ class Problem:
             ret = [job.result() for job in jobs]
 
         else:
-            raise Exception("Unknown parallelization method: %s (None, threads, dask)" % self.parallelization)
+            raise Exception("Unknown parallelization method: %s (should be one of: None, starmap, threads, dask)" % _type)
 
         # stack all the single outputs together
         for key in ret[0].keys():
@@ -449,6 +457,10 @@ class Problem:
         else:
             return np.sum(G * (G > 0).astype(np.float), axis=1)[:, None]
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state["parallelization"] = None
+        return state
 
 # makes all the output at least 2-d dimensional
 def at_least2d(d):
