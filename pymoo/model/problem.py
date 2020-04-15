@@ -50,6 +50,7 @@ class Problem:
         elementwise_evaluation : bool
 
         parallelization : str or tuple
+            See :ref:`nb_parallelization` for guidance on parallelization.
 
         """
 
