@@ -463,7 +463,7 @@ class Problem:
 
         # If the parallelization is starmap,
         # we can't pickle self with the starmapper function.
-        if state.get("parallelization", [None])[0] == "starmap":
+        if state["parallelization"] is not None and state["parallelization"][0] == "starmap":
             state["parallelization"] = None
 
         return state
