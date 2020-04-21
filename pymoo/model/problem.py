@@ -50,6 +50,7 @@ class Problem:
         elementwise_evaluation : bool
 
         parallelization : str or tuple
+            See :ref:`nb_parallelization` for guidance on parallelization.
 
         """
 
@@ -460,7 +461,12 @@ class Problem:
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        state["parallelization"] = None
+
+        # If the parallelization is starmap,
+        # we can't pickle self with the starmapper function.
+        if state["parallelization"] is not None and state["parallelization"][0] == "starmap":
+            state["parallelization"] = None
+
         return state
 
 # makes all the output at least 2-d dimensional
