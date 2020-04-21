@@ -2,6 +2,7 @@ import numpy as np
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
+from pymoo.model.replacement import ImprovementReplacement
 from pymoo.operators.crossover.biased_crossover import BiasedCrossover
 from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
 from pymoo.operators.crossover.exponential_crossover import ExponentialCrossover
@@ -123,17 +124,8 @@ class DE(GeneticAlgorithm):
         # evaluate the results
         self.evaluator.eval(self.problem, self.off, algorithm=self)
 
-        _F, _CV, _feasible = self.off.get("F", "CV", "feasible")
-        _F = parameter_less(_F, _CV)
-
-        # find the individuals which are indeed better
-        is_better = np.where((_F <= F)[:, 0])[0]
-
-        # replace the individuals in the population
-        pop[is_better] = self.off[is_better]
-
-        # store the population in the algorithm object
-        self.pop = pop
+        # replace the individuals that have improved
+        self.pop = ImprovementReplacement().do(self.problem, self.pop, self.off)
 
 
 parse_doc_string(DE.__init__)

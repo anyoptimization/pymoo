@@ -77,7 +77,7 @@ class GeneticAlgorithm(Algorithm):
         if self.survival:
             pop = self.survival.do(self.problem, pop, len(pop), algorithm=self)
 
-        self.pop = pop
+        self.pop, self.off = pop, pop
 
     def _next(self):
 

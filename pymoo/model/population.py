@@ -14,9 +14,11 @@ class Population(np.ndarray):
 
     @classmethod
     def merge(cls, a, b):
+        a, b = pop_from_array_or_individual(a), pop_from_array_or_individual(b)
         return a.merge(b)
 
     def merge(self, other):
+        other = pop_from_array_or_individual(other)
         if len(self) == 0:
             return other
         else:

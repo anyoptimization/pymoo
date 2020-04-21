@@ -10,13 +10,13 @@ from pymoo.model.sampling import Sampling
 
 
 def parameter_less(F, CV):
-    val = np.copy(F)
+    ret = np.copy(F)
     parameter_less = np.max(F, axis=0) + CV
 
     infeasible = CV > 0
-    val[infeasible] = parameter_less[infeasible]
+    ret[infeasible] = parameter_less[infeasible]
 
-    return val
+    return ret
 
 
 def swap(M, a, b):
@@ -253,6 +253,7 @@ def intersect(a, b):
 
 def has_feasible(pop):
     return np.any(pop.get("feasible"))
+
 
 def to_numpy(a):
     return np.array(a)

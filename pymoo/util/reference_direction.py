@@ -3,7 +3,7 @@ import sys
 import numpy as np
 from scipy import special
 
-from pymoo.util.misc import cdist, find_duplicates
+from pymoo.util.misc import find_duplicates, vectorized_cdist, cdist
 
 
 # =========================================================================================================
@@ -45,7 +45,7 @@ class ReferenceDirectionFactory:
                 I = np.lexsort([ref_dirs[:, j] for j in range(ref_dirs.shape[1])][::-1])
                 ref_dirs = ref_dirs[I]
 
-            return val
+            return ref_dirs
 
     def _do(self):
         return None
@@ -150,90 +150,6 @@ class MultiLayerReferenceDirectionFactory:
         ref_dirs = np.concatenate(ref_dirs, axis=0)
         is_duplicate = find_duplicates(ref_dirs)
         return ref_dirs[np.logical_not(is_duplicate)]
-
-
-# =========================================================================================================
-# Reduction Based Reference Directions
-# =========================================================================================================
-
-def kmeans(X, centroids, n_max_iter, a_tol):
-
-    for i in range(n_max_iter):
-
-        # assign all points to one of the centroids
-        points_to_centroid = cdist(X, centroids).argmin(axis=1)
-
-        centroids_to_points = [[] for _ in range(len(centroids))]
-        for j, k in enumerate(points_to_centroid):
-            centroids_to_points[k].append(j)
-
-        last_centroids = np.copy(centroids)
-        for j in range(len(centroids_to_points)):
-            centroids[j] = np.mean(X[centroids_to_points[j]], axis=0)
-
-        if np.abs(centroids - last_centroids).sum(axis=1).mean() < a_tol:
-            break
-
-
-def stretch(centroids):
-
-    # because the centroids went inside, we need to stretch the points finally
-    index_of_extreme = centroids.argmax(axis=0)
-
-    # for each dimension of the simplex
-    for i in range(centroids.shape[1]):
-
-        ext = np.copy(centroids[index_of_extreme[i]])
-        ext[i] = 0
-        centroids -= ext
-
-        centroids[centroids < 0] = 0
-
-
-class ReductionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
-
-    def __init__(self,
-                 n_dim,
-                 scaling=None,
-                 n_points=None,
-                 n_sample_points=5000,
-                 sampling="kraemer",
-                 seed=1,
-                 kmeans=True):
-
-        super().__init__(n_dim, scaling)
-        self.n_sample_points = n_sample_points
-        self.sampling = sampling
-        self.seed = seed
-        self.kmeans = kmeans
-
-        if n_points is None:
-            raise Exception("Please provide the number of points to be factored!")
-        self.n_points = n_points
-
-    def _do(self):
-
-        rnd = sample_on_unit_simplex(self.n_sample_points, self.n_dim, unit_simplex_mapping=self.sampling)
-
-        # add the corner coordinates
-        X = np.row_stack([np.eye(self.n_dim), rnd])
-
-        selected = list(range(self.n_dim))
-        I = select_points_with_maximum_distance(X, self.n_points, selected=selected)
-
-        centroids = X[I]
-
-        # if clustering should be performed after this algorithm
-        if self.kmeans:
-            kmeans(X, centroids, 10000, 1e-8)
-
-        stretch(centroids)
-
-        # make sure the sum is one after stretching
-        centroids = centroids / centroids.sum(axis=1)[:, None]
-
-        return centroids
-
 
 # =========================================================================================================
 # Util

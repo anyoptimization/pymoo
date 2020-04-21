@@ -18,6 +18,7 @@ from pymoo.problems.single import *
 # Generic
 # =========================================================================================================
 
+
 def get_from_list(l, name, args, kwargs):
     i = None
 
@@ -313,12 +314,14 @@ def get_problem(name, *args, d={}, **kwargs):
 
 def get_reference_direction_options():
     from pymoo.util.reference_direction import UniformReferenceDirectionFactory
-    from pymoo.util.reference_direction import ReductionBasedReferenceDirectionFactory
     from pymoo.util.reference_direction import MultiLayerReferenceDirectionFactory
+    from pymoo.util.ref_dirs.reduction import ReductionBasedReferenceDirectionFactory
+    from pymoo.util.ref_dirs.energy import RieszEnergyReferenceDirectionFactory
 
     REFERENCE_DIRECTIONS = [
         ("(das-dennis|uniform)", UniformReferenceDirectionFactory),
         ("multi-layer", MultiLayerReferenceDirectionFactory),
+        ("(energy|riesz)", RieszEnergyReferenceDirectionFactory),
         ("red", ReductionBasedReferenceDirectionFactory)
     ]
 
