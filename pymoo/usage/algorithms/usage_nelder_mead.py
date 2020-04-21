@@ -1,14 +1,15 @@
-from pymoo.algorithms.so_cmaes import CMAES
+from pymoo.algorithms.so_nelder_mead import NelderMead
 from pymoo.factory import get_problem
 from pymoo.optimize import minimize
 
 problem = get_problem("sphere")
 
-algorithm = CMAES()
+algorithm = NelderMead()
 
 res = minimize(problem,
                algorithm,
                seed=1,
-               verbose=True)
+               verbose=False)
 
-print(f"Best solution found: \nX = {res.X}\nF = {res.X}\nCV= {res.CV}")
+print(res.X)
+print(res.F)

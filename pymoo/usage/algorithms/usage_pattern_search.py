@@ -1,15 +1,16 @@
-from pymoo.algorithms.so_nelder_mead import NelderMead
+from pymoo.algorithms.so_pattern_search import PatternSearch
 from pymoo.factory import get_problem
 from pymoo.optimize import minimize
 
-problem = get_problem("sphere")
+problem = get_problem("ackley")
 
-algorithm = NelderMead(n_max_restarts=10)
+algorithm = PatternSearch()
 
 res = minimize(problem,
                algorithm,
                seed=1,
-               verbose=False)
+               verbose=True)
 
 print(res.X)
 print(res.F)
+print(res.CV)

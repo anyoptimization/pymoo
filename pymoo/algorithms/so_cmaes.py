@@ -1,9 +1,9 @@
 import numpy as np
 
+from pymoo.algorithms.so_local_search import LocalSearch
 from pymoo.docs import parse_doc_string
-from pymoo.model.algorithm import Algorithm, filter_optimum
+from pymoo.model.algorithm import filter_optimum
 from pymoo.model.population import Population
-from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.util.display import Display
 from pymoo.util.termination.max_eval import MaximumFunctionCallTermination
 from pymoo.util.termination.max_gen import MaximumGenerationTermination
@@ -47,10 +47,9 @@ class CMAESDisplay(Display):
         self.output.append("axis", axis, width=8)
 
 
-class CMAES(Algorithm):
+class CMAES(LocalSearch):
 
     def __init__(self,
-                 x0=None,
                  sigma=0.5,
                  parallelize=True,
                  maxfevals=np.inf,
@@ -339,7 +338,6 @@ class CMAES(Algorithm):
         self.es = None
         self.cma = None
 
-        self.x0 = x0
         self.sigma = sigma
         self.restarts = restarts
         self.restart_from_best = restart_from_best
@@ -362,6 +360,7 @@ class CMAES(Algorithm):
         self.default_termination = NoTermination()
         self.send_array_to_yield = True
         self.parallelize = parallelize
+        self.al = None
 
     def initialize(self, problem, seed=None, **kwargs):
         super().initialize(problem, **kwargs)
@@ -378,13 +377,18 @@ class CMAES(Algorithm):
         elif isinstance(self.termination, MaximumFunctionCallTermination):
             self.options['maxfevals'] = self.termination.n_max_evals
 
-        if self.x0 is None:
-            np.random.seed(seed)
-            self.x0 = FloatRandomSampling().do(problem, 1).get("X")[0]
+        # if self.problem.n_constr > 0:
+        #     _al = AugmentedLagrangian(problem.n_var)
+        #     _al.set_m(problem.n_constr)
+        #     _al._equality = np.full(problem.n_constr, False)
+        #     self.al = _al
+        #     kwargs.setdefault('options', {}).setdefault('tolstagnation', 0)
 
-        self.es = my_fmin(
-            self.x0,
-            self.sigma,
+    def _initialize(self):
+        super()._initialize()
+        self.pop = Population()
+
+        kwargs = dict(
             options=self.options,
             parallelize=self.parallelize,
             restarts=self.restarts,
@@ -394,19 +398,30 @@ class CMAES(Algorithm):
             noise_handler=self.noise_handler,
             noise_change_sigma_exponent=self.noise_change_sigma_exponent,
             noise_kappa_exponent=self.noise_kappa_exponent,
-            bipop=self.bipop
-        )
+            bipop=self.bipop)
 
-    def _initialize(self):
+        self.es = my_fmin(self.x0.X, self.sigma, **kwargs)
         self._next()
 
     def _next(self):
 
-        if self.pop is None:
+        if self.pop is None or len(self.pop) == 0:
             X = next(self.es)
 
         else:
             F = self.pop.get("F")[:, 0].tolist()
+            #
+            # if self.problem.n_constr > 0:
+            #     G = self.pop.get("G").tolist()
+            #     self.al.set_coefficients(F, G)
+            #
+            #     x = self.es.gi_frame.f_locals["es"].ask(1, sigma_fac=0)[0]
+            #     ind = Individual(X=x)
+            #     self.evaluator.eval(self.problem, ind, algorithm=self)
+            #     self.al.update(ind.F[0], ind.G)
+            #
+            #     F = F + sum(self.al(G))
+
             if not self.send_array_to_yield:
                 F = F[0]
 

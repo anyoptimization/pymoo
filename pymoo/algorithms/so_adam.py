@@ -5,7 +5,8 @@ from pymoo.algorithms.so_gradient_descent import GradientBasedAlgorithm
 
 class Adam(GradientBasedAlgorithm):
 
-    def __init__(self, X,
+    def __init__(self,
+                 X,
                  alpha=0.005,
                  beta_1=0.9,
                  beta_2=0.999,

@@ -168,7 +168,7 @@ class Algorithm:
         # other run dependent variables that are reset
         self.n_gen = None
         self.history = []
-        self.pop = None
+        self.pop = Population()
         self.opt = None
 
     def solve(self):

@@ -1,29 +1,31 @@
+import time
+
 import numpy as np
 from cma import CMAOptions
 from cma import optimization_tools as ot
 from cma.evolution_strategy import cma_default_options, CMAEvolutionStrategy
 from cma.utilities import utils
 from cma.utilities.math import Mh
-import time
 
-all_stoppings = []  # accessable via cma.evolution_strategy.all_stoppings, bound to change
+all_stoppings = []
+
+
 def my_fmin(
-         x0, 
-         sigma0,
-         options=None,
-         args=(),
-         gradf=None,
-         restarts=0,
-         restart_from_best='False',
-         incpopsize=2,
-         eval_initial_x=False,
-         noise_handler=None,
-         parallelize=True,
-         noise_change_sigma_exponent=1,
-         noise_kappa_exponent=0,  # TODO: add max kappa value as parameter
-         bipop=False,
-         callback=None):
-
+        x0,
+        sigma0,
+        options=None,
+        args=(),
+        gradf=None,
+        restarts=0,
+        restart_from_best='False',
+        incpopsize=2,
+        eval_initial_x=False,
+        noise_handler=None,
+        parallelize=True,
+        noise_change_sigma_exponent=1,
+        noise_kappa_exponent=0,  # TODO: add max kappa value as parameter
+        bipop=False,
+        callback=None):
     if 1 < 3:  # try: # pass on KeyboardInterrupt
 
         fmin_options = locals().copy()  # archive original options
@@ -62,7 +64,7 @@ def my_fmin(
                 # BIPOP not in use, simply double the previous population
                 # on restart.
                 if irun > 0:
-                    popsize_multiplier = fmin_options['incpopsize']**(irun - runs_with_small)
+                    popsize_multiplier = fmin_options['incpopsize'] ** (irun - runs_with_small)
                     opts['popsize'] = popsize0 * popsize_multiplier
 
             elif irun == 0:
@@ -79,9 +81,9 @@ def my_fmin(
                     restarts += 1  # A small restart doesn't count in the total
                 runs_with_small += 1  # _Before_ it's used in popsize_lastlarge
 
-                sigma_factor = 0.01**np.random.uniform()  # Local search
-                popsize_multiplier = fmin_options['incpopsize']**(irun - runs_with_small)
-                opts['popsize'] = np.floor(popsize0 * popsize_multiplier**(np.random.uniform()**2))
+                sigma_factor = 0.01 ** np.random.uniform()  # Local search
+                popsize_multiplier = fmin_options['incpopsize'] ** (irun - runs_with_small)
+                opts['popsize'] = np.floor(popsize0 * popsize_multiplier ** (np.random.uniform() ** 2))
                 opts['maxiter'] = min(maxiter0, 0.5 * sum(large_i) / opts['popsize'])
                 # print('small basemul %s --> %s; maxiter %s' % (popsize_multiplier, opts['popsize'], opts['maxiter']))
 
@@ -90,7 +92,7 @@ def my_fmin(
                 # doubling is implicit with incpopsize.
                 poptype = 'large'
 
-                popsize_multiplier = fmin_options['incpopsize']**(irun - runs_with_small)
+                popsize_multiplier = fmin_options['incpopsize'] ** (irun - runs_with_small)
                 opts['popsize'] = popsize0 * popsize_multiplier
                 opts['maxiter'] = maxiter0
                 # print('large basemul %s --> %s; maxiter %s' % (popsize_multiplier, opts['popsize'], opts['maxiter']))
@@ -117,7 +119,7 @@ def my_fmin(
                 if (eval_initial_x
                         or es.opts['CMA_elitist'] == 'initial'
                         or (es.opts['CMA_elitist'] and
-                                    eval_initial_x is None)):
+                            eval_initial_x is None)):
                     x = es.gp.pheno(es.mean,
                                     into_bounds=es.boundary_handler.repair,
                                     archive=es.sent_solutions)
@@ -144,9 +146,9 @@ def my_fmin(
             if 11 < 3:
                 if es.countiter == 0 and es.opts['verb_log'] > 0 and \
                         not es.opts['verb_append']:
-                   logger = CMADataLogger(es.opts['verb_filenameprefix']
-                                            ).register(es)
-                   logger.add()
+                    logger = CMADataLogger(es.opts['verb_filenameprefix']
+                                           ).register(es)
+                    logger.add()
                 es.writeOutput()  # initial values for sigma etc
 
             if noise_handler:
@@ -168,14 +170,14 @@ def my_fmin(
                 while not es.stop():  # iteration loop
                     # X, fit = eval_in_parallel(lambda: es.ask(1)[0], es.popsize, args, repetitions=noisehandler.evaluations-1)
                     X, fit = yield from es.ask_and_eval(gradf=gradf,
-                                             evaluations=noisehandler.evaluations,
-                                             aggregation=np.median,
-                                             parallel_mode=parallelize)  # treats NaN with resampling if not parallel_mode
+                                                        evaluations=noisehandler.evaluations,
+                                                        aggregation=np.median,
+                                                        parallel_mode=parallelize)  # treats NaN with resampling if not parallel_mode
 
                     if 11 < 3 and opts['vv']:  # inject a solution
                         # use option check_point = [0]
                         if 0 * np.random.randn() >= 0:
-                            X[0] = 0 + opts['vv'] * es.sigma**0 * np.random.randn(es.N)
+                            X[0] = 0 + opts['vv'] * es.sigma ** 0 * np.random.randn(es.N)
                             fit[0] = yield X[0]
                             # print fit[0]
                     if es.opts['verbose'] > 4:
@@ -190,7 +192,7 @@ def my_fmin(
                     es.tell(X, fit)  # prepare for next iteration
                     if noise_handling:  # it would be better to also use these f-evaluations in tell
                         es.sigma *= noisehandler(X, fit, objective_function, es.ask,
-                                                 args=args)**fmin_opts['noise_change_sigma_exponent']
+                                                 args=args) ** fmin_opts['noise_change_sigma_exponent']
 
                         es.countevals += noisehandler.evaluations_just_done  # TODO: this is a hack, not important though
                         # es.more_to_write.append(noisehandler.evaluations_just_done)
@@ -206,10 +208,11 @@ def my_fmin(
                     for f in callback:
                         f is None or f(es)
                     es.disp()
-                    logger.add(# more_data=[noisehandler.evaluations, 10**noisehandler.noiseS] if noise_handling else [],
-                               modulo=1 if es.stop() and logger.modulo else None)
+                    logger.add(
+                        # more_data=[noisehandler.evaluations, 10**noisehandler.noiseS] if noise_handling else [],
+                        modulo=1 if es.stop() and logger.modulo else None)
                     if (opts['verb_log'] and opts['verb_plot'] and
-                          (es.countiter % max(opts['verb_plot'], opts['verb_log']) == 0 or es.stop())):
+                            (es.countiter % max(opts['verb_plot'], opts['verb_log']) == 0 or es.stop())):
                         logger.plot(324)
 
             # end while not es.stop
@@ -278,7 +281,6 @@ def my_fmin(
 
 class MyCMAEvolutionStrategy(CMAEvolutionStrategy):
 
-
     def ask_and_eval(self, gradf=None, number=None, xmean=None, sigma_fac=1,
                      evaluations=1, aggregation=np.median, kappa=1, parallel_mode=False):
 
@@ -326,7 +328,7 @@ class MyCMAEvolutionStrategy(CMAEvolutionStrategy):
                     "ask_and_eval", "CMAEvolutionStrategy")
         else:
             fit_first = len(X_first) * [None]
-            
+
         for k in range(popsize):
             x, f = X_first.pop(0), fit_first.pop(0)
             rejected = -1
@@ -358,7 +360,8 @@ class MyCMAEvolutionStrategy(CMAEvolutionStrategy):
                     # Or is the reason the deviation of the direction introduced by using the original
                     # length, which also can effect the measured correlation?
                     # Update: if the length of z in CSA is clipped at chiN+1, it works, but only sometimes?
-                    length_normalizer = self.N**0.5 / self.mahalanobis_norm(x - xmean)  # self.const.chiN < N**0.5, the constant here is irrelevant (absorbed by kappa)
+                    length_normalizer = self.N ** 0.5 / self.mahalanobis_norm(
+                        x - xmean)  # self.const.chiN < N**0.5, the constant here is irrelevant (absorbed by kappa)
                     # print(self.N**0.5 / self.mahalanobis_norm(x - xmean))
                     # self.more_to_write += [length_normalizer * 1e-3, length_normalizer * self.mahalanobis_norm(x - xmean) * 1e2]
 
@@ -381,7 +384,7 @@ class MyCMAEvolutionStrategy(CMAEvolutionStrategy):
                     f = aggregation([f] + _f)
                 if (rejected + 1) % 1000 == 0:
                     utils.print_warning('  %d solutions rejected (f-value NaN or None) at iteration %d' %
-                          (rejected, self.countiter))
+                                        (rejected, self.countiter))
             fit.append(f)
             X.append(x)
         self.evaluations_per_f_value = int(evaluations)
@@ -395,3 +398,8 @@ class MyCMAEvolutionStrategy(CMAEvolutionStrategy):
                                 'CMAEvolutionStrategy',
                                 self.countiter)
         return X, fit
+
+
+
+
+

@@ -361,7 +361,6 @@ class Problem:
             [ret.append(func(x)) for x in X]
 
         elif _type is "starmap":
-
             if len(_params) != 1:
                 raise Exception("The starmap parallelization method must be accompanied by a starmapping callable")
 
@@ -379,7 +378,6 @@ class Problem:
 
             with ThreadPool(n_threads) as pool:
                 params = [[X[k], calc_gradient, self._evaluate, args, kwargs] for k in range(len(X))]
-
                 ret = pool.starmap(evaluate_in_parallel, params)
 
         elif _type == "dask":
@@ -411,6 +409,9 @@ class Problem:
 
     def has_bounds(self):
         return self.xl is not None and self.xu is not None
+
+    def bounds(self):
+        return self.xl, self.xu
 
     def name(self):
         """
