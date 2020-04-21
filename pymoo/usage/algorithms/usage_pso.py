@@ -1,8 +1,8 @@
 from pymoo.algorithms.so_pso import PSO
+from pymoo.factory import get_problem, Sphere
 from pymoo.optimize import minimize
-from pymoo.problems.single import Sphere
 
-problem = Sphere(n_var=30)
+problem = get_problem("rastrigin", n_var=4)
 
 algorithm = PSO()
 
@@ -12,6 +12,8 @@ ret = minimize(problem,
                save_history=True,
                verbose=True)
 
+print(ret.X)
+print("Optimal:", problem.pareto_front()[0])
 print(ret.F)
 
 

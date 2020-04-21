@@ -22,7 +22,7 @@ class Survival:
         super().__init__()
         self.filter_infeasible = filter_infeasible
 
-    def do(self, problem, pop, n_survive, **kwargs):
+    def do(self, problem, pop, n_survive, return_indices=False, **kwargs):
 
         # if the split should be done beforehand
         if self.filter_infeasible and problem.n_constr > 0:
@@ -48,7 +48,13 @@ class Survival:
         else:
             survivors = self._do(problem, pop, n_survive, **kwargs)
 
-        return survivors
+        if return_indices:
+            H = {}
+            for k, ind in enumerate(pop):
+                H[ind] = k
+            return [H[survivor] for survivor in survivors]
+        else:
+            return survivors
 
     @abstractmethod
     def _do(self, problem, pop, n_survive, **kwargs):

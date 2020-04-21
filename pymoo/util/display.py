@@ -131,10 +131,10 @@ class SingleObjectiveDisplay(Display):
 
         if len(feasible) > 0:
             _F = F[feasible]
-            self.output.append("favg", np.mean(_F))
             self.output.append("fopt", opt.F[0])
+            self.output.append("favg", np.mean(_F))
         else:
-            self.output.extend(*[('favg', "-"), ('fopt', "-")])
+            self.output.extend(*[('fopt', "-"), ('favg', "-")])
 
 
 class MultiObjectiveDisplay(Display):

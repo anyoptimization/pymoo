@@ -24,11 +24,17 @@ def select_by_clearing(pop, D, n_select, func_select, eps=0.05):
 
 class EpsilonClearing:
 
-    def __init__(self, D,
+    def __init__(self,
+                 D,
                  epsilon) -> None:
         super().__init__()
-        self.D = D
-        self.n = len(D)
+
+        if isinstance(D, tuple):
+            self.n, self.D = D
+        else:
+            self.D = D
+            self.n = len(D)
+
         self.epsilon = epsilon
 
         self.S = []
@@ -54,5 +60,11 @@ class EpsilonClearing:
         self.S.append(k)
         self.C[k] = True
 
-        less_than_epsilon = self.D[k] < self.epsilon
+        if callable(self.D):
+            dist_to_other = self.D(k)
+        else:
+            dist_to_other = self.D[k]
+
+        less_than_epsilon = dist_to_other < self.epsilon
+
         self.C[less_than_epsilon] = True
