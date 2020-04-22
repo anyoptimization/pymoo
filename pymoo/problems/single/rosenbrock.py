@@ -10,7 +10,8 @@ class Rosenbrock(Problem):
     def _evaluate(self, x, out, *args, **kwargs):
         l = []
         for i in range(x.shape[1] - 1):
-            l.append(100 * anp.square((x[:, i + 1] - anp.square(x[:, i]))) + anp.square((1 - x[:, i])))
+            val = 100 * (x[:, i + 1] - x[:, i] ** 2) ** 2 + (1 - x[:, i]) ** 2
+            l.append(val)
         out["F"] = anp.sum(anp.column_stack(l), axis=1)
 
     def _calc_pareto_front(self):
