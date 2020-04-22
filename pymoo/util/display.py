@@ -118,6 +118,10 @@ class Display:
 
 class SingleObjectiveDisplay(Display):
 
+    def __init__(self, favg=True, **kwargs):
+        super().__init__(**kwargs)
+        self.favg = favg
+
     def _do(self, problem, evaluator, algorithm):
         super()._do(problem, evaluator, algorithm)
 
@@ -132,9 +136,12 @@ class SingleObjectiveDisplay(Display):
         if len(feasible) > 0:
             _F = F[feasible]
             self.output.append("fopt", opt.F[0])
-            self.output.append("favg", np.mean(_F))
+            if self.favg:
+                self.output.append("favg", np.mean(_F))
         else:
-            self.output.extend(*[('fopt', "-"), ('favg', "-")])
+            self.output.append("fopt", "-")
+            if self.favg:
+                self.output.append("favg", "-")
 
 
 class MultiObjectiveDisplay(Display):
@@ -180,12 +187,3 @@ class MultiObjectiveDisplay(Display):
             self.output.append("delta_ideal", delta_ideal)
             self.output.append("delta_nadir", delta_nadir)
             self.output.append("delta_f", delta_f)
-
-
-
-
-
-
-
-
-

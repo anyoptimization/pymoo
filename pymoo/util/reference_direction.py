@@ -3,7 +3,7 @@ import sys
 import numpy as np
 from scipy import special
 
-from pymoo.util.misc import find_duplicates, vectorized_cdist, cdist
+from pymoo.util.misc import find_duplicates, cdist
 
 
 # =========================================================================================================
@@ -21,7 +21,7 @@ class ReferenceDirectionFactory:
         self.verbose = verbose
         self.seed = seed
 
-    def do(self, seed=None):
+    def do(self):
 
         # set the random seed if it is provided
         if self.seed is not None:
