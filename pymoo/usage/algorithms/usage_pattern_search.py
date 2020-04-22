@@ -2,7 +2,7 @@ from pymoo.algorithms.so_pattern_search import PatternSearch
 from pymoo.factory import get_problem
 from pymoo.optimize import minimize
 
-problem = get_problem("ackley")
+problem = get_problem("ackley", n_var=30)
 
 algorithm = PatternSearch()
 
