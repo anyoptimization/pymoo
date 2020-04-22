@@ -8,16 +8,16 @@ n_dim = 3
 n_points = 100
 
 
-ref_dirs = RandomSamplingAndMap(n_dim, n_points).do(seed=1)
+ref_dirs = RandomSamplingAndMap(n_dim, n_points, seed=1).do()
 Scatter(title="Random Sampling + Mapping").add(ref_dirs).show()
 
-ref_dirs = ConstructionBasedReferenceDirectionFactory(n_dim, n_points).do(seed=1)
+ref_dirs = ConstructionBasedReferenceDirectionFactory(n_dim, n_points, seed=1).do()
 Scatter(title="Construction").add(ref_dirs).show()
 
-ref_dirs = ReductionBasedReferenceDirectionFactory(n_dim, n_points).do(seed=1)
+ref_dirs = ReductionBasedReferenceDirectionFactory(n_dim, n_points, seed=1).do()
 Scatter(title="Reduction").add(ref_dirs).show()
 
-ref_dirs = RieszEnergyReferenceDirectionFactory(n_dim, n_points).do(seed=1)
+ref_dirs = RieszEnergyReferenceDirectionFactory(n_dim, n_points, seed=1).do()
 Scatter(title="Riesz s-Energy").add(ref_dirs).show()
 
 
