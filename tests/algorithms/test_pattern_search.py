@@ -6,34 +6,51 @@ from pymoo.algorithms.so_pattern_search import PatternSearch
 from pymoo.model.evaluator import Evaluator
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
+from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.optimize import minimize
-from pymoo.problems.single import Rosenbrock
+from pymoo.problems.single import Rosenbrock, Ackley, Sphere
 
 
 class PatternSearchTest(unittest.TestCase):
 
     def test_against_orginal_implementation(self):
 
-        problem = Rosenbrock(n_var=2)
-        problem.xl = None
-        problem.xu = None
-        x0 = np.array([-1.2, 1.0])
-        pop = run(problem, x0)[1:]
+        for problem in [
+            Sphere(n_var=10),
+            Ackley(n_var=2),
+            Rosenbrock(n_var=2),
+        ]:
 
+            print(problem.__class__.__name__)
 
-        algorithm = PatternSearch(x0=x0, explr_delta=np.array([0.6, 0.5]))
+            x0 = FloatRandomSampling().do(problem, 1)[0].X
 
-        ret = minimize(problem, algorithm, verbose=True)
+            problem.xl = None
+            problem.xu = None
 
-        X, _X = pop.get("X"), ret.pop.get("X")
-        F, _F = pop.get("F"), ret.pop.get("F")
+            rho = 0.5
 
-        n = min(len(X), len(_X))
-        X, _X, F, _F = X[:n], _X[:n], F[:n], _F[:n]
+            pop = run(problem, x0, rho=rho)[1:]
 
-        np.testing.assert_allclose(X, _X)
-        np.testing.assert_allclose(F, _F)
+            delta = np.zeros(problem.n_var)
+            for i in range(0, problem.n_var):
+                if (x0[i] == 0.0):
+                    delta[i] = rho
+                else:
+                    delta[i] = rho * abs(x0[i])
 
+            algorithm = PatternSearch(x0=x0, explr_delta=delta)
+
+            ret = minimize(problem, algorithm, verbose=True)
+
+            X, _X = pop.get("X"), ret.pop.get("X")
+            F, _F = pop.get("F"), ret.pop.get("F")
+
+            n = min(len(X), len(_X))
+            X, _X, F, _F = X[:n], _X[:n], F[:n], _F[:n]
+
+            np.testing.assert_allclose(X, _X, rtol=0, atol=1e-4)
+            np.testing.assert_allclose(F, _F, rtol=0, atol=1e-4)
 
 
 def best_nearby(delta, point, prevbest, nvars, f, funevals):
