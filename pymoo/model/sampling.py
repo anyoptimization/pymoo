@@ -4,12 +4,13 @@ from pymoo.model.population import Population
 
 
 class Sampling:
-    """
 
-    This abstract class represents any sampling strategy that can be used to create an initial population or
-    an initial search point.
-
-    """
+    def __init__(self) -> None:
+        """
+        This abstract class represents any sampling strategy that can be used to create an initial population or
+        an initial search point.
+        """
+        super().__init__()
 
     def do(self, problem, n_samples, pop=Population(), **kwargs):
         """
@@ -18,23 +19,19 @@ class Sampling:
         Parameters
         ----------
 
-        problem: class
+        problem : :class:`~pymoo.model.problem.Problem`
             The problem to which points should be sampled. (lower and upper bounds, discrete, binary, ...)
 
-        n_samples: int
+        n_samples : int
             Number of samples
 
-        kwargs: class
-            Any additional data that might be necessary. e.g. constants of the algorithm, ...
-
-        pop : Population
+        pop : :class:`~pymoo.model.population.Population`
             The sampling results are stored in a population. The template of the population can be changed.
             If 'none' simply a numpy array is returned.
 
-
         Returns
         -------
-        X : np.array
+        X : numpy.array
             Samples points in a two dimensional array
 
         """
@@ -48,5 +45,3 @@ class Sampling:
     @abstractmethod
     def _do(self, problem, n_samples, **kwargs):
         pass
-
-

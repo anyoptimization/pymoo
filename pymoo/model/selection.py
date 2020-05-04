@@ -2,10 +2,13 @@ from abc import abstractmethod
 
 
 class Selection:
-    """
-    This class is used to select parents for the mating or other evolutionary operators. Several strategies can be
-    used to increase the selection pressure.
-    """
+
+    def __init__(self) -> None:
+        """
+        This class is used to select parents for the mating or other evolutionary operators.
+        Several strategies can be used to increase the selection pressure.
+        """
+        super().__init__()
 
     def do(self, pop, n_select, n_parents=2, **kwargs):
         """
@@ -13,7 +16,7 @@ class Selection:
 
         Parameters
         ----------
-        pop : class
+        pop : :class:`~pymoo.model.population.Population`
             The population which should be selected from. Some criteria from the design or objective space
             might be used for the selection. Therefore, only the number of individual might be not enough.
 
@@ -25,7 +28,7 @@ class Selection:
 
         Returns
         -------
-        np.array
+        I : numpy.array
             Indices of selected individuals.
 
         """

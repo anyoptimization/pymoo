@@ -2,6 +2,7 @@ import autograd.numpy as anp
 import numpy as np
 from autograd import value_and_grad
 
+from pymoo.util.normalization import normalize
 from pymoo.util.ref_dirs.construction import ConstructionBasedReferenceDirectionFactory
 from pymoo.util.ref_dirs.misc import project_onto_sum_equals_zero_plane, project_onto_unit_simplex_recursive
 from pymoo.util.ref_dirs.optimizer import Adam
@@ -156,12 +157,12 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
                 X = ReductionBasedReferenceDirectionFactory(self.n_dim,
                                                             self.n_points,
                                                             kmeans=True,
-                                                            lexsort=False)\
+                                                            lexsort=False) \
                     .do()
 
             elif self.sampling == "construction":
                 X = ConstructionBasedReferenceDirectionFactory(self.n_dim,
-                                                               self.n_points)\
+                                                               self.n_points) \
                     .do()
             else:
                 raise Exception("Unknown sampling method. Either reduction or construction.")
@@ -210,7 +211,8 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
 
             # create new points in the simplex where reference directions are supposed to be optimized
             _n_points = n_points_of_ref + (n_points - len(I))
-            _R = ReductionBasedReferenceDirectionFactory(self.n_dim, n_points=_n_points, kmeans=True, lexsort=False).do()
+            _R = ReductionBasedReferenceDirectionFactory(self.n_dim, n_points=_n_points, kmeans=True,
+                                                         lexsort=False).do()
 
             # detect the edges and just optimize them and shrink later
             outer = np.any(_R == 0, axis=1)

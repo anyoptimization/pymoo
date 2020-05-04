@@ -9,6 +9,6 @@ algorithm = CMAES()
 res = minimize(problem,
                algorithm,
                seed=1,
-               verbose=True)
+               verbose=False)
 
 print(f"Best solution found: \nX = {res.X}\nF = {res.X}\nCV= {res.CV}")

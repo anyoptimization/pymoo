@@ -156,13 +156,13 @@ html_static_path = ['_static']
 links_local = [
     ("http://localhost:8001", "pymoo.org"),
     ("https://github.com/msu-coinlab/pymoo", "GitHub"),
-    ("api/index.html", "API")
+    ("/api/index.html", "API")
 ]
 
 links_remote = [
     ("http://pymoo.org/", "pymoo.org"),
     ("https://github.com/msu-coinlab/pymoo", "GitHub"),
-    ("api/index.html", "API")
+    ("/api/index.html", "API")
 ]
 
 html_theme_options = {

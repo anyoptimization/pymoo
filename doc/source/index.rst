@@ -1,11 +1,10 @@
 
 
 
-
-
 .. meta::
    :description: pymoo - Multi-objective Optimization in Python
-   :keywords: pymoo, optimization, multi-objective optimization, evolutionary optimization, nsga2, nsga3
+   :keywords: pymoo, Optimization, multi-objective optimization, evolutionary optimization, nsga2, nsga3
+   :title: This is a test
 
 
 
@@ -28,7 +27,12 @@
 
 .. |coin| raw:: html
 
-   <a href="https://www.coin-laboratory.com" target="_blank">Computational Optimization and Innovation Laboratory (COIN)</a>
+   <a href="http://www.coin-lab.org" target="_blank">Computational Optimization and Innovation Laboratory (COIN)</a>
+
+
+.. |paper| raw:: html
+
+   <a href="https://ieeexplore.ieee.org/document/9078759" target="_blank">Paper</a>
 
 
 Our framework offers state of the art single- and multi-objective algorithms and many
@@ -89,8 +93,7 @@ Furthermore, our framework offers a variety of different features which cover va
 Reference
 ------------------------------------------------------------------------------
 
-We are currently working on a journal publication.
-Meanwhile, if you have used our framework for research purposes, you can cite us with:
+If you have used our framework for research purposes, you can cite our journal |paper| with:
 
 ::
 
@@ -183,16 +186,17 @@ Content
    news
    installation
    getting_started.ipynb
-   algorithms/index.ipynb
+   interface/index.ipynb
    problems/index.ipynb
+   algorithms/index.ipynb
+   customization/index.ipynb
    operators/index.ipynb
    visualization/index.ipynb
    decision_making/index.ipynb
    misc/performance_indicator.ipynb
    misc/index.ipynb
-   tutorial/index
    api/index
-   versions
+   versions.ipynb
    contributions.ipynb
    references
    contact
