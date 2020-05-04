@@ -70,13 +70,14 @@ class AlgorithmTest(unittest.TestCase):
         self.assertEqual(res.G, None)
 
         res = minimize(MyProblem(),
-                       NSGA2(return_least_infeasible=True),
+                       NSGA2(),
                        ("n_gen", 10),
                        seed=1,
                        verbose=True,
+                       return_least_infeasible=True,
                        save_history=True)
 
-        self.assertEqual(res.CV, 1)
+        self.assertAlmostEqual(res.CV[0], 1.0)
 
 
     def test_thread_pool(self):

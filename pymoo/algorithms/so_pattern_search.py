@@ -51,15 +51,35 @@ class PatternSearch(LocalSearch):
                  display=PatternSearchDisplay(),
                  **kwargs):
         """
+        An implementation of well-known Hooke and Jeeves Pattern Search.
 
         Parameters
         ----------
-        explr_delta
-        explr_rho
-        pattern_step
-        eps
-        display
-        kwargs
+
+        x0 : numpy.array
+            The initial value where the local search should be initiated. If not provided `n_sample_points` are created
+            created using latin hypercube sampling and the best solution found is set to `x0`.
+
+        n_sample_points : int
+            Number of sample points to be used to determine the initial search point. (Only used of `x0` is not provided)
+
+        explr_delta : float
+            The `delta` values which is used for the exploration move. If lower and upper bounds are provided the
+            value is in relation to the overall search space. For instance, a value of 0.25 means that initially the
+            pattern is created in 25% distance of the initial search point.
+
+        explr_rho : float
+            If the move was unsuccessful then the `delta` value is reduced by multiplying it with the value provided.
+            For instance, `explr_rho` implies that with a value of `delta/2` is continued.
+
+        pattern_step : float
+            After the exploration move the new center is determined by following a promising direction.
+            This value defines how large to step on this direction will be.
+
+        eps : float
+            This value is used for an additional termination criterion. When all delta values (maximum move along each variable)
+            is less than epsilon the algorithm is terminated. Otherwise, the default termination criteria are also used.
+
         """
 
         super().__init__(display=display, **kwargs)

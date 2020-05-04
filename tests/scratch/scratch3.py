@@ -19,7 +19,6 @@ class MyProblem(Problem):
         out["F"] = np.column_stack([f1, f2])
 
 
-
 problem = MyProblem()
 
 algorithm = NSGA2(pop_size=100, eliminate_duplicates=True)

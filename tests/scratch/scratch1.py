@@ -1,42 +1,27 @@
-import autograd.numpy as anp
-import numpy as np
-
-from pymoo.algorithms.moead import MOEAD
-from pymoo.factory import get_reference_directions
-from pymoo.model.problem import Problem
+from pymoo.algorithms.so_genetic_algorithm import GA
+from pymoo.factory import get_problem, get_termination
 from pymoo.optimize import minimize
+from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 from pymoo.visualization.scatter import Scatter
 
+problem = get_problem("rastrigin")
 
-class MyProblem(Problem):
+termination = SingleObjectiveDefaultTermination(x_tol=1e-100,
+                                                cv_tol=1e-6,
+                                                f_tol=1e-6,
+                                                nth_gen=5,
+                                                n_last=20,
+                                                n_max_gen=5)
 
-    def __init__(self):
-        super().__init__(n_var=3,
-                         n_obj=3,
-                         n_constr=0,
-                         xl=anp.array([0.0, 0.0, 0.0]),
-                         xu=anp.array([2.0, 2.0, 2.0]))
+algorithm = GA(pop_size=100, eliminate_duplicates=True)
 
-    def _evaluate(self, x, out, *args, **kwargs):
-        f1 = 10 + (x[:, 0] - 2)**2 + x[:, 1]**4 + 5 * x[:, 2]
-        f2 = x[:, 0]**2 + (x[:, 1] - 1)**2 + 4 * (x[:, 2] - 2)**3
-        f3 = 2 * (x[:, 0] + 2) + (x[:, 1] - 2)**3 + (x[:, 2] - 1)**2
+res = minimize(problem,
+               algorithm,
+               termination,
+               seed=1,
+               verbose=True)
 
-        out["F"] = anp.column_stack([f1, f2, f3])
-
-
-problem = MyProblem()
-
-ref_dirs = get_reference_directions("das-dennis", 3, n_partitions=16)
-algorithm = MOEAD(ref_dirs)
-
-ret = minimize(problem, algorithm, verbose=True)
-
-Scatter().add(ret.F).show()
-
-np.savetxt("deb_sample.x", ret.X)
-np.savetxt("deb_sample.f", ret.F)
-
-
-print(np.min(ret.F, axis=0))
-print(np.max(ret.F, axis=0))
+plot = Scatter()
+plot.add(problem.pareto_front(), plot_type="line", color="black", alpha=0.7)
+plot.add(res.F, color="red")
+plot.show()
