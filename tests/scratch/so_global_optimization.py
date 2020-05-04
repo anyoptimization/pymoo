@@ -96,7 +96,7 @@ class SingleObjectiveGlobalOptimization(Algorithm):
             algorithm = get_algorithm("nelder-mead",
                                       problem=self.problem,
                                       x0=pop[i],
-                                      termination=NelderAndMeadTermination(xtol=1e-3, ftol=1e-3),
+                                      termination=NelderAndMeadTermination(x_tol=1e-3, f_tol=1e-3),
                                       evaluator=self.evaluator
                                       )
             algorithm.initialize()
@@ -148,7 +148,7 @@ class SingleObjectiveGlobalOptimization(Algorithm):
                 algorithm = get_algorithm("nelder-mead",
                                           problem=self.problem,
                                           x0=x0,
-                                          termination=NelderAndMeadTermination(xtol=1e-3, ftol=1e-3),
+                                          termination=NelderAndMeadTermination(x_tol=1e-3, f_tol=1e-3),
                                           evaluator=self.evaluator,
                                           )
                 algorithm.initialize()

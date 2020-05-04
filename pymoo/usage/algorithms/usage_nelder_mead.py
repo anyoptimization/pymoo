@@ -11,5 +11,4 @@ res = minimize(problem,
                seed=1,
                verbose=False)
 
-print(res.X)
-print(res.F)
+print("Best solution found: \nX = %s\nF = %s" % (res.X, res.F))

@@ -1,7 +1,5 @@
-import numpy as np
+from pymoo.factory import get_reference_directions
 
-from pymoo.vendor.hv import HyperVolume
+ref_dirs = get_reference_directions("das-dennis", 10, n_partitions=15)
 
-data = np.array([[0, 3, 0], [1, 2, 0], [2, 1, 0], [3, 0, 0]]).astype('double')
-ref_point = np.array([3.0, 3.0, 0])
-HyperVolume(ref_point).compute(data)
+print(len(ref_dirs))
