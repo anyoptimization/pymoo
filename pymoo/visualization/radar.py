@@ -16,35 +16,27 @@ class Radar(Plot):
                  **kwargs):
 
         """
-
         Radar Plot
 
         Parameters
         ----------------
         normalize_each_objective : bool
             Whether each objective is normalized. Otherwise the inner and outer bound is plotted.
-
         point_style : dict
             The style being used to visualize the points
-
         n_partitions : int
             Number of partitions to show in the radar.
-
         reverse : {reverse}
-            Reverses the plotting. Larger area is better. Works only when normalize_each_objective is set to true.
-
         axis_style : {axis_style}
         labels : {labels}
 
         Other Parameters
         ----------------
-
         figsize : {figsize}
         title : {title}
         legend : {legend}
         tight_layout : {tight_layout}
         cmap : {cmap}
-
         """
 
         super().__init__(**kwargs)

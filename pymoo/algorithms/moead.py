@@ -2,13 +2,12 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.docs import parse_doc_string
 from pymoo.factory import get_decomposition
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.util.display import MultiObjectiveDisplay
-from pymoo.util.misc import set_if_none
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
+from pymoo.util.display import MultiObjectiveDisplay
+from pymoo.util.misc import set_if_none
 
 
 # =========================================================================================================
@@ -28,19 +27,12 @@ class MOEAD(GeneticAlgorithm):
 
         Parameters
         ----------
-        ref_dirs : {ref_dirs}
-
-        decomposition : {{ 'auto', 'tchebi', 'pbi' }}
-            The decomposition approach that should be used. If set to `auto` for two objectives `tchebi` and for more than
-            two `pbi` will be used.
-
-        n_neighbors : int
-            Number of neighboring reference lines to be used for selection.
-
-        prob_neighbor_mating : float
-            Probability of selecting the parents in the neighborhood.
-
-
+        ref_dirs
+        n_neighbors
+        decomposition
+        prob_neighbor_mating
+        display
+        kwargs
         """
 
         self.n_neighbors = n_neighbors
@@ -130,4 +122,4 @@ class MOEAD(GeneticAlgorithm):
             pop[N[I]] = off
 
 
-parse_doc_string(MOEAD.__init__)
+# parse_doc_string(MOEAD.__init__)

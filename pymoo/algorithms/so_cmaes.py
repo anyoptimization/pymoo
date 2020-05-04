@@ -50,6 +50,7 @@ class CMAESDisplay(Display):
 class CMAES(LocalSearch):
 
     def __init__(self,
+                 x0=None,
                  sigma=0.5,
                  parallelize=True,
                  maxfevals=np.inf,
@@ -333,7 +334,7 @@ class CMAES(LocalSearch):
               for a list of available options.
 
         """
-        super().__init__(display=display, **kwargs)
+        super().__init__(x0=x0, display=display, **kwargs)
 
         self.es = None
         self.cma = None

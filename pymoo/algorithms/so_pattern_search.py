@@ -43,7 +43,6 @@ class PatternSearchTermination(Termination):
 
 
 class PatternSearch(LocalSearch):
-
     def __init__(self,
                  explr_delta=0.25,
                  explr_rho=0.5,
@@ -51,12 +50,23 @@ class PatternSearch(LocalSearch):
                  eps=1e-5,
                  display=PatternSearchDisplay(),
                  **kwargs):
+        """
+
+        Parameters
+        ----------
+        explr_delta
+        explr_rho
+        pattern_step
+        eps
+        display
+        kwargs
+        """
 
         super().__init__(display=display, **kwargs)
         self.explr_rho = explr_rho
         self.pattern_step = pattern_step
         self.explr_delta = explr_delta
-        self.default_termination = PatternSearchTermination(eps=eps, x_tol=1e-6, f_tol=1e-6, nth_gen=1, n_last=2)
+        self.default_termination = PatternSearchTermination(eps=eps, x_tol=1e-6, f_tol=1e-6, nth_gen=1, n_last=30)
 
     def _initialize(self, **kwargs):
         super()._initialize(**kwargs)
@@ -80,7 +90,13 @@ class PatternSearch(LocalSearch):
             # perform an exploration move around the trial vector - the best known solution is always stored in _current
             explr = self._exploration_move(trial, opt=self._current)
 
+            # we can break if we did not improve
             if not is_better(explr, self._current):
+                break
+
+            # else also check if we are terminating - otherwise this loop might run far too long
+            self._set_optimum()
+            if self.termination.has_terminated(self):
                 break
 
             self._previous, self._current = self._current, explr
