@@ -1,5 +1,6 @@
 import autograd.numpy as anp
 from pymoo.model.problem import Problem
+from pymoo.visualization.scatter import Scatter
 
 
 class MyProblem(Problem):
@@ -34,48 +35,25 @@ algorithm = NSGA2(
     eliminate_duplicates=True
 )
 
+
 from pymoo.optimize import minimize
-from pymoo.factory import get_termination
 
-problem = MyProblem()
-
-res = minimize(problem,
+res = minimize(MyProblem(),
                algorithm,
                ('n_gen', 40),
                seed=1,
-               pf=problem.pareto_front(use_cache=False),
-               save_history=True,
                verbose=True)
 
-
-import numpy as np
-from pymoo.factory import get_decision_making, get_reference_directions
-
-
-weights = np.array([0.5, 0.5])
-b, pseudo_weights = get_decision_making("pseudo-weights", weights).do(res.F, return_pseudo_weights=True)
-print(b)
+plot = Scatter()
+plot.add(res.F, color="red")
+plot.show()
 
 
+plot = Scatter()
+plot.add(res.X, color="red")
+plot.do()
+import matplotlib.pyplot as plt
+plt.ylim(-2,2)
+plt.show()
 
 
-problem = MyProblem()
-
-print(problem.pareto_front())
-print(problem.pareto_set())
-
-F, dF = problem.evaluate(anp.array([0.1, 0.2]), return_values_of=["F", "dF"])
-
-ps = problem.pareto_set(use_cache=False, flatten=False)
-pf = problem.pareto_front(use_cache=False, flatten=False)
-print(ps)
-print(pf)
-
-# Make decision
-weights = np.array([0.25, 0.25, 0.25, 0.25])
-a, pseudo_weights = get_decision_making("pseudo-weights", weights).do(pf, return_pseudo_weights=True)
-
-weights = np.array([0.4, 0.20, 0.15, 0.25])
-b, pseudo_weights = get_decision_making("pseudo-weights", weights).do(F, return_pseudo_weights=True)
-
-print(b)

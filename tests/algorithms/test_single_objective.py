@@ -2,89 +2,67 @@ import unittest
 
 import numpy as np
 
-from pymoo.algorithms.nsga2 import NSGA2
-from pymoo.factory import get_problem, Problem, ZDT
+from pymoo.algorithms.so_genetic_algorithm import GA
+from pymoo.algorithms.so_nelder_mead import NelderMead
+from pymoo.algorithms.so_pattern_search import PatternSearch
+from pymoo.algorithms.so_pso import PSO
+from pymoo.factory import Sphere, Problem
 from pymoo.optimize import minimize
 
-class MyThreadedProblem(Problem):
 
-    def __init__(self):
-        super().__init__(n_var=2,
-                         n_obj=1,
-                         n_constr=0,
-                         elementwise_evaluation=True,
-                         parallelization=("threads", 4),
-                         xl=np.array([0, 0]),
-                         xu=np.array([100, 100]))
+class SphereNoBounds(Sphere):
+
+    def __init__(self, n_var=10, **kwargs):
+        super().__init__(n_var=n_var, **kwargs)
+        self.xl = None
+        self.xu = None
+
+
+class SphereWithConstraints(Problem):
+
+    def __init__(self, n_var=10):
+        super().__init__(n_var=n_var, n_obj=1, n_constr=1, xl=-0, xu=1, type_var=np.double)
 
     def _evaluate(self, x, out, *args, **kwargs):
-        out["F"] = x[0] + x[1]
+        out["F"] = np.sum(np.square(x - 0.5), axis=1)
+        out["G"] = 0.1 - out["F"]
+
+    def _calc_pareto_front(self):
+        return 0.1
 
 
-class AlgorithmTest(unittest.TestCase):
-
-    def test_same_seed_same_result(self):
-        problem = get_problem("zdt3")
-        algorithm = NSGA2(pop_size=100, eliminate_duplicates=True)
-
-        res1 = minimize(problem, algorithm, ('n_gen', 20), seed=1)
-        np.random.seed(200)
-        res2 = minimize(problem, algorithm, ('n_gen', 20), seed=1)
-
-        self.assertEqual(res1.X.shape, res2.X.shape)
-        self.assertTrue(np.all(np.allclose(res1.X, res2.X)))
-
-    def test_no_pareto_front_given(self):
-        class ZDT1NoPF(ZDT):
-            def _evaluate(self, x, out, *args, **kwargs):
-                f1 = x[:, 0]
-                g = 1 + 9.0 / (self.n_var - 1) * np.sum(x[:, 1:], axis=1)
-                f2 = g * (1 - np.power((f1 / g), 0.5))
-                out["F"] = np.column_stack([f1, f2])
-
-        algorithm = NSGA2(pop_size=100, eliminate_duplicates=True)
-        minimize(ZDT1NoPF(), algorithm, ('n_gen', 20), seed=1, verbose=True)
-
-    def test_no_feasible_solution_found(self):
-        class MyProblem(Problem):
-
-            def __init__(self):
-                super().__init__(n_var=2,
-                                 n_obj=1,
-                                 n_constr=36,
-                                 xl=np.array([0, 0]),
-                                 xu=np.array([100, 100]))
-
-            def _evaluate(self, x, out, *args, **kwargs):
-                f1 = x[:, 0] + x[:, 1]
-                out["F"] = np.column_stack([f1])
-                out["G"] = np.ones(len(x))
-
-        res = minimize(MyProblem(),
-                       NSGA2(),
-                       ("n_gen", 10),
-                       seed=1)
-
-        self.assertEqual(res.X, None)
-        self.assertEqual(res.F, None)
-        self.assertEqual(res.G, None)
-
-        res = minimize(MyProblem(),
-                       NSGA2(return_least_infeasible=True),
-                       ("n_gen", 10),
-                       seed=1,
-                       verbose=True,
-                       save_history=True)
-
-        self.assertEqual(res.CV, 1)
+def test(problem, algorithm):
+    res = minimize(problem, algorithm, seed=1)
+    f = res.F[0]
+    print(res.CV)
+    f_opt = problem.pareto_front()[0, 0]
+    return f, f_opt
 
 
-    def test_thread_pool(self):
-        minimize(MyThreadedProblem(),
-                 NSGA2(),
-                 ("n_gen", 10),
-                 seed=1,
-                 save_history=False)
+class SingleObjectiveAlgorithmTest(unittest.TestCase):
+
+    def test_sphere(self):
+        problem = Sphere()
+        for algorithm in [NelderMead(), PatternSearch(), PSO(), GA()]:
+            f, f_opt = test(problem, algorithm)
+            self.assertAlmostEqual(f, f_opt, places=5)
+            print(problem.__class__.__name__, algorithm.__class__.__name__, "Yes")
+
+    def test_sphere_with_constraints(self):
+        problem = SphereWithConstraints()
+        for algorithm in [GA(), NelderMead(), PatternSearch()]:
+            f, f_opt = test(problem, algorithm)
+            self.assertAlmostEqual(f, f_opt, places=3)
+            print(problem.__class__.__name__, algorithm.__class__.__name__, "Yes")
+
+    def test_sphere_no_bounds(self):
+        problem = SphereNoBounds()
+        x0 = np.random.random(problem.n_var)
+
+        for algorithm in [NelderMead(x0=x0), PatternSearch(x0=x0)]:
+            f, f_opt = test(problem, algorithm)
+            self.assertAlmostEqual(f, f_opt, places=5)
+            print(problem.__class__.__name__, algorithm.__class__.__name__, "Yes")
 
 
 if __name__ == '__main__':

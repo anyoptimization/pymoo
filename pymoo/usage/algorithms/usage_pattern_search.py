@@ -9,8 +9,6 @@ algorithm = PatternSearch()
 res = minimize(problem,
                algorithm,
                seed=1,
-               verbose=True)
+               verbose=False)
 
-print(res.X)
-print(res.F)
-print(res.CV)
+print("Best solution found: \nX = %s\nF = %s" % (res.X, res.F))

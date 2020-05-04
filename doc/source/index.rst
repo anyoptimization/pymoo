@@ -93,19 +93,19 @@ Furthermore, our framework offers a variety of different features which cover va
 Reference
 ------------------------------------------------------------------------------
 
-If you have used our framework for research purposes, you can cite our journal |paper| with:
+If you have used our framework for research purposes, you can cite our journal |paper| (IEEE Early Access) with:
 
 ::
 
-    @misc{pymoo,
+    @ARTICLE{pymoo,
+        author={J. {Blank} and K. {Deb}},
         title={pymoo: Multi-objective Optimization in Python},
-        author={Julian Blank and Kalyanmoy Deb},
+        journal={IEEE Access},
         year={2020},
-        eprint={2002.04504},
-        archivePrefix={arXiv},
-        primaryClass={cs.NE}
+        volume={},
+        number={},
+        pages={1-1}
     }
-
 
 
 News

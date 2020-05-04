@@ -6,14 +6,16 @@ Meanwhile, if you have used our framework for research purposes, you can cite us
 
 ::
 
-    @misc{pymoo,
+    @ARTICLE{pymoo,
+        author={J. {Blank} and K. {Deb}},
         title={pymoo: Multi-objective Optimization in Python},
-        author={Julian Blank and Kalyanmoy Deb},
+        journal={IEEE Access},
         year={2020},
-        eprint={2002.04504},
-        archivePrefix={arXiv},
-        primaryClass={cs.NE}
+        volume={},
+        number={},
+        pages={1-1}
     }
+
 
 The reference made in our framework are listed below.
 The corresponding `BibTex <https://raw.githubusercontent.com/msu-coinlab/pymoo/master/doc/source/references.bib>`_ 

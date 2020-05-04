@@ -16,9 +16,9 @@ class PatternSearchTest(unittest.TestCase):
     def test_against_orginal_implementation(self):
 
         for problem in [
-            Sphere(n_var=10),
             Ackley(n_var=2),
             Rosenbrock(n_var=2),
+            Sphere(n_var=10),
         ]:
 
             print(problem.__class__.__name__)
@@ -49,8 +49,8 @@ class PatternSearchTest(unittest.TestCase):
             n = min(len(X), len(_X))
             X, _X, F, _F = X[:n], _X[:n], F[:n], _F[:n]
 
-            np.testing.assert_allclose(X, _X, rtol=0, atol=1e-4)
-            np.testing.assert_allclose(F, _F, rtol=0, atol=1e-4)
+            np.testing.assert_allclose(X, _X, rtol=0, atol=1e-3)
+            np.testing.assert_allclose(F, _F, rtol=0, atol=1e-3)
 
 
 def best_nearby(delta, point, prevbest, nvars, f, funevals):
