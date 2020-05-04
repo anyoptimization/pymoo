@@ -4,11 +4,12 @@ from pymoo.optimize import minimize
 from pymoo.util.termination.constr_violation import ConstraintViolationToleranceTermination
 
 problem = get_problem("g05")
-algorithm = GA(pop_size=100, return_least_infeasible=True)
+algorithm = GA(pop_size=100)
 
 res = minimize(problem,
                algorithm,
                ConstraintViolationToleranceTermination(),
+               return_least_infeasible=True,
                seed=1,
                verbose=True)
 

@@ -15,10 +15,12 @@ class MyDisplay(Display):
 
 problem = get_problem("zdt2")
 
-algorithm = NSGA2(pop_size=100, display=MyDisplay())
+algorithm = NSGA2(pop_size=100)
 
 res = minimize(problem,
                algorithm,
                ('n_gen', 10),
                seed=1,
+               display=MyDisplay(),
                verbose=True)
+

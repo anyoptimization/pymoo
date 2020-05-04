@@ -4,12 +4,13 @@ from pymoo.optimize import minimize
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 problem = get_problem("g05")
-algorithm = GA(pop_size=100, return_least_infeasible=True)
+algorithm = GA(pop_size=100)
 termination = SingleObjectiveDefaultTermination()
 
 res = minimize(problem,
                algorithm,
                termination,
+               return_least_infeasible=True,
                pf=None,
                seed=1,
                verbose=True)

@@ -60,9 +60,9 @@ class NeighborFinder:
 
         _, n_dim = N.shape
 
-        # at least find dimensionality times two neighbors - if enabled
+        # at least find min(dimensionality times two neighbors, number PO solutions - 1) - if enabled
         if n_min_neigbors == "auto":
-            self.n_min_neigbors = 2 * n_dim
+            self.n_min_neigbors = min(2 * n_dim, _ - 1)
 
         # disable the minimum neighbor variable
         else:

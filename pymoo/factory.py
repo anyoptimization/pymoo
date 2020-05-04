@@ -8,7 +8,6 @@ The definitions for each object are purposely defined as a list and not as a dic
 import re
 
 from pymoo.configuration import Configuration
-
 from pymoo.problems.many import *
 from pymoo.problems.multi import *
 from pymoo.problems.single import *
@@ -17,6 +16,7 @@ from pymoo.problems.single import *
 # =========================================================================================================
 # Generic
 # =========================================================================================================
+
 
 
 def get_from_list(l, name, args, kwargs):
@@ -67,12 +67,14 @@ def get_algorithm_options():
     from pymoo.algorithms.so_nelder_mead import NelderMead
     from pymoo.algorithms.so_cmaes import CMAES
     from pymoo.algorithms.so_brkga import BRKGA
+    from pymoo.algorithms.so_pattern_search import PatternSearch
 
     ALGORITHMS = [
         ("ga", GA),
         ("brkga", BRKGA),
         ("de", DE),
         ("nelder-mead", NelderMead),
+        ("pattern-search", PatternSearch),
         ("cmaes", CMAES),
         ("nsga2", NSGA2),
         ("rnsga2", RNSGA2),
@@ -317,11 +319,13 @@ def get_reference_direction_options():
     from pymoo.util.reference_direction import MultiLayerReferenceDirectionFactory
     from pymoo.util.ref_dirs.reduction import ReductionBasedReferenceDirectionFactory
     from pymoo.util.ref_dirs.energy import RieszEnergyReferenceDirectionFactory
+    from pymoo.util.ref_dirs.energy_layer import LayerwiseRieszEnergyReferenceDirectionFactory
 
     REFERENCE_DIRECTIONS = [
         ("(das-dennis|uniform)", UniformReferenceDirectionFactory),
         ("multi-layer", MultiLayerReferenceDirectionFactory),
         ("(energy|riesz)", RieszEnergyReferenceDirectionFactory),
+        ("(layer-energy|layer-riesz)", LayerwiseRieszEnergyReferenceDirectionFactory),
         ("red", ReductionBasedReferenceDirectionFactory)
     ]
 

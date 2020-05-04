@@ -25,13 +25,13 @@ class Algorithm:
     Parameters
     ----------
 
-    problem: class
+    problem : :class:`~pymoo.model.problem.Problem`
         Problem to be solved by the algorithm
 
-    termination: class
+    termination: :class:`~pymoo.model.termination.Termination`
         Object that tells the algorithm when to terminate.
 
-    seed: int
+    seed : int
         Random seed to be used. Same seed is supposed to return the same result. If set to None, a random seed
         is chosen randomly and stored in the result object to ensure reproducibility.
 
@@ -48,24 +48,19 @@ class Algorithm:
     save_history : bool
         If true, a current snapshot of each generation is saved.
 
-    pf : np.array
+    pf : numpy.array
         The Pareto-front for the given problem. If provided performance metrics are printed during execution.
 
     return_least_infeasible : bool
         Whether the algorithm should return the least infeasible solution, if no solution was found.
 
-    evaluator : class
+    evaluator : :class:`~pymoo.model.evaluator.Evaluator`
         The evaluator which can be used to make modifications before calling the evaluate function of a problem.
 
 
     """
 
-    def __init__(self,
-                 callback=None,
-                 display=None,
-                 termination=None,
-                 return_least_infeasible=False,
-                 **kwargs):
+    def __init__(self, **kwargs):
 
         # !
         # Here all algorithm parameters needed no matter what is problem is passed are defined
@@ -77,45 +72,45 @@ class Algorithm:
         # prints the compile warning if enabled
         FunctionLoader.get_instance()
 
-        # function used to display attributes
-
-        # other attributes of the algorithm
-        self.callback = callback
-        self.display = None
-        self.return_least_infeasible = return_least_infeasible
+        # !
+        # DEFAULT SETTINGS OF ALGORITHM
+        # !
+        # the termination criterion to be used by the algorithm - might be specific for an algorithm
+        self.termination = kwargs.get("termination")
+        # set the display variable supplied to the algorithm - might be specific for an algorithm
+        self.display = kwargs.get("display")
+        # callback to be executed each generation
+        self.callback = kwargs.get("callback")
 
         # !
         # Attributes to be set later on for each problem run
         # !
-
         # the optimization problem as an instance
         self.problem = None
-        # the termination criterion of the algorithm
-        self.termination = termination
+        # whether the algorithm should finally return the least infeasible solution if no feasible found
+        self.return_least_infeasible = None
+        # whether the history should be saved or not
+        self.save_history = None
+        # whether the algorithm should print output in this run or not
+        self.verbose = None
+        # the random seed that was used
+        self.seed = None
         # an algorithm can defined the default termination which can be overwritten
         self.default_termination = None
         # whether the algorithm as terminated or not
         self.has_terminated = None
-        # the random seed that was used
-        self.seed = None
         # the pareto-front of the problem - if it exist or passed
         self.pf = None
         # the function evaluator object (can be used to inject code)
         self.evaluator = None
         # the current number of generation or iteration
         self.n_gen = None
-        # whether the history should be saved or not
-        self.save_history = None
         # the history object which contains the list
         self.history = None
         # the current solutions stored - here considered as population
         self.pop = None
         # the optimum found by the algorithm
         self.opt = None
-        # whether the algorithm should print output in this run or not
-        self.verbose = None
-        # set the display variable supplied to the algorithm
-        self.display = display
         # can be used to store additional data in submodules
         self.data = {}
 
@@ -125,36 +120,28 @@ class Algorithm:
 
     def initialize(self,
                    problem,
-                   termination=None,
-                   seed=None,
                    pf=True,
                    evaluator=None,
+
+                   # START Default minimize
+                   seed=None,
                    verbose=False,
                    save_history=False,
-                   **kwargs):
+                   return_least_infeasible=False,
+                   # END Default minimize
 
-        # if this run should be verbose or not
-        self.verbose = verbose
+                   # START Overwrite by minimize
+                   termination=None,
+                   callback=None,
+                   display=None,
+                   # END Overwrite by minimize
+
+                   **kwargs):
 
         # set the problem that is optimized for the current run
         self.problem = problem
 
-        # the termination criterion to be used to stop the algorithm
-        if self.termination is None:
-            self.termination = termination
-
-        # if nothing given fall back to default
-        if self.termination is None:
-            self.termination = self.default_termination
-
-        # by default the algorithm as not terminated
-        self.has_terminated = False
-
-        # set the random seed in the algorithm object
-        self.seed = seed
-        if self.seed is None:
-            self.seed = np.random.randint(0, 10000000)
-        np.random.seed(self.seed)
+        # set the provided pareto front
         self.pf = pf
 
         # by default make sure an evaluator exists if nothing is passed
@@ -162,8 +149,46 @@ class Algorithm:
             evaluator = Evaluator()
         self.evaluator = evaluator
 
+        # !
+        # START Default minimize
+        # !
+        # if this run should be verbose or not
+        self.verbose = verbose
+        # whether the least infeasible should be returned or not
+        self.return_least_infeasible = return_least_infeasible
         # whether the history should be stored or not
         self.save_history = save_history
+
+        # set the random seed in the algorithm object
+        self.seed = seed
+        if self.seed is None:
+            self.seed = np.random.randint(0, 10000000)
+        np.random.seed(self.seed)
+        # !
+        # END Default minimize
+        # !
+
+        # !
+        # START Overwrite by minimize
+        # !
+        # the termination criterion to be used to stop the algorithm
+        if self.termination is None:
+            self.termination = termination
+        # if nothing given fall back to default
+        if self.termination is None:
+            self.termination = self.default_termination
+
+        if callback is not None:
+            self.callback = callback
+        if display is not None:
+            self.display = display
+
+        # !
+        # END Overwrite by minimize
+        # !
+
+        # by default the algorithm as not terminated
+        self.has_terminated = False
 
         # other run dependent variables that are reset
         self.n_gen = None
