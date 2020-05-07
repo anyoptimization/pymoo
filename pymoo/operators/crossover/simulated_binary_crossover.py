@@ -5,8 +5,8 @@ from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds
 
 
 class SimulatedBinaryCrossover(Crossover):
-    def __init__(self, eta, prob_per_variable=0.5, **kwargs):
-        super().__init__(2, 2, **kwargs)
+    def __init__(self, eta, n_offsprings=2, prob_per_variable=0.5, **kwargs):
+        super().__init__(2, n_offsprings, **kwargs)
         self.eta = float(eta)
         self.prob_per_variable = prob_per_variable
 
@@ -77,5 +77,10 @@ class SimulatedBinaryCrossover(Crossover):
 
         c[0] = repair_out_of_bounds(problem, c[0])
         c[1] = repair_out_of_bounds(problem, c[1])
+
+        if self.n_offsprings == 1:
+            # Randomly select one offspring
+            c = c[np.random.choice(2, X.shape[1]), np.arange(X.shape[1])]
+            c = c.reshape((1, X.shape[1], X.shape[2]))
 
         return c
