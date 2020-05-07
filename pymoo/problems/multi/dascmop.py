@@ -2,7 +2,6 @@ import numpy as np
 
 from pymoo.model.problem import Problem
 
-
 triplets = [
     (0.25, 0., 0.), (0., 0.25, 0.), (0., 0., 0.25), (0.25, 0.25, 0.25),
     (0.5, 0., 0.), (0., 0.5, 0.), (0., 0., 0.5), (0.5, 0.5, 0.5),
@@ -110,6 +109,11 @@ class DASCMOP4(DASCMOP1):
 
 
 class DASCMOP5(DASCMOP1):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.n_var = 5
+
     def _evaluate(self, X, out, *args, **kwargs):
         g = self.g2(X)
 
