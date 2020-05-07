@@ -16,18 +16,16 @@ class DASCMOP(Problem):
                          n_obj=n_obj,
                          n_constr=n_constr,
                          type_var=np.double, xl=0., xu=1., **kwargs)
-        self.eta = difficulty_factors[0]
-        self.zeta = difficulty_factors[1]
-        self.gamma = difficulty_factors[2]
+        self.eta, self.zeta, self.gamma = difficulty_factors
 
     def g1(self, X):
         contrib = (X[:, self.n_obj - 1:] - np.sin(0.5 * np.pi * X[:, 0:1])) ** 2
-        return contrib.sum(axis=1).reshape((-1, 1))
+        return contrib.sum(axis=1)[:, None]
 
     def g2(self, X):
         z = X[:, self.n_obj - 1:] - 0.5
         contrib = z ** 2 - np.cos(20 * np.pi * z)
-        return (self.n_var - self.n_obj + 1) + contrib.sum(axis=1).reshape((-1, 1))
+        return (self.n_var - self.n_obj + 1) + contrib.sum(axis=1)[:, None]
 
     def g3(self, X):
         j = np.arange(self.n_obj - 1, self.n_var) + 1
@@ -42,7 +40,7 @@ class DASCMOP1(DASCMOP):
     def constraints(self, X, f0, f1, g):
         a = 20.
         b = 2. * self.eta - 1.
-        d = 0.5 if self.zeta != 0 else 0
+        d = 0.5 if self.zeta != 0 else 0.
         if self.zeta > 0:
             e = d - np.log(self.zeta)
         else:
