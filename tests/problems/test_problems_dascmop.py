@@ -4,6 +4,7 @@ import unittest
 import numpy as np
 
 from pymoo.factory import get_problem
+from pymoo.problems.multi import DIFFICULTIES
 
 
 def load(name, diff):
@@ -18,12 +19,7 @@ class CorrectnessTest(unittest.TestCase):
 
     def test_problems(self):
 
-        difficulties = [[0.25, 0.0, 0.0], [0.0, 0.25, 0.0], [0.0, 0.0, 0.25], [0.25, 0.25, 0.25],
-                        [0.5, 0.0, 0.0], [0.0, 0.5, 0.0], [0.0, 0.0, 0.5], [0.5, 0.5, 0.5],
-                        [0.75, 0.0, 0.0], [0.0, 0.75, 0.0], [0.0, 0.0, 0.75], [0.75, 0.75, 0.75],
-                        [0.0, 1.0, 0.0], [0.5, 1.0, 0.0], [0.0, 1.0, 0.5], [0.5, 1.0, 0.5]]
-
-        for k, diff_factors in enumerate(difficulties):
+        for k, diff_factors in enumerate(DIFFICULTIES):
 
             problems = [
                 get_problem("dascmop1", diff_factors),

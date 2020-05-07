@@ -1,8 +1,11 @@
+import os
+
 import numpy as np
 
 from pymoo.model.problem import Problem
+from pymoo.problems.util import load_pareto_front_from_file
 
-triplets = [
+DIFFICULTIES = [
     (0.25, 0., 0.), (0., 0.25, 0.), (0., 0., 0.25), (0.25, 0.25, 0.25),
     (0.5, 0., 0.), (0., 0.5, 0.), (0., 0., 0.5), (0.5, 0.5, 0.5),
     (0.75, 0., 0.), (0., 0.75, 0.), (0., 0., 0.75), (0.75, 0.75, 0.75),
@@ -11,12 +14,14 @@ triplets = [
 
 
 class DASCMOP(Problem):
-    def __init__(self, n_obj, n_constr, difficulty_factors, **kwargs):
+    def __init__(self, n_obj, n_constr, difficulty, **kwargs):
         super().__init__(n_var=30,
                          n_obj=n_obj,
                          n_constr=n_constr,
                          type_var=np.double, xl=0., xu=1., **kwargs)
-        self.eta, self.zeta, self.gamma = difficulty_factors
+
+        self.difficulty = difficulty
+        self.eta, self.zeta, self.gamma = DIFFICULTIES[difficulty]
 
     def g1(self, X):
         contrib = (X[:, self.n_obj - 1:] - np.sin(0.5 * np.pi * X[:, 0:1])) ** 2
@@ -32,10 +37,13 @@ class DASCMOP(Problem):
         contrib = (X[:, self.n_obj - 1:] - np.cos(0.25 * j / self.n_var * np.pi * (X[:, 0:1] + X[:, 1:2]))) ** 2
         return contrib.sum(axis=1)[:, None]
 
+    def _calc_pareto_front(self, *args, **kwargs):
+        fname = f"{str(self.__class__.__name__).lower()}_{self.difficulty+1}.pf"
+        return load_pareto_front_from_file(os.path.join("DASCMOP", fname))
 
 class DASCMOP1(DASCMOP):
-    def __init__(self, difficulty_factors, **kwargs):
-        super().__init__(2, 11, difficulty_factors)
+    def __init__(self, difficulty, **kwargs):
+        super().__init__(2, 11, difficulty)
 
     def constraints(self, X, f0, f1, g):
         a = 20.
@@ -57,10 +65,15 @@ class DASCMOP1(DASCMOP):
         c = np.zeros((X.shape[0], 2 + p_k.shape[1]))
 
         c[:, 0] = np.sin(a * np.pi * X[:, 0]) - b
-        c[:, 1:2] = (e - g) * (g - d)
+        if self.zeta == 1.:
+            c[:, 1:2] = 1e-4 - np.abs(e - g)
+        else:
+            c[:, 1:2] = (e - g) * (g - d)
+
         c[:, 2:] = (((f0 - p_k) * np.cos(theta_k) - (f1 - q_k) * np.sin(theta_k)) ** 2 / a_k2
                     + ((f0 - p_k) * np.sin(theta_k) + (f1 - q_k) * np.cos(theta_k)) ** 2 / b_k2
                     - r)
+
         return -1 * c
 
     def _evaluate(self, X, out, *args, **kwargs):
@@ -152,7 +165,10 @@ class DASCMOP7(DASCMOP):
 
         c[:, 0] = np.sin(a * np.pi * X[:, 0]) - b
         c[:, 1] = np.cos(a * np.pi * X[:, 1]) - b
-        c[:, 2:3] = (e - g) * (g - d)
+        if self.zeta == 1:
+            c[:, 2:3] = 1e-4 - np.abs(e - g)
+        else:
+            c[:, 2:3] = (e - g) * (g - d)
 
         c[:, 3:] = (f0 - x_k) ** 2 + (f1 - y_k) ** 2 + (f2 - z_k) ** 2 - r ** 2
         return -1 * c
