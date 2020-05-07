@@ -2,6 +2,9 @@ import numpy as np
 
 from pymoo.model.problem import Problem
 
+# Based on the C++ implementation by the Ma and Wang
+# http://www.escience.cn/people/yongwang1/index.html
+
 
 class MW(Problem):
     def __init__(self, n_var, n_obj, n_constr, **kwargs):
