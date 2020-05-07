@@ -18,7 +18,6 @@ from pymoo.problems.single import *
 # =========================================================================================================
 
 
-
 def get_from_list(l, name, args, kwargs):
     i = None
 
