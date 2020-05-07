@@ -30,8 +30,8 @@ class CorrectnessTest(unittest.TestCase):
                 get_problem("dascmop5", diff_factors),
                 get_problem("dascmop6", diff_factors),
                 get_problem("dascmop7", diff_factors),
-                # get_problem("dascmop8", diff_factors),
-                # get_problem("dascmop9", diff_factors)
+                get_problem("dascmop8", diff_factors),
+                get_problem("dascmop9", diff_factors)
             ]
 
             for problem in problems:
