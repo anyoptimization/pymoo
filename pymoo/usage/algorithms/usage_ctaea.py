@@ -27,7 +27,11 @@ plot.show()
 # END ctaea
 
 # START carside
-res = minimize(get_problem("carside"),
+problem = get_problem("carside")
+ref_dirs = get_reference_directions("das-dennis", problem.n_obj, n_points=91)
+algorithm = CTAEA(ref_dirs=ref_dirs)
+
+res = minimize(problem,
                algorithm,
                ('n_gen', 600),
                seed=1,
