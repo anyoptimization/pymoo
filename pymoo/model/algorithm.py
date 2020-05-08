@@ -191,7 +191,7 @@ class Algorithm:
         self.has_terminated = False
 
         # other run dependent variables that are reset
-        self.n_gen = None
+        self.n_gen = 1
         self.history = []
         self.pop = Population()
         self.opt = None
@@ -279,7 +279,6 @@ class Algorithm:
             raise Exception("No termination criterion defined and algorithm has no default termination implemented!")
 
         # initialize the first population and evaluate it
-        self.n_gen = 1
         self._initialize()
         self._set_optimum()
         self._each_iteration()

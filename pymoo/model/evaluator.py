@@ -12,9 +12,12 @@ class Evaluator:
 
     """
 
-    def __init__(self, evaluate_values_of=["F", "CV", "G"]):
+    def __init__(self,
+                 skip_already_evaluated=True,
+                 evaluate_values_of=["F", "CV", "G"]):
         self.n_eval = 0
         self.evaluate_values_of = evaluate_values_of
+        self.skip_already_evaluated = skip_already_evaluated
 
     def eval(self,
              problem,
@@ -42,7 +45,10 @@ class Evaluator:
             pop = Population().create(pop)
 
         # find indices to be evaluated
-        I = [k for k in range(len(pop)) if pop[k].F is None]
+        if self.skip_already_evaluated:
+            I = [k for k in range(len(pop)) if pop[k].F is None]
+        else:
+            I = np.arange(len(pop))
 
         # update the function evaluation counter
         self.n_eval += len(I)
