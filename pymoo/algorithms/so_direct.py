@@ -3,9 +3,6 @@ import numpy as np
 from pymoo.algorithms.so_local_search import LocalSearch
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
-from pymoo.model.problem import Problem
-from pymoo.optimize import minimize
-from pymoo.problems.single import Himmelblau, Sphere, Rastrigin
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.normalization import normalize, denormalize
@@ -32,11 +29,13 @@ class DIRECT(LocalSearch):
     def __init__(self,
                  eps=1e-2,
                  penalty=0.1,
+                 n_max_candidates=10,
                  display=SingleObjectiveDisplay(),
                  **kwargs):
         super().__init__(display=display, **kwargs)
         self.eps = eps
         self.penalty = penalty
+        self.n_max_candidates = n_max_candidates
 
     def initialize(self, problem, **kwargs):
         super().initialize(problem, **kwargs)
@@ -64,7 +63,7 @@ class DIRECT(LocalSearch):
         F = nF + self.penalty * _CV
 
         # get the length of the interval of each solution
-        nxl, nxu = norm_bounds(pop, problem)
+        nxl, nxu = norm_bounds(pop, self.problem)
         length = (nxu - nxl) / 2
 
         val = length.max(axis=1)
@@ -85,10 +84,9 @@ class DIRECT(LocalSearch):
         else:
             # TODO: The second condition needs to be implemented here. Exact implementation still unclear.
 
-            n_max_candidates = 10
+            if len(candidates) > self.n_max_candidates:
+                I = list(np.random.choice(np.arange(len(candidates)), self.n_max_candidates - 1))
 
-            if len(candidates) > n_max_candidates:
-                I = list(np.random.choice(np.arange(len(candidates)), n_max_candidates - 1))
                 k = np.argmin(F[:, 0])
                 if k not in I:
                     I.append(k)
@@ -107,7 +105,7 @@ class DIRECT(LocalSearch):
         for current in potential_optimal:
 
             # find the largest dimension the solution has not been evaluated yet
-            nxl, nxu = norm_bounds(current, problem)
+            nxl, nxu = norm_bounds(current, self.problem)
             k = np.argmax(nxu - nxl)
 
             # the delta value to be used to get left and right - this is one sixth of the range
@@ -140,36 +138,6 @@ class DIRECT(LocalSearch):
         # evaluate the offsprings
         self.evaluator.eval(self.problem, off, algorithm=self)
 
-        # print(off.get("X"))
-
         # add the offsprings to the population
         self.pop = Population.merge(self.pop, off)
 
-
-class ExSwarm(Problem):
-
-    def __init__(self):
-        super().__init__(n_var=2, n_obj=1, n_constr=0, xl=np.array([-1.0, -1.0]), xu=np.array([1.0, 1.0]))
-
-    def _evaluate(self, x, out, *args, **kwargs):
-        v1 = 20 * x[:, 0]
-        v2 = 20 * x[:, 1]
-        out["F"] = -np.sin(v1 / np.pi) ** 2. * np.sin(v2 / np.pi) ** 2. * (abs(v1) + abs(v2) + 0.1 * (v1 + v2)) + (
-                v1 * v1 + v2 * v2) / 30
-
-
-if __name__ == '__main__':
-    problem = ExSwarm()
-    problem = Himmelblau()
-    # problem = Sphere(n_var=100, opt=0.2 * np.ones(100))
-    problem = Rastrigin(n_var=10)
-    problem.xl *= 1.5
-
-    # problem = get_problem("g02")
-    algorithm = DIRECT()
-    # algorithm = GA()
-
-    ret = minimize(problem,
-                   algorithm,
-                   ("n_iter", 1000),
-                   verbose=True)

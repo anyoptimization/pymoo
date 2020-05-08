@@ -26,7 +26,6 @@ class Problem:
                  n_constr=0,
                  xl=None,
                  xu=None,
-                 bounds_as_constraints=False,
                  type_var=np.double,
                  evaluation_of="auto",
                  parallelization=None,
@@ -577,4 +576,4 @@ class MetaProblem(Problem):
         self.problem = problem
 
     def _evaluate(self, x, *args, **kwargs):
-        return self.problem.evaluate(x, return_as_dictionary=True, return_values_of=["F", "CV", "G", "feasible"])
+        self.problem._evaluate(x, *args, **kwargs)

@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 
 from pymoo.model.individual import Individual
@@ -26,10 +28,11 @@ class Population(np.ndarray):
             obj.individual = self.individual
             return obj
 
-    def copy(self):
+    def copy(self, deep=False):
         pop = Population(n_individuals=len(self), individual=self.individual)
         for i in range(len(self)):
-            pop[i] = self[i]
+            val = copy.deepcopy(self[i]) if deep else self[i]
+            pop[i] = val
         return pop
 
     def has(self, key):
