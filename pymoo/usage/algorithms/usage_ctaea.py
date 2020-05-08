@@ -4,7 +4,7 @@ from pymoo.factory import get_problem, get_reference_directions
 from pymoo.optimize import minimize
 from pymoo.visualization.scatter import Scatter
 
-problem = get_problem("DASCMOP1", 0)
+problem = get_problem("DASCMOP1", 1)
 
 # create the reference directions to be used for the optimization
 ref_dirs = get_reference_directions("das-dennis", problem.n_obj, n_points=91)
