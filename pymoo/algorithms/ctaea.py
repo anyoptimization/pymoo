@@ -6,10 +6,8 @@ from scipy.spatial.distance import pdist, squareform
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.algorithms.nsga3 import comp_by_cv_then_random
 from pymoo.factory import get_decomposition
-from pymoo.model.crossover import Crossover
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
-from pymoo.model.survival import Survival
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
