@@ -95,7 +95,7 @@ However, for instance executing NSGA2:
                    algorithm,
                    ('n_gen', 200),
                    seed=1,
-                   verbose=True)
+                   verbose=False)
 
     plot = Scatter()
     plot.add(problem.pareto_front(), plot_type="line", color="black", alpha=0.7)
@@ -120,13 +120,14 @@ Meanwhile, if you have used our framework for research purposes, please cite us 
 
 ::
 
-    @misc{pymoo,
+    @ARTICLE{pymoo,
+        author={J. {Blank} and K. {Deb}},
         title={pymoo: Multi-objective Optimization in Python},
-        author={Julian Blank and Kalyanmoy Deb},
+        journal={IEEE Access},
         year={2020},
-        eprint={2002.04504},
-        archivePrefix={arXiv},
-        primaryClass={cs.NE}
+        volume={},
+        number={},
+        pages={1-1}
     }
 
 

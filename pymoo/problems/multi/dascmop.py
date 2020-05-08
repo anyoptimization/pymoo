@@ -20,8 +20,17 @@ class DASCMOP(Problem):
                          n_constr=n_constr,
                          type_var=np.double, xl=0., xu=1., **kwargs)
 
-        self.difficulty = difficulty
-        self.eta, self.zeta, self.gamma = DIFFICULTIES[difficulty]
+
+        if isinstance(difficulty, int):
+            self.difficulty = difficulty
+            if not (1 <= difficulty <= len(DIFFICULTIES)):
+                raise Exception(f"Difficulty must be 1 <= difficulty <= {len(DIFFICULTIES)}, but it is {difficulty}!")
+            vals = DIFFICULTIES[difficulty-1]
+        else:
+            self.difficulty = -1
+            vals = difficulty
+
+        self.eta, self.zeta, self.gamma = vals
 
     def g1(self, X):
         contrib = (X[:, self.n_obj - 1:] - np.sin(0.5 * np.pi * X[:, 0:1])) ** 2
@@ -38,7 +47,7 @@ class DASCMOP(Problem):
         return contrib.sum(axis=1)[:, None]
 
     def _calc_pareto_front(self, *args, **kwargs):
-        fname = f"{str(self.__class__.__name__).lower()}_{self.difficulty+1}.pf"
+        fname = f"{str(self.__class__.__name__).lower()}_{self.difficulty}.pf"
         return load_pareto_front_from_file(os.path.join("DASCMOP", fname))
 
 class DASCMOP1(DASCMOP):
