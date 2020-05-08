@@ -8,7 +8,7 @@ from pymoo.problems.multi import DIFFICULTIES
 
 
 def load(name, diff):
-    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "DASCOMP", str(diff))
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "DASCMOP", str(diff))
     X = np.loadtxt(os.path.join(path, "%s.x" % name))
     F = np.loadtxt(os.path.join(path, "%s.f" % name))
     CV = np.loadtxt(os.path.join(path, "%s.cv" % name))[:, None]
