@@ -68,11 +68,7 @@ class Problem:
         self.n_constr = n_constr
 
         # whether box boundaries (xl, xu) should be handled as constraints during the optimization
-        self.bounds_as_constraints = bounds_as_constraints
-
-        # increase the number of constraints if the boundaries are counted too
-        if self.bounds_as_constraints:
-            self.n_constr += 2 * self.n_var
+        self.bounds_as_constraints = False
 
         # allow just an integer for xl and xu if all bounds are equal
         if n_var > 0 and not isinstance(xl, np.ndarray) and xl is not None:
@@ -495,6 +491,14 @@ class Problem:
             state["parallelization"] = None
 
         return state
+
+    def set_boundaries_as_constraints(self, val=True):
+        if self.bounds_as_constraints and not val:
+            self.bounds_as_constraints = False
+            self.n_constr -= 2 * self.n_var
+        elif not self.bounds_as_constraints and val:
+            self.bounds_as_constraints = True
+            self.n_constr += 2 * self.n_var
 
 
 # makes all the output at least 2-d dimensional
