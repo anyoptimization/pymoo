@@ -1,10 +1,12 @@
+import os
+
 import numpy as np
 
 from pymoo.model.problem import Problem
 
-
 # Based on the C++ implementation by the Ma and Wang
 # http://www.escience.cn/people/yongwang1/index.html
+from pymoo.problems.util import load_pareto_front_from_file
 
 
 class MW(Problem):
@@ -178,6 +180,9 @@ class MW5(MW):
         out["F"] = np.column_stack([f0, f1])
         out["G"] = np.column_stack([g0, g1, g2])
 
+    def _calc_pareto_front(self, **kwargs):
+        return load_pareto_front_from_file(os.path.join("MW", "MW5.pf"))
+
 
 class MW6(MW):
     def __init__(self, n_var=15, **kwargs):
@@ -226,6 +231,9 @@ class MW7(MW):
         out["F"] = np.column_stack([f0, f1])
         out["G"] = np.column_stack([g0, g1])
 
+    def _calc_pareto_front(self, **kwargs):
+        return load_pareto_front_from_file(os.path.join("MW", "MW7.pf"))
+
 
 class MW8(MW):
     def __init__(self, n_var=None, n_obj=3, **kwargs):
@@ -242,7 +250,7 @@ class MW8(MW):
 
         f_squared = (f ** 2).sum(axis=1)
         g0 = f_squared - (1.25 - self.LA2(0.5, 6.0, 1.0, 2.0, np.arcsin(f[:, -1] / np.sqrt(f_squared)))) * (
-                    1.25 - self.LA2(0.5, 6.0, 1.0, 2.0, np.arcsin(f[:, -1] / np.sqrt(f_squared))))
+                1.25 - self.LA2(0.5, 6.0, 1.0, 2.0, np.arcsin(f[:, -1] / np.sqrt(f_squared))))
         out["F"] = f
         out["G"] = g0.reshape((-1, 1))
 
@@ -268,6 +276,9 @@ class MW9(MW):
         out["F"] = np.column_stack([f0, f1])
         out["G"] = g0.reshape((-1, 1))
 
+    def _calc_pareto_front(self, **kwargs):
+        return load_pareto_front_from_file(os.path.join("MW", "MW9.pf"))
+
 
 class MW10(MW):
     def __init__(self, n_var=15, **kwargs):
@@ -283,6 +294,9 @@ class MW10(MW):
         g2 = (1.0 - f0 * f0 - f1) * (1.2 - 1.2 * f0 * f0 - f1)
         out["F"] = np.column_stack([f0, f1])
         out["G"] = np.column_stack([g0, g1, g2])
+
+    def _calc_pareto_front(self, **kwargs):
+        return load_pareto_front_from_file(os.path.join("MW", "MW10.pf"))
 
 
 class MW11(MW):
@@ -301,6 +315,9 @@ class MW11(MW):
         out["F"] = np.column_stack([f0, f1])
         out["G"] = np.column_stack([g0, g1, g2, g3])
 
+    def _calc_pareto_front(self, **kwargs):
+        return load_pareto_front_from_file(os.path.join("MW", "MW11.pf"))
+
 
 class MW12(MW):
     def __init__(self, n_var=15, **kwargs):
@@ -312,9 +329,9 @@ class MW12(MW):
         f1 = g * (0.85 - 0.8 * (f0 / g) - 0.08 * np.abs(np.sin(3.2 * np.pi * (f0 / g))))
 
         g0 = -1.0 * (1 - 0.625 * f0 - f1 + 0.08 * np.sin(2 * np.pi * (f1 - f0 / 1.6))) * (
-                    1.4 - 0.875 * f0 - f1 + 0.08 * np.sin(2 * np.pi * (f1 / 1.4 - f0 / 1.6)))
+                1.4 - 0.875 * f0 - f1 + 0.08 * np.sin(2 * np.pi * (f1 / 1.4 - f0 / 1.6)))
         g1 = (1 - 0.8 * f0 - f1 + 0.08 * np.sin(2 * np.pi * (f1 - f0 / 1.5))) * (
-                    1.8 - 1.125 * f0 - f1 + 0.08 * np.sin(2 * np.pi * (f1 / 1.8 - f0 / 1.6)))
+                1.8 - 1.125 * f0 - f1 + 0.08 * np.sin(2 * np.pi * (f1 / 1.8 - f0 / 1.6)))
         out["F"] = np.column_stack([f0, f1])
         out["G"] = np.column_stack([g0, g1])
 
@@ -327,12 +344,12 @@ class MW12(MW):
         F[:, 1] = 0.85 - 0.8 * F[:, 0] - 0.08 * np.abs(np.sin(3.2 * np.pi * F[:, 0]))
 
         invalid = (1 - 0.8 * F[:, 0] - F[:, 1] + 0.08 * np.sin(2 * np.pi * (F[:, 1] - F[:, 0] / 1.5))) * (
-                    1.8 - 1.125 * F[:, 0] - F[:, 1] + 0.08 * np.sin(2 * np.pi * (F[:, 1] / 1.8 - F[:, 0] / 1.6))) > 0
+                1.8 - 1.125 * F[:, 0] - F[:, 1] + 0.08 * np.sin(2 * np.pi * (F[:, 1] / 1.8 - F[:, 0] / 1.6))) > 0
         while invalid.any():
             F[invalid, :] *= 1.001
             invalid = (1 - 0.8 * F[:, 0] - F[:, 1] + 0.08 * np.sin(2 * np.pi * (F[:, 1] - F[:, 0] / 1.5))) * (
-                        1.8 - 1.125 * F[:, 0] - F[:, 1] + 0.08 * np.sin(
-                    2 * np.pi * (F[:, 1] / 1.8 - F[:, 0] / 1.6))) > 0
+                    1.8 - 1.125 * F[:, 0] - F[:, 1] + 0.08 * np.sin(
+                2 * np.pi * (F[:, 1] / 1.8 - F[:, 0] / 1.6))) > 0
         return F
 
 
@@ -346,11 +363,14 @@ class MW13(MW):
         f1 = g * (5.0 - np.exp(f0 / g) - np.abs(0.5 * np.sin(3 * np.pi * f0 / g)))
 
         g0 = -1.0 * (5.0 - (1 + f0 + 0.5 * f0 * f0) - 0.5 * np.sin(3 * np.pi * f0) - f1) * (
-                    5.0 - (1 + 0.7 * f0) - 0.5 * np.sin(3 * np.pi * f0) - f1)
+                5.0 - (1 + 0.7 * f0) - 0.5 * np.sin(3 * np.pi * f0) - f1)
         g1 = (5.0 - np.exp(f0) - 0.5 * np.sin(3 * np.pi * f0) - f1) * (
-                    5.0 - (1 + 0.4 * f0) - 0.5 * np.sin(3 * np.pi * f0) - f1)
+                5.0 - (1 + 0.4 * f0) - 0.5 * np.sin(3 * np.pi * f0) - f1)
         out["F"] = np.column_stack([f0, f1])
         out["G"] = np.column_stack([g0, g1])
+
+    def _calc_pareto_front(self, **kwargs):
+        return load_pareto_front_from_file(os.path.join("MW", "MW13.pf"))
 
 
 class MW14(MW):
@@ -371,3 +391,6 @@ class MW14(MW):
         g0 = f[:, -1] - 1 / (self.n_obj - 1) * alpha.sum(axis=1)
         out["F"] = f
         out["G"] = g0.reshape((-1, 1))
+
+    def _calc_pareto_front(self, **kwargs):
+        return load_pareto_front_from_file(os.path.join("MW", "MW14.pf"))
