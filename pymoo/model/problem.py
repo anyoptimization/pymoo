@@ -70,6 +70,10 @@ class Problem:
         # whether box boundaries (xl, xu) should be handled as constraints during the optimization
         self.bounds_as_constraints = bounds_as_constraints
 
+        # increase the number of constraints if the boundaries are counted too
+        if self.bounds_as_constraints:
+            self.n_constr += 2 * self.n_var
+
         # allow just an integer for xl and xu if all bounds are equal
         if n_var > 0 and not isinstance(xl, np.ndarray) and xl is not None:
             self.xl = np.ones(n_var) * xl
