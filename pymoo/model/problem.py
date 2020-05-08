@@ -26,6 +26,7 @@ class Problem:
                  n_constr=0,
                  xl=None,
                  xu=None,
+                 bounds_as_constraints=False,
                  type_var=np.double,
                  evaluation_of="auto",
                  parallelization=None,
@@ -65,6 +66,9 @@ class Problem:
 
         # number of constraints
         self.n_constr = n_constr
+
+        # whether box boundaries (xl, xu) should be handled as constraints during the optimization
+        self.bounds_as_constraints = bounds_as_constraints
 
         # allow just an integer for xl and xu if all bounds are equal
         if n_var > 0 and not isinstance(xl, np.ndarray) and xl is not None:
@@ -280,6 +284,24 @@ class Problem:
             if type(out[key]) == autograd.numpy.numpy_boxes.ArrayBox:
                 out[key] = out[key]._value
 
+        # add the boundary constraints if they are supposed to be added
+        if self.bounds_as_constraints:
+
+            # get the boundaries for normalization
+            xl, xu = self.bounds()
+            norm = xu - xl
+
+            # add the boundary constraint if enabled
+            _G = np.zeros((len(X), 2 * self.n_var))
+            _G[:, :self.n_var] = (xl - X) / norm
+            _G[:, self.n_var:] = (X - xu) / norm
+
+            # attach the constraints to the results
+            if out["G"] is None:
+                out["G"] = _G
+            else:
+                out["G"] = np.column_stack([out["G"], _G])
+
         # if constraint violation should be returned as well
         if self.n_constr == 0:
             CV = np.zeros([X.shape[0], 1])
@@ -396,7 +418,8 @@ class Problem:
             ret = [job.result() for job in jobs]
 
         else:
-            raise Exception("Unknown parallelization method: %s (should be one of: None, starmap, threads, dask)" % _type)
+            raise Exception(
+                "Unknown parallelization method: %s (should be one of: None, starmap, threads, dask)" % _type)
 
         # stack all the single outputs together
         for key in ret[0].keys():
@@ -469,6 +492,7 @@ class Problem:
 
         return state
 
+
 # makes all the output at least 2-d dimensional
 def at_least2d(d):
     for key in d.keys():
@@ -526,3 +550,23 @@ def get_problem_from_func(func, xl=None, xu=None, n_var=None, func_args={}):
             func(x, out, *args, **kwargs)
 
     return MyProblem()
+
+
+class MetaProblem(Problem):
+
+    def __init__(self, problem):
+        super().__init__(problem.n_var,
+                         problem.n_obj,
+                         problem.n_constr,
+                         problem.xl,
+                         problem.xu,
+                         problem.type_var,
+                         problem.evaluation_of,
+                         problem.parallelization,
+                         problem.elementwise_evaluation,
+                         problem.callback)
+
+        self.problem = problem
+
+    def _evaluate(self, x, *args, **kwargs):
+        return self.problem.evaluate(x, return_as_dictionary=True, return_values_of=["F", "CV", "G", "feasible"])
