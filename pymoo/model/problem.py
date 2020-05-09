@@ -288,18 +288,21 @@ class Problem:
 
             # get the boundaries for normalization
             xl, xu = self.bounds()
-            norm = xu - xl
 
             # add the boundary constraint if enabled
             _G = np.zeros((len(X), 2 * self.n_var))
-            _G[:, :self.n_var] = (xl - X) / norm
-            _G[:, self.n_var:] = (X - xu) / norm
+            _G[:, :self.n_var] = (xl - X)
+            _G[:, self.n_var:] = (X - xu)
 
             # attach the constraints to the results
-            if out["G"] is None:
-                out["G"] = _G
-            else:
-                out["G"] = np.column_stack([out["G"], _G])
+            out["G"] = np.column_stack([out["G"], _G]) if out["G"] is not None else _G
+
+            if "dG" in out:
+                _dG = np.zeros((len(X), 2 * self.n_var, self.n_var))
+                _dG[:, :self.n_var, :] = - np.eye(self.n_var)
+                _dG[:, self.n_var:, :] = np.eye(self.n_var)
+
+                out["dG"] = np.column_stack([out["dG"], _dG]) if out["dG"] is not None else _dG
 
         # if constraint violation should be returned as well
         if self.n_constr == 0:

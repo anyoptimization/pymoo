@@ -69,6 +69,15 @@ class KKTPM:
 
             n_constr = n_constr + 2 * n_var
 
+            problem.set_boundaries_as_constraints(True)
+            F_, CV_, G_, dF_, dG_ = problem.evaluate(X, return_values_of=["F", "CV", "G", "dF", "dG"])
+
+            np.testing.assert_allclose(F, F_)
+            np.testing.assert_allclose(CV_, CV_)
+            np.testing.assert_allclose(dF_, dF_)
+            np.testing.assert_allclose(dG, dG_)
+            problem.set_boundaries_as_constraints(False)
+
         # loop through each solution to be considered
         for i in range(n_solutions):
 
