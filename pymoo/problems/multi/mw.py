@@ -208,7 +208,7 @@ class MW6(MW):
         else:
             F = ref_dirs
         F[:, 1] = 1 - F[:, 0]
-        F = F / np.sqrt(np.sum(P ** 2, 2) / 1.21)
+        F = F / np.sqrt(np.sum(F ** 2, axis=1) / 1.21).reshape((-1, 1))
         l = np.cos(6 * np.arctan(F[:, 1] / F[:, 0]) ** 4) ** 10
         c = 1 - (F[:, 0] / (1 + 0.15 * l)) ** 2 - (F[:, 1] / (1 + 0.75 * l)) ** 2
         return F[c >= 0]
@@ -256,7 +256,7 @@ class MW8(MW):
 
     def _calc_pareto_front(self, ref_dirs):
         F = ref_dirs
-        F = F / np.sqrt(np.sum(F ** 2, axis=1))
+        F = F / np.sqrt(np.sum(F ** 2, axis=1)).reshape((-1, 1))
         c = (1.25 - 0.5 * np.sin(6 * np.arcsin(F[:, -1])) ** 2) ** 2 - np.sum(F ** 2, axis=1)
         return F[c >= 0]
 
