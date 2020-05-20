@@ -4,15 +4,15 @@ from pymoo.model.individual import Individual
 from pymoo.model.population import Population
 
 
-def is_better(_new, _old):
+def is_better(_new, _old, eps=1e-8):
     both_infeasible = not _old.feasible[0] and not _new.feasible[0]
     both_feasible = _old.feasible[0] and _new.feasible[0]
 
-    if both_infeasible and _new.CV[0] < _old.CV[0]:
+    if both_infeasible and _old.CV[0] - _new.CV[0] > eps:
         return True
     elif not _old.feasible and _new.feasible:
         return True
-    elif both_feasible and _new.F[0] < _old.F[0]:
+    elif both_feasible and _old.F[0] - _new.F[0] > eps:
         return True
 
     return False

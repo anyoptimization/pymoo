@@ -1,39 +1,61 @@
-from pymoo.model.crossover import Crossover
 import numpy as np
+
+from pymoo.model.crossover import Crossover
+
+
+def random_sequence(n):
+    start, end = np.sort(np.random.choice(n, 2, replace=False))
+    return tuple([start, end])
+
+
+# Implementation based on http://www.dmi.unict.it/mpavone/nc-cs/materiale/moscato89.pdf
+def ox(receiver, donor, seq=None, shift=True):
+    assert len(donor) == len(receiver)
+
+    seq = seq if not None else random_sequence(len(receiver))
+    start, end = seq
+
+    donation = np.copy(donor[start:end + 1])
+    donation_as_set = set(donation)
+
+    # the final value to be returned
+    y = []
+
+    for k in range(len(receiver)):
+
+        # do the shift starting from the swapped sequence - as proposed in the paper
+        i = k if not shift else (start + k) % len(receiver)
+        v = receiver[i]
+
+        if v not in donation_as_set:
+            y.append(v)
+
+    # now insert the donation at the right place
+    y = np.concatenate([y[:start], donation, y[start:]]).astype(copy=False, dtype=np.int)
+
+    return y
 
 
 class OrderCrossover(Crossover):
-    """
-    Order crossover for permutation encoding proposed by Davis.
-    """
-    def __init__(self, prob=1, **kwargs):
+
+    def __init__(self, **kwargs):
         super().__init__(2, 2, **kwargs)
-        self.prob = prob
 
     def _do(self, problem, X, **kwargs):
-        # X is a list of pairs of parents: X[:, 1, :] is the 1th group of parents
-        n_pair = X.shape[1]
+        n_matings = X.shape[1]
         Y = np.full(X.shape, 0, dtype=problem.type_var)
-        for i in range(n_pair):
-            x1, x2 = X[:, i, :]
-            y1, y2 = OrderCrossover.cross(x1, x2)
-            Y[:, i, :] = [y1, y2]
+
+        for i in range(n_matings):
+            a, b = X[:, i, :]
+            n = len(a)
+
+            # define the sequence to be used for crossover
+            start, end = random_sequence(n)
+
+            # if the receiver should be shifted and actually start with the original sequence
+            shift = np.random.rand() < 0.5
+
+            Y[0, i, :] = ox(a, b, seq=(start, end), shift=shift)
+            Y[1, i, :] = ox(b, a, seq=(start, end), shift=shift)
+
         return Y
-
-    @staticmethod
-    def cross(x1, x2):
-        assert len(x1) == len(x2)
-        start, end = np.sort(np.random.choice(len(x1), 2, replace=False))
-        y1 = x1.copy()
-        y2 = x2.copy()
-        # build y1 and y2
-        segment1 = set(y1[start:end])
-        segment2 = set(y2[start:end])
-        I = np.concatenate((np.arange(0, start), np.arange(end, len(x1))))
-
-        # find elements in x2 that are not in segment1
-        y1[I] = [y for y in x2 if y not in segment1]
-        # find elements in x1 that are not in segment2
-        y2[I] = [y for y in x1 if y not in segment2]
-
-        return y1, y2
