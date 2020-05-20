@@ -1,23 +1,33 @@
-from scipy.spatial.distance import pdist, squareform
+import matplotlib.pyplot as plt
 import numpy as np
+from scipy.spatial.distance import pdist, squareform, cdist
 
 from pymoo.model.problem import Problem
 
 
 class TravelingSalesman(Problem):
-    """
-    2-dimensional travelling salesman problem. This problem uses permutation encoding.
-    Args:
-        cities: a n by 2 numpy array, where n is the number of cities
-    """
+
     def __init__(self, cities, **kwargs):
-        n_cities = cities.shape[0]
+        """
+        A two-dimensional traveling salesman problem (TSP)
+
+        Parameters
+        ----------
+        cities : numpy.array
+            The cities with 2-dimensional coordinates provided by a matrix where where city is represented by a row.
+
+        """
+        n_cities, _ = cities.shape
 
         self.cities = cities
-        self.PD = squareform(pdist(cities))  # pairwise distance between cities
+        self.D = cdist(cities, cities)
 
         super(TravelingSalesman, self).__init__(
-            n_var=n_cities, n_obj=1, xl=0, xu=n_cities, type_var=np.int,
+            n_var=n_cities,
+            n_obj=1,
+            xl=0,
+            xu=n_cities,
+            type_var=np.int,
             elementwise_evaluation=True,
             **kwargs
         )
@@ -28,7 +38,43 @@ class TravelingSalesman(Problem):
     def get_route_length(self, x):
         n_cities = len(x)
         dist = 0
-        for j in range(n_cities - 1):
-            dist = dist + self.PD[x[j], x[j + 1]]
-        dist = dist + self.PD[x[-1], x[0]]  # back to the initial city
+        for k in range(n_cities - 1):
+            i, j = x[k], x[k + 1]
+            dist += self.D[i, j]
+
+        last, first = x[-1], x[0]
+        dist += self.D[last, first]  # back to the initial city
         return dist
+
+
+def create_random_tsp_problem(n_cities, grid_width=100.0, grid_height=None, seed=None):
+    if seed is not None:
+        np.random.seed(seed)
+    grid_height = grid_height if grid_height is not None else grid_width
+    cities = np.random.random((n_cities, 2)) * [grid_width, grid_height]
+    return TravelingSalesman(cities)
+
+
+def visualize(problem, x, path=None, label=True):
+    with plt.style.context('ggplot'):
+        # plot cities using scatter plot
+        plt.scatter(problem.cities[:, 0], problem.cities[:, 1], s=250)
+        if label:
+            # annotate cities
+            for i, c in enumerate(problem.cities):
+                plt.annotate(str(i), xy=c, fontsize=10, ha="center", va="center", color="white")
+
+        if x is not None:
+            # plot route path x
+            for i in range(len(x) - 1):
+                current = x[i]
+                next_ = x[i + 1]
+                plt.plot(problem.cities[[current, next_], 0], problem.cities[[current, next_], 1], 'r--')
+            # back to the initial city
+            end = x[-1]
+            start = x[0]
+            plt.plot(problem.cities[[end, start], 0], problem.cities[[end, start], 1], 'r--')
+            plt.title("Route length: %.4f" % problem.get_route_length(x))
+            if path is not None:
+                plt.savefig(path)
+            plt.show()

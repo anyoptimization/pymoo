@@ -38,11 +38,17 @@ Documentation_ / Paper_ / Installation_ / Usage_ / Citation_ / Contact_
 
 
 
+pymoo: Multi-objective Optimization in Python
+====================================================================
+
+Our open source framework pymoo offers state of the art single- and multi-objective algorithms and many more features
+related to multi-objective optimization such as visualization and decision making.
+
 
 .. _Installation:
 
 Installation
-====================================================================
+********************************************************************************
 
 First, make sure you have a Python 3 environment installed. We recommend miniconda3 or anaconda3.
 
@@ -74,7 +80,7 @@ directory because otherwise not the in site-packages installed version will be u
 .. _Usage:
 
 Usage
-==================================
+********************************************************************************
 
 We refer here to our documentation for all the details.
 However, for instance executing NSGA2:
@@ -113,7 +119,7 @@ A representative run of NSGA2 looks as follows:
 .. _Citation:
 
 Citation
-====================================================================
+********************************************************************************
 
 We are currently working on a journal publication for *pymoo*.
 Meanwhile, if you have used our framework for research purposes, please cite us with:
@@ -135,7 +141,7 @@ Meanwhile, if you have used our framework for research purposes, please cite us 
 .. _Contact:
 
 Contact
-====================================================================
+********************************************************************************
 
 Feel free to contact me if you have any question:
 
