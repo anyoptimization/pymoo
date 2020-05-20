@@ -1,10 +1,9 @@
 
-
-
 .. meta::
-   :description: pymoo - Multi-objective Optimization in Python
-   :keywords: pymoo, Optimization, multi-objective optimization, evolutionary optimization, nsga2, nsga3
-   :title: This is a test
+   :description: pymoo: An open source framework for multi-objective optimization in Python.
+          It provides not only state of the art single- and multi-objective optimization algorithms but also many
+          more features related to multi-objective optimization such as visualization and decision making.
+   :keywords: Multi-objective Optimization, Evolutionary Algorithm, NSGA2
 
 
 
@@ -35,7 +34,11 @@
    <a href="https://ieeexplore.ieee.org/document/9078759" target="_blank">Paper</a>
 
 
-Our framework offers state of the art single- and multi-objective algorithms and many
+
+pymoo: Multi-objective Optimization in Python
+------------------------------------------------------------------------------
+
+Our framework offers state of the art single- and multi-objective optimization algorithms and many
 more features related to multi-objective optimization such as visualization and decision making.
 **pymoo** is available on PyPi and can be installed by:
 
@@ -82,7 +85,8 @@ getting started guide:
 
 
 Features
-------------------------------------------------------------------------------
+********************************************************************************
+
 
 Furthermore, our framework offers a variety of different features which cover various facets of multi-objective optimization:
 
@@ -91,7 +95,7 @@ Furthermore, our framework offers a variety of different features which cover va
 
 
 Reference
-------------------------------------------------------------------------------
+********************************************************************************
 
 If you have used our framework for research purposes, you can cite our journal |paper| (IEEE Early Access) with:
 
@@ -109,13 +113,13 @@ If you have used our framework for research purposes, you can cite our journal |
 
 
 News
-------------------------------------------------------------------------------
+********************************************************************************
 .. include:: news_current.rst
 :ref:`More News<news>`
 
 
 About
-------------------------------------------------------------------------------
+********************************************************************************
 
 This framework is developed and maintained by |blankjul| who is affiliated to the
 |coin| supervised
@@ -178,7 +182,7 @@ and only if we are aware of issues we can start to investigate them.
 
 
 Content
-------------------------------------------------------------------------------
+********************************************************************************
 
 .. toctree::
    :maxdepth: 2
@@ -206,7 +210,7 @@ Content
 
 
 Indices and tables
-------------------------------------------------------------------------------
+********************************************************************************
 
 * :ref:`genindex`
 * :ref:`modindex`
@@ -215,7 +219,7 @@ Indices and tables
 
 
 Contact
-------------------------------------------------------------------------------
+********************************************************************************
 
 | `Julian Blank <http://julianblank.com>`_  (blankjul [at] egr.msu.edu)
 | Michigan State University

@@ -1,14 +1,21 @@
-from pymoo.model.problem import Problem
+import matplotlib.pyplot as plt
 import numpy as np
+
+from pymoo.model.problem import Problem
 
 
 class FlowshopScheduling(Problem):
-    """
-    Flowshop scheduling problem. This problem uses permutation encoding.
-    Args:
-        processing_times: numpy array, where processing_time[i][j] is the processing time for job j on machine i.
-    """
+
     def __init__(self, processing_times, **kwargs):
+        """
+        Flowshop scheduling problem.
+
+        Parameters
+        ----------
+        processing_times : numpy.array
+            Matrix where processing_time[i][j] is the processing time for job j on machine i.
+
+        """
         n_machines, n_jobs = processing_times.shape
         self.data = processing_times
 
@@ -66,3 +73,40 @@ class FlowshopScheduling(Problem):
                     )
                 )
         return machine_times
+
+
+def create_random_flowshop_problem(n_machines, n_jobs, seed=None):
+    if seed is not None:
+        np.random.seed(seed)
+    T = np.random.random((n_machines, n_jobs)) * 50 + 50
+    return FlowshopScheduling(T)
+
+
+def visualize(problem, x, path=None, label=True):
+    with plt.style.context('ggplot'):
+        n_machines, n_jobs = problem.data.shape
+        machine_times = problem.get_machine_times(x)
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        Y = np.flip(np.arange(n_machines))
+
+        for i in range(n_machines):
+            for j in range(n_jobs):
+                width = problem.data[i][x[j]]
+                left = machine_times[i][j]
+                ax.barh(Y[i], width, left=left,
+                        align='center', color='gray',
+                        edgecolor='black', linewidth=0.8
+                        )
+                if label:
+                    ax.text((left + width / 2), Y[i], str(x[j] + 1), ha='center', va='center', color='white',
+                            fontsize=15)
+        ax.set_xlabel("Time")
+        ax.set_yticks(np.arange(n_machines))
+        ax.set_yticklabels(["M%d" % (i + 1) for i in Y])
+        ax.set_title("Makespan: {}".format(problem.makespan(x)))
+        if path is not None:
+            plt.savefig(path)
+        plt.show()

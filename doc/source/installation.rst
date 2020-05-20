@@ -1,3 +1,8 @@
+.. meta::
+   :description: How to install pymoo, an open-source multi-objective optimization framework in Python.
+   :keywords: PyPI, Python, Framework, Multi-objective Optimization
+
+
 .. _installation:
 
 Installation

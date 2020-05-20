@@ -15,6 +15,17 @@
 
 <head>
 
+    <!--
+    ---------------------------------------
+    META
+    ---------------------------------------
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Julian Blank">
+    {{ metatags }}
+    <link rel="icon" type="image/png" href="{{ pathto('_static/img/favicon.ico', 1) }}">
+
 
     <!--
     ---------------------------------------
@@ -30,11 +41,6 @@
     <link rel="stylesheet" href="{{ pathto('_static/pygments.css', 1) }}" type="text/css">
     <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css"
           integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
-
-    {%- for cssfile in css_files %}
-        <link rel="stylesheet" href="{{ pathto(cssfile, 1) }}" type="text/css">
-    {%- endfor %}
-
 
 
     <!--
@@ -65,34 +71,20 @@
 
     <script type="text/javascript" src="{{ pathto('_static/js/custom.js', 1) }}"></script>
     {%- for scriptfile in script_files %}
-        {% if pathto(scriptfile, 1) %}
+        {% if pathto(scriptfile, 1) != "None" %}
             <script type="text/javascript" src="{{ pathto(scriptfile, 1) }}"></script>
         {% endif %}
     {%- endfor %}
 
-    {% if shorttitle != "pymoo" %}
-        <title>pymoo - {{ shorttitle|e }}</title>
+    {% if title != None %}
+        {% if 'pymoo' in title %}
+            <title>{{ title }}</title>
+        {% else %}
+            <title>pymoo - {{ title|e }}</title>
+        {% endif %}
     {% else %}
-        <title>pymoo - Multi-objective Optimization in Python</title>
+        <title>pymoo: Multi-objective Optimization in Python</title>
     {% endif %}
-
-
-
-    <link rel="icon" type="image/png" href="{{ pathto('_static/img/favicon.ico', 1) }}">
-
-
-    <meta charset="{{ encoding }}">
-    <meta name="description" content="Multi-objective Optimization">
-    <meta name="description" content="Evolutionary Computing">
-    <meta name="description" content="Genetic Algorithms">
-    <meta name="description" content="NSGA2">
-    <meta name="description" content="NSGA3">
-    <meta name="description" content="Differential Evolution">
-    <meta name="description" content="Julian Blank">
-    <meta name="description" content="Kalyanmoy Deb">
-
-
-    {{ metatags }}
 
 
 </head>
@@ -170,8 +162,8 @@ CONTENT
                         <div class="bodywrapper">
                             <div class="body" id="spc-section-body">
 
-                            {% block body %}
-                            {% endblock %}
+                                {% block body %}
+                                {% endblock %}
 
 
                             </div>
