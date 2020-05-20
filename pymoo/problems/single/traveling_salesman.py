@@ -1,11 +1,10 @@
 from scipy.spatial.distance import pdist, squareform
 import numpy as np
-import matplotlib.pyplot as plt
 
 from pymoo.model.problem import Problem
 
 
-class TravellingSalesman(Problem):
+class TravelingSalesman(Problem):
     """
     2-dimensional travelling salesman problem. This problem uses permutation encoding.
     Args:
@@ -17,7 +16,7 @@ class TravellingSalesman(Problem):
         self.cities = cities
         self.PD = squareform(pdist(cities))  # pairwise distance between cities
 
-        super(TravellingSalesman, self).__init__(
+        super(TravelingSalesman, self).__init__(
             n_var=n_cities, n_obj=1, xl=0, xu=n_cities, type_var=np.int,
             elementwise_evaluation=True,
             **kwargs
