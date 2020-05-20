@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from pymoo.algorithms.so_genetic_algorithm import GA
 from pymoo.optimize import minimize
-from pymoo.problems.single.travelling_salesman import TravellingSalesman
+from pymoo.problems.single.traveling_salesman import TravelingSalesman
 from pymoo.operators.crossover.order_crossover import OrderCrossover
 from pymoo.operators.mutation.inversion_mutation import InversionMutation
 from pymoo.operators.sampling.random_permutation_sampling import RandomPermutationSampling
@@ -37,7 +37,7 @@ def visualize(problem, x, path=None, label=True):
 # randomly generate 10 cities on [0, 100]
 cities = np.random.random((10, 2)) * 100
 # create problem
-problem = TravellingSalesman(cities)
+problem = TravelingSalesman(cities)
 # solve the problem using genetic algorithm
 algorithm = GA(
         pop_size=200,
