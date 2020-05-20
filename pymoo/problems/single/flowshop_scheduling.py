@@ -1,6 +1,5 @@
 from pymoo.model.problem import Problem
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 class FlowshopScheduling(Problem):
