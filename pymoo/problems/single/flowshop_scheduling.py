@@ -16,6 +16,7 @@ class FlowshopScheduling(Problem):
             Matrix where processing_time[i][j] is the processing time for job j on machine i.
 
         """
+
         n_machines, n_jobs = processing_times.shape
         self.data = processing_times
 

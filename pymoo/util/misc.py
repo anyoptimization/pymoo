@@ -161,6 +161,10 @@ def stack(*args, flatten=True):
     return ps
 
 
+def all_except(x, i):
+    return np.concatenate([x[:i], x[i + 1:]])
+
+
 def all_combinations(A, B):
     u = np.repeat(A, B.shape[0], axis=0)
     v = np.tile(B, A.shape[0])
