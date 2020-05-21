@@ -1,8 +1,9 @@
 from pymoo.model.algorithm import Algorithm
-from pymoo.model.duplicate import DefaultDuplicateElimination
+from pymoo.model.duplicate import DefaultDuplicateElimination, NoDuplicateElimination
 from pymoo.model.individual import Individual
 from pymoo.model.initialization import Initialization
 from pymoo.model.mating import Mating
+from pymoo.model.repair import NoRepair
 
 
 class GeneticAlgorithm(Algorithm):
@@ -44,19 +45,22 @@ class GeneticAlgorithm(Algorithm):
             if eliminate_duplicates:
                 self.eliminate_duplicates = DefaultDuplicateElimination()
             else:
-                self.eliminate_duplicates = None
+                self.eliminate_duplicates = NoDuplicateElimination()
         else:
             self.eliminate_duplicates = eliminate_duplicates
 
+        # simply set the no repair object if it is None
+        self.repair = repair if repair is not None else NoRepair()
+
         self.initialization = Initialization(sampling,
                                              individual=individual,
-                                             repair=repair,
+                                             repair=self.repair,
                                              eliminate_duplicates=self.eliminate_duplicates)
 
         self.mating = Mating(selection,
                              crossover,
                              mutation,
-                             repair=repair,
+                             repair=self.repair,
                              eliminate_duplicates=self.eliminate_duplicates,
                              n_max_iterations=100)
 

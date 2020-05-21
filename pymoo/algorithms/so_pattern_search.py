@@ -111,7 +111,7 @@ class PatternSearch(LocalSearch):
             explr = self._exploration_move(trial, opt=self._current)
 
             # we can break if we did not improve
-            if not is_better(explr, self._current):
+            if not is_better(explr, self._current, eps=1e-6):
                 break
 
             # else also check if we are terminating - otherwise this loop might run far too long

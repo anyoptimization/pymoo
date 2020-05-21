@@ -37,6 +37,14 @@ class OrderCrossoverTest(unittest.TestCase):
         np.testing.assert_allclose(ox(a, b, (3, 5), shift=True), np.array([5, 6, 7, 2, 3, 0, 1, 9, 8, 4]))
         np.testing.assert_allclose(ox(b, a, (3, 5), shift=True), np.array([2, 3, 0, 5, 6, 7, 9, 4, 8, 1]))
 
+    # http://mat.uab.cat/~alseda/MasterOpt/GeneticOperations.pdf
+    def test_other_example(self):
+        a = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
+        b = np.array([5, 7, 4, 9, 1, 3, 6, 2, 8])
+        res = ox(b, a, (2, 5), shift=False)
+
+        np.testing.assert_allclose(res, np.array([7, 9, 3, 4, 5, 6, 1, 2, 8]))
+
     def test_example_to_bound(self):
         a = np.array([9, 8, 4, 5, 6, 7, 1, 3, 2, 0])
         b = np.array([8, 7, 1, 2, 3, 0, 9, 5, 4, 6])
