@@ -82,7 +82,7 @@ class MOEAD(GeneticAlgorithm):
         self.ideal_point = np.min(self.pop.get("F"), axis=0)
 
     def _next(self):
-        repair, crossover, mutation = self.mating.repair, self.mating.crossover, self.mating.mutation
+        repair, crossover, mutation = self.repair, self.mating.crossover, self.mating.mutation
 
         # retrieve the current population
         pop = self.pop
@@ -103,9 +103,8 @@ class MOEAD(GeneticAlgorithm):
             off = mutation.do(self.problem, off)
             off = off[np.random.randint(0, len(off))]
 
-            # repair first in case it is necessary
-            if repair:
-                off = self.repair.do(self.problem, off, algorithm=self)
+            # repair first in case it is necessary - disabled if instance of NoRepair
+            off = repair.do(self.problem, off, algorithm=self)
 
             # evaluate the offspring
             self.evaluator.eval(self.problem, off)

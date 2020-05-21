@@ -55,26 +55,26 @@ def create_random_tsp_problem(n_cities, grid_width=100.0, grid_height=None, seed
     return TravelingSalesman(cities)
 
 
-def visualize(problem, x, path=None, label=True):
+def visualize(problem, x, fig=None, ax=None, show=True, label=True):
     with plt.style.context('ggplot'):
+
+        if fig is None or ax is None:
+            fig, ax = plt.subplots()
+
         # plot cities using scatter plot
-        plt.scatter(problem.cities[:, 0], problem.cities[:, 1], s=250)
+        ax.scatter(problem.cities[:, 0], problem.cities[:, 1], s=250)
         if label:
             # annotate cities
             for i, c in enumerate(problem.cities):
-                plt.annotate(str(i), xy=c, fontsize=10, ha="center", va="center", color="white")
+                ax.annotate(str(i), xy=c, fontsize=10, ha="center", va="center", color="white")
 
-        if x is not None:
-            # plot route path x
-            for i in range(len(x) - 1):
-                current = x[i]
-                next_ = x[i + 1]
-                plt.plot(problem.cities[[current, next_], 0], problem.cities[[current, next_], 1], 'r--')
-            # back to the initial city
-            end = x[-1]
-            start = x[0]
-            plt.plot(problem.cities[[end, start], 0], problem.cities[[end, start], 1], 'r--')
-            plt.title("Route length: %.4f" % problem.get_route_length(x))
-            if path is not None:
-                plt.savefig(path)
+        # plot the line on the path
+        for i in range(len(x)):
+            current = x[i]
+            next_ = x[(i + 1) % len(x)]
+            ax.plot(problem.cities[[current, next_], 0], problem.cities[[current, next_], 1], 'r--')
+
+        fig.suptitle("Route length: %.4f" % problem.get_route_length(x))
+
+        if show:
             plt.show()

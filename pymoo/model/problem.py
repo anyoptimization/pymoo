@@ -486,12 +486,8 @@ class Problem:
 
     def __getstate__(self):
         state = self.__dict__.copy()
-
-        # If the parallelization is starmap,
-        # we can't pickle self with the starmapper function.
-        if state["parallelization"] is not None and state["parallelization"][0] == "starmap":
-            state["parallelization"] = None
-
+        # never pickle the parallelization object - it always causes issue or might not be possible at all
+        state["parallelization"] = None
         return state
 
     def set_boundaries_as_constraints(self, val=True):

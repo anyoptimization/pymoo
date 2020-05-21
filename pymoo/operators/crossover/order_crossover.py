@@ -8,13 +8,38 @@ def random_sequence(n):
     return tuple([start, end])
 
 
-# Implementation based on http://www.dmi.unict.it/mpavone/nc-cs/materiale/moscato89.pdf
-def ox(receiver, donor, seq=None, shift=True):
+def ox(receiver, donor, seq=None, shift=False):
+    """
+    The Ordered Crossover (OX) as explained in http://www.dmi.unict.it/mpavone/nc-cs/materiale/moscato89.pdf.
+
+    Parameters
+    ----------
+    receiver : numpy.array
+        The receiver of the sequence. The array needs to be repaired after the donation took place.
+    donor : numpy.array
+        The donor of the sequence.
+    seq : tuple (optional)
+        Tuple with two entries defining the start and the end of the sequence. Please note in our implementation
+        the end of the sequence is included. The sequence is randomly chosen if not provided.
+
+    shift : bool
+        Whether during the repair the receiver should be shifted or not. Both version of it can be found in the
+        literature.
+
+    Returns
+    -------
+
+    y : numpy.array
+        The offspring which was created by the ordered crossover.
+
+    """
     assert len(donor) == len(receiver)
 
+    # the sequence which shall be use for the crossover
     seq = seq if not None else random_sequence(len(receiver))
     start, end = seq
 
+    # the donation and a set of it to allow a quick lookup
     donation = np.copy(donor[start:end + 1])
     donation_as_set = set(donation)
 
@@ -38,8 +63,9 @@ def ox(receiver, donor, seq=None, shift=True):
 
 class OrderCrossover(Crossover):
 
-    def __init__(self, **kwargs):
+    def __init__(self, shift=False, **kwargs):
         super().__init__(2, 2, **kwargs)
+        self.shift = shift
 
     def _do(self, problem, X, **kwargs):
         n_matings = X.shape[1]
@@ -52,10 +78,7 @@ class OrderCrossover(Crossover):
             # define the sequence to be used for crossover
             start, end = random_sequence(n)
 
-            # if the receiver should be shifted and actually start with the original sequence
-            shift = np.random.rand() < 0.5
-
-            Y[0, i, :] = ox(a, b, seq=(start, end), shift=shift)
-            Y[1, i, :] = ox(b, a, seq=(start, end), shift=shift)
+            Y[0, i, :] = ox(a, b, seq=(start, end), shift=self.shift)
+            Y[1, i, :] = ox(b, a, seq=(start, end), shift=self.shift)
 
         return Y

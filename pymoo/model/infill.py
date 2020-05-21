@@ -1,3 +1,7 @@
+from pymoo.model.duplicate import NoDuplicateElimination
+from pymoo.model.repair import NoRepair
+
+
 class InfillCriterion:
 
     def __init__(self,
@@ -8,8 +12,8 @@ class InfillCriterion:
 
         super().__init__()
         self.n_max_iterations = n_max_iterations
-        self.eliminate_duplicates = eliminate_duplicates
-        self.repair = repair
+        self.eliminate_duplicates = eliminate_duplicates if eliminate_duplicates is not None else NoDuplicateElimination()
+        self.repair = repair if repair is not None else NoRepair()
 
     def do(self, problem, pop, n_offsprings, **kwargs):
 
@@ -28,12 +32,11 @@ class InfillCriterion:
             # do the mating
             _off = self._do(problem, pop, n_remaining, **kwargs)
 
-            # repair the individuals if necessary
-            if self.repair:
-                _off = self.repair.do(problem, _off, **kwargs)
+            # repair the individuals if necessary - disabled if repair is NoRepair
+            _off = self.repair.do(problem, _off, **kwargs)
 
-            if self.eliminate_duplicates is not None:
-                _off = self.eliminate_duplicates.do(_off, pop, off)
+            # eliminate the duplicates - disabled if it is NoRepair
+            _off = self.eliminate_duplicates.do(_off, pop, off)
 
             # if more offsprings than necessary - truncate them randomly
             if len(off) + len(_off) > n_offsprings:

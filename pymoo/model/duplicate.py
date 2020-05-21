@@ -149,3 +149,9 @@ class HashDuplicateElimination(DuplicateElimination):
                 H.add(h)
 
         return is_duplicate
+
+
+class NoDuplicateElimination(DuplicateElimination):
+
+    def do(self, pop, *args, **kwargs):
+        return pop
