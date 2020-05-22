@@ -68,8 +68,8 @@ class OrderCrossover(Crossover):
         self.shift = shift
 
     def _do(self, problem, X, **kwargs):
-        n_matings = X.shape[1]
-        Y = np.full(X.shape, 0, dtype=problem.type_var)
+        _, n_matings, n_var = X.shape
+        Y = np.full((self.n_offsprings, n_matings, n_var), -1, dtype=np.int)
 
         for i in range(n_matings):
             a, b = X[:, i, :]

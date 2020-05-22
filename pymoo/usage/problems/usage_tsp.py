@@ -13,7 +13,7 @@ from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 from pyrecorder.recorders.file import File
 from pyrecorder.video import Video
 
-problem = create_random_tsp_problem(40, 100, seed=1)
+problem = create_random_tsp_problem(100, 100, seed=1)
 
 
 class StartFromZeroRepair(Repair):
@@ -35,6 +35,7 @@ algorithm = GA(
     pop_size=20,
     sampling=RandomPermutationSampling(),
     mutation=InversionMutation(),
+    # crossover=EdgeRecombinationCrossover(),
     crossover=OrderCrossover(),
     repair=StartFromZeroRepair(),
     eliminate_duplicates=True
