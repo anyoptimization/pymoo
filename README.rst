@@ -41,7 +41,7 @@ Documentation_ / Paper_ / Installation_ / Usage_ / Citation_ / Contact_
 pymoo: Multi-objective Optimization in Python
 ====================================================================
 
-Our open source framework pymoo offers state of the art single- and multi-objective algorithms and many more features
+Our open-source framework pymoo offers state of the art single- and multi-objective algorithms and many more features
 related to multi-objective optimization such as visualization and decision making.
 
 
@@ -128,12 +128,12 @@ Meanwhile, if you have used our framework for research purposes, please cite us 
 
     @ARTICLE{pymoo,
         author={J. {Blank} and K. {Deb}},
-        title={pymoo: Multi-objective Optimization in Python},
         journal={IEEE Access},
+        title={Pymoo: Multi-Objective Optimization in Python},
         year={2020},
-        volume={},
+        volume={8},
         number={},
-        pages={1-1}
+        pages={89497-89509},
     }
 
 
