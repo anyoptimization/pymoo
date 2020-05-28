@@ -86,7 +86,7 @@ class GeneticAlgorithm(Algorithm):
     def _next(self):
 
         # do the mating using the current population
-        self.off = self.mating.do(self.problem, self.pop, n_offsprings=self.n_offsprings, algorithm=self)
+        self.off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
 
         # if the mating could not generate any new offspring (duplicate elimination might make that happen)
         if len(self.off) == 0:

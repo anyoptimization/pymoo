@@ -2,7 +2,7 @@ from pymoo.model.sampling import Sampling
 import numpy as np
 
 
-class RandomPermutationSampling(Sampling):
+class PermutationRandomSampling(Sampling):
     """
     Generate random permutation.
     """

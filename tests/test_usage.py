@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pymoo.configuration import get_pymoo
 
-SKIP = ["__init__.py", "usage_video.py", "usage_stream.py", "usage_mopta08.py"]
+SKIP = ["__init__.py", "usage_video.py", "usage_stream.py", "usage_mopta08.py", "__pycache__"]
 
 
 def test_usage(usages):

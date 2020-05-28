@@ -19,6 +19,9 @@ class DuplicateElimination:
     def do(self, pop, *args, return_indices=False, to_itself=True):
         original = pop
 
+        if len(pop) == 0:
+            return pop
+
         if to_itself:
             pop = pop[~self._do(pop, None, np.full(len(pop), False))]
 

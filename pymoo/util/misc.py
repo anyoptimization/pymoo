@@ -161,8 +161,13 @@ def stack(*args, flatten=True):
     return ps
 
 
-def all_except(x, i):
-    return np.concatenate([x[:i], x[i + 1:]])
+def all_except(x, *args):
+    if len(args) == 0:
+        return x
+    else:
+        H = set(args) if len(args) > 5 else args
+        I = [k for k in range(len(x)) if k not in H]
+        return x[I]
 
 
 def all_combinations(A, B):

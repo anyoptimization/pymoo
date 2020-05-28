@@ -107,7 +107,7 @@ def visualize(problem, x, path=None, label=True):
         ax.set_xlabel("Time")
         ax.set_yticks(np.arange(n_machines))
         ax.set_yticklabels(["M%d" % (i + 1) for i in Y])
-        ax.set_title("Makespan: {}".format(problem.makespan(x)))
+        ax.set_title("Makespan: %s" % np.round(problem.makespan(x), 3))
         if path is not None:
             plt.savefig(path)
         plt.show()

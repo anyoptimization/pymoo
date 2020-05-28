@@ -36,4 +36,5 @@ class LocalSearch(Algorithm):
 
         self.evaluator.eval(self.problem, self.pop, algorithm=self)
         self._set_optimum()
-        self.x0 = self.opt[0]
+        if self.opt is not None and len(self.opt) > 0:
+            self.x0 = self.opt[0]
