@@ -101,13 +101,15 @@ def get_sampling_options():
     from pymoo.operators.sampling.random_sampling import FloatRandomSampling
     from pymoo.operators.integer_from_float_operator import IntegerFromFloatSampling
     from pymoo.operators.sampling.random_sampling import BinaryRandomSampling
+    from pymoo.operators.sampling.random_permutation_sampling import PermutationRandomSampling
 
     SAMPLING = [
         ("real_random", FloatRandomSampling),
         ("real_lhs", LatinHypercubeSampling),
         ("bin_random", BinaryRandomSampling),
         ("int_random", IntegerFromFloatSampling, {'clazz': FloatRandomSampling}),
-        ("int_lhs", IntegerFromFloatSampling, {'clazz': LatinHypercubeSampling})
+        ("int_lhs", IntegerFromFloatSampling, {'clazz': LatinHypercubeSampling}),
+        ("perm_random", PermutationRandomSampling)
     ]
 
     return SAMPLING
@@ -149,6 +151,8 @@ def get_crossover_options():
     from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
     from pymoo.operators.crossover.uniform_crossover import UniformCrossover
     from pymoo.operators.integer_from_float_operator import IntegerFromFloatCrossover
+    from pymoo.operators.crossover.edge_recombination_crossover import EdgeRecombinationCrossover
+    from pymoo.operators.crossover.order_crossover import OrderCrossover
 
     CROSSOVER = [
         ("real_sbx", SimulatedBinaryCrossover, dict(prob=0.9, eta=30)),
@@ -159,7 +163,9 @@ def get_crossover_options():
         ("(real|bin|int)_exp", ExponentialCrossover),
         ("(real|bin|int)_one_point", PointCrossover, {'n_points': 1}),
         ("(real|bin|int)_two_point", PointCrossover, {'n_points': 2}),
-        ("(real|bin|int)_k_point", PointCrossover)
+        ("(real|bin|int)_k_point", PointCrossover),
+        ("perm_ox", OrderCrossover),
+        ("perm_erx", EdgeRecombinationCrossover)
     ]
 
     return CROSSOVER
@@ -178,12 +184,14 @@ def get_mutation_options():
     from pymoo.operators.mutation.bitflip_mutation import BinaryBitflipMutation
     from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
     from pymoo.operators.integer_from_float_operator import IntegerFromFloatMutation
+    from pymoo.operators.mutation.inversion_mutation import InversionMutation
 
     MUTATION = [
         ("none", NoMutation, {}),
         ("real_pm", PolynomialMutation, dict(eta=20)),
         ("int_pm", IntegerFromFloatMutation, dict(clazz=PolynomialMutation, eta=20)),
-        ("bin_bitflip", BinaryBitflipMutation)
+        ("bin_bitflip", BinaryBitflipMutation),
+        ("perm_inv", InversionMutation)
     ]
 
     return MUTATION

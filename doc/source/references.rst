@@ -8,12 +8,12 @@ Meanwhile, if you have used our framework for research purposes, you can cite us
 
     @ARTICLE{pymoo,
         author={J. {Blank} and K. {Deb}},
-        title={pymoo: Multi-objective Optimization in Python},
         journal={IEEE Access},
+        title={Pymoo: Multi-Objective Optimization in Python},
         year={2020},
-        volume={},
+        volume={8},
         number={},
-        pages={1-1}
+        pages={89497-89509},
     }
 
 

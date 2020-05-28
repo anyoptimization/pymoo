@@ -1,6 +1,8 @@
 import numpy as np
 
+from pymoo.performance_indicator.hv import Hypervolume
 from pymoo.performance_indicator.igd import IGD
+from pymoo.performance_indicator.igd_plus import IGDPlus
 from pymoo.util.normalization import normalize
 from pymoo.util.termination.sliding_window_termination import SlidingWindowTermination
 
@@ -85,6 +87,7 @@ class MultiObjectiveSpaceToleranceTerminationWithRenormalization(MultiObjectiveS
                  n_last=30,
                  all_to_current=False,
                  sliding_window=True,
+                 perf_indicator="igd",
                  **kwargs) -> None:
 
         super().__init__(n_last=n_last,
@@ -94,6 +97,7 @@ class MultiObjectiveSpaceToleranceTerminationWithRenormalization(MultiObjectiveS
         self.data = []
         self.all_to_current = all_to_current
         self.sliding_window = sliding_window
+        self.perf_indicator = perf_indicator
 
     def _metric(self, data):
         ret = super()._metric(data)
@@ -111,7 +115,12 @@ class MultiObjectiveSpaceToleranceTerminationWithRenormalization(MultiObjectiveS
         # check if the movement of all points is significant
         if self.all_to_current:
             c_N = normalize(c_F, c_ideal, c_nadir)
-            delta_f = [IGD(c_N).calc(N[k]) for k in range(len(N))]
+            if self.perf_indicator == "igd":
+                delta_f = [IGD(c_N).calc(N[k]) for k in range(len(N))]
+            elif self.perf_indicator == "hv":
+                # delta_f = [IGDPlus(c_N).calc(N[k]) for k in range(len(N))]
+                hv = Hypervolume(ref_point=np.ones(c_F.shape[1]))
+                delta_f = [hv.calc(N[k]) for k in range(len(N))]
         else:
             delta_f = [IGD(N[k + 1]).calc(N[k]) for k in range(len(N) - 1)]
 

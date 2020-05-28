@@ -10,7 +10,7 @@ class RunningMetric(Callback):
     def __init__(self, nth_gen, n_plots=4) -> None:
         super().__init__()
         self.nth_gen = nth_gen
-        self.term = MultiObjectiveSpaceToleranceTerminationWithRenormalization(n_last=30,
+        self.term = MultiObjectiveSpaceToleranceTerminationWithRenormalization(n_last=100000,
                                                                                all_to_current=True,
                                                                                sliding_window=False)
 
