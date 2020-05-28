@@ -1,10 +1,9 @@
 import math
 
 import numpy as np
-from scipy.spatial.distance import pdist, squareform
+from scipy.spatial.distance import cdist, pdist, squareform
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.algorithms.nsga3 import comp_by_cv_then_random
 from pymoo.factory import get_decomposition
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
@@ -13,6 +12,7 @@ from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.operators.selection.tournament_selection import TournamentSelection
 from pymoo.util.display import MultiObjectiveDisplay
+from pymoo.util.dominator import Dominator
 from pymoo.util.function_loader import load_function
 from pymoo.util.misc import has_feasible, random_permuations
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
@@ -20,21 +20,44 @@ from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
 # =========================================================================================================
 # Implementation
+# Following original code by K. Li https://cola-laboratory.github.io/codes/CTAEA.zip
 # =========================================================================================================
 
 
+def comp_by_cv_dom_then_random(pop, P, **kwargs):
+    S = np.full(P.shape[0], np.nan)
+
+    for i in range(P.shape[0]):
+        a, b = P[i, 0], P[i, 1]
+
+        if pop[a].CV <= 0.0 and pop[b].CV <= 0.0:
+            rel = Dominator.get_relation(pop[a].F, pop[b].F)
+            if rel == 1:
+                S[i] = a
+            elif rel == -1:
+                S[i] = b
+            else:
+                S[i] = np.random.choice([a, b])
+        elif pop[a].CV <= 0.0:
+            S[i] = a
+        elif pop[b].CV <= 0.0:
+            S[i] = b
+        else:
+            S[i] = np.random.choice([a, b])
+
+    return S[:, None].astype(np.int)
+
+
 class RestrictedMating(TournamentSelection):
+    """Restricted mating approach to balance convergence and diversity archives"""
 
-    def _do(self, Hm, n_select, n_parents=1, **kwargs):
-        algorithm = kwargs['algorithm']
-
+    def _do(self, Hm, n_select, n_parents=2, **kwargs):
         n_pop = len(Hm) // 2
 
         _, rank = NonDominatedSorting().do(Hm.get('F'), return_rank=True)
 
         Pc = (rank[:n_pop] == 0).sum()/len(Hm)
         Pd = (rank[n_pop:] == 0).sum()/len(Hm)
-        PC = len(algorithm.opt) / n_pop
 
         # number of random individuals needed
         n_random = n_select * n_parents * self.pressure
@@ -46,7 +69,7 @@ class RestrictedMating(TournamentSelection):
             # Choose from DA
             P[::n_parents, :] += n_pop
         pf = np.random.random(n_select)
-        P[1::2, 1][pf >= PC] += n_pop
+        P[1::n_parents, :][pf >= Pc] += n_pop
 
         # compare using tournament function
         S = self.f_comp(Hm, P, **kwargs)
@@ -59,7 +82,7 @@ class CTAEA(GeneticAlgorithm):
     def __init__(self,
                  ref_dirs,
                  sampling=FloatRandomSampling(),
-                 selection=RestrictedMating(func_comp=comp_by_cv_then_random),
+                 selection=RestrictedMating(func_comp=comp_by_cv_dom_then_random),
                  crossover=SimulatedBinaryCrossover(n_offsprings=1, eta=30, prob=1.0),
                  mutation=PolynomialMutation(eta=20, prob=None),
                  eliminate_duplicates=True,
@@ -82,7 +105,7 @@ class CTAEA(GeneticAlgorithm):
         self.ref_dirs = ref_dirs
         pop_size = len(ref_dirs)
 
-        kwargs['individual'] = Individual(rank=np.inf)
+        kwargs['individual'] = Individual(rank=np.inf, niche=-1, FV=-1)
 
         if 'survival' in kwargs:
             survival = kwargs['survival']
@@ -167,104 +190,129 @@ class CADASurvival:
     def __init__(self, ref_dirs):
         self.ref_dirs = ref_dirs
         self.opt = None
-        self._decomposition = get_decomposition('tchebi')
+        self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
+        self._decomposition = get_decomposition('asf')
         self._calc_perpendicular_distance = load_function("calc_perpendicular_distance")
 
     def do(self, problem, pop, da, n_survive, **kwargs):
+        # Offspring are last of merged population
         off = pop[-n_survive:]
+        # Update ideal point
+        self.ideal_point = np.min(np.vstack((self.ideal_point, off.get("F"))), axis=0)
+        # Update CA
         pop = self._updateCA(pop, n_survive)
+        # Update DA
         Hd = da.merge(off)
         da = self._updateDA(pop, Hd, n_survive)
         return pop, da
 
-    def _association(self, F):
-        dist_matrix = self._calc_perpendicular_distance(F, self.ref_dirs)
+    def _associate(self, pop):
+        """Associate each individual with a weight vector and calculate decomposed fitness"""
+        F = pop.get("F")
+        dist_matrix = self._calc_perpendicular_distance(F - self.ideal_point, self.ref_dirs)
         niche_of_individuals = np.argmin(dist_matrix, axis=1)
-        return niche_of_individuals
-
-    def _get_decomposition(self, F):
-        niche_of_individuals = self._association(F)
-        ideal_point = np.min(F, axis=0)
-        return self._decomposition.do(
-            F, weights=self.ref_dirs[niche_of_individuals, :],
-            ideal_point=ideal_point)
+        FV = self._decomposition.do(F, weights=self.ref_dirs[niche_of_individuals, :],
+                                    ideal_point=self.ideal_point, weight_0=1e-4)
+        pop.set("niche", niche_of_individuals)
+        pop.set("FV", FV)
+        return niche_of_individuals, FV
 
     def _updateCA(self, pop, n_survive):
+        """Update the Convergence archive (CA)"""
         CV = pop.get("CV").flatten()
 
-        Sc = pop[CV == 0]
-        if len(Sc) == n_survive:
+        Sc = pop[CV == 0]  # Feasible population
+        if len(Sc) == n_survive:  # Exactly n_survive feasible individuals
             F = Sc.get("F")
             fronts, rank = NonDominatedSorting().do(F, return_rank=True)
             Sc.set('rank', rank)
             self.opt = Sc[fronts[0]]
             return Sc
-        elif len(Sc) < n_survive:
+        elif len(Sc) < n_survive:  # Not enough feasible individuals
             remainder = n_survive-len(Sc)
             # Solve sub-problem CV, tche
             SI = pop[CV > 0]
             f1 = SI.get("CV")
-            F = SI.get("F")
-            f2 = self._get_decomposition(F)
+            _, f2 = self._associate(SI)
             sub_F = np.column_stack([f1, f2])
-            fronts, rank = NonDominatedSorting().do(sub_F, return_rank=True, n_stop_if_ranked=remainder)
-            I = np.concatenate(fronts)
+            fronts = NonDominatedSorting().do(sub_F, n_stop_if_ranked=remainder)
+            I = []
+            for front in fronts:
+                if len(I) + len(front) <= remainder:
+                    I.extend(front)
+                else:
+                    n_missing = remainder - len(I)
+                    last_front_CV = np.argsort(f1.flatten()[front])
+                    I.extend(front[last_front_CV[:n_missing]])
             SI = SI[I]
-            if len(SI) > remainder:
-                SI = SI[np.argsort(f1.flatten()[I])[:remainder]]
             S = Sc.merge(SI)
             F = S.get("F")
             fronts, rank = NonDominatedSorting().do(F, return_rank=True)
             S.set('rank', rank)
             self.opt = S[fronts[0]]
             return S
-        else:  # len(Sc) > n_survive
+        else:  # Too many feasible individuals
             F = Sc.get("F")
+            # Filter by non-dominated sorting
             fronts, rank = NonDominatedSorting().do(F, return_rank=True, n_stop_if_ranked=n_survive)
             I = np.concatenate(fronts)
             S, rank, F = Sc[I], rank[I], F[I]
-
             if len(S) > n_survive:
-                self.nadir_point = np.max(F, axis=0)
-                self.ideal_point = np.min(F, axis=0)
-                nF = (F - self.ideal_point) / (self.nadir_point - self.ideal_point)
-                niche_of_individuals = self._association(nF)
+                # Remove individual in most crowded niche and with worst fitness
+                niche_of_individuals, FV = self._associate(S)
                 index, count = np.unique(niche_of_individuals, return_counts=True)
                 survivors = np.full(S.shape[0], True)
                 while survivors.sum() > n_survive:
-                    crowdest_niche = np.argmax(count)
-                    crowdest = np.where((niche_of_individuals == index[crowdest_niche]) & survivors)[0]
-                    crowdest_F = F[crowdest, :]
-                    dist = pdist(crowdest_F)
-                    sdist = squareform(dist)
-                    sdist[sdist == 0] == np.inf
-                    min_d_i = np.unravel_index(np.argmin(sdist, axis=None), sdist.shape)
-                    St_F = crowdest_F[min_d_i, :]
-                    St_FV = self._get_decomposition(St_F)
-                    survivors[crowdest[min_d_i[np.argmax(St_FV)]]] = False
-                    count[crowdest_niche] -= 1
+                    crowdest_niches, = np.where(count == count.max())
+                    worst_idx = None
+                    worst_niche = None
+                    worst_fit = -1
+                    for crowdest_niche in crowdest_niches:
+                        crowdest, = np.where((niche_of_individuals == index[crowdest_niche]) & survivors)
+                        niche_worst = crowdest[FV[crowdest].argmax()]
+                        dist_to_max_fit = cdist(F[[niche_worst], :], F).flatten()
+                        dist_to_max_fit[niche_worst] = np.inf
+                        dist_to_max_fit[~survivors] = np.inf
+                        min_d_to_max_fit = dist_to_max_fit.min()
+
+                        dist_in_niche = squareform(pdist(F[crowdest]))
+                        np.fill_diagonal(dist_in_niche, np.inf)
+
+                        delta_d = dist_in_niche - min_d_to_max_fit
+                        min_d_i = np.unravel_index(np.argmin(delta_d, axis=None), dist_in_niche.shape)
+                        if (delta_d[min_d_i] < 0) or (delta_d[min_d_i] == 0 and (FV[crowdest[list(min_d_i)]] > niche_worst).any()):
+                            min_d_i = list(min_d_i)
+                            np.random.shuffle(min_d_i)
+                            closest = crowdest[min_d_i]
+                            niche_worst = closest[np.argmax(FV[closest])]
+                        if FV[niche_worst] > worst_fit:
+                            worst_fit = FV[niche_worst]
+                            worst_idx = niche_worst
+                            worst_niche = crowdest_niche
+                    survivors[worst_idx] = False
+                    count[worst_niche] -= 1
                 S, rank = S[survivors], rank[survivors]
             S.set('rank', rank)
             self.opt = S[rank == 0]
             return S
 
     def _updateDA(self, pop, Hd, n_survive):
-        niche_Hd = self._association(Hd.get('F'))
-        niche_CA = self._association(pop.get('F'))
+        """Update the Diversity archive (DA)"""
+        niche_Hd, FV = self._associate(Hd)
+        niche_CA, _ = self._associate(pop)
 
         itr = 1
         S = []
         while len(S) < n_survive:
             for i in range(n_survive):
-                current_ca = np.where(niche_CA == i)
+                current_ca, = np.where(niche_CA == i)
                 if len(current_ca) < itr:
                     for _ in range(itr - len(current_ca)):
                         current_da = np.where(niche_Hd == i)[0]
                         if current_da.size > 0:
                             F = Hd[current_da].get('F')
                             nd = NonDominatedSorting().do(F, only_non_dominated_front=True, n_stop_if_ranked=0)
-                            FV = self._get_decomposition(F[nd])
-                            i_best = current_da[nd[np.argmin(FV)]]
+                            i_best = current_da[nd[np.argmin(FV[current_da[nd]])]]
                             niche_Hd[i_best] = -1
                             if len(S) < n_survive:
                                 S.append(i_best)
