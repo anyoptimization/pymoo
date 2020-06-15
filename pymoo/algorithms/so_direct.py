@@ -83,7 +83,6 @@ class DIRECT(LocalSearch):
 
         else:
             # TODO: The second condition needs to be implemented here. Exact implementation still unclear.
-
             if len(candidates) > self.n_max_candidates:
                 I = list(np.random.choice(np.arange(len(candidates)), self.n_max_candidates - 1))
 

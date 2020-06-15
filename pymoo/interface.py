@@ -132,7 +132,7 @@ class AskAndTell:
 
             # execute the fake evaluation of the individuals
             self.problem._evaluate = types.MethodType(evaluate_to_nan, self.problem)
-            self.algorithm.evaluator.eval(self.problem, off, algorithm=self.algorithm)
+            self.algorithm.evaluator.process(self.problem, off, algorithm=self.algorithm)
             self.set_offsprings(off)
 
             return off.get("X")
@@ -148,7 +148,7 @@ class AskAndTell:
 
         # do the function evaluations
         self.problem._evaluate = types.MethodType(evaluate_to_value(F.copy(), G.copy()), self.problem)
-        self.algorithm.evaluator.eval(self.problem, pop_to_evaluate, algorithm=self.algorithm)
+        self.algorithm.evaluator.process(self.problem, pop_to_evaluate, algorithm=self.algorithm)
 
     def result(self, only_optimum=True, return_values_of="auto"):
 
