@@ -436,6 +436,9 @@ class Problem:
     def has_bounds(self):
         return self.xl is not None and self.xu is not None
 
+    def has_constraints(self):
+        return self.n_constr > 0
+
     def bounds(self):
         return self.xl, self.xu
 
@@ -521,39 +524,50 @@ def evaluate_in_parallel_object(_x, calc_gradient, obj, args, kwargs):
     return _out
 
 
-def get_problem_from_func(func, xl=None, xu=None, n_var=None, func_args={}):
-    if xl is None or xu is None:
-        raise Exception("Please provide lower and upper bounds for the problem.")
-    if isinstance(xl, (int, float)):
-        xl = xl * anp.ones(n_var)
-    if isinstance(xu, (int, float)):
-        xu = xu * anp.ones(n_var)
-
-    # determine through a test evaluation details about the problem
-    n_var = xl.shape[0]
-    n_obj = -1
-    n_constr = 0
-
-    out = {}
-    func(xl[None, :], out, **func_args)
-    at_least2d(out)
-
-    n_obj = out["F"].shape[1]
-    if out.get("G") is not None:
-        n_constr = out["G"].shape[1]
+def create_problem_from_funcs(n_var,
+                              objs,
+                              xl=None, xu=None,
+                              constr_ieq=[],
+                              constr_eq=[],
+                              penalty_ieq=1e+8,
+                              penalty_eq=1e+8):
+    if callable(objs):
+        objs = [objs]
 
     class MyProblem(Problem):
-        def __init__(self):
-            Problem.__init__(self)
-            self.n_var = n_var
-            self.n_constr = n_constr
-            self.n_obj = n_obj
-            self.func = self._evaluate
-            self.xl = xl
-            self.xu = xu
+
+        def __init__(self, **kwargs):
+            super().__init__(n_var,
+                             n_obj=len(objs),
+                             n_constr=0,
+                             xl=xl,
+                             xu=xu,
+                             elementwise_evaluation=True,
+                             **kwargs)
 
         def _evaluate(self, x, out, *args, **kwargs):
-            func(x, out, *args, **kwargs)
+
+            # calculate violation from the inequality constraints
+            ieq = np.array([constr(x) for constr in constr_ieq])
+            ieq[ieq < 0] = 0
+
+            # calculate violation from the quality constraints
+            eq = np.array([constr(x) for constr in constr_eq])
+            eq = np.abs(eq)
+
+            # calculate the objective function
+            f = np.array([obj(x) for obj in objs])
+
+            # calculate the penalty terms
+            penalty = (ieq ** 2).sum() * penalty_ieq + (eq ** 2).sum() * penalty_eq
+
+            out["__F__"] = f
+            out["__IEQ__"] = ieq
+            out["__EQ__"] = eq
+            out["__PENALTY__"] = penalty
+            out["__CV__"] = ieq.sum() + eq.sum()
+
+            out["F"] = f + penalty
 
     return MyProblem()
 
@@ -582,5 +596,3 @@ class MetaProblem(Problem):
 
     def pareto_set(self, *args, **kwargs):
         return self.problem.pareto_set(*args, **kwargs)
-
-

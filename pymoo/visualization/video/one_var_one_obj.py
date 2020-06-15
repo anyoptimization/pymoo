@@ -1,30 +1,23 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pymoo.model.callback import Callback
+from pymoo.visualization.video.callback_video import AnimationCallback
 
 
-class OneVariableOneObjectiveVisualization(Callback):
+class OneVariableOneObjectiveVisualization(AnimationCallback):
 
     def __init__(self,
-                 do_show=True,
-                 exception_if_not_applicable=True,
-                 n_samples_for_surface=10000):
-        super().__init__()
+                 n_samples_for_surface=10000,
+                 **kwargs):
+        super().__init__(**kwargs)
         self.last_pop = None
-        self.do_show = do_show
-        self.exception_if_not_applicable = exception_if_not_applicable
         self.n_samples_for_surface = n_samples_for_surface
 
-    def notify(self, algorithm):
-        problem = algorithm.problem
+    def do(self, problem, algorithm):
 
         # check whether the visualization can be done or not - throw exception or simply do nothing
-        if problem.n_var > 1 or problem.n_obj > 1:
-            if self.exception_if_not_applicable:
-                raise Exception("This visualization can only be used for problems with one variable and one objective!")
-            else:
-                return
+        if problem.n_var != 1 or problem.n_obj != 1:
+            raise Exception("This visualization can only be used for problems with one variable and one objective!")
 
         # draw the problem surface
         xl, xu = problem.bounds()
@@ -57,8 +50,8 @@ class OneVariableOneObjectiveVisualization(Callback):
         plt.title(f"Generation: {algorithm.n_gen}")
         plt.legend()
 
-        if self.do_show:
-            plt.show()
-
         # store the current population as the last
         self.last_pop = set(pop)
+
+
+

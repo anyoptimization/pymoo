@@ -26,10 +26,22 @@ class Individual:
         ind.data = self.data.copy()
         return ind
 
-    def get(self, keys):
-        if keys in self.data:
-            return self.data[keys]
-        elif keys in self.attr:
-            return self.__dict__[keys]
+    def get(self, *keys):
+
+        def _get(key):
+            if key in self.data:
+                return self.data[key]
+            elif key in self.attr:
+                return self.__dict__[key]
+            else:
+                return None
+
+        ret = []
+
+        for key in keys:
+            ret.append(_get(key))
+
+        if len(ret) == 1:
+            return ret[0]
         else:
-            return None
+            return tuple(ret)

@@ -203,7 +203,7 @@ def pop_from_sampling(problem, sampling, n_initial_samples, pop=None):
 def evaluate_if_not_done_yet(evaluator, problem, pop, algorithm=None):
     I = np.where(pop.get("F") == None)[0]
     if len(I) > 0:
-        pop[I] = evaluator.eval(problem, pop[I], algorithm=algorithm)
+        pop[I] = evaluator.process(problem, pop[I], algorithm=algorithm)
 
 
 def set_if_none(kwargs, str, val):
