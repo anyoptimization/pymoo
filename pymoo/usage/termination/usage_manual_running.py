@@ -6,7 +6,7 @@ from pymoo.util.running_metric import RunningMetric
 problem = get_problem("zdt3")
 algorithm = NSGA2(pop_size=100, callback=RunningMetric(10))
 
-if False:
+if True:
     minimize(problem,
              algorithm,
              ('n_gen', 200),

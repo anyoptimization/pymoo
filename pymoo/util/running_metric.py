@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pymoo.model.callback import Callback
 from pymoo.util.termination.f_tol import MultiObjectiveSpaceToleranceTerminationWithRenormalization
+from pymoo.visualization.video.callback_video import AnimationCallback
 
 
-class RunningMetric(Callback):
+class RunningMetric(AnimationCallback):
 
     def __init__(self, nth_gen, n_plots=4) -> None:
         super().__init__()
@@ -13,13 +13,11 @@ class RunningMetric(Callback):
         self.term = MultiObjectiveSpaceToleranceTerminationWithRenormalization(n_last=100000,
                                                                                all_to_current=True,
                                                                                sliding_window=False)
-
         self.hist = []
         self.n_hist = n_plots
 
     def notify(self, algorithm):
         self.term.do_continue(algorithm)
-        t = algorithm.n_gen
 
         def press(event):
             if event.key == 'q':
@@ -62,4 +60,4 @@ class RunningMetric(Callback):
             plt.waitforbuttonpress()
 
             fig.clf()
-            plt.close(fig)
+            plt.close('all')

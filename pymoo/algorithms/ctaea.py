@@ -156,7 +156,7 @@ class CTAEA(GeneticAlgorithm):
     def _next(self):
 
         # do the mating using the total population
-        Hm = self.pop.merge(self.da)
+        Hm = Population.merge(self.pop, self.da)
         self.off = self.mating.do(self.problem, Hm, n_offsprings=self.n_offsprings, algorithm=self)
 
         # if the mating could not generate any new offspring (duplicate elimination might make that happen)

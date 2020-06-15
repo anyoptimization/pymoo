@@ -14,6 +14,7 @@ def select_by_clearing(pop, D, n_select, func_select, eps=0.05):
 
         if len(remaining) == 0:
             clearing.reset()
+            remaining = clearing.remaining()
 
         best = remaining[func_select(pop[remaining])]
         clearing.select(best)

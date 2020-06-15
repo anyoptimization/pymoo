@@ -12,6 +12,25 @@ from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 
 # =========================================================================================================
+# Survival
+# =========================================================================================================
+
+
+class FitnessSurvival(Survival):
+
+    def __init__(self) -> None:
+        super().__init__(True)
+
+    def _do(self, problem, pop, n_survive, out=None, **kwargs):
+        F = pop.get("F")
+
+        if F.shape[1] != 1:
+            raise ValueError("FitnessSurvival can only used for single objective single!")
+
+        return pop[np.argsort(F[:, 0])[:n_survive]]
+
+
+# =========================================================================================================
 # Implementation
 # =========================================================================================================
 
@@ -41,6 +60,7 @@ class GA(GeneticAlgorithm):
                  selection=TournamentSelection(func_comp=comp_by_cv_and_fitness),
                  crossover=SimulatedBinaryCrossover(prob=0.9, eta=3),
                  mutation=PolynomialMutation(prob=None, eta=5),
+                 survival=FitnessSurvival(),
                  eliminate_duplicates=True,
                  n_offsprings=None,
                  display=SingleObjectiveDisplay(),
@@ -64,27 +84,13 @@ class GA(GeneticAlgorithm):
                          selection=selection,
                          crossover=crossover,
                          mutation=mutation,
-                         survival=FitnessSurvival(),
+                         survival=survival,
                          eliminate_duplicates=eliminate_duplicates,
                          n_offsprings=n_offsprings,
                          display=display,
                          **kwargs)
 
         self.default_termination = SingleObjectiveDefaultTermination()
-
-
-class FitnessSurvival(Survival):
-
-    def __init__(self) -> None:
-        super().__init__(True)
-
-    def _do(self, problem, pop, n_survive, out=None, **kwargs):
-        F = pop.get("F")
-
-        if F.shape[1] != 1:
-            raise ValueError("FitnessSurvival can only used for single objective single!")
-
-        return pop[np.argsort(F[:, 0])[:n_survive]]
 
 
 parse_doc_string(GA.__init__)

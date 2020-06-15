@@ -2,6 +2,24 @@ import numpy as np
 
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
+from pymoo.model.problem import Problem
+
+
+def set_feasibility(pop):
+    for ind in pop:
+        cv = ind.get("CV")
+        if cv is not None:
+            ind.set("feasible", cv <= 0)
+
+
+def set_cv_no_constr(pop):
+    CV = np.zeros((len(pop), 1))
+    pop.set("CV", CV)
+
+
+def set_cv(pop):
+    CV = Problem.calc_constraint_violation(pop.get("G"))
+    pop.set("CV", CV)
 
 
 class Evaluator:
@@ -58,10 +76,7 @@ class Evaluator:
             self._eval(problem, pop[I], **kwargs)
 
             # set the feasibility attribute if cv exists
-            for ind in pop[I]:
-                cv = ind.get("CV")
-                if cv is not None:
-                    ind.set("feasible", cv <= 0)
+            set_feasibility(pop[I])
 
         if is_individual:
             return pop[0]
@@ -84,5 +99,3 @@ class Evaluator:
                 continue
             else:
                 pop.set(key, val)
-
-
