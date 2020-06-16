@@ -126,14 +126,12 @@ setup = {
         'termination': ('n_gen', 1000),
         'problem': get_problem("dtlz3", None, 3, k=10),
         **get_setup(3)
-
     },
 
     'dtlz3_5obj': {
         'termination': ('n_gen', 1000),
         'problem': get_problem("dtlz3", None, 5, k=10),
         **get_setup(5)
-
     },
 
     'dtlz3_8obj': {
