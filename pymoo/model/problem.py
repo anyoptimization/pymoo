@@ -171,7 +171,9 @@ class Problem:
             try:
                 pf = self._calc_pareto_front(*args, **kwargs)
                 if pf is not None:
-                    self._pareto_front = at_least_2d_array(pf)
+                    pf = at_least_2d_array(pf)
+
+                self._pareto_front = pf
 
             except Exception as e:
                 if exception_if_failing:
@@ -187,7 +189,10 @@ class Problem:
             Returns the pareto set for a problem. Points in the X space to be known to be optimal!
         """
         if not use_cache or self._pareto_set is None:
-            self._pareto_set = at_least_2d_array(self._calc_pareto_set(*args, **kwargs))
+            ps = self._calc_pareto_set(*args, **kwargs)
+            if ps is not None:
+                ps = at_least_2d_array(ps)
+            self._pareto_set = ps
 
         return self._pareto_set
 
@@ -524,52 +529,60 @@ def evaluate_in_parallel_object(_x, calc_gradient, obj, args, kwargs):
     return _out
 
 
-def create_problem_from_funcs(n_var,
-                              objs,
-                              xl=None, xu=None,
-                              constr_ieq=[],
-                              constr_eq=[],
-                              penalty_ieq=1e+8,
-                              penalty_eq=1e+8):
-    if callable(objs):
-        objs = [objs]
+def func_return_none(*args, **kwargs):
+    return None
 
-    class MyProblem(Problem):
 
-        def __init__(self, **kwargs):
-            super().__init__(n_var,
-                             n_obj=len(objs),
-                             n_constr=0,
-                             xl=xl,
-                             xu=xu,
-                             elementwise_evaluation=True,
-                             **kwargs)
+class FunctionalProblem(Problem):
 
-        def _evaluate(self, x, out, *args, **kwargs):
+    def __init__(self,
+                 n_var,
+                 objs,
+                 constr_ieq=[],
+                 constr_eq=[],
+                 constr_eq_eps=1e-6,
+                 func_pf=func_return_none,
+                 func_ps=func_return_none,
+                 **kwargs):
+        if callable(objs):
+            objs = [objs]
 
-            # calculate violation from the inequality constraints
-            ieq = np.array([constr(x) for constr in constr_ieq])
-            ieq[ieq < 0] = 0
+        self.objs = objs
+        self.constr_ieq = constr_ieq
+        self.constr_eq = constr_eq
+        self.constr_eq_eps = constr_eq_eps
+        self.func_pf = func_pf
+        self.func_ps = func_ps
 
-            # calculate violation from the quality constraints
-            eq = np.array([constr(x) for constr in constr_eq])
-            eq = np.abs(eq)
+        n_constr = len(constr_ieq) + len(constr_eq)
 
-            # calculate the objective function
-            f = np.array([obj(x) for obj in objs])
+        super().__init__(n_var,
+                         n_obj=len(self.objs),
+                         n_constr=n_constr,
+                         elementwise_evaluation=True,
+                         **kwargs)
 
-            # calculate the penalty terms
-            penalty = (ieq ** 2).sum() * penalty_ieq + (eq ** 2).sum() * penalty_eq
+    def _evaluate(self, x, out, *args, **kwargs):
+        # calculate violation from the inequality constraints
+        ieq = np.array([constr(x) for constr in self.constr_ieq])
+        ieq[ieq < 0] = 0
 
-            out["__F__"] = f
-            out["__IEQ__"] = ieq
-            out["__EQ__"] = eq
-            out["__PENALTY__"] = penalty
-            out["__CV__"] = ieq.sum() + eq.sum()
+        # calculate violation from the quality constraints
+        eq = np.array([constr(x) for constr in self.constr_eq])
+        eq = np.abs(eq)
+        eq = eq - self.constr_eq_eps
 
-            out["F"] = f + penalty
+        # calculate the objective function
+        f = np.array([obj(x) for obj in self.objs])
 
-    return MyProblem()
+        out["F"] = f
+        out["G"] = np.concatenate([ieq, eq])
+
+    def _calc_pareto_front(self, *args, **kwargs):
+        return self.func_pf(*args, **kwargs)
+
+    def _calc_pareto_set(self, *args, **kwargs):
+        return self.func_ps(*args, **kwargs)
 
 
 class MetaProblem(Problem):
@@ -588,8 +601,37 @@ class MetaProblem(Problem):
 
         self.problem = problem
 
-    def _evaluate(self, x, *args, **kwargs):
-        self.problem._evaluate(x, *args, **kwargs)
+    def _evaluate(self, x, out, *args, **kwargs):
+        self.problem._evaluate(x, out, *args, **kwargs)
+
+    def pareto_front(self, *args, **kwargs):
+        return self.problem.pareto_front(*args, **kwargs)
+
+    def pareto_set(self, *args, **kwargs):
+        return self.problem.pareto_set(*args, **kwargs)
+
+
+class ConstraintsAsPenaltyProblem(MetaProblem):
+
+    def __init__(self,
+                 problem,
+                 penalty=1e6):
+        super().__init__(problem)
+        self.penalty = penalty
+        self.n_constr = 0
+
+    def _evaluate(self, x, out, *args, **kwargs):
+        super()._evaluate(x, out, return_as_dictionary=True)
+
+        F, G = at_least_2d_array(out["F"]), at_least_2d_array(out["G"])
+        CV = Problem.calc_constraint_violation(G)
+
+        out["__F__"] = F
+        out["__G__"] = G
+        out["__CV__"] = CV
+
+        out["F"] = out["F"] + self.penalty * CV
+        out["G"] = None
 
     def pareto_front(self, *args, **kwargs):
         return self.problem.pareto_front(*args, **kwargs)
