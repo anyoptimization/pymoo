@@ -10,20 +10,18 @@ def set_feasibility(pop):
     for ind in pop:
         cv = ind.get("CV")
         if cv is not None:
-            ind.set("feasible", cv <= 0)
+            ind.feasible = cv <= 0
 
 
-def set_cv_no_constr(pop):
-    CV = np.zeros((len(pop), 1))
-    pop.set("CV", CV)
-
-
-def set_cv(pop):
+def set_cv(pop, feasbility=True):
     for ind in pop:
         if ind.G is None:
             ind.CV = np.zeros(1)
         else:
             ind.CV = Problem.calc_constraint_violation(at_least_2d_array(ind.G))[0]
+
+    if feasbility:
+        set_feasibility(pop)
 
 
 class Evaluator:
