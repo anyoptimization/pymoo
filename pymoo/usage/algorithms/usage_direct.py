@@ -8,6 +8,5 @@ algorithm = DIRECT()
 
 ret = minimize(problem,
                algorithm,
-               ("n_iter", 20),
                verbose=True)
 

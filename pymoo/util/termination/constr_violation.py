@@ -28,7 +28,7 @@ class ConstraintViolationToleranceTermination(SlidingWindowTermination):
     def _metric(self, data):
         last, current = data[-2], data[-1]
         return {"cv": current,
-                "delta_cv": last - current
+                "delta_cv": abs(last - current)
                 }
 
     def _decide(self, metrics):

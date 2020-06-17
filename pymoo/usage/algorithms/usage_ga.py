@@ -10,7 +10,6 @@ algorithm = GA(
 
 res = minimize(problem,
                algorithm,
-               termination=('n_gen', 50),
                seed=1,
                verbose=False)
 

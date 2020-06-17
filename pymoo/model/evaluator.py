@@ -3,6 +3,7 @@ import numpy as np
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
 from pymoo.model.problem import Problem
+from pymoo.util.misc import at_least_2d_array
 
 
 def set_feasibility(pop):
@@ -18,8 +19,11 @@ def set_cv_no_constr(pop):
 
 
 def set_cv(pop):
-    CV = Problem.calc_constraint_violation(pop.get("G"))
-    pop.set("CV", CV)
+    for ind in pop:
+        if ind.G is None:
+            ind.CV = np.zeros(1)
+        else:
+            ind.CV = Problem.calc_constraint_violation(at_least_2d_array(ind.G))[0]
 
 
 class Evaluator:
