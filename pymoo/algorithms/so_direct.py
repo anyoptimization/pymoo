@@ -1,5 +1,6 @@
 import numpy as np
 
+from pymoo.algorithms.nsga2 import RankAndCrowdingSurvival
 from pymoo.algorithms.so_local_search import LocalSearch
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
@@ -80,16 +81,9 @@ class DIRECT(LocalSearch):
 
         if len(candidates) == 1:
             return candidates
-
         else:
-            # TODO: The second condition needs to be implemented here. Exact implementation still unclear.
             if len(candidates) > self.n_max_candidates:
-                I = list(np.random.choice(np.arange(len(candidates)), self.n_max_candidates - 1))
-
-                k = np.argmin(F[:, 0])
-                if k not in I:
-                    I.append(k)
-                candidates = candidates[I]
+                candidates = RankAndCrowdingSurvival().do(self.problem, pop, self.n_max_candidates)
 
             return candidates
 
@@ -111,8 +105,6 @@ class DIRECT(LocalSearch):
             xl, xu = current.get("xl"), current.get("xu")
 
             delta = (xu[k] - xl[k]) / 6
-
-            # print(current.X, delta, k, xl, xu)
 
             # create the left individual
             left_x = np.copy(current.X)
@@ -139,4 +131,3 @@ class DIRECT(LocalSearch):
 
         # add the offsprings to the population
         self.pop = Population.merge(self.pop, off)
-

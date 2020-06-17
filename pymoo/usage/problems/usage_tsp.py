@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 
 from pymoo.algorithms.so_genetic_algorithm import GA
@@ -8,8 +9,9 @@ from pymoo.operators.sampling.random_permutation_sampling import PermutationRand
 from pymoo.optimize import minimize
 from pymoo.problems.single.traveling_salesman import visualize, create_random_tsp_problem
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
+from pymoo.visualization.video.callback_video import AnimationCallback
 
-problem = create_random_tsp_problem(100, 100, seed=1)
+problem = create_random_tsp_problem(50, 100, seed=1)
 
 
 class StartFromZeroRepair(Repair):
@@ -27,11 +29,23 @@ class StartFromZeroRepair(Repair):
         return pop
 
 
+class PathVisualization(AnimationCallback):
+
+    def notify(self, algorithm):
+        if algorithm.n_gen % 10 == 0:
+
+            fig, ax = plt.subplots()
+
+            x = algorithm.opt[0].get("X")
+            visualize(problem, x, fig=fig, ax=ax, show=False)
+            ax.set_title(f"Generation: {algorithm.n_gen}")
+            self.video.record(fig=fig)
+
+
 algorithm = GA(
     pop_size=20,
     sampling=PermutationRandomSampling(),
     mutation=InversionMutation(),
-    # crossover=EdgeRecombinationCrossover(),
     crossover=OrderCrossover(),
     repair=StartFromZeroRepair(),
     eliminate_duplicates=True
@@ -44,7 +58,8 @@ res = minimize(
     problem,
     algorithm,
     termination,
-    seed=1,
+    # UNCOMMENT to save the visualization
+    # callback=PathVisualization(fname="tsp.mp4"),
     verbose=False
 )
 
@@ -53,28 +68,3 @@ print(res.algorithm.evaluator.n_eval)
 
 visualize(problem, res.X)
 
-
-#
-# class PathVisualization(Callback):
-#
-#     def __init__(self):
-#         super().__init__()
-#         self.vid = Video(File("tsp.mp4"))
-#
-#     def notify(self, algorithm):
-#         if algorithm.n_gen % 10 == 0:
-#             x = algorithm.opt[0].get("X")
-#             visualize(problem, x, show=False)
-#             plt.title(f"Generation: {algorithm.n_gen}")
-#             self.vid.record()
-#
-#
-# algorithm.callback = PathVisualization()
-#
-# res = minimize(
-#     problem,
-#     algorithm,
-#     termination,
-#     seed=1,
-#     verbose=False
-# )

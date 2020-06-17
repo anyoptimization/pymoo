@@ -19,6 +19,7 @@ class GeneticAlgorithm(Algorithm):
                  eliminate_duplicates=DefaultDuplicateElimination(),
                  repair=None,
                  individual=Individual(),
+                 min_infeas_pop_size=0,
                  **kwargs
                  ):
 
@@ -26,6 +27,9 @@ class GeneticAlgorithm(Algorithm):
 
         # the population size used
         self.pop_size = pop_size
+
+        # minimum number of individuals surviving despite being infeasible - by default disabled
+        self.min_infeas_pop_size = min_infeas_pop_size
 
         # the survival for the genetic algorithm
         self.survival = survival
@@ -73,13 +77,14 @@ class GeneticAlgorithm(Algorithm):
 
         # create the initial population
         pop = self.initialization.do(self.problem, self.pop_size, algorithm=self)
+        pop.set("n_gen", self.n_gen)
 
         # then evaluate using the objective function
         self.evaluator.eval(self.problem, pop, algorithm=self)
 
         # that call is a dummy survival to set attributes that are necessary for the mating selection
         if self.survival:
-            pop = self.survival.do(self.problem, pop, len(pop), algorithm=self)
+            pop = self.survival.do(self.problem, pop, len(pop), algorithm=self, n_min_infeas_survive=self.min_infeas_pop_size)
 
         self.pop, self.off = pop, pop
 
@@ -87,6 +92,7 @@ class GeneticAlgorithm(Algorithm):
 
         # do the mating using the current population
         self.off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
+        self.off.set("n_gen", self.n_gen)
 
         # if the mating could not generate any new offspring (duplicate elimination might make that happen)
         if len(self.off) == 0:
@@ -106,7 +112,7 @@ class GeneticAlgorithm(Algorithm):
 
         # the do survival selection
         if self.survival:
-            self.pop = self.survival.do(self.problem, self.pop, self.pop_size, algorithm=self)
+            self.pop = self.survival.do(self.problem, self.pop, self.pop_size, algorithm=self, n_min_infeas_survive=self.min_infeas_pop_size)
 
     def _finalize(self):
         pass
