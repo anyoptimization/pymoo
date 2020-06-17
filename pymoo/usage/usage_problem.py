@@ -1,5 +1,4 @@
 
-
 # --------------------------------------------------------------------------------------------
 # Single
 # --------------------------------------------------------------------------------------------
@@ -10,7 +9,7 @@ import numpy as np
 from pymoo.factory import get_problem
 from pymoo.util.plotting import plot_problem_surface
 
-problem = get_problem("ackley", n_var=2, a=20, b=1/5, c=2 * np.pi)
+problem = get_problem("ackley", n_var=2, a=20, b= 1 /5, c=2 * np.pi)
 plot_problem_surface(problem, 100, plot_type="wireframe+contour")
 # END ackley
 
@@ -175,28 +174,29 @@ p = get_problem("dtlz1_-1", n_var=20, n_obj=5)
 # START from_function
 
 import numpy as np
-
-# this will be the evaluation function that is called each time
-from pymoo.model.problem import get_problem_from_func
+from pymoo.model.problem import FunctionalProblem
 
 
-def my_evaluate_func(x, out, *args, **kwargs):
+objs = [
+    lambda x: np.sum((x - 2) ** 2),
+    lambda x: np.sum((x + 2) ** 2)
+]
 
-    # define the objective as x^2
-    f1 = np.sum(np.square(x - 2), axis=1)
-    f2 = np.sum(np.square(x + 2), axis=1)
-    out["F"] = np.column_stack([f1, f2])
-
-    # x^2 < 2 constraint
-    out["G"] = np.sum(np.square(x - 1), axis=1)
+constr_ieq = [
+    lambda x: np.sum((x - 1) ** 2)
+]
 
 
-# load the problem from a function - define 3 variables with the same lower bound
-problem = get_problem_from_func(my_evaluate_func, xl=-10, xu=10, n_var=3)
-F, CV = problem.evaluate(np.random.rand(100, 3))
+problem = FunctionalProblem(10,
+                            objs,
+                            constr_ieq=constr_ieq,
+                            xl=np.array([-10, -5, -10]),
+                            xu=np.array([10, 5, 10])
+                            )
 
-# or define a problem with varying lower and upper bounds
-problem = get_problem_from_func(my_evaluate_func, xl=np.array([-10, -5, -10]), xu=np.array([10, 5, 10]))
-F, CV = problem.evaluate(np.random.rand(100, 3))
+F, CV = problem.evaluate(np.random.rand(3, 10))
+
+print(f"F: {F}\n")
+print(f"CV: {CV}")
 
 # END from_string

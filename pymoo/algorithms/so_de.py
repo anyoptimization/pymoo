@@ -22,7 +22,7 @@ from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 class DE(GeneticAlgorithm):
     def __init__(self,
                  pop_size=100,
-                 sampling=LatinHypercubeSampling(iterations=100, criterion="maxmin"),
+                 sampling=LatinHypercubeSampling(),
                  variant="DE/rand/1/bin",
                  CR=0.5,
                  F=0.3,

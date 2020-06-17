@@ -77,4 +77,4 @@ def visualize(problem, x, fig=None, ax=None, show=True, label=True):
         fig.suptitle("Route length: %.4f" % problem.get_route_length(x))
 
         if show:
-            plt.show()
+            fig.show()

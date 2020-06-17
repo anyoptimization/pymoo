@@ -6,8 +6,12 @@ def func_select_by_objective(pop):
     return F[:, 0].argmin()
 
 
-def select_by_clearing(pop, D, n_select, func_select, eps=0.05):
-    clearing = EpsilonClearing(D, eps)
+def func_select_from_sorted(_):
+    return 0
+
+
+def select_by_clearing(pop, D, n_select, func_select, delta=0.05):
+    clearing = EpsilonClearing(D, delta)
 
     while len(clearing.selected()) < n_select:
         remaining = clearing.remaining()
