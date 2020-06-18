@@ -28,6 +28,7 @@ class Problem:
                  xu=None,
                  type_var=np.double,
                  evaluation_of="auto",
+                 replace_nan_values_of="auto",
                  parallelization=None,
                  elementwise_evaluation=False,
                  callback=None):
@@ -93,6 +94,12 @@ class Problem:
                 self.evaluation_of.append("G")
         else:
             self.evaluation_of = evaluation_of
+
+        # if nan values should be replace
+        if replace_nan_values_of == "auto":
+            self.replace_nan_values_of = ["F", "G"] if self.has_constraints() else ["F"]
+        else:
+            self.replace_nan_values_of = replace_nan_values_of
 
         # whether the evaluation function is called per set of solutions or single solution
         self.elementwise_evaluation = elementwise_evaluation
@@ -309,6 +316,16 @@ class Problem:
 
                 out["dG"] = np.column_stack([out["dG"], _dG]) if out["dG"] is not None else _dG
 
+        # replace non values by infinity - because of minimization it serves like a large penalty
+        for key in self.replace_nan_values_of:
+            if key in out:
+                try:
+                    v = out[key]
+                    v[np.isnan(v)] = np.inf
+                    out[key] = v
+                except:
+                    pass
+
         # if constraint violation should be returned as well
         if self.n_constr == 0:
             CV = np.zeros([X.shape[0], 1])
@@ -323,9 +340,9 @@ class Problem:
             out["feasible"] = (CV <= 0)
 
         # if asked for a value but not set in the evaluation set to None
-        for val in return_values_of:
-            if val not in out:
-                out[val] = None
+        for key in return_values_of:
+            if key not in out:
+                out[key] = None
 
         # remove the first dimension of the output - in case input was a 1d- vector
         if only_single_value:
@@ -588,16 +605,16 @@ class FunctionalProblem(Problem):
 class MetaProblem(Problem):
 
     def __init__(self, problem):
-        super().__init__(problem.n_var,
-                         problem.n_obj,
-                         problem.n_constr,
-                         problem.xl,
-                         problem.xu,
-                         problem.type_var,
-                         problem.evaluation_of,
-                         problem.parallelization,
-                         problem.elementwise_evaluation,
-                         problem.callback)
+        super().__init__(n_var=problem.n_var,
+                         n_obj=problem.n_obj,
+                         n_constr=problem.n_constr,
+                         xl=problem.xl,
+                         xu=problem.xu,
+                         type_var=problem.type_var,
+                         evaluation_of=problem.evaluation_of,
+                         parallelization=problem.parallelization,
+                         elementwise_evaluation=problem.elementwise_evaluation,
+                         callback=problem.callback)
 
         self.problem = problem
 
@@ -621,7 +638,8 @@ class ConstraintsAsPenaltyProblem(MetaProblem):
         self.n_constr = 0
 
     def _evaluate(self, x, out, *args, **kwargs):
-        super()._evaluate(x, out, return_as_dictionary=True)
+        kwargs["return_as_dictionary"] = True
+        super()._evaluate(x, out, *args, **kwargs)
 
         F, G = at_least_2d_array(out["F"]), at_least_2d_array(out["G"])
         CV = Problem.calc_constraint_violation(G)
@@ -630,7 +648,7 @@ class ConstraintsAsPenaltyProblem(MetaProblem):
         out["__G__"] = G
         out["__CV__"] = CV
 
-        out["F"] = out["F"] + self.penalty * CV
+        out["F"] = F + self.penalty * CV
         out["G"] = None
 
     def pareto_front(self, *args, **kwargs):
