@@ -1,3 +1,5 @@
+from abc import abstractmethod
+
 import numpy as np
 
 from pymoo.algorithms.so_genetic_algorithm import FitnessSurvival
@@ -9,11 +11,13 @@ from pymoo.model.population import Population
 from pymoo.optimize import minimize
 from pymoo.problems.single.traveling_salesman import create_random_tsp_problem
 from pymoo.util.display import SingleObjectiveDisplay
+from pymoo.util.roulette import RouletteWheelSelection
 
 
 # =========================================================================================================
 # Display
 # =========================================================================================================
+
 
 class ACODisplay(SingleObjectiveDisplay):
 
@@ -22,57 +26,139 @@ class ACODisplay(SingleObjectiveDisplay):
 
 
 # =========================================================================================================
+# Entry
+# =========================================================================================================
+
+
+class Entry:
+
+    def __init__(self, key=None, value=None, heuristic=None) -> None:
+        super().__init__()
+        self.key = key
+        self.value = value
+        self.heuristic = heuristic
+
+
+# =========================================================================================================
 # Ant
 # =========================================================================================================
 
 class Ant(Individual):
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self,
+                 **kwargs) -> None:
         super().__init__(**kwargs)
         self.path = []
         self.data = {}
+
         self.problem = None
+        self.pheromones = None
+        self.alpha = None
+        self.beta = None
 
-    def initialize(self, problem):
+    def initialize(self, problem, pheromones, alpha, beta):
         self.problem = problem
-
-    def start(self):
-        return self._start()
+        self.pheromones = pheromones
+        self.alpha = alpha
+        self.beta = beta
 
     def next(self):
-        if len(self.path) == 0:
-            val = self.start()
-        else:
-            val = self._next()
+        candidates = self._next()
 
-        self.path.append(val)
+        # information coming from the pheromones
+        tau = []
+        for entry in candidates:
+            key = entry.key
+            if not self.pheromones.has(key):
+                self.pheromones.initialize(key)
+            _tau = self.pheromones.get(key)
+            tau.append(_tau)
+        tau = np.array(tau)
+
+        # information coming from the heuristics
+        eta = np.array([e.heuristic for e in candidates])
+
+        p = tau ** self.alpha + eta ** self.beta
+        p = p / p.sum()
+
+        k = RouletteWheelSelection(p).next()
+
+        entry = candidates[k]
+        self.notify(entry)
 
     def has_next(self):
         return self._has_next()
 
+    def notify(self, entry):
+        self.path.append(entry)
+        self._notify(entry)
+
+    def get_values(self, key="value", as_numpy_array=True, skip_if_none=True):
+        ret = [e.__dict__[key] for e in self.path]
+        if skip_if_none:
+            ret = [e for e in ret if e is not None]
+        if as_numpy_array:
+            ret = np.array(ret)
+        return ret
+
     def finalize(self):
-        self.X = np.array(self.path)
+        self.X = self.get_values()
         self._finalize()
 
-    def _start(self):
-        raise Exception("To be implemented")
-
+    @abstractmethod
     def _next(self):
         raise Exception("To be implemented")
 
+    @abstractmethod
     def _has_next(self):
         raise Exception("To be implemented")
 
     def _finalize(self):
-        raise Exception("To be implemented")
+        pass
+
+    def _notify(self, entry):
+        pass
 
 
 # =========================================================================================================
-# Algorithm
+# Pheromones
 # =========================================================================================================
 
 
-class AntEvaluator(Evaluator):
+class Pheromones:
+
+    def __init__(self,
+                 ) -> None:
+        super().__init__()
+        self.data = {}
+
+    def initialize(self, key):
+        self.set(key, 1.0)
+
+    def get(self, key):
+        return self.data.get(key)
+
+    def has(self, key):
+        return key in self.data
+
+    def set(self, key, value):
+        self.data[key] = value
+
+    def evaporate(self, rho):
+        for key in list(self.data.keys()):
+            self.data[key] *= (1 - rho)
+
+    def update(self, keys, value):
+        for key in keys:
+            self.data[key] += value
+
+
+# =========================================================================================================
+# Mock Evaluator
+# =========================================================================================================
+
+
+class MockEvaluator(Evaluator):
 
     def __init__(self, **kwargs):
         super().__init__(skip_already_evaluated=False, **kwargs)
@@ -81,11 +167,22 @@ class AntEvaluator(Evaluator):
         pass
 
 
+# =========================================================================================================
+# Algorithm
+# =========================================================================================================
+
+
 class ACO(Algorithm):
 
     def __init__(self,
                  ant,
+                 pheromones=Pheromones(),
                  n_ants=1,
+                 rho=0.1,
+                 alpha=1.0,
+                 beta=10.0,
+                 q=2.0,
+                 evaluate_each_ant=True,
                  display=ACODisplay(),
                  **kwargs):
         """
@@ -113,9 +210,15 @@ class ACO(Algorithm):
 
         self.ant = ant
         self.n_ants = n_ants
+        self.rho = rho
+        self.alpha = alpha
+        self.beta = beta
+        self.q = q
+        self.evaluate_each_ant = evaluate_each_ant
+        self.pheromones = pheromones
 
     def _initialize(self):
-        self.evaluator = AntEvaluator()
+        self.evaluator = Evaluator() if self.evaluate_each_ant else MockEvaluator()
         self.opt = Population()
         self._next()
 
@@ -128,7 +231,7 @@ class ACO(Algorithm):
 
             # create a new ant and send it through the search space
             ant = self.ant()
-            ant.initialize(self.problem)
+            ant.initialize(self.problem, self.pheromones, self.alpha, self.beta)
             while ant.has_next():
                 ant.next()
             ant.finalize()
@@ -140,6 +243,17 @@ class ACO(Algorithm):
         self.evaluator.eval(self.problem, colony)
         set_cv(colony)
         set_feasibility(colony)
+
+        # do the evaporation after this iteration
+        self.pheromones.evaporate(self.rho)
+
+        # now spread the pheromones for each ant depending on performance
+        for ant in colony:
+            # print(ant.X)
+            keys = ant.get_values(key="key", as_numpy_array=False)
+            print([round(self.pheromones.get(k), 3) for k in keys])
+            value = self.q / ant.F[0]
+            self.pheromones.update(keys, value)
 
         opt = FitnessSurvival().do(problem, Population.merge(colony, self.opt), 1)
 
@@ -162,38 +276,41 @@ class GraphAnt(Ant):
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.time = 0
-        self.cities = None
+        self.not_visited = None
 
-    def initialize(self, problem):
-        super().initialize(problem)
-        self.cities = self.problem.n_var
+    def initialize(self, *args, **kwargs):
+        super().initialize(*args, **kwargs)
 
-    def _start(self):
-        return np.random.choice(np.arange(self.cities))
+        self.not_visited = np.full(self.problem.n_var, True)
+        self.notify(Entry(key=None, value=0))
+
+    def _notify(self, entry):
+        self.not_visited[entry.value] = False
 
     def _next(self):
-        not_visited = np.full(self.problem.n_var, True)
-        not_visited[self.path] = False
+        ret = []
 
-        remaining = np.where(not_visited)[0]
+        _current = self.path[-1].value
+        remaining = np.where(self.not_visited)[0]
 
-        _next = np.random.choice(remaining)
-        _current = self.path[-1]
-        self.time += self.problem.D[_current, _next]
+        for city in remaining:
+            _next = city
+            _heur = 1 / self.problem.D[_current, _next]
+            entry = Entry(key=(_current, _next), value=_next, heuristic=_heur)
+            ret.append(entry)
 
-        return _next
+        return ret
 
     def _has_next(self):
         return len(self.path) < self.problem.n_var
 
-    def _finalize(self):
-        self.F = np.array([self.time])
-
 
 if __name__ == "__main__":
-    problem = create_random_tsp_problem(50, 100, seed=1)
+    problem = create_random_tsp_problem(10, 100, seed=1)
 
-    aco = ACO(GraphAnt, n_ants=100)
+    algorithm = ACO(GraphAnt, n_ants=5, alpha=1.0, beta=4.0, q=4.0)
 
-    minimize(problem, aco, seed=1, verbose=True)
+    minimize(problem,
+             algorithm,
+             seed=1,
+             verbose=True)
