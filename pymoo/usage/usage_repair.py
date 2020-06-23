@@ -4,6 +4,7 @@ from pymoo.algorithms.so_genetic_algorithm import GA
 from pymoo.factory import get_algorithm, get_crossover, get_mutation, get_sampling, create_random_knapsack_problem
 from pymoo.model.repair import Repair
 from pymoo.optimize import minimize
+from pymoo.operators.sampling.random_sampling import BinaryRandomSampling
 
 
 class ConsiderMaximumWeightRepair(Repair):
@@ -43,6 +44,11 @@ class ConsiderMaximumWeightRepair(Repair):
 
 problem = create_random_knapsack_problem(30)
 
+# test repair a single individual
+pop = BinaryRandomSampling().do(problem, 100)
+indv = np.random.choice(pop, 1)[0]
+print(ConsiderMaximumWeightRepair().do(problem, indv))
+
 algorithm = GA(
     pop_size=200,
     sampling=get_sampling("bin_random"),
@@ -55,3 +61,4 @@ res = minimize(problem,
                algorithm,
                termination=('n_gen', 10),
                disp=True)
+

@@ -1,4 +1,6 @@
 from abc import abstractmethod
+from multimethod import overload, isa
+from pymoo.model.population import Population, Individual
 
 
 class Repair:
@@ -6,7 +8,13 @@ class Repair:
     This class is allows to repair individuals after crossover if necessary.
     """
 
-    def do(self, problem, pop, **kwargs):
+    @overload
+    def do(self, problem, individual: isa(Individual), **kwargs):
+        pop = Population.create(individual)
+        return self.do(problem, pop, **kwargs)[0]
+
+    @overload
+    def do(self, problem, pop: isa(Population), **kwargs):
         return self._do(problem, pop, **kwargs)
 
     @abstractmethod
