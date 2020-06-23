@@ -1,6 +1,8 @@
 import numpy as np
+from multimethod import overload, isa
 
-from pymoo.model.population import Population
+
+from pymoo.model.population import Population, Individual
 
 
 class Crossover:
@@ -14,7 +16,7 @@ class Crossover:
         self.n_parents = n_parents
         self.n_offsprings = n_offsprings
 
-    def do(self, problem, pop, parents, **kwargs):
+    def do(self, problem, a, b, **kwargs):
         """
 
         This method executes the crossover on the parents. This class wraps the implementation of the class
@@ -42,25 +44,34 @@ class Crossover:
             length of the problem.
 
         """
+        @overload
+        def cross(a: isa(Individual), b: isa(Individual)):
+            pop = Population.create(a, b)
+            parents = np.array([[0, 1]])
+            return cross(pop, parents)
 
-        if self.n_parents != parents.shape[1]:
-            raise ValueError('Exception during crossover: Number of parents differs from defined at crossover.')
+        @overload
+        def cross(pop: isa(Population), parents: isa(np.ndarray)):
+            if self.n_parents != parents.shape[1]:
+                raise ValueError('Exception during crossover: Number of parents differs from defined at crossover.')
 
-        # get the design space matrix form the population and parents
-        X = pop.get("X")[parents.T].copy()
+            # get the design space matrix form the population and parents
+            X = pop.get("X")[parents.T].copy()
 
-        # now apply the crossover probability
-        do_crossover = np.random.random(len(parents)) < self.prob
+            # now apply the crossover probability
+            do_crossover = np.random.random(len(parents)) < self.prob
 
-        # execute the crossover
-        _X = self._do(problem, X, **kwargs)
+            # execute the crossover
+            _X = self._do(problem, X, **kwargs)
 
-        X[:, do_crossover, :] = _X[:, do_crossover, :]
+            X[:, do_crossover, :] = _X[:, do_crossover, :]
 
-        # flatten the array to become a 2d-array
-        X = X.reshape(-1, X.shape[-1])
+            # flatten the array to become a 2d-array
+            X = X.reshape(-1, X.shape[-1])
 
-        # create a population object
-        off = pop.new("X", X)
+            # create a population object
+            off = pop.new("X", X)
 
-        return off
+            return off
+
+        return cross(a, b)
