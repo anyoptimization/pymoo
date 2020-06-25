@@ -34,11 +34,11 @@ def sample(sampling, n_samples, n_var, xl=0, xu=1, **kwargs):
 
 def crossover(crossover, a, b, c=None, xl=0, xu=1, type_var=np.double, **kwargs):
     n = a.shape[0]
-    _pop = Population().new("X", a).merge(Population().new("X", b))
+    _pop = Population.merge(Population().new("X", a), Population().new("X", b))
     _P = np.column_stack([np.arange(n), np.arange(n) + n])
 
     if c is not None:
-        _pop = _pop.merge(Population().new("X", c))
+        _pop = Population.merge(_pop, Population().new("X", c))
         _P = np.column_stack([_P, np.arange(n) + 2 * n])
 
     problem = get_problem_func(a.shape[1], xl, xu, type_var)(**kwargs)
@@ -119,7 +119,7 @@ class AskAndTell:
 
             # if offsprings do not exist set the pop - otherwise always offsprings
             if self.get_offsprings() is not None:
-                self.set_population(self.get_population().merge(self.get_offsprings()))
+                self.set_population(Population.merge(self.get_population(), self.get_offsprings()))
 
             # execute a survival of the algorithm
             survivors = self.algorithm.survival.do(self.problem, self.get_population(),

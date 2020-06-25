@@ -1,6 +1,7 @@
-from pymoo.model.crossover import Crossover
-
 import numpy as np
+
+from pymoo.model.crossover import Crossover
+from pymoo.operators.repair.bounds_back_repair import bounds_back
 
 
 class DifferentialEvolutionCrossover(Crossover):
@@ -28,4 +29,5 @@ class DifferentialEvolutionCrossover(Crossover):
             weight = (self.weight * (1 + gamma * (np.random.random(n_matings) - 0.5)))[:, None]
 
         _X = X[0] + weight * (X[1] - X[2])
-        return _X[None, ...]
+
+        return bounds_back(problem, _X)[None, ...]

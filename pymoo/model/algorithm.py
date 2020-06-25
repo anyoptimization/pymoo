@@ -1,4 +1,5 @@
 import copy
+import random
 import time
 from abc import abstractmethod
 
@@ -163,6 +164,8 @@ class Algorithm:
         self.seed = seed
         if self.seed is None:
             self.seed = np.random.randint(0, 10000000)
+        # set the random seed for Python and Numpy methods
+        random.seed(self.seed)
         np.random.seed(self.seed)
         # !
         # END Default minimize

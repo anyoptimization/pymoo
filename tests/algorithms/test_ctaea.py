@@ -47,7 +47,7 @@ class CTAEATest(unittest.TestCase):
         sorted_id = np.argsort(true_id)
 
         survival = CADASurvival(self.ref_dirs)
-        mixed = CA.merge(off)
+        mixed = Population.merge(CA, off)
         survival.ideal_point = np.min(np.vstack((DA.get("F"), mixed.get("F"))), axis=0)
 
         fronts = NonDominatedSorting().do(mixed.get("F"), n_stop_if_ranked=len(self.ref_dirs))
@@ -76,7 +76,7 @@ class CTAEATest(unittest.TestCase):
         self.evaluator.eval(problem, true_pCA)
 
         survival = CADASurvival(self.ref_dirs)
-        mixed = CA.merge(off)
+        mixed = Population.merge(CA, off)
         survival.ideal_point = np.min(np.vstack((DA.get("F"), mixed.get("F"))), axis=0)
 
         pCA = survival._updateCA(mixed, len(self.ref_dirs))
@@ -103,7 +103,7 @@ class CTAEATest(unittest.TestCase):
         self.evaluator.eval(problem, true_pCA)
 
         survival = CADASurvival(self.ref_dirs)
-        mixed = CA.merge(off)
+        mixed = Population.merge(CA, off)
         survival.ideal_point = np.min(np.vstack((DA.get("F"), mixed.get("F"))), axis=0)
 
         pCA = survival._updateCA(mixed, len(self.ref_dirs))
@@ -130,7 +130,7 @@ class CTAEATest(unittest.TestCase):
         self.evaluator.eval(problem, true_pCA)
 
         survival = CADASurvival(self.ref_dirs)
-        mixed = CA.merge(off)
+        mixed = Population.merge(CA, off)
         survival.ideal_point = np.min(np.vstack((DA.get("F"), mixed.get("F"))), axis=0)
 
         pCA = survival._updateCA(mixed, len(self.ref_dirs))
@@ -155,14 +155,14 @@ class CTAEATest(unittest.TestCase):
             self.evaluator.eval(problem, off)
 
             survival = CADASurvival(self.ref_dirs)
-            mixed = CA.merge(off)
+            mixed = Population.merge(CA, off)
             survival.ideal_point = np.min(np.vstack((DA.get("F"), mixed.get("F"))), axis=0)
 
             post_ca_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz3', f'case{i+1}', 'postCA.x'))
             CA = Population.create(post_ca_x)
             self.evaluator.eval(problem, CA)
 
-            Hd = DA.merge(off)
+            Hd = Population.merge(DA, off)
             pDA = survival._updateDA(CA, Hd, 91)
 
 
@@ -209,7 +209,7 @@ class CTAEATest(unittest.TestCase):
         self.evaluator.eval(problem, true_pDA)
 
         survival = CADASurvival(self.ref_dirs)
-        mixed = CA.merge(off)
+        mixed = Population.merge(CA, off)
         survival.ideal_point = np.array([0., 0., 0.])
 
         pCA, pDA = survival.do(problem, mixed, DA, len(self.ref_dirs))
@@ -239,7 +239,7 @@ class CTAEATest(unittest.TestCase):
         DA = Population.create(da_x)
         self.evaluator.eval(problem, DA)
 
-        Hm = CA.merge(DA)
+        Hm = Population.merge(CA, DA)
         n_pop = len(CA)
 
         _, rank = NonDominatedSorting().do(Hm.get('F'), return_rank=True)
