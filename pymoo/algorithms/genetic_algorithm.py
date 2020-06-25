@@ -64,12 +64,12 @@ class GeneticAlgorithm(Algorithm):
                                              eliminate_duplicates=self.eliminate_duplicates)
 
         if mating is None:
-            self.mating = Mating(selection,
-                                 crossover,
-                                 mutation,
-                                 repair=self.repair,
-                                 eliminate_duplicates=self.eliminate_duplicates,
-                                 n_max_iterations=100)
+            mating = Mating(selection,
+                            crossover,
+                            mutation,
+                            repair=self.repair,
+                            eliminate_duplicates=self.eliminate_duplicates,
+                            n_max_iterations=100)
         self.mating = mating
 
         # other run specific data updated whenever solve is called - to share them in all algorithms
