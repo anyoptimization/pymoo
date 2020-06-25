@@ -5,6 +5,7 @@ from numpy import (zeros, array, asfarray, concatenate)
 from scipy.optimize._slsqp import slsqp
 
 from pymoo.algorithms.so_local_search import LocalSearch
+from pymoo.model.evaluator import set_cv
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
 from pymoo.model.problem import Problem
@@ -110,9 +111,9 @@ class SQLP(LocalSearch):
     def _update(self):
         D = self.D
         ind = Individual(X=np.copy(D["X"]), F=np.copy(D["F"]), G=np.copy(-D["G"]))
-        ind.CV = Problem.calc_constraint_violation(ind.G[None, :])[0]
-        ind.feasible = (ind.CV <= 0)
-        self.pop = Population.merge(self.pop, Population.create(ind))
+        pop = Population.merge(self.pop, Population.create(ind))
+        set_cv(pop)
+        self.pop = pop
 
     def _call(self):
         # args = np.load("/Users/blankjul/workspace/pymoo/pymoo/algorithms/data_constr.npy", allow_pickle=True)

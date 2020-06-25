@@ -1,4 +1,5 @@
 from pymoo.model.duplicate import NoDuplicateElimination
+from pymoo.model.population import Population
 from pymoo.model.repair import NoRepair
 
 
@@ -45,7 +46,7 @@ class InfillCriterion:
                 _off = _off[:n_remaining]
 
             # add to the offsprings and increase the mating counter
-            off = off.merge(_off)
+            off = Population.merge(off, _off)
             n_infills += 1
 
             # if no new offsprings can be generated within a pre-specified number of generations

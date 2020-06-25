@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 
 for problem, name in zip([SYMPART(), SYMPARTRotated()], ["SYM-PART", "SYM-PART rotated"]):
+
     ref_dirs = get_reference_directions("das-dennis", problem.n_obj, n_partitions=20)
     PS = problem.pareto_set(500)
     PF = problem.pareto_front(500)
