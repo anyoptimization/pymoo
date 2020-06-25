@@ -49,7 +49,7 @@ class Survival:
 
     def __init__(self,
                  filter_infeasible=True,
-                 infeas_survival=LeastInfeasibleSurvival(clearing=True)):
+                 infeas_survival=LeastInfeasibleSurvival(clearing=False)):
         """
         The survival process is implemented inheriting from this class, which selects from a population only
         specific individuals to survive. This base class can take care of splitting the feasible and infeasible
@@ -78,6 +78,8 @@ class Survival:
         # make sure the population has at least one individual
         if len(pop) == 0:
             return pop
+
+        n_survive = min(n_survive, len(pop))
 
         # if the split should be done beforehand
         if self.filter_infeasible and problem.n_constr > 0:

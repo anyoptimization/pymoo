@@ -4,6 +4,7 @@ from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.algorithms.so_genetic_algorithm import FitnessSurvival
 from pymoo.docs import parse_doc_string
 from pymoo.model.duplicate import DefaultDuplicateElimination, DuplicateElimination
+from pymoo.model.population import Population
 from pymoo.model.selection import Selection
 from pymoo.model.survival import Survival
 from pymoo.operators.crossover.biased_crossover import BiasedCrossover
@@ -143,11 +144,11 @@ class BRKGA(GeneticAlgorithm):
         mutants = FloatRandomSampling().do(self.problem, self.n_mutants, algorithm=self)
 
         # evaluate all the new solutions
-        to_evaluate = off.merge(mutants)
+        to_evaluate = Population.merge(off, mutants)
         self.evaluator.eval(self.problem, to_evaluate, algorithm=self)
 
         # finally merge everything together and sort by fitness
-        pop = pop[elites].merge(to_evaluate)
+        pop = Population.merge(pop[elites], to_evaluate)
 
         # the do survival selection - set the elites for the next round
         self.pop = self.survival.do(self.problem, pop, len(pop), algorithm=self)

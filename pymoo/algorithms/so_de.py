@@ -2,6 +2,7 @@ import numpy as np
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
+from pymoo.model.population import Population
 from pymoo.model.replacement import ImprovementReplacement
 from pymoo.operators.crossover.biased_crossover import BiasedCrossover
 from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
@@ -114,7 +115,7 @@ class DE(GeneticAlgorithm):
         self.off = crossover.do(self.problem, pop, P, algorithm=self)
 
         # then do the mutation (which is actually )
-        _pop = self.off.new().merge(self.pop).merge(self.off)
+        _pop = Population.merge(self.pop, self.off)
         _P = np.column_stack([np.arange(len(pop)), np.arange(len(pop)) + len(pop)])
         self.off = mutation.do(self.problem, _pop, _P, algorithm=self)[:len(self.pop)]
 

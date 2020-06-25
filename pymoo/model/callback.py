@@ -4,5 +4,5 @@ class Callback:
         super().__init__()
         self.data = {}
 
-    def notify(self, algorithm):
+    def notify(self, algorithm, **kwargs):
         pass

@@ -31,7 +31,7 @@ class GradientApproximation:
             eps_F, _, eps_G = self.evaluator.eval(prob, x)
             dF[:, i] = (eps_F - individual.F) / self.epsilon
 
-            if eps_G is not None:
+            if n_constr > 0 and eps_G is not None:
                 dG[:, i] = (eps_G - individual.G) / self.epsilon
 
         return dF, dG
