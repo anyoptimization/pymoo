@@ -86,9 +86,9 @@ def comp_by_cv_and_clearing_fitness(pop, P, **kwargs):
 
 class EpsilonClearingSurvival(Survival):
 
-    def __init__(self, radius, n_max_each_iter=None) -> None:
+    def __init__(self, epsilon, n_max_each_iter=None) -> None:
         super().__init__(False)
-        self.radius = radius
+        self.epsilon = epsilon
         self.n_max_each_iter = n_max_each_iter
 
     def _do(self, problem, pop, n_survive, out=None, **kwargs):
@@ -105,7 +105,7 @@ class EpsilonClearingSurvival(Survival):
         D = norm_eucl_dist(problem, X, X)
 
         # initialize the clearing strategy
-        clearing = EpsilonClearing(D, self.radius)
+        clearing = EpsilonClearing(D, self.epsilon)
 
         # initialize the iteration and rank i the beginning
         iter, rank = 1, 1

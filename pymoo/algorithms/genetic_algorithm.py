@@ -3,6 +3,7 @@ from pymoo.model.duplicate import DefaultDuplicateElimination, NoDuplicateElimin
 from pymoo.model.individual import Individual
 from pymoo.model.initialization import Initialization
 from pymoo.model.mating import Mating
+from pymoo.model.population import Population
 from pymoo.model.repair import NoRepair
 
 
@@ -18,6 +19,7 @@ class GeneticAlgorithm(Algorithm):
                  n_offsprings=None,
                  eliminate_duplicates=DefaultDuplicateElimination(),
                  repair=None,
+                 mating=None,
                  individual=Individual(),
                  min_infeas_pop_size=0,
                  **kwargs
@@ -61,12 +63,14 @@ class GeneticAlgorithm(Algorithm):
                                              repair=self.repair,
                                              eliminate_duplicates=self.eliminate_duplicates)
 
-        self.mating = Mating(selection,
-                             crossover,
-                             mutation,
-                             repair=self.repair,
-                             eliminate_duplicates=self.eliminate_duplicates,
-                             n_max_iterations=100)
+        if mating is None:
+            mating = Mating(selection,
+                            crossover,
+                            mutation,
+                            repair=self.repair,
+                            eliminate_duplicates=self.eliminate_duplicates,
+                            n_max_iterations=100)
+        self.mating = mating
 
         # other run specific data updated whenever solve is called - to share them in all algorithms
         self.n_gen = None
@@ -84,7 +88,8 @@ class GeneticAlgorithm(Algorithm):
 
         # that call is a dummy survival to set attributes that are necessary for the mating selection
         if self.survival:
-            pop = self.survival.do(self.problem, pop, len(pop), algorithm=self, n_min_infeas_survive=self.min_infeas_pop_size)
+            pop = self.survival.do(self.problem, pop, len(pop), algorithm=self,
+                                   n_min_infeas_survive=self.min_infeas_pop_size)
 
         self.pop, self.off = pop, pop
 
@@ -108,11 +113,12 @@ class GeneticAlgorithm(Algorithm):
         self.evaluator.eval(self.problem, self.off, algorithm=self)
 
         # merge the offsprings with the current population
-        self.pop = self.pop.merge(self.off)
+        self.pop = Population.merge(self.pop, self.off)
 
         # the do survival selection
         if self.survival:
-            self.pop = self.survival.do(self.problem, self.pop, self.pop_size, algorithm=self, n_min_infeas_survive=self.min_infeas_pop_size)
+            self.pop = self.survival.do(self.problem, self.pop, self.pop_size, algorithm=self,
+                                        n_min_infeas_survive=self.min_infeas_pop_size)
 
     def _finalize(self):
         pass

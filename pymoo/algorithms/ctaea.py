@@ -173,7 +173,7 @@ class CTAEA(GeneticAlgorithm):
         self.evaluator.eval(self.problem, self.off, algorithm=self)
 
         # merge the offsprings with the current population
-        self.pop = self.pop.merge(self.off)
+        self.pop = Population.merge(self.pop, self.off)
 
         # the do survival selection
         self.pop, self.da = self.survival.do(self.problem, self.pop, self.da, self.pop_size, algorithm=self)
@@ -202,7 +202,7 @@ class CADASurvival:
         # Update CA
         pop = self._updateCA(pop, n_survive)
         # Update DA
-        Hd = da.merge(off)
+        Hd = Population.merge(da, off)
         da = self._updateDA(pop, Hd, n_survive)
         return pop, da
 
@@ -245,7 +245,7 @@ class CADASurvival:
                     last_front_CV = np.argsort(f1.flatten()[front])
                     I.extend(front[last_front_CV[:n_missing]])
             SI = SI[I]
-            S = Sc.merge(SI)
+            S = Population.merge(Sc, SI)
             F = S.get("F")
             fronts, rank = NonDominatedSorting().do(F, return_rank=True)
             S.set('rank', rank)

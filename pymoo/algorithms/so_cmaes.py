@@ -449,7 +449,7 @@ class CMAES(LocalSearch):
     def _set_optimum(self):
         val = self.pop
         if self.opt is not None:
-            val = val.merge(self.opt)
+            val = Population.merge(val, self.opt)
         self.opt = filter_optimum(val, least_infeasible=True)
 
     def __getstate__(self):

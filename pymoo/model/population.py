@@ -17,15 +17,14 @@ class Population(np.ndarray):
     @classmethod
     def merge(cls, a, b):
         a, b = pop_from_array_or_individual(a), pop_from_array_or_individual(b)
-        return a.merge(b)
 
-    def merge(self, other):
-        other = pop_from_array_or_individual(other)
-        if len(self) == 0:
-            return other
+        if len(a) == 0:
+            return b
+        elif len(b) == 0:
+            return a
         else:
-            obj = np.concatenate([self, other]).view(Population)
-            obj.individual = self.individual
+            obj = np.concatenate([a, b]).view(Population)
+            obj.individual = a.individual
             return obj
 
     def copy(self, deep=False):
@@ -125,6 +124,7 @@ def pop_from_array_or_individual(array, pop=None):
         return None
 
     return pop
+
 
 if __name__ == '__main__':
     pop = Population(10)
