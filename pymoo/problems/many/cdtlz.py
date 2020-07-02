@@ -68,6 +68,17 @@ class C2DTLZ2(DTLZ2):
         return F[G <= 0]
 
 
+class C3DTLZ1(DTLZ1):
+
+    def __init__(self, n_var=12, n_obj=3, **kwargs):
+        super().__init__(n_var, n_obj, **kwargs)
+        self.n_constr = n_obj
+
+    def _evaluate(self, X, out, *args, **kwargs):
+        super()._evaluate(X, out, *args, **kwargs)
+        out["G"] = constraint_c3_linear(out["F"])
+
+
 class C3DTLZ4(DTLZ4):
 
     def __init__(self, n_var=7, n_obj=3, **kwargs):

@@ -27,7 +27,7 @@ def load(name):
 problems = [
     ('DTLZ1', [10, 3]), ('DTLZ2', [10, 3]), ('DTLZ3', [10, 3]), ('DTLZ4', [10, 3]), ('DTLZ5', [10, 3]),
     ('DTLZ6', [10, 3]), ('DTLZ7', [10, 3]),
-    ('C1DTLZ1', [12, 3]), ('C2DTLZ2', [12, 3]), ('C3DTLZ4', [7, 3]),
+    ('C1DTLZ1', [12, 3]), ('C2DTLZ2', [12, 3]), ('C3DTLZ1', [12, 3]), ('C3DTLZ4', [7, 3]),
     ('ZDT1', [10]), ('ZDT2', [10]), ('ZDT3', [10]), ('ZDT4', [10]), ('ZDT6', [10]),
     ('TNK', []), ('Rosenbrock', [10]), ('Rastrigin', [10]), ('Griewank', [10]), ('OSY', []), ('Kursawe', []),
     ('Welded_Beam', []), ('Carside', []), ('BNH', []), ('Cantilevered_Beam', []), ('Pressure_Vessel', []),
