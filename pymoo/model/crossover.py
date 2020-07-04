@@ -1,7 +1,6 @@
 import numpy as np
-from multimethod import overload, isa
 
-from pymoo.model.population import Population, Individual
+from pymoo.model.population import Population
 
 
 class Crossover:
