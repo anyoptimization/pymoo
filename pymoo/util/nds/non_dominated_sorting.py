@@ -6,7 +6,7 @@ from pymoo.util.function_loader import load_function
 
 class NonDominatedSorting:
 
-    def __init__(self, epsilon=0.0, method="efficient_non_dominated_sort") -> None:
+    def __init__(self, epsilon=0.0, method="fast_non_dominated_sort") -> None:
         super().__init__()
         self.epsilon = float(epsilon)
         self.method = method
