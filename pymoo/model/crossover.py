@@ -15,8 +15,13 @@ class Crossover:
         self.n_parents = n_parents
         self.n_offsprings = n_offsprings
 
-    @overload
-    def do(self, problem, pop: isa(Population), parents, **kwargs):
+    def do(self, problem, *args, **kwargs):
+        if type(args[0]) is Population:
+            pop, parents = args
+        else:
+            pop = Population.create(*args)
+            parents = np.array([np.arange(len(args))])
+
         if self.n_parents != parents.shape[1]:
             raise ValueError('Exception during crossover: Number of parents differs from defined at crossover.')
 
@@ -38,9 +43,3 @@ class Crossover:
         off = pop.new("X", X)
 
         return off
-
-    @overload
-    def do(self, problem, individual_a: isa(Individual), individual_b: isa(Individual), **kwargs):
-        pop = Population.create(individual_a, individual_b)
-        parents = np.array([[0, 1]])
-        return self.do(problem, pop, parents, **kwargs)

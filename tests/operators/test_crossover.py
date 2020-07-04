@@ -2,14 +2,26 @@ import unittest
 
 from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.algorithms.so_genetic_algorithm import GA
-from pymoo.factory import get_crossover, get_problem
+from pymoo.factory import get_crossover, get_problem, get_sampling
 from pymoo.optimize import minimize
 
 
 class CrossoverTest(unittest.TestCase):
+    def test_single_offspring(self):
+        problem = get_problem('zdt1')
+        sampling = get_sampling('real_random')
+        pop = sampling.do(problem, n_samples=3)
+
+        crossover = get_crossover('real_sbx', eta=20)
+        off = crossover.do(problem, pop[0], pop[1])
+        print(off)
+
+        crossover = get_crossover('real_de')
+        off = crossover.do(problem, pop[0], pop[1], pop[2])
+        print(off)
+
 
     def test_crossover(self):
-
         for crossover in ['real_de', 'real_sbx', 'real_exp']:
             print(crossover)
             method = GA(pop_size=20, crossover=get_crossover(crossover, prob=0.95))
