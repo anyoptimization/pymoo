@@ -1,29 +1,24 @@
 import numpy as np
 
-from pymoo.util.function_loader import load_function
 from pymoo.util.dominator import Dominator
+from pymoo.util.function_loader import load_function
 
 
 class NonDominatedSorting:
 
-    def __init__(self, epsilon=0.0, method="fast_non_dominated_sort") -> None:
+    def __init__(self, epsilon=0.0, method="efficient_non_dominated_sort") -> None:
         super().__init__()
         self.epsilon = float(epsilon)
         self.method = method
 
-    def do(self, F, return_rank=False, only_non_dominated_front=False, n_stop_if_ranked=None):
+    def do(self, F, return_rank=False, only_non_dominated_front=False, n_stop_if_ranked=None, **kwargs):
         F = F.astype(np.float)
 
         # if not set just set it to a very large values because the cython algorithms do not take None
         if n_stop_if_ranked is None:
             n_stop_if_ranked = int(1e8)
-
-        if self.method == 'fast_non_dominated_sort':
-            func = load_function("fast_non_dominated_sort")
-        else:
-            raise Exception("Unknown non-dominated sorting method: %s" % self.method)
-
-        fronts = func(F, epsilon=self.epsilon)
+        func = load_function(self.method)
+        fronts = func(F, epsilon=self.epsilon, **kwargs)
 
         # convert to numpy array for each front and filter by n_stop_if_ranked if desired
         _fronts = []
@@ -65,5 +60,3 @@ def find_non_dominated(F, _F=None):
     M = Dominator.calc_domination_matrix(F, _F)
     I = np.where(np.all(M >= 0, axis=1))[0]
     return I
-
-
