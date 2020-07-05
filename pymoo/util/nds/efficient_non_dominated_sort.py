@@ -1,12 +1,13 @@
-import numpy as np
 from math import floor
+
+import numpy as np
 
 from pymoo.util.dominator import Dominator
 
 
 def efficient_non_dominated_sort(F, strategy="sequential"):
     """
-    Efficient Non-dominated Sorting
+    Efficient Non-dominated Sorting (ENS)
     Parameters
     ----------
     F: numpy.ndarray
@@ -15,7 +16,7 @@ def efficient_non_dominated_sort(F, strategy="sequential"):
         search strategy, can be "sequential" or "binary".
     Returns
     -------
-    indices of the individuals in each front.
+        indices of the individuals in each front.
 
     References
     ----------
@@ -25,8 +26,8 @@ def efficient_non_dominated_sort(F, strategy="sequential"):
     """
     assert (strategy in ["sequential", 'binary']), "Invalid search strategy"
     N, M = F.shape
-    # sort F in a ascending order of the first objective value
-    indices = np.argsort(F[:, 0])
+    # sort the rows in F
+    indices = sort_rows(F)
     F = F[indices]
     # front ranks for each individual
     fronts = []  # front with sorted indices
@@ -89,13 +90,13 @@ def binary_search(F, i, fronts):
     num_found_fronts = len(fronts)
     k_min = 0  # the lower bound for checking
     k_max = num_found_fronts  # the upper bound for checking
-    k = floor((k_max + k_min) / 2 + 0.5)     # the front now checked
+    k = floor((k_max + k_min) / 2 + 0.5)  # the front now checked
     current = F[i]
     while True:
         if num_found_fronts == 0:
             return 0
         # solutions in the k-th front, examine in reverse order
-        fk_indices = fronts[k-1]
+        fk_indices = fronts[k - 1]
         solutions = F[fk_indices[::-1]]
         non_dominated = True
         for f in solutions:
@@ -118,3 +119,23 @@ def binary_search(F, i, fronts):
                 return num_found_fronts
             else:
                 k = floor((k_max + k_min) / 2 + 0.5)
+
+
+def sort_rows(array, order='asc'):
+    """
+    Sort the rows of an array in ascending order.
+    The algorithm will try to use the first column to sort the rows of the given array. If ties occur, it will use the
+    second column, and so on.
+    Parameters
+    ----------
+    array: numpy.ndarray
+        array to be sorted
+    order: str
+        sort order, can be 'asc' or 'desc'
+    Returns
+    -------
+    the indices of the rows in the sorted array.
+    """
+    assert (order in ['asc', 'desc']), "Invalid sort order!"
+    ix = np.lexsort(array.T[::-1])
+    return ix if order == 'asc' else ix[::-1]
