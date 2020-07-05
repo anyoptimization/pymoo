@@ -14,8 +14,8 @@ class Tree:
     ----------
     key: object
         key of the node
-    val: object
-        value stored in this node
+    num_branch: int
+        how many branches in each node
     children: Iterable[Tree]
         reference of the children
     parent: Tree
@@ -65,9 +65,14 @@ def tree_based_non_dominated_sort(F):
     Returns
     -------
         indices of the individuals in each front.
+    References
+    ----------
+    X. Zhang, Y. Tian, R. Cheng, and Y. Jin,
+    A decision variable clustering based evolutionary algorithm for large-scale many-objective optimization,
+    IEEE Transactions on Evolutionary Computation, 2018, 22(1): 97-112.
     """
     N, M = F.shape
-    # sort F in a ascending order of the first objective value
+    # sort the rows in F
     indices = sort_rows(F)
     F = F[indices]
 
