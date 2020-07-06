@@ -5,12 +5,20 @@ from pymoo.configuration import Configuration
 
 def get_functions():
     from pymoo.util.nds.fast_non_dominated_sort import fast_non_dominated_sort
+    from pymoo.util.nds.efficient_non_dominated_sort import efficient_non_dominated_sort
+    from pymoo.util.nds.tree_based_non_dominated_sort import tree_based_non_dominated_sort
     from pymoo.decomposition.util import calc_distance_to_weights
     from pymoo.util.misc import calc_perpendicular_distance
 
     FUNCTIONS = {
         "fast_non_dominated_sort": {
             "python": fast_non_dominated_sort, "cython": "pymoo.cython.non_dominated_sorting"
+        },
+        "efficient_non_dominated_sort": {
+            "python": efficient_non_dominated_sort, "cython": "pymoo.cython.non_dominated_sorting"
+        },
+        "tree_based_non_dominated_sort": {
+            "python": tree_based_non_dominated_sort, "cython": "pymoo.cython.non_dominated_sorting"
         },
         "calc_distance_to_weights": {
             "python": calc_distance_to_weights, "cython": "pymoo.cython.decomposition"
