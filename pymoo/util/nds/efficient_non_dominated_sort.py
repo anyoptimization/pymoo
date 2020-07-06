@@ -24,25 +24,39 @@ def efficient_non_dominated_sort(F, strategy="sequential"):
     An efficient approach to nondominated sorting for evolutionary multiobjective optimization,
     IEEE Transactions on Evolutionary Computation, 2015, 19(2): 201-213.
     """
+
     assert (strategy in ["sequential", 'binary']), "Invalid search strategy"
+
+    # the shape of the input
     N, M = F.shape
-    # sort the rows in F
-    indices = sort_rows(F)
-    F = F[indices]
+
+    # do a lexicographic ordering
+    I = np.lexsort(F.T[::-1])
+    F = F[I]
+
     # front ranks for each individual
-    fronts = []  # front with sorted indices
-    _fronts = []  # real fronts
+    fronts = []
+
     for i in range(N):
+
         if strategy == 'sequential':
             k = sequential_search(F, i, fronts)
         else:
             k = binary_search(F, i, fronts)
+
+        # create empty fronts if necessary
         if k >= len(fronts):
             fronts.append([])
-            _fronts.append([])
+
+        # append the current individual to a front
         fronts[k].append(i)
-        _fronts[k].append(indices[i])
-    return _fronts
+
+    # now map the fronts back to the originally sorting
+    ret = []
+    for front in fronts:
+        ret.append(I[front])
+
+    return ret
 
 
 def sequential_search(F, i, fronts) -> int:
@@ -50,10 +64,14 @@ def sequential_search(F, i, fronts) -> int:
     Find the front rank for the i-th individual through sequential search
     Parameters
     ----------
-    F: the objective values
-    i: the index of the individual
-    fronts: individuals in each front
+    F: np.ndarray
+        the objective values
+    i: int
+        the index of the individual
+    fronts: list
+        individuals in each front
     """
+
     num_found_fronts = len(fronts)
     k = 0  # the front now checked
     current = F[i]
@@ -80,30 +98,38 @@ def sequential_search(F, i, fronts) -> int:
 
 def binary_search(F, i, fronts):
     """
-    Find the front rank for the i-th individual through binary search
+    Find the front rank for the i-th individual through sequential search
     Parameters
     ----------
-    F: the objective values
-    i: the index of the individual
-    fronts: individuals in each front
+    F: np.ndarray
+        the objective values
+    i: int
+        the index of the individual
+    fronts: list
+        individuals in each front
     """
+
     num_found_fronts = len(fronts)
+    if num_found_fronts == 0:
+        return 0
+
     k_min = 0  # the lower bound for checking
     k_max = num_found_fronts  # the upper bound for checking
     k = floor((k_max + k_min) / 2 + 0.5)  # the front now checked
     current = F[i]
     while True:
-        if num_found_fronts == 0:
-            return 0
+
         # solutions in the k-th front, examine in reverse order
         fk_indices = fronts[k - 1]
         solutions = F[fk_indices[::-1]]
         non_dominated = True
+
         for f in solutions:
             relation = Dominator.get_relation(current, f)
             if relation == -1:
                 non_dominated = False
                 break
+
         # binary search
         if non_dominated:
             if k == k_min + 1:
@@ -119,23 +145,3 @@ def binary_search(F, i, fronts):
                 return num_found_fronts
             else:
                 k = floor((k_max + k_min) / 2 + 0.5)
-
-
-def sort_rows(array, order='asc'):
-    """
-    Sort the rows of an array in ascending order.
-    The algorithm will try to use the first column to sort the rows of the given array. If ties occur, it will use the
-    second column, and so on.
-    Parameters
-    ----------
-    array: numpy.ndarray
-        array to be sorted
-    order: str
-        sort order, can be 'asc' or 'desc'
-    Returns
-    -------
-    the indices of the rows in the sorted array.
-    """
-    assert (order in ['asc', 'desc']), "Invalid sort order!"
-    ix = np.lexsort(array.T[::-1])
-    return ix if order == 'asc' else ix[::-1]
