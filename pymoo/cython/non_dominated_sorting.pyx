@@ -7,8 +7,20 @@ from libcpp cimport bool
 from libcpp.vector cimport vector
 
 
+cdef extern from "math.h":
+    cpdef double floor(double x)
+
 cdef extern from "limits.h":
     int INT_MAX
+
+
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Interface
+# ---------------------------------------------------------------------------------------------------------
+
+
 
 def fast_non_dominated_sort(double[:,:] F, double epsilon = 0.0, int n_stop_if_ranked=INT_MAX):
     return c_fast_non_dominated_sort(F, epsilon, n_stop_if_ranked)
@@ -21,6 +33,18 @@ def get_relation(F, a, b):
 
 def fast_best_order_sort(double[:,:] F):
     return c_fast_best_order_sort(F)
+
+def efficient_non_dominated_sort(double[:,:] F, strategy="sequential"):
+    assert (strategy in ["sequential", 'binary']), "Invalid search strategy"
+    return c_efficient_non_dominated_sort(F, strategy)
+
+
+
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Fast Non-Dominated Sort
+# ---------------------------------------------------------------------------------------------------------
 
 
 
@@ -309,6 +333,146 @@ cdef vector[vector[int]] c_fast_best_order_sort(double[:,:] F):
                     break
 
     return fronts
+
+
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Efficient Non-dominated Sort
+# ---------------------------------------------------------------------------------------------------------
+
+
+cdef vector[vector[int]] c_efficient_non_dominated_sort(double[:,:] F, str strategy):
+    cdef:
+        int i, j, k, n, val
+        vector[int] empty, e
+        vector[vector[int]] fronts, ret
+
+    # number of individuals
+    n = len(F)
+
+    # sort the input lexicographically
+    indices = np.lexsort(F.T[::-1])
+    F = np.asarray(F)[indices]
+
+    # the fronts to be set for each iteration
+    fronts = vector[vector[int]]()
+
+    for i in range(n):
+
+        if strategy == "sequential":
+            k = sequential_search(F, i, fronts)
+        else:
+            k = binary_search(F, i, fronts)
+
+        if k >= fronts.size():
+            empty = vector[int]()
+            fronts.push_back(empty)
+
+        fronts[k].push_back(i)
+
+    # convert to the return array
+    ret = vector[vector[int]]()
+    for i in range(fronts.size()):
+        e = vector[int]()
+        for j in range(fronts[i].size()):
+            k = fronts[i][j]
+            val = indices[k]
+            e.push_back(val)
+        ret.push_back(e)
+
+    return ret
+
+
+
+cdef int sequential_search(double[:,:] F, int i, vector[vector[int]] fronts):
+
+    cdef:
+        int k, j, n_fronts
+        bool non_dominated
+
+    n_fronts = fronts.size()
+    if n_fronts == 0:
+        return 0
+
+    k = 0
+    while True:
+
+        non_dominated = True
+
+        # solutions in the k-th front, examine in reverse order
+        j = fronts[k].size() - 1
+
+        while j >= 0:
+            relation = c_get_relation(F, i, fronts[k][j])
+            if relation == -1:
+                non_dominated = False
+                break
+            j = j - 1
+
+        if non_dominated:
+            return k
+
+        # move the individual to a new front
+        else:
+            k += 1
+            if k >= n_fronts:
+                return n_fronts
+
+
+cdef int binary_search(double[:,:] F, int i, vector[vector[int]] fronts):
+
+    cdef:
+        int n_fronts, k, k_min, k_max, j
+        bool non_dominated
+
+    n_fronts = fronts.size()
+    if n_fronts == 0:
+        return 0
+
+    k_min = 0  # the lower bound for checking
+    k_max = n_fronts  # the upper bound for checking
+    k = int(floor((k_max + k_min) / 2.0 + 0.5))  # the front now checked
+
+    while True:
+
+        non_dominated = True
+
+        # solutions in the k-th front, examine in reverse order
+        j = fronts[k-1].size() - 1
+
+        while j >= 0:
+            relation = c_get_relation(F, i, fronts[k-1][j])
+            if relation == -1:
+                non_dominated = False
+                break
+            j = j - 1
+
+        # binary search
+        if non_dominated:
+            if k == k_min + 1:
+                return k - 1
+            else:
+                k_max = k
+                k = int(floor((k_max + k_min) / 2.0 + 0.5))
+
+        else:
+            k_min = k
+            if k_max == k_min + 1 and k_max < n_fronts:
+                return k_max - 1
+            elif k_min == n_fronts:
+                return n_fronts
+            else:
+                k = int(floor((k_max + k_min) / 2.0 + 0.5))
+
+
+
+
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Util
+# ---------------------------------------------------------------------------------------------------------
 
 
 cdef int c_get_relation(double[:,:] F, int a, int b, double epsilon = 0.0):

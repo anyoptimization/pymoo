@@ -2,7 +2,6 @@ import weakref
 
 import numpy as np
 
-from pymoo.util.nds.efficient_non_dominated_sort import sort_rows
 
 
 class Tree:
@@ -73,7 +72,7 @@ def tree_based_non_dominated_sort(F):
     """
     N, M = F.shape
     # sort the rows in F
-    indices = sort_rows(F)
+    indices = np.lexsort(F.T[::-1])
     F = F[indices]
 
     obj_seq = np.argsort(F[:, :0:-1], axis=1) + 1
