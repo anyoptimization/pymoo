@@ -49,11 +49,9 @@ class DTLZ1(DTLZ):
     def _calc_pareto_front(self, ref_dirs=None):
         return 0.5 * ref_dirs
 
-    def _evaluate(self, x, out, *args, **kwargs):
-        X_, X_M = x[:, :self.n_obj - 1], x[:, self.n_obj - 1:]
-        g = self.g1(X_M)
-
+    def obj_func(self, X_, g):
         f = []
+
         for i in range(0, self.n_obj):
             _f = 0.5 * (1 + g)
             _f *= anp.prod(X_[:, :X_.shape[1] - i], axis=1)
@@ -61,7 +59,12 @@ class DTLZ1(DTLZ):
                 _f *= 1 - X_[:, X_.shape[1] - i]
             f.append(_f)
 
-        out["F"] = anp.column_stack(f)
+        return anp.column_stack(f)
+
+    def _evaluate(self, x, out, *args, **kwargs):
+        X_, X_M = x[:, :self.n_obj - 1], x[:, self.n_obj - 1:]
+        g = self.g1(X_M)
+        out["F"] = self.obj_func(X_, g)
 
 
 class DTLZ2(DTLZ):
