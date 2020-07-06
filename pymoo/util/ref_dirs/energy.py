@@ -2,7 +2,6 @@ import autograd.numpy as anp
 import numpy as np
 from autograd import value_and_grad
 
-from pymoo.util.normalization import normalize
 from pymoo.util.ref_dirs.construction import ConstructionBasedReferenceDirectionFactory
 from pymoo.util.ref_dirs.misc import project_onto_sum_equals_zero_plane, project_onto_unit_simplex_recursive
 from pymoo.util.ref_dirs.optimizer import Adam
