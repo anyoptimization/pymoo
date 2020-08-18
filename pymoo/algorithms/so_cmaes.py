@@ -363,8 +363,8 @@ class CMAES(LocalSearch):
         self.parallelize = parallelize
         self.al = None
 
-    def initialize(self, problem, seed=None, **kwargs):
-        super().initialize(problem, **kwargs)
+    def setup(self, problem, seed=None, **kwargs):
+        super().setup(problem, **kwargs)
         self.n_gen = 0
 
         xl = problem.xl.tolist() if problem.xl is not None else None
@@ -438,7 +438,7 @@ class CMAES(LocalSearch):
             X = np.atleast_2d(X)
 
             # evaluate the population
-            self.pop = Population().new("X", X)
+            self.pop = Population.new("X", X)
             self.evaluator.eval(self.problem, self.pop, algorithm=self)
 
             # set infeasible individual's objective values to np.nan - then CMAES can handle it

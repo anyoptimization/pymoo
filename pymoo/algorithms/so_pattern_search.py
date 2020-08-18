@@ -6,7 +6,7 @@ from pymoo.model.individual import Individual
 from pymoo.model.population import Population, pop_from_array_or_individual
 from pymoo.model.replacement import is_better
 from pymoo.model.termination import Termination
-from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds_manually
+from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
@@ -135,7 +135,7 @@ class PatternSearch(LocalSearch):
 
         # calculate the new X and repair out of bounds if necessary
         X = _current.X + self.pattern_step * direction
-        repair_out_of_bounds_manually(X, *self.problem.bounds())
+        set_to_bounds_if_outside_by_problem(self.problem, X)
 
         # create the new center individual without evaluating it
         trial = Individual(X=X)
@@ -163,7 +163,7 @@ class PatternSearch(LocalSearch):
             X[k] = X[k] + eps
 
             # repair if out of bounds if necessary
-            X = repair_out_of_bounds_manually(X, *self.problem.bounds())
+            X = set_to_bounds_if_outside_by_problem(self.problem, X)
 
             # return the new solution as individual
             mutant = pop_from_array_or_individual(X)[0]

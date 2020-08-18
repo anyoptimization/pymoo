@@ -187,6 +187,10 @@ class Plot:
         else:
             return [f"${self.axis_labels}_{{{i}}}$" for i in range(1, self.n_dim + 1)]
 
+    def __del__(self):
+        if self.fig is not None:
+            plt.close(self.fig)
+
 
 def get_parameter_with_options(param):
     if param is None:

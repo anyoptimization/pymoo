@@ -34,11 +34,11 @@ def sample(sampling, n_samples, n_var, xl=0, xu=1, **kwargs):
 
 def crossover(crossover, a, b, c=None, xl=0, xu=1, type_var=np.double, **kwargs):
     n = a.shape[0]
-    _pop = Population.merge(Population().new("X", a), Population().new("X", b))
+    _pop = Population.merge(Population.new("X", a), Population.new("X", b))
     _P = np.column_stack([np.arange(n), np.arange(n) + n])
 
     if c is not None:
-        _pop = Population.merge(_pop, Population().new("X", c))
+        _pop = Population.merge(_pop, Population.new("X", c))
         _P = np.column_stack([_P, np.arange(n) + 2 * n])
 
     problem = get_problem_func(a.shape[1], xl, xu, type_var)(**kwargs)
@@ -47,7 +47,7 @@ def crossover(crossover, a, b, c=None, xl=0, xu=1, type_var=np.double, **kwargs)
 
 def mutation(mutation, X, xl=0, xu=1, type_var=np.double, **kwargs):
     problem = get_problem_func(X.shape[1], xl, xu, type_var)(**kwargs)
-    return mutation.do(problem, Population().new("X", X), **kwargs).get("X")
+    return mutation.do(problem, Population.new("X", X), **kwargs).get("X")
 
 
 # =========================================================================================================
@@ -100,7 +100,7 @@ class AskAndTell:
         # if the initial population has not been generated yet
         if self.get_population() is None:
 
-            self.algorithm.initialize(self.problem)
+            self.algorithm.setup(self.problem)
 
             # deactivate the survival because no values have been set yet
             survival = self.algorithm.survival

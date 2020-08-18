@@ -2,12 +2,15 @@ import copy
 
 from pymoo.factory import get_termination
 from pymoo.model.termination import Termination
+from pymoo.util.misc import termination_from_tuple
 from pymoo.util.termination.default import MultiObjectiveDefaultTermination, SingleObjectiveDefaultTermination
 
 
 def minimize(problem,
              algorithm,
              termination=None,
+             copy_algorithm=True,
+             copy_termination=True,
              **kwargs):
     """
 
@@ -45,6 +48,12 @@ def minimize(problem,
     save_history : bool
         Whether the history should be stored or not.
 
+    copy_algorithm : bool
+        Whether the algorithm object should be copied before optimization.
+
+    copy_termination : bool
+        Whether the termination object should be copied before called.
+
     Returns
     -------
     res : :class:`~pymoo.model.result.Result`
@@ -53,24 +62,24 @@ def minimize(problem,
     """
 
     # create a copy of the algorithm object to ensure no side-effects
-    algorithm = copy.deepcopy(algorithm)
+    if copy_algorithm:
+        algorithm = copy.deepcopy(algorithm)
 
-    # get the termination if provided as a tuple - create an object
-    if termination is not None and not isinstance(termination, Termination):
-        if isinstance(termination, str):
-            termination = get_termination(termination)
-        else:
-            termination = get_termination(*termination)
-
-    # initialize the algorithm object given a problem
-    algorithm.initialize(problem, termination=termination, **kwargs)
+    # initialize the algorithm object given a problem - if not set already
+    if algorithm.problem is None:
+        algorithm.setup(problem, termination=termination, **kwargs)
+    else:
+        if termination is not None:
+            algorithm.termination = termination_from_tuple(termination)
 
     # if no termination could be found add the default termination either for single or multi objective
-    if algorithm.termination is None:
-        if problem.n_obj > 1:
-            algorithm.termination = MultiObjectiveDefaultTermination()
-        else:
-            algorithm.termination = SingleObjectiveDefaultTermination()
+    termination = algorithm.termination
+    if termination is None:
+        termination = default_termination(problem)
+
+    if copy_termination:
+        termination = copy.deepcopy(termination)
+    algorithm.termination = termination
 
     # actually execute the algorithm
     res = algorithm.solve()
@@ -79,3 +88,12 @@ def minimize(problem,
     res.algorithm = algorithm
 
     return res
+
+
+def default_termination(problem):
+    if problem.n_obj > 1:
+        termination = MultiObjectiveDefaultTermination()
+    else:
+        termination = SingleObjectiveDefaultTermination()
+
+    return termination

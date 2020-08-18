@@ -25,6 +25,8 @@ class MOEAD(GeneticAlgorithm):
                  **kwargs):
         """
 
+        MOEAD Algorithm.
+
         Parameters
         ----------
         ref_dirs

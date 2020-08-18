@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.factory import get_decomposition, get_algorithm, ZDT
-from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds
+from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
 from pymoo.optimize import minimize
 from pymoo.problems.util import decompose
 from pymoo.visualization.scatter import Scatter
@@ -14,7 +14,7 @@ class ModifiedZDT1(ZDT):
         return np.array([x, 1 - np.sqrt(x)]).T
 
     def _evaluate(self, x, out, *args, **kwargs):
-        out_of_bounds = np.any(repair_out_of_bounds(self, x.copy()) != x)
+        out_of_bounds = np.any(set_to_bounds_if_outside_by_problem(self, x.copy()) != x)
 
         f1 = x[:, 0]
         g = 1 + 9.0 / (self.n_var - 1) * np.sum((x[:, 1:]) ** 2, axis=1)

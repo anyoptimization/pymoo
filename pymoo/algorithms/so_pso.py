@@ -7,7 +7,8 @@ from pymoo.model.initialization import Initialization
 from pymoo.model.population import Population
 from pymoo.model.replacement import ImprovementReplacement, is_better
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds, repair_out_of_bounds_manually
+from pymoo.operators.repair.inverse_penalty import InversePenaltyOutOfBoundsRepair
+from pymoo.operators.repair.to_bound import set_to_bounds_if_outside
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.misc import norm_eucl_dist, norm_euclidean_distance
@@ -161,8 +162,8 @@ class PSO(Algorithm):
         self.c1 = c1
         self.c2 = c2
 
-    def initialize(self, problem, **kwargs):
-        super().initialize(problem, **kwargs)
+    def setup(self, problem, **kwargs):
+        super().setup(problem, **kwargs)
         self.V_max = self.max_velocity_rate * (problem.xu - problem.xl)
 
     def _initialize(self):
@@ -214,11 +215,11 @@ class PSO(Algorithm):
 
         # calculate the velocity vector
         _V = inerta + cognitive + social
-        _V = repair_out_of_bounds_manually(_V, - self.V_max, self.V_max)
+        _V = set_to_bounds_if_outside(_V, - self.V_max, self.V_max)
 
         # update the values of each particle
         _X = X + _V
-        _X = repair_out_of_bounds(self.problem, _X)
+        _X = InversePenaltyOutOfBoundsRepair().do(self.problem, _X, P=X)
 
         # evaluate the offspring population
         off = Population(len(pop)).set("X", _X, "V", _V, "pbest", pbest)

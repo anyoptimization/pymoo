@@ -8,15 +8,18 @@ from pymoo.util.dominator import Dominator
 def efficient_non_dominated_sort(F, strategy="sequential"):
     """
     Efficient Non-dominated Sorting (ENS)
+
     Parameters
     ----------
     F: numpy.ndarray
         objective values for each individual.
     strategy: str
         search strategy, can be "sequential" or "binary".
+
     Returns
     -------
-        indices of the individuals in each front.
+        fronts: list
+            Indices of the individuals in each front.
 
     References
     ----------
@@ -61,7 +64,8 @@ def efficient_non_dominated_sort(F, strategy="sequential"):
 
 def sequential_search(F, i, fronts) -> int:
     """
-    Find the front rank for the i-th individual through sequential search
+    Find the front rank for the i-th individual through sequential search.
+
     Parameters
     ----------
     F: np.ndarray
@@ -98,7 +102,8 @@ def sequential_search(F, i, fronts) -> int:
 
 def binary_search(F, i, fronts):
     """
-    Find the front rank for the i-th individual through sequential search
+    Find the front rank for the i-th individual through binary search.
+
     Parameters
     ----------
     F: np.ndarray

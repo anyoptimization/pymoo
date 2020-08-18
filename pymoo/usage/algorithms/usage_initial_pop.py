@@ -10,7 +10,7 @@ problem = get_problem("zdt2")
 
 # create initial data and set to the population object
 X = np.random.random((300, problem.n_var))
-pop = Population().new("X", X)
+pop = Population.new("X", X)
 Evaluator().eval(problem, pop)
 
 algorithm = NSGA2(pop_size=100, sampling=pop)

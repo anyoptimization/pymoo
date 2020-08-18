@@ -1,11 +1,10 @@
 import numpy as np
 
-from pymoo.model.repair import Repair
+from pymoo.operators.repair.bounds_repair import BoundsRepair
 from pymoo.util.misc import at_least_2d_array
 
 
-def repair_out_of_bounds_manually(X, xl, xu):
-
+def set_to_bounds_if_outside(X, xl, xu):
     only_1d = (X.ndim == 1)
     X = at_least_2d_array(X)
 
@@ -23,13 +22,11 @@ def repair_out_of_bounds_manually(X, xl, xu):
         return X
 
 
-def repair_out_of_bounds(problem, X):
-    return repair_out_of_bounds_manually(X, problem.xl, problem.xu)
+def set_to_bounds_if_outside_by_problem(problem, X):
+    return set_to_bounds_if_outside(X, problem.xl, problem.xu)
 
 
-class OutOfBoundsRepair(Repair):
+class ToBoundOutOfBoundsRepair(BoundsRepair):
 
-    def _do(self, problem, pop, **kwargs):
-        X = pop.get("X")
-        pop.set("X", repair_out_of_bounds(problem, X))
-        return pop
+    def repair_out_of_bounds(self, problem, X):
+        return set_to_bounds_if_outside_by_problem(problem, X)
