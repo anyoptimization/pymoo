@@ -7,7 +7,14 @@ from pymoo.model.individual import Individual
 
 class Population(np.ndarray):
 
-    def __new__(cls, n_individuals=0, individual=Individual()):
+    individual = None
+
+    def __new__(cls, n_individuals=0, individual=None):
+
+        # the default individual if not specific otherwise
+        if individual is None:
+            individual = Individual()
+
         obj = super(Population, cls).__new__(cls, n_individuals, dtype=individual.__class__).view(cls)
         for i in range(n_individuals):
             obj[i] = individual.copy()
@@ -46,13 +53,14 @@ class Population(np.ndarray):
         pop.individual = Individual()
         return pop
 
-    def new(self, *args):
+    @classmethod
+    def new(cls, *args, **kwargs):
 
         if len(args) == 1:
-            return Population(n_individuals=args[0], individual=self.individual)
+            return Population(n_individuals=args[0], **kwargs)
         else:
             n = len(args[1]) if len(args) > 0 else 0
-            pop = Population(n_individuals=n, individual=self.individual)
+            pop = Population(n_individuals=n, **kwargs)
             if len(args) > 0:
                 pop.set(*args)
             return pop

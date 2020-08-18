@@ -40,8 +40,8 @@ class SQLP(LocalSearch):
                      "alpha", "f0", "gs", "h1", "h2", "h3", "h4", "t", "t0", "tol",
                      "iexact", "incons", "ireset", "itermx", "line", "n1", "n2", "n3"]
 
-    def initialize(self, problem, **kwargs):
-        super().initialize(problem, **kwargs)
+    def setup(self, problem, **kwargs):
+        super().setup(problem, **kwargs)
 
         n, meq, mieq = problem.n_var, 0, problem.n_constr
         m = meq + mieq

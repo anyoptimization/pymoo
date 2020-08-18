@@ -4,6 +4,12 @@
 News
 ==============================================================================
 
+**August 7, 2020:** We are more than happy to announce that a new version of pymoo is available. This version
+has some new features and evolutionary operators as well as an improved getting started guide.
+For more details please have a look at the release notes.
+(:ref:`Release Notes<version_0_4_2>`)
+
+
 
 **May 4, 2020:** A new release of pymoo is available. Version **0.4.1** of our framework contains
 a novel method to generate an arbitrary number of reference directions. Reference directions are

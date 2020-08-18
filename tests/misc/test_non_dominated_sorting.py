@@ -61,17 +61,23 @@ class FastNonDominatedSortTest(unittest.TestCase):
 
                 python_fast_nds = load_function("fast_non_dominated_sort", _type="python")(F)
                 cython_fast_nds = load_function("fast_non_dominated_sort", _type="cython")(F)
-
-                python_efficient_fast_nds = load_function("efficient_non_dominated_sort", _type="python")(F)
-                cython_efficient_fast_nds = load_function("efficient_non_dominated_sort", _type="cython")(F)
-
-                python_tree_based_nds = load_function("tree_based_non_dominated_sort", _type="python")(F)
-
                 assert_fronts_equal(python_fast_nds, cython_fast_nds)
 
+                python_efficient_fast_nds = load_function("efficient_non_dominated_sort", _type="python")(F,
+                                                                                                          strategy="binary")
                 assert_fronts_equal(python_fast_nds, python_efficient_fast_nds)
+
+                cython_efficient_fast_nds = load_function("efficient_non_dominated_sort", _type="cython")(F,
+                                                                                                          strategy="binary")
                 assert_fronts_equal(python_efficient_fast_nds, cython_efficient_fast_nds)
 
+                python_efficient_fast_nds_bin = load_function("efficient_non_dominated_sort", _type="python")(F)
+                assert_fronts_equal(python_fast_nds, python_efficient_fast_nds_bin)
+
+                cython_efficient_fast_nds_bin = load_function("efficient_non_dominated_sort", _type="cython")(F)
+                assert_fronts_equal(python_efficient_fast_nds_bin, cython_efficient_fast_nds_bin)
+
+                python_tree_based_nds = load_function("tree_based_non_dominated_sort", _type="python")(F)
                 assert_fronts_equal(python_fast_nds, python_tree_based_nds)
 
         for n_obj in [3, 5, 10]:

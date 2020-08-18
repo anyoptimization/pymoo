@@ -16,8 +16,8 @@ class LocalSearch(Algorithm):
         self.sampling = sampling
         self.n_sample_points = n_sample_points
 
-    def initialize(self, problem, **kwargs):
-        super().initialize(problem, **kwargs)
+    def setup(self, problem, **kwargs):
+        super().setup(problem, **kwargs)
 
         if self.n_sample_points == "auto":
             self.n_sample_points = self.problem.n_var * 5

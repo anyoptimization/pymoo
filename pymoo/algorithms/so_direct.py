@@ -38,8 +38,8 @@ class DIRECT(LocalSearch):
         self.penalty = penalty
         self.n_max_candidates = n_max_candidates
 
-    def initialize(self, problem, **kwargs):
-        super().initialize(problem, **kwargs)
+    def setup(self, problem, **kwargs):
+        super().setup(problem, **kwargs)
 
         xl, xu = problem.bounds()
         X = denormalize(0.5 * np.ones(problem.n_var), xl, xu)

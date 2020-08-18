@@ -31,6 +31,7 @@ class Problem:
                  replace_nan_values_of="auto",
                  parallelization=None,
                  elementwise_evaluation=False,
+                 exclude_from_serialization=["parallelization"],
                  callback=None):
         """
 
@@ -106,6 +107,9 @@ class Problem:
 
         # only applicable if elementwise_evaluation is true - if, how should the single evaluations be parallelized
         self.parallelization = parallelization
+
+        # attribute which are excluded from being serialized )
+        self.exclude_from_serialization = exclude_from_serialization
 
         # store the callback if defined
         self.callback = callback
@@ -495,9 +499,6 @@ class Problem:
         s += "# n_var: %s\n" % self.n_var
         s += "# n_obj: %s\n" % self.n_obj
         s += "# n_constr: %s\n" % self.n_constr
-        s += "# f(xl): %s\n" % self.evaluate(self.xl)[0]
-        s += "# f((xl+xu)/2): %s\n" % self.evaluate((self.xl + self.xu) / 2.0)[0]
-        s += "# f(xu): %s\n" % self.evaluate(self.xu)[0]
         return s
 
     @staticmethod
@@ -511,8 +512,9 @@ class Problem:
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        # never pickle the parallelization object - it always causes issue or might not be possible at all
-        state["parallelization"] = None
+        # exclude objects which should not be stored
+        for key in self.exclude_from_serialization:
+            state[key] = None
         return state
 
     def set_boundaries_as_constraints(self, val=True):
@@ -656,3 +658,14 @@ class ConstraintsAsPenaltyProblem(MetaProblem):
 
     def pareto_set(self, *args, **kwargs):
         return self.problem.pareto_set(*args, **kwargs)
+
+
+class StaticProblem(MetaProblem):
+
+    def __init__(self, problem, **kwargs):
+        super().__init__(problem)
+        self.kwargs = kwargs
+
+    def _evaluate(self, x, out, *args, **kwargs):
+        for K, V in self.kwargs.items():
+            out[K] = V

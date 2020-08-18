@@ -47,8 +47,8 @@ more features related to multi-objective optimization such as visualization and 
     pip install -U pymoo
 
 
-Please note, that some modules can be compiled to speed up computations (optional). By using the command
-above, an attempt is made to compile the modules, however, if unsuccessful the
+Please note that some modules can be compiled to speed up computations (optional). The command
+above attempts is made to compile the modules; however, if unsuccessful, the
 plain python version is installed. More information are available in our 
 :ref:`Installation Guide <installation>`.
 
@@ -137,7 +137,7 @@ state-of-the-art algorithms are just the starting point for many optimization pr
 The full potential of genetic algorithms requires customization and the incorporation of domain knowledge.
 We have experience for more than 20 years in the optimization field and are eager to tackle challenging problems.
 Let us know if you are interested in working with experienced collaborators in optimization. Please keep in mind
-that only through such projects we are able to keep developing and improving our framework and make sure
+that only through such projects we can keep developing and improving our framework and make sure
 it meets the current needs of the industry.
 
 Moreover, any kind of **contribution** is more than welcome:
@@ -150,23 +150,20 @@ Moreover, any kind of **contribution** is more than welcome:
 
   <div style="margin-left: 10px;">
 
-**(i)** Give us a |star| on |github|.
-This makes not only our framework but in general multi-objective optimization more 
-popular by being listed with a higher rank regarding specific keywords.
 
-**(ii)** In order to offer more and more new algorithms and features, we are more than 
-happy if somebody wants to contribute by developing code. You can see it as a 
-win-win situation, because your development will be linked to your publication(s) which
-can significantly increase the awareness of your work. Please note that, we aim to keep 
-a high-level of code quality and some refactoring might be suggested. We have prepared
+**(i)** Give us a |star| on |github|.
+This makes not only our framework but, in general, multi-objective optimization more accessible by being listed with a higher rank regarding specific keywords.
+
+**(ii)** To offer more and more new algorithms and features, we are more than happy if somebody wants to contribute by developing code. You can see it as a
+win-win situation because your development will be linked to your publication(s), which
+can significantly increase your work awareness. Please note that we aim to keep a high level of code quality, and some refactoring might be suggested. We have prepared
 a list of `suggested contributions <contributions.html>`_.
 
 
-**(iii)** You like our framework and you would like to use it for profit-making purposes?
-We are always searching for industrial collaborations because they help to direct research to meet 
-the needs the of the industry. In our laboratory solving practical problems has a high priority 
-for every student and can help you to benefit from our research experience we have gained
+**(iii)** You like our framework, and you would like to use it for profit-making purposes?
+We are always searching for industrial collaborations because they help direct research to meet the industry's needs. In our laboratory solving practical problems has a high priority for every student and can help you to benefit from our research experience we have gained
 over the last years.
+
 
 .. raw:: html
 
@@ -174,9 +171,9 @@ over the last years.
 
 
 
-If you find a bug or you have any kind of concern regarding correctness please use 
+If you find a bug or you have any kind of concern regarding the correctness, please use
 our |issues| Nobody is perfect
-and only if we are aware of issues we can start to investigate them.
+Moreover, only if we are aware of issues, we can start to investigate them.
 
 
 

@@ -121,6 +121,7 @@ class RankAndCrowdingSurvival(Survival):
 
     def __init__(self) -> None:
         super().__init__(filter_infeasible=True)
+        self.nds = NonDominatedSorting()
 
     def _do(self, problem, pop, n_survive, D=None, **kwargs):
 
@@ -131,7 +132,7 @@ class RankAndCrowdingSurvival(Survival):
         survivors = []
 
         # do the non-dominated sorting until splitting front
-        fronts = NonDominatedSorting().do(F, n_stop_if_ranked=n_survive)
+        fronts = self.nds.do(F, n_stop_if_ranked=n_survive)
 
         for k, front in enumerate(fronts):
 

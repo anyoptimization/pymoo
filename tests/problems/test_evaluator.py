@@ -35,14 +35,14 @@ class EvaluatorTest(unittest.TestCase):
 
     def test_evaluate_pop(self):
         evaluator = Evaluator()
-        pop = Population().new("X", X)
+        pop = Population.new("X", X)
         evaluator.eval(problem, pop)
         np.testing.assert_allclose(F, pop.get("F"))
         self.assertTrue(evaluator.n_eval == len(X))
 
     def test_preevaluated(self):
         evaluator = Evaluator()
-        pop = Population().new("X", X)
+        pop = Population.new("X", X)
         evaluator.eval(problem, pop)
 
         pop[range(30)].set("F", None)

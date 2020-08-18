@@ -11,6 +11,7 @@ from pymoo.model.individual import Individual
 from pymoo.model.population import Population
 from pymoo.model.result import Result
 from pymoo.util.function_loader import FunctionLoader
+from pymoo.util.misc import termination_from_tuple
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
 
@@ -65,7 +66,7 @@ class Algorithm:
 
         # !
         # Here all algorithm parameters needed no matter what is problem is passed are defined
-        # problem dependent initialization happens in initialize(problem, **kwargs)
+        # problem dependent initialization happens in setup(problem, **kwargs)
         # !
 
         super().__init__()
@@ -114,30 +115,34 @@ class Algorithm:
         self.opt = None
         # can be used to store additional data in submodules
         self.data = {}
+        # if the initialized method has been called before or not
+        self.is_initialized = False
+        # the time when the algorithm has been setup for the first time
+        self.start_time = None
 
     # =========================================================================================================
     # PUBLIC
     # =========================================================================================================
 
-    def initialize(self,
-                   problem,
-                   pf=True,
-                   evaluator=None,
+    def setup(self,
+              problem,
 
-                   # START Default minimize
-                   seed=None,
-                   verbose=False,
-                   save_history=False,
-                   return_least_infeasible=False,
-                   # END Default minimize
+              # START Overwrite by minimize
+              termination=None,
+              callback=None,
+              display=None,
+              # END Overwrite by minimize
 
-                   # START Overwrite by minimize
-                   termination=None,
-                   callback=None,
-                   display=None,
-                   # END Overwrite by minimize
+              # START Default minimize
+              seed=None,
+              verbose=False,
+              save_history=False,
+              return_least_infeasible=False,
+              # END Default minimize
 
-                   **kwargs):
+              pf=True,
+              evaluator=None,
+              **kwargs):
 
         # set the problem that is optimized for the current run
         self.problem = problem
@@ -174,15 +179,17 @@ class Algorithm:
         # !
         # START Overwrite by minimize
         # !
+
         # the termination criterion to be used to stop the algorithm
         if self.termination is None:
-            self.termination = termination
+            self.termination = termination_from_tuple(termination)
         # if nothing given fall back to default
         if self.termination is None:
             self.termination = self.default_termination
 
         if callback is not None:
             self.callback = callback
+
         if display is not None:
             self.display = display
 
@@ -190,14 +197,22 @@ class Algorithm:
         # END Overwrite by minimize
         # !
 
-        # by default the algorithm as not terminated
-        self.has_terminated = False
+    def initialize(self):
 
-        # other run dependent variables that are reset
+        # set the attribute for the optimization method to start
         self.n_gen = 1
-        self.history = []
-        self.pop = Population()
-        self.opt = None
+        self.has_terminated = False
+        self.pop, self.opt = Population(), None
+
+        # if the history is supposed to be saved
+        if self.save_history:
+            self.history = []
+
+        # the time starts whenever this method is called
+        self.start_time = time.time()
+
+        # call the initialize method of the concrete algorithm implementation
+        self._initialize()
 
     def solve(self):
 
@@ -210,17 +225,55 @@ class Algorithm:
         # call the algorithm to solve the problem
         self._solve(self.problem)
 
+        # create the result object based on the current iteration
+        res = self.result()
+
+        return res
+
+    def has_next(self):
+        return not self.has_terminated
+
+    def next(self):
+
+        if self.problem is None:
+            raise Exception("You have to call the `setup(problem)` method first before calling next().")
+
+        # call next of the implementation of the algorithm
+        if not self.is_initialized:
+            self.initialize()
+            self.is_initialized = True
+        else:
+            self._next()
+            self.n_gen += 1
+
+        # set the optimum - only done if the algorithm did not do it yet
+        self._set_optimum()
+
+        # set whether the algorithm is terminated or not
+        self.has_terminated = not self.termination.do_continue(self)
+
+        # if the algorithm has terminated call the finalize method
+        if self.has_terminated:
+            self.finalize()
+
+        # do what needs to be done each generation
+        self._each_iteration()
+
+    def finalize(self):
+        return self._finalize()
+
+    def result(self):
+        res = Result()
+
         # store the time when the algorithm as finished
+        res.start_time = self.start_time
         res.end_time = time.time()
         res.exec_time = res.end_time - res.start_time
 
-        # store the resulting population
         res.pop = self.pop
 
         # get the optimal solution found
         opt = self.opt
-
-        # if optimum is not set
         if len(opt) == 0:
             opt = None
 
@@ -230,12 +283,10 @@ class Algorithm:
                 opt = filter_optimum(opt, least_infeasible=True)
             else:
                 opt = None
-
-        # set the optimum to the result object
         res.opt = opt
 
         # if optimum is set to none to not report anything
-        if opt is None:
+        if res.opt is None:
             X, F, CV, G = None, None, None, None
 
         # otherwise get the values from the population
@@ -255,22 +306,6 @@ class Algorithm:
 
         return res
 
-    def next(self):
-        # increase the generation counter
-        self.n_gen += 1
-
-        # call next of the implementation of the algorithm
-        self._next()
-
-        # set the optimum - only done if the algorithm did not do it yet
-        self._set_optimum()
-
-        # do what needs to be done each generation
-        self._each_iteration()
-
-    def finalize(self):
-        return self._finalize()
-
     # =========================================================================================================
     # PROTECTED
     # =========================================================================================================
@@ -281,20 +316,9 @@ class Algorithm:
         if self.termination is None:
             raise Exception("No termination criterion defined and algorithm has no default termination implemented!")
 
-        # initialize the first population and evaluate it
-        self._initialize()
-        self._set_optimum()
-        self._each_iteration()
-
         # while termination criterion not fulfilled
-        while self.termination.do_continue(self):
+        while self.has_next():
             self.next()
-
-        # set the algorithm to be terminated from now on
-        self.has_terminated = True
-
-        # finalize the algorithm and do postprocessing of desired
-        self.finalize()
 
     # method that is called each iteration to call some algorithms regularly
     def _each_iteration(self, *args, **kwargs):
@@ -311,13 +335,12 @@ class Algorithm:
                 self.callback(self)
 
         if self.save_history:
-            hist, _callback = self.history, self.callback
+            _hist, _callback = self.history, self.callback
+
             self.history, self.callback = None, None
-
             obj = copy.deepcopy(self)
-            self.history = hist
-            self.callback = _callback
 
+            self.history, self.callback = _hist, _callback
             self.history.append(obj)
 
     def _set_optimum(self, force=False):
@@ -326,15 +349,15 @@ class Algorithm:
         #     pop = Population.merge(pop, self.opt)
         self.opt = filter_optimum(pop, least_infeasible=True)
 
-    def _finalize(self):
-        pass
-
     @abstractmethod
     def _initialize(self):
         pass
 
     @abstractmethod
     def _next(self):
+        pass
+
+    def _finalize(self):
         pass
 
 

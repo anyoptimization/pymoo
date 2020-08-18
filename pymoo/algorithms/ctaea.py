@@ -4,6 +4,7 @@ import numpy as np
 from scipy.spatial.distance import cdist, pdist, squareform
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
+from pymoo.docs import parse_doc_string
 from pymoo.factory import get_decomposition
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
@@ -89,17 +90,16 @@ class CTAEA(GeneticAlgorithm):
                  display=MultiObjectiveDisplay(),
                  **kwargs):
         """
+        CTAEA
 
         Parameters
         ----------
-
         ref_dirs : {ref_dirs}
         sampling : {sampling}
         selection : {selection}
         crossover : {crossover}
         mutation : {mutation}
         eliminate_duplicates : {eliminate_duplicates}
-
         """
 
         self.ref_dirs = ref_dirs
@@ -194,7 +194,7 @@ class CADASurvival:
         self._decomposition = get_decomposition('asf')
         self._calc_perpendicular_distance = load_function("calc_perpendicular_distance")
 
-    def do(self, problem, pop, da, n_survive, **kwargs):
+    def do(self, _, pop, da, n_survive, **kwargs):
         # Offspring are last of merged population
         off = pop[-n_survive:]
         # Update ideal point
@@ -322,3 +322,6 @@ class CADASurvival:
                     break
             itr += 1
         return Hd[S]
+
+
+parse_doc_string(CTAEA.__init__)

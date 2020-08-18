@@ -20,6 +20,7 @@ class Individual:
             self.__dict__[key] = value
         else:
             self.data[key] = value
+        return self
 
     def copy(self):
         ind = copy.copy(self)
