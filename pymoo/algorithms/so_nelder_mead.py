@@ -7,7 +7,7 @@ from pymoo.model.individual import Individual
 from pymoo.model.population import Population, pop_from_array_or_individual
 from pymoo.model.replacement import is_better
 from pymoo.model.termination import Termination
-from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds
+from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.misc import vectorized_cdist
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
@@ -192,7 +192,7 @@ class NelderMead(LocalSearch):
 
         # reflect the point, consider factor if bounds are there, make sure in bounds (floating point) evaluate
         x_reflect = centroid + min(self.alpha, max_alpha) * (centroid - pop[n + 1].X)
-        x_reflect = repair_out_of_bounds(self.problem, x_reflect)
+        x_reflect = set_to_bounds_if_outside_by_problem(self.problem, x_reflect)
         reflect = self.evaluator.eval(self.problem, Individual(X=x_reflect), algorithm=self)
 
         # whether a shrink is necessary or not - decided during this step
@@ -214,7 +214,7 @@ class NelderMead(LocalSearch):
 
             # expand using the factor, consider bounds, make sure in case of floating point issues
             x_expand = centroid + min(self.beta, max_beta) * (x_reflect - centroid)
-            x_expand = repair_out_of_bounds(self.problem, x_expand)
+            x_expand = set_to_bounds_if_outside_by_problem(self.problem, x_expand)
 
             # if the expansion is almost equal to reflection (if boundaries were hit) - no evaluation
             if np.allclose(x_expand, x_reflect, atol=1e-16):

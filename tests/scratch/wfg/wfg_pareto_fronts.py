@@ -19,7 +19,7 @@ def calc_pareto_front(problem, ref_dirs):
         _pf = problem.pareto_front(n_pareto_points=n_pareto_points, use_cache=False)
         F = np.row_stack([pf, _pf])
 
-        pop = Population().new("F", F)
+        pop = Population.new("F", F)
         pop = survival.do(problem, pop, n_pareto_points // 2)
 
         pf = pop.get("F")

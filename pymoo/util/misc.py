@@ -266,3 +266,17 @@ def has_feasible(pop):
 
 def to_numpy(a):
     return np.array(a)
+
+
+def termination_from_tuple(termination):
+    from pymoo.model.termination import Termination
+
+    # get the termination if provided as a tuple - create an object
+    if termination is not None and not isinstance(termination, Termination):
+        from pymoo.factory import get_termination
+        if isinstance(termination, str):
+            termination = get_termination(termination)
+        else:
+            termination = get_termination(*termination)
+
+    return termination

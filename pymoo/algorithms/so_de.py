@@ -7,7 +7,7 @@ from pymoo.model.replacement import ImprovementReplacement
 from pymoo.operators.crossover.biased_crossover import BiasedCrossover
 from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
 from pymoo.operators.crossover.exponential_crossover import ExponentialCrossover
-from pymoo.operators.repair.bounds_back_repair import BoundsBackRepair
+from pymoo.operators.repair.bounce_back import BounceBackOutOfBoundsRepair
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
 from pymoo.operators.selection.random_selection import RandomSelection
 from pymoo.util.display import SingleObjectiveDisplay
@@ -120,7 +120,7 @@ class DE(GeneticAlgorithm):
         self.off = mutation.do(self.problem, _pop, _P, algorithm=self)[:len(self.pop)]
 
         # bounds back if something is out of bounds
-        self.off = BoundsBackRepair().do(self.problem, self.off)
+        self.off = BounceBackOutOfBoundsRepair().do(self.problem, self.off)
 
         # evaluate the results
         self.evaluator.eval(self.problem, self.off, algorithm=self)

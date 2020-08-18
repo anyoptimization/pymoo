@@ -20,7 +20,7 @@ class TimeBasedTermination(Termination):
 
     def do_continue(self, algorithm):
         if self.start is None:
-            self.start = time.time()
+            self.start = algorithm.start_time
 
         self.now = time.time()
         return self.now - self.start < self.max_time

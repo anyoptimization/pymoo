@@ -71,8 +71,16 @@ class NSGA3(GeneticAlgorithm):
 
         self.ref_dirs = ref_dirs
 
-        if pop_size is None:
-            pop_size = len(ref_dirs)
+        # in case of R-NSGA-3 they will be None - otherwise this will be executed
+        if self.ref_dirs is not None:
+
+            if pop_size is None:
+                pop_size = len(self.ref_dirs)
+
+            if pop_size < len(self.ref_dirs):
+                print(f"WARNING: pop_size={pop_size} is less than the number of reference directions ref_dirs={len(self.ref_dirs)}.\n"
+                      "This might cause unwanted behavior of the algorithm. \nPlease make sure pop_size is equal or larger "
+                      "than the number of reference directions. ")
 
         kwargs['individual'] = Individual(rank=np.inf, niche=-1, dist_to_niche=np.inf)
 

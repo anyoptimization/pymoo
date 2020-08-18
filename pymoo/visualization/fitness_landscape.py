@@ -118,5 +118,8 @@ class FitnessLandscape(Plot):
                 plot_surface()
                 plot_contour()
 
+        else:
+            raise Exception("Only landscapes of problems with one or two variables and one objective can be visualized.")
+
 
 parse_doc_string(FitnessLandscape.__init__)

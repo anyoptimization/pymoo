@@ -70,6 +70,7 @@ def tree_based_non_dominated_sort(F):
     A decision variable clustering based evolutionary algorithm for large-scale many-objective optimization,
     IEEE Transactions on Evolutionary Computation, 2018, 22(1): 97-112.
     """
+
     N, M = F.shape
     # sort the rows in F
     indices = np.lexsort(F.T[::-1])

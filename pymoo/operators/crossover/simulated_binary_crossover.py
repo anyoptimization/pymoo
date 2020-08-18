@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.model.crossover import Crossover
-from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds
+from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
 
 
 class SimulatedBinaryCrossover(Crossover):
@@ -75,8 +75,8 @@ class SimulatedBinaryCrossover(Crossover):
         c[0, do_crossover] = c1[do_crossover]
         c[1, do_crossover] = c2[do_crossover]
 
-        c[0] = repair_out_of_bounds(problem, c[0])
-        c[1] = repair_out_of_bounds(problem, c[1])
+        c[0] = set_to_bounds_if_outside_by_problem(problem, c[0])
+        c[1] = set_to_bounds_if_outside_by_problem(problem, c[1])
 
         if self.n_offsprings == 1:
             # Randomly select one offspring
@@ -84,3 +84,7 @@ class SimulatedBinaryCrossover(Crossover):
             c = c.reshape((1, X.shape[1], X.shape[2]))
 
         return c
+
+
+class SBX(SimulatedBinaryCrossover):
+    pass

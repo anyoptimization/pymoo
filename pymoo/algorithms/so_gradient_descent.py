@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.population import Population
-from pymoo.operators.repair.out_of_bounds_repair import repair_out_of_bounds
+from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
@@ -60,7 +60,7 @@ class GradientBasedAlgorithm(Algorithm):
 
                 # make the step and check out of bounds for X
                 self.apply()
-                self.X = repair_out_of_bounds(self.problem, self.X)
+                self.X = set_to_bounds_if_outside_by_problem(self.problem, self.X)
 
                 # set the population object for automatic print
                 self.pop = Population(len(self.X)).set("X", self.X, "F", self.F,
