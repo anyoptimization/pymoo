@@ -1,7 +1,6 @@
 import numpy as np
 
 from pymoo.operators.repair.bounds_repair import BoundsRepair
-from pymoo.operators.repair.to_bound import set_to_bounds_if_outside, set_to_bounds_if_outside_by_problem
 
 
 def inverse_penality(x, p, xl, xu, alpha=None):
@@ -72,8 +71,8 @@ if __name__ == '__main__':
     xu = np.ones(2)
 
     # chosen parents
-    p = np.array([0.1, 1.0])
-    # p = np.array([0.5, 0.6])
+    # p = np.array([0.1, 1.0])
+    p = np.array([0.5, 0.6])
 
     c = np.array([-0.1, 1.0])
 
