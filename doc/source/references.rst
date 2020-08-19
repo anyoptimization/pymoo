@@ -17,7 +17,7 @@ Meanwhile, if you have used our framework for research purposes, you can cite us
     }
 
 
-The reference made in our framework are listed below.
+All references of this online documentation are listed below.
 The corresponding `BibTex <https://raw.githubusercontent.com/msu-coinlab/pymoo/master/doc/source/references.bib>`_ 
 is available as well.
 

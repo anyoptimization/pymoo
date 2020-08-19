@@ -1,6 +1,6 @@
-**August 7, 2020:** We are more than happy to announce that a new version of pymoo is available. This version
-has some new features and evolutionary operators as well as an improved getting started guide.
-For more details please have a look at the release notes.
+**August 7, 2020:** We are more than happy to announce that a new version of pymoo (version **0.4.2**) is available. This version
+has some new features and evolutionary operators, as well as an improved getting, started guide.
+For more details, please have a look at the release notes.
 (:ref:`Release Notes<version_0_4_2>`)
 
 
@@ -19,4 +19,5 @@ algorithm for single-objective problems.
 We have added two new algorithms (BRKGA, CMAES) and added the test problem suite WFG.
 Additionally, we have improved the Display Module to create custom printouts and developed
 a new termination criterion for multi-objective algorithms. (:ref:`Release Notes<version_0_4_0>`)
+
 
