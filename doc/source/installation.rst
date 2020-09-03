@@ -9,19 +9,19 @@ Installation
 ==============================================================================
 
 The *pymoo* framework can be run with and without compiled modules. Some computationally more
-expensive function have been implemented using `Cython <https://github.com/cython/cython>`_
-for speedup. To figure out what version is used after the installation please see `Plain/Compiled Modules`_ section.
+expensive function has been implemented using `Cython <https://github.com/cython/cython>`_
+for speedup. To figure out what version is used after the installation, please see `Plain/Compiled Modules`_ section.
 
 
 Setting up the Python environment using Conda
 ------------------------------------------------------------------------------
 
-Here, we are setting up the environment in order to be able to use the speedup of Cython.
+Here, we are setting up the environment to be able to use the speedup of Cython.
 Therefore, before using the install command, the environment needs to be set up.
 We recommend using `miniconda <https://docs.conda.io/en/latest/miniconda.html>`_ or
 `anaconda <https://www.anaconda.com>`_.
 
-Please check if conda is available in your current terminal:
+Please check if conda is available in the command line:
 
 .. code:: bash
 
@@ -40,7 +40,7 @@ Otherwise, create a new python environment with NumPy preinstalled and activate 
 
 
 
-If the environment is not setup correct, the installation will NOT fail and you
+If the environment is not set up correctly, the installation will NOT fail and you
 will still be able to use *pymoo* without the benefit of the compiled modules.
 
 
@@ -54,10 +54,10 @@ To use the current stable release of *pymoo* use
 
     pip install -U pymoo
 
-If you have already installed an older version of the framework you can force
-an update by using the *-U* option as shown above.
+If you have already installed an older version of the framework, you can force
+update by using the *-U* option as shown above.
 
-To forcefully fetch and recompile the package is might be necessary to disable
+To forcefully fetch and recompile the package might be necessary to disable
 the local cache created by pip.
 
 .. code:: bash
@@ -85,7 +85,7 @@ To compile the modules or see an output log:
     pip install Cython
     make compile-with-cython
 
-This translates the pyx files to cpp files and then compiles them. If anything fails
+These commands translate the pyx files to cpp files and then compile them. If anything fails
 this will provide more details about why this has happened.
     
 
@@ -101,12 +101,12 @@ has worked during the installation, you can use the following command:
     python -c "from pymoo.util.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
 
 
-If no compilation is available, we recommend pulling the latest stable release from GitHub and to execute
+If no compilation is available, we recommend pulling the latest stable release from GitHub and executing
 
 .. code:: bash
 
     make compile
     
-This shows detailed error messages why the compilation was not successful.
+This command shows detailed error messages about why the compilation was not successful.
 
 

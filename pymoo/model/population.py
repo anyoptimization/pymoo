@@ -7,8 +7,6 @@ from pymoo.model.individual import Individual
 
 class Population(np.ndarray):
 
-    individual = None
-
     def __new__(cls, n_individuals=0, individual=None):
 
         # the default individual if not specific otherwise

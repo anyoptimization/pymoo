@@ -38,6 +38,7 @@
 pymoo: Multi-objective Optimization in Python
 ------------------------------------------------------------------------------
 
+
 Our framework offers state of the art single- and multi-objective optimization algorithms and many
 more features related to multi-objective optimization such as visualization and decision making.
 **pymoo** is available on PyPi and can be installed by:
@@ -137,8 +138,8 @@ state-of-the-art algorithms are just the starting point for many optimization pr
 The full potential of genetic algorithms requires customization and the incorporation of domain knowledge.
 We have experience for more than 20 years in the optimization field and are eager to tackle challenging problems.
 Let us know if you are interested in working with experienced collaborators in optimization. Please keep in mind
-that only through such projects we can keep developing and improving our framework and make sure
-it meets the current needs of the industry.
+that only through such projects can we keep developing and improving our framework and making sure
+it meets the industry's current needs.
 
 Moreover, any kind of **contribution** is more than welcome:
 
@@ -161,7 +162,7 @@ a list of `suggested contributions <contributions.html>`_.
 
 
 **(iii)** You like our framework, and you would like to use it for profit-making purposes?
-We are always searching for industrial collaborations because they help direct research to meet the industry's needs. In our laboratory solving practical problems has a high priority for every student and can help you to benefit from our research experience we have gained
+We are always searching for industrial collaborations because they help direct research to meet the industry's needs. Our laboratory solving practical problems have a high priority for every student and can help you benefit from the research experience we have gained
 over the last years.
 
 
@@ -173,7 +174,7 @@ over the last years.
 
 If you find a bug or you have any kind of concern regarding the correctness, please use
 our |issues| Nobody is perfect
-Moreover, only if we are aware of issues, we can start to investigate them.
+Moreover, only if we are aware of the issues we can start to investigate them.
 
 
 
@@ -222,5 +223,4 @@ Contact
 | Michigan State University
 | Computational Optimization and Innovation Laboratory (COIN)
 | East Lansing, MI 48824, USA
-
 
