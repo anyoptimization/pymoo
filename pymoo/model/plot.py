@@ -172,6 +172,8 @@ class Plot:
             plt.show(**kwargs)
             plt.close()
 
+        return self
+
     def save(self, fname, **kwargs):
         self.plot_if_not_done_yet()
         set_if_none(kwargs, "bbox_inches", "tight")
