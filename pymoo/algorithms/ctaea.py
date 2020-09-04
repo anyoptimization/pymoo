@@ -105,8 +105,6 @@ class CTAEA(GeneticAlgorithm):
         self.ref_dirs = ref_dirs
         pop_size = len(ref_dirs)
 
-        kwargs['individual'] = Individual(rank=np.inf, niche=-1, FV=-1)
-
         if 'survival' in kwargs:
             survival = kwargs['survival']
             del kwargs['survival']
@@ -129,7 +127,7 @@ class CTAEA(GeneticAlgorithm):
 
     def _initialize(self):
         # Prepare diversity archives
-        da = Population(0, individual=self.individual)
+        da = Population()
 
         # create the initial population
         pop = self.initialization.do(self.problem, self.pop_size, algorithm=self)

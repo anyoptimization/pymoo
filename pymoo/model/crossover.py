@@ -61,6 +61,6 @@ class Crossover:
         X = X.reshape(-1, X.shape[-1])
 
         # create a population object
-        off = pop.new("X", X)
+        off = Population.new("X", X)
 
         return off

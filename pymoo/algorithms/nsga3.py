@@ -82,8 +82,6 @@ class NSGA3(GeneticAlgorithm):
                       "This might cause unwanted behavior of the algorithm. \nPlease make sure pop_size is equal or larger "
                       "than the number of reference directions. ")
 
-        kwargs['individual'] = Individual(rank=np.inf, niche=-1, dist_to_niche=np.inf)
-
         if 'survival' in kwargs:
             survival = kwargs['survival']
             del kwargs['survival']

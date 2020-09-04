@@ -1,6 +1,5 @@
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.duplicate import DefaultDuplicateElimination, NoDuplicateElimination
-from pymoo.model.individual import Individual
 from pymoo.model.initialization import Initialization
 from pymoo.model.mating import Mating
 from pymoo.model.population import Population
@@ -20,7 +19,6 @@ class GeneticAlgorithm(Algorithm):
                  eliminate_duplicates=DefaultDuplicateElimination(),
                  repair=None,
                  mating=None,
-                 individual=Individual(),
                  min_infeas_pop_size=0,
                  **kwargs
                  ):
@@ -43,9 +41,6 @@ class GeneticAlgorithm(Algorithm):
         if self.n_offsprings is None:
             self.n_offsprings = pop_size
 
-        # the object to be used to represent an individual - either individual or derived class
-        self.individual = individual
-
         # set the duplicate detection class - a boolean value chooses the default duplicate detection
         if isinstance(eliminate_duplicates, bool):
             if eliminate_duplicates:
@@ -59,7 +54,6 @@ class GeneticAlgorithm(Algorithm):
         self.repair = repair if repair is not None else NoRepair()
 
         self.initialization = Initialization(sampling,
-                                             individual=individual,
                                              repair=self.repair,
                                              eliminate_duplicates=self.eliminate_duplicates)
 

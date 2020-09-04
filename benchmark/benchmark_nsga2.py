@@ -91,7 +91,7 @@ if __name__ == '__main__':
     prefix = "runs"
 
     # name of the experiment
-    name = "pynsga2-0.4.0"
+    name = "pynsga2-0.4.2"
 
     # number of runs to execute
     n_runs = 100
