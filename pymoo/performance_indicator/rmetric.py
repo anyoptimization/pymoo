@@ -2,39 +2,41 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from pymoo.model.indicator import Indicator
-from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
+from pymoo.performance_indicator.hv import Hypervolume
+from pymoo.performance_indicator.igd import IGD
 
 
 class RMetric(Indicator):
 
-    def __init__(self, curr_pop, whole_pop, ref_points, problem, w=None):
+    def __init__(self, problem, ref_points, w=None, delta=0.2):
         """
 
         Parameters
         ----------
-        curr_pop : numpy.array
-             Population from algorithm being evaluated
-
-        whole_pop : numpy.array
-            Whole population of all algorithms
-
+        
+        problem : class
+            problem instance
+            
         ref_points : numpy.array
             list of reference points
 
-        problem : class
-            problem instance
-
         w : numpy.array
             weights for each objective
+
+        delta : float
+            The delta value representing the region of interest
+
         """
 
         Indicator.__init__(self)
-        self.curr_pop = curr_pop
-        self.whole_pop = whole_pop
         self.ref_points = ref_points
         self.problem = problem
         w_ = np.ones(self.ref_points.shape[1]) if not w else w
         self.w_points = self.ref_points + 2 * w_
+        self.delta = delta
+
+        self.F = None
+        self.others = None
 
     def _filter(self):
 
@@ -54,21 +56,21 @@ class RMetric(Indicator):
             else:
                 return 0
 
-        num_objs = np.size(self.curr_pop, axis=1)
-        index_array = np.zeros(np.size(self.curr_pop, axis=0))
-        for i in range(np.size(self.curr_pop, 0)):
-            for j in range(np.size(self.whole_pop, 0)):
-                flag = check_dominance(self.curr_pop[i, :], self.whole_pop[j, :], num_objs)
-                if flag == -1:
-                    index_array[i] = 1
-                    break
+        num_objs = np.size(self.F, axis=1)
+        index_array = np.zeros(np.size(self.F, axis=0))
+
+        # filter out all solutions that are dominated by solutions found by other algorithms
+        if self.others is not None:
+            for i in range(np.size(self.F, 0)):
+                for j in range(np.size(self.others, 0)):
+                    flag = check_dominance(self.F[i, :], self.others[j, :], num_objs)
+                    if flag == -1:
+                        index_array[i] = 1
+                        break
+
         final_index = np.logical_not(index_array)
-        filtered_pop = self.curr_pop[final_index, :]
+        filtered_pop = self.F[final_index, :]
 
-        return filtered_pop
-
-    def _filter_fast(self):
-        filtered_pop = NonDominatedSorting.get_non_dominated(self.whole_pop, self.curr_pop)
         return filtered_pop
 
     def _preprocess(self, data, ref_point, w_point):
@@ -102,13 +104,6 @@ class RMetric(Indicator):
         return trimmed_data + shift_direction
 
     def _trim(self, pop, centeroid, range=0.2):
-        """
-        Box trimming
-        :param pop:
-        :param centeroid:
-        :param range:
-        :return:
-        """
         popsize, objDim = pop.shape
         diff_matrix = pop - np.tile(centeroid, (popsize, 1))[0]
         flags = np.sum(abs(diff_matrix) < range / 2, axis=1)
@@ -116,35 +111,52 @@ class RMetric(Indicator):
         return filtered_matrix
 
     def _trim_fast(self, pop, centeroid, range=0.2):
-        """
-        Euclidean trimming
-        :param pop:
-        :param centeroid:
-        :param range:
-        :return:
-        """
         centeroid_matrix = cdist(pop, centeroid, metric='euclidean')
         filtered_matrix = pop[np.where(centeroid_matrix < range / 2), :][0]
         return filtered_matrix
 
-    def calc(self, hyper_volume=True, delta=0.2, pf=None):
+    def calc(self, F, others=None, calc_hv=True):
         """
-        This method calculates the R-IGD and R-HV based off of the population that was provided
-        :return: R-IGD and R-HV
+
+        This method calculates the R-IGD and R-HV based off of the values provided.
+        
+        
+        Parameters
+        ----------
+
+        F : numpy.ndarray
+            The objective space values
+
+        others : numpy.ndarray
+            Results from other algorithms which should be used for filtering nds solutions
+
+        calc_hv : bool
+            Whether the hv is calculate - (None if more than 3 dimensions)
+
+
+        Returns
+        -------
+        rigd : float
+            R-IGD
+
+        rhv : float
+            R-HV if calc_hv is true and less or equal to 3 dimensions
+
         """
+        self.F, self.others = F, others
+
         translated = []
         final_PF = []
 
         # 1. Prescreen Procedure - NDS Filtering
         pop = self._filter()
 
-        if pf is not None:
-            solution = pf
-        else:
-            solution = self.problem.pareto_front()
+        pf = self.pf
+        if pf is None:
+            pf = self.problem.pareto_front()
 
-
-        # solution = calc_PF(1, 10000, 2)
+        if pf is None:
+            raise Exception("Please provide the Pareto front to calculate the R-Metric!")
 
         labels = np.argmin(cdist(pop, self.ref_points), axis=1)
 
@@ -154,47 +166,37 @@ class RMetric(Indicator):
                 # 2. Representative Point Identification
                 zp = self._preprocess(cluster, self.ref_points[i], w_point=self.w_points[i])[0]
                 # 3. Filtering Procedure - Filter points
-                trimmed_data = self._trim(cluster, zp, range=delta)
+                trimmed_data = self._trim(cluster, zp, range=self.delta)
                 # 4. Solution Translation
                 pop_t = self._translate(zp, trimmed_data, self.ref_points[i], w_point=self.w_points[i])
                 translated.extend(pop_t)
 
             # 5. R-Metric Computation
-            target = self._preprocess(data=solution, ref_point=self.ref_points[i], w_point=self.w_points[i])
-            PF = self._trim(solution, target)
+            target = self._preprocess(data=pf, ref_point=self.ref_points[i], w_point=self.w_points[i])
+            PF = self._trim(pf, target)
             final_PF.extend(PF)
 
         translated = np.array(translated)
+        final_PF = np.array(final_PF)
 
-        if np.size(translated) == 0:
-            igd = -1
-            volume = -1
-        else:
+        rigd, rhv = None, None
+
+        if len(translated) > 0:
+
             # IGD Computation
-            from pymoo.performance_indicator.igd import IGD
-            IGD_ = IGD(final_PF)
-            igd = IGD_.calc(translated)
-            # HV Computation
+            rigd = IGD(final_PF).calc(translated)
 
             nadir_point = np.amax(self.w_points, axis=0)
             front = translated
             dim = self.ref_points[0].shape[0]
-            if hyper_volume:
-                if dim < 3:
+            if calc_hv:
+                if dim <= 3:
                     try:
-                        # Python
-                        from pymoo.performance_indicator.hv import HyperVolume
-                        hv = HyperVolume(nadir_point)
-                        volume = hv.compute(front)
-                    except TypeError:
-                        volume = -1
+                        rhv = Hypervolume(ref_point=nadir_point).calc(front)
+                    except:
+                        pass
 
-                else:
-                    # cpp
-
-                    from pymoo.cpp.hypervolume.build import hypervolume
-
-                    volume = hypervolume.calculate(dim, len(front), front, nadir_point)
-            else:
-                volume = np.nan
-        return igd, volume
+        if calc_hv:
+            return rigd, rhv
+        else:
+            return rigd

@@ -2,7 +2,10 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
+from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.factory import get_decomposition
+from pymoo.model.individual import Individual
+from pymoo.model.population import Population
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
