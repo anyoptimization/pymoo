@@ -176,12 +176,22 @@ class MultiObjectiveDisplay(Display):
             self.output.append("n_nds", len(algorithm.opt), width=7)
             self.term.do_continue(algorithm)
 
-            delta_bounds, delta_f, hist_delta_max = "-", "-", "-"
+            max_from, eps = "-", "-"
 
             if len(self.term.metrics) > 0:
                 metric = self.term.metrics[-1]
-                delta_bounds = np.maximum(metric["delta_ideal"], metric["delta_nadir"])
-                delta_f = metric["delta_f"]
+                tol = self.term.tol
+                delta_ideal, delta_nadir, delta_f = metric["delta_ideal"], metric["delta_nadir"], metric["delta_f"]
 
-            self.output.append("delta_bounds", delta_bounds)
-            self.output.append("delta_f", delta_f)
+                if delta_ideal > tol:
+                    max_from = "ideal"
+                    eps = delta_ideal
+                elif delta_nadir > tol:
+                    max_from = "nadir"
+                    eps = delta_nadir
+                else:
+                    max_from = "f"
+                    eps = delta_f
+
+            self.output.append("eps", eps)
+            self.output.append("indicator", max_from)

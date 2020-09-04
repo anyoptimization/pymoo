@@ -46,7 +46,7 @@ def binary_tournament(pop, P, algorithm, **kwargs):
                     S[i] = b
 
             elif tournament_type == 'comp_by_rank_and_crowding':
-                S[i] = compare(a, pop[a].rank, b, pop[b].rank,
+                S[i] = compare(a, pop[a].get("rank"), b, pop[b].get("rank"),
                                method='smaller_is_better')
 
             else:
@@ -91,7 +91,6 @@ class NSGA2(GeneticAlgorithm):
 
         """
 
-        kwargs['individual'] = Individual(rank=np.inf, crowding=-1)
         super().__init__(pop_size=pop_size,
                          sampling=sampling,
                          selection=selection,
