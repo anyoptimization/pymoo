@@ -411,7 +411,7 @@ class Problem:
         if _type is None:
             [ret.append(func(x)) for x in X]
 
-        elif _type is "starmap":
+        elif _type == "starmap":
             if len(_params) != 1:
                 raise Exception("The starmap parallelization method must be accompanied by a starmapping callable")
 
