@@ -27,7 +27,8 @@ class AnimationCallback(Callback):
                 from pyrecorder.video import Video
                 from pyrecorder.converters.matplotlib import Matplotlib
             except:
-                print("Please install pyrecorder for animation support: pip install pyrecorder")
+                raise Exception("Please install pyrecorder for animation support: pip install pyrecorder")
+
             self.video = Video(File(fname), converter=Matplotlib(dpi=dpi))
 
     def notify(self, algorithm, **kwargs):
