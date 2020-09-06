@@ -260,6 +260,7 @@ def get_problem_options():
         ('dascmop7', DASCMOP7),
         ('dascmop8', DASCMOP8),
         ('dascmop9', DASCMOP9),
+        ('modact', MODAct),
         ('mw1', MW1),
         ('mw2', MW2),
         ('mw3', MW3),
