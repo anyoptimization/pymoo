@@ -46,6 +46,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         self.decomposition = decomposition
         self.cluster = cluster
         self.number_of_clusters = number_of_clusters
+        self.aggregations = []
         set_if_none(kwargs, 'pop_size', len(ref_dirs))
         set_if_none(kwargs, 'sampling', FloatRandomSampling())
         set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob=1.0, eta=20))
@@ -87,8 +88,9 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
 
         super()._initialize()
         self.ideal_point = np.min(self.pop.get("F"), axis=0)
-        transformation_matrix = self.apply_cluster_reduction()
-        self.ideal_point = np.dot(transformation_matrix, self.ideal_point)
+        self.apply_cluster_reduction()
+        self.aggregations.append(self.get_aggregation_string(self.transformation_matrix))
+        self.ideal_point = np.dot(self.transformation_matrix, self.ideal_point)
         self.current_generation = 0
     
     def _next(self):
@@ -98,12 +100,13 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         pop = self.pop
 
         self.evaluate_population_in_original_objectives(pop)
-        transformation_matrix = self.apply_cluster_reduction()
-
-        print(transformation_matrix)
+        self.apply_cluster_reduction()
+        self.aggregations.append(self.get_aggregation_string(self.transformation_matrix))
+        
+        print(self.get_aggregation_string(self.transformation_matrix))
         print('Current generation:', self.current_generation)
         
-        self.reduce_population(pop, transformation_matrix)
+        self.reduce_population(pop, self.transformation_matrix)
 
         # iterate for each member of the population in random order
         for i in np.random.permutation(len(pop)):
@@ -128,14 +131,14 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
             self.evaluator.eval(self.problem, off)
 
             # reduce objectives in offspring
-            off.F = np.dot(transformation_matrix, off.F)
+            off.F = np.dot(self.transformation_matrix, off.F)
             
             # update the ideal point
             self.ideal_point = np.min(np.vstack([self.ideal_point, off.F]), axis=0)
 
             # calculate the decomposed values for each neighbor
-            FV = self._decomposition.do(pop[N].get("F"), weights=np.dot(transformation_matrix, self.ref_dirs[N, :].T).T, ideal_point=self.ideal_point)#, utopian_point=np.array([0,0])
-            off_FV = self._decomposition.do(off.F[None, :], np.dot(transformation_matrix, self.ref_dirs[N, :].T).T, ideal_point=self.ideal_point)#, utopian_point=np.array([0,0])
+            FV = self._decomposition.do(pop[N].get("F"), weights=np.dot(self.transformation_matrix, self.ref_dirs[N, :].T).T, ideal_point=self.ideal_point)#, utopian_point=np.array([0,0])
+            off_FV = self._decomposition.do(off.F[None, :], np.dot(self.transformation_matrix, self.ref_dirs[N, :].T).T, ideal_point=self.ideal_point)#, utopian_point=np.array([0,0])
 
             # get the absolute index in F where offspring is better than the current F (decomposed space)
             I = np.where(off_FV < FV)[0]
@@ -157,9 +160,25 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
     def _finalize(self):
         for individual in self.pop:
             individual.F = self.problem.evaluate(individual.get('X'))
+
+        print(self.aggregations)
     
     def apply_cluster_reduction(self):
         cluster = self.cluster(n_clusters=self.number_of_clusters)
         cluster.fit(np.array([individual.F for individual in self.pop]).T)
-        return self.get_transformation_matrix(cluster)
+        self.transformation_matrix = self.get_transformation_matrix(cluster)
+
+    def get_aggregation_string(self, transformation_matrix):
+        aggregation = []
+        for i in range(len(transformation_matrix)):
+            line = ''
+            for j in range(len(transformation_matrix[0])):
+                if transformation_matrix[i][j] == 1:
+                    function_number = j
+                    function_number += 1
+                    line += 'f' + str(function_number)
+            aggregation.append(line)
+        return '-'.join([i for i in sorted(aggregation)])
+
+
 # parse_doc_string(MOEAD.__init__)
