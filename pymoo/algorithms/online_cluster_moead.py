@@ -87,14 +87,10 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
 
         super()._initialize()
         self.ideal_point = np.min(self.pop.get("F"), axis=0)
-        X = np.array([individual.F for individual in self.pop])
-        cluster = self.cluster(n_clusters=self.number_of_clusters)
-        cluster.fit(X.T)
-        transformation_matrix = self.get_transformation_matrix(cluster)
+        transformation_matrix = self.apply_cluster_reduction()
         self.ideal_point = np.dot(transformation_matrix, self.ideal_point)
-
         self.current_generation = 0
-
+    
     def _next(self):
         repair, crossover, mutation = self.repair, self.mating.crossover, self.mating.mutation
 
@@ -102,16 +98,13 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         pop = self.pop
 
         self.evaluate_population_in_original_objectives(pop)
+        transformation_matrix = self.apply_cluster_reduction()
 
-        # generate cluster for current population
-        X = np.array([individual.F for individual in self.pop])
-        cluster = self.cluster(n_clusters=self.number_of_clusters)
-        cluster.fit(X.T)
-        transformation_matrix = self.get_transformation_matrix(cluster)
         print(transformation_matrix)
         print('Current generation:', self.current_generation)
         
         self.reduce_population(pop, transformation_matrix)
+
         # iterate for each member of the population in random order
         for i in np.random.permutation(len(pop)):
 
@@ -141,8 +134,8 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
             self.ideal_point = np.min(np.vstack([self.ideal_point, off.F]), axis=0)
 
             # calculate the decomposed values for each neighbor
-            FV = self._decomposition.do(pop[N].get("F"), weights=np.dot(transformation_matrix, self.ref_dirs[N, :].T).T, ideal_point=self.ideal_point, utopian_point=np.array([0,0]))
-            off_FV = self._decomposition.do(off.F[None, :], np.dot(transformation_matrix, self.ref_dirs[N, :].T).T, ideal_point=self.ideal_point, utopian_point=np.array([0,0]))
+            FV = self._decomposition.do(pop[N].get("F"), weights=np.dot(transformation_matrix, self.ref_dirs[N, :].T).T, ideal_point=self.ideal_point)#, utopian_point=np.array([0,0])
+            off_FV = self._decomposition.do(off.F[None, :], np.dot(transformation_matrix, self.ref_dirs[N, :].T).T, ideal_point=self.ideal_point)#, utopian_point=np.array([0,0])
 
             # get the absolute index in F where offspring is better than the current F (decomposed space)
             I = np.where(off_FV < FV)[0]
@@ -160,4 +153,13 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
     def evaluate_population_in_original_objectives(self, population):
         for individual in population:
             individual.F = self.problem.evaluate(individual.get('X'))
+
+    def _finalize(self):
+        for individual in self.pop:
+            individual.F = self.problem.evaluate(individual.get('X'))
+    
+    def apply_cluster_reduction(self):
+        cluster = self.cluster(n_clusters=self.number_of_clusters)
+        cluster.fit(np.array([individual.F for individual in self.pop]).T)
+        return self.get_transformation_matrix(cluster)
 # parse_doc_string(MOEAD.__init__)
