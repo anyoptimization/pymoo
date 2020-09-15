@@ -25,6 +25,7 @@ class Plot:
                  axis_label_style=None,
                  func_number_to_text=default_number_to_text,
                  labels="f",
+                 close_on_destroy=True,
                  **kwargs):
 
         super().__init__()
@@ -36,6 +37,9 @@ class Plot:
         self.fig = fig
         self.ax = ax
         self.figsize = figsize
+
+        # whether the figure should be closed when object is destroyed
+        self.close_on_destroy = close_on_destroy
 
         # the title of the figure - can also be a list if subfigures
         self.title = title
@@ -190,7 +194,7 @@ class Plot:
             return [f"${self.axis_labels}_{{{i}}}$" for i in range(1, self.n_dim + 1)]
 
     def __del__(self):
-        if self.fig is not None:
+        if self.fig is not None and self.close_on_destroy:
             plt.close(self.fig)
 
 

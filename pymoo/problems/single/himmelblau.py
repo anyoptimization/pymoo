@@ -4,7 +4,7 @@ from pymoo.model.problem import Problem
 
 
 class Himmelblau(Problem):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__(n_var=2, n_obj=1, n_constr=0, xl=-6, xu=6, type_var=anp.double)
 
     def _evaluate(self, x, out, *args, **kwargs):
