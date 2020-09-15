@@ -27,7 +27,10 @@ class MODAct(Problem):
     IEEE Transactions on Evolutionary Computation, pp. 1–1, 2020.
     """
     def __init__(self, function, **kwargs):
-        import modact.problems as pb
+        try:
+            import modact.problems as pb
+        except:
+            raise Exception("Please install the modact library: https://github.com/epfl-lamd/modact")
 
         if isinstance(function, pb.Problem):
             self.fct = function

@@ -83,7 +83,11 @@ def euclidean_distance(a, b):
 
 
 def norm_euclidean_distance(problem):
-    return lambda a, b: np.sqrt((((a - b) / (problem.xu - problem.xl)) ** 2).sum(axis=1))
+    return norm_euclidean_distance_by_bounds(problem.xl, problem.xu)
+
+
+def norm_euclidean_distance_by_bounds(xl, xu):
+    return lambda a, b: np.sqrt((((a - b) / (xu - xl)) ** 2).sum(axis=1))
 
 
 def cdist(A, B, **kwargs):
@@ -105,6 +109,10 @@ def vectorized_cdist(A, B, func_dist=euclidean_distance, fill_diag_with_inf=Fals
 
 def norm_eucl_dist(problem, A, B, **kwargs):
     return vectorized_cdist(A, B, func_dist=norm_euclidean_distance(problem), **kwargs)
+
+
+def norm_eucl_dist_by_bounds(A, B, xl, xu, **kwargs):
+    return vectorized_cdist(A, B, func_dist=norm_euclidean_distance_by_bounds(xl, xu), **kwargs)
 
 
 def covert_to_type(problem, X):
