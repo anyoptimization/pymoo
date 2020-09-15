@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.spatial.distance import pdist, squareform, cdist
+from scipy.spatial.distance import cdist
 
 from pymoo.model.problem import Problem
 

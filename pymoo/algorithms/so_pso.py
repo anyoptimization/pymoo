@@ -327,7 +327,8 @@ class PSOAnimation(AnimationCallback):
         FitnessLandscape(problem,
                          _type="contour",
                          kwargs_contour=dict(alpha=0.3),
-                         n_samples=self.n_samples_for_surface).do()
+                         n_samples=self.n_samples_for_surface,
+                         close_on_destroy=False).do()
 
         # get the population
         off = algorithm.pop

@@ -150,6 +150,7 @@ numpydoc_edit_link = False
 # =========================================================================================================
 
 html_theme = 'custom_theme'
+# html_theme = 'scipy_sphinx_theme'
 html_theme_path = ['_theme']
 html_static_path = ['_static']
 
