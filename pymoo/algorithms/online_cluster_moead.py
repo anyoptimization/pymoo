@@ -51,6 +51,8 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         self.interval_of_aggregations = interval_of_aggregations
         self.aggregations = []
         self.hvs = []
+        self.igds = []
+
         set_if_none(kwargs, 'pop_size', len(ref_dirs))
         set_if_none(kwargs, 'sampling', FloatRandomSampling())
         set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob=1.0, eta=20))
@@ -98,7 +100,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         self.ideal_point = np.dot(self.transformation_matrix, self.ideal_point)
         
         self.hv = get_performance_indicator("hv", ref_point=np.array([1.2]*self.problem.n_obj))
-        print('number of objectives',self.problem.n_obj)
+        self.igd_plus = get_performance_indicator("igd+", self.problem.pareto_front(ref_dirs=self.ref_dirs))
         
     def _next(self):
         repair, crossover, mutation = self.repair, self.mating.crossover, self.mating.mutation
@@ -107,15 +109,16 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         pop = self.pop
 
         self.evaluate_population_in_original_objectives(pop)
-
         self.apply_cluster_reduction()
         self.aggregations.append(self.get_aggregation_string(self.transformation_matrix))
         
         print(self.get_aggregation_string(self.transformation_matrix))
         print('Current generation:', self.current_generation)
         current_hv = self.get_hypervolume(pop)
+        current_igd = self.get_igd(pop)
         self.hvs.append(current_hv)
-        print(current_hv)
+        self.igds.append(current_igd)
+        print('Metrics HV {} IDG+ {}'.format(current_hv, current_igd))
         self.reduce_population(pop, self.transformation_matrix)
 
         # iterate for each member of the population in random order
@@ -173,6 +176,10 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
 
         plt.plot(self.hvs)
         plt.show()
+
+        plt.plot(self.igds)
+        plt.show()
+        
         print(self.aggregations)
     
     def apply_cluster_reduction(self):
@@ -195,4 +202,8 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
 
     def get_hypervolume(self, population):
         return self.hv.calc(population.get('F'))
+    
+    def get_igd(self, population):
+        return self.igd_plus.calc(population.get('F'))
+         
 # parse_doc_string(MOEAD.__init__)
