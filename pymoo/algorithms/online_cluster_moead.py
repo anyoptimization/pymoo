@@ -28,6 +28,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
                  cluster=KMeans,
                  number_of_clusters=2,
                  interval_of_aggregations=1,
+                 save_current_iteration_data=True,
                  **kwargs):
         """
 
