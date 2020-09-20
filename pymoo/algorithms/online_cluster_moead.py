@@ -50,6 +50,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         self.cluster = cluster
         self.number_of_clusters = number_of_clusters
         self.interval_of_aggregations = interval_of_aggregations
+        self.save_current_iteration_data = save_current_iteration_data
         self.aggregations = []
         self.hvs = []
         self.igds = []
@@ -159,6 +160,9 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
             pop[N[I]] = off
         self.current_generation += 1
 
+        if self.save_current_iteration_data:
+            self.save_current_iteration_files()
+
     def get_transformation_matrix(self, cluster):
         return pd.get_dummies(cluster.labels_).T.values
     
@@ -206,5 +210,8 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
     
     def get_igd(self, population):
         return self.igd_plus.calc(population.get('F'))
+
+    def save_current_iteration_files(self):
+        pass
          
 # parse_doc_string(MOEAD.__init__)
