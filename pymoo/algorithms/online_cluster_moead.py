@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from scipy.spatial.distance import cdist
 
@@ -28,6 +29,8 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
                  cluster=KMeans,
                  number_of_clusters=2,
                  interval_of_aggregations=1,
+                 current_execution_number=0,
+                 save_dir='',
                  save_current_iteration_data=True,
                  **kwargs):
         """
@@ -50,6 +53,8 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         self.cluster = cluster
         self.number_of_clusters = number_of_clusters
         self.interval_of_aggregations = interval_of_aggregations
+        self.current_execution_number = current_execution_number
+        self.save_dir = save_dir
         self.save_current_iteration_data = save_current_iteration_data
         self.aggregations = []
         self.hvs = []
@@ -103,6 +108,8 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         
         self.hv = get_performance_indicator("hv", ref_point=np.array([1.2]*self.problem.n_obj))
         self.igd_plus = get_performance_indicator("igd+", self.problem.pareto_front(ref_dirs=self.ref_dirs))
+        self.create_result_folders()
+        
         
     def _next(self):
         repair, crossover, mutation = self.repair, self.mating.crossover, self.mating.mutation
@@ -120,6 +127,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         current_igd = self.get_igd(pop)
         self.hvs.append(current_hv)
         self.igds.append(current_igd)
+
         print('Metrics HV {} IDG+ {}'.format(current_hv, current_igd))
         self.reduce_population(pop, self.transformation_matrix)
 
@@ -179,13 +187,9 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         for individual in self.pop:
             individual.F = self.problem.evaluate(individual.get('X'))
 
-        plt.plot(self.hvs)
-        plt.show()
-
-        plt.plot(self.igds)
-        plt.show()
-        
-        print(self.aggregations)
+        self.save_data('aggregations.txt', self.aggregations)
+        self.save_data('hv_convergence.txt', self.hvs)
+        self.save_data('igd_convergence.txt', self.igds)
     
     def apply_cluster_reduction(self):
         if self.current_generation % self.interval_of_aggregations == 0:
@@ -213,5 +217,19 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
 
     def save_current_iteration_files(self):
         pass
-         
-# parse_doc_string(MOEAD.__init__)
+    
+    def save_data(self, file_name, data_list):
+        with open(os.path.join(self.full_path, file_name),'w') as file:
+            print(data_list)
+            for data in data_list:
+                file.write(str(data) + '\n')
+
+    def create_result_folders(self):
+        folder = 'Execution {}'.format(self.current_execution_number)
+        self.full_path = os.path.join(self.save_dir, folder)
+        
+        if not os.path.exists(self.full_path):
+            os.makedirs(self.full_path)
+            print('Execution folder created!')
+        else:
+            print('Folder already exists!')

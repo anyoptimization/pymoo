@@ -18,6 +18,7 @@ class ExperimentOnlineClusterMOEAD(object):
                  problem=get_problem("dtlz1"),
                  number_of_executions=1,
                  termination=('n_gen',100),
+                 save_dir='',
                  verbose=False,
                  save_history=True,
                  use_different_seeds=True,
@@ -28,10 +29,11 @@ class ExperimentOnlineClusterMOEAD(object):
         self.problem = problem
         self.number_of_executions = number_of_executions
         self.termination = termination
+        self.save_dir = save_dir
         self.verbose = verbose
         self.save_history = save_history
         self.show_heat_map = show_heat_map
-        
+
         if use_different_seeds:
             self.algorithms  = [OnlineClusterMOEAD(
                                         ref_dirs,
@@ -41,6 +43,8 @@ class ExperimentOnlineClusterMOEAD(object):
                                         seed=i,
                                         number_of_clusters=number_of_clusters,
                                         interval_of_aggregations=interval_of_aggregations,
+                                        current_execution_number=i,
+                                        save_dir=self.save_dir,
                                         save_current_iteration_data=self.save_algorith_current_iteration_data,
                                         cluster=cluster) for i in range(self.number_of_executions)]
         else:
@@ -52,9 +56,12 @@ class ExperimentOnlineClusterMOEAD(object):
                                         seed=1,
                                         number_of_clusters=number_of_clusters,
                                         interval_of_aggregations=interval_of_aggregations,
+                                        current_execution_number=i,
+                                        save_dir=self.save_dir,
                                         save_current_iteration_data=self.save_algorith_current_iteration_data,
                                         cluster=cluster) for i in range(self.number_of_executions)]
     def run(self):
+        print('run is ok!')
         self.current_execution = 1
         for algorithm in self.algorithms:
             res = minimize(
@@ -64,7 +71,7 @@ class ExperimentOnlineClusterMOEAD(object):
                  verbose=self.verbose,
                  save_history=self.save_history)
 
-            get_visualization("scatter").add(res.F).show()
+            # get_visualization("scatter").add(res.F).show()
             self.save_current_execution_files()
             self.current_execution +=1
 
@@ -73,8 +80,8 @@ class ExperimentOnlineClusterMOEAD(object):
             self.generate_aggregation_heat_map()
     
     def save_current_execution_files(self):
+        print('showing current population')
         
-        pass
 
     def generate_aggregation_heat_map(self):
         pass
