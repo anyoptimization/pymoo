@@ -31,7 +31,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
                  interval_of_aggregations=1,
                  current_execution_number=0,
                  save_dir='',
-                 save_current_iteration_data=True,
+                 save_data=True,
                  **kwargs):
         """
 
@@ -55,7 +55,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         self.interval_of_aggregations = interval_of_aggregations
         self.current_execution_number = current_execution_number
         self.save_dir = save_dir
-        self.save_current_iteration_data = save_current_iteration_data
+        self.save_data = save_data
         self.aggregations = []
         self.hvs = []
         self.igds = []
@@ -168,7 +168,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
             pop[N[I]] = off
         self.current_generation += 1
 
-        if self.save_current_iteration_data:
+        if self.save_data:
             self.save_current_iteration_files()
 
     def get_transformation_matrix(self, cluster):
@@ -186,10 +186,11 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
     def _finalize(self):
         for individual in self.pop:
             individual.F = self.problem.evaluate(individual.get('X'))
-
-        self.save_data('aggregations.txt', self.aggregations)
-        self.save_data('hv_convergence.txt', self.hvs)
-        self.save_data('igd_convergence.txt', self.igds)
+        
+        if self.save_data:
+            self.save_algorithm_data('aggregations.txt', self.aggregations)
+            self.save_algorithm_data('hv_convergence.txt', self.hvs)
+            self.save_algorithm_data('igd_convergence.txt', self.igds)
     
     def apply_cluster_reduction(self):
         if self.current_generation % self.interval_of_aggregations == 0:
@@ -218,9 +219,8 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
     def save_current_iteration_files(self):
         pass
     
-    def save_data(self, file_name, data_list):
+    def save_algorithm_data(self, file_name, data_list):
         with open(os.path.join(self.full_path, file_name),'w') as file:
-            print(data_list)
             for data in data_list:
                 file.write(str(data) + '\n')
 

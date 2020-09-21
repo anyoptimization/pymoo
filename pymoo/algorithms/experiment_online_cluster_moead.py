@@ -14,7 +14,7 @@ class ExperimentOnlineClusterMOEAD(object):
                  cluster=KMeans,
                  number_of_clusters=2,
                  interval_of_aggregations=1,
-                 save_algorith_current_iteration_data=True,
+                 save_data=True,
                  problem=get_problem("dtlz1"),
                  number_of_executions=1,
                  termination=('n_gen',100),
@@ -25,7 +25,7 @@ class ExperimentOnlineClusterMOEAD(object):
                  show_heat_map=True,
                  **kwargs):
 
-        self.save_algorith_current_iteration_data = save_algorith_current_iteration_data
+        self.save_data = save_data
         self.problem = problem
         self.number_of_executions = number_of_executions
         self.termination = termination
@@ -45,7 +45,7 @@ class ExperimentOnlineClusterMOEAD(object):
                                         interval_of_aggregations=interval_of_aggregations,
                                         current_execution_number=i,
                                         save_dir=self.save_dir,
-                                        save_current_iteration_data=self.save_algorith_current_iteration_data,
+                                        save_data=self.save_data,
                                         cluster=cluster) for i in range(self.number_of_executions)]
         else:
             self.algorithms  = [OnlineClusterMOEAD(
@@ -58,7 +58,7 @@ class ExperimentOnlineClusterMOEAD(object):
                                         interval_of_aggregations=interval_of_aggregations,
                                         current_execution_number=i,
                                         save_dir=self.save_dir,
-                                        save_current_iteration_data=self.save_algorith_current_iteration_data,
+                                        save_data=self.save_data,
                                         cluster=cluster) for i in range(self.number_of_executions)]
     def run(self):
         print('run is ok!')
