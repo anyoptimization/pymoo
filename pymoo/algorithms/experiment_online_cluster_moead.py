@@ -23,12 +23,11 @@ class ExperimentOnlineClusterMOEAD(object):
                  save_data=True,
                  problem=get_problem("dtlz1"),
                  number_of_executions=1,
-                 termination=('n_gen',100),
+                 termination=('n_gen', 100),
                  save_dir='',
                  verbose=False,
                  save_history=True,
                  use_different_seeds=True,
-                 show_heat_map=True,
                  **kwargs):
 
         self.save_data = save_data
@@ -38,7 +37,6 @@ class ExperimentOnlineClusterMOEAD(object):
         self.save_dir = save_dir
         self.verbose = verbose
         self.save_history = save_history
-        self.show_heat_map = show_heat_map
 
         if use_different_seeds:
             self.algorithms  = [OnlineClusterMOEAD(
@@ -81,11 +79,7 @@ class ExperimentOnlineClusterMOEAD(object):
             # get_visualization("scatter").add(res.F).show()
             self.current_execution +=1
 
-        #generate heatmap if number of executions is greater than 1
-        if self.show_heat_map:
-            self.generate_heat_map()
-
-    def generate_heat_map(self):
+    def show_heat_map(self):
         aggregations = []
         for i in range(self.number_of_executions):
             aggregations.append(pd.read_csv(os.path.join(self.save_dir,'Execution {}'.format(i), 'aggregations.txt'), header=None))
@@ -122,3 +116,26 @@ class ExperimentOnlineClusterMOEAD(object):
         plt.title('Aggregation Heat Map', fontsize=20)
         plt.savefig(os.path.join(self.save_dir, 'heat_map.pdf'))
         plt.show()
+
+    def show_mean_convergence(self, file_name):
+        convergence = pd.DataFrame(self.generate_mean_convergence(file_name)).mean().values
+        self.save_convergence(file_name, convergence)
+        plt.xlabel('Generation', fontsize=20)
+        plt.ylabel(file_name.split('_')[0], fontsize=20)
+        plt.plot(convergence)
+        plt.title('Convergence', fontsize=20)
+        plt.savefig(os.path.join(self.save_dir, file_name.split('.')[0] + '.pdf'))
+        plt.show()
+
+    def generate_mean_convergence(self, file_name):
+        return [self.read_data_file(os.path.join(self.save_dir, 'Execution {}'.format(execution), file_name)) 
+                                for execution in range(self.number_of_executions)]      
+            
+    def read_data_file(self, file_path):
+        with open(file_path, 'r') as file:
+            lines = [float(line.replace('\n','')) for line in file.readlines()]
+            return lines
+
+    def save_convergence(self, file_name, convergence):
+        with open(os.path.join(self.save_dir, 'mean_' + file_name), 'w') as file:
+            file.write('\n'.join([str(i) for i in convergence]))

@@ -147,7 +147,8 @@ class MOEAD(GeneticAlgorithm):
             # get the absolute index in F where offspring is better than the current F (decomposed space)
             I = np.where(off_FV < FV)[0]
             pop[N[I]] = off
-
+        self.current_generation += 1
+        
     def _finalize(self):        
         if self.save_data:
             self.save_algorithm_data('hv_convergence.txt', self.hvs)
