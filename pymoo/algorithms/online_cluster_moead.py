@@ -129,6 +129,10 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         self.igds.append(current_igd)
 
         print('Metrics HV {} IDG+ {}'.format(current_hv, current_igd))
+
+        if self.save_data:
+            self.save_current_iteration_files(pop)
+        
         self.reduce_population(pop, self.transformation_matrix)
 
         # iterate for each member of the population in random order
@@ -167,9 +171,6 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
             I = np.where(off_FV < FV)[0]
             pop[N[I]] = off
         self.current_generation += 1
-
-        if self.save_data:
-            self.save_current_iteration_files()
 
     def get_transformation_matrix(self, cluster):
         return pd.get_dummies(cluster.labels_).T.values
@@ -216,9 +217,12 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
     def get_igd(self, population):
         return self.igd_plus.calc(population.get('F'))
 
-    def save_current_iteration_files(self):
-        pass
-    
+    def save_current_iteration_files(self, population):
+        variables = [individual.get('X') for individual in population]
+        objectives = [individual.get('F') for individual in population]
+        self.save_algorithm_data('variables_{}.txt'.format(self.current_generation), variables)
+        self.save_algorithm_data('objectives_{}.txt'.format(self.current_generation), objectives)
+        
     def save_algorithm_data(self, file_name, data_list):
         with open(os.path.join(self.full_path, file_name),'w') as file:
             for data in data_list:
