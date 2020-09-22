@@ -67,15 +67,16 @@ class ExperimentOnlineClusterMOEAD(object):
                                         save_data=self.save_data,
                                         cluster=cluster) for i in range(self.number_of_executions)]
     def run(self):
+        results = []
         print('run is ok!')
         self.current_execution = 1
         for algorithm in self.algorithms:
-            res = minimize(
+            results.append(minimize(
                 self.problem,
                  algorithm,
                  termination=self.termination,
                  verbose=self.verbose,
-                 save_history=self.save_history)
+                 save_history=self.save_history))
 
             # get_visualization("scatter").add(res.F).show()
             self.current_execution +=1
