@@ -54,9 +54,9 @@ class ExperimentMOEAD(object):
                                       save_data=self.save_data) for i in range(self.number_of_executions)]
     def run(self):
         results = []
-        print('run is ok!')
         self.current_execution = 1
         for algorithm in self.algorithms:
+            print('CURRENT EXECUTION {}'.format(self.current_execution))
             results.append(minimize(
                 self.problem,
                  algorithm,
@@ -69,12 +69,13 @@ class ExperimentMOEAD(object):
     def show_mean_convergence(self, file_name):
         convergence = pd.DataFrame(self.generate_mean_convergence(file_name)).mean().values
         self.save_convergence(file_name, convergence)
+        plt.figure()
         plt.xlabel('Generation', fontsize=20)
         plt.ylabel(file_name.split('_')[0], fontsize=20)
         plt.plot(convergence)
         plt.title('Convergence', fontsize=20)
         plt.savefig(os.path.join(self.save_dir, file_name.split('.')[0] + '.pdf'))
-        plt.show()
+        #plt.show()
 
     def generate_mean_convergence(self, file_name):
         return [self.read_data_file(os.path.join(self.save_dir, 'Execution {}'.format(execution), file_name)) 

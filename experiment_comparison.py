@@ -33,22 +33,32 @@ def generate_boxplots(number_of_executions, file_name, save_files_path, results_
     plt.boxplot([data_1, data_2], labels=[algorithm_1, algorithm_2])
     plt.savefig(os.path.join(save_files_path, file_name.split('_')[0] + '_boxplot.pdf'))
     plt.show()
-    
+
+def create_folder(full_path):
+    if not os.path.exists(full_path):
+        os.makedirs(full_path)
+        print('Final results folder created!')
+    else:
+        print('Folder already exists!')
+
 problem = 'DTLZ2'
 original_dimension = 4
 reduced_dimension = 2
-algorithm_1 = 'MOEAD'
+number_of_executions = 11
+algorithm_1 = 'MOEAD_{}_{}'.format(problem, original_dimension)
 results_path_1 = '.\\experiment_results'
-algorithm_2 = 'OnlineClusterMOEAD'
+algorithm_2 = 'OnlineClusterMOEAD_{}_{}_{}'.format(problem, original_dimension, reduced_dimension)
 results_path_2 = '.\\experiment_results'
-save_files_path = '.\\experiment_results'
+save_files_path = '.\\experiment_results\\{}_{}_{}'.format(problem, original_dimension, reduced_dimension)
 hv_file_name = 'mean_hv_convergence.txt'
 igd_file_name = 'mean_igd_convergence.txt'
+
+create_folder(save_files_path)
 
 generate_convergence_plot(hv_file_name, save_files_path, results_path_1, algorithm_1, results_path_2, algorithm_2)
 generate_convergence_plot(igd_file_name, save_files_path, results_path_1, algorithm_1, results_path_2, algorithm_2)
 
-generate_boxplots(3, 'hv_convergence.txt', save_files_path, results_path_1, algorithm_1,
+generate_boxplots(number_of_executions, 'hv_convergence.txt', save_files_path, results_path_1, algorithm_1,
  results_path_2, algorithm_2)
-generate_boxplots(3, 'igd_convergence.txt',save_files_path, results_path_1, algorithm_1,
+generate_boxplots(number_of_executions, 'igd_convergence.txt',save_files_path, results_path_1, algorithm_1,
  results_path_2, algorithm_2)
