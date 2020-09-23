@@ -6,17 +6,18 @@ from sklearn.cluster import AgglomerativeClustering
 from pymoo.algorithms.experiment_online_cluster_moead import ExperimentOnlineClusterMOEAD
 
 original_dimension = 4
-reduced_dimention = 2
+reduced_dimension = 2
 n_neighbors=15
 decomposition_type = 'pbi'
 prob_neighbor_mating = 0.3
 interval_of_aggregations = 1
 save_data = True
 termination_criterion = ('n_gen', 20)
-save_dir = '.\\experiment_results\\OnlineClusterMOEAD'
+problem = get_problem("dtlz2", n_obj=original_dimension)
+
+save_dir = '.\\experiment_results\\OnlineClusterMOEAD_{}_{}_{}'.format(problem.name(), original_dimension, reduced_dimension)
 number_of_executions = 3
 reference_directions = get_reference_directions("das-dennis", original_dimension, n_partitions=12)
-problem = get_problem("dtlz2", n_obj=original_dimension)
 show_heat_map = True
 
 experiment = ExperimentOnlineClusterMOEAD(
@@ -24,7 +25,7 @@ experiment = ExperimentOnlineClusterMOEAD(
     n_neighbors=n_neighbors,
     decomposition=decomposition_type,
     prob_neighbor_mating=prob_neighbor_mating,
-    number_of_clusters=reduced_dimention,
+    number_of_clusters=reduced_dimension,
     interval_of_aggregations=interval_of_aggregations,
     problem=problem,
     cluster=AgglomerativeClustering,

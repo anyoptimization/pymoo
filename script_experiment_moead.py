@@ -10,10 +10,11 @@ decomposition_type = 'pbi'
 prob_neighbor_mating = 0.3
 save_data = True
 termination_criterion = ('n_gen', 20)
-save_dir = '.\\experiment_results\\MOEAD'
+problem = get_problem("dtlz2", n_obj=original_dimension)
+save_dir = '.\\experiment_results\\MOEAD_{}_{}'.format(problem.name(), original_dimension)
 number_of_executions = 3
 reference_directions = get_reference_directions("das-dennis", original_dimension, n_partitions=12)
-problem = get_problem("dtlz2", n_obj=original_dimension)
+
 
 experiment = ExperimentMOEAD(
     reference_directions,
