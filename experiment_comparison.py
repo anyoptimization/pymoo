@@ -43,13 +43,14 @@ def create_folder(full_path):
 
 problem = 'DTLZ2'
 original_dimension = 4
-reduced_dimension = 2
-number_of_executions = 11
+reduced_dimension = 3
+number_of_executions = 3
+interval_of_aggregations = 1
 algorithm_1 = 'MOEAD_{}_{}'.format(problem, original_dimension)
 results_path_1 = '.\\experiment_results'
-algorithm_2 = 'OnlineClusterMOEAD_{}_{}_{}'.format(problem, original_dimension, reduced_dimension)
+algorithm_2 = 'OnlineClusterMOEAD_{}_{}_{}_{}'.format(problem, original_dimension, reduced_dimension, interval_of_aggregations)
 results_path_2 = '.\\experiment_results'
-save_files_path = '.\\experiment_results\\{}_{}_{}'.format(problem, original_dimension, reduced_dimension)
+save_files_path = '.\\experiment_results\\{}_{}_{}_{}'.format(problem, original_dimension, reduced_dimension, interval_of_aggregations)
 hv_file_name = 'mean_hv_convergence.txt'
 igd_file_name = 'mean_igd_convergence.txt'
 

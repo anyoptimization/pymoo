@@ -31,6 +31,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
                  number_of_clusters=2,
                  interval_of_aggregations=1,
                  current_execution_number=0,
+                 use_random_aggregation=False,
                  save_dir='',
                  save_data=True,
                  **kwargs):
@@ -55,6 +56,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         self.number_of_clusters = number_of_clusters
         self.interval_of_aggregations = interval_of_aggregations
         self.current_execution_number = current_execution_number
+        self.use_random_aggregation = use_random_aggregation
         self.save_dir = save_dir
         self.save_data = save_data
         self.aggregations = []
@@ -176,6 +178,13 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
     def get_transformation_matrix(self, cluster):
         return pd.get_dummies(cluster.labels_).T.values
     
+    def get_random_transformation_matrix(self, cluster):
+        self.number_of_clusters
+        self.problem.n_obj
+
+        np.random.randint()
+        pass
+
     def reduce_population(self, population, transformation_matrix):
         for individual in population:
             individual.F = self.problem.evaluate(individual.get('X'))
@@ -196,13 +205,24 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
     
     def apply_cluster_reduction(self):
         if self.current_generation % self.interval_of_aggregations == 0:
-            dataframe = pd.DataFrame(np.array([individual.F for individual in self.pop]))
-            similarity = 1 - dataframe.corr(method='kendall').values
-            cluster = self.cluster(n_clusters=self.number_of_clusters, affinity='precomputed', linkage='single')
-            cluster.fit(similarity)
-            # cluster = self.cluster(n_clusters=self.number_of_clusters)
-            # cluster.fit(np.array([individual.F for individual in self.pop]).T)
-            self.transformation_matrix = self.get_transformation_matrix(cluster)
+            if not self.use_random_aggregation:
+                dataframe = pd.DataFrame(np.array([individual.F for individual in self.pop]))
+                similarity = 1 - dataframe.corr(method='kendall').values
+                print(dataframe.corr(method='kendall').values)
+                cluster = self.cluster(n_clusters=self.number_of_clusters, affinity='precomputed', linkage='single')
+                cluster.fit(similarity)
+                # cluster = self.cluster(n_clusters=self.number_of_clusters)
+                # cluster.fit(np.array([individual.F for individual in self.pop]).T)
+                self.transformation_matrix = self.get_transformation_matrix(cluster)
+            else:
+                dataframe = pd.DataFrame(np.random.randn(len(self.pop), self.problem.n_obj))
+                similarity = 1 - dataframe.corr(method='kendall').values
+                print(dataframe.corr(method='kendall').values)
+                cluster = self.cluster(n_clusters=self.number_of_clusters, affinity='precomputed', linkage='single')
+                cluster.fit(similarity)
+                # cluster = self.cluster(n_clusters=self.number_of_clusters)
+                # cluster.fit(np.array([individual.F for individual in self.pop]).T)
+                self.transformation_matrix = self.get_transformation_matrix(cluster)
 
     def get_aggregation_string(self, transformation_matrix):
         aggregation = []

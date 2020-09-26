@@ -24,6 +24,7 @@ class ExperimentOnlineClusterMOEAD(object):
                  problem=get_problem("dtlz1"),
                  number_of_executions=1,
                  termination=('n_gen', 100),
+                 use_random_aggregation=False,
                  save_dir='',
                  verbose=False,
                  save_history=True,
@@ -34,6 +35,7 @@ class ExperimentOnlineClusterMOEAD(object):
         self.problem = problem
         self.number_of_executions = number_of_executions
         self.termination = termination
+        self.use_random_aggregation = use_random_aggregation
         self.save_dir = save_dir
         self.verbose = verbose
         self.save_history = save_history
@@ -48,6 +50,7 @@ class ExperimentOnlineClusterMOEAD(object):
                                         number_of_clusters=number_of_clusters,
                                         interval_of_aggregations=interval_of_aggregations,
                                         current_execution_number=i,
+                                        use_random_aggregation = use_random_aggregation,
                                         save_dir=self.save_dir,
                                         save_data=self.save_data,
                                         cluster=cluster) for i in range(self.number_of_executions)]
@@ -61,6 +64,7 @@ class ExperimentOnlineClusterMOEAD(object):
                                         number_of_clusters=number_of_clusters,
                                         interval_of_aggregations=interval_of_aggregations,
                                         current_execution_number=i,
+                                        use_random_aggregation = use_random_aggregation,
                                         save_dir=self.save_dir,
                                         save_data=self.save_data,
                                         cluster=cluster) for i in range(self.number_of_executions)]
