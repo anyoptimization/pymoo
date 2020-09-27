@@ -8,6 +8,7 @@ from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.misc import set_if_none
 
 import os
+import time
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -40,7 +41,7 @@ class MOEAD(GeneticAlgorithm):
         display
         kwargs
         """
-
+        self.start = time.time()
         self.n_neighbors = n_neighbors
         self.prob_neighbor_mating = prob_neighbor_mating
         self.decomposition = decomposition
@@ -153,6 +154,7 @@ class MOEAD(GeneticAlgorithm):
         if self.save_data:
             self.save_algorithm_data('hv_convergence.txt', self.hvs)
             self.save_algorithm_data('igd_convergence.txt', self.igds)
+            self.save_algorithm_data('time.txt', [time.time() - self.start])
 
     def get_hypervolume(self, population):
         return self.hv.calc(population.get('F'))

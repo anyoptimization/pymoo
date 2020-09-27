@@ -10,6 +10,7 @@ from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.misc import set_if_none
 
 import os
+import time
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -48,7 +49,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         display
         kwargs
         """
-
+        self.start = time.time()
         self.n_neighbors = n_neighbors
         self.prob_neighbor_mating = prob_neighbor_mating
         self.decomposition = decomposition
@@ -62,7 +63,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
         self.aggregations = []
         self.hvs = []
         self.igds = []
-
+        
         set_if_none(kwargs, 'pop_size', len(ref_dirs))
         set_if_none(kwargs, 'sampling', FloatRandomSampling())
         set_if_none(kwargs, 'crossover', SimulatedBinaryCrossover(prob=1.0, eta=20))
@@ -202,6 +203,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
             self.save_algorithm_data('aggregations.txt', self.aggregations)
             self.save_algorithm_data('hv_convergence.txt', self.hvs)
             self.save_algorithm_data('igd_convergence.txt', self.igds)
+            self.save_algorithm_data('time.txt', [time.time() - self.start])
     
     def apply_cluster_reduction(self):
         if self.current_generation % self.interval_of_aggregations == 0:
