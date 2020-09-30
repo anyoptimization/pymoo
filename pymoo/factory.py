@@ -308,6 +308,7 @@ def get_problem_options():
         ('rosenbrock', Rosenbrock),
         ('schwefel', Schwefel),
         ('sphere', Sphere),
+        ('srn', SRN),
         ('tnk', TNK),
         ('truss2d', Truss2D),
         ('welded_beam', WeldedBeam),

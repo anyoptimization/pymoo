@@ -52,10 +52,12 @@ To use the current stable release of *pymoo* use
 
 .. code:: bash
 
-    pip install -U pymoo
+    pip install -U --no-cache-dir pymoo
 
 If you have already installed an older version of the framework, you can force
-update by using the *-U* option as shown above.
+update by using the `-U` option as shown above.
+Also, `no-cache-dir` makes pip to check for the latest release on the remote server without
+using any local data of packages cached before.
 
 To forcefully fetch and recompile the package might be necessary to disable
 the local cache created by pip.
@@ -87,7 +89,9 @@ To compile the modules or see an output log:
 
 These commands translate the pyx files to cpp files and then compile them. If anything fails
 this will provide more details about why this has happened.
-    
+
+
+
 
 Plain/Compiled Modules
 ------------------------------------------------------------------------------
@@ -105,8 +109,21 @@ If no compilation is available, we recommend pulling the latest stable release f
 
 .. code:: bash
 
-    make compile
+    python setup.py build_ext --inplace
+    
+Or if Cython shall be used to create the `cpp` files from scratch use:    
+
+.. code:: bash
+
+    python setup.py build_ext --inplace --cythonize
     
 This command shows detailed error messages about why the compilation was not successful.
 
 
+Windows
+------------------------------------------------------------------------------
+
+On Windows you have to install C++ Distributable Libarary to compile the modules:
+https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
+    
+If you use pre-compiled packages from PyPi this should not be required.

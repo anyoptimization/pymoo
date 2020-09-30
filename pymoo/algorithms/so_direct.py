@@ -66,10 +66,9 @@ class DIRECT(LocalSearch):
         # get the length of the interval of each solution
         nxl, nxu = norm_bounds(pop, self.problem)
         length = (nxu - nxl) / 2
-
         val = length.max(axis=1)
 
-        # (a) non-dominated with respect to interval
+        # (a) non-dominated set with respect to interval
         obj = np.column_stack([-val, F])
         I = NonDominatedSorting().do(obj, only_non_dominated_front=True)
         candidates, F, xl, xu, val = pop[I], F[I], xl[I], xu[I], val[I]

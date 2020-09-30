@@ -24,6 +24,7 @@ class DE(GeneticAlgorithm):
     def __init__(self,
                  pop_size=100,
                  sampling=LatinHypercubeSampling(),
+                 crossover=None,
                  variant="DE/rand/1/bin",
                  CR=0.5,
                  F=0.3,
@@ -72,10 +73,13 @@ class DE(GeneticAlgorithm):
         elif self.var_mutation == "bin":
             mutation = BiasedCrossover(CR)
 
+        if crossover is None:
+            crossover = DifferentialEvolutionCrossover(weight=F, dither=dither, jitter=jitter)
+
         super().__init__(pop_size=pop_size,
                          sampling=sampling,
                          selection=RandomSelection(),
-                         crossover=DifferentialEvolutionCrossover(weight=F, dither=dither, jitter=jitter),
+                         crossover=crossover,
                          mutation=mutation,
                          survival=None,
                          display=display,
@@ -84,6 +88,17 @@ class DE(GeneticAlgorithm):
         self.default_termination = SingleObjectiveDefaultTermination()
 
     def _next(self):
+
+        # make a step and create the offsprings
+        self.off = self._step()
+
+        # evaluate the offsprings
+        self.evaluator.eval(self.problem, self.off, algorithm=self)
+
+        # replace the individuals that have improved
+        self.pop = ImprovementReplacement().do(self.problem, self.pop, self.off)
+
+    def _step(self):
         selection, crossover, mutation = self.mating.selection, self.mating.crossover, self.mating.mutation
 
         # retrieve the current population
@@ -94,39 +109,25 @@ class DE(GeneticAlgorithm):
         F = parameter_less(F, CV)
 
         # create offsprings and add it to the data of the algorithm
-        if self.var_selection == "rand":
-            P = selection.do(pop, self.pop_size, crossover.n_parents)
+        P = selection.do(pop, self.pop_size, crossover.n_parents)
 
-        elif self.var_selection == "best":
-            best = np.argmin(F[:, 0])
-            P = selection.do(pop, self.pop_size, crossover.n_parents - 1)
-            P = np.column_stack([np.full(len(pop), best), P])
-
+        if self.var_selection == "best":
+            P[:, 0] = np.argmin(F[:, 0])
         elif self.var_selection == "rand+best":
-            best = np.argmin(F[:, 0])
-            P = selection.do(pop, self.pop_size, crossover.n_parents)
-            use_best = np.random.random(len(pop)) < 0.3
-            P[use_best, 0] = best
-
-        else:
-            raise Exception("Unknown selection: %s" % self.var_selection)
+            P[np.random.random(len(pop)) < 0.3, 0] = np.argmin(F[:, 0])
 
         # do the first crossover which is the actual DE operation
-        self.off = crossover.do(self.problem, pop, P, algorithm=self)
+        off = crossover.do(self.problem, pop, P, algorithm=self)
 
-        # then do the mutation (which is actually )
-        _pop = Population.merge(self.pop, self.off)
+        # then do the mutation (which is actually a crossover between old and new individual)
+        _pop = Population.merge(self.pop, off)
         _P = np.column_stack([np.arange(len(pop)), np.arange(len(pop)) + len(pop)])
-        self.off = mutation.do(self.problem, _pop, _P, algorithm=self)[:len(self.pop)]
+        off = mutation.do(self.problem, _pop, _P, algorithm=self)[:len(self.pop)]
 
         # bounds back if something is out of bounds
-        self.off = BounceBackOutOfBoundsRepair().do(self.problem, self.off)
+        off = BounceBackOutOfBoundsRepair().do(self.problem, off)
 
-        # evaluate the results
-        self.evaluator.eval(self.problem, self.off, algorithm=self)
-
-        # replace the individuals that have improved
-        self.pop = ImprovementReplacement().do(self.problem, self.pop, self.off)
+        return off
 
 
 parse_doc_string(DE.__init__)

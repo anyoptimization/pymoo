@@ -30,12 +30,30 @@ class CTP(Problem):
     def calc_objectives(self, x):
         f1 = x[:, 0]
         gg = self.calc_g(x[:, 1:])
+        # f2 = gg * (1 - anp.sqrt(f1 / gg))
         f2 = gg * (1 - anp.sqrt(f1 / gg))
         return f1, f2
 
     def calc_constraint(self, theta, a, b, c, d, e, f1, f2):
-        return - (anp.cos(theta) * (f2 - e) - anp.sin(theta) * f1 -
-                  a * anp.abs(anp.sin(b * anp.pi * (anp.sin(theta) * (f2 - e) + anp.cos(theta) * f1) ** c)) ** d)
+
+        exp1 = (f2 - e) * anp.cos(theta) - f1 * anp.sin(theta)
+
+        exp2 = (f2 - e) * anp.sin(theta) + f1 * anp.cos(theta)
+        exp2 = b * anp.pi * (exp2 ** c)
+        exp2 = anp.abs(anp.sin(exp2))
+        exp2 = a * (exp2 ** d)
+
+        # val = - (exp1 - exp2)
+        # val = exp2 - exp1
+
+        val = 1 - exp1 / exp2
+
+
+
+        # _val = - (anp.cos(theta) * (f2 - e) - anp.sin(theta) * f1 -
+        #           a * anp.abs(anp.sin(b * anp.pi * (anp.sin(theta) * (f2 - e) + anp.cos(theta) * f1) ** c)) ** d)
+
+        return val
 
 
 class CTP1(CTP):
@@ -136,6 +154,10 @@ class CTP5(CTP):
 
 class CTP6(CTP):
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.xu = anp.array([1, 20])
+
     def _calc_pareto_front(self):
         return load_pareto_front_from_file("ctp6.pf")
 
@@ -167,6 +189,7 @@ class CTP7(CTP):
 class CTP8(CTP):
     def __init__(self, **kwargs):
         super().__init__(n_constr=2, **kwargs)
+        self.xu = anp.array([1, 20])
 
     def _calc_pareto_front(self):
         return load_pareto_front_from_file("ctp8.pf")
