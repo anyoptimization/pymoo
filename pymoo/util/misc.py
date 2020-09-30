@@ -13,8 +13,10 @@ def parameter_less(F, CV):
     ret = np.copy(F)
     parameter_less = np.max(F, axis=0) + CV
 
-    infeasible = CV > 0
-    ret[infeasible] = parameter_less[infeasible]
+    infeasible = (CV > 0)[:, 0]
+    
+    if np.any(infeasible):
+        ret[infeasible] = parameter_less[infeasible]
 
     return ret
 
@@ -288,3 +290,14 @@ def termination_from_tuple(termination):
             termination = get_termination(*termination)
 
     return termination
+
+
+def unique_and_all_indices(arr):
+    sort_indexes = np.argsort(arr)
+    arr = np.asarray(arr)[sort_indexes]
+    vals, first_indexes, inverse, counts = np.unique(arr,
+                                                     return_index=True, return_inverse=True, return_counts=True)
+    indexes = np.split(sort_indexes, first_indexes[1:])
+    for x in indexes:
+        x.sort()
+    return vals, indexes

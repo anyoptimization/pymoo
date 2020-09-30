@@ -23,7 +23,7 @@ class RVEATest(unittest.TestCase):
 
         for k in range(1, 11):
 
-            print(k)
+            print("TEST RVEA GEN", k)
 
             ref_dirs = np.loadtxt(path_to_test_resources('rvea', f"ref_dirs_{k}.txt"))
             F = np.loadtxt(path_to_test_resources('rvea', f"F_{k}.txt"))

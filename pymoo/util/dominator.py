@@ -1,6 +1,10 @@
 import numpy as np
 
 
+def get_relation(ind_a, ind_b):
+    return Dominator.get_relation(ind_a.F, ind_b.F, ind_a.CV[0], ind_b.CV[0])
+
+
 class Dominator:
 
     @staticmethod
