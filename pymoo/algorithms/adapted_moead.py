@@ -158,9 +158,11 @@ class MOEAD(GeneticAlgorithm):
 
     def get_hypervolume(self, population):
         return self.hv.calc(population.get('F'))
+        # return 1
     
     def get_igd(self, population):
         return self.igd_plus.calc(population.get('F'))
+        # return 0
 
     def save_current_iteration_files(self, population):
         variables = [individual.get('X') for individual in population]

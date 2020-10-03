@@ -8,7 +8,7 @@ from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.misc import set_if_none
-
+from pymoo.util.nds import non_dominated_sorting
 import os
 import time
 import numpy as np
@@ -182,7 +182,6 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
     def get_random_transformation_matrix(self, cluster):
         self.number_of_clusters
         self.problem.n_obj
-
         np.random.randint()
         pass
 
@@ -210,7 +209,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
             if not self.use_random_aggregation:
                 dataframe = pd.DataFrame(np.array([individual.F for individual in self.pop]))
                 similarity = 1 - dataframe.corr(method='kendall').values
-                print(dataframe.corr(method='kendall').values)
+                # print(dataframe.corr(method='kendall').values)
                 cluster = self.cluster(n_clusters=self.number_of_clusters, affinity='precomputed', linkage='single')
                 cluster.fit(similarity)
                 # cluster = self.cluster(n_clusters=self.number_of_clusters)
@@ -219,7 +218,7 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
             else:
                 dataframe = pd.DataFrame(np.random.randn(len(self.pop), self.problem.n_obj))
                 similarity = 1 - dataframe.corr(method='kendall').values
-                print(dataframe.corr(method='kendall').values)
+                # print(dataframe.corr(method='kendall').values)
                 cluster = self.cluster(n_clusters=self.number_of_clusters, affinity='precomputed', linkage='single')
                 cluster.fit(similarity)
                 # cluster = self.cluster(n_clusters=self.number_of_clusters)

@@ -8,6 +8,7 @@ from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.misc import set_if_none
+from pymoo.optimize import minimize
 
 import os
 import time
@@ -24,6 +25,7 @@ class OfflineClusterMOEAD(AggregatedGeneticAlgorithm):
 
     def __init__(self,
                  ref_dirs,
+                 transformation_matrix,
                  n_neighbors=20,
                  decomposition='auto',
                  prob_neighbor_mating=0.9,
@@ -52,6 +54,7 @@ class OfflineClusterMOEAD(AggregatedGeneticAlgorithm):
         self.prob_neighbor_mating = prob_neighbor_mating
         self.decomposition = decomposition
         self.cluster = cluster
+        self.transformation_matrix = transformation_matrix
         self.number_of_clusters = number_of_clusters
         self.current_execution_number = current_execution_number
         self.save_dir = save_dir
@@ -101,8 +104,8 @@ class OfflineClusterMOEAD(AggregatedGeneticAlgorithm):
             self._decomposition = self.decomposition
 
         super()._initialize()
+
         self.ideal_point = np.min(self.pop.get("F"), axis=0)
-        self.apply_cluster_reduction()
         self.aggregations.append(self.get_aggregation_string(self.transformation_matrix))
         self.ideal_point = np.dot(self.transformation_matrix, self.ideal_point)
         
@@ -193,14 +196,8 @@ class OfflineClusterMOEAD(AggregatedGeneticAlgorithm):
             self.save_algorithm_data('igd_convergence.txt', self.igds)
             self.save_algorithm_data('time.txt', [time.time() - self.start])
     
-    def apply_cluster_reduction(self):
-        dataframe = pd.DataFrame(np.array([individual.F for individual in self.pop]))
-        similarity = 1 - dataframe.corr(method='kendall').values
-        cluster = self.cluster(n_clusters=self.number_of_clusters, affinity='precomputed', linkage='single')
-        cluster.fit(similarity)
-        # cluster = self.cluster(n_clusters=self.number_of_clusters)
-        # cluster.fit(np.array([individual.F for individual in self.pop]).T)
-        self.transformation_matrix = self.get_transformation_matrix(cluster)
+    def apply_offline_cluster_reduction(self):
+        return self.transformation_matrix
 
     def get_aggregation_string(self, transformation_matrix):
         aggregation = []

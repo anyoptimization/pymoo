@@ -38,6 +38,14 @@ class ExperimentOfflineClusterMOEAD(object):
         self.verbose = verbose
         self.save_history = save_history
 
+        self.ref_dirs = ref_dirs
+        self.n_neighbors = n_neighbors
+        self.prob_neighbor_mating = prob_neighbor_mating
+        self.decomposition = decomposition
+        self.cluster = cluster
+        self.number_of_clusters = number_of_clusters
+        
+        self.transformation_matrix = self.generate_transformation_matrix()
         if use_different_seeds:
             self.algorithms  = [OfflineClusterMOEAD(
                                         ref_dirs,
@@ -46,6 +54,7 @@ class ExperimentOfflineClusterMOEAD(object):
                                         prob_neighbor_mating=prob_neighbor_mating,
                                         seed=i,
                                         number_of_clusters=number_of_clusters,
+                                        transformation_matrix=self.transformation_matrix,
                                         current_execution_number=i,
                                         save_dir=self.save_dir,
                                         save_data=self.save_data,
@@ -58,6 +67,7 @@ class ExperimentOfflineClusterMOEAD(object):
                                         prob_neighbor_mating=prob_neighbor_mating,
                                         seed=1,
                                         number_of_clusters=number_of_clusters,
+                                        transformation_matrix=self.transformation_matrix,
                                         current_execution_number=i,
                                         save_dir=self.save_dir,
                                         save_data=self.save_data,
@@ -74,8 +84,35 @@ class ExperimentOfflineClusterMOEAD(object):
                  verbose=self.verbose,
                  save_history=self.save_history))
 
-            # get_visualization("scatter").add(res.F).show()
             self.current_execution +=1
+
+    def generate_transformation_matrix(self):
+        print('Generating random solutions for aggregations...')
+        algorithm = OfflineClusterMOEAD(self.ref_dirs,
+                                transformation_matrix=[[1]*self.problem.n_obj for i in range(self.problem.n_obj)],
+                                n_neighbors=self.n_neighbors,
+                                decomposition=self.decomposition,
+                                prob_neighbor_mating=self.prob_neighbor_mating,
+                                seed=1,
+                                pop_size=10000,
+                                number_of_clusters=self.number_of_clusters,
+                                current_execution_number=0,
+                                save_dir=self.save_dir,
+                                save_data=self.save_data,
+                                cluster=self.cluster)
+
+        res = minimize(self.problem, algorithm, termination=('n_gen', 0))
+        print('Random solutions generated...')
+        print('Start clustering...')
+        dataframe = pd.DataFrame(np.array(res.pop.get('F')))
+        similarity = 1 - dataframe.corr(method='kendall').values
+        cluster = self.cluster(n_clusters=self.number_of_clusters, affinity='precomputed', linkage='single')
+        cluster.fit(similarity)
+        print('Cluster generated...')
+        transformation_matrix = pd.get_dummies(cluster.labels_).T.values
+        print('Transformation matrix:')
+        print(transformation_matrix)
+        return transformation_matrix
 
     def show_heat_map(self):
         aggregations = []
