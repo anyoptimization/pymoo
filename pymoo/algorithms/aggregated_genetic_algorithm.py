@@ -92,9 +92,8 @@ class AggregatedGeneticAlgorithm(Algorithm):
                                    n_min_infeas_survive=self.min_infeas_pop_size)
 
         self.pop, self.off = pop, pop
-
+        
     def _next(self):
-
         # do the mating using the current population
         self.off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
         self.off.set("n_gen", self.n_gen)
