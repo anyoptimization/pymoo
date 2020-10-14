@@ -174,8 +174,8 @@ class AdaptedGeneticAlgorithm(Algorithm):
     def save_current_iteration_files(self, population):
         variables = [individual.get('X') for individual in population]
         objectives = [individual.get('F') for individual in population]
-        self.save_algorithm_data('variables_{}.txt'.format(self.current_generation), variables)
-        self.save_algorithm_data('objectives_{}.txt'.format(self.current_generation), objectives)
+        #self.save_algorithm_data('variables_{}.txt'.format(self.current_generation), variables)
+        #self.save_algorithm_data('objectives_{}.txt'.format(self.current_generation), objectives)
         
     def save_algorithm_data(self, file_name, data_list):
         with open(os.path.join(self.full_path, file_name),'w') as file:
