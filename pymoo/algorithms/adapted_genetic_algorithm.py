@@ -1,22 +1,18 @@
 import os
 import time
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
 
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.duplicate import DefaultDuplicateElimination, NoDuplicateElimination
 from pymoo.model.individual import Individual
 from pymoo.model.initialization import Initialization
 from pymoo.model.mating import Mating
-from pymoo.model.evaluator import Evaluator
 from pymoo.model.population import Population
 from pymoo.model.repair import NoRepair
 from pymoo.factory import get_performance_indicator
 
 
-class OnlineNonDominatedGeneticAlgorithm(Algorithm):
+class AdaptedGeneticAlgorithm(Algorithm):
 
     def __init__(self,
                  ref_dirs,
@@ -32,11 +28,7 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
                  mating=None,
                  individual=Individual(),
                  min_infeas_pop_size=0,
-                 cluster=KMeans,
-                 number_of_clusters=2,
-                 interval_of_aggregations=1,
                  current_execution_number=0,
-                 use_random_aggregation=False,
                  save_dir='',
                  save_data=True,
                  **kwargs
@@ -95,19 +87,16 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
         self.off = None
 
         self.ref_dirs = ref_dirs
-        self.cluster = cluster
-        self.number_of_clusters = number_of_clusters
-        self.interval_of_aggregations = interval_of_aggregations
         self.current_execution_number = current_execution_number
-        self.use_random_aggregation = use_random_aggregation
         self.save_dir = save_dir
         self.save_data = save_data
-        self.aggregations = []
         self.hvs = []
         self.igds = []
         self.current_generation = 0
 
+
     def _initialize(self):
+
         # create the initial population
         pop = self.initialization.do(self.problem, self.pop_size, algorithm=self)
         pop.set("n_gen", self.n_gen)
@@ -115,38 +104,19 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
         # then evaluate using the objective function
         self.evaluator.eval(self.problem, pop, algorithm=self)
 
-        print(pop.get('F'))
-
         # that call is a dummy survival to set attributes that are necessary for the mating selection
-        # if self.survival:
-        #     pop = self.survival.do(self.problem, pop, len(pop), algorithm=self,
-        #                            n_min_infeas_survive=self.min_infeas_pop_size)
+        if self.survival:
+            pop = self.survival.do(self.problem, pop, len(pop), algorithm=self,
+                                   n_min_infeas_survive=self.min_infeas_pop_size)
 
         self.pop, self.off = pop, pop
 
         self.hv = get_performance_indicator("hv", ref_point=np.array([1.2]*self.problem.n_obj))
         self.igd_plus = get_performance_indicator("igd+", self.problem.pareto_front(ref_dirs=self.ref_dirs))
         self.create_result_folders()
-    
-    def generate_max_min(self, problem):
-        print('Generating initial random population...')
-        self.random_population = self.initialization.do(problem, 10000, algorithm=self, seed=1)
-        evaluator = Evaluator()
-        evaluator.eval(problem, self.random_population, algorithm=self)
-        F = self.random_population.get('F')
-        F_max = np.max(F, axis=0)
-        F_min = np.min(F, axis=0)
-        print('Solutions generated...')
-        return F_min, F_max
 
+        
     def _next(self):
-        self.evaluate_population_in_original_objectives(self.pop)
-       
-        self.apply_cluster_reduction()
-        self.reduce_population(self.pop, self.transformation_matrix)
-        self.aggregations.append(self.get_aggregation_string(self.transformation_matrix))
-
-        print(self.get_aggregation_string(self.transformation_matrix))
 
         # do the mating using the current population
         self.off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
@@ -165,33 +135,26 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
         # evaluate the offspring
         self.evaluator.eval(self.problem, self.off, algorithm=self)
 
-        self.reduce_population(self.off, self.transformation_matrix)
-        
         # merge the offsprings with the current population
         self.pop = Population.merge(self.pop, self.off)
-        
-        #self.evaluate_population_in_original_objectives(self.pop)
-        # print('Fazendo um teste novamente')
-        # print(self.pop.get('F'))
-        # print(self.off.get('F'))
 
         # the do survival selection
         if self.survival:
             self.pop = self.survival.do(self.problem, self.pop, self.pop_size, algorithm=self,
                                         n_min_infeas_survive=self.min_infeas_pop_size)
-        
-        self.evaluate_population_in_original_objectives(self.pop)
         current_hv = self.get_hypervolume(self.pop)
         current_igd = self.get_igd(self.pop)
         self.hvs.append(current_hv)
         self.igds.append(current_igd)
+
+        self.current_generation += 1
+        print(self.current_generation)
 
     def _finalize(self):
         for individual in self.pop:
             individual.F = self.problem.evaluate(individual.get('X'))
         
         if self.save_data:
-            self.save_algorithm_data('aggregations.txt', self.aggregations)
             self.save_algorithm_data('hv_convergence.txt', self.hvs)
             self.save_algorithm_data('igd_convergence.txt', self.igds)
             self.save_algorithm_data('time.txt', [time.time() - self.start])
@@ -202,39 +165,6 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
     def _get_igd(self, population):
         return self.igd_plus.calc(population.get('F'))
     
-    def apply_cluster_reduction(self):
-        if self.current_generation % self.interval_of_aggregations == 0:
-            if not self.use_random_aggregation:
-                dataframe = pd.DataFrame(np.array([individual.F for individual in self.pop]))
-                similarity = 1 - dataframe.corr(method='kendall').values
-                cluster = self.cluster(n_clusters=self.number_of_clusters, affinity='precomputed', linkage='single')
-                cluster.fit(similarity)
-                # print(similarity)
-                # cluster = self.cluster(n_clusters=self.number_of_clusters)
-                # cluster.fit(np.array([individual.F for individual in self.pop]).T)
-                self.transformation_matrix = self.get_transformation_matrix(cluster)
-            else:
-                dataframe = pd.DataFrame(np.random.randn(len(self.pop), self.problem.n_obj))
-                similarity = 1 - dataframe.corr(method='kendall').values
-                # print(dataframe.corr(method='kendall').values)
-                cluster = self.cluster(n_clusters=self.number_of_clusters, affinity='precomputed', linkage='single')
-                cluster.fit(similarity)
-                # cluster = self.cluster(n_clusters=self.number_of_clusters)
-                # cluster.fit(np.array([individual.F for individual in self.pop]).T)
-                self.transformation_matrix = self.get_transformation_matrix(cluster)
-
-    def get_aggregation_string(self, transformation_matrix):
-        aggregation = []
-        for i in range(len(transformation_matrix)):
-            line = ''
-            for j in range(len(transformation_matrix[0])):
-                if transformation_matrix[i][j] == 1:
-                    function_number = j
-                    function_number += 1
-                    line += 'f' + str(function_number)
-            aggregation.append(line)
-        return '-'.join([i for i in sorted(aggregation)])
-
     def get_hypervolume(self, population):
         return self.hv.calc(population.get('F'))
     
@@ -261,21 +191,3 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
             print('Execution folder created!')
         else:
             print('Folder already exists!')
-
-    def get_transformation_matrix(self, cluster):
-        return pd.get_dummies(cluster.labels_).T.values
-    
-    def get_random_transformation_matrix(self, cluster):
-        self.number_of_clusters
-        self.problem.n_obj
-        np.random.randint()
-        pass
-
-    def reduce_population(self, population, transformation_matrix):
-        for individual in population:
-            individual.F = self.problem.evaluate(individual.get('X'))
-            individual.F = np.dot(transformation_matrix, individual.F)
-    
-    def evaluate_population_in_original_objectives(self, population):
-        for individual in population:
-            individual.F = self.problem.evaluate(individual.get('X'))

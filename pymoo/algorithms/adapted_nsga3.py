@@ -3,6 +3,7 @@ import warnings
 import numpy as np
 from numpy.linalg import LinAlgError
 
+from pymoo.algorithms.adapted_genetic_algorithm import AdaptedGeneticAlgorithm
 from pymoo.docs import parse_doc_string
 from pymoo.model.individual import Individual
 from pymoo.model.survival import Survival
@@ -14,8 +15,7 @@ from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.function_loader import load_function
 from pymoo.util.misc import intersect, has_feasible
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-from pymoo.algorithms.online_non_dominated_genetic_algorithm import OnlineNonDominatedGeneticAlgorithm
-from pymoo.factory import get_reference_directions
+
 
 # =========================================================================================================
 # Implementation
@@ -38,7 +38,7 @@ def comp_by_cv_then_random(pop, P, **kwargs):
     return S[:, None].astype(np.int)
 
 
-class OnlineClusterNSGA3(OnlineNonDominatedGeneticAlgorithm):
+class NSGA3(AdaptedGeneticAlgorithm):
 
     def __init__(self,
                  ref_dirs,
@@ -49,7 +49,6 @@ class OnlineClusterNSGA3(OnlineNonDominatedGeneticAlgorithm):
                  mutation=PolynomialMutation(eta=20, prob=None),
                  eliminate_duplicates=True,
                  n_offsprings=None,
-                 number_of_clusters_for_directions=2,
                  display=MultiObjectiveDisplay(),
                  **kwargs):
         """
@@ -69,9 +68,8 @@ class OnlineClusterNSGA3(OnlineNonDominatedGeneticAlgorithm):
         n_offsprings : {n_offsprings}
 
         """
-        self.number_of_clusters_for_directions = number_of_clusters_for_directions
-        # self.ref_dirs = ref_dirs
-        self.ref_dirs = get_reference_directions("das-dennis", self.number_of_clusters_for_directions, n_partitions=12)
+
+        self.ref_dirs = ref_dirs
 
         # in case of R-NSGA-3 they will be None - otherwise this will be executed
         if self.ref_dirs is not None:
@@ -90,9 +88,10 @@ class OnlineClusterNSGA3(OnlineNonDominatedGeneticAlgorithm):
             survival = kwargs['survival']
             del kwargs['survival']
         else:
-            survival = ReferenceDirectionSurvival(ref_dirs, self.number_of_clusters_for_directions)
+            survival = ReferenceDirectionSurvival(ref_dirs)
 
-        super().__init__(ref_dirs=ref_dirs,
+        super().__init__(
+                         ref_dirs=ref_dirs,
                          pop_size=pop_size,
                          sampling=sampling,
                          selection=selection,
@@ -103,7 +102,7 @@ class OnlineClusterNSGA3(OnlineNonDominatedGeneticAlgorithm):
                          n_offsprings=n_offsprings,
                          display=display,
                          **kwargs)
-        
+
     def _solve(self, problem):
 
         if self.ref_dirs is not None and self.ref_dirs.shape[1] != problem.n_obj:
@@ -122,26 +121,21 @@ class OnlineClusterNSGA3(OnlineNonDominatedGeneticAlgorithm):
 
 class ReferenceDirectionSurvival(Survival):
 
-    def __init__(self, ref_dirs, number_of_clusters_for_directions):
+    def __init__(self, ref_dirs):
         super().__init__(filter_infeasible=True)
         self.ref_dirs = ref_dirs
-        self.ref_dirs = get_reference_directions("das-dennis", number_of_clusters_for_directions, n_partitions=12)
         self.extreme_points = None
         self.intercepts = None
         self.nadir_point = None
         self.opt = None
-        self.ideal_point = np.full(self.ref_dirs.shape[1], np.inf)
-        self.worst_point = np.full(self.ref_dirs.shape[1], -np.inf)
+        self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
+        self.worst_point = np.full(ref_dirs.shape[1], -np.inf)
 
     def _do(self, problem, pop, n_survive, D=None, **kwargs):
         # attributes to be set after the survival
         F = pop.get("F")
-        # print('imprimindo as funções objetivo dentro da avaliação dos pontos de referência')
-        # print([len(i) for i in F])
 
         # find or usually update the new ideal point - from feasible solutions
-        # print('ideal point')
-        # print(self.ideal_point)
         self.ideal_point = np.min(np.vstack((self.ideal_point, F)), axis=0)
         self.worst_point = np.max(np.vstack((self.worst_point, F)), axis=0)
 
@@ -335,4 +329,4 @@ def calc_niche_count(n_niches, niche_of_individuals):
     return niche_count
 
 
-parse_doc_string(OnlineClusterNSGA3.__init__)
+parse_doc_string(NSGA3.__init__)

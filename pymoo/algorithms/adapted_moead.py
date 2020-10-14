@@ -169,11 +169,19 @@ class MOEAD(GeneticAlgorithm):
         objectives = [individual.get('F') for individual in population]
         self.save_algorithm_data('variables_{}.txt'.format(self.current_generation), variables)
         self.save_algorithm_data('objectives_{}.txt'.format(self.current_generation), objectives)
+        self.save_algorithm_unique_data('objectives.txt', [i.tolist() for i in objectives])
         
     def save_algorithm_data(self, file_name, data_list):
         with open(os.path.join(self.full_path, file_name),'w') as file:
             for data in data_list:
                 file.write(str(data) + '\n')
+
+    def save_algorithm_unique_data(self, file_name, data_list):
+        with open(os.path.join(self.full_path, file_name),'a') as file:
+            file.write('#\n')
+            for data in data_list:
+                file.write(','.join([str(i) for i in data]) + '\n')
+            file.write('#\n')
 
     def create_result_folders(self):
         folder = 'Execution {}'.format(self.current_execution_number)
