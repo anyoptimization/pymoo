@@ -37,6 +37,7 @@ class ExperimentNSGA3(object):
         if use_different_seeds:
             self.algorithms  = [NSGA3(
                                         ref_dirs,
+                                        pop_size=100,
                                         n_neighbors=n_neighbors,
                                         decomposition=decomposition,
                                         prob_neighbor_mating=prob_neighbor_mating,
@@ -47,6 +48,7 @@ class ExperimentNSGA3(object):
         else:
             self.algorithms  = [NSGA3(
                                         ref_dirs,
+                                        pop_size=100,
                                         n_neighbors=n_neighbors,
                                         decomposition=decomposition,
                                         prob_neighbor_mating=prob_neighbor_mating,

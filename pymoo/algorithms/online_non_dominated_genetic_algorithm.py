@@ -115,8 +115,6 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
         # then evaluate using the objective function
         self.evaluator.eval(self.problem, pop, algorithm=self)
 
-        print(pop.get('F'))
-
         # that call is a dummy survival to set attributes that are necessary for the mating selection
         # if self.survival:
         #     pop = self.survival.do(self.problem, pop, len(pop), algorithm=self,
@@ -170,20 +168,15 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
         # merge the offsprings with the current population
         self.pop = Population.merge(self.pop, self.off)
         
-        #self.evaluate_population_in_original_objectives(self.pop)
-        # print('Fazendo um teste novamente')
-        # print(self.pop.get('F'))
-        # print(self.off.get('F'))
-
         # the do survival selection
         if self.survival:
             self.pop = self.survival.do(self.problem, self.pop, self.pop_size, algorithm=self,
                                         n_min_infeas_survive=self.min_infeas_pop_size)
         
         self.evaluate_population_in_original_objectives(self.pop)
-        current_hv = self.get_hypervolume(self.pop)
+        #current_hv = self.get_hypervolume(self.pop)
         current_igd = self.get_igd(self.pop)
-        self.hvs.append(current_hv)
+        #self.hvs.append(current_hv)
         self.igds.append(current_igd)
 
     def _finalize(self):
@@ -192,7 +185,7 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
         
         if self.save_data:
             self.save_algorithm_data('aggregations.txt', self.aggregations)
-            self.save_algorithm_data('hv_convergence.txt', self.hvs)
+            #self.save_algorithm_data('hv_convergence.txt', self.hvs)
             self.save_algorithm_data('igd_convergence.txt', self.igds)
             self.save_algorithm_data('time.txt', [time.time() - self.start])
     
@@ -209,18 +202,12 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
                 similarity = 1 - dataframe.corr(method='kendall').values
                 cluster = self.cluster(n_clusters=self.number_of_clusters, affinity='precomputed', linkage='single')
                 cluster.fit(similarity)
-                # print(similarity)
-                # cluster = self.cluster(n_clusters=self.number_of_clusters)
-                # cluster.fit(np.array([individual.F for individual in self.pop]).T)
                 self.transformation_matrix = self.get_transformation_matrix(cluster)
             else:
                 dataframe = pd.DataFrame(np.random.randn(len(self.pop), self.problem.n_obj))
                 similarity = 1 - dataframe.corr(method='kendall').values
-                # print(dataframe.corr(method='kendall').values)
                 cluster = self.cluster(n_clusters=self.number_of_clusters, affinity='precomputed', linkage='single')
                 cluster.fit(similarity)
-                # cluster = self.cluster(n_clusters=self.number_of_clusters)
-                # cluster.fit(np.array([individual.F for individual in self.pop]).T)
                 self.transformation_matrix = self.get_transformation_matrix(cluster)
 
     def get_aggregation_string(self, transformation_matrix):

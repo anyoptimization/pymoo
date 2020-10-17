@@ -114,13 +114,15 @@ class AdaptedGeneticAlgorithm(Algorithm):
         self.hv = get_performance_indicator("hv", ref_point=np.array([1.2]*self.problem.n_obj))
         self.igd_plus = get_performance_indicator("igd+", self.problem.pareto_front(ref_dirs=self.ref_dirs))
         self.create_result_folders()
-
         
     def _next(self):
 
         # do the mating using the current population
         self.off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
         self.off.set("n_gen", self.n_gen)
+
+        if self.save_data:
+            self.save_current_iteration_files(self.pop)
 
         # if the mating could not generate any new offspring (duplicate elimination might make that happen)
         if len(self.off) == 0:
@@ -142,9 +144,9 @@ class AdaptedGeneticAlgorithm(Algorithm):
         if self.survival:
             self.pop = self.survival.do(self.problem, self.pop, self.pop_size, algorithm=self,
                                         n_min_infeas_survive=self.min_infeas_pop_size)
-        current_hv = self.get_hypervolume(self.pop)
+        #current_hv = self.get_hypervolume(self.pop)
         current_igd = self.get_igd(self.pop)
-        self.hvs.append(current_hv)
+        #self.hvs.append(current_hv)
         self.igds.append(current_igd)
 
         self.current_generation += 1
@@ -172,10 +174,10 @@ class AdaptedGeneticAlgorithm(Algorithm):
         return self.igd_plus.calc(population.get('F'))
 
     def save_current_iteration_files(self, population):
-        variables = [individual.get('X') for individual in population]
+        # variables = [individual.get('X') for individual in population]
         objectives = [individual.get('F') for individual in population]
-        #self.save_algorithm_data('variables_{}.txt'.format(self.current_generation), variables)
-        #self.save_algorithm_data('objectives_{}.txt'.format(self.current_generation), objectives)
+        # self.save_algorithm_data('variables_{}.txt'.format(self.current_generation), variables)
+        self.save_algorithm_data('objectives_{}.txt'.format(self.current_generation), objectives)
         
     def save_algorithm_data(self, file_name, data_list):
         with open(os.path.join(self.full_path, file_name),'w') as file:

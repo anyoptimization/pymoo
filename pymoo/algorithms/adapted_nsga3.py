@@ -102,6 +102,7 @@ class NSGA3(AdaptedGeneticAlgorithm):
                          n_offsprings=n_offsprings,
                          display=display,
                          **kwargs)
+        
 
     def _solve(self, problem):
 
