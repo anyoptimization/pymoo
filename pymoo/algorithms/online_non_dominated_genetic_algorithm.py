@@ -139,7 +139,10 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
 
     def _next(self):
         self.evaluate_population_in_original_objectives(self.pop)
-       
+
+        if self.save_data:
+            self.save_current_iteration_files(self.pop)
+
         self.apply_cluster_reduction()
         self.reduce_population(self.pop, self.transformation_matrix)
         self.aggregations.append(self.get_aggregation_string(self.transformation_matrix))
@@ -149,6 +152,8 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
         # do the mating using the current population
         self.off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
         self.off.set("n_gen", self.n_gen)
+
+        
 
         # if the mating could not generate any new offspring (duplicate elimination might make that happen)
         if len(self.off) == 0:
@@ -178,6 +183,9 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
         current_igd = self.get_igd(self.pop)
         #self.hvs.append(current_hv)
         self.igds.append(current_igd)
+
+        self.current_generation += 1
+        print(self.current_generation)
 
     def _finalize(self):
         for individual in self.pop:
@@ -229,10 +237,15 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
         return self.igd_plus.calc(population.get('F'))
 
     def save_current_iteration_files(self, population):
-        variables = [individual.get('X') for individual in population]
+        # variables = [individual.get('X') for individual in population]
         objectives = [individual.get('F') for individual in population]
-        self.save_algorithm_data('variables_{}.txt'.format(self.current_generation), variables)
-        self.save_algorithm_data('objectives_{}.txt'.format(self.current_generation), objectives)
+        # self.save_algorithm_data('variables_{}.txt'.format(self.current_generation), variables)
+        if self.current_generation < 10:
+            self.save_algorithm_data('objectives_00{}.txt'.format(self.current_generation), objectives)
+        elif self.current_generation < 100:
+            self.save_algorithm_data('objectives_0{}.txt'.format(self.current_generation), objectives)
+        else:
+            self.save_algorithm_data('objectives_{}.txt'.format(self.current_generation), objectives)
         
     def save_algorithm_data(self, file_name, data_list):
         with open(os.path.join(self.full_path, file_name),'w') as file:
