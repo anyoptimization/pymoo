@@ -1,10 +1,14 @@
 import os
 
-import matlab.engine
 import numpy as np
 
 from pymoo.model.problem import Problem
-from pymoo.usage.misc.matlab_engine import MatlabEngine
+from pymoo.usage.misc.matlab_engine import MatlabEngine, install_matlab
+
+try:
+    import matlab.engine
+except:
+    print(install_matlab())
 
 
 class MyProblem(Problem):
@@ -23,7 +27,6 @@ class MyProblem(Problem):
 
         # if the matlab engine has not been started yet do this now
         if self.engine is None:
-
             # prepare the folder where the matlab files are
             folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'code')
 
