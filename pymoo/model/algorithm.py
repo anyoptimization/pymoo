@@ -62,7 +62,7 @@ class Algorithm:
 
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, seed, **kwargs):
 
         # !
         # Here all algorithm parameters needed no matter what is problem is passed are defined
@@ -120,6 +120,15 @@ class Algorithm:
         # the time when the algorithm has been setup for the first time
         self.start_time = None
 
+
+    # set the random seed in the algorithm object
+        self.seed = seed
+        if self.seed is None:
+            self.seed = np.random.randint(0, 10000000)
+        # set the random seed for Python and Numpy methods
+        random.seed(self.seed)
+        np.random.seed(self.seed)
+
     # =========================================================================================================
     # PUBLIC
     # =========================================================================================================
@@ -165,13 +174,7 @@ class Algorithm:
         # whether the history should be stored or not
         self.save_history = save_history
 
-        # set the random seed in the algorithm object
-        self.seed = seed
-        if self.seed is None:
-            self.seed = np.random.randint(0, 10000000)
-        # set the random seed for Python and Numpy methods
-        random.seed(self.seed)
-        np.random.seed(self.seed)
+        
         # !
         # END Default minimize
         # !

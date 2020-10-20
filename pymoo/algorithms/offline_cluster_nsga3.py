@@ -14,7 +14,7 @@ from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.function_loader import load_function
 from pymoo.util.misc import intersect, has_feasible
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-from pymoo.algorithms.online_non_dominated_genetic_algorithm import OnlineNonDominatedGeneticAlgorithm
+from pymoo.algorithms.offline_non_dominated_genetic_algorithm import OfflineNonDominatedGeneticAlgorithm
 from pymoo.factory import get_reference_directions
 
 # =========================================================================================================
@@ -38,14 +38,14 @@ def comp_by_cv_then_random(pop, P, **kwargs):
     return S[:, None].astype(np.int)
 
 
-class OnlineClusterNSGA3(OnlineNonDominatedGeneticAlgorithm):
+class OfflineClusterNSGA3(OfflineNonDominatedGeneticAlgorithm):
 
     def __init__(self,
                  ref_dirs,
+                 transformation_matrix,
                  min_max_values,
                  use_normalization=True,
                  pop_size=None,
-                 seed=None,
                  sampling=FloatRandomSampling(),
                  selection=TournamentSelection(func_comp=comp_by_cv_then_random),
                  crossover=SimulatedBinaryCrossover(eta=30, prob=1.0),
@@ -72,8 +72,6 @@ class OnlineClusterNSGA3(OnlineNonDominatedGeneticAlgorithm):
         n_offsprings : {n_offsprings}
 
         """
-        self.seed = seed
-        print('SEED ONLINECLUSTER', self.seed)
         self.number_of_clusters_for_directions = number_of_clusters_for_directions
         # self.ref_dirs = ref_dirs
         self.ref_dirs = get_reference_directions("das-dennis", self.number_of_clusters_for_directions, n_partitions=12)
@@ -100,8 +98,8 @@ class OnlineClusterNSGA3(OnlineNonDominatedGeneticAlgorithm):
         super().__init__(ref_dirs=ref_dirs,
                          min_max_values=min_max_values,
                          use_normalization=True,
+                         transformation_matrix=transformation_matrix,
                          pop_size=pop_size,
-                         seed=seed,
                          sampling=sampling,
                          selection=selection,
                          crossover=crossover,
@@ -143,13 +141,10 @@ class ReferenceDirectionSurvival(Survival):
 
     def _do(self, problem, pop, n_survive, D=None, **kwargs):
         # attributes to be set after the survival
+        # print('F inside survival')
         F = pop.get("F")
-        # print('imprimindo as funções objetivo dentro da avaliação dos pontos de referência')
-        # print([len(i) for i in F])
-
-        # find or usually update the new ideal point - from feasible solutions
-        # print('ideal point')
-        # print(self.ideal_point)
+        # print(F)
+        # print('ideal point', self.ideal_point)
         self.ideal_point = np.min(np.vstack((self.ideal_point, F)), axis=0)
         self.worst_point = np.max(np.vstack((self.worst_point, F)), axis=0)
 
@@ -343,4 +338,4 @@ def calc_niche_count(n_niches, niche_of_individuals):
     return niche_count
 
 
-parse_doc_string(OnlineClusterNSGA3.__init__)
+parse_doc_string(OfflineClusterNSGA3.__init__)

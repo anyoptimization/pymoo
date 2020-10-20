@@ -14,9 +14,8 @@ class ExperimentNSGA3(object):
 
     def __init__(self,
                  ref_dirs,
-                 n_neighbors=20,
-                 decomposition='auto',
-                 prob_neighbor_mating=0.9,
+                 min_max_values,
+                 use_normalization=True,
                  save_data=True,
                  problem=get_problem("dtlz1"),
                  number_of_executions=1,
@@ -34,13 +33,15 @@ class ExperimentNSGA3(object):
         self.verbose = verbose
         self.save_history = save_history
         self.number_of_executions = number_of_executions
+        self.min_max_values = min_max_values
+        self.use_normalization = use_normalization
+
         if use_different_seeds:
             self.algorithms  = [NSGA3(
                                         ref_dirs,
+                                        min_max_values=self.min_max_values,
+                                        use_normalization=self.use_normalization,
                                         pop_size=100,
-                                        n_neighbors=n_neighbors,
-                                        decomposition=decomposition,
-                                        prob_neighbor_mating=prob_neighbor_mating,
                                         seed=i,
                                         current_execution_number=i,
                                         save_dir=self.save_dir,
@@ -48,10 +49,9 @@ class ExperimentNSGA3(object):
         else:
             self.algorithms  = [NSGA3(
                                         ref_dirs,
+                                        min_max_values=self.min_max_values,
+                                        use_normalization=self.use_normalization,
                                         pop_size=100,
-                                        n_neighbors=n_neighbors,
-                                        decomposition=decomposition,
-                                        prob_neighbor_mating=prob_neighbor_mating,
                                         seed=1,
                                         current_execution_number=i,
                                         save_dir=self.save_dir,
@@ -79,7 +79,7 @@ class ExperimentNSGA3(object):
         plt.plot(convergence)
         plt.title('Convergence', fontsize=20)
         plt.savefig(os.path.join(self.save_dir, file_name.split('.')[0] + '.pdf'))
-        plt.show()
+        # plt.show()
 
     def generate_mean_convergence(self, file_name):
         return [self.read_data_file(os.path.join(self.save_dir, 'Execution {}'.format(execution), file_name)) 

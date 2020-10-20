@@ -56,31 +56,49 @@ def evaluate_results(metric, save_dir, max_value, min_value, number_of_execution
 
 def get_metric_from_file_without_normalization(metric, file, problem):
     data = read_file_for_metric(file)
-    print(file)
-    # population = P.pop_from_array_or_individual(data)
-    # for individual in population:
-    #     individual.F = problem.evaluate(individual.get('X'))
-    # return metric.calc(population.get('F')
+    print('Current file {}'.format(file))
     return metric.calc(np.array(data))
+
+def save_metrics(metric_list, path, file_name):
+    with open(os.path.join(path, file_name), 'w') as file:
+        for metric in metric_list:
+            file.write(str(metric) + '\n')
 
 def evaluate_files_in_folder_without_normalization(metric, path):
     files = [file_name for file_name in os.listdir(path) if file_name.startswith('objectives')]
-    return [get_metric_from_file_without_normalization(hv, os.path.join(path, file_name), problem) for file_name in files]
+    hvs = [get_metric_from_file_without_normalization(hv, os.path.join(path, file_name), problem) for file_name in files]
+    save_metrics(hvs, path, 'hv_convergence.txt')
+    return hvs
 
 def evaluate_results_without_normalization(metric, save_dir, number_of_executions):
-    return np.array([evaluate_files_in_folder_without_normalization(metric, os.path.join(save_dir, 'Execution {}'.format(execution))) for execution in range(number_of_executions)]).mean(axis=0)
+    mean_values = np.array([evaluate_files_in_folder_without_normalization(metric, os.path.join(save_dir, 'Execution {}'.format(execution))) 
+                            for execution in range(number_of_executions)]).mean(axis=0)
+    save_metrics(mean_values, save_dir, 'mean_hv_convergence.txt')
+    return mean_values
+
+def show_mean_convergence(save_dir, file_name, metrics):
+    convergence = metrics
+    plt.figure()
+    plt.xlabel('Generation', fontsize=20)
+    plt.ylabel(file_name.split('_')[0], fontsize=20)
+    plt.plot(convergence)
+    plt.title('Convergence', fontsize=20)
+    plt.savefig(os.path.join(save_dir, file_name))
+    plt.show()
 
 original_dimension = 5
-reduced_dimension = 2
+reduced_dimension = 4
 interval_of_aggregations = 1
 number_of_executions = 3
 problem = get_problem("dtlz2", n_obj=original_dimension)
 save_dir = '.\\experiment_results\\NSGA3_{}_{}'.format(problem.name(), original_dimension)
+save_dir = '.\\experiment_results\\OnlineClusterNSGA3_{}_{}_{}_{}'.format(problem.name(), original_dimension, reduced_dimension, interval_of_aggregations)
 
 reference_directions = get_reference_directions("das-dennis", original_dimension, n_partitions=12)
 hv = get_performance_indicator("hv", ref_point=np.array([1.2]*problem.n_obj))
 start = time.time()
 hvs_values = evaluate_results_without_normalization(hv, save_dir, number_of_executions)
+show_mean_convergence(save_dir, 'hv_convergence.pdf', hvs_values)
 end = time.time()
 print(hvs_values)
 

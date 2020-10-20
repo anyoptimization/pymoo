@@ -16,7 +16,10 @@ class AdaptedGeneticAlgorithm(Algorithm):
 
     def __init__(self,
                  ref_dirs,
+                 min_max_values,
+                 use_normalization=True,
                  pop_size=None,
+                 seed=None,
                  sampling=None,
                  selection=None,
                  crossover=None,
@@ -34,7 +37,7 @@ class AdaptedGeneticAlgorithm(Algorithm):
                  **kwargs
                  ):
 
-        super().__init__(**kwargs)
+        super().__init__(seed=seed, **kwargs)
         self.start = time.time()
         # the population size used
         self.pop_size = pop_size
@@ -93,6 +96,11 @@ class AdaptedGeneticAlgorithm(Algorithm):
         self.hvs = []
         self.igds = []
         self.current_generation = 0
+        self.seed = seed
+        self.min_max_values = min_max_values
+        self.use_normalization = use_normalization
+        print('Seed')
+        print(self.seed)
 
 
     def _initialize(self):
@@ -116,6 +124,7 @@ class AdaptedGeneticAlgorithm(Algorithm):
         self.create_result_folders()
         
     def _next(self):
+        self.evaluate_population_in_original_objectives(self.pop)
 
         # do the mating using the current population
         self.off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
@@ -198,3 +207,12 @@ class AdaptedGeneticAlgorithm(Algorithm):
             print('Execution folder created!')
         else:
             print('Folder already exists!')
+
+    def evaluate_population_in_original_objectives(self, population):
+        min_values = self.min_max_values[0]
+        max_values = self.min_max_values[1]
+        for individual in population:
+            if self.use_normalization:
+                individual.F = (self.problem.evaluate(individual.get('X')) - min_values)/(max_values - min_values)
+            else:
+                individual.F = self.problem.evaluate(individual.get('X'))

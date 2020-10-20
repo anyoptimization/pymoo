@@ -42,6 +42,8 @@ class NSGA3(AdaptedGeneticAlgorithm):
 
     def __init__(self,
                  ref_dirs,
+                 min_max_values,
+                 use_normalization=True,
                  pop_size=None,
                  sampling=FloatRandomSampling(),
                  selection=TournamentSelection(func_comp=comp_by_cv_then_random),
@@ -92,6 +94,8 @@ class NSGA3(AdaptedGeneticAlgorithm):
 
         super().__init__(
                          ref_dirs=ref_dirs,
+                         min_max_values=min_max_values,
+                         use_normalization=True,
                          pop_size=pop_size,
                          sampling=sampling,
                          selection=selection,

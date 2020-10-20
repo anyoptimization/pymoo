@@ -16,10 +16,11 @@ from pymoo.model.repair import NoRepair
 from pymoo.factory import get_performance_indicator
 
 
-class OnlineNonDominatedGeneticAlgorithm(Algorithm):
+class OfflineNonDominatedGeneticAlgorithm(Algorithm):
 
     def __init__(self,
                  ref_dirs,
+                 transformation_matrix,
                  min_max_values,
                  use_normalization=True,
                  pop_size=None,
@@ -103,6 +104,7 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
         self.interval_of_aggregations = interval_of_aggregations
         self.current_execution_number = current_execution_number
         self.use_random_aggregation = use_random_aggregation
+        self.transformation_matrix = transformation_matrix
         self.save_dir = save_dir
         self.save_data = save_data
         self.aggregations = []
@@ -150,8 +152,7 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
 
         if self.save_data:
             self.save_current_iteration_files(self.pop)
-        
-        self.apply_cluster_reduction()
+
         self.reduce_population(self.pop, self.transformation_matrix)
         self.aggregations.append(self.get_aggregation_string(self.transformation_matrix))
 
@@ -203,12 +204,7 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
             self.save_algorithm_data('igd_convergence.txt', self.igds)
             self.save_algorithm_data('time.txt', [time.time() - self.start])
     
-    def _get_hypervolume(self, population):
-        return self.hv.calc(population.get('F'))
-    
-    def _get_igd(self, population):
-        return self.igd_plus.calc(population.get('F'))
-    
+
     def apply_cluster_reduction(self):
         if self.current_generation % self.interval_of_aggregations == 0:
             if not self.use_random_aggregation:
@@ -224,6 +220,12 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
                 cluster.fit(similarity)
                 self.transformation_matrix = self.get_transformation_matrix(cluster)
 
+    def _get_hypervolume(self, population):
+        return self.hv.calc(population.get('F'))
+    
+    def _get_igd(self, population):
+        return self.igd_plus.calc(population.get('F'))
+    
     def get_aggregation_string(self, transformation_matrix):
         aggregation = []
         for i in range(len(transformation_matrix)):
@@ -274,10 +276,11 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
     def get_random_transformation_matrix(self, cluster):
         self.number_of_clusters
         self.problem.n_obj
-        np.random.randint()
+        # np.random.randint()
         pass
 
     def reduce_population(self, population, transformation_matrix):
+ 
         for individual in population:
             individual.F = self.problem.evaluate(individual.get('X'))
             individual.F = np.dot(transformation_matrix, individual.F)
