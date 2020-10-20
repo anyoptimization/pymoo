@@ -13,9 +13,8 @@ class ExperimentOnlineClusterNSGA3(object):
 
     def __init__(self,
                  ref_dirs,
-                 n_neighbors=20,
-                 decomposition='auto',
-                 prob_neighbor_mating=0.9,
+                 min_max_values,
+                 use_normalization=True,
                  cluster=KMeans,
                  number_of_clusters=2,
                  interval_of_aggregations=1,
@@ -38,14 +37,15 @@ class ExperimentOnlineClusterNSGA3(object):
         self.save_dir = save_dir
         self.verbose = verbose
         self.save_history = save_history
+        self.min_max_values = min_max_values
+        self.use_normalization = use_normalization
 
         if use_different_seeds:
             self.algorithms  = [OnlineClusterNSGA3(
                                         ref_dirs,
+                                        use_normalization=self.use_normalization,
+                                        min_max_values=self.min_max_values,
                                         pop_size=100,
-                                        n_neighbors=n_neighbors,
-                                        decomposition=decomposition,
-                                        prob_neighbor_mating=prob_neighbor_mating,
                                         seed=i,
                                         number_of_clusters=number_of_clusters,
                                         number_of_clusters_for_directions=number_of_clusters,
@@ -58,10 +58,9 @@ class ExperimentOnlineClusterNSGA3(object):
         else:
             self.algorithms  = [OnlineClusterNSGA3(
                                         ref_dirs,
+                                        use_normalization=self.use_normalization,
+                                        min_max_values=self.min_max_values,
                                         pop_size=100,
-                                        n_neighbors=n_neighbors,
-                                        decomposition=decomposition,
-                                        prob_neighbor_mating=prob_neighbor_mating,
                                         seed=1,
                                         number_of_clusters=number_of_clusters,
                                         number_of_clusters_for_directions=number_of_clusters,
@@ -111,17 +110,17 @@ class ExperimentOnlineClusterNSGA3(object):
             if heat_map[i].values.sum() != self.number_of_executions:
                 print('Error in generation {}'.format(i))
 
-        plt.figure(figsize=(18,10))
+        plt.figure(figsize=(20,10))
         sns.heatmap(heat_map.values, yticklabels=heat_map.index.values, cmap="Blues")
-
+        
         plt.xlabel('Generation', fontsize=20)
 
-        plt.yticks(fontsize=13)
-        plt.ylabel('Aggregation', fontsize=20)
+        plt.yticks(fontsize=13, rotation=60)
+        # plt.ylabel('Aggregation', fontsize=20)
 
         plt.title('Aggregation Heat Map', fontsize=20)
         plt.savefig(os.path.join(self.save_dir, 'heat_map.pdf'))
-        plt.show()
+        # plt.show()
 
     def show_mean_convergence(self, file_name):
         convergence = pd.DataFrame(self.generate_mean_convergence(file_name)).mean().values
@@ -132,7 +131,7 @@ class ExperimentOnlineClusterNSGA3(object):
         plt.plot(convergence)
         plt.title('Convergence', fontsize=20)
         plt.savefig(os.path.join(self.save_dir, file_name.split('.')[0] + '.pdf'))
-        plt.show()
+        # plt.show()
 
     def generate_mean_convergence(self, file_name):
         return [self.read_data_file(os.path.join(self.save_dir, 'Execution {}'.format(execution), file_name)) 

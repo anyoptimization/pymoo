@@ -34,9 +34,9 @@ reduced_dimension = 4
 interval_of_aggregations = 1
 save_data = True
 use_normalization=True
-termination_criterion = ('n_gen', 10)
+termination_criterion = ('n_gen', 80)
 problem = get_problem("dtlz2", n_obj=original_dimension)
-number_of_executions = 3
+number_of_executions = 11
 reference_directions = get_reference_directions("das-dennis", original_dimension, n_partitions=12)
 
 normalization_point = generate_max_min(problem, reference_directions, number_of_executions)
@@ -62,9 +62,9 @@ experiment = ExperimentOnlineClusterNSGA3(ref_dirs=reference_directions,
     use_different_seeds=True)
 
 print('Online Cluster NSGA-III Experiment Run')
-# experiment.run()
-# experiment.show_mean_convergence('igd_convergence.txt')
-# experiment.show_heat_map()
+experiment.run()
+experiment.show_mean_convergence('igd_convergence.txt')
+experiment.show_heat_map()
 
 
 experiment = ExperimentNSGA3(ref_dirs=reference_directions,

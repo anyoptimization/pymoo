@@ -84,22 +84,27 @@ def show_mean_convergence(save_dir, file_name, metrics):
     plt.plot(convergence)
     plt.title('Convergence', fontsize=20)
     plt.savefig(os.path.join(save_dir, file_name))
-    plt.show()
+    # plt.show()
 
 original_dimension = 5
 reduced_dimension = 4
 interval_of_aggregations = 1
-number_of_executions = 3
+number_of_executions = 11
 problem = get_problem("dtlz2", n_obj=original_dimension)
-save_dir = '.\\experiment_results\\NSGA3_{}_{}'.format(problem.name(), original_dimension)
-save_dir = '.\\experiment_results\\OnlineClusterNSGA3_{}_{}_{}_{}'.format(problem.name(), original_dimension, reduced_dimension, interval_of_aggregations)
 
-reference_directions = get_reference_directions("das-dennis", original_dimension, n_partitions=12)
-hv = get_performance_indicator("hv", ref_point=np.array([1.2]*problem.n_obj))
-start = time.time()
-hvs_values = evaluate_results_without_normalization(hv, save_dir, number_of_executions)
-show_mean_convergence(save_dir, 'hv_convergence.pdf', hvs_values)
-end = time.time()
-print(hvs_values)
+save_dir_1 = '.\\experiment_results\\NSGA3_{}_{}'.format(problem.name(), original_dimension)
+save_dir_2 = '.\\experiment_results\\OnlineClusterNSGA3_{}_{}_{}_{}'.format(problem.name(), original_dimension, reduced_dimension, interval_of_aggregations)
+save_dir_3 = '.\\experiment_results\\RandomClusterNSGA3_{}_{}_{}_{}'.format(problem.name(), original_dimension, reduced_dimension, interval_of_aggregations)
+save_dir_4 = '.\\experiment_results\\OfflineClusterNSGA3_{}_{}_{}'.format(problem.name(), original_dimension, reduced_dimension)
 
-print('Elapsed time {}'.format(end-start))
+dirs = [save_dir_1, save_dir_2, save_dir_3, save_dir_4]
+
+for save_dir in dirs:
+    reference_directions = get_reference_directions("das-dennis", original_dimension, n_partitions=12)
+    hv = get_performance_indicator("hv", ref_point=np.array([1.2]*problem.n_obj))
+    start = time.time()
+    hvs_values = evaluate_results_without_normalization(hv, save_dir, number_of_executions)
+    show_mean_convergence(save_dir, 'hv_convergence.pdf', hvs_values)
+    end = time.time()
+    print(hvs_values)
+    print('Elapsed time {}'.format(end-start))
