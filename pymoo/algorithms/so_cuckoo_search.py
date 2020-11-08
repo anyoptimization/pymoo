@@ -26,7 +26,7 @@ class CuckooSearch(Algorithm):
                  sampling=FloatRandomSampling(),
                  survival=FitnessSurvival(),
                  eliminate_duplicates=DefaultDuplicateElimination(),
-                 termination=None,
+                 termination=SingleObjectiveDefaultTermination(),
                  pop_size=100,
                  beta=1.5,
                  a0=0.1,
@@ -60,12 +60,8 @@ class CuckooSearch(Algorithm):
         self.survival = survival
         self.display = display
         self.pop_size = pop_size
-        if termination is None:
-            self.default_termination = SingleObjectiveDefaultTermination()
-        else :
-            self.default_termination = termination
+        self.default_termination = termination
         self.eliminate_duplicates = eliminate_duplicates
-        self.V_max = None
         self.a0 = a0
         self.pa = pa
         self.beta = beta
@@ -83,6 +79,9 @@ class CuckooSearch(Algorithm):
                                      algorithm=self,
                                      eliminate_duplicates=self.eliminate_duplicates)
         self.evaluator.eval(self.problem, pop, algorithm=self)
+
+        if self.survival:
+            pop = self.survival.do(self.problem, pop, len(pop), algorithm=self)
         self.pop = pop
 
     def _next(self):
@@ -94,9 +93,9 @@ class CuckooSearch(Algorithm):
         V = abs(np.random.rand(*shape))**(1./self.beta)
         return U/V
 
-    def _get_global_step_size(self, X, G_X):
+    def _get_global_step_size(self, X):
         step = self._get_levy_step(X.shape)
-        step_size = self.a0*step*(G_X-X)
+        step_size = self.a0*step
         return step_size
 
     def _get_local_step_size(self, X):
@@ -128,8 +127,8 @@ class CuckooSearch(Algorithm):
         best = self.opt
         G_X = best.get("X")
 
-        step_size = self._get_global_step_size(X, G_X)
-        _X = X + np.random.rand(*X.shape)*step_size
+        step_size = self._get_global_step_size(X)
+        _X = X + np.random.rand(*X.shape)*step_size*(G_X-X)
         _X = set_to_bounds_if_outside_by_problem(self.problem, _X)
 
         #Evaluate
@@ -139,6 +138,7 @@ class CuckooSearch(Algorithm):
         # replace the worse pop with better off per index
         ImprovementReplacement().do(self.problem, pop, off, inplace=True)
 
+        #Local Random Walk
         step_size = self._get_local_step_size(X)
         _X = X + step_size
         _X = set_to_bounds_if_outside_by_problem(self.problem, _X)
