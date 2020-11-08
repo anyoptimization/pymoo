@@ -2,6 +2,7 @@ import unittest
 
 import numpy as np
 
+from pymoo.algorithms.so_cuckoo_search import CuckooSearch
 from pymoo.algorithms.so_genetic_algorithm import GA
 from pymoo.algorithms.so_nelder_mead import NelderMead
 from pymoo.algorithms.so_pattern_search import PatternSearch
@@ -43,14 +44,14 @@ class SingleObjectiveAlgorithmTest(unittest.TestCase):
 
     def test_sphere(self):
         problem = Sphere()
-        for algorithm in [NelderMead(), PatternSearch(), PSO(), GA()]:
+        for algorithm in [NelderMead(), PatternSearch(), PSO(), GA(), CuckooSearch()]:
             f, f_opt = test(problem, algorithm)
             self.assertAlmostEqual(f, f_opt, places=5)
             print(problem.__class__.__name__, algorithm.__class__.__name__, "Yes")
 
     def test_sphere_with_constraints(self):
         problem = SphereWithConstraints()
-        for algorithm in [GA(), NelderMead(), PatternSearch()]:
+        for algorithm in [GA(), NelderMead(), PatternSearch(), CuckooSearch()]:
             f, f_opt = test(problem, algorithm)
             self.assertAlmostEqual(f, f_opt, places=3)
             print(problem.__class__.__name__, algorithm.__class__.__name__, "Yes")
