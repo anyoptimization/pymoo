@@ -29,7 +29,7 @@ class MOCS(CuckooSearch):
                  termination=None,
                  pop_size=100,
                  beta=1.5,
-                 a0=0.1,
+                 alfa=0.1,
                  pa=0.35,
                  **kwargs):
         """
@@ -47,7 +47,7 @@ class MOCS(CuckooSearch):
         beta : The input parameter of the Mantegna's Algorithm to simulate
             sampling on Levy Distribution
 
-        a0   : The scaling step size and is usually O(L/100) with L is the
+        alfa   : The scaling step size and is usually O(L/100) with L is the
             scale of the problem
 
         pa   : The switch probability, pa fraction of the nests will be
@@ -61,7 +61,7 @@ class MOCS(CuckooSearch):
                          termination=termination,
                          pop_size=pop_size,
                          beta=beta,
-                         a0=a0,
+                         alfa=alfa,
                          pa=pa,
                          **kwargs)
 
@@ -91,8 +91,8 @@ class MOCS(CuckooSearch):
 
         #Local Random Walk
         _X = off.get("X")
-        step_size = self._get_local_step_size(X)
-        _X = _X + step_size
+        dir_vec = self._get_local_directional_vector(X)
+        _X = _X + dir_vec
         _X = set_to_bounds_if_outside_by_problem(self.problem, _X)
         off = Population(len(_X)).set("X", _X)
         self.evaluator.eval(self.problem, off, algorithm=self)
