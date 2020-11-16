@@ -3,7 +3,7 @@ python:
   - "3.7"
 
 install:
-  - pip install numpy pyrecorder
+  - pip install numpy pyrecorder scipy
   - python setup.py build_ext --inplace
   - python setup.py sdist
   - pip install dist/*.tar.gz

@@ -2,12 +2,13 @@ import numpy as np
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
+from pymoo.model.mating import Mating
 from pymoo.model.population import Population
 from pymoo.model.replacement import ImprovementReplacement
+from pymoo.model.selection import Selection
 from pymoo.operators.crossover.biased_crossover import BiasedCrossover
 from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
 from pymoo.operators.crossover.exponential_crossover import ExponentialCrossover
-from pymoo.operators.repair.bounce_back import BounceBackOutOfBoundsRepair
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
 from pymoo.operators.selection.random_selection import RandomSelection
 from pymoo.util.display import SingleObjectiveDisplay
@@ -24,7 +25,6 @@ class DE(GeneticAlgorithm):
     def __init__(self,
                  pop_size=100,
                  sampling=LatinHypercubeSampling(),
-                 crossover=None,
                  variant="DE/rand/1/bin",
                  CR=0.5,
                  F=0.3,
@@ -33,7 +33,6 @@ class DE(GeneticAlgorithm):
                  display=SingleObjectiveDisplay(),
                  **kwargs
                  ):
-
         """
 
         Parameters
@@ -63,24 +62,17 @@ class DE(GeneticAlgorithm):
          Another strategy for adaptive weights (F). Here, only a very small value is added or
          subtracted to the weight used for the crossover for each individual.
 
-
         """
 
-        _, self.var_selection, self.var_n, self.var_mutation, = variant.split("/")
-
-        if self.var_mutation == "exp":
-            mutation = ExponentialCrossover(CR)
-        elif self.var_mutation == "bin":
-            mutation = BiasedCrossover(CR)
-
-        if crossover is None:
-            crossover = DifferentialEvolutionCrossover(weight=F, dither=dither, jitter=jitter)
+        mating = DifferentialEvolutionMating(variant=variant,
+                                             CR=CR,
+                                             F=F,
+                                             dither=dither,
+                                             jitter=jitter)
 
         super().__init__(pop_size=pop_size,
                          sampling=sampling,
-                         selection=RandomSelection(),
-                         crossover=crossover,
-                         mutation=mutation,
+                         mating=mating,
                          survival=None,
                          display=display,
                          **kwargs)
@@ -88,9 +80,9 @@ class DE(GeneticAlgorithm):
         self.default_termination = SingleObjectiveDefaultTermination()
 
     def _next(self):
-
         # make a step and create the offsprings
-        self.off = self._step()
+        self.off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
+        self.off.set("n_gen", self.n_gen)
 
         # evaluate the offsprings
         self.evaluator.eval(self.problem, self.off, algorithm=self)
@@ -98,34 +90,95 @@ class DE(GeneticAlgorithm):
         # replace the individuals that have improved
         self.pop = ImprovementReplacement().do(self.problem, self.pop, self.off)
 
-    def _step(self):
-        selection, crossover, mutation = self.mating.selection, self.mating.crossover, self.mating.mutation
 
-        # retrieve the current population
-        pop = self.pop
+# =========================================================================================================
+# Selection and Mating
+# =========================================================================================================
 
-        # get the vectors from the population
-        F, CV, feasible = pop.get("F", "CV", "feasible")
-        F = parameter_less(F, CV)
+class DESelection(Selection):
+
+    def __init__(self, variant) -> None:
+        super().__init__()
+        self.variant = variant
+
+    def _do(self, pop, n_select, n_parents, **kwargs):
+        variant = self.variant
 
         # create offsprings and add it to the data of the algorithm
-        P = selection.do(pop, self.pop_size, crossover.n_parents)
+        P = RandomSelection().do(pop, n_select, n_parents)
 
-        if self.var_selection == "best":
-            P[:, 0] = np.argmin(F[:, 0])
-        elif self.var_selection == "rand+best":
-            P[np.random.random(len(pop)) < 0.3, 0] = np.argmin(F[:, 0])
+        F, CV = pop.get("F", "CV")
+        fitness = parameter_less(F, CV)[:, 0]
+        sorted_by_fitness = fitness.argsort()
+        best = sorted_by_fitness[0]
+
+        if variant == "best":
+            P[:, 0] = best
+        elif variant == "current-to-best":
+            P[:, 0] = np.arange(len(pop))
+            P[:, 1] = best
+            P[:, 2] = np.arange(len(pop))
+        elif variant == "current-to-rand":
+            P[:, 0] = np.arange(len(pop))
+            P[:, 2] = np.arange(len(pop))
+        elif variant == "rand-to-best":
+            P[:, 1] = best
+            P[:, 2] = np.arange(len(pop))
+        elif variant == "current-to-pbest":
+            n_pbest = int(np.ceil(0.1 * len(pop)))
+            pbest = sorted_by_fitness[:n_pbest]
+
+            P[:, 0] = np.arange(len(pop))
+            P[:, 1] = np.random.choice(pbest, len(pop))
+            P[:, 2] = np.arange(len(pop))
+
+        return P
+
+
+class DifferentialEvolutionMating(Mating):
+
+    def __init__(self,
+                 variant="DE/rand/1/bin",
+                 CR=0.5,
+                 F=0.3,
+                 dither="vector",
+                 jitter=False,
+                 selection=None,
+                 crossover=None,
+                 mutation=None,
+                 **kwargs):
+
+        _, sel, n_diff, mut, = variant.split("/")
+        self.variant = sel
+        self.n_diffs = int(n_diff)
+        if "-to-" in self.variant:
+            self.n_diffs += 1
+
+        if selection is None:
+            selection = DESelection(sel)
+
+        if mutation is None:
+            if mut == "exp":
+                mutation = ExponentialCrossover(CR)
+            elif mut == "bin":
+                mutation = BiasedCrossover(CR)
+
+        if crossover is None:
+            crossover = DifferentialEvolutionCrossover(n_diffs=self.n_diffs, weight=F, dither=dither, jitter=jitter)
+
+        super().__init__(selection, crossover, mutation, **kwargs)
+
+    def _do(self, problem, pop, n_offsprings, parents=None, **kwargs):
+
+        P = self.selection.do(pop, len(pop), self.crossover.n_parents)
 
         # do the first crossover which is the actual DE operation
-        off = crossover.do(self.problem, pop, P, algorithm=self)
+        off = self.crossover.do(problem, pop, P, algorithm=self)
 
         # then do the mutation (which is actually a crossover between old and new individual)
-        _pop = Population.merge(self.pop, off)
+        _pop = Population.merge(pop, off)
         _P = np.column_stack([np.arange(len(pop)), np.arange(len(pop)) + len(pop)])
-        off = mutation.do(self.problem, _pop, _P, algorithm=self)[:len(self.pop)]
-
-        # bounds back if something is out of bounds
-        off = BounceBackOutOfBoundsRepair().do(self.problem, off)
+        off = self.mutation.do(problem, _pop, _P, algorithm=self)[:len(pop)]
 
         return off
 

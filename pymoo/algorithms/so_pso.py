@@ -11,7 +11,7 @@ from pymoo.operators.repair.inverse_penalty import InversePenaltyOutOfBoundsRepa
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
 from pymoo.util.display import SingleObjectiveDisplay
-from pymoo.util.misc import norm_eucl_dist, norm_euclidean_distance
+from pymoo.util.misc import norm_eucl_dist
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 from pymoo.visualization.fitness_landscape import FitnessLandscape
 from pymoo.visualization.video.callback_video import AnimationCallback
@@ -260,7 +260,7 @@ class PSO(Algorithm):
         _min, _max = mD.min(), mD.max()
 
         # get the average distance to the global best
-        g_D = norm_euclidean_distance(self.problem)(best.get("X"), X).mean()
+        g_D = norm_eucl_dist(self.problem, best.get("X"), X).mean()
         f = (g_D - _min) / (_max - _min + 1e-32)
 
         S = np.array([S1_exploration(f), S2_exploitation(f), S3_convergence(f), S4_jumping_out(f)])

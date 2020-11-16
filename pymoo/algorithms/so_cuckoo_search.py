@@ -1,167 +1,174 @@
 import math
-import numpy as np
-from itertools import combinations
 
+import numpy as np
+
+from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.algorithms.so_genetic_algorithm import FitnessSurvival
 from pymoo.docs import parse_doc_string
-from pymoo.model.algorithm import Algorithm
-from pymoo.model.duplicate import DefaultDuplicateElimination
-from pymoo.model.initialization import Initialization
+from pymoo.model.infill import InfillCriterion
 from pymoo.model.population import Population
-from pymoo.model.replacement import ImprovementReplacement, is_better
-from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
-from pymoo.operators.sampling.random_sampling import FloatRandomSampling
+from pymoo.model.replacement import ImprovementReplacement
+from pymoo.operators.repair.to_bound import ToBoundOutOfBoundsRepair
+from pymoo.operators.sampling.latin_hypercube_sampling import LHS
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
-class CSDisplay(SingleObjectiveDisplay):
 
-    def _do(self, problem, evaluator, algorithm):
-        super()._do(problem, evaluator, algorithm)
+# =========================================================================================================
+# Levy
+# =========================================================================================================
 
-class CuckooSearch(Algorithm):
+
+class MantegnasAlgorithm:
+
+    def __init__(self, beta) -> None:
+        """
+        This algorithm can be used to sample to levy flight.
+
+        Parameters
+        ----------
+        beta : float
+            The parameter of the levy distribution
+
+        """
+        super().__init__()
+
+        # calculate the constant that we can actually sample form the normal distribution
+        a = math.gamma(1. + beta) * math.sin(math.pi * beta / 2.)
+        b = beta * math.gamma((1. + beta) / 2.) * 2 ** ((beta - 1.) / 2)
+        self.s_u = (a / b) ** (1. / (2 * beta))
+        self.beta = beta
+        self.s_v = 1
+
+    def do(self, size=None):
+        u = np.random.normal(0, self.s_u, size)
+        v = np.abs(np.random.normal(0, self.s_v, size)) ** (1. / self.beta)
+        return u / v
+
+
+class LevyFlights(InfillCriterion):
+
+    def __init__(self, alpha, beta, **kwargs):
+        super().__init__(**kwargs)
+        self.alpha = alpha
+        self.levy = MantegnasAlgorithm(beta)
+
+    def _do(self, problem, pop, n_offsprings, parents=None, **kwargs):
+        if parents is None:
+            raise Exception("For levy flights please provide the parents!")
+
+        X, F = pop.get("X", "F")
+        xl, xu = problem.bounds()
+
+        a, b, c = parents.T
+
+        # the direction to be used for improvement
+        direction = (X[b] - X[c])
+
+        # get random levy values to be used for the step size
+        levy = self.levy.do(size=(len(parents), 1))
+        # levy = np.random.normal(0, 1, size=(len(parents), problem.n_var))
+
+        _X = X[a] + (xu - xl) / self.alpha * levy * direction
+
+        _X = ToBoundOutOfBoundsRepair().do(problem, _X)
+        # _X = InversePenaltyOutOfBoundsRepair().do(problem, _X, P=X[a])
+
+        return Population.new(X=_X, index=a)
+
+
+# =========================================================================================================
+# Implementation
+# =========================================================================================================
+
+
+class CuckooSearch(GeneticAlgorithm):
 
     def __init__(self,
-                 display=CSDisplay(),
-                 sampling=FloatRandomSampling(),
-                 survival=FitnessSurvival(),
-                 eliminate_duplicates=DefaultDuplicateElimination(),
+                 pop_size=25,
+                 n_offsprings=None,
+                 sampling=LHS(),
                  termination=SingleObjectiveDefaultTermination(),
-                 pop_size=100,
+                 display=SingleObjectiveDisplay(),
                  beta=1.5,
-                 alfa=0.01,
-                 pa=0.35,
+                 alpha=0.01,
+                 pa=0.1,
                  **kwargs):
         """
 
         Parameters
         ----------
-        display : {display}
+
         sampling : {sampling}
-        survival : {survival}
-        eliminate_duplicates: This does not exists in the original paper/book.
-            Without this the solutions might get too biased to current global best solution,
-            because the global random walk use the global best solution as the reference.
 
         termination : {termination}
 
-        pop_size : The number of nests (solutions)
+        pop_size : int
+         The number of nests to be used
 
-        beta : The input parameter of the Mantegna's Algorithm to simulate
+        beta : float
+            The input parameter of the Mantegna's Algorithm to simulate
             sampling on Levy Distribution
 
-        alfa : alfa is the step size scaling factor and is usually
-            0.01, so that the step size will be scaled down to O(L/100) with L is
-            the scale (range of bounds) of the problem.
+        alpha : float
+            The step size scaling factor and is usually 0.01.
 
-        pa   : The switch probability, pa fraction of the nests will be
-            abandoned on every iteration
+        pa : float
+            The switch probability, pa fraction of the nests will be abandoned on every iteration
         """
+        mating = kwargs.get("mating")
+        if mating is None:
+            mating = LevyFlights(alpha, beta)
 
-        super().__init__(**kwargs)
+        super().__init__(pop_size=pop_size, n_offsprings=n_offsprings, sampling=sampling, mating=mating,
+                         termination=termination, display=display, **kwargs)
 
-        self.initialization = Initialization(sampling)
-        self.survival = survival
-        self.display = display
-        self.pop_size = pop_size
-        self.default_termination = termination
-        self.eliminate_duplicates = eliminate_duplicates
-
-        #the scale will be multiplied by problem scale after problem given in setup
-        self.alfa = alfa
-        self.scale = alfa
         self.pa = pa
-        self.beta = beta
-        a = math.gamma(1. + beta) * math.sin(math.pi*beta/2.)
-        b = beta*math.gamma((1.+beta)/2.)*2**((beta-1.)/2)
-        self.sig = (a/b)**(1./(2*beta))
-
-
-
-    def setup(self, problem, **kwargs):
-        super().setup(problem, **kwargs)
-        x_lower, x_upper = self.problem.bounds()
-        if x_lower is not None and x_upper is not None:
-            self.scale = self.alfa*(x_upper-x_lower)
-        else:
-            self.scale = self.alfa
-
-    def _initialize(self):
-        pop = self.initialization.do(self.problem,
-                                     self.pop_size,
-                                     algorithm=self,
-                                     eliminate_duplicates=self.eliminate_duplicates)
-        self.evaluator.eval(self.problem, pop, algorithm=self)
-
-        if self.survival:
-            pop = self.survival.do(self.problem, pop, len(pop), algorithm=self)
-        self.pop = pop
 
     def _next(self):
-        self._step()
+        pop, n_offsprings = self.pop, self.n_offsprings
 
-    def _get_levy_step(self, shape):
-        #Mantegna's algorithm simulating levy sampling
-        U = np.random.normal(0, self.sig, shape)
-        V = abs(np.random.normal(0, 1, shape))**(1./self.beta)
-        return U/V
+        best = FitnessSurvival().do(self.problem, pop, 1, return_indices=True)[0]
 
-    def _get_global_step_size(self, X):
-        step = self._get_levy_step(X.shape)
-        step_size = self.scale*step
-        return step_size
+        perm = lambda: np.random.permutation(len(pop))
 
-    def _get_local_directional_vector(self, X):
-        #local random walk (abandon nest) for pa fraction of the nests
-        #find 2 random different solution for the local random walk (nest_i ~ nest_i+ (nest_j - nest_k))
-        Xjk_idx = np.random.rand(len(X), len(X)).argpartition(2, axis=1)[:, :2]
-        Xj_idx = Xjk_idx[:, 0]
-        Xk_idx = Xjk_idx[:, 1]
-        Xj = X[Xj_idx]
-        Xk = X[Xk_idx]
+        # randomly select the parents and to be used for mating
+        a = perm()[:n_offsprings]
+        # a = np.repeat(best, n_offsprings)
 
-        #calculate Heaviside function (or wether local search will be done with nest_i or not)
-        #then duplicate H coloumn as many as the number of decision variable
-        H = (np.random.rand(len(X))<self.pa).astype(np.float)
-        H = np.tile(H, (self.problem.n_var, 1)).transpose()
+        # b = perm()[:n_offsprings]
+        # b[np.random.random(len(b)) < 0.25] = best
 
-        #calculate d (scale*(X_j - X_k)) , however XS Yang implementation in mathworks differ from the book
-        #replacing the scale with a random number [0,1], we use the book version here (a0)
-        dir_vec = np.random.rand(*X.shape)*(Xj-Xk)*H
-        return dir_vec
+        # a = np.repeat(best, n_offsprings)
+        b = np.repeat(best, n_offsprings)
+        # b = np.random.permutation(len(pop))[:n_offsprings]
+        c = perm()[:n_offsprings]
 
+        P = np.column_stack([a, b, c])
 
-    def _step(self):
-        pop = self.pop
-        X = pop.get("X")
-        F = pop.get("F")
-
-        #Levy Flight
-        best = self.opt
-        G_X = best.get("X")
-
-        step_size = self._get_global_step_size(X)
-        _X = X + np.random.rand(*X.shape)*step_size*(G_X-X)
-        _X = set_to_bounds_if_outside_by_problem(self.problem, _X)
-
-        #Evaluate
-        off = Population(len(pop)).set("X", _X)
+        # do the levy flight mating and evaluate the result offsprings
+        off = self.mating.do(self.problem, pop, len(pop), parents=P, algorithm=self)
         self.evaluator.eval(self.problem, off, algorithm=self)
 
-        # replace the worse pop with better off per index
-        # this method includes replacement with less constraints violation
-        # which the original paper doesn't have
-        ImprovementReplacement().do(self.problem, pop, off, inplace=True)
+        # randomly assign an offspring to a nest to be replaced
+        # I = perm()[:len(off)]
+        I = off.get("index")
 
-        #Local Random Walk
-        dir_vec = self._get_local_directional_vector(X)
-        _X = X + dir_vec
-        _X = set_to_bounds_if_outside_by_problem(self.problem, _X)
-        off = Population(len(pop)).set("X", _X)
-        self.evaluator.eval(self.problem, off, algorithm=self)
+        # replace the solution in each nest where it has improved
+        has_improved = ImprovementReplacement().do(self.problem, pop[I], off, return_indices=True)
 
-        #append offspring to population and then sort for elitism (survival)
-        self.pop = Population.merge(pop, off)
-        self.pop = self.survival.do(self.problem, self.pop, self.pop_size, algorithm=self)
+        # choose some nests to be abandon no matter if they have improved or not
+        abandon = np.random.random(len(I)) < self.pa
+
+        # never abandon the currently best solution
+        abandon[I == best] = False
+
+        # either because they have improved or they have been abandoned they are replaced
+        replace = has_improved | abandon
+
+        # replace the individuals in the population
+        self.pop[I[replace]] = off[replace]
+        self.off = off
+
 
 parse_doc_string(CuckooSearch.__init__)

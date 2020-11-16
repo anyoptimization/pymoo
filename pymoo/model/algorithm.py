@@ -197,6 +197,8 @@ class Algorithm:
         # END Overwrite by minimize
         # !
 
+        return self
+
     def initialize(self):
 
         # set the attribute for the optimization method to start
@@ -223,7 +225,7 @@ class Algorithm:
         res.start_time = time.time()
 
         # call the algorithm to solve the problem
-        self._solve(self.problem)
+        self._solve()
 
         # create the result object based on the current iteration
         res = self.result()
@@ -274,7 +276,7 @@ class Algorithm:
 
         # get the optimal solution found
         opt = self.opt
-        if len(opt) == 0:
+        if opt is None or len(opt) == 0:
             opt = None
 
         # if no feasible solution has been found
@@ -310,7 +312,7 @@ class Algorithm:
     # PROTECTED
     # =========================================================================================================
 
-    def _solve(self, problem):
+    def _solve(self):
 
         # now the termination criterion should be set
         if self.termination is None:

@@ -85,7 +85,7 @@ def create_random_flowshop_problem(n_machines, n_jobs, seed=None):
 
 def visualize(problem, x, path=None, label=True):
     with plt.style.context('ggplot'):
-        n_machines, n_jobs = problem.data.shape
+        n_machines, n_jobs = problem.records.shape
         machine_times = problem.get_machine_times(x)
 
         fig = plt.figure()
@@ -95,7 +95,7 @@ def visualize(problem, x, path=None, label=True):
 
         for i in range(n_machines):
             for j in range(n_jobs):
-                width = problem.data[i][x[j]]
+                width = problem.records[i][x[j]]
                 left = machine_times[i][j]
                 ax.barh(Y[i], width, left=left,
                         align='center', color='gray',

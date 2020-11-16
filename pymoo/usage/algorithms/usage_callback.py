@@ -29,7 +29,7 @@ res = minimize(problem,
                save_history=True,
                verbose=True)
 
-val = res.algorithm.callback.data["best"]
+val = res.algorithm.callback.records["best"]
 plt.plot(np.arange(len(val)), val)
 plt.show()
 

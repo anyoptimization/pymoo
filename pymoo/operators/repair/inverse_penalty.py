@@ -17,22 +17,21 @@ def inverse_penality(x, p, xl, xu, alpha=None):
         return x
 
     else:
-        # lower bound of Y
+        # lower bounds of Y
         diff = (p - x)
         diff[diff == 0] = 1e-32
         d = normv * np.max(np.maximum(idl * (xl - x) / diff, idr * (xu - x) / diff))
 
-        # upper bound on Y
-        up = np.array([~idl * ((xl - x) / diff), ~idr * (xu - x) / diff])
+        # upper bounds on Y
+        bounds = np.array([~idl * ((xl - x) / diff), ~idr * (xu - x) / diff])
 
-        D = normv * np.min(up[up > 0])
+        D = normv * np.min(bounds[bounds > 0])
 
         if alpha is None:
             alpha = (normv - d) / normv
             alpha += 1e-32
 
         Y = d
-
         r = np.random.random()
         if r > 0:
             Y = d * (1.0 + alpha * np.tan(r * np.arctan((D - d) / (alpha * d))))
@@ -78,8 +77,8 @@ if __name__ == '__main__':
 
     import matplotlib.pyplot as plt
 
-    plt.scatter(p[0], p[1], color="green")
-    plt.scatter(c[0], c[1], color="orange")
+    plt.scatter(p[0], p[1], color="green", label="Parent")
+    plt.scatter(c[0], c[1], color="orange", label="Offspring")
 
     data = []
     for j in range(200):
@@ -88,4 +87,5 @@ if __name__ == '__main__':
 
     plt.ylim(0.0, 1.3)
     plt.xlim(-0.2, 1)
+    plt.legend()
     plt.show()

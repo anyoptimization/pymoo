@@ -8,6 +8,9 @@ def denormalize(x, x_min, x_max):
     else:
         _range = (x_max - x_min)
 
+    if x_min is None:
+        x_min = 0
+
     return x * _range + x_min
 
 

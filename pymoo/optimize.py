@@ -1,7 +1,5 @@
 import copy
 
-from pymoo.factory import get_termination
-from pymoo.model.termination import Termination
 from pymoo.util.misc import termination_from_tuple
 from pymoo.util.termination.default import MultiObjectiveDefaultTermination, SingleObjectiveDefaultTermination
 
