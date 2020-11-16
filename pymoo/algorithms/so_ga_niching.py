@@ -86,10 +86,11 @@ def comp_by_cv_and_clearing_fitness(pop, P, **kwargs):
 
 class EpsilonClearingSurvival(Survival):
 
-    def __init__(self, epsilon, n_max_each_iter=None) -> None:
+    def __init__(self, epsilon, n_max_each_iter=None, norm_by_dim=False) -> None:
         super().__init__(False)
         self.epsilon = epsilon
         self.n_max_each_iter = n_max_each_iter
+        self.norm_by_dim = norm_by_dim
 
     def _do(self, problem, pop, n_survive, out=None, **kwargs):
         F = pop.get("F")
@@ -101,8 +102,11 @@ class EpsilonClearingSurvival(Survival):
         pop = FitnessSurvival().do(problem, pop, len(pop))
 
         # calculate the distance from each individual to another - pre-processing for the clearing
+        # NOTE: the distance is normalized by the maximum distance possible
         X = pop.get("X")
         D = norm_eucl_dist(problem, X, X)
+        if self.norm_by_dim:
+            D = D / (problem.n_var ** 0.5)
 
         # initialize the clearing strategy
         clearing = EpsilonClearing(D, self.epsilon)
@@ -121,6 +125,7 @@ class EpsilonClearingSurvival(Survival):
 
             # if no individuals are left because of clearing - perform a reset
             if len(remaining) == 0 or (self.n_max_each_iter is not None and rank > self.n_max_each_iter):
+
                 # reset and retrieve the newly available indices
                 clearing.reset()
                 remaining = clearing.remaining()
@@ -166,6 +171,7 @@ class NicheGA(GA):
     def __init__(self,
                  pop_size=100,
                  norm_niche_size=0.05,
+                 norm_by_dim=False,
                  display=NicheDisplay(),
                  **kwargs):
         """
@@ -187,7 +193,7 @@ class NicheGA(GA):
 
         surv = kwargs.get("survival")
         if surv is None:
-            surv = EpsilonClearingSurvival(norm_niche_size, n_max_each_iter=None)
+            surv = EpsilonClearingSurvival(norm_niche_size, n_max_each_iter=None, norm_by_dim=norm_by_dim)
 
         selection = kwargs.get("selection")
         if selection is None:

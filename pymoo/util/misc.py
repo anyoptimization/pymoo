@@ -14,7 +14,7 @@ def parameter_less(F, CV):
     parameter_less = np.max(F, axis=0) + CV
 
     infeasible = (CV > 0)[:, 0]
-    
+
     if np.any(infeasible):
         ret[infeasible] = parameter_less[infeasible]
 
@@ -80,23 +80,77 @@ def get_duplicates(M):
     return res
 
 
-def euclidean_distance(a, b):
+# -----------------------------------------------
+# Euclidean Distance
+# -----------------------------------------------
+
+def func_euclidean_distance(a, b):
     return np.sqrt(((a - b) ** 2).sum(axis=1))
 
 
-def norm_euclidean_distance(problem):
-    return norm_euclidean_distance_by_bounds(problem.xl, problem.xu)
-
-
-def norm_euclidean_distance_by_bounds(xl, xu):
+def func_norm_euclidean_distance(xl, xu):
     return lambda a, b: np.sqrt((((a - b) / (xu - xl)) ** 2).sum(axis=1))
+
+
+def norm_eucl_dist_by_bounds(A, B, xl, xu, **kwargs):
+    return vectorized_cdist(A, B, func_dist=func_norm_euclidean_distance(xl, xu), **kwargs)
+
+
+def norm_eucl_dist(problem, A, B, **kwargs):
+    return norm_eucl_dist_by_bounds(A, B, *problem.bounds(), **kwargs)
+
+
+# -----------------------------------------------
+# Manhatten Distance
+# -----------------------------------------------
+
+def func_manhatten_distance(a, b):
+    return np.abs(a - b).sum(axis=1)
+
+
+def func_norm_manhatten_distance(xl, xu):
+    return lambda a, b: np.abs((a - b) / (xu - xl)).sum(axis=1)
+
+
+def norm_manhatten_dist_by_bounds(A, B, xl, xu, **kwargs):
+    return vectorized_cdist(A, B, func_dist=func_norm_manhatten_distance(xl, xu), **kwargs)
+
+
+def norm_manhatten_dist(problem, A, B, **kwargs):
+    return norm_manhatten_dist_by_bounds(A, B, *problem.bounds(), **kwargs)
+
+
+# -----------------------------------------------
+# Tchebychev Distance
+# -----------------------------------------------
+
+
+def func_tchebychev_distance(a, b):
+    return np.abs(a - b).max(axis=1)
+
+
+def func_norm_tchebychev_distance(xl, xu):
+    return lambda a, b: np.abs((a - b) / (xu - xl)).max(axis=1)
+
+
+def norm_tchebychev_dist_by_bounds(A, B, xl, xu, **kwargs):
+    return vectorized_cdist(A, B, func_dist=func_norm_tchebychev_distance(xl, xu), **kwargs)
+
+
+def norm_tchebychev_dist(problem, A, B, **kwargs):
+    return norm_tchebychev_dist_by_bounds(A, B, *problem.bounds(), **kwargs)
+
+
+# -----------------------------------------------
+# Others
+# -----------------------------------------------
 
 
 def cdist(A, B, **kwargs):
     return scipy.spatial.distance.cdist(A, B, **kwargs)
 
 
-def vectorized_cdist(A, B, func_dist=euclidean_distance, fill_diag_with_inf=False, **kwargs):
+def vectorized_cdist(A, B, func_dist=func_euclidean_distance, fill_diag_with_inf=False, **kwargs):
     u = np.repeat(A, B.shape[0], axis=0)
     v = np.tile(B, (A.shape[0], 1))
 
@@ -107,14 +161,6 @@ def vectorized_cdist(A, B, func_dist=euclidean_distance, fill_diag_with_inf=Fals
         np.fill_diagonal(M, np.inf)
 
     return M
-
-
-def norm_eucl_dist(problem, A, B, **kwargs):
-    return vectorized_cdist(A, B, func_dist=norm_euclidean_distance(problem), **kwargs)
-
-
-def norm_eucl_dist_by_bounds(A, B, xl, xu, **kwargs):
-    return vectorized_cdist(A, B, func_dist=norm_euclidean_distance_by_bounds(xl, xu), **kwargs)
 
 
 def covert_to_type(problem, X):
@@ -301,3 +347,5 @@ def unique_and_all_indices(arr):
     for x in indexes:
         x.sort()
     return vals, indexes
+
+

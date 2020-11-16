@@ -9,6 +9,7 @@ import numpy as np
 
 from pymoo.problems.gradient import run_and_trace, calc_jacobian
 from pymoo.util.misc import at_least_2d_array
+from pymoo.util.normalization import denormalize
 
 
 class Problem:
@@ -630,6 +631,25 @@ class MetaProblem(Problem):
         return self.problem.pareto_set(*args, **kwargs)
 
 
+class ZeroToOneProblem(MetaProblem):
+
+    def __init__(self, problem):
+        super().__init__(problem)
+        self._xl, self._xu = self.xl, self.xu
+
+        if self.xl is not None:
+            self.xl = np.zeros(self.n_var)
+
+        if self.xu is not None:
+            self.xu = np.ones(self.n_var)
+
+    def _evaluate(self, x, out, *args, **kwargs):
+        super()._evaluate(self.denormalize(x), out, *args, **kwargs)
+
+    def denormalize(self, x):
+        return denormalize(x, self._xl, self._xu)
+
+
 class ConstraintsAsPenaltyProblem(MetaProblem):
 
     def __init__(self,
@@ -669,3 +689,4 @@ class StaticProblem(MetaProblem):
     def _evaluate(self, x, out, *args, **kwargs):
         for K, V in self.kwargs.items():
             out[K] = V
+

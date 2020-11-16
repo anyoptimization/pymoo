@@ -99,14 +99,14 @@ class NSGA3(GeneticAlgorithm):
                          display=display,
                          **kwargs)
 
-    def _solve(self, problem):
+    def setup(self, problem, **kwargs):
 
         if self.ref_dirs is not None and self.ref_dirs.shape[1] != problem.n_obj:
             raise Exception(
                 "Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
                 (self.ref_dirs.shape[1], problem.n_obj))
 
-        return super()._solve(problem)
+        return super().setup(problem, **kwargs)
 
     def _set_optimum(self, **kwargs):
         if not has_feasible(self.pop):
