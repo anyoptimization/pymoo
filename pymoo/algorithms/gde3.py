@@ -14,7 +14,8 @@ class GDE3(DE):
     def _next(self):
 
         # make a step and create the offsprings
-        self.off = self._step()
+        self.off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
+        self.off.set("n_gen", self.n_gen)
 
         # evaluate the offsprings
         self.evaluator.eval(self.problem, self.off, algorithm=self)

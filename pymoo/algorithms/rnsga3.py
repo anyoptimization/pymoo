@@ -78,12 +78,12 @@ class RNSGA3(NSGA3):
                          n_offsprings=n_offsprings,
                          **kwargs)
 
-    def _solve(self, problem):
+    def setup(self, problem, **kwargs):
         if self.survival.ref_points.shape[1] != problem.n_obj:
             raise Exception("Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
                             (self.survival.ref_points.shape[1], problem.n_obj))
 
-        return super()._solve(problem)
+        return super().setup(problem, **kwargs)
 
     def _finalize(self):
         pass

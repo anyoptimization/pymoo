@@ -151,6 +151,12 @@ def cdist(A, B, **kwargs):
 
 
 def vectorized_cdist(A, B, func_dist=func_euclidean_distance, fill_diag_with_inf=False, **kwargs):
+
+    assert A.ndim <= 2 and B.ndim <= 2
+
+    A, only_row = at_least_2d_array(A, extend_as="row", return_if_reshaped=True)
+    B, only_column = at_least_2d_array(B, extend_as="row", return_if_reshaped=True)
+
     u = np.repeat(A, B.shape[0], axis=0)
     v = np.tile(B, (A.shape[0], 1))
 
@@ -159,6 +165,13 @@ def vectorized_cdist(A, B, func_dist=func_euclidean_distance, fill_diag_with_inf
 
     if fill_diag_with_inf:
         np.fill_diagonal(M, np.inf)
+
+    if only_row and only_column:
+        M = M[0,0]
+    elif only_row:
+        M = M[0]
+    elif only_column:
+        M = M[:, [0]]
 
     return M
 
@@ -185,9 +198,11 @@ def find_duplicates(X, epsilon=1e-16):
     return is_duplicate
 
 
-def at_least_2d_array(x, extend_as="row"):
+def at_least_2d_array(x, extend_as="row", return_if_reshaped=False):
     if not isinstance(x, np.ndarray):
         x = np.array([x])
+
+    has_been_reshaped = False
 
     if x.ndim == 1:
         if extend_as == "row":
@@ -195,7 +210,12 @@ def at_least_2d_array(x, extend_as="row"):
         elif extend_as == "column":
             x = x[:, None]
 
-    return x
+        has_been_reshaped = True
+
+    if return_if_reshaped:
+        return x, has_been_reshaped
+    else:
+        return x
 
 
 def to_1d_array_if_possible(x):

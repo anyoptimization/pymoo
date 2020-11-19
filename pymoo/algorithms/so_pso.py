@@ -165,13 +165,11 @@ class PSO(Algorithm):
     def setup(self, problem, **kwargs):
         super().setup(problem, **kwargs)
         self.V_max = self.max_velocity_rate * (problem.xu - problem.xl)
+        return self
 
     def _initialize(self):
         pop = self.initialization.do(self.problem, self.pop_size, algorithm=self)
         self.evaluator.eval(self.problem, pop, algorithm=self)
-
-        if self.pertube_best:
-            pop = FitnessSurvival().do(self.problem, pop, self.pop_size - 1)
 
         if self.initial_velocity == "random":
             init_V = np.random.random((len(pop), self.problem.n_var)) * self.V_max[None, :]
@@ -186,10 +184,29 @@ class PSO(Algorithm):
         self.strategy = None
 
     def _next(self):
-        self._step()
+
+        # get the offspring solutions and evaluate them
+        off = self._step()
+        self.evaluator.eval(self.problem, off, algorithm=self)
+
+        # the the personal bests of the current population
+        pbest = Population.create(*self.pop.get("pbest"))
+
+        # if an offspring has improved the personal store that index
+        has_improved = ImprovementReplacement().do(self.problem, pbest, off, return_indices=True)
+
+        # replace the personal best of each particle if it has improved
+        off[has_improved].set("pbest", off[has_improved])
+        pop = off
+
+        self.off = off
+        self.pop = pop
 
         if self.adaptive:
             self._adapt()
+
+    def _social_best(self):
+        return Population.create(*[self.opt] * len(self.pop))
 
     def _step(self):
         pop = self.pop
@@ -199,8 +216,8 @@ class PSO(Algorithm):
         pbest = Population.create(*pop.get("pbest"))
         P_X, P_F = pbest.get("X", "F")
 
-        # get the GLOBAL best solution - other variants such as local best can be implemented here too
-        best = self.opt.repeat(len(pop))
+        # get the best for each solution - could be global or local or something else - (here: Global)
+        best = self._social_best()
         G_X = best.get("X")
 
         # get the inertia weight of the individual
@@ -222,30 +239,17 @@ class PSO(Algorithm):
         _X = InversePenaltyOutOfBoundsRepair().do(self.problem, _X, P=X)
 
         # evaluate the offspring population
-        off = Population(len(pop)).set("X", _X, "V", _V, "pbest", pbest)
-        self.evaluator.eval(self.problem, off, algorithm=self)
-
-        # check whether a solution has improved or not - also consider constraints here
-        has_improved = ImprovementReplacement().do(self.problem, pbest, off, return_indices=True)
-
-        # replace the personal best of each particle if it has improved
-        off[has_improved].set("pbest", off[has_improved])
-        off.set("best", best)
-        pop = off
+        off = Population(len(pop)).set("X", _X, "V", _V, "pbest", pbest, "best", best)
 
         # try to improve the current best with a pertubation
         if self.pertube_best:
             pbest = Population.create(*pop.get("pbest"))
             k = FitnessSurvival().do(self.problem, pbest, 1, return_indices=True)[0]
-            eta = int(np.random.uniform(5, 30))
+            eta = int(np.random.uniform(20, 30))
             mutant = PolynomialMutation(eta).do(self.problem, pbest[[k]])[0]
-            self.evaluator.eval(self.problem, mutant, algorithm=self)
+            off[k].set("X", mutant.X)
 
-            # if the mutant is in fact better - replace the personal best
-            if is_better(mutant, pop[k]):
-                pop[k].set("pbest", mutant)
-
-        self.pop = pop
+        return off
 
     def _adapt(self):
         pop = self.pop
@@ -259,7 +263,7 @@ class PSO(Algorithm):
         mD = D.sum(axis=1) / (len(pop) - 1)
         _min, _max = mD.min(), mD.max()
 
-        # get the average distance to the global best
+        # get the average distance to the best
         g_D = norm_eucl_dist(self.problem, best.get("X"), X).mean()
         f = (g_D - _min) / (_max - _min + 1e-32)
 
