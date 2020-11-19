@@ -5,14 +5,11 @@ except:
 
 import warnings
 
-import autograd.numpy as anp
 import numpy as np
 
 from pymoo.algorithms.so_local_search import LocalSearch
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
-from pymoo.model.problem import Problem, ZeroToOneProblem
-from pymoo.optimize import minimize
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.termination.max_gen import MaximumGenerationTermination
 from pymoo.util.termination.no_termination import NoTermination
