@@ -31,10 +31,8 @@ def inverse_penality(x, p, xl, xu, alpha=None):
             alpha = (normv - d) / normv
             alpha += 1e-32
 
-        Y = d
         r = np.random.random()
-        if r > 0:
-            Y = d * (1.0 + alpha * np.tan(r * np.arctan((D - d) / (alpha * d))))
+        Y = d * (1.0 + alpha * np.tan(r * np.arctan((D - d) / (alpha * d))))
 
         ret = x + (p - x) * Y / normv
 

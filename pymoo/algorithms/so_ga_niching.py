@@ -125,7 +125,6 @@ class EpsilonClearingSurvival(Survival):
 
             # if no individuals are left because of clearing - perform a reset
             if len(remaining) == 0 or (self.n_max_each_iter is not None and rank > self.n_max_each_iter):
-
                 # reset and retrieve the newly available indices
                 clearing.reset()
                 remaining = clearing.remaining()
@@ -172,6 +171,7 @@ class NicheGA(GA):
                  pop_size=100,
                  norm_niche_size=0.05,
                  norm_by_dim=False,
+                 return_all_opt=False,
                  display=NicheDisplay(),
                  **kwargs):
         """
@@ -208,8 +208,14 @@ class NicheGA(GA):
         # self.default_termination = NicheTermination()
         self.default_termination = SingleObjectiveDefaultTermination()
 
+        # whether with rank one after clearing or just the best should be considered as optimal
+        self.return_all_opt = return_all_opt
+
     def _set_optimum(self, **kwargs):
-        self.opt = self.pop[self.pop.get("iter") == 1]
+        if self.return_all_opt:
+            self.opt = self.pop[self.pop.get("iter") == 1]
+        else:
+            super()._set_optimum()
 
 
 parse_doc_string(NicheGA.__init__)

@@ -216,6 +216,9 @@ class Algorithm:
         # call the initialize method of the concrete algorithm implementation
         self._initialize()
 
+        # set the algorithm object to be initialized
+        self.is_initialized = True
+
     def solve(self):
 
         # the result object to be finally returned
@@ -243,7 +246,6 @@ class Algorithm:
         # call next of the implementation of the algorithm
         if not self.is_initialized:
             self.initialize()
-            self.is_initialized = True
         else:
             self._next()
             self.n_gen += 1
