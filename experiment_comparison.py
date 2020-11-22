@@ -13,6 +13,7 @@ def generate_convergence_plot_full(file_name, save_files_path, results_path_1, a
     metric_2 = read_data_file(os.path.join(results_path_2, algorithm_2, file_name))
     metric_3 = read_data_file(os.path.join(results_path_3, algorithm_3, file_name))
     metric_4 = read_data_file(os.path.join(results_path_4, algorithm_4, file_name))
+    plt.figure()
     plt.plot(metric_1, label=algorithm_1)
     plt.plot(metric_2, label=algorithm_2)
     plt.plot(metric_3, label=algorithm_3)
@@ -21,7 +22,7 @@ def generate_convergence_plot_full(file_name, save_files_path, results_path_1, a
     plt.ylabel(file_name.split('.')[0], fontsize=20)
     plt.legend()
     plt.savefig(os.path.join(save_files_path, file_name.split('.')[0] + '.pdf'))
-    # plt.show()
+    plt.show()
 
 def generate_boxplots_full(number_of_executions, file_name, save_files_path, results_path_1, algorithm_1,
  results_path_2, algorithm_2, results_path_3, algorithm_3, results_path_4, algorithm_4):
@@ -47,7 +48,7 @@ def generate_boxplots_full(number_of_executions, file_name, save_files_path, res
         algorithm_4.replace('ClusterNSGA3','')])
     plt.xticks(rotation=10)
     plt.savefig(os.path.join(save_files_path, file_name.split('_')[0] + '_boxplot.pdf'))
-    # plt.show()
+    plt.show()
 
 def create_folder(full_path):
     if not os.path.exists(full_path):
@@ -59,7 +60,7 @@ def create_folder(full_path):
 problem = 'DTLZ2'
 original_dimension = 5
 reduced_dimension = 4
-number_of_executions = 3
+number_of_executions = 5
 interval_of_aggregations = 1
 
 # algorithm files path
@@ -69,6 +70,8 @@ algorithm_2 = 'OnlineClusterNSGA3_{}_{}_{}_{}'.format(problem, original_dimensio
 results_path_2 = '.\\experiment_results\\'
 algorithm_3 = 'OfflineClusterNSGA3_{}_{}_{}'.format(problem, original_dimension, reduced_dimension)
 results_path_3 = '.\\experiment_results\\'
+# algorithm_3 = algorithm_1
+# results_path_3 = results_path_1
 algorithm_4 = 'RandomClusterNSGA3_{}_{}_{}_{}'.format(problem, original_dimension, reduced_dimension, interval_of_aggregations)
 results_path_4 = '.\\experiment_results\\'
 save_files_path = '.\\experiment_results\\{}_{}_{}_{}'.format(problem, original_dimension, reduced_dimension, interval_of_aggregations)
@@ -78,13 +81,13 @@ igd_file_name = 'mean_igd_convergence.txt'
 create_folder(save_files_path)
 
 ## Convergence plots
-generate_convergence_plot_full(hv_file_name, save_files_path, results_path_1, algorithm_1,
- results_path_2, algorithm_2, results_path_3, algorithm_3, results_path_4, algorithm_4)
+# generate_convergence_plot_full(hv_file_name, save_files_path, results_path_1, algorithm_1,
+#  results_path_2, algorithm_2, results_path_3, algorithm_3, results_path_4, algorithm_4)
 generate_convergence_plot_full(igd_file_name, save_files_path, results_path_1, algorithm_1,
  results_path_2, algorithm_2, results_path_3, algorithm_3, results_path_4, algorithm_4)
 
 ## Boxplots
-generate_boxplots_full(number_of_executions, 'hv_convergence.txt', save_files_path, results_path_1, algorithm_1,
- results_path_2, algorithm_2, results_path_3, algorithm_3, results_path_4, algorithm_4)
+# generate_boxplots_full(number_of_executions, 'hv_convergence.txt', save_files_path, results_path_1, algorithm_1,
+#  results_path_2, algorithm_2, results_path_3, algorithm_3, results_path_4, algorithm_4)
 generate_boxplots_full(number_of_executions, 'igd_convergence.txt',save_files_path, results_path_1, algorithm_1,
  results_path_2, algorithm_2, results_path_3, algorithm_3, results_path_4, algorithm_4)

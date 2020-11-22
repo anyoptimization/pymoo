@@ -20,7 +20,6 @@ class Decomposition:
            **kwargs):
 
         _F, _weights = to_1d_array_if_possible(F), to_1d_array_if_possible(weights)
-
         if _type == "auto":
             if _F.ndim == 1 and _weights.ndim > 1:
                 _type = "one_to_many"

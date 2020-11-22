@@ -209,7 +209,6 @@ class OnlineClusterMOEAD(AggregatedGeneticAlgorithm):
             if not self.use_random_aggregation:
                 dataframe = pd.DataFrame(np.array([individual.F for individual in self.pop]))
                 similarity = 1 - dataframe.corr(method='kendall').values
-                # print(dataframe.corr(method='kendall').values)
                 cluster = self.cluster(n_clusters=self.number_of_clusters, affinity='precomputed', linkage='single')
                 cluster.fit(similarity)
                 # cluster = self.cluster(n_clusters=self.number_of_clusters)

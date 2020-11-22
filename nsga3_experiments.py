@@ -34,9 +34,10 @@ reduced_dimension = 4
 interval_of_aggregations = 1
 save_data = True
 use_normalization=True
-termination_criterion = ('n_gen', 80)
+use_different_seeds = True
+termination_criterion = ('n_gen', 10)
 problem = get_problem("dtlz2", n_obj=original_dimension)
-number_of_executions = 11
+number_of_executions = 5
 reference_directions = get_reference_directions("das-dennis", original_dimension, n_partitions=12)
 
 normalization_point = generate_max_min(problem, reference_directions, number_of_executions)
@@ -59,7 +60,7 @@ experiment = ExperimentOnlineClusterNSGA3(ref_dirs=reference_directions,
     use_random_aggregation=False,    
     verbose=False,
     save_history=True,
-    use_different_seeds=True)
+    use_different_seeds=use_different_seeds)
 
 print('Online Cluster NSGA-III Experiment Run')
 experiment.run()
@@ -81,7 +82,7 @@ experiment = ExperimentNSGA3(ref_dirs=reference_directions,
     termination=termination_criterion,
     verbose=False,
     save_history=True,
-    use_different_seeds=True)
+    use_different_seeds=use_different_seeds)
 
 print('NSGA-III Experiment Run')
 experiment.run()
@@ -102,7 +103,7 @@ experiment = ExperimentOnlineClusterNSGA3(ref_dirs=reference_directions,
     use_random_aggregation=True,    
     verbose=False,
     save_history=True,
-    use_different_seeds=True)
+    use_different_seeds=use_different_seeds)
 
 print('Random Cluster NSGA-III Experiment Run')
 experiment.run()
@@ -124,7 +125,7 @@ experiment = ExperimentOfflineClusterNSGA3(ref_dirs=reference_directions,
     use_random_aggregation=False,    
     verbose=False,
     save_history=True,
-    use_different_seeds=True)
+    use_different_seeds=use_different_seeds)
 
 print('Offline Cluster NSGA-III Experiment Run')
 experiment.run()

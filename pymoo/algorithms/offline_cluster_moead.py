@@ -234,6 +234,11 @@ class OfflineClusterMOEAD(AggregatedGeneticAlgorithm):
         
         if not os.path.exists(self.full_path):
             os.makedirs(self.full_path)
-            print('Execution folder created!')
+            pass
+            # print('Execution folder created!')
         else:
-            print('Folder already exists!')
+            pass
+            # print('Folder already exists!')
+
+    def get_initial_population_number(self, seed):
+        pass

@@ -130,7 +130,6 @@ def pop_from_array_or_individual(array, pop=None):
         pop[0] = array
     else:
         return None
-
     return pop
 
 

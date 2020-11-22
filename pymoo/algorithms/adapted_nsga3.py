@@ -45,6 +45,7 @@ class NSGA3(AdaptedGeneticAlgorithm):
                  min_max_values,
                  use_normalization=True,
                  pop_size=None,
+                 seed=None,
                  sampling=FloatRandomSampling(),
                  selection=TournamentSelection(func_comp=comp_by_cv_then_random),
                  crossover=SimulatedBinaryCrossover(eta=30, prob=1.0),
@@ -70,7 +71,8 @@ class NSGA3(AdaptedGeneticAlgorithm):
         n_offsprings : {n_offsprings}
 
         """
-
+        self.seed = seed
+        print('SEED ORIGINAL NSGA3', self.seed)
         self.ref_dirs = ref_dirs
 
         # in case of R-NSGA-3 they will be None - otherwise this will be executed
@@ -97,6 +99,7 @@ class NSGA3(AdaptedGeneticAlgorithm):
                          min_max_values=min_max_values,
                          use_normalization=True,
                          pop_size=pop_size,
+                         seed=seed,
                          sampling=sampling,
                          selection=selection,
                          crossover=crossover,

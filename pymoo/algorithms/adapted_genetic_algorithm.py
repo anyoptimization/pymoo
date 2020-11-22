@@ -101,10 +101,9 @@ class AdaptedGeneticAlgorithm(Algorithm):
         self.use_normalization = use_normalization
         print('Seed')
         print(self.seed)
-
+        
 
     def _initialize(self):
-
         # create the initial population
         pop = self.initialization.do(self.problem, self.pop_size, algorithm=self)
         pop.set("n_gen", self.n_gen)
@@ -113,16 +112,22 @@ class AdaptedGeneticAlgorithm(Algorithm):
         self.evaluator.eval(self.problem, pop, algorithm=self)
 
         # that call is a dummy survival to set attributes that are necessary for the mating selection
-        if self.survival:
-            pop = self.survival.do(self.problem, pop, len(pop), algorithm=self,
-                                   n_min_infeas_survive=self.min_infeas_pop_size)
+        # if self.survival:
+        #     pop = self.survival.do(self.problem, pop, len(pop), algorithm=self,
+        #                            n_min_infeas_survive=self.min_infeas_pop_size)
 
         self.pop, self.off = pop, pop
 
         self.hv = get_performance_indicator("hv", ref_point=np.array([1.2]*self.problem.n_obj))
         self.igd_plus = get_performance_indicator("igd+", self.problem.pareto_front(ref_dirs=self.ref_dirs))
         self.create_result_folders()
-        
+
+        read_pop = self.get_initial_population_number(self.seed)
+        self.evaluator.eval(self.problem, read_pop, algorithm=self)
+        self.pop, self.off = read_pop, read_pop
+        current_igd = self.get_igd(self.pop)
+        self.igds.append(current_igd)
+
     def _next(self):
         self.evaluate_population_in_original_objectives(self.pop)
 

@@ -135,6 +135,12 @@ class OfflineNonDominatedGeneticAlgorithm(Algorithm):
         self.hv = get_performance_indicator("hv", ref_point=np.array([1.2]*self.problem.n_obj))
         self.igd_plus = get_performance_indicator("igd+", self.problem.pareto_front(ref_dirs=self.ref_dirs))
         self.create_result_folders()
+
+        read_pop = self.get_initial_population_number(self.seed)
+        self.evaluator.eval(self.problem, read_pop, algorithm=self)
+        self.pop, self.off = read_pop, read_pop
+        current_igd = self.get_igd(self.pop)
+        self.igds.append(current_igd)
     
     def generate_max_min(self, problem):
         print('Generating initial random population...')

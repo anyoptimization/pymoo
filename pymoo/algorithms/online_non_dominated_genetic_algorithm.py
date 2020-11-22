@@ -112,8 +112,6 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
         self.seed = seed
         self.min_max_values = min_max_values
         self.use_normalization = use_normalization
-        print('Seed')
-        print(self.seed)
 
     def _initialize(self):
         # create the initial population
@@ -133,6 +131,13 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
         self.hv = get_performance_indicator("hv", ref_point=np.array([1.2]*self.problem.n_obj))
         self.igd_plus = get_performance_indicator("igd+", self.problem.pareto_front(ref_dirs=self.ref_dirs))
         self.create_result_folders()
+        # self.save_initial_population(self.seed)
+
+        read_pop = self.get_initial_population_number(self.seed)
+        self.evaluator.eval(self.problem, read_pop, algorithm=self)
+        self.pop, self.off = read_pop, read_pop
+        current_igd = self.get_igd(self.pop)
+        self.igds.append(current_igd)
     
     def generate_max_min(self, problem):
         print('Generating initial random population...')
@@ -290,3 +295,10 @@ class OnlineNonDominatedGeneticAlgorithm(Algorithm):
                 individual.F = (self.problem.evaluate(individual.get('X')) - min_values)/(max_values - min_values)
             else:
                 individual.F = self.problem.evaluate(individual.get('X'))
+
+    def save_initial_population(self, seed):
+        path = '.\\initial_populations'
+        file_path = os.path.join(path, 'initial_population_{}.npy'.format(seed))   
+        np.save(file_path, self.pop.get('X'))
+
+        print('Vectors saved', self.pop.get('X'))

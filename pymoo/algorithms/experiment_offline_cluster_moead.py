@@ -90,9 +90,6 @@ class ExperimentOfflineClusterMOEAD(object):
         print('Generating random solutions for aggregations...')
         algorithm = OfflineClusterMOEAD(self.ref_dirs,
                                 transformation_matrix=[[1]*self.problem.n_obj for i in range(self.problem.n_obj)],
-                                n_neighbors=self.n_neighbors,
-                                decomposition=self.decomposition,
-                                prob_neighbor_mating=self.prob_neighbor_mating,
                                 seed=1,
                                 pop_size=10000,
                                 number_of_clusters=self.number_of_clusters,
@@ -100,8 +97,8 @@ class ExperimentOfflineClusterMOEAD(object):
                                 save_dir=self.save_dir,
                                 save_data=self.save_data,
                                 cluster=self.cluster)
-
-        res = minimize(self.problem, algorithm, termination=('n_gen', 0))
+        
+        res = minimize(self.problem, algorithm, termination=('n_gen', 1))
         print('Random solutions generated...')
         print('Start clustering...')
         dataframe = pd.DataFrame(np.array(res.pop.get('F')))

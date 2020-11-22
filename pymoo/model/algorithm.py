@@ -2,13 +2,13 @@ import copy
 import random
 import time
 from abc import abstractmethod
-
+import os
 import numpy as np
 
 from pymoo.model.callback import Callback
 from pymoo.model.evaluator import Evaluator
 from pymoo.model.individual import Individual
-from pymoo.model.population import Population
+from pymoo.model.population import Population, pop_from_array_or_individual
 from pymoo.model.result import Result
 from pymoo.util.function_loader import FunctionLoader
 from pymoo.util.misc import termination_from_tuple
@@ -120,8 +120,7 @@ class Algorithm:
         # the time when the algorithm has been setup for the first time
         self.start_time = None
 
-
-    # set the random seed in the algorithm object
+        # set the random seed in the algorithm object
         self.seed = seed
         if self.seed is None:
             self.seed = np.random.randint(0, 10000000)
@@ -363,6 +362,13 @@ class Algorithm:
     def _finalize(self):
         pass
 
+    def get_initial_population_number(self, seed):
+        path = '.\\initial_populations'
+        file_path = os.path.join(path, 'initial_population_{}.npy'.format(seed))
+        X = np.load(file_path)
+        pop = pop_from_array_or_individual(X)
+        # pop = self.evaluator.eval(self.problem, X)
+        return pop
 
 def filter_optimum(pop, least_infeasible=False):
     # first only choose feasible solutions
@@ -394,3 +400,5 @@ def filter_optimum(pop, least_infeasible=False):
         ret = Population().create(ret)
 
     return ret
+
+
