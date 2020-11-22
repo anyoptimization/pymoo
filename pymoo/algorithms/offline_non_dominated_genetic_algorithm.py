@@ -251,15 +251,17 @@ class OfflineNonDominatedGeneticAlgorithm(Algorithm):
         return self.igd_plus.calc(population.get('F'))
 
     def save_current_iteration_files(self, population):
-        # variables = [individual.get('X') for individual in population]
+        variables = [individual.get('X') for individual in population]
         objectives = [individual.get('F') for individual in population]
-        # self.save_algorithm_data('variables_{}.txt'.format(self.current_generation), variables)
         if self.current_generation < 10:
             self.save_algorithm_data('objectives_00{}.txt'.format(self.current_generation), objectives)
+            self.save_algorithm_data('variables_00{}.txt'.format(self.current_generation), variables)
         elif self.current_generation < 100:
             self.save_algorithm_data('objectives_0{}.txt'.format(self.current_generation), objectives)
+            self.save_algorithm_data('variables_0{}.txt'.format(self.current_generation), variables)
         else:
             self.save_algorithm_data('objectives_{}.txt'.format(self.current_generation), objectives)
+            self.save_algorithm_data('variables_{}.txt'.format(self.current_generation), variables)
         
     def save_algorithm_data(self, file_name, data_list):
         with open(os.path.join(self.full_path, file_name),'w') as file:
