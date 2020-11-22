@@ -11,6 +11,9 @@ __pycache__/
 *.run
 *.so
 
+# experiment results
+experiment_results/*
+experiment_results/
 
 # files which are in tests
 tests/!archive/*
