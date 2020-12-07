@@ -219,6 +219,8 @@ class Algorithm:
         # set the algorithm object to be initialized
         self.is_initialized = True
 
+        return self
+
     def solve(self):
 
         # the result object to be finally returned

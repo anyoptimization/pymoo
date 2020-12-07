@@ -1,4 +1,4 @@
-from pymoo.algorithms.so_golden import GoldenSectionSearch
+from pymoo.algorithms.univariate.golden import GoldenSectionSearch
 from pymoo.optimize import minimize
 from pymoo.problems.single import Sphere
 

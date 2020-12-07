@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.algorithms.so_gradient_descent import GradientDescent
+from pymoo.algorithms.convex.gradient_descent import GradientDescent
 from pymoo.factory import get_problem
 from pymoo.optimize import minimize
 
