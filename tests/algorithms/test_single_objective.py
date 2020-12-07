@@ -2,7 +2,6 @@ import unittest
 
 import numpy as np
 
-from pymoo.algorithms.so_cuckoo_search import CuckooSearch
 from pymoo.algorithms.so_genetic_algorithm import GA
 from pymoo.algorithms.so_nelder_mead import NelderMead
 from pymoo.algorithms.so_pattern_search import PatternSearch
