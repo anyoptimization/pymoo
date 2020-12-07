@@ -88,6 +88,8 @@ class RVEA(GeneticAlgorithm):
         if not isinstance(self.termination, MaximumGenerationTermination):
             raise Exception("Please use the n_gen or n_eval as a termination criterion to execute RVEA!")
 
+        return self
+
     def _next(self):
         super()._next()
 

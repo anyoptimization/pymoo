@@ -101,3 +101,16 @@ class Evaluator:
                 continue
             else:
                 pop.set(key, val)
+
+
+class VoidEvaluator(Evaluator):
+
+    def eval(self, problem, pop, **kwargs):
+
+        for individual in pop:
+            if individual.F is None:
+                individual.F = np.full(problem.n_obj, np.inf)
+                individual.G = np.full(problem.n_constr, np.inf) if problem.has_constraints() else None
+                individual.CV = [-np.inf]
+                individual.feasible = [False]
+

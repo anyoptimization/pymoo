@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.algorithms.so_gradient_descent import GradientBasedAlgorithm
+from pymoo.algorithms.convex.base import GradientBasedAlgorithm
 
 
 class Adam(GradientBasedAlgorithm):
