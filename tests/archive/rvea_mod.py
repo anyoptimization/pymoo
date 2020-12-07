@@ -1,7 +1,6 @@
 import numpy as np
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
-from pymoo.algorithms.rvea import RVEA
 from pymoo.factory import get_problem, get_reference_directions
 from pymoo.model.survival import Survival
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover

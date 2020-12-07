@@ -44,14 +44,14 @@ class SingleObjectiveAlgorithmTest(unittest.TestCase):
 
     def test_sphere(self):
         problem = Sphere()
-        for algorithm in [NelderMead(), PatternSearch(), PSO(), GA(), CuckooSearch()]:
+        for algorithm in [NelderMead(), PatternSearch(), PSO(), GA()]:
             f, f_opt = test(problem, algorithm)
             self.assertAlmostEqual(f, f_opt, places=5)
             print(problem.__class__.__name__, algorithm.__class__.__name__, "Yes")
 
     def test_sphere_with_constraints(self):
         problem = SphereWithConstraints()
-        for algorithm in [GA(), NelderMead(), PatternSearch(), CuckooSearch()]:
+        for algorithm in [GA(), NelderMead(), PatternSearch()]:
             f, f_opt = test(problem, algorithm)
             self.assertAlmostEqual(f, f_opt, places=3)
             print(problem.__class__.__name__, algorithm.__class__.__name__, "Yes")
