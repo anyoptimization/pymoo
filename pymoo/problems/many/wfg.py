@@ -73,9 +73,10 @@ class WFG(Problem):
         return ps
 
     def _calc_pareto_front(self, *args, **kwargs):
-        # ps = self.pareto_set(n_pareto_points=n_pareto_points)
-        # return self.evaluate(ps, return_values_of=["F"])
-        return None
+        pf = self.evaluate(self.pareto_set(), return_values_of=["F"])
+        # do lexicographical sort by columns to help drawing pf line on 2-obj
+        pf = pf[np.lexsort(pf.T[::-1])]
+        return pf
 
 
 class WFG1(WFG):
@@ -123,7 +124,6 @@ class WFG1(WFG):
 
     def _rand_optimal_position(self, n):
         return np.power(np.random.random((n, self.k)), 50.0)
-
 
 class WFG2(WFG):
 
@@ -218,9 +218,6 @@ class WFG4(WFG):
 
         out["F"] = self._calculate(y, self.S, h)
 
-    def _calc_pareto_front(self, ref_dirs):
-        return generic_sphere(ref_dirs) * self.S
-
 
 class WFG5(WFG):
 
@@ -237,9 +234,6 @@ class WFG5(WFG):
         h = [_shape_concave(y[:, :-1], m + 1) for m in range(self.n_obj)]
 
         out["F"] = self._calculate(y, self.S, h)
-
-    def _calc_pareto_front(self, ref_dirs):
-        return generic_sphere(ref_dirs) * self.S
 
 
 class WFG6(WFG):
@@ -260,9 +254,6 @@ class WFG6(WFG):
         h = [_shape_concave(y[:, :-1], m + 1) for m in range(self.n_obj)]
 
         out["F"] = self._calculate(y, self.S, h)
-
-    def _calc_pareto_front(self, ref_dirs):
-        return generic_sphere(ref_dirs) * self.S
 
 
 class WFG7(WFG):
@@ -285,9 +276,6 @@ class WFG7(WFG):
 
         out["F"] = self._calculate(y, self.S, h)
 
-    def _calc_pareto_front(self, ref_dirs):
-        return generic_sphere(ref_dirs) * self.S
-
 
 class WFG8(WFG):
 
@@ -309,9 +297,6 @@ class WFG8(WFG):
         h = [_shape_concave(y[:, :-1], m + 1) for m in range(self.n_obj)]
 
         out["F"] = self._calculate(y, self.S, h)
-
-    def _calc_pareto_front(self, ref_dirs):
-        return generic_sphere(ref_dirs) * self.S
 
     def _positional_to_optimal(self, K):
         k, l = self.k, self.l
@@ -360,9 +345,6 @@ class WFG9(WFG):
         h = [_shape_concave(y[:, :-1], m + 1) for m in range(self.n_obj)]
 
         out["F"] = self._calculate(y, self.S, h)
-
-    def _calc_pareto_front(self, ref_dirs):
-        return generic_sphere(ref_dirs) * self.S
 
     def _positional_to_optimal(self, K):
         k, l = self.k, self.l
