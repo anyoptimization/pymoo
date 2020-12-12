@@ -1,8 +1,8 @@
 # START unsga3
 import numpy as np
 
-from pymoo.algorithms.nsga3 import NSGA3
-from pymoo.algorithms.unsga3 import UNSGA3
+from pymoo.algorithms.moo.nsga3 import NSGA3
+from pymoo.algorithms.moo.unsga3 import UNSGA3
 from pymoo.factory import get_problem
 from pymoo.optimize import minimize
 

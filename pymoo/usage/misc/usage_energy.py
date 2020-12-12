@@ -1,4 +1,3 @@
-from pymoo.factory import get_reference_directions
 from pymoo.util.ref_dirs.construction import ConstructionBasedReferenceDirectionFactory
 from pymoo.util.ref_dirs.energy import RieszEnergyReferenceDirectionFactory
 from pymoo.util.ref_dirs.energy_layer import LayerwiseRieszEnergyReferenceDirectionFactory

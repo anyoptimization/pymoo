@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from pymoo.algorithms.ctaea import (CADASurvival, RestrictedMating,
+from pymoo.algorithms.moo.ctaea import (CADASurvival, RestrictedMating,
                                     comp_by_cv_dom_then_random)
 from pymoo.model.evaluator import Evaluator
 from pymoo.model.population import Population

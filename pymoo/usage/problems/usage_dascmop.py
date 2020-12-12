@@ -1,4 +1,4 @@
-from pymoo.algorithms.nsga3 import NSGA3
+from pymoo.algorithms.moo.nsga3 import NSGA3
 from pymoo.factory import get_problem, get_reference_directions
 from pymoo.optimize import minimize
 from pymoo.visualization.scatter import Scatter

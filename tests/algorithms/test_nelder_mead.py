@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from scipy.optimize import minimize as scipy_minimize
 
-from pymoo.algorithms.so_nelder_mead import NelderMead
+from pymoo.algorithms.soo.convex.nonderiv.nelder_mead import NelderMead
 from pymoo.factory import get_problem, get_termination
 from pymoo.optimize import minimize
 

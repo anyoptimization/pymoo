@@ -76,7 +76,7 @@ class MyMutation(Mutation):
         return X
 
 
-from pymoo.algorithms.so_genetic_algorithm import GA
+from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.optimize import minimize
 
 algorithm = GA(

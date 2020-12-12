@@ -33,6 +33,7 @@ class Problem:
                  parallelization=None,
                  elementwise_evaluation=False,
                  exclude_from_serialization=["parallelization"],
+                 autograd=True,
                  callback=None):
         """
 
@@ -115,13 +116,16 @@ class Problem:
         # store the callback if defined
         self.callback = callback
 
+        # if autograd should potential be used to derive derivations
+        self.autograd = autograd
+
     def nadir_point(self):
         """
         Returns
         -------
         nadir_point : np.array
-            The nadir point for a multi-objective problem.
-            If single-objective, it returns the best possible solution which is equal to the ideal point.
+            The nadir point for a multi-objective problem. If single-objective, it returns the best possible solution
+            which is equal to the ideal point.
 
         """
         # if the ideal point has not been calculated yet
@@ -133,7 +137,7 @@ class Problem:
 
             # if already done or it was successful - calculate the ideal point
             if self._pareto_front is not None:
-                self._ideal_point = np.max(self._pareto_front, axis=0)
+                self._nadir_point = np.max(self._pareto_front, axis=0)
 
         return self._nadir_point
 
@@ -142,8 +146,7 @@ class Problem:
         Returns
         -------
         ideal_point : np.array
-            The ideal point for a multi-objective problem. If single-objective
-            it returns the best possible solution.
+            The ideal point for a multi-objective problem. If single-objective it returns the best possible solution.
         """
 
         # if the ideal point has not been calculated yet
@@ -273,7 +276,7 @@ class Problem:
         gradients_not_set = [val for val in values_not_set if val.startswith("d")]
 
         # whether gradient calculation is necessary or not
-        calc_gradient = (len(gradients_not_set) > 0)
+        calc_gradient = self.autograd and (len(gradients_not_set) > 0)
 
         # set in the dictionary if the output should be calculated - can be used for the gradient
         out = {}
@@ -291,7 +294,7 @@ class Problem:
                                 out.get("d" + key) is None and
                                 (type(val) == autograd.numpy.numpy_boxes.ArrayBox)]
 
-            if len(calc_gradient_of) > 0:
+            if self.autograd and len(calc_gradient_of) > 0:
                 deriv = self._calc_gradient(out, calc_gradient_of)
                 out = {**out, **deriv}
 
@@ -392,7 +395,7 @@ class Problem:
         ret = []
 
         def func(_x):
-            _out = {}
+            _out = dict(out)
             if calc_gradient:
                 grad, _ = run_and_trace(self._evaluate, _x, *[_out])
                 _out["__autograd__"] = grad

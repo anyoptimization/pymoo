@@ -1,7 +1,7 @@
 import unittest
 
-from pymoo.algorithms.nsga2 import NSGA2
-from pymoo.algorithms.so_genetic_algorithm import GA
+from pymoo.algorithms.moo.nsga2 import NSGA2
+from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.factory import get_crossover, get_problem
 from pymoo.optimize import minimize
 

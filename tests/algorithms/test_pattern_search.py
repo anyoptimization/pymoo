@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from pymoo.algorithms.so_pattern_search import PatternSearch
+from pymoo.algorithms.soo.convex.nonderiv.pattern_search import PatternSearch
 from pymoo.model.evaluator import Evaluator
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population

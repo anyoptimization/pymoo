@@ -3,7 +3,7 @@ import os
 import numpy as np
 
 from pymoo.model.problem import Problem
-from pymoo.usage.misc.matlab_engine import MatlabEngine, install_matlab
+from pymoo.util.matlab_engine import install_matlab, MatlabEngine
 
 try:
     import matlab.engine
@@ -57,7 +57,7 @@ class MyProblem(Problem):
 
 
 if __name__ == '__main__':
-    from pymoo.algorithms.nsga2 import NSGA2
+    from pymoo.algorithms.moo.nsga2 import NSGA2
     from pymoo.optimize import minimize
     from pymoo.visualization.scatter import Scatter
 

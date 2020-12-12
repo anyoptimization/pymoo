@@ -111,6 +111,8 @@ class Algorithm:
         self.history = None
         # the current solutions stored - here considered as population
         self.pop = None
+        # a placeholder object for implementation to store solutions in each iteration
+        self.off, self.infill = None, None
         # the optimum found by the algorithm
         self.opt = None
         # can be used to store additional data in submodules

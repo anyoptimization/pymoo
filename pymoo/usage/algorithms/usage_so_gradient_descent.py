@@ -1,8 +1,8 @@
 import numpy as np
 
-from pymoo.algorithms.convex.gradient_descent import GradientDescent
 from pymoo.factory import get_problem
 from pymoo.optimize import minimize
+from pymoo.util.ref_dirs.optimizer import GradientDescent
 
 problem = get_problem("sphere")
 

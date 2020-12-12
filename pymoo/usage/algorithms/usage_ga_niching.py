@@ -1,4 +1,4 @@
-from pymoo.algorithms.so_ga_niching import NicheGA
+from pymoo.algorithms.soo.nonconvex.ga_niching import NicheGA
 from pymoo.optimize import minimize
 from pymoo.problems.single import Rastrigin
 from pymoo.problems.single.simple import SimpleMultiModal01

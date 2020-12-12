@@ -1,5 +1,5 @@
 # START ctaea
-from pymoo.algorithms.ctaea import CTAEA
+from pymoo.algorithms.moo.ctaea import CTAEA
 from pymoo.factory import get_problem, get_reference_directions
 from pymoo.optimize import minimize
 from pymoo.visualization.scatter import Scatter

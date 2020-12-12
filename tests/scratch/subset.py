@@ -1,6 +1,10 @@
 import numpy as np
 
+from pymoo.algorithms.soo.nonconvex.ga import GA
+from pymoo.model.crossover import Crossover
+from pymoo.model.mutation import Mutation
 from pymoo.model.problem import Problem
+from pymoo.model.sampling import Sampling
 
 
 class SubsetProblem(Problem):
@@ -24,9 +28,6 @@ n_max = 10
 problem = SubsetProblem(L, n_max)
 
 
-from pymoo.model.crossover import Crossover
-from pymoo.model.mutation import Mutation
-from pymoo.model.sampling import Sampling
 
 
 class MySampling(Sampling):
@@ -77,8 +78,6 @@ class MyMutation(Mutation):
 
         return X
 
-
-from pymoo.algorithms.so_genetic_algorithm import GA
 
 from pymoo.optimize import minimize
 

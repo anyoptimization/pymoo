@@ -1,10 +1,9 @@
 import autograd.numpy as anp
 import numpy as np
 
-from pymoo.algorithms.so_nelder_mead import NelderMead
 from pymoo.model.problem import Problem
 from pymoo.optimize import minimize
-from pymoo.vendor.vendor_scipy import CG, BFGS, Powell
+from pymoo.vendor.vendor_scipy import CG, BFGS, Powell, NelderMead
 
 
 class MySphere(Problem):

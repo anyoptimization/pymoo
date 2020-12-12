@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pymoo.algorithms.so_genetic_algorithm import GA
+from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.model.repair import Repair
 from pymoo.operators.crossover.order_crossover import OrderCrossover
 from pymoo.operators.mutation.inversion_mutation import InversionMutation

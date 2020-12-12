@@ -2,7 +2,7 @@ import string
 
 import numpy as np
 
-from pymoo.algorithms.nsga2 import NSGA2
+from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.model.crossover import Crossover
 from pymoo.model.duplicate import ElementwiseDuplicateElimination
 from pymoo.model.mutation import Mutation

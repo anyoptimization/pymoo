@@ -1,5 +1,6 @@
 # START perm_prob
 import numpy as np
+
 from pymoo.model.problem import Problem
 
 
@@ -41,7 +42,7 @@ print("Sorted by", np.argsort(list_to_sort))
 
 
 # START solve
-from pymoo.algorithms.so_brkga import BRKGA
+from pymoo.algorithms.soo.nonconvex.brkga import BRKGA
 from pymoo.optimize import minimize
 
 algorithm = BRKGA(

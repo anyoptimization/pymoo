@@ -1,4 +1,4 @@
-from pymoo.algorithms.so_genetic_algorithm import GA
+from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.operators.crossover.order_crossover import OrderCrossover
 from pymoo.operators.mutation.inversion_mutation import InversionMutation
 from pymoo.operators.sampling.random_permutation_sampling import PermutationRandomSampling

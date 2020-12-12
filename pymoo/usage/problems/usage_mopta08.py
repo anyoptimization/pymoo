@@ -1,4 +1,4 @@
-from pymoo.algorithms.so_genetic_algorithm import GA
+from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.optimize import minimize
 from pymoo.problems.single.mopta08 import MOPTA08
 

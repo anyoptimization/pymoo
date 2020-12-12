@@ -3,7 +3,7 @@ import numpy as np
 from pyrecorder.recorders.file import File
 from pyrecorder.video import Video
 
-from pymoo.algorithms.nsga2 import NSGA2
+from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.visualization.scatter import Scatter
 
 vid = Video(File("example.mp4"))
