@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from pymoo.algorithms.nsga3 import NSGA3
+from pymoo.algorithms.moo.nsga3 import NSGA3
 from pymoo.factory import get_reference_directions, DTLZ, DTLZ2
 from pymoo.model.callback import Callback
 from pymoo.optimize import minimize

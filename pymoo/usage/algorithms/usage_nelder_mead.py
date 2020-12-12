@@ -1,4 +1,4 @@
-from pymoo.algorithms.so_nelder_mead import NelderMead
+from pymoo.algorithms.soo.convex.nonderiv.nelder_mead import NelderMead
 from pymoo.factory import get_problem
 from pymoo.optimize import minimize
 

@@ -128,7 +128,7 @@ functional_test_problem = FunctionalProblem(2,
 
 
 for problem in [vectorized_problem, elementwise_problem, functional_problem, test_problem, functional_test_problem]:
-    from pymoo.algorithms.nsga2 import NSGA2
+    from pymoo.algorithms.moo.nsga2 import NSGA2
     from pymoo.factory import get_sampling, get_crossover, get_mutation
 
 

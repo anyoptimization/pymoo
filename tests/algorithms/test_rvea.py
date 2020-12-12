@@ -1,18 +1,10 @@
-import os
-import pickle
 import unittest
 
 import numpy as np
 
-from pymoo.algorithms.ctaea import (CADASurvival, RestrictedMating,
-                                    comp_by_cv_dom_then_random)
-from pymoo.algorithms.rvea import RVEA, APDSurvival
-from pymoo.factory import get_reference_directions, DTLZ1, DTLZ2
-from pymoo.model.evaluator import Evaluator
+from pymoo.algorithms.moo.rvea import APDSurvival, RVEA
+from pymoo.factory import DTLZ2
 from pymoo.model.population import Population
-from pymoo.problems.many import C1DTLZ1, C1DTLZ3, C3DTLZ4
-from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-
 from tests import path_to_test_resources
 
 

@@ -2,10 +2,10 @@ import unittest
 
 import numpy as np
 
-from pymoo.algorithms.so_genetic_algorithm import GA
-from pymoo.algorithms.so_nelder_mead import NelderMead
-from pymoo.algorithms.so_pattern_search import PatternSearch
-from pymoo.algorithms.so_pso import PSO
+from pymoo.algorithms.soo.convex.nonderiv.nelder_mead import NelderMead
+from pymoo.algorithms.soo.convex.nonderiv.pattern_search import PatternSearch
+from pymoo.algorithms.soo.nonconvex.ga import GA
+from pymoo.algorithms.soo.nonconvex.pso import PSO
 from pymoo.factory import Sphere, Problem
 from pymoo.optimize import minimize
 

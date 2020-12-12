@@ -1,7 +1,8 @@
+from pymoo.algorithms.soo.nonconvex.ga import GA
 from pyrecorder.recorders.streamer import Streamer
 from pyrecorder.video import Video
 
-from pymoo.algorithms.so_genetic_algorithm import GA
+
 from pymoo.factory import get_problem
 from pymoo.model.callback import Callback
 from pymoo.optimize import minimize

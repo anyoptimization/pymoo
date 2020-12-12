@@ -1,6 +1,6 @@
 import random
 
-from pymoo.algorithms.so_genetic_algorithm import GA
+from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.model.mating import Mating
 from pymoo.model.repair import NoRepair
 from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover

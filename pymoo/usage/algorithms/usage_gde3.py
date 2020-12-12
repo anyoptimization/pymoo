@@ -1,4 +1,4 @@
-from pymoo.algorithms.gde3 import GDE3
+from pymoo.algorithms.moo.gde3 import GDE3
 from pymoo.factory import get_problem
 from pymoo.optimize import minimize
 from pymoo.visualization.scatter import Scatter

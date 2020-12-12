@@ -1,4 +1,4 @@
-from pymoo.algorithms.rvea import RVEA
+from pymoo.algorithms.moo.rvea import RVEA
 from pymoo.factory import get_problem, get_reference_directions
 from pymoo.optimize import minimize
 from pymoo.visualization.scatter import Scatter

@@ -1,4 +1,4 @@
-from pymoo.algorithms.so_cmaes import CMAES
+from pymoo.algorithms.soo.convex.nonderiv.cmaes import CMAES
 from pymoo.factory import get_problem
 from pymoo.optimize import minimize
 

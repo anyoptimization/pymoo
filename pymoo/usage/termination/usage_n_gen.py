@@ -1,4 +1,4 @@
-from pymoo.algorithms.nsga2 import NSGA2
+from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.factory import get_problem, get_termination
 from pymoo.optimize import minimize
 

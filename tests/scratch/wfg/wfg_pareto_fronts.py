@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.algorithms.nsga2 import RankAndCrowdingSurvival
+from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
 from pymoo.factory import get_reference_directions
 from pymoo.model.population import Population
 from pymoo.problems.many import WFG1, WFG2, WFG3, WFG4, WFG5, WFG6, WFG7, WFG8, WFG9

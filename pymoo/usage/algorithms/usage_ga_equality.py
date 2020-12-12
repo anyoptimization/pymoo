@@ -36,7 +36,7 @@ class MyRepair(Repair):
         return pop
 
 
-from pymoo.algorithms.nsga2 import NSGA2
+from pymoo.algorithms.moo.nsga2 import NSGA2
 
 algorithm = NSGA2(pop_size=100, repair=MyRepair(), eliminate_duplicates=True)
 

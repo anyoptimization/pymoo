@@ -4,7 +4,7 @@ import unittest
 
 import numpy as np
 
-from pymoo.algorithms.nsga2 import calc_crowding_distance
+from pymoo.algorithms.moo.nsga2 import calc_crowding_distance
 from pymoo.configuration import get_pymoo
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 

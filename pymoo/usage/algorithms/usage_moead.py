@@ -1,4 +1,4 @@
-from pymoo.algorithms.moead import MOEAD
+from pymoo.algorithms.moo.moead import MOEAD
 from pymoo.factory import get_problem, get_visualization, get_reference_directions
 from pymoo.optimize import minimize
 

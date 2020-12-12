@@ -1,7 +1,7 @@
 # START rnsga3
 import numpy as np
 
-from pymoo.algorithms.rnsga3 import RNSGA3
+from pymoo.algorithms.moo.rnsga3 import RNSGA3
 from pymoo.factory import get_problem
 from pymoo.optimize import minimize
 from pymoo.visualization.scatter import Scatter

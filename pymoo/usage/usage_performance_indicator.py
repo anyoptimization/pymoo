@@ -1,5 +1,4 @@
 # START load_data
-import numpy as np
 from pymoo.factory import get_problem
 from pymoo.visualization.scatter import Scatter
 
@@ -52,6 +51,7 @@ print("IGD+", igd_plus.calc(A))
 
 
 # START hv
+import numpy as np
 from pymoo.factory import get_performance_indicator
 
 hv = get_performance_indicator("hv", ref_point=np.array([1.2, 1.2]))

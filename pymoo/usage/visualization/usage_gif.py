@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from pymoo.algorithms.nsga2 import NSGA2
+from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.optimize import minimize
 from pymoo.problems.multi import ZDT1
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting

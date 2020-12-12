@@ -1,4 +1,4 @@
-from pymoo.algorithms.so_pattern_search import PatternSearch
+from pymoo.algorithms.soo.convex.nonderiv.pattern_search import PatternSearch
 from pymoo.factory import get_problem
 from pymoo.optimize import minimize
 
