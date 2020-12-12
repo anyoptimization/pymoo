@@ -1,4 +1,4 @@
-from pymoo.algorithms.so_random_search import RandomSearch
+from pymoo.algorithms.soo.nonconvex.random_search import RandomSearch
 from pymoo.factory import get_problem
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
 from pymoo.optimize import minimize

@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.algorithms.rnsga2 import RNSGA2
+from pymoo.algorithms.moo.rnsga2 import RNSGA2
 from pymoo.factory import get_problem
 from pymoo.model.callback import Callback
 from pymoo.optimize import minimize

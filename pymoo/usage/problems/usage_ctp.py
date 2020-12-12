@@ -1,4 +1,4 @@
-from pymoo.algorithms.nsga2 import NSGA2
+from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.optimize import minimize
 from pymoo.problems.multi import CTP3
 from pymoo.visualization.scatter import Scatter

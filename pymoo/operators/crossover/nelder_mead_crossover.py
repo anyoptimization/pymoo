@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.algorithms.so_nelder_mead import max_expansion_factor
+from pymoo.algorithms.soo.convex.nonderiv.nelder_mead import max_expansion_factor
 from pymoo.model.crossover import Crossover
 
 

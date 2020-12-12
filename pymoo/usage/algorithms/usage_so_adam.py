@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.algorithms.convex.adam import Adam
+from pymoo.algorithms.soo.convex.deriv.adam import Adam
 from pymoo.factory import Rosenbrock
 from pymoo.optimize import minimize
 

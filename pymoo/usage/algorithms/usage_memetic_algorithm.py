@@ -1,4 +1,4 @@
-from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
+from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.model.population import Population
 
 

@@ -1,4 +1,4 @@
-from pymoo.algorithms.so_direct import DIRECT
+from pymoo.algorithms.soo.nonconvex.direct import DIRECT
 from pymoo.optimize import minimize
 from pymoo.problems.single import Himmelblau
 

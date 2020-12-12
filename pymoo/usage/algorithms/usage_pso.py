@@ -1,4 +1,4 @@
-from pymoo.algorithms.so_pso import PSO
+from pymoo.algorithms.soo.nonconvex.pso import PSO
 from pymoo.factory import Rastrigin
 from pymoo.optimize import minimize
 

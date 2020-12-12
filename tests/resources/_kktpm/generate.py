@@ -1,6 +1,7 @@
-from pymoo.optimize import minimize
-from pymop.factory import get_problem
 import numpy as np
+
+from pymoo.factory import get_problem
+from pymoo.optimize import minimize
 
 
 def generate_test_data():

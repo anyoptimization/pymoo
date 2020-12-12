@@ -55,19 +55,19 @@ def get_from_list(l, name, args, kwargs):
 # =========================================================================================================
 
 def get_algorithm_options():
-    from pymoo.algorithms.ctaea import CTAEA
-    from pymoo.algorithms.moead import MOEAD
-    from pymoo.algorithms.nsga2 import NSGA2
-    from pymoo.algorithms.nsga3 import NSGA3
-    from pymoo.algorithms.rnsga2 import RNSGA2
-    from pymoo.algorithms.rnsga3 import RNSGA3
-    from pymoo.algorithms.so_de import DE
-    from pymoo.algorithms.so_genetic_algorithm import GA
-    from pymoo.algorithms.unsga3 import UNSGA3
-    from pymoo.algorithms.so_nelder_mead import NelderMead
-    from pymoo.algorithms.so_cmaes import CMAES
-    from pymoo.algorithms.so_brkga import BRKGA
-    from pymoo.algorithms.so_pattern_search import PatternSearch
+    from pymoo.algorithms.moo.ctaea import CTAEA
+    from pymoo.algorithms.moo.moead import MOEAD
+    from pymoo.algorithms.moo.nsga2 import NSGA2
+    from pymoo.algorithms.moo.nsga3 import NSGA3
+    from pymoo.algorithms.moo.rnsga2 import RNSGA2
+    from pymoo.algorithms.moo.rnsga3 import RNSGA3
+    from pymoo.algorithms.soo.nonconvex.de import DE
+    from pymoo.algorithms.soo.nonconvex.ga import GA
+    from pymoo.algorithms.moo.unsga3 import UNSGA3
+    from pymoo.algorithms.soo.convex.nonderiv.nelder_mead import NelderMead
+    from pymoo.algorithms.soo.convex.nonderiv.cmaes import CMAES
+    from pymoo.algorithms.soo.nonconvex.brkga import BRKGA
+    from pymoo.algorithms.soo.convex.nonderiv.pattern_search import PatternSearch
 
     ALGORITHMS = [
         ("ga", GA),
