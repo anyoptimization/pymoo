@@ -1,55 +1,8 @@
-import algopy
-import numpy as np
+import autograd.numpy as np
 
-from pymoo.model.problem import Problem, MetaProblem
-from pymoo.problems.multi import ZDT
-
-
-class ElementwiseAutomaticDifferentiation(MetaProblem):
-
-    def __init__(self, problem) -> None:
-        assert problem.elementwise_evaluation
-        super().__init__(problem)
-        self.problem = problem
-
-    def _evaluate(self, _x, out, *args, **kwargs):
-        keys = [e for e in out if e in ["dF", "dG", "ddF", "ddG"]]
-
-        if len(keys) > 0:
-            cg = algopy.CGraph()
-            x = algopy.Function(_x)
-
-            super()._evaluate(x, out, *args, **kwargs)
-
-            F = out["F"]
-            if not isinstance(F, list):
-                F = [F]
-
-            out["F"] = np.array([e.x for e in F])
-
-            if self.has_constraints():
-                G = out["G"]
-                if not isinstance(G, list):
-                    G = [G]
-
-            cg.trace_off()
-            cg.independentFunctionList = [x]
-
-            for key in keys:
-
-                target = F if key.endswith("F") else G
-
-                func = cg.hessian if key.startswith("dd") else cg.jacobian
-
-                vals = []
-                for k in range(len(target)):
-                    cg.dependentFunctionList = [target[k]]
-                    val = func(_x)
-                    vals.append(val)
-                out[key] = np.row_stack(vals)[None, :]
-
-        else:
-            super()._evaluate(_x, out, *args, **kwargs)
+from pymoo.model.problem import Problem
+from pymoo.problems.autodiff import AutomaticDifferentiation
+from pymoo.problems.multi import ZDT, ZDT1
 
 
 class ElementwiseZDT1(Problem):
@@ -107,9 +60,9 @@ class ZDT1WithGradient(ZDT):
 
 if __name__ == '__main__':
     # problem = MySphere()
-    problem = ZDT1WithGradient()
+    # problem = ZDT1WithGradient()
 
-    problem = ElementwiseAutomaticDifferentiation(problem)
+    problem = AutomaticDifferentiation(ZDT1())
 
     X = np.random.random((10, problem.n_var))
 

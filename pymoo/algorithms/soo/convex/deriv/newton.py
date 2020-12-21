@@ -1,11 +1,43 @@
 import numpy as np
 from scipy.linalg import solve_triangular, LinAlgError
 
-from pymoo.algorithms.base.gradient import GradientBasedAlgorithm
+from pymoo.algorithms.base.gradient import GradientBasedAlgorithm, inexact_line_search
 from pymoo.model.population import Population
 from pymoo.model.solution import Solution
-from pymoo.optimize import minimize
-from pymoo.problems.single import Himmelblau
+
+
+def direction_cholesky(jac, hess):
+    # https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf, Page: 510
+    adapted = False
+
+    try:
+        L = np.linalg.cholesky(hess)
+
+    # hessian is not positive definite, we fix it (for degenerated cases this may lead to "bad" directions)
+    except LinAlgError:
+        eigvals, _ = np.linalg.eig(hess)
+        E = max(0, 1e-5 - eigvals.min()) * np.eye(len(jac))
+        try:
+            L = np.linalg.cholesky(hess + E)
+        # this should happen for very degnerated cases only
+        except LinAlgError:
+            return None, None, None, False
+        adapted = True
+
+    w = solve_triangular(L, - jac, lower=True)
+    dir = solve_triangular(L.T, w, lower=False)
+    dec = np.linalg.norm(w) ** 2
+    return dir, dec, adapted, True
+
+
+def direction_inv(jac, hess):
+    try:
+        hess_inv = np.linalg.inv(hess)
+        dir = - hess_inv @ jac
+        dec = jac.T @ hess_inv @ jac
+    except:
+        return None, None, False, False
+    return dir, dec, False, True
 
 
 class NewtonMethod(GradientBasedAlgorithm):
@@ -19,38 +51,28 @@ class NewtonMethod(GradientBasedAlgorithm):
         super().setup(problem, **kwargs)
         assert problem.n_obj == 1, "The Newton method can only be used for single-objective problems (n_obj=1)."
         assert problem.n_constr == 0, "The Newton method can only be used for unconstrained problems (n_constr=0)."
+        return self
 
     def _next(self):
         sol = self.opt[0]
         x = sol.get("X")
-        dF, ddF = self.gradient_and_hessian(sol)
+        jac, hess = self.gradient_and_hessian(sol)
 
-        # ddF_inv = np.linalg.inv(ddF)
-        # direction = - ddF_inv @ dF
-        # decrement = dF.T @ ddF_inv @ dF
-        # https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf, Page: 510
+        method = "cholesky"
+        func = direction_cholesky if method == "cholesky" else direction_inv
+        direction, decrement, adapted, success = func(jac, hess)
 
-        try:
-            L = np.linalg.cholesky(ddF)
-            is_pos_def = True
-
-        # hessian is not positive definite, we fix it (for degenerated cases this may lead to "bad" directions)
-        except LinAlgError:
-            eigvals, _ = np.linalg.eig(ddF)
-            E = max(0, 1e-8 - eigvals.min()) * np.eye(len(x))
-            L = np.linalg.cholesky(ddF + E)
-            is_pos_def = False
-
-        w = solve_triangular(L, - dF, lower=True)
-        direction = solve_triangular(L.T, w, lower=False)
-        decrement = np.linalg.norm(w) ** 2
+        # in case we can not calculate the newton direction fall back to the gradient approach
+        if not success:
+            direction = -jac
+            decrement = np.linalg.norm(direction) ** 2
 
         if self.damped:
-            _next = self.inexact_line_search(sol, direction)
+            _next = inexact_line_search(self.problem, sol, direction, evaluator=self.evaluator)
 
             # if the newton step was not successful, then try the gradient
-            if not is_pos_def and (sol.F[0] - _next.F[0]) < 1e-16:
-                _next = self.inexact_line_search(sol, -dF)
+            if adapted and (sol.F[0] - _next.F[0]) < 1e-16:
+                _next = inexact_line_search(self.problem, sol, -jac, evaluator=self.evaluator)
 
         else:
             _x = x + direction
@@ -60,10 +82,3 @@ class NewtonMethod(GradientBasedAlgorithm):
 
         if decrement / 2 <= self.eps:
             self.termination.force_termination = True
-
-
-problem = Himmelblau()
-
-algorithm = NewtonMethod()
-
-res = minimize(problem, algorithm, verbose=True, seed=1)

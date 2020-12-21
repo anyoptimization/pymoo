@@ -9,8 +9,6 @@ from pymoo.util.termination.no_termination import NoTermination
 class BacktrackingLineSearch(LineSearch):
 
     def __init__(self, alpha=0.1, beta=0.33, **kwargs):
-        """
-        """
         super().__init__(**kwargs)
         self.alpha = alpha
         self.beta = beta

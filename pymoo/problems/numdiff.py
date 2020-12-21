@@ -3,14 +3,27 @@ import numpy as np
 from pymoo.model.evaluator import Evaluator
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
+
 from pymoo.model.solution import Solution, SolutionSet
+from pymoo.problems.meta import MetaProblem
+
+
+class NumericalDifferentiation(MetaProblem):
+
+    def __init__(self, problem):
+        super().__init__(problem)
+
+    def do(self, X, out, *args, **kwargs):
+        self.problem.do(X, out, *args, **kwargs)
+        out["dF"] = NumericalDifferentiationUtil().do(self.problem, X, out["F"], return_values_of=["dF"])
+
 
 EPS = np.finfo(np.float32).eps
 
 
-class NumericalDifferentiation:
+class NumericalDifferentiationUtil(object):
 
-    def __init__(self, eps=None, jacobian=None, hessian=None) -> None:
+    def __init__(self, eps=None, jacobian=None, hessian=None):
         """
 
         eps as in https://stackoverflow.com/questions/31206443/numpy-second-derivative-of-a-ndimensional-array
@@ -32,16 +45,20 @@ class NumericalDifferentiation:
 
     def do(self, problem, X, F=None, G=None, evaluator=None, hessian=False, return_values_of="auto"):
 
-        # if it is not a population object yet, make one out of it
-        pop = to_solution_set(X, F, G)
-
         # if no evaluator is provided to count function evaluations just use a plain one
         if evaluator is None:
             evaluator = Evaluator()
 
+        # if it is not a population object yet, make one out of it
+        pop = to_solution_set(X, F, G)
+
         # loop over each solution the approximation should be done for
         for solution in pop:
             x = solution.X
+
+            # make sure the solution is evaluated
+            if solution.F is None:
+                evaluator.eval(problem, solution)
 
             eps = self.eps
             if eps is None:
@@ -231,8 +248,8 @@ class ComplexStepJacobian(NumericalDifferentiationEstimator):
 # ---------------------------------------------------------------------------------------------------------
 
 def to_solution_set(X, F=None, G=None):
-    if F is not None:
-        if F.ndim == 1:
+    if isinstance(X, np.ndarray):
+        if X.ndim == 1:
             X = Solution(X=X, F=F, G=G)
         else:
             X = Population.new(X=X, F=F, G=G)

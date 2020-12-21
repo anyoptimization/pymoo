@@ -2,6 +2,7 @@ import numpy as np
 
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
+from pymoo.model.survival import Survival
 
 
 def is_better(_new, _old, eps=1e-8):
@@ -18,9 +19,22 @@ def is_better(_new, _old, eps=1e-8):
     return False
 
 
-class ReplacementStrategy:
+class ReplacementSurvival(Survival):
 
     def do(self, problem, pop, off, return_indices=False, inplace=False, **kwargs):
+
+        # this makes it usable as a traditional survival
+        if isinstance(off, int):
+            k = off
+            off = pop[k:]
+            pop = pop[:k]
+
+        # if the offsprings are simply empty don't do anything
+        if len(off) == 0:
+            return pop
+
+        assert len(pop) == len(off), "For the replacement pop and off must have the same number of individuals."
+
         pop = Population.create(pop) if isinstance(pop, Individual) else pop
         off = Population.create(off) if isinstance(off, Individual) else off
 
@@ -38,9 +52,10 @@ class ReplacementStrategy:
         pass
 
 
-class ImprovementReplacement(ReplacementStrategy):
+class ImprovementReplacement(ReplacementSurvival):
 
     def _do(self, problem, pop, off, **kwargs):
+
         ret = np.full((len(pop), 1), False)
 
         pop_F, pop_CV, pop_feasible = pop.get("F", "CV", "feasible")
