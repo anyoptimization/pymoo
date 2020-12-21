@@ -20,14 +20,13 @@ sys.path.insert(0, os.path.abspath('../../../pymoo'))
 import pymoo
 from pymoo.configuration import Configuration
 
-DEBUG = True
+DEBUG = False
 
 # -- Project information -----------------------------------------------------
 
 project = 'pymoo: Multi-objective Optimization in Python'
 copyright = '2020'
 author = 'Julian Blank'
-pagetitle = "sste"
 
 version = pymoo.__version__
 release = version

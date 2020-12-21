@@ -1,8 +1,6 @@
 var initTriggerNavBar = () => {
     if ($(window).width() < 768) {
-        // $("#navbar-toggler").trigger("click")
-        $("#main-navbar").addClass("collapsed");
-        $("#main-navbar").removeClass("show");
+        $("#nb-toogle").trigger('click');
     }
 }
 var scrollToActive = () => {
@@ -134,8 +132,17 @@ var initThebeSBT = () => {
     }
     initThebe();
 }
+var prettyTable = () => {
+    $('table').removeClass('docutils');
+    $('table').addClass('table-responsive w-100 d-block d-md-table pure-table pure-table-bordered my-table');
+}
+
 sbRunWhenDOMLoaded(initTooltips)
-// sbRunWhenDOMLoaded(initTriggerNavBar)
+sbRunWhenDOMLoaded(initTriggerNavBar)
 sbRunWhenDOMLoaded(scrollToActive)
 sbRunWhenDOMLoaded(initTocHide)
 sbRunWhenDOMLoaded(collapsibleListener)
+sbRunWhenDOMLoaded(prettyTable)
+
+
+
