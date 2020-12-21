@@ -1,0 +1,353 @@
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+      integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+<style>
+
+    #wrapper h4 {
+        margin: 5px 0px 15px 0px;
+        font-weight: 400;
+    }
+
+    .entry {
+        height: 100%;
+        width: 100%;
+    }
+
+
+    .border {
+        border: 1px solid #DCDCDC;
+    }
+
+    .icon {
+        margin-top: 5px;
+    }
+
+    .entry:hover {
+        background: #DCDCDC;
+        cursor: pointer;
+    }
+
+    }
+
+
+</style>
+
+<div id="wrapper">
+
+    <div class="row row-eq-height">
+
+        <div class="col-12 col-lg-6 p-1" onclick="location.href='interface/index.html';">
+            <div class="entry border py-2 px-1">
+                <div class="d-flex flex-row">
+                    <div class="icon col-2">
+                        <i class="fas fa-bullhorn fa-2x"></i>
+                    </div>
+                    <div class="desc col-10">
+                        <h4>Interface</h4>
+
+                        <b>Function:</b>
+                        <a href="interface/minimize.html">minimize</a>
+                        <p style="margin-bottom:0.4em;"></p>
+
+                        <b>Parameters:</b>
+                        <a href="problems/index.html">Problem</a>,
+                        <a href="algorithms/index.html">Algorithm</a>,
+                        <a href="interface/termination.html">Termination</a>
+                        <p style="margin-bottom:0.4em;"></p>
+
+                        <b>Optionals:</b>
+                        <a href="interface/callback.html">Callback</a>,
+                        <a href="interface/display.html">Display</a>,
+                        <a href="interface/minimize.html">...</a>
+
+                        <p style="margin-bottom:0.4em;"></p>
+
+                        <b>Returns:</b> <a href="interface/result.html">Result</a>
+
+                        <br>
+                        <p style="margin-bottom:0.7em;"></p>
+
+                        <b>Related:</b>
+                        <a href="misc/checkpoint.html">Checkpoints</a><img class="new-flag" src="_static/new-flag.svg">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6 p-1" onclick="location.href='problems/index.html';">
+            <div class="entry border p-3">
+                <div class="d-flex flex-row">
+
+                    <div class="icon col-2">
+                        <i class="fas fa-chess fa-2x"></i>
+                    </div>
+                    <div class="desc col-10">
+                        <h4>Problems</h4>
+                        <b>Single-objective:</b>
+                        <a href="problems/single/ackley.html">Ackley</a>,
+                        <a href="problems/single/griewank.html">Griewank</a>,
+                        <a href="problems/single/rastrigin.html">Rastrigin</a>,
+                        <a href="problems/single/rosenbrock.html">Rosenbrock</a>,
+                        <a href="problems/single/zakharov.html">Zakharov</a>,
+                        <a href="problems/index.html#Single-Objective">...</a>
+                        <br>
+                        <p style="margin-bottom:0.4em;"></p>
+
+
+                        <b>Multi-objective:</b>
+                        <a href="problems/multi/bnh.html">BNH</a>,
+                        <a href="problems/multi/osy.html">OSY</a>,
+                        <a href="problems/multi/tnk.html">TNK</a>,
+                        <a href="problems/multi/truss2d.html">Truss2d</a>,
+                        <a href="problems/multi/welded_beam.html">Welded Beam</a>,
+                        <a href="problems/multi/zdt.html">ZDT</a>,
+                        <a href="problems/index.html#Multi-Objective">...</a>
+                        <br>
+                        <p style="margin-bottom:0.4em;"></p>
+
+
+                        <b>Many-objective:</b>
+                        <a href="problems/many/dtlz.html">DTLZ</a>,
+                        WFG
+                        <br>
+                        <p style="margin-bottom:0.7em;"></p>
+
+                        <b>Constrained:</b>
+                        CTP,
+                        <a href="problems/constrained/dascmop.html">DASCMOP</a>,
+                        <a href="problems/constrained/modact.html">MODAct</a>,
+                        <a href="problems/constrained/mw.html">MW</a>,
+                        CDTLZ
+                        <br>
+                        <p style="margin-bottom:0.7em;"></p>
+
+                        <b>Related:</b>
+                        <a href="problems/custom.html">Problem Definition</a>,
+                        <a href="problems/gradients.html">Gradients</a>,
+                        <a href="problems/parallelization.html">Parallelization</a><img class="new-flag"
+                                                                                        src="_static/new-flag.svg">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="row row-eq-height">
+
+        <div class="col-12 col-lg-6 p-1" onclick="location.href='algorithms/index.html';">
+            <div class="entry border p-3">
+                <div class="d-flex flex-row">
+
+                    <div class="icon col-2">
+                        <i class="fas fa-search fa-2x"></i>
+                    </div>
+                    <div class="desc col-10">
+                        <h4>Algorithms</h4>
+                        <b>Single-objective:</b>
+                        <a href="algorithms/genetic_algorithm.html">Genetic Algorithm</a>,
+                        <a href="algorithms/differential_evolution.html">Differential Evolution</a>,
+                        <a href="algorithms/pso.html">PSO</a><img class="new-flag" src="_static/new-flag.svg">,
+                        <a href="algorithms/nelder_mead.html">Nelder Mead</a>,
+                        <a href="algorithms/pattern_search.html">Pattern Search</a><img class="new-flag"
+                                                                                        src="_static/new-flag.svg">,
+                        <a href="algorithms/brkga.html">BRKGA</a>,
+                        <a href="algorithms/cmaes.html">CMA-ES</a>
+
+                        <p style="margin-bottom:0.4em;"></p>
+                        <p style="margin-bottom:0.4em;"></p>
+
+                        <b>Multi-objective:</b>
+                        <a href="algorithms/nsga2.html">NSGA-II</a>,
+                        <a href="algorithms/rnsga2.html">R-NSGA-II</a>
+
+                        <br>
+                        <p style="margin-bottom:0.4em;"></p>
+
+                        <b>Many-objective:</b>
+                        <a href="algorithms/nsga3.html">NSGA-III</a>,
+                        <a href="algorithms/rnsga3.html">R-NSGA-III</a>,
+                        <a href="algorithms/unsga3.html">U-NSGA-III</a>,
+                        <a href="algorithms/moead.html">MOEA/D</a>
+
+                        <br>
+                        <p style="margin-bottom:0.7em;"></p>
+
+                        <b>Related:</b>
+                        <a href="misc/reference_directions.html">Reference Directions</a>
+                        <img class="new-flag" src="_static/new-flag.svg">,
+                        <a href="misc/constraint_handling.html">Constraint Handling</a><img class="new-flag"
+                                                                                            src="_static/new-flag.svg">,
+                        <a href="misc/convergence.html">Convergence</a>
+                        <img class="new-flag" src="_static/new-flag.svg">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6 p-1" onclick="location.href='customization/index.html';">
+            <div class="entry border p-3">
+                <div class="d-flex flex-row">
+                    <div class="icon col-2">
+                        <i class="fas fa-book-open fa-2x"></i>
+                    </div>
+                    <div class="desc col-10">
+                        <h4>Customization</h4>
+                        <b>Variable Types:</b>
+                        <a href="customization/binary_problem.html">Binary</a>,
+                        <a href="customization/discrete_problem.html">Discrete</a>,
+                        <a href="customization/permutation.html">Permutation</a>
+                        <img class="new-flag" src="_static/new-flag.svg">,
+                        <a href="customization/mixed_variable_problem.html">Mixed</a>,
+                        <a href="customization/custom.html">Custom</a>
+
+                        <br>
+                        <p style="margin-bottom:0.4em;"></p>
+
+                        <b>Examples:</b>
+                        <a href="customization/initialization.html">Biased Initialization</a>,
+                        <a href="customization/subset_selection.html">Subset Selection</a>,
+                        <a href="customization/permutation.html#Traveling-Salesman-Problem-(TSP)">Traveling Salesman</a>
+                        <img class="new-flag" src="_static/new-flag.svg">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="row row-eq-height">
+
+        <div class="col-12 col-lg-6 p-1" onclick="location.href='operators/index.html';">
+            <div class="entry border p-3">
+                <div class="d-flex flex-row">
+
+
+                    <div class="icon col-2">
+                        <i class="fas fa-tools fa-2x"></i>
+                    </div>
+                    <div class="desc col-10">
+                        <h4>Operators</h4>
+                        <a href="operators/sampling.html">Sampling:</a>
+                        Random, LHS
+                        </br>
+                        <a href="operators/selection.html">Selection:</a>
+                        Random, Binary Tournament
+
+                        </br>
+                        <a href="operators/crossover.html">Crossover:</a>
+                        SBX, UX, HUX, DE Point, Exponential, OX, ERX
+                        </br>
+
+                        <a href="operators/mutation.html">Mutation:</a>
+                        Polynomial, Bitflip, Inverse Mutation
+                        </br>
+                        <a href="operators/repair.html">Repair</a>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6 p-1" onclick="location.href='visualization/index.html';">
+            <div class="entry border p-3">
+                <div class="d-flex flex-row">
+
+                    <div class="icon col-2">
+                        <i class="fas fa-chart-line fa-2x"></i>
+                    </div>
+                    <div class="desc col-10">
+                        <h4>Visualization</h4>
+                        <a href="visualization/scatter.html">Scatter Plot (2D/3D/ND)</a>,
+                        <a href="visualization/pcp.html">Parallel Coordinate Plot (PCP) </a>,
+                        <a href="visualization/radviz.html">Radviz</a>,
+                        <a href="visualization/star.html">Star Coordinates</a>,
+                        <a href="visualization/heatmap.html">Heatmap</a>,
+                        <a href="visualization/petal.html">Petal Diagram</a>,
+                        <a href="visualization/radar.html">Spider Web / Radar</a>,
+                        <a href="visualization/video.html">Video</a><img class="new-flag" src="_static/new-flag.svg">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="row row-eq-height">
+
+        <div class="col-12 col-lg-6 p-1" onclick="location.href='decision_making/index.html';">
+            <div class="entry border p-3">
+                <div class="d-flex flex-row">
+
+                    <div class="icon col-2">
+                        <i class="fas fa-balance-scale fa-2x"></i>
+                    </div>
+                    <div class="desc col-10">
+                        <h4>Decision Making</h4>
+                        <a href="decision_making/index.html#nb-compromise">Compromise Programming</a>,
+                        <a href="decision_making/index.html#nb-pseudo-weights">Pseudo Weights</a>,
+                        <a href="decision_making/index.html#nb-high-tradeoff">High Trade-off Points</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-12 col-lg-6 p-1" onclick="location.href='misc/performance_indicator.html';">
+            <div class="entry border p-3">
+                <div class="d-flex flex-row">
+                    <div class="icon col-2">
+                        <i class="fas fa-medal fa-2x"></i>
+                    </div>
+                    <div class="desc col-10">
+                        <h4>Performance Indicator</h4>
+                        <a href="misc/performance_indicator.html#nb-gd">GD</a>,
+                        <a href="misc/performance_indicator.html#nb-gd-plus">GD+</a>,
+                        <a href="misc/performance_indicator.html#nb-igd">IGD</a>,
+                        <a href="misc/performance_indicator.html#nb-igd-plus">IGD+</a>,
+                        <a href="misc/performance_indicator.html#nb-hv">Hypervolume</a>,
+                        <a href="misc/kktpm.html">KKTPM</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="row row-eq-height">
+
+
+        <div class="col-12 col-md-12 p-1" onclick="location.href='misc/decomposition.html';">
+            <div class="entry border p-3">
+                <div class="d-flex flex-row">
+                    <div class="icon col-2 col-md-1">
+                        <i class="fas fa-layer-group fa-2x"></i>
+                    </div>
+                    <div class="desc col-10">
+                        <h4>Decomposition</h4>
+                        <a href="misc/decomposition.html#nb-weighted-sum">Weighted-Sum</a>,
+                        <a href="misc/decomposition.html#nb-asf">ASF</a>,
+                        <a href="misc/decomposition.html#nb-aasf">AASF</a>,
+                        <a href="misc/decomposition.html#nb-tchebi">Tchebysheff</a>,
+                        <a href="misc/decomposition.html#nb-pbi">PBI</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+</div>

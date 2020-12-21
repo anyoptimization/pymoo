@@ -35,8 +35,11 @@
 
 
 
+
 pymoo: Multi-objective Optimization in Python
 ------------------------------------------------------------------------------
+
+
 
 
 Our framework offers state of the art single- and multi-objective optimization algorithms and many
@@ -91,7 +94,7 @@ Features
 
 Furthermore, our framework offers a variety of different features which cover various facets of multi-objective optimization:
 
-.. include:: portfolio.rst
+.. include:: home/portfolio.rst
 
 
 
@@ -203,7 +206,6 @@ Content
    references
    contact
    license
-
 
 
 

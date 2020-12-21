@@ -40,11 +40,11 @@ class LineSearch(Algorithm):
 
 class LineSearchProblem(MetaProblem):
 
-    def __init__(self, problem, point, direction):
+    def __init__(self, problem, point, direction, xl=0.0, xu=1.0):
         super().__init__(problem)
         self.n_var = 1
-        self.xl = np.zeros(1)
-        self.xu = np.ones(1)
+        self.xl = np.array([xl])
+        self.xu = np.array([xu])
         self.point = point
         self.direction = direction
 

@@ -1,24 +1,45 @@
-import sys, os
+# Configuration file for the Sphinx documentation builder.
+#
+# This file only contains a selection of the most common options. For a full
+# list see the documentation:
+# https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# =========================================================================================================
-# Import pymoo
-# =========================================================================================================
+# -- Path setup --------------------------------------------------------------
+
+# If extensions (or modules to document with autodoc) are in another directory,
+# add these directories to sys.path here. If the directory is relative to the
+# documentation root, use os.path.abspath to make it absolute, like shown here.
+import os
+import sys
+from datetime import date
+
+sys.path.insert(0, os.path.abspath('.'))
+from _theme import *
 
 sys.path.insert(0, os.path.abspath('../../../pymoo'))
 import pymoo
 from pymoo.configuration import Configuration
 
-# sphinx version what should be used to compiling the documentation
-needs_sphinx = '2.0'
-Configuration.parse_custom_docs = True
+DEBUG = True
 
-only_base = True
+# -- Project information -----------------------------------------------------
 
-# =========================================================================================================
-# Extensions
-# =========================================================================================================
+project = 'pymoo: Multi-objective Optimization in Python'
+copyright = '2020'
+author = 'Julian Blank'
+pagetitle = "sste"
+
+version = pymoo.__version__
+release = version
+
+# ===========================================================================
+# General
+# ===========================================================================
 
 
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+# ones.
 extensions = [
 
     # for creating the APi
@@ -43,22 +64,31 @@ extensions = [
     # for the reference page and citing
     'sphinxcontrib.bibtex',
 
+
 ]
 
-# =========================================================================================================
-# sphinx
-# =========================================================================================================
+# ===========================================================================
+# HTML
+# ===========================================================================
 
+# The theme to use for HTML and HTML Help pages.  See the documentation for
+# a list of builtin themes.
+#
+# html_theme = 'alabaster'
+# html_theme = "sphinx_book_theme"
+# html_theme = 'custom_theme'
 
-templates_path = ['templates']
-source_suffix = '.rst'
-master_doc = 'index'
-project = u'pymoo'
-copyright = u'2019, Julian Blank, Michigan State University'
-version = pymoo.__version__
-release = version
-pygments_style = 'sphinx'
-html_title = 'pymoo'
+html_theme = '_theme'
+html_theme_path = ['.']
+html_logo = "_static/logo.svg"
+
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+html_static_path = ['_static']
+
+# Add any paths that contain templates here, relative to this directory.
+templates_path = ['_templates']
 
 # =========================================================================================================
 # sphinx.ext.intersphinx - Mappings to other projects
@@ -67,14 +97,17 @@ html_title = 'pymoo'
 intersphinx_mapping = {'python': ('http://docs.python.org/2', None),
                        'numpy': ('http://docs.scipy.org/doc/numpy', "http://docs.scipy.org/doc/numpy/objects.inv"),
                        'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
-                       'matplo tlib': ('http://matplotlib.sourceforge.net', None)}
+                       'matplotlib': ('http://matplotlib.sourceforge.net', None)}
 
-# =========================================================================================================
-# nbsphinx - Using jupyter notebooks in this documentation
-# =========================================================================================================
+# ===========================================================================
+# nbsphinx
+# ===========================================================================
+
 
 # Exclude build directory and Jupyter backup files:
 exclude_patterns = ['build', '**.ipynb_checkpoints']
+if DEBUG:
+    exclude_patterns.append("**ipynb")
 
 # Default language for syntax highlighting in reST and Markdown cells
 highlight_language = 'none'
@@ -115,7 +148,7 @@ nbsphinx_execute_arguments = [
 # nbsphinx_responsive_width = '700px'
 
 
-# =========================================================================================================
+# ===========================================================================
 # Numpydoc
 # ===========================================================================
 
@@ -144,34 +177,3 @@ numpydoc_use_blockquotes = False
 
 # Deprecated since version edit: your HTML template instead. Whether to insert an edit link after docstrings.
 numpydoc_edit_link = False
-
-# =========================================================================================================
-# html
-# =========================================================================================================
-
-html_theme = 'custom_theme'
-# html_theme = 'scipy_sphinx_theme'
-html_theme_path = ['_theme']
-html_static_path = ['_static']
-
-links_local = [
-    ("http://localhost:8001", "pymoo.org"),
-    ("https://github.com/msu-coinlab/pymoo", "GitHub"),
-    ("/api/index.html", "API")
-]
-
-links_remote = [
-    ("http://pymoo.org/", "pymoo.org"),
-    ("https://github.com/msu-coinlab/pymoo", "GitHub"),
-    ("/api/index.html", "API")
-]
-
-html_theme_options = {
-    "edit_link": "false",
-    "sidebar": "right",
-    "scipy_org_logo": "true",
-    "rootlinks": links_remote
-}
-
-html_sidebars = {'**': ['custom_sidebar.html']}
-

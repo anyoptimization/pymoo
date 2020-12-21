@@ -16,10 +16,10 @@ class ConsiderMaximumWeightRepair(Repair):
         # the packing plan for the whole population (each row one individual)
         Z = pop.get("X")
 
-        # the corresponding weight of each individual
+        # the corresponding weight of each individuals
         weights = (Z * problem.W).sum(axis=1)
 
-        # now repair each indvidiual i
+        # now repair each individual i
         for i in range(len(Z)):
 
             # the packing plan for i

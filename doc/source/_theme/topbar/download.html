@@ -1,0 +1,21 @@
+{% if page_source_suffix and theme_use_download_button %}
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="{{ translate('Download this page') }}"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        {% if ipynb_source %}<a class="dropdown-buttons"
+            href="{{ pathto('_sources', 1) }}/{{ ipynb_source }}"><button type="button"
+                class="btn btn-secondary topbarbtn" title="{{ translate('Download notebook file') }}" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>{% endif %}
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="{{ pathto('_sources', 1) }}/{{ sourcename }}"><button type="button"
+                class="btn btn-secondary topbarbtn" title="{{ translate('Download source file') }}" data-toggle="tooltip"
+                data-placement="left">{{ page_source_suffix }}</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="{{ translate('Print to PDF') }}"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+{% endif %}

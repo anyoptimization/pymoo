@@ -1,0 +1,110 @@
+{% extends "pydata_sphinx_theme/layout.html" %}
+
+
+{%- block htmltitle %}
+{% if pagename == "index" %}
+<title>pymoo: Multi-objective Optimization in Python</title>
+{% else %}
+<title>pymoo - {{ title|e }}</title>
+{% endif %}
+{%- endblock %}
+
+{% block docs_sidebar %}
+{% endblock %}
+
+
+{%- block css %}
+{{ super() }}
+<link rel="stylesheet" href="{{ pathto('_static/css/custom.css', 1) }}">
+<link rel="icon" type="image/png" href="{{ pathto('_static/favicon.ico', 1) }}"/>
+{%- endblock %}
+
+
+{% set is_single_page = (theme_single_page == True) or (theme_single_page == "True") %}
+{% if is_single_page %}
+{%- set sidebar_width_class = "col-md-2" %}
+{% else %}
+{%- set sidebar_width_class = "col-md-3" %}
+{% endif %}
+
+{% block extrahead %}
+{{ super() }}
+
+{% if pageurl %}
+<!-- Opengraph tags -->
+<meta property="og:url" content="{{ pageurl }}"/>
+<meta property="og:type" content="article"/>
+<meta property="og:title" content="{% if pagetitle %}{{ pagetitle | e }}{% else %}{{ docstitle | e }}{% endif %}"/>
+<meta property="og:description" content="{{ page_description | e }}"/>
+{% if logourl %}
+<meta property="og:image" content="{{ logourl }}"/>{% endif %}
+<meta name="twitter:card" content="summary"/>
+{% endif %}
+{% endblock %}
+
+
+{% block docs_main %}
+<main id="my-wrapper" class="container-xl mx-auto p-0 m-0 mt-3 mb-1 bd-content" role="main">
+
+
+    {% block docs_body %}
+
+    <!--    <div class="w-25 p-3" style="background-color: #eee;">Width 25%</div>-->
+
+
+    <div id="main-header" class="row no-gutters">
+        <div class="col-12">
+            <a href="/">
+                <img class="img-header d-none d-md-block" alt="header" src="{{ pathto('_static/header.jpg', 1) }}">
+                <img class="img-header d-block d-md-none" alt="header" src="{{ pathto('_static/logo.svg', 1) }}">
+            </a>
+        </div>
+    </div>
+
+    <div id="main-topbar" class="row m-0 px-3 py-3 border-bottom sticky">
+        {% include "topbar.html" %}
+    </div>
+
+    <div class="row m-0 pt-1 px-3">
+
+        <div id="main-navbar" class="col-12 col-md-3 bd-sidebar sticky show" role="menu">
+            {% include "sidebar-search-bs.html" %}
+            {% include "sbt-sidebar-nav.html" %}
+        </div>
+
+
+        <div id="main-content" class="col py-3">
+            {{ super() }}
+
+            {% if theme_show_prev_next %}
+            <div class='prev-next-bottom'>
+                {{ prev_next(prev, next) }}
+            </div>
+            {% endif %}
+        </div>
+
+
+        <div id="main-contentbar" class="d-none d-md-block col-md-2 pl-0 bd-sidebar">
+            {{ generate_toc_html() }}
+        </div>
+
+    </div>
+
+    <div id="main-footer" class="row">
+        {%- include "footer.html" %}
+    </div>
+
+</main>
+{% endblock %}
+
+</div>
+{% endblock %}
+
+{% block docs_toc %}
+{% endblock %}
+
+{% block docs_navbar %}
+{%- endblock %}
+
+{%- block footer %}
+{%- endblock %}
