@@ -35,14 +35,16 @@ class GradientBasedAlgorithm(LocalSearch):
                                  return_values_of=["dF", "ddF"])
         return dF[0], ddF[0]
 
-    def exact_line_search(self, sol, direction, algorithm=GoldenSectionSearch(), n_iter=10):
-        problem = LineSearchProblem(self.problem, sol, direction)
-        res = minimize(problem, algorithm, ("n_iter", n_iter), evaluator=self.evaluator)
-        sol = res.opt[0]
-        sol.set("X", sol.get("__X__"))
-        return sol
 
-    def inexact_line_search(self, sol, direction, algorithm=BacktrackingLineSearch()):
-        algorithm = algorithm.setup(self.problem, point=sol, direction=direction).initialize()
-        res = minimize(self.problem, algorithm, evaluator=self.evaluator)
-        return res.opt[0]
+def exact_line_search(problem, sol, direction, algorithm=GoldenSectionSearch(), n_iter=10, evaluator=None):
+    problem = LineSearchProblem(problem, sol, direction)
+    res = minimize(problem, algorithm, ("n_iter", n_iter), evaluator=evaluator)
+    sol = res.opt[0]
+    sol.set("X", sol.get("__X__"))
+    return sol
+
+def inexact_line_search(problem, sol, direction, evaluator=None):
+    algorithm = BacktrackingLineSearch()
+    algorithm = algorithm.setup(problem, point=sol, direction=direction).initialize()
+    res = minimize(problem, algorithm, evaluator=evaluator)
+    return res.opt[0]

@@ -10,6 +10,7 @@ from pymoo.model.termination import Termination
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.misc import vectorized_cdist
+from pymoo.util.vectors import max_alpha
 
 
 # =========================================================================================================
@@ -156,10 +157,10 @@ class NelderMead(LocalSearch):
         # -------------------------------------------------------------------------------------------
 
         # check the maximum alpha until the bounds are hit
-        max_alpha = max_expansion_factor(centroid, (centroid - pop[n + 1].X), xl, xu)
+        alphaU = max_alpha(centroid, (centroid - pop[n + 1].X), xl, xu)
 
         # reflect the point, consider factor if bounds are there, make sure in bounds (floating point) evaluate
-        x_reflect = centroid + min(self.alpha, max_alpha) * (centroid - pop[n + 1].X)
+        x_reflect = centroid + min(self.alpha, alphaU) * (centroid - pop[n + 1].X)
         x_reflect = set_to_bounds_if_outside_by_problem(self.problem, x_reflect)
         reflect = self.evaluator.eval(self.problem, Individual(X=x_reflect), algorithm=self)
 
@@ -178,10 +179,10 @@ class NelderMead(LocalSearch):
             # -------------------------------------------------------------------------------------------
 
             # the maximum expansion until the bounds are hit
-            max_beta = max_expansion_factor(centroid, (x_reflect - centroid), xl, xu)
+            betaU = max_alpha(centroid, (x_reflect - centroid), xl, xu)
 
             # expand using the factor, consider bounds, make sure in case of floating point issues
-            x_expand = centroid + min(self.beta, max_beta) * (x_reflect - centroid)
+            x_expand = centroid + min(self.beta, betaU) * (x_reflect - centroid)
             x_expand = set_to_bounds_if_outside_by_problem(self.problem, x_expand)
 
             # if the expansion is almost equal to reflection (if boundaries were hit) - no evaluation
@@ -262,40 +263,6 @@ class NelderMead(LocalSearch):
                 X[k, k] = X[k, k] + self.simplex_scaling[k]
 
         return X
-
-
-def max_expansion_factor(point, direction, xl, xu):
-    bounds = []
-
-    if xl is not None:
-        bounds.append(xl)
-
-    if xu is not None:
-        bounds.append(xu)
-
-    if len(bounds) == 0:
-        return np.inf
-
-    # the bounds in one array
-    bounds = np.column_stack(bounds)
-
-    # if the direction is too small we can not divide by 0 - nan will make it being ignored
-    _direction = direction.copy()
-    _direction[_direction == 0] = np.nan
-
-    # calculate the max factor to be not out of bounds
-    val = (bounds - point[:, None]) / _direction[:, None]
-
-    # remove nan and less than 0 values
-    val = val[np.logical_not(np.isnan(val))]
-    val = val[val >= 0]
-
-    # if no value there - no bound exist
-    if len(val) == 0:
-        return np.inf
-    # otherwise return the minimum of values considered
-    else:
-        return val.min()
 
 
 def default_params(*args):

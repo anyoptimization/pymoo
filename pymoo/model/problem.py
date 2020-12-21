@@ -1,68 +1,89 @@
-import multiprocessing
-import warnings
 from abc import abstractmethod
-from multiprocessing.pool import ThreadPool
 
-import autograd
-import autograd.numpy as anp
 import numpy as np
 
-from pymoo.problems.gradient import run_and_trace, calc_jacobian
 from pymoo.util.misc import at_least_2d_array
-from pymoo.util.normalization import denormalize
 
+
+# ---------------------------------------------------------------------------------------------------------
+# Util
+# ---------------------------------------------------------------------------------------------------------
+
+def default_return_values(has_constr=False):
+    vals = ["F"]
+    if has_constr:
+        vals.append("CV")
+    return vals
+
+
+def dict_with_none(keys):
+    out = {}
+    for val in keys:
+        out[val] = None
+    return out
+
+
+def calc_constr(G):
+    if G is None:
+        return None
+    elif G.shape[1] == 0:
+        return np.zeros(G.shape[0])[:, None]
+    else:
+        return np.maximum(0, G).sum(axis=1)[:, None]
+
+
+def replace_nan_values(out, by=np.inf):
+    for key in out:
+        try:
+            v = out[key]
+            v[np.isnan(v)] = by
+            out[key] = v
+        except:
+            pass
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Implementation
+# ---------------------------------------------------------------------------------------------------------
 
 class Problem:
-    """
-    Superclass for each problem that is defined. It provides attributes such
-    as the number of variables, number of objectives or constraints.
-    Also, the lower and upper bounds are stored. If available the Pareto-front, nadir point
-    and ideal point are stored.
-
-    """
-
     def __init__(self,
                  n_var=-1,
-                 n_obj=-1,
+                 n_obj=1,
                  n_constr=0,
                  xl=None,
                  xu=None,
-                 type_var=np.double,
-                 evaluation_of="auto",
-                 replace_nan_values_of="auto",
-                 parallelization=None,
-                 elementwise_evaluation=False,
-                 exclude_from_serialization=["parallelization"],
-                 autograd=True,
-                 callback=None):
+                 check_inconsistencies=True,
+                 replace_nan_values_by=np.inf,
+                 exclude_from_serialization=None,
+                 **kwargs):
+
         """
 
         Parameters
         ----------
         n_var : int
-            number of variables
-        n_obj : int
-            number of objectives
-        n_constr : int
-            number of constraints
-        xl : np.array or int
-            lower bounds for the variables. if integer all lower bounds are equal.
-        xu : np.array or int
-            upper bounds for the variable. if integer all upper bounds are equal.
-        type_var : numpy type
-            type of the variable to be evaluated. Can also be np.object if it is a complex data type
-        elementwise_evaluation : bool
+            Number of Variables
 
-        parallelization : str or tuple
-            See :ref:`nb_parallelization` for guidance on parallelization.
+        n_obj : int
+            Number of Objectives
+
+        n_constr : int
+            Number of Constraints
+
+        xl : np.array, float, int
+            Lower bounds for the variables. if integer all lower bounds are equal.
+
+        xu : np.array, float, int
+            Upper bounds for the variable. if integer all upper bounds are equal.
+
+        type_var : numpy.dtype
+
 
         """
 
-        # number of variable for this problem
+        # number of variable
         self.n_var = n_var
-
-        # type of the variable to be evaluated
-        self.type_var = type_var
 
         # number of objectives
         self.n_obj = n_obj
@@ -70,54 +91,114 @@ class Problem:
         # number of constraints
         self.n_constr = n_constr
 
-        # whether box boundaries (xl, xu) should be handled as constraints during the optimization
-        self.bounds_as_constraints = False
+        # type of the variable to be evaluated
+        self.data = dict(**kwargs)
 
-        # allow just an integer for xl and xu if all bounds are equal
-        if n_var > 0 and not isinstance(xl, np.ndarray) and xl is not None:
-            self.xl = np.ones(n_var) * xl
-        else:
-            self.xl = xl
+        # the lower bounds, make sure it is a numpy array with the length of n_var
+        self.xl, self.xu = xl, xu
 
-        if n_var > 0 and not isinstance(xu, np.ndarray) and xu is not None:
-            self.xu = np.ones(n_var) * xu
-        else:
+        # if it is a problem with an actual number of variables - make sure xl and xu are numpy arrays
+        if n_var > 0:
+            if self.xl is not None and not isinstance(self.xl, np.ndarray):
+                self.xl = np.ones(n_var) * xl
             self.xu = xu
+            if self.xu is not None and not isinstance(self.xu, np.ndarray):
+                self.xu = np.ones(n_var) * xu
+
+        # whether the problem should strictly be checked for inconsistency during evaluation
+        self.check_inconsistencies = check_inconsistencies
+
+        # this defines if NaN values should be replaced or not
+        self.replace_nan_values_by = replace_nan_values_by
+
+        # attribute which are excluded from being serialized )
+        self.exclude_from_serialization = exclude_from_serialization if exclude_from_serialization is not None else []
 
         # the pareto set and front will be calculated only once and is stored here
         self._pareto_front = None
         self._pareto_set = None
         self._ideal_point, self._nadir_point = None, None
 
-        # actually defines what _evaluate is setting during the evaluation
-        if evaluation_of == "auto":
-            # by default F is set, and G if the problem does have constraints
-            self.evaluation_of = ["F"]
-            if self.n_constr > 0:
-                self.evaluation_of.append("G")
+    def evaluate(self,
+                 X,
+                 *args,
+                 return_values_of=None,
+                 return_as_dictionary=False,
+                 **kwargs):
+
+        # make sure the array is at least 2d. store if reshaping was necessary
+        X, only_single_value = at_least_2d_array(X, extend_as="row", return_if_reshaped=True)
+        assert X.shape[1] == self.n_var, f'Input dimension {X.shape[1]} are not equal to n_var {self.n_var}!'
+
+        # number of function evaluations to be done
+        n_evals = X.shape[0]
+
+        # the values to be actually returned by in the end
+        ret_vals = default_return_values(self.has_constraints()) if return_values_of is None else return_values_of
+
+        # prepare the dictionary to be filled after the evaluation
+        out = dict_with_none(ret_vals)
+
+        # do the actual evaluation for the given problem - calls in _evaluate method internally
+        self.do(X, out, *args, **kwargs)
+
+        # make sure all values have at least 2 dimensions in out
+        for key, val in out.items():
+            if val is not None:
+                if isinstance(val, np.ndarray):
+                    if val.ndim == 1:
+                        out[key] = val[:, None]
+
+        # if enabled (recommended) the output shapes are checked for inconsistencies
+        if self.check_inconsistencies:
+            self.check(out, ret_vals, n_evals)
+
+        # if the NaN values should be replaced
+        if self.replace_nan_values_by is not None:
+            replace_nan_values(out, self.replace_nan_values_by)
+
+        if "CV" in ret_vals or "feasible" in ret_vals:
+            CV = calc_constr(out["G"]) if self.has_constraints() else np.zeros([n_evals, 1])
+            out["CV"] = CV
+            out["feasible"] = CV <= 0
+
+        # in case the input had only one dimension, then remove always the first dimension from each output
+        if only_single_value:
+            for key in out.keys():
+                if out[key] is not None:
+                    out[key] = out[key][0, :]
+
+        # now depending on what should be returned prepare the output
+        if return_as_dictionary:
+            return out
         else:
-            self.evaluation_of = evaluation_of
+            if len(ret_vals) == 1:
+                return out[ret_vals[0]]
+            else:
+                return tuple([out[e] for e in ret_vals])
 
-        # if nan values should be replace
-        if replace_nan_values_of == "auto":
-            self.replace_nan_values_of = ["F", "G"] if self.has_constraints() else ["F"]
-        else:
-            self.replace_nan_values_of = replace_nan_values_of
+    def do(self, X, out, *args, **kwargs):
+        self._evaluate(X, out, *args, **kwargs)
 
-        # whether the evaluation function is called per set of solutions or single solution
-        self.elementwise_evaluation = elementwise_evaluation
+    def check(self, out, ret_vals, n_evals):
 
-        # only applicable if elementwise_evaluation is true - if, how should the single evaluations be parallelized
-        self.parallelization = parallelization
+        if "F" in ret_vals and out.get("F") is not None:
+            shape_F = (n_evals, self.n_obj)
+            assert out["F"].shape == shape_F, f"Incorrect shape of F: {out['F'].shape} != {shape_F}"
 
-        # attribute which are excluded from being serialized )
-        self.exclude_from_serialization = exclude_from_serialization
+        if "dF" in ret_vals and out.get("dF") is not None:
+            shape_dF = (n_evals, self.n_obj, self.n_var)
+            assert out["dF"].shape == shape_dF, f"Incorrect shape of dF: {out['dF'].shape} != {shape_dF}"
 
-        # store the callback if defined
-        self.callback = callback
+        if "G" in ret_vals and out.get("G") is not None:
+            if self.has_constraints():
+                shape_G = (n_evals, self.n_constr)
+                assert out["G"].shape == shape_G, f"Incorrect shape of G: {out['G'].shape} != {shape_G}"
 
-        # if autograd should potential be used to derive derivations
-        self.autograd = autograd
+        if "dG" in ret_vals and out.get("dG") is not None:
+            if self.has_constraints():
+                shape_dG = (n_evals, self.n_constr, self.n_var)
+                assert out["dG"].shape == shape_dG, f"Incorrect shape of dF: {out['dG'].shape} != {shape_dG}"
 
     def nadir_point(self):
         """
@@ -211,254 +292,6 @@ class Problem:
 
         return self._pareto_set
 
-    def evaluate(self,
-                 X,
-                 *args,
-                 return_values_of="auto",
-                 return_as_dictionary=False,
-                 **kwargs):
-
-        """
-        Evaluate the given problem.
-
-        The function values set as defined in the function.
-        The constraint values are meant to be positive if infeasible. A higher positive values means "more" infeasible".
-        If they are 0 or negative, they will be considered as feasible what ever their value is.
-
-        Parameters
-        ----------
-
-        X : np.array
-            A two dimensional matrix where each row is a point to evaluate and each column a variable.
-
-        return_as_dictionary : bool
-            If this is true than only one object, a dictionary, is returned. This contains all the results
-            that are defined by return_values_of. Otherwise, by default a tuple as defined is returned.
-
-        return_values_of : list of strings
-            You can provide a list of strings which defines the values that are returned. By default it is set to
-            "auto" which means depending on the problem the function values or additional the constraint violation (if
-            the problem has constraints) are returned. Otherwise, you can provide a list of values to be returned.
-
-            Allowed is ["F", "CV", "G", "dF", "dG", "dCV", "feasible"] where the d stands for
-            derivative and h stands for hessian matrix.
-
-
-        Returns
-        -------
-
-            A dictionary, if return_as_dictionary enabled, or a list of values as defined in return_values_of.
-
-        """
-
-        # call the callback of the problem
-        if self.callback is not None:
-            self.callback(X)
-
-        # make the array at least 2-d - even if only one row should be evaluated
-        only_single_value = len(np.shape(X)) == 1
-        X = np.atleast_2d(X)
-
-        # check the dimensionality of the problem and the given input
-        if X.shape[1] != self.n_var:
-            raise Exception('Input dimension %s are not equal to n_var %s!' % (X.shape[1], self.n_var))
-
-        # automatic return the function values and CV if it has constraints if not defined otherwise
-        if type(return_values_of) == str and return_values_of == "auto":
-            return_values_of = ["F"]
-            if self.n_constr > 0:
-                return_values_of.append("CV")
-
-        # all values that are set in the evaluation function
-        values_not_set = [val for val in return_values_of if val not in self.evaluation_of]
-
-        # have a look if gradients are not set and try to use autograd and calculate grading if implemented using it
-        gradients_not_set = [val for val in values_not_set if val.startswith("d")]
-
-        # whether gradient calculation is necessary or not
-        calc_gradient = self.autograd and (len(gradients_not_set) > 0)
-
-        # set in the dictionary if the output should be calculated - can be used for the gradient
-        out = {}
-        for val in return_values_of:
-            out[val] = None
-
-        # calculate the output array - either elementwise or not. also consider the gradient
-        if self.elementwise_evaluation:
-            out = self._evaluate_elementwise(X, calc_gradient, out, *args, **kwargs)
-        else:
-            out = self._evaluate_batch(X, calc_gradient, out, *args, **kwargs)
-
-            calc_gradient_of = [key for key, val in out.items()
-                                if "d" + key in return_values_of and
-                                out.get("d" + key) is None and
-                                (type(val) == autograd.numpy.numpy_boxes.ArrayBox)]
-
-            if self.autograd and len(calc_gradient_of) > 0:
-                deriv = self._calc_gradient(out, calc_gradient_of)
-                out = {**out, **deriv}
-
-        # convert back to conventional numpy arrays - no array box as return type
-        for key in out.keys():
-            if type(out[key]) == autograd.numpy.numpy_boxes.ArrayBox:
-                out[key] = out[key]._value
-
-        # add the boundary constraints if they are supposed to be added
-        if self.bounds_as_constraints:
-
-            # get the boundaries for normalization
-            xl, xu = self.bounds()
-
-            # add the boundary constraint if enabled
-            _G = np.zeros((len(X), 2 * self.n_var))
-            _G[:, :self.n_var] = (xl - X)
-            _G[:, self.n_var:] = (X - xu)
-
-            # attach the constraints to the results
-            out["G"] = np.column_stack([out["G"], _G]) if out["G"] is not None else _G
-
-            if "dG" in out:
-                _dG = np.zeros((len(X), 2 * self.n_var, self.n_var))
-                _dG[:, :self.n_var, :] = - np.eye(self.n_var)
-                _dG[:, self.n_var:, :] = np.eye(self.n_var)
-
-                out["dG"] = np.column_stack([out["dG"], _dG]) if out["dG"] is not None else _dG
-
-        # replace non values by infinity - because of minimization it serves like a large penalty
-        for key in self.replace_nan_values_of:
-            if key in out:
-                try:
-                    v = out[key]
-                    v[np.isnan(v)] = np.inf
-                    out[key] = v
-                except:
-                    pass
-
-        # if constraint violation should be returned as well
-        if self.n_constr == 0:
-            CV = np.zeros([X.shape[0], 1])
-        else:
-            CV = Problem.calc_constraint_violation(out["G"])
-
-        if "CV" in return_values_of:
-            out["CV"] = CV
-
-        # if an additional boolean flag for feasibility should be returned
-        if "feasible" in return_values_of:
-            out["feasible"] = (CV <= 0)
-
-        # if asked for a value but not set in the evaluation set to None
-        for key in return_values_of:
-            if key not in out:
-                out[key] = None
-
-        # remove the first dimension of the output - in case input was a 1d- vector
-        if only_single_value:
-            for key in out.keys():
-                if out[key] is not None:
-                    out[key] = out[key][0, :]
-
-        if return_as_dictionary:
-            return out
-        else:
-
-            # if just a single value do not return a tuple
-            if len(return_values_of) == 1:
-                return out[return_values_of[0]]
-            else:
-                return tuple([out[val] for val in return_values_of])
-
-    def _calc_gradient(self, out, keys):
-
-        deriv = {}
-        for key in keys:
-            val = out[key]
-
-            # calculate the jacobian matrix and set it - (ignore warnings of autograd here)
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                jac = calc_jacobian(out["__autograd__"], val)
-                deriv["d" + key] = jac
-
-        return deriv
-
-    def _evaluate_batch(self, X, calc_gradient, out, *args, **kwargs):
-        if calc_gradient:
-            out["__autograd__"], _ = run_and_trace(self._evaluate, X, *[out])
-        else:
-            self._evaluate(X, out, *args, **kwargs)
-        at_least2d(out)
-
-        return out
-
-    def _evaluate_elementwise(self, X, calc_gradient, out, *args, **kwargs):
-        ret = []
-
-        def func(_x):
-            _out = dict(out)
-            if calc_gradient:
-                grad, _ = run_and_trace(self._evaluate, _x, *[_out])
-                _out["__autograd__"] = grad
-            else:
-                self._evaluate(_x, _out, *args, **kwargs)
-            return _out
-
-        parallelization = self.parallelization
-        if not isinstance(parallelization, (list, tuple)):
-            parallelization = [self.parallelization]
-
-        _type = parallelization[0]
-        if len(parallelization) >= 1:
-            _params = parallelization[1:]
-
-        # just serialize evaluation
-        if _type is None:
-            [ret.append(func(x)) for x in X]
-
-        elif _type == "starmap":
-            if len(_params) != 1:
-                raise Exception("The starmap parallelization method must be accompanied by a starmapping callable")
-
-            params = [[X[k], calc_gradient, self._evaluate, args, kwargs] for k in range(len(X))]
-
-            starmapper = _params[0]
-            ret = list(starmapper(evaluate_in_parallel, params))
-
-        elif _type == "threads":
-
-            if len(_params) == 0:
-                n_threads = multiprocessing.cpu_count() - 1
-            else:
-                n_threads = _params[0]
-
-            with ThreadPool(n_threads) as pool:
-                params = [[X[k], calc_gradient, self._evaluate, args, kwargs] for k in range(len(X))]
-                ret = pool.starmap(evaluate_in_parallel, params)
-
-        elif _type == "dask":
-
-            if len(_params) != 2:
-                raise Exception("A distributed client objective is need for using dask. parallelization=(dask, "
-                                "<client>, <function>).")
-            else:
-                client, fun = _params
-
-            jobs = []
-            for k in range(len(X)):
-                jobs.append(client.submit(fun, X[k]))
-
-            ret = [job.result() for job in jobs]
-
-        else:
-            raise Exception(
-                "Unknown parallelization method: %s (should be one of: None, starmap, threads, dask)" % _type)
-
-        # stack all the single outputs together
-        for key in ret[0].keys():
-            out[key] = anp.row_stack([ret[i][key] for i in range(len(ret))])
-
-        return out
-
     @abstractmethod
     def _evaluate(self, x, out, *args, **kwargs):
         pass
@@ -473,12 +306,6 @@ class Problem:
         return self.xl, self.xu
 
     def name(self):
-        """
-        Returns
-        -------
-        name : str
-            The name of the problem. Per default it is the name of the class but it can be overridden.
-        """
         return self.__class__.__name__
 
     def _calc_pareto_front(self, *args, **kwargs):
@@ -488,7 +315,7 @@ class Problem:
 
         Returns
         -------
-        pf : np.array
+        pf : np.ndarray
             Pareto front as array.
 
         """
@@ -496,14 +323,6 @@ class Problem:
 
     def _calc_pareto_set(self, *args, **kwargs):
         pass
-
-    # some problem information
-    def __str__(self):
-        s = "# name: %s\n" % self.name()
-        s += "# n_var: %s\n" % self.n_var
-        s += "# n_obj: %s\n" % self.n_obj
-        s += "# n_constr: %s\n" % self.n_constr
-        return s
 
     @staticmethod
     def calc_constraint_violation(G):
@@ -514,182 +333,105 @@ class Problem:
         else:
             return np.sum(G * (G > 0).astype(np.float), axis=1)[:, None]
 
+    def __str__(self):
+        s = "# name: %s\n" % self.name()
+        s += "# n_var: %s\n" % self.n_var
+        s += "# n_obj: %s\n" % self.n_obj
+        s += "# n_constr: %s\n" % self.n_constr
+        return s
+
     def __getstate__(self):
-        state = self.__dict__.copy()
-        # exclude objects which should not be stored
-        for key in self.exclude_from_serialization:
-            state[key] = None
-        return state
-
-    def set_boundaries_as_constraints(self, val=True):
-        if self.bounds_as_constraints and not val:
-            self.bounds_as_constraints = False
-            self.n_constr -= 2 * self.n_var
-        elif not self.bounds_as_constraints and val:
-            self.bounds_as_constraints = True
-            self.n_constr += 2 * self.n_var
+        if self.exclude_from_serialization is not None:
+            state = self.__dict__.copy()
+            # exclude objects which should not be stored
+            for key in self.exclude_from_serialization:
+                state[key] = None
+            return state
+        else:
+            return self.__dict__
 
 
-# makes all the output at least 2-d dimensional
-def at_least2d(d):
-    for key in d.keys():
-        if len(np.shape(d[key])) == 1:
-            d[key] = d[key][:, None]
+# ---------------------------------------------------------------------------------------------------------
+# Elementwise Problem
+# ---------------------------------------------------------------------------------------------------------
 
 
-def evaluate_in_parallel(_x, calc_gradient, func, args, kwargs):
-    _out = {}
-    if calc_gradient:
-        _out["__autograd__"], _ = run_and_trace(func, _x, *[_out])
-    else:
-        func(_x, _out, *args, **kwargs)
-    return _out
+def elementwise_eval(problem, x, out, args, kwargs):
+    problem._evaluate(x, out, *args, **kwargs)
+    return out
 
 
-def evaluate_in_parallel_object(_x, calc_gradient, obj, args, kwargs):
-    _out = {}
-    obj._evaluate(_x, _out, *args, **kwargs)
-    return _out
+def looped_eval(func_elementwise_eval, problem, X, out, *args, **kwargs):
+    return [func_elementwise_eval(problem, x, dict(out), args, kwargs) for x in X]
 
 
-def func_return_none(*args, **kwargs):
-    return None
+def starmap_parallelized_eval(func_elementwise_eval, problem, X, out, *args, **kwargs):
+    starmap = problem.starmap
+    params = [(problem, x, dict(out), args, kwargs) for x in X]
+    return list(starmap(func_elementwise_eval, params))
 
 
-class FunctionalProblem(Problem):
+def dask_parallelized_eval(func_elementwise_eval, problem, X, out, *args, **kwargs):
+    client = problem.client
+    jobs = [client.submit(func_elementwise_eval, (problem, x, dict(out), args, kwargs)) for x in X]
+    return [job.result() for job in jobs]
+
+
+class ElementwiseProblem(Problem):
 
     def __init__(self,
-                 n_var,
-                 objs,
-                 constr_ieq=[],
-                 constr_eq=[],
-                 constr_eq_eps=1e-6,
-                 func_pf=func_return_none,
-                 func_ps=func_return_none,
+                 func_elementwise_eval=elementwise_eval,
+                 func_eval=looped_eval,
+                 starmap=None,
+                 exclude_from_serialization=None,
+                 dask=None,
                  **kwargs):
-        if callable(objs):
-            objs = [objs]
+        super().__init__(exclude_from_serialization=exclude_from_serialization, **kwargs)
+        self.func_elementwise_eval = func_elementwise_eval
+        self.func_eval = func_eval if starmap is None else starmap_parallelized_eval
 
-        self.objs = objs
-        self.constr_ieq = constr_ieq
-        self.constr_eq = constr_eq
-        self.constr_eq_eps = constr_eq_eps
-        self.func_pf = func_pf
-        self.func_ps = func_ps
+        # the two ways of parallelization which are supported
+        self.starmap = starmap
+        self.dask = dask
 
-        n_constr = len(constr_ieq) + len(constr_eq)
+        # do not serialize the starmap - this will throw an exception
+        self.exclude_from_serialization = self.exclude_from_serialization + ["starmap", "dask"]
 
-        super().__init__(n_var,
-                         n_obj=len(self.objs),
-                         n_constr=n_constr,
-                         elementwise_evaluation=True,
-                         **kwargs)
+    def do(self, X, out, *args, **kwargs):
 
+        # do an elementwise evaluation and return the results
+        ret = self.func_eval(self.func_elementwise_eval, self, X, out, *args, **kwargs)
+
+        # the first element decides what keys will be set
+        keys = list(ret[0].keys())
+
+        # now stack all the results for each of them together
+        for key in keys:
+            assert all([key in _out for _out in ret]), f"For some elements the {key} value has not been set."
+
+            vals = []
+            for elem in ret:
+                val = elem[key]
+
+                if val is not None:
+
+                    # if it is just a float
+                    if not isinstance(val, np.ndarray):
+                        val = val * np.ones((1, 1))
+                    # otherwise prepare the value to be stacked with each other by extending the dimension
+                    else:
+                        val = val[None, ...]
+
+                vals.append(val)
+
+            # that means the key has never been set at all
+            if all([val is None for val in vals]):
+                out[key] = None
+            else:
+                out[key] = np.row_stack(vals)
+
+        return out
+
+    @abstractmethod
     def _evaluate(self, x, out, *args, **kwargs):
-        # calculate violation from the inequality constraints
-        ieq = np.array([constr(x) for constr in self.constr_ieq])
-        ieq[ieq < 0] = 0
-
-        # calculate violation from the quality constraints
-        eq = np.array([constr(x) for constr in self.constr_eq])
-        eq = np.abs(eq)
-        eq = eq - self.constr_eq_eps
-
-        # calculate the objective function
-        f = np.array([obj(x) for obj in self.objs])
-
-        out["F"] = f
-        out["G"] = np.concatenate([ieq, eq])
-
-    def _calc_pareto_front(self, *args, **kwargs):
-        return self.func_pf(*args, **kwargs)
-
-    def _calc_pareto_set(self, *args, **kwargs):
-        return self.func_ps(*args, **kwargs)
-
-
-class MetaProblem(Problem):
-
-    def __init__(self, problem):
-        super().__init__(n_var=problem.n_var,
-                         n_obj=problem.n_obj,
-                         n_constr=problem.n_constr,
-                         xl=problem.xl,
-                         xu=problem.xu,
-                         type_var=problem.type_var,
-                         evaluation_of=problem.evaluation_of,
-                         parallelization=problem.parallelization,
-                         elementwise_evaluation=problem.elementwise_evaluation,
-                         callback=problem.callback)
-
-        self.problem = problem
-
-    def _evaluate(self, x, out, *args, **kwargs):
-        self.problem._evaluate(x, out, *args, **kwargs)
-
-    def pareto_front(self, *args, **kwargs):
-        return self.problem.pareto_front(*args, **kwargs)
-
-    def pareto_set(self, *args, **kwargs):
-        return self.problem.pareto_set(*args, **kwargs)
-
-
-class ZeroToOneProblem(MetaProblem):
-
-    def __init__(self, problem):
-        super().__init__(problem)
-        self._xl, self._xu = self.xl, self.xu
-
-        if self.xl is not None:
-            self.xl = np.zeros(self.n_var)
-
-        if self.xu is not None:
-            self.xu = np.ones(self.n_var)
-
-    def _evaluate(self, x, out, *args, **kwargs):
-        super()._evaluate(self.denormalize(x), out, *args, **kwargs)
-
-    def denormalize(self, x):
-        return denormalize(x, self._xl, self._xu)
-
-
-class ConstraintsAsPenaltyProblem(MetaProblem):
-
-    def __init__(self,
-                 problem,
-                 penalty=1e6):
-        super().__init__(problem)
-        self.penalty = penalty
-        self.n_constr = 0
-
-    def _evaluate(self, x, out, *args, **kwargs):
-        kwargs["return_as_dictionary"] = True
-        super()._evaluate(x, out, *args, **kwargs)
-
-        F, G = at_least_2d_array(out["F"]), at_least_2d_array(out["G"])
-        CV = Problem.calc_constraint_violation(G)
-
-        out["__F__"] = F
-        out["__G__"] = G
-        out["__CV__"] = CV
-
-        out["F"] = F + self.penalty * CV
-        out["G"] = None
-
-    def pareto_front(self, *args, **kwargs):
-        return self.problem.pareto_front(*args, **kwargs)
-
-    def pareto_set(self, *args, **kwargs):
-        return self.problem.pareto_set(*args, **kwargs)
-
-
-class StaticProblem(MetaProblem):
-
-    def __init__(self, problem, **kwargs):
-        super().__init__(problem)
-        self.kwargs = kwargs
-
-    def _evaluate(self, x, out, *args, **kwargs):
-        for K, V in self.kwargs.items():
-            out[K] = V
-
+        pass

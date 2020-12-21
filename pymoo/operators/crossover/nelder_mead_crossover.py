@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.algorithms.soo.convex.nonderiv.nelder_mead import max_expansion_factor
+from pymoo.algorithms.soo.convex.nonderiv.nelder_mead import max_alpha
 from pymoo.model.crossover import Crossover
 
 
@@ -30,7 +30,7 @@ class NelderMeadCrossover(Crossover):
             v = centroid - x[n + 1]
 
             # maximum factor until the boundaries are hit
-            max_factor = max_expansion_factor(centroid, v, problem)
+            max_factor = max_alpha(centroid, v, problem)
 
             # randomly chose the extension, expansion or contraction through a factor
             factor = np.random.random() * min(3, max_factor)
