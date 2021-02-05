@@ -56,8 +56,8 @@ class RestrictedMating(TournamentSelection):
 
         _, rank = NonDominatedSorting().do(Hm.get('F'), return_rank=True)
 
-        Pc = (rank[:n_pop] == 0).sum()/len(Hm)
-        Pd = (rank[n_pop:] == 0).sum()/len(Hm)
+        Pc = (rank[:n_pop] == 0).sum() / len(Hm)
+        Pd = (rank[n_pop:] == 0).sum() / len(Hm)
 
         # number of random individuals needed
         n_random = n_select * n_parents * self.pressure
@@ -124,56 +124,28 @@ class CTAEA(GeneticAlgorithm):
                          display=display,
                          **kwargs)
 
-    def _initialize(self):
-        # Prepare diversity archives
-        da = Population()
-
-        # create the initial population
-        pop = self.initialization.do(self.problem, self.pop_size, algorithm=self)
-
-        # then evaluate using the objective function
-        self.evaluator.eval(self.problem, pop, algorithm=self)
-
-        # that call is a dummy survival to set attributes that are necessary for the mating selection
-        if self.survival:
-            pop, da = self.survival.do(self.problem, pop, da, len(pop), algorithm=self)
-
-        self.pop = pop
-        self.da = da
-
-    def setup(self, problem, **kwargs):
+    def _setup(self, problem, **kwargs):
 
         if self.ref_dirs is not None and self.ref_dirs.shape[1] != problem.n_obj:
             raise Exception(
                 "Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
                 (self.ref_dirs.shape[1], problem.n_obj))
 
-        return super().setup(problem)
+    def _initialize(self):
+        return self.initialization.do(self.problem, self.pop_size, algorithm=self)
 
-    def _next(self):
+    def _post_initialize(self):
+        super()._post_initialize()
+        self.pop, self.da = self.survival.do(self.problem, self.pop, Population(), n_survive=len(self.pop), algorithm=self)
 
-        # do the mating using the total population
+    def _infill(self):
         Hm = Population.merge(self.pop, self.da)
-        self.off = self.mating.do(self.problem, Hm, n_offsprings=self.n_offsprings, algorithm=self)
+        return self.mating.do(self.problem, Hm, n_offsprings=self.n_offsprings, algorithm=self)
 
-        # if the mating could not generate any new offspring (duplicate elimination might make that happen)
-        if len(self.off) == 0:
-            self.termination.force_termination = True
-            return
-
-        # if not the desired number of offspring could be created
-        elif len(self.off) < self.n_offsprings:
-            if self.verbose:
-                print("WARNING: Mating could not produce the required number of (unique) offsprings!")
-
-        # evaluate the offspring
-        self.evaluator.eval(self.problem, self.off, algorithm=self)
-
-        # merge the offsprings with the current population
-        self.pop = Population.merge(self.pop, self.off)
-
-        # the do survival selection
-        self.pop, self.da = self.survival.do(self.problem, self.pop, self.da, self.pop_size, algorithm=self)
+    def _advance(self, infills=None, **kwargs):
+        assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
+        pop = Population.merge(self.pop, infills)
+        self.pop, self.da = self.survival.do(self.problem, pop, self.da, self.pop_size, algorithm=self)
 
     def _set_optimum(self, **kwargs):
         if not has_feasible(self.pop):
@@ -191,7 +163,7 @@ class CADASurvival:
         self._decomposition = get_decomposition('asf')
         self._calc_perpendicular_distance = load_function("calc_perpendicular_distance")
 
-    def do(self, _, pop, da, n_survive, **kwargs):
+    def do(self, _, pop, da, n_survive=None, **kwargs):
         # Offspring are last of merged population
         off = pop[-n_survive:]
         # Update ideal point
@@ -226,7 +198,7 @@ class CADASurvival:
             self.opt = Sc[fronts[0]]
             return Sc
         elif len(Sc) < n_survive:  # Not enough feasible individuals
-            remainder = n_survive-len(Sc)
+            remainder = n_survive - len(Sc)
             # Solve sub-problem CV, tche
             SI = pop[CV > 0]
             f1 = SI.get("CV")
@@ -277,7 +249,8 @@ class CADASurvival:
 
                         delta_d = dist_in_niche - min_d_to_max_fit
                         min_d_i = np.unravel_index(np.argmin(delta_d, axis=None), dist_in_niche.shape)
-                        if (delta_d[min_d_i] < 0) or (delta_d[min_d_i] == 0 and (FV[crowdest[list(min_d_i)]] > niche_worst).any()):
+                        if (delta_d[min_d_i] < 0) or (
+                                delta_d[min_d_i] == 0 and (FV[crowdest[list(min_d_i)]] > niche_worst).any()):
                             min_d_i = list(min_d_i)
                             np.random.shuffle(min_d_i)
                             closest = crowdest[min_d_i]

@@ -1,7 +1,10 @@
 import numpy as np
 from scipy.linalg import solve_triangular, LinAlgError
 
-from pymoo.algorithms.base.gradient import GradientBasedAlgorithm, inexact_line_search
+from pymoo.algorithms.base.gradient import DerivationBasedAlgorithm, inexact_line_search
+from pymoo.algorithms.base.line import LineSearchProblem
+from pymoo.algorithms.soo.univariate.wolfe import wolfe_line_search, WolfeSearch
+from pymoo.model.individual import Individual
 from pymoo.model.population import Population
 from pymoo.model.solution import Solution
 
@@ -40,7 +43,9 @@ def direction_inv(jac, hess):
     return dir, dec, False, True
 
 
-class NewtonMethod(GradientBasedAlgorithm):
+
+
+class NewtonMethod(DerivationBasedAlgorithm):
 
     def __init__(self, damped=True, eps=1e-8, **kwargs):
         super().__init__(**kwargs)
@@ -68,7 +73,9 @@ class NewtonMethod(GradientBasedAlgorithm):
             decrement = np.linalg.norm(direction) ** 2
 
         if self.damped:
-            _next = inexact_line_search(self.problem, sol, direction, evaluator=self.evaluator)
+            line = LineSearchProblem(self.problem, sol, direction)
+            _next = WolfeSearch().setup(line, evaluator=self.evaluator).run()
+            # _next = wolfe_line_search(self.problem, sol, direction, evaluator=self.evaluator)
 
             # if the newton step was not successful, then try the gradient
             if adapted and (sol.F[0] - _next.F[0]) < 1e-16:
@@ -77,6 +84,9 @@ class NewtonMethod(GradientBasedAlgorithm):
         else:
             _x = x + direction
             _next = Solution(X=_x)
+
+        if isinstance(_next, Individual):
+            _next = Population.create(_next)
 
         self.pop = Population.merge(self.opt, _next)
 

@@ -133,9 +133,8 @@ class BRKGA(GeneticAlgorithm):
         self.bias = bias
         self.default_termination = SingleObjectiveDefaultTermination()
 
-    def _next(self):
+    def _infill(self):
         pop = self.pop
-        elites = np.where(pop.get("type") == "elite")[0]
 
         # actually do the mating given the elite selection and biased crossover
         off = self.mating.do(self.problem, pop, n_offsprings=self.n_offsprings, algorithm=self)
@@ -144,11 +143,16 @@ class BRKGA(GeneticAlgorithm):
         mutants = FloatRandomSampling().do(self.problem, self.n_mutants, algorithm=self)
 
         # evaluate all the new solutions
-        to_evaluate = Population.merge(off, mutants)
-        self.evaluator.eval(self.problem, to_evaluate, algorithm=self)
+        return Population.merge(off, mutants)
+
+    def _advance(self, off):
+        pop = self.pop
+
+        # get all the elites from the current population
+        elites = np.where(pop.get("type") == "elite")[0]
 
         # finally merge everything together and sort by fitness
-        pop = Population.merge(pop[elites], to_evaluate)
+        pop = Population.merge(pop[elites], off)
 
         # the do survival selection - set the elites for the next round
         self.pop = self.survival.do(self.problem, pop, len(pop), algorithm=self)

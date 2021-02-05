@@ -71,7 +71,7 @@ class Display:
         self.pf = None
         self.attributes = attributes
 
-    def do(self, problem, evaluator, algorithm, pf=None):
+    def do(self, problem, evaluator, algorithm, pf=None, show=True):
 
         try:
 
@@ -99,16 +99,15 @@ class Display:
             if self.attributes is not None:
                 self.output.attrs = [attr for attr in self.output.attrs if attr[0] in self.attributes]
 
-            if self.display_header:
-                self.output.header()
-
-            # print the actually line
-            self.output.do()
+            if show:
+                if self.display_header:
+                    self.output.header()
+                # print the actually line
+                self.output.do()
 
         # catch any exception to make sure the algorithm does not fail because of printing
         except:
             print("WARNING: Error while preparing the output to be printed.")
-            self._do(problem, evaluator, algorithm)
 
         self.display_header = False
 
@@ -136,10 +135,14 @@ class SingleObjectiveDisplay(Display):
         if len(feasible) > 0:
             _F = F[feasible]
             self.output.append("fopt", opt.F[0])
+            if self.pareto_front_is_available:
+                self.output.append("fopt_gap", opt.F[0] - self.pf.flatten()[0])
             if self.favg:
                 self.output.append("favg", np.mean(_F))
         else:
             self.output.append("fopt", "-")
+            if self.pareto_front_is_available:
+                self.output.append("fopt_delta", "-")
             if self.favg:
                 self.output.append("favg", "-")
 

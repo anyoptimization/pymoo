@@ -19,6 +19,6 @@ algorithm = DE(
 res = minimize(problem,
                algorithm,
                seed=1,
-               verbose=True)
+               verbose=False)
 
 print("Best solution found: \nX = %s\nF = %s" % (res.X, res.F))

@@ -23,7 +23,7 @@ class BacktrackingLineSearch(LineSearch):
         if self.point.get("dF") is None:
             self.evaluator.eval(self.problem, self.point, evaluate_values_of=["dF"], algorithm=self)
 
-    def _next(self):
+    def step(self):
         t = self.t
         x, f, df, p = self.point.X, self.point.F[0], self.point.get("dF")[0], self.direction
 

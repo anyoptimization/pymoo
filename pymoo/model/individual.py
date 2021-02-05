@@ -3,12 +3,36 @@ import copy
 
 class Individual:
 
-    def __init__(self, X=None, F=None, CV=None, G=None, feasible=None, **kwargs) -> None:
+    def __init__(self,
+                 X=None, F=None, G=None,
+                 dF=None, dG=None,
+                 ddF=None, ddG=None,
+                 CV=None, feasible=None,
+                 **kwargs) -> None:
+
+        # design variables
         self.X = X
+
+        # objectives and constraint values
         self.F = F
-        self.CV = CV
         self.G = G
+
+        # first order derivation
+        self.dF = dF
+        self.dG = dG
+
+        # second order derivation
+        self.ddF = ddF
+        self.ddG = ddG
+
+        # constraint violation and feasibility flag
+        self.CV = CV
         self.feasible = feasible
+
+        # a set storing what has been evaluated
+        self.evaluated = set()
+
+        # additional data to be set
         self.data = kwargs
         self.attr = set(self.__dict__.keys())
 

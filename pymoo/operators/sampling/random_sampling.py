@@ -1,8 +1,16 @@
-from pymoo.model.sampling import Sampling
-
 import numpy as np
 
+from pymoo.model.sampling import Sampling
 from pymoo.util.normalization import denormalize
+
+
+def random_by_bounds(n_var, xl, xu, n_samples=1):
+    val = np.random.random((n_samples, n_var))
+    return denormalize(val, xl, xu)
+
+
+def random(problem, n_samples=1):
+    return random_by_bounds(problem.n_var, problem.xl, problem.xu, n_samples=n_samples)
 
 
 class FloatRandomSampling(Sampling):
@@ -15,8 +23,7 @@ class FloatRandomSampling(Sampling):
         self.var_type = var_type
 
     def _do(self, problem, n_samples, **kwargs):
-        val = np.random.random((n_samples, problem.n_var))
-        return denormalize(val, problem.xl, problem.xu)
+        return random(problem, n_samples=n_samples)
 
 
 class BinaryRandomSampling(Sampling):

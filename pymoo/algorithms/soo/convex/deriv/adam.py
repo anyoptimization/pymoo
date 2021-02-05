@@ -1,9 +1,9 @@
 import numpy as np
 
-from pymoo.algorithms.base.gradient import GradientBasedAlgorithm
+from pymoo.algorithms.base.gradient import DerivationBasedAlgorithm
 
 
-class Adam(GradientBasedAlgorithm):
+class Adam(DerivationBasedAlgorithm):
 
     def __init__(self,
                  X,

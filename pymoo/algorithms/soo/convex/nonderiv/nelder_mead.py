@@ -116,10 +116,10 @@ class NelderMead(LocalSearch):
         # the scaling used for the initial simplex
         self.simplex_scaling = None
 
+        # the termination used for nelder and mead if nothing else provided
         self.default_termination = NelderAndMeadTermination()
 
     def _initialize(self):
-        super()._initialize()
         self.alpha, self.beta, self.gamma, self.delta = self.func_params(self.problem)
 
         # the corresponding x values of the provided or best found solution
@@ -137,13 +137,16 @@ class NelderMead(LocalSearch):
 
         # initialize the simplex
         simplex = pop_from_array_or_individual(self.initialize_simplex(x0))
-        self.evaluator.eval(self.problem, simplex, algorithm=self)
 
-        # make the simplex the current the population and sort them by fitness
-        pop = Population.merge(self.opt, simplex)
-        self.pop = FitnessSurvival().do(self.problem, pop, len(pop))
+        return Population.merge(self.x0, simplex)
 
-    def _next(self):
+    def _post_initialize(self):
+        super()._post_initialize()
+
+        # sort the current simplex by fitness
+        self.pop = FitnessSurvival().do(self.problem, self.pop, len(self.pop))
+
+    def _advance(self, **kwargs):
 
         # number of variables increased by one - matches equations in the paper
         xl, xu = self.problem.bounds()

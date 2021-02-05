@@ -30,7 +30,7 @@ class LayerwiseRieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
     def _step(self, optimizer, X, scalings):
         obj, grad = value_and_grad(calc_potential_energy)(scalings, X)
         scalings = optimizer.next(scalings, np.array(grad))
-        scalings = normalize(scalings, x_min=0, x_max=scalings.max())
+        scalings = normalize(scalings, xl=0, xu=scalings.max())
         return scalings, obj
 
     def _solve(self, X, scalings):

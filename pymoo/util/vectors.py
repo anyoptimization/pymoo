@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def max_alpha(point, direction, xl, xu):
+def max_alpha(point, direction, xl, xu, mode="one_hits_bound"):
     bounds = []
 
     if xl is not None:
@@ -23,13 +23,15 @@ def max_alpha(point, direction, xl, xu):
     # calculate the max factor to be not out of bounds
     val = (bounds - point[:, None]) / dir[:, None]
 
-    # remove nan and less than 0 values
-    val = val[np.logical_not(np.isnan(val))]
-    val = val[val >= 0]
+    # remove nan values by setting them to a negative number
+    val[np.isnan(val)] = - np.inf
 
     # if no value there - no bound exist
     if len(val) == 0:
         return np.inf
     # otherwise return the minimum of values considered
     else:
-        return val.min()
+        if mode == "one_hits_bound":
+            return val[val >= 0].min()
+        else:
+            return val.max()

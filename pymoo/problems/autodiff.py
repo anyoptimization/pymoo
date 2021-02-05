@@ -2,11 +2,10 @@ import warnings
 
 import autograd
 import autograd.numpy as anp
-import autograd.numpy as anp
 from autograd.core import VJPNode, vspace, backward_pass
 from autograd.tracer import new_box, isbox
 
-from pymoo.model.problem import ElementwiseProblem
+from pymoo.model.problem import ElementwiseProblem, out_to_ndarray, check
 from pymoo.problems.meta import MetaProblem
 
 
@@ -82,6 +81,9 @@ def autograd_elementwise_eval(problem, X, out, *args, **kwargs):
         # make sure all results are pure numpy arrays
         out_to_numpy(out)
 
+    out_to_ndarray(out)
+    check(problem, X, out)
+
     return out
 
 
@@ -102,6 +104,8 @@ class AutomaticDifferentiation(MetaProblem):
             # set a new elementwise function, do the evaluation and revert to default
             problem.func_elementwise_eval = autograd_elementwise_eval
             problem.do(X, out, *args, **kwargs)
+
+            # revert to the old function evaluation
             problem.func_elementwise_eval = func
 
         else:

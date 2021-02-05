@@ -1,4 +1,3 @@
-
 # --------------------------------------------------------------------------------------------
 # Single
 # --------------------------------------------------------------------------------------------
@@ -9,7 +8,7 @@ import numpy as np
 from pymoo.factory import get_problem
 from pymoo.util.plotting import plot_problem_surface
 
-problem = get_problem("ackley", n_var=2, a=20, b= 1 /5, c=2 * np.pi)
+problem = get_problem("ackley", n_var=2, a=20, b=1 / 5, c=2 * np.pi)
 plot_problem_surface(problem, 100, plot_type="wireframe+contour")
 # END ackley
 
@@ -36,7 +35,6 @@ from pymoo.util.plotting import plot_problem_surface
 problem = get_problem("zakharov", n_var=2)
 plot_problem_surface(problem, 100, plot_type="wireframe+contour")
 # END zakharov
-
 
 
 # --------------------------------------------------------------------------------------------
@@ -146,8 +144,6 @@ plot.show()
 # END truss2d_log
 
 
-
-
 # --------------------------------------------------------------------------------------------
 
 
@@ -174,8 +170,7 @@ p = get_problem("dtlz1_-1", n_var=20, n_obj=5)
 # START from_function
 
 import numpy as np
-from pymoo.model.problem import FunctionalProblem
-
+from pymoo.problems.functional import FunctionalProblem
 
 objs = [
     lambda x: np.sum((x - 2) ** 2),
@@ -185,7 +180,6 @@ objs = [
 constr_ieq = [
     lambda x: np.sum((x - 1) ** 2)
 ]
-
 
 problem = FunctionalProblem(10,
                             objs,

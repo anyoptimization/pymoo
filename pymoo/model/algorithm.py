@@ -1,18 +1,16 @@
 import copy
 import random
 import time
-from abc import abstractmethod
 
 import numpy as np
 
 from pymoo.model.callback import Callback
 from pymoo.model.evaluator import Evaluator
-from pymoo.model.individual import Individual
 from pymoo.model.population import Population
 from pymoo.model.result import Result
 from pymoo.util.function_loader import FunctionLoader
 from pymoo.util.misc import termination_from_tuple
-from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.optimum import filter_optimum
 
 
 class Algorithm:
@@ -83,6 +81,8 @@ class Algorithm:
         self.display = kwargs.get("display")
         # callback to be executed each generation
         self.callback = kwargs.get("callback")
+        # whether after the initialization advance should be called or not
+        self.advance_after_initialization = kwargs.get("advance_after_initialization")
 
         # !
         # Attributes to be set later on for each problem run
@@ -112,7 +112,7 @@ class Algorithm:
         # the current solutions stored - here considered as population
         self.pop = None
         # a placeholder object for implementation to store solutions in each iteration
-        self.off, self.infill = None, None
+        self.off = None
         # the optimum found by the algorithm
         self.opt = None
         # can be used to store additional data in submodules
@@ -199,42 +199,51 @@ class Algorithm:
         # END Overwrite by minimize
         # !
 
+        # no call the algorithm specific setup given the problem
+        self._setup(problem, **kwargs)
+
         return self
 
-    def initialize(self):
+    def initialize(self, pop=None):
+        # hook mostly used by the class to happen before even to initialize
+        self._pre_initialize()
 
-        # set the attribute for the optimization method to start
-        self.n_gen = 1
-        self.has_terminated = False
-        self.pop, self.opt = Population(), None
-
-        # if the history is supposed to be saved
-        if self.save_history:
-            self.history = []
-
-        # the time starts whenever this method is called
-        self.start_time = time.time()
+        self.pop = pop
 
         # call the initialize method of the concrete algorithm implementation
-        self._initialize()
+        if pop is None:
+            pop = self._initialize()
+
+        # evaluate the population
+        if pop is not None:
+            pop.set("n_gen", 1)
+            self.evaluator.eval(self.problem, pop, algorithm=self)
+
+        # assign the population to the algorithm
+        self.pop = pop
+
+        # hook for things to happen after the individuals are evaluated
+        self._post_initialize()
+
+        # set the optimum after the initialization has been done
+        self._set_optimum()
 
         # set the algorithm object to be initialized
         self.is_initialized = True
 
         return self
 
-    def solve(self):
+    def run(self):
 
-        # the result object to be finally returned
-        res = Result()
+        # now the termination criterion should be set
+        if self.termination is None:
+            raise Exception("No termination criterion defined and algorithm has no default termination implemented!")
 
-        # set the timer in the beginning of the call
-        res.start_time = time.time()
+        # while termination criterion not fulfilled
+        while self.has_next():
+            self.next()
 
-        # call the algorithm to solve the problem
-        self._solve()
-
-        # create the result object based on the current iteration
+        # create the result object to be returned
         res = self.result()
 
         return res
@@ -242,20 +251,20 @@ class Algorithm:
     def has_next(self):
         return not self.has_terminated
 
+    def finalize(self):
+        return self._finalize()
+
     def next(self):
-
         if self.problem is None:
-            raise Exception("You have to call the `setup(problem)` method first before calling next().")
+            raise Exception("Please call `setup(problem)` before calling next().")
 
-        # call next of the implementation of the algorithm
+        # the first time next is called simply initial the algorithm - makes the interface cleaner
         if not self.is_initialized:
             self.initialize()
-        else:
-            self._next()
-            self.n_gen += 1
 
-        # set the optimum - only done if the algorithm did not do it yet
-        self._set_optimum()
+        # call next of the implementation of the algorithm
+        else:
+            self.step()
 
         # set whether the algorithm is terminated or not
         self.has_terminated = not self.termination.do_continue(self)
@@ -264,11 +273,30 @@ class Algorithm:
         if self.has_terminated:
             self.finalize()
 
-        # do what needs to be done each generation
-        self._each_iteration()
+    def infill(self):
+        # request the infill solutions if the algorithm has implemented it
+        off = self._infill()
 
-    def finalize(self):
-        return self._finalize()
+        # the the current generation to the offsprings
+        if off is not None:
+            off.set("n_gen", self.n_gen)
+
+        return off
+
+    def advance(self, infills=None, **kwargs):
+
+        # if infills have been provided set them as offsprings and feed them into advance
+        if infills is not None:
+            self.off = infills
+
+        # call the implementation of the advance method - if the infill is not None
+        self._advance(infills=infills, **kwargs)
+
+        # execute everything which needs to be done after having the algorithm advanced to the nexg generation
+        self._post_advance()
+
+        # increase the generation counter by one
+        self.n_gen += 1
 
     def result(self):
         res = Result()
@@ -318,18 +346,50 @@ class Algorithm:
     # PROTECTED
     # =========================================================================================================
 
-    def _solve(self):
+    def _pre_initialize(self):
 
-        # now the termination criterion should be set
-        if self.termination is None:
-            raise Exception("No termination criterion defined and algorithm has no default termination implemented!")
+        # the time starts whenever this method is called
+        self.start_time = time.time()
 
-        # while termination criterion not fulfilled
-        while self.has_next():
-            self.next()
+        # set the attribute for the optimization method to start
+        self.n_gen = 1
+        self.has_terminated = False
+        self.pop, self.opt = Population(), None
 
-    # method that is called each iteration to call some algorithms regularly
-    def _each_iteration(self, *args, **kwargs):
+        # if the history is supposed to be saved
+        if self.save_history:
+            self.history = []
+
+    def _post_initialize(self):
+        pop = self.pop
+
+        # initially set the population, offsprings and infill to the initialized pop
+        self.off = pop
+
+        # advance once if the algorithms says to do so
+        if self.advance_after_initialization:
+            self._advance(infills=pop)
+
+        # and also do the post advance steps
+        self._post_advance()
+
+    def step(self):
+
+        infills = self.infill()
+
+        if infills is not None:
+            self.evaluator.eval(self.problem, infills, algorithm=self)
+            self.advance(infills=infills)
+        else:
+            self.advance()
+
+    def _set_optimum(self):
+        self.opt = filter_optimum(self.pop, least_infeasible=True)
+
+    def _post_advance(self):
+
+        # update the current optimum of the algorithm
+        self._set_optimum()
 
         # display the output if defined by the algorithm
         if self.verbose and self.display is not None:
@@ -351,51 +411,22 @@ class Algorithm:
             self.history, self.callback = _hist, _callback
             self.history.append(obj)
 
-    def _set_optimum(self, force=False):
-        pop = self.pop
-        # if self.opt is not None:
-        #     pop = Population.merge(pop, self.opt)
-        self.opt = filter_optimum(pop, least_infeasible=True)
 
-    @abstractmethod
+    # =========================================================================================================
+    # TO BE OVERWRITTEN
+    # =========================================================================================================
+
+    def _setup(self, problem, **kwargs):
+        pass
+
     def _initialize(self):
         pass
 
-    @abstractmethod
-    def _next(self):
+    def _infill(self):
+        pass
+
+    def _advance(self, infills=None, **kwargs):
         pass
 
     def _finalize(self):
         pass
-
-
-def filter_optimum(pop, least_infeasible=False):
-    # first only choose feasible solutions
-    ret = pop[pop.get("feasible")[:, 0]]
-
-    # if at least one feasible solution was found
-    if len(ret) > 0:
-
-        # then check the objective values
-        F = ret.get("F")
-
-        if F.shape[1] > 1:
-            I = NonDominatedSorting().do(F, only_non_dominated_front=True)
-            ret = ret[I]
-
-        else:
-            ret = ret[np.argmin(F)]
-
-    # no feasible solution was found
-    else:
-        # if flag enable report the least infeasible
-        if least_infeasible:
-            ret = pop[np.argmin(pop.get("CV"))]
-        # otherwise just return none
-        else:
-            ret = None
-
-    if isinstance(ret, Individual):
-        ret = Population().create(ret)
-
-    return ret

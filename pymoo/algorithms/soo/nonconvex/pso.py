@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.docs import parse_doc_string
-from pymoo.model.algorithm import Algorithm, filter_optimum
+from pymoo.model.algorithm import Algorithm
 from pymoo.model.initialization import Initialization
 from pymoo.model.population import Population
 from pymoo.model.replacement import ImprovementReplacement
@@ -12,6 +12,7 @@ from pymoo.operators.repair.to_bound import set_to_bounds_if_outside
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.misc import norm_eucl_dist
+from pymoo.util.optimum import filter_optimum
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 from pymoo.visualization.fitness_landscape import FitnessLandscape
 from pymoo.visualization.video.callback_video import AnimationCallback
@@ -25,7 +26,7 @@ class PSODisplay(SingleObjectiveDisplay):
 
     def _do(self, problem, evaluator, algorithm):
         pop = algorithm.pop
-        algorithm.pop = Population.create(*algorithm.pop.get("pbest"))
+        algorithm.pop = algorithm.pbest
         super()._do(problem, evaluator, algorithm)
         algorithm.pop = pop
 
@@ -134,7 +135,6 @@ class PSO(Algorithm):
             random velocity vector or 'zero' which makes the particles start to find the direction through the
             velocity update equation.
 
-
         max_velocity_rate : float
             The maximum velocity rate. It is determined variable (and not vector) wise. We consider the rate here
             since the value is normalized regarding the `xl` and `xu` defined in the problem.
@@ -162,14 +162,19 @@ class PSO(Algorithm):
         self.c1 = c1
         self.c2 = c2
 
-    def setup(self, problem, **kwargs):
-        super().setup(problem, **kwargs)
+        self.V = None
+        self.pbest = None
+        self.sbest = None
+
+    def _setup(self, problem, **kwargs):
         self.V_max = self.max_velocity_rate * (problem.xu - problem.xl)
-        return self
+        self.f, self.strategy = None, None
 
     def _initialize(self):
-        pop = self.initialization.do(self.problem, self.pop_size, algorithm=self)
-        self.evaluator.eval(self.problem, pop, algorithm=self)
+        return self.initialization.do(self.problem, self.pop_size, algorithm=self)
+
+    def _post_initialize(self):
+        pop = self.pop
 
         if self.initial_velocity == "random":
             init_V = np.random.random((len(pop), self.problem.n_var)) * self.V_max[None, :]
@@ -177,48 +182,22 @@ class PSO(Algorithm):
             init_V = np.zeros((len(pop), self.problem.n_var))
 
         pop.set("V", init_V)
-        pop.set("pbest", pop)
-        self.pop, self.off = pop, pop
+        self.pbest = pop.copy()
 
-        self.f = None
-        self.strategy = None
+        # after that do all the other initializations
+        super()._post_initialize()
 
-    def _next(self):
-
-        # get the offspring solutions and evaluate them
-        off = self._step()
-        self.evaluator.eval(self.problem, off, algorithm=self)
-
-        # the the personal bests of the current population
-        pbest = Population.create(*self.pop.get("pbest"))
-
-        # if an offspring has improved the personal store that index
-        has_improved = ImprovementReplacement().do(self.problem, pbest, off, return_indices=True)
-
-        # replace the personal best of each particle if it has improved
-        off[has_improved].set("pbest", off[has_improved])
-        pop = off
-
-        self.off = off
-        self.pop = pop
-
-        if self.adaptive:
-            self._adapt()
-
-    def _social_best(self):
-        return Population.create(*[self.opt] * len(self.pop))
-
-    def _step(self):
+    def _infill(self):
         pop = self.pop
         X, F, V = pop.get("X", "F", "V")
 
         # get the personal best of each particle
-        pbest = Population.create(*pop.get("pbest"))
+        pbest = self.pbest
         P_X, P_F = pbest.get("X", "F")
 
         # get the best for each solution - could be global or local or something else - (here: Global)
-        best = self._social_best()
-        G_X = best.get("X")
+        sbest = self._social_best()
+        G_X = sbest.get("X")
 
         # get the inertia weight of the individual
         inerta = self.w * V
@@ -238,24 +217,43 @@ class PSO(Algorithm):
         _X = X + _V
         _X = InversePenaltyOutOfBoundsRepair().do(self.problem, _X, P=X)
 
-        # evaluate the offspring population
-        off = Population(len(pop)).set("X", _X, "V", _V, "pbest", pbest, "best", best)
+        # create the offspring population
+        off = Population.new(X=_X, V=_V)
 
         # try to improve the current best with a pertubation
         if self.pertube_best:
-            pbest = Population.create(*pop.get("pbest"))
-            k = FitnessSurvival().do(self.problem, pbest, 1, return_indices=True)[0]
+            k = FitnessSurvival().do(self.problem, pbest, n_survive=1, return_indices=True)[0]
             eta = int(np.random.uniform(20, 30))
             mutant = PolynomialMutation(eta).do(self.problem, pbest[[k]])[0]
             off[k].set("X", mutant.X)
 
+        self.sbest = sbest.copy()
+
         return off
+
+    def _advance(self, infills=None):
+        assert infills is not None, "This algorithms uses the AskAndTell interface thus 'infills' must to be provided."
+
+        # set the new population to be equal to the offsprings
+        self.pop = infills
+
+        # if an offspring has improved the personal store that index
+        has_improved = ImprovementReplacement().do(self.problem, self.pbest, infills, return_indices=True)
+
+        # set the personal best which have been improved
+        self.pbest[has_improved] = infills[has_improved].copy()
+
+        if self.adaptive:
+            self._adapt()
+
+    def _social_best(self):
+        return Population.create(*[self.opt] * len(self.pop))
 
     def _adapt(self):
         pop = self.pop
 
-        X, F, best = pop.get("X", "F", "best")
-        best = Population.create(*best)
+        X, F  = pop.get("X", "F")
+        sbest = self.sbest
         w, c1, c2, = self.w, self.c1, self.c2
 
         # get the average distance from one to another for normalization
@@ -264,7 +262,7 @@ class PSO(Algorithm):
         _min, _max = mD.min(), mD.max()
 
         # get the average distance to the best
-        g_D = norm_eucl_dist(self.problem, best.get("X"), X).mean()
+        g_D = norm_eucl_dist(self.problem, sbest.get("X"), X).mean()
         f = (g_D - _min) / (_max - _min + 1e-32)
 
         S = np.array([S1_exploration(f), S2_exploitation(f), S3_convergence(f), S4_jumping_out(f)])
@@ -301,8 +299,7 @@ class PSO(Algorithm):
         self.w = w
 
     def _set_optimum(self, force=False):
-        pbest = Population.create(*self.pop.get("pbest"))
-        self.opt = filter_optimum(pbest, least_infeasible=True)
+        self.opt = filter_optimum(self.pbest, least_infeasible=True)
 
 
 # =========================================================================================================
