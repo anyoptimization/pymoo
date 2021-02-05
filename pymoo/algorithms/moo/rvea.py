@@ -2,18 +2,15 @@ import numpy as np
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
-from pymoo.factory import get_problem, get_reference_directions
 from pymoo.model.survival import Survival
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.operators.selection.random_selection import RandomSelection
-from pymoo.optimize import minimize
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.misc import has_feasible, vectorized_cdist
 from pymoo.util.termination.max_eval import MaximumFunctionCallTermination
 from pymoo.util.termination.max_gen import MaximumGenerationTermination
-from pymoo.visualization.scatter import Scatter
 
 
 class RVEA(GeneticAlgorithm):
@@ -76,8 +73,7 @@ class RVEA(GeneticAlgorithm):
                          display=display,
                          **kwargs)
 
-    def setup(self, problem, **kwargs):
-        super().setup(problem, **kwargs)
+    def _setup(self, problem, **kwargs):
 
         # if maximum functions termination convert it to generations
         if isinstance(self.termination, MaximumFunctionCallTermination):
@@ -88,10 +84,8 @@ class RVEA(GeneticAlgorithm):
         if not isinstance(self.termination, MaximumGenerationTermination):
             raise Exception("Please use the n_gen or n_eval as a termination criterion to execute RVEA!")
 
-        return self
-
-    def _next(self):
-        super()._next()
+    def _advance(self, **kwargs):
+        super()._advance(**kwargs)
 
         # get the  current generation and maximum of generations
         n_gen, n_max_gen = self.n_gen, self.termination.n_max_gen
@@ -217,25 +211,3 @@ class APDSurvival(Survival):
 
 parse_doc_string(RVEA.__init__)
 
-
-if __name__ == "__main__":
-
-    problem = get_problem("zdt1")
-
-    ref_dirs = get_reference_directions("das-dennis", 2, n_partitions=99)
-
-    algorithm = RVEA(ref_dirs)
-
-    pf = problem.pareto_front()
-
-    res = minimize(problem,
-                   algorithm,
-                   ('n_gen', 200),
-                   seed=1,
-                   pf=pf,
-                   verbose=True)
-
-    plot = Scatter()
-    plot.add(pf, plot_type="line", color="black", alpha=0.7)
-    plot.add(res.F, color="red")
-    plot.show()

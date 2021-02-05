@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.model.problem import MetaProblem
+from pymoo.problems.meta import MetaProblem
 
 
 class BoundariesAsConstraints(MetaProblem):

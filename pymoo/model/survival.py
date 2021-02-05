@@ -70,7 +70,8 @@ class Survival:
     def do(self,
            problem,
            pop,
-           n_survive,
+           *args,
+           n_survive=None,
            n_min_infeas_survive=0,
            return_indices=False,
            **kwargs):
@@ -92,14 +93,14 @@ class Survival:
 
             # if there was no feasible solution was added at all - which means at least one infeasible
             if len(feas) == 0:
-                infeas_pop = self.infeas_survival.do(problem, pop[infeas], n_survive, **kwargs)
+                infeas_pop = self.infeas_survival.do(problem, pop[infeas], *args, n_survive=n_survive, **kwargs)
 
             # if there are feasible solutions in the population
             else:
 
                 # if feasible solutions do exist
                 if len(feas) > 0:
-                    feas_pop = self._do(problem, pop[feas], min(len(feas), n_survive), **kwargs)
+                    feas_pop = self._do(problem, pop[feas], *args, n_survive=min(len(feas), n_survive), **kwargs)
 
                 # calculate how many individuals are still remaining to be filled up with infeasible ones
                 n_remaining = n_survive - len(feas_pop)
@@ -112,12 +113,12 @@ class Survival:
 
                 # if infeasible solutions needs to be added
                 if n_infeas_survive > 0:
-                    infeas_pop = self.infeas_survival.do(problem, pop[infeas], n_infeas_survive, **kwargs)
+                    infeas_pop = self.infeas_survival.do(problem, pop[infeas], *args, n_survive=n_infeas_survive, **kwargs)
 
             survivors = Population.merge(feas_pop, infeas_pop)
 
         else:
-            survivors = self._do(problem, pop, n_survive, **kwargs)
+            survivors = self._do(problem, pop, *args, n_survive=n_survive, **kwargs)
 
         if return_indices:
             H = {}
@@ -128,7 +129,7 @@ class Survival:
             return survivors
 
     @abstractmethod
-    def _do(self, problem, pop, n_survive, **kwargs):
+    def _do(self, problem, pop, *args, n_survive=None, **kwargs):
         pass
 
 

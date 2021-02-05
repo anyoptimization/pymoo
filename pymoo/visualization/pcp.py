@@ -86,8 +86,11 @@ class PCP(Plot):
             margin_left = 0.08
 
             if self.show_bounds:
-                self.ax.text(i - margin_left, bottom, self.func_number_to_text(bounds[0][i]))
-                self.ax.text(i - margin_left, top, self.func_number_to_text(bounds[1][i]))
+                lower = self.ax.text(i - margin_left, bottom, self.func_number_to_text(bounds[0][i]))
+                lower.set_bbox(dict(facecolor='white', alpha=0.8))
+
+                upper = self.ax.text(i - margin_left, top, self.func_number_to_text(bounds[1][i]))
+                upper.set_bbox(dict(facecolor='white', alpha=0.8))
 
             if self.n_ticks is not None:
                 n_length = 0.03

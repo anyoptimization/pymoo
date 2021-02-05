@@ -50,7 +50,7 @@ class InfillCriterion:
             n_infills += 1
 
             # if no new offsprings can be generated within a pre-specified number of generations
-            if n_infills > self.n_max_iterations:
+            if n_infills >= self.n_max_iterations:
                 break
 
         return off

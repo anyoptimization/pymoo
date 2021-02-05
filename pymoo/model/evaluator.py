@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
-from pymoo.model.problem import Problem
+from pymoo.model.problem import Problem, default_return_values
 from pymoo.util.misc import at_least_2d_array
 
 
@@ -42,6 +42,8 @@ class Evaluator:
     def eval(self,
              problem,
              pop,
+             skip_already_evaluated=None,
+             evaluate_values_of=None,
              **kwargs):
         """
 
@@ -57,6 +59,9 @@ class Evaluator:
 
         """
 
+        if evaluate_values_of is None:
+            evaluate_values_of = ["F", "G", "CV", "feasible"]
+
         is_individual = isinstance(pop, Individual)
         is_numpy_array = isinstance(pop, np.ndarray) and not isinstance(pop, Population)
 
@@ -65,8 +70,8 @@ class Evaluator:
             pop = Population().create(pop)
 
         # find indices to be evaluated
-        if self.skip_already_evaluated:
-            I = [k for k in range(len(pop)) if pop[k].F is None]
+        if skip_already_evaluated or (skip_already_evaluated is None and self.skip_already_evaluated):
+            I = [k for k in range(len(pop)) if not all([e in pop[k].evaluated for e in evaluate_values_of])]
         else:
             I = np.arange(len(pop))
 
@@ -75,7 +80,7 @@ class Evaluator:
 
         # actually evaluate all solutions using the function that can be overwritten
         if len(I) > 0:
-            self._eval(problem, pop[I], **kwargs)
+            self._eval(problem, pop[I], evaluate_values_of=evaluate_values_of, **kwargs)
 
             # set the feasibility attribute if cv exists
             set_feasibility(pop[I])
@@ -89,10 +94,11 @@ class Evaluator:
         else:
             return pop
 
-    def _eval(self, problem, pop, **kwargs):
+    def _eval(self, problem, pop, evaluate_values_of=None, **kwargs):
+        evaluate_values_of = self.evaluate_values_of if evaluate_values_of is None else evaluate_values_of
 
         out = problem.evaluate(pop.get("X"),
-                               return_values_of=self.evaluate_values_of,
+                               return_values_of=evaluate_values_of,
                                return_as_dictionary=True,
                                **kwargs)
 
@@ -102,15 +108,22 @@ class Evaluator:
             else:
                 pop.set(key, val)
 
+        for ind in pop:
+            ind.evaluated.update(out.keys())
+
 
 class VoidEvaluator(Evaluator):
 
+    def __init__(self, value=np.inf, **kwargs):
+        super().__init__(**kwargs)
+        self.value = value
+
     def eval(self, problem, pop, **kwargs):
-
-        for individual in pop:
-            if individual.F is None:
-                individual.F = np.full(problem.n_obj, np.inf)
-                individual.G = np.full(problem.n_constr, np.inf) if problem.has_constraints() else None
-                individual.CV = [-np.inf]
-                individual.feasible = [False]
-
+        val = self.value
+        if val is not None:
+            for individual in pop:
+                if individual.F is None:
+                    individual.F = np.full(problem.n_obj, val)
+                    individual.G = np.full(problem.n_constr, val) if problem.has_constraints() else None
+                    individual.CV = [-np.inf]
+                    individual.feasible = [False]

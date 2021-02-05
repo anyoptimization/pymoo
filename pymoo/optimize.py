@@ -80,7 +80,7 @@ def minimize(problem,
     algorithm.termination = termination
 
     # actually execute the algorithm
-    res = algorithm.solve()
+    res = algorithm.run()
 
     # store the deep copied algorithm in the result object
     res.algorithm = algorithm

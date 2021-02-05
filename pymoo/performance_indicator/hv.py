@@ -63,7 +63,7 @@ class Hypervolume(Indicator):
             # because we normalize now the reference point is (1,...1)
             ref_point = np.ones(F.shape[1])
             hv = _HyperVolume(ref_point)
-            _F = normalize(_F, x_min=self.ideal_point, x_max=self.nadir_point)
+            _F = normalize(_F, xl=self.ideal_point, xu=self.nadir_point)
         else:
             hv = _HyperVolume(self.ref_point)
 

@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import datetime
 from itertools import combinations
 
@@ -9,16 +10,21 @@ from pymoo.model.population import Population
 from pymoo.model.sampling import Sampling
 
 
-def parameter_less(F, CV):
-    ret = np.copy(F)
-    parameter_less = np.max(F, axis=0) + CV
+def parameter_less(F, CV, fmax=None, inplace=False):
+    assert F.shape == CV.shape
 
-    infeasible = (CV > 0)[:, 0]
+    if not inplace:
+        F = np.copy(F)
 
-    if np.any(infeasible):
-        ret[infeasible] = parameter_less[infeasible]
+    if fmax is None:
+        fmax = np.max(F)
 
-    return ret
+    param_less = fmax + CV
+
+    infeas = (CV > 0)
+    F[..., infeas] = param_less[..., infeas]
+
+    return F
 
 
 def swap(M, a, b):
@@ -151,7 +157,6 @@ def cdist(A, B, **kwargs):
 
 
 def vectorized_cdist(A, B, func_dist=func_euclidean_distance, fill_diag_with_inf=False, **kwargs):
-
     assert A.ndim <= 2 and B.ndim <= 2
 
     A, only_row = at_least_2d_array(A, extend_as="row", return_if_reshaped=True)
@@ -167,7 +172,7 @@ def vectorized_cdist(A, B, func_dist=func_euclidean_distance, fill_diag_with_inf
         np.fill_diagonal(M, np.inf)
 
     if only_row and only_column:
-        M = M[0,0]
+        M = M[0, 0]
     elif only_row:
         M = M[0]
     elif only_column:
@@ -369,3 +374,29 @@ def unique_and_all_indices(arr):
     return vals, indexes
 
 
+def from_dict(D, *keys):
+    return [D.get(k) for k in keys]
+
+
+def list_of_dicts_unique(l, k):
+    return list(OrderedDict([(e[k], None) for e in l]).keys())
+
+
+def list_of_dicts_filter(l, *pairs):
+    return [e for e in l if all(e[k] == v for (k, v) in pairs)]
+
+
+def logical_op(func, a, b, *args):
+    ret = func(a, b)
+    for c in args:
+        ret = func(ret, c)
+    return ret
+
+
+def replace_nan_by(x, val, inplace=False):
+    is_nan = np.isnan(x)
+    if np.sum(is_nan) > 0:
+        if not inplace:
+            x = x.copy()
+        x[is_nan] = val
+    return x
