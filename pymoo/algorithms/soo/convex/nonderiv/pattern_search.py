@@ -88,14 +88,13 @@ class PatternSearch(LocalSearch):
         self.explr_delta = explr_delta
         self.default_termination = PatternSearchTermination(eps=eps, x_tol=1e-6, f_tol=1e-6, nth_gen=1, n_last=30)
 
-    def _initialize(self, **kwargs):
-        super()._initialize(**kwargs)
+    def _setup(self, problem, x0=None, **kwargs):
 
         # make delta a vector - the sign is later updated individually
         if not isinstance(self.explr_delta, np.ndarray):
             self.explr_delta = np.ones(self.problem.n_var) * self.explr_delta
 
-    def _next(self):
+    def step(self):
 
         # in the beginning of each iteration first do an exploration move
         self._previous = self.opt[0]
@@ -181,7 +180,6 @@ class PatternSearch(LocalSearch):
                 center, opt = mutant, mutant
 
             else:
-
                 # inverse the sign of the delta
                 self.explr_delta[k] = - self.explr_delta[k]
 

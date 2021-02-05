@@ -1,7 +1,7 @@
 import numpy as np
 
-from pymoo.model.problem_bak import MetaProblem
-from pymoo.util.normalization import denormalize
+from pymoo.problems.meta import MetaProblem
+from pymoo.util.normalization import denormalize, normalize
 
 
 class ZeroToOne(MetaProblem):
@@ -20,5 +20,8 @@ class ZeroToOne(MetaProblem):
 
     def denormalize(self, x):
         return denormalize(x, self._xl, self._xu)
+
+    def normalize(self, x):
+        return normalize(x, self._xl, self._xu)
 
 

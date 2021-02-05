@@ -46,7 +46,7 @@ class Optimizer(LocalSearch):
         self.termination = NoTermination()
         self.return_least_infeasible = True
 
-    def _next(self):
+    def step(self):
         problem, evaluator = self.problem, self.evaluator
 
         # add the box constraints defined in the problem

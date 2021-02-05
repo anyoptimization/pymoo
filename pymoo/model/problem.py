@@ -1,45 +1,8 @@
 from abc import abstractmethod
 
-import numpy as np
+import autograd.numpy as np
 
 from pymoo.util.misc import at_least_2d_array
-
-
-# ---------------------------------------------------------------------------------------------------------
-# Util
-# ---------------------------------------------------------------------------------------------------------
-
-def default_return_values(has_constr=False):
-    vals = ["F"]
-    if has_constr:
-        vals.append("CV")
-    return vals
-
-
-def dict_with_none(keys):
-    out = {}
-    for val in keys:
-        out[val] = None
-    return out
-
-
-def calc_constr(G):
-    if G is None:
-        return None
-    elif G.shape[1] == 0:
-        return np.zeros(G.shape[0])[:, None]
-    else:
-        return np.maximum(0, G).sum(axis=1)[:, None]
-
-
-def replace_nan_values(out, by=np.inf):
-    for key in out:
-        try:
-            v = out[key]
-            v[np.isnan(v)] = by
-            out[key] = v
-        except:
-            pass
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -81,6 +44,10 @@ class Problem:
 
 
         """
+
+        if "elementwise_evaluation" in kwargs and kwargs.get("elementwise_evaluation"):
+            raise Exception("The interface in pymoo 0.5.0 has changed. Please inherit from the ElementwiseProblem "
+                            "class AND remove the 'elementwise_evaluation=True' argument to disable this exception.")
 
         # number of variable
         self.n_var = n_var
@@ -133,7 +100,7 @@ class Problem:
         # number of function evaluations to be done
         n_evals = X.shape[0]
 
-        # the values to be actually returned by in the end
+        # the values to be actually returned by in the end - set bu default if not providded
         ret_vals = default_return_values(self.has_constraints()) if return_values_of is None else return_values_of
 
         # prepare the dictionary to be filled after the evaluation
@@ -142,16 +109,12 @@ class Problem:
         # do the actual evaluation for the given problem - calls in _evaluate method internally
         self.do(X, out, *args, **kwargs)
 
-        # make sure all values have at least 2 dimensions in out
-        for key, val in out.items():
-            if val is not None:
-                if isinstance(val, np.ndarray):
-                    if val.ndim == 1:
-                        out[key] = val[:, None]
+        # make sure the array is 2d before doing the shape check
+        out_to_2d_ndarray(out)
 
         # if enabled (recommended) the output shapes are checked for inconsistencies
         if self.check_inconsistencies:
-            self.check(out, ret_vals, n_evals)
+            check(self, X, out)
 
         # if the NaN values should be replaced
         if self.replace_nan_values_by is not None:
@@ -164,9 +127,7 @@ class Problem:
 
         # in case the input had only one dimension, then remove always the first dimension from each output
         if only_single_value:
-            for key in out.keys():
-                if out[key] is not None:
-                    out[key] = out[key][0, :]
+            out_to_1d_ndarray(out)
 
         # now depending on what should be returned prepare the output
         if return_as_dictionary:
@@ -179,26 +140,7 @@ class Problem:
 
     def do(self, X, out, *args, **kwargs):
         self._evaluate(X, out, *args, **kwargs)
-
-    def check(self, out, ret_vals, n_evals):
-
-        if "F" in ret_vals and out.get("F") is not None:
-            shape_F = (n_evals, self.n_obj)
-            assert out["F"].shape == shape_F, f"Incorrect shape of F: {out['F'].shape} != {shape_F}"
-
-        if "dF" in ret_vals and out.get("dF") is not None:
-            shape_dF = (n_evals, self.n_obj, self.n_var)
-            assert out["dF"].shape == shape_dF, f"Incorrect shape of dF: {out['dF'].shape} != {shape_dF}"
-
-        if "G" in ret_vals and out.get("G") is not None:
-            if self.has_constraints():
-                shape_G = (n_evals, self.n_constr)
-                assert out["G"].shape == shape_G, f"Incorrect shape of G: {out['G'].shape} != {shape_G}"
-
-        if "dG" in ret_vals and out.get("dG") is not None:
-            if self.has_constraints():
-                shape_dG = (n_evals, self.n_constr, self.n_var)
-                assert out["dG"].shape == shape_dG, f"Incorrect shape of dF: {out['dG'].shape} != {shape_dG}"
+        out_to_2d_ndarray(out)
 
     def nadir_point(self):
         """
@@ -243,7 +185,7 @@ class Problem:
 
         return self._ideal_point
 
-    def pareto_front(self, *args, use_cache=True, exception_if_failing=True, **kwargs):
+    def pareto_front(self, *args, use_cache=True, exception_if_failing=False, **kwargs):
         """
         Parameters
         ----------
@@ -270,14 +212,13 @@ class Problem:
                     pf = at_least_2d_array(pf)
 
                 self._pareto_front = pf
-
             except Exception as e:
                 if exception_if_failing:
                     raise e
 
         return self._pareto_front
 
-    def pareto_set(self, *args, use_cache=True, **kwargs):
+    def pareto_set(self, *args, use_cache=True, exception_if_failing=False, **kwargs):
         """
         Returns
         -------
@@ -285,10 +226,14 @@ class Problem:
             Returns the pareto set for a problem. Points in the X space to be known to be optimal!
         """
         if not use_cache or self._pareto_set is None:
-            ps = self._calc_pareto_set(*args, **kwargs)
-            if ps is not None:
-                ps = at_least_2d_array(ps)
-            self._pareto_set = ps
+            try:
+                ps = self._calc_pareto_set(*args, **kwargs)
+                if ps is not None:
+                    ps = at_least_2d_array(ps)
+                self._pareto_set = ps
+            except Exception as e:
+                if exception_if_failing:
+                    raise e
 
         return self._pareto_set
 
@@ -326,12 +271,7 @@ class Problem:
 
     @staticmethod
     def calc_constraint_violation(G):
-        if G is None:
-            return None
-        elif G.shape[1] == 0:
-            return np.zeros(G.shape[0])[:, None]
-        else:
-            return np.sum(G * (G > 0).astype(np.float), axis=1)[:, None]
+        return calc_constr(G)
 
     def __str__(self):
         s = "# name: %s\n" % self.name()
@@ -358,6 +298,8 @@ class Problem:
 
 def elementwise_eval(problem, x, out, args, kwargs):
     problem._evaluate(x, out, *args, **kwargs)
+    out_to_ndarray(out)
+    check(problem, x, out)
     return out
 
 
@@ -386,6 +328,7 @@ class ElementwiseProblem(Problem):
                  exclude_from_serialization=None,
                  dask=None,
                  **kwargs):
+
         super().__init__(exclude_from_serialization=exclude_from_serialization, **kwargs)
         self.func_elementwise_eval = func_elementwise_eval
         self.func_eval = func_eval if starmap is None else starmap_parallelized_eval
@@ -417,7 +360,7 @@ class ElementwiseProblem(Problem):
 
                     # if it is just a float
                     if not isinstance(val, np.ndarray):
-                        val = val * np.ones((1, 1))
+                        val = np.full((1, 1), val)
                     # otherwise prepare the value to be stacked with each other by extending the dimension
                     else:
                         val = val[None, ...]
@@ -435,3 +378,89 @@ class ElementwiseProblem(Problem):
     @abstractmethod
     def _evaluate(self, x, out, *args, **kwargs):
         pass
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Util
+# ---------------------------------------------------------------------------------------------------------
+
+def default_return_values(has_constr=False):
+    vals = ["F"]
+    if has_constr:
+        vals.append("CV")
+    return vals
+
+
+def dict_with_none(keys):
+    out = {}
+    for val in keys:
+        out[val] = None
+    return out
+
+
+def out_to_ndarray(out):
+    for key, val in out.items():
+        if val is not None:
+            if not isinstance(val, np.ndarray):
+                out[key] = np.array([val])
+
+
+def out_to_2d_ndarray(out):
+    for key, val in out.items():
+        if val is not None:
+            if isinstance(val, np.ndarray):
+                if val.ndim == 1:
+                    out[key] = val[:, None]
+
+
+def out_to_1d_ndarray(out):
+    for key in out.keys():
+        if out[key] is not None:
+            out[key] = out[key][0, :]
+
+
+def calc_constr(G):
+    if G is None:
+        return None
+    elif G.ndim == 1 or G.shape[1] == 0:
+        return np.zeros(len(G))[:, None]
+    else:
+        return np.maximum(0, G).sum(axis=1)[:, None]
+
+
+def replace_nan_values(out, by=np.inf):
+    for key in out:
+        try:
+            v = out[key]
+            v[np.isnan(v)] = by
+            out[key] = v
+        except:
+            pass
+
+
+def check(problem, X, out):
+    elementwise = X.ndim == 1
+
+    # only used if not elementwise
+    n_evals = X.shape[0]
+
+    # the values from the output to be checked
+    F, dF, G, dG = out.get("F"), out.get("dF"), out.get("G"), out.get("dG")
+
+    if F is not None:
+        correct = tuple([problem.n_obj]) if elementwise else (n_evals, problem.n_obj)
+        assert F.shape == correct, f"Incorrect shape of F: {F.shape} != {correct} (provided != expected)"
+
+    if dF is not None:
+        correct = (problem.n_obj, problem.n_var) if elementwise else (n_evals, problem.n_obj, problem.n_var)
+        assert dF.shape == correct, f"Incorrect shape of dF: {dF.shape} != {correct} (provided != expected)"
+
+    if G is not None:
+        if problem.has_constraints():
+            correct = tuple([problem.n_constr]) if elementwise else (n_evals, problem.n_constr)
+            assert G.shape == correct, f"Incorrect shape of G: {G.shape} != {correct} (provided != expected)"
+
+    if dG is not None:
+        if problem.has_constraints():
+            correct = (problem.n_constr, problem.n_var) if elementwise else (n_evals, problem.n_constr, problem.n_var)
+            assert dG.shape == correct, f"Incorrect shape of dG: {dG.shape} != {correct} (provided != expected)"

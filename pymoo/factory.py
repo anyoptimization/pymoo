@@ -18,6 +18,7 @@ from pymoo.problems.single import *
 # =========================================================================================================
 
 
+
 def get_from_list(l, name, args, kwargs):
     i = None
 
@@ -347,6 +348,9 @@ def get_problem(name, *args, d={}, **kwargs):
     if name.startswith("go-"):
         from pymoo.vendor.global_opt import get_global_optimization_problem_options
         return get_from_list(get_global_optimization_problem_options(), name.lower(), args, {**d, **kwargs})
+    elif name.startswith("bbob-"):
+        from pymoo.vendor.vendor_coco import COCOProblem
+        return COCOProblem(name.lower(), **kwargs)
     else:
         return get_from_list(get_problem_options(), name.lower(), args, {**d, **kwargs})
 

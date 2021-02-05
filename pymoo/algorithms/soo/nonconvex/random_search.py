@@ -1,4 +1,5 @@
 from pymoo.model.algorithm import Algorithm
+from pymoo.model.population import Population
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
 from pymoo.util.display import SingleObjectiveDisplay
 
@@ -15,9 +16,10 @@ class RandomSearch(Algorithm):
         self.sampling = sampling
 
     def _initialize(self):
-        self._next()
+        return self._infill()
 
-    def _next(self):
-        pop = self.sampling.do(self.problem, self.n_points_per_iteration)
-        self.evaluator.eval(self.problem, pop, algorithm=self)
-        self.pop = pop
+    def _infill(self):
+        return self.sampling.do(self.problem, self.n_points_per_iteration)
+
+    def _advance(self, infills=None):
+        self.pop = infills if self.opt is None else Population.merge(self.pop, self.opt)

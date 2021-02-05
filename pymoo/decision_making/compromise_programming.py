@@ -11,8 +11,8 @@ class CompromiseProgramming(DecisionMaking):
     def _do(self, F, **kwargs):
 
         F, _, ideal_point, nadir_point = normalize(F,
-                                                   x_min=self.ideal_point,
-                                                   x_max=self.nadir_point,
+                                                   xl=self.ideal_point,
+                                                   xu=self.nadir_point,
                                                    estimate_bounds_if_none=True,
                                                    return_bounds=True)
 

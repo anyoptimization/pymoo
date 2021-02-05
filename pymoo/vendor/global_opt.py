@@ -1,8 +1,8 @@
-from pymoo.model.problem import Problem
+from pymoo.model.problem import ElementwiseProblem
 from pymoo.vendor.go_benchmark_functions import *
 
 
-class GlobalOptimizationProblem(Problem):
+class GlobalOptimizationProblem(ElementwiseProblem):
 
     def __init__(self, n_var=None, clazz=None, **kwargs):
         if clazz is None:
@@ -18,7 +18,6 @@ class GlobalOptimizationProblem(Problem):
                          n_constr=0,
                          xl=self.object.xmin,
                          xu=self.object.xmax,
-                         elementwise_evaluation=True,
                          **kwargs)
 
     def _calc_pareto_set(self, *args, **kwargs):

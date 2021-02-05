@@ -3,7 +3,6 @@ import numpy as np
 from pymoo.model.evaluator import Evaluator
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
-
 from pymoo.model.solution import Solution, SolutionSet
 from pymoo.problems.meta import MetaProblem
 
@@ -15,13 +14,15 @@ class NumericalDifferentiation(MetaProblem):
 
     def do(self, X, out, *args, **kwargs):
         self.problem.do(X, out, *args, **kwargs)
-        out["dF"] = NumericalDifferentiationUtil().do(self.problem, X, out["F"], return_values_of=["dF"])
+
+        if "dF" in out:
+            out["dF"] = NumericalDifferentiationUtil().do(self.problem, X, out["F"], return_values_of=["dF"])
 
 
 EPS = np.finfo(np.float32).eps
 
 
-class NumericalDifferentiationUtil(object):
+class NumericalDifferentiationUtil:
 
     def __init__(self, eps=None, jacobian=None, hessian=None):
         """

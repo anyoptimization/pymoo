@@ -31,7 +31,7 @@ class DesignSpaceToleranceTermination(SlidingWindowTermination):
 
         if X.dtype != np.object:
             if problem.xl is not None and problem.xu is not None:
-                X = normalize(X, x_min=problem.xl, x_max=problem.xu)
+                X = normalize(X, xl=problem.xl, xu=problem.xu)
             return X
 
     def _metric(self, data):

@@ -22,7 +22,6 @@ X = 5 * np.random.random((5, 2))
 problem = AutomaticDifferentiation(ElementwiseSphere())
 F, dF = problem.evaluate(X, return_values_of=["F", "dF"])
 
-
 problem = AutomaticDifferentiation(Sphere(n_var=2))
 _F, _dF = problem.evaluate(X, return_values_of=["F", "dF"])
 

@@ -23,11 +23,11 @@ class GoldenSectionSearch(BracketSearch):
         # create a population with all four individuals
         pop = Population.create(a, c, d, b)
 
-        # evaluate all the points
-        self.evaluator.eval(self.problem, pop, algorithm=self)
         self.pop, self.infill = pop, pop
 
-    def _next(self):
+        return pop
+
+    def step(self):
 
         # all the elements in the interval
         a, c, d, b = self.pop

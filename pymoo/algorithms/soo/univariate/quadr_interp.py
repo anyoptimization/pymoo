@@ -16,7 +16,6 @@ def quadr_interp(a, b, c):
 
 class QuadraticInterpolationSearch(BracketSearch):
 
-
     def __init__(self, a=None, b=None, **kwargs):
         """
 
@@ -45,7 +44,7 @@ class QuadraticInterpolationSearch(BracketSearch):
         self.evaluator.eval(self.problem, pop, algorithm=self)
         self.pop, self.infill = pop, pop
 
-    def _next(self):
+    def step(self):
 
         # all the elements in the interval
         a, b, c = self.pop

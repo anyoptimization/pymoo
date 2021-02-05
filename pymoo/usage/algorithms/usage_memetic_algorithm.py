@@ -4,7 +4,7 @@ from pymoo.model.population import Population
 
 class MemeticAlgorithm(GeneticAlgorithm):
 
-    def _next(self):
+    def step(self):
         # do the mating using the current population
         self.off = self._mating(self.pop)
 

@@ -79,16 +79,12 @@ class DE(GeneticAlgorithm):
 
         self.default_termination = SingleObjectiveDefaultTermination()
 
-    def _next(self):
-        # make a step and create the offsprings
-        self.off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
-        self.off.set("n_gen", self.n_gen)
+    def _infill(self):
+        return self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
 
-        # evaluate the offsprings
-        self.evaluator.eval(self.problem, self.off, algorithm=self)
-
-        # replace the individuals that have improved
-        self.pop = ImprovementReplacement().do(self.problem, self.pop, self.off)
+    def _advance(self, infills=None, **kwargs):
+        assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
+        self.pop = ImprovementReplacement().do(self.problem, self.pop, infills)
 
 
 # =========================================================================================================

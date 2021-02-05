@@ -203,6 +203,7 @@ class NicheGA(GA):
                          selection=selection,
                          survival=surv,
                          display=display,
+                         advance_after_initialization=True,
                          **kwargs)
 
         # self.default_termination = NicheTermination()

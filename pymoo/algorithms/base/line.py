@@ -2,7 +2,8 @@ import numpy as np
 
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.individual import Individual
-from pymoo.model.problem import MetaProblem
+from pymoo.operators.repair.to_bound import set_to_bounds_if_outside
+from pymoo.problems.meta import MetaProblem
 
 
 class LineSearch(Algorithm):
@@ -40,15 +41,21 @@ class LineSearch(Algorithm):
 
 class LineSearchProblem(MetaProblem):
 
-    def __init__(self, problem, point, direction, xl=0.0, xu=1.0):
+    def __init__(self, problem, point, direction, strict_bounds=True, xl=0.0, xu=np.inf):
         super().__init__(problem)
         self.n_var = 1
-        self.xl = np.array([xl])
-        self.xu = np.array([xu])
+        self.xl, self.xu = np.array([xl]), np.array([xu])
+
         self.point = point
         self.direction = direction
+        self.strict_bounds = strict_bounds
 
-    def _evaluate(self, x, out, *args, **kwargs):
-        _x = self.point + x * self.direction
-        out["__X__"] = _x
-        super()._evaluate(_x, out, *args, **kwargs)
+    def _evaluate(self, alpha, out, *args, **kwargs):
+        out["alpha"] = alpha
+
+        x = self.point.X + alpha * self.direction
+        if self.strict_bounds:
+            x = set_to_bounds_if_outside(x, self.problem.xl, self.problem.xu)
+        out["__X__"] = x
+
+        super()._evaluate(x, out, *args, **kwargs)

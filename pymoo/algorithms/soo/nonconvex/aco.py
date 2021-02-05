@@ -297,9 +297,9 @@ class ACO(Algorithm):
     def _initialize(self):
         self.evaluator = Evaluator(skip_already_evaluated=False) if self.evaluate_each_ant else MockEvaluator()
         self.opt = Population()
-        self._next()
+        self.step()
 
-    def _next(self):
+    def step(self):
 
         # initialize all ants to be used in this iteration
         ants = []

@@ -147,6 +147,7 @@ class NSGA2(GeneticAlgorithm):
                          eliminate_duplicates=eliminate_duplicates,
                          n_offsprings=n_offsprings,
                          display=display,
+                         advance_after_initialization=True,
                          **kwargs)
 
         self.tournament_type = 'comp_by_dom_and_crowding'

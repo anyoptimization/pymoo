@@ -72,47 +72,33 @@ class GeneticAlgorithm(Algorithm):
         self.off = None
 
     def _initialize(self):
-
-        # create the initial population
         pop = self.initialization.do(self.problem, self.pop_size, algorithm=self)
         pop.set("n_gen", self.n_gen)
+        return pop
 
-        # then evaluate using the objective function
-        self.evaluator.eval(self.problem, pop, algorithm=self)
-
-        # that call is a dummy survival to set attributes that are necessary for the mating selection
-        if self.survival:
-            pop = self.survival.do(self.problem, pop, len(pop), algorithm=self,
-                                   n_min_infeas_survive=self.min_infeas_pop_size)
-
-        self.pop, self.off = pop, pop
-
-    def _next(self):
+    def _infill(self):
 
         # do the mating using the current population
-        self.off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
-        self.off.set("n_gen", self.n_gen)
+        off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
 
         # if the mating could not generate any new offspring (duplicate elimination might make that happen)
-        if len(self.off) == 0:
+        if len(off) == 0:
             self.termination.force_termination = True
             return
 
         # if not the desired number of offspring could be created
-        elif len(self.off) < self.n_offsprings:
+        elif len(off) < self.n_offsprings:
             if self.verbose:
                 print("WARNING: Mating could not produce the required number of (unique) offsprings!")
 
-        # evaluate the offspring
-        self.evaluator.eval(self.problem, self.off, algorithm=self)
+        return off
+
+    def _advance(self, infills=None, **kwargs):
+        assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
 
         # merge the offsprings with the current population
-        self.pop = Population.merge(self.pop, self.off)
+        self.pop = Population.merge(self.pop, infills)
 
-        # the do survival selection
-        if self.survival:
-            self.pop = self.survival.do(self.problem, self.pop, self.pop_size, algorithm=self,
-                                        n_min_infeas_survive=self.min_infeas_pop_size)
-
-    def _finalize(self):
-        pass
+        # execute the survival to find the fittest solutions
+        self.pop = self.survival.do(self.problem, self.pop, n_survive=self.pop_size, algorithm=self,
+                                    n_min_infeas_survive=self.min_infeas_pop_size)
