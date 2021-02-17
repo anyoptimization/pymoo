@@ -1,4 +1,4 @@
-from pymoo.performance_indicator.distance_indicator import DistanceIndicator, euclidean_distance, modified_distance
+from pymoo.performance_indicator.distance_indicator import DistanceIndicator, modified_distance
 
 
 class IGDPlus(DistanceIndicator):

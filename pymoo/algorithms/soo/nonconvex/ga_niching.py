@@ -99,7 +99,7 @@ class EpsilonClearingSurvival(Survival):
             raise ValueError("FitnessSurvival can only used for single objective single!")
 
         # this basically sorts the population by constraint and objective value
-        pop = FitnessSurvival().do(problem, pop, len(pop))
+        pop = FitnessSurvival().do(problem, pop, n_survive=len(pop))
 
         # calculate the distance from each individual to another - pre-processing for the clearing
         # NOTE: the distance is normalized by the maximum distance possible

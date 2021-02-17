@@ -1,7 +1,8 @@
 import numpy as np
 
 from pymoo.model.problem import Problem
-from pymoo.problems.many import generic_sphere
+from pymoo.problems.many import generic_sphere, get_ref_dirs
+from pymoo.util.function_loader import load_function
 from pymoo.util.misc import powerset
 
 
@@ -11,12 +12,12 @@ class WFG(Problem):
         super().__init__(n_var=n_var,
                          n_obj=n_obj,
                          n_constr=0,
-                         xl=0,
-                         xu=2 * np.arange(1, n_var + 1),
+                         xl=0.0,
+                         xu=2 * np.arange(1, n_var + 1).astype(np.float),
                          type_var=np.double,
                          **kwargs)
 
-        self.S = np.arange(2, 2 * self.n_obj + 1, 2)
+        self.S = np.arange(2, 2 * self.n_obj + 1, 2).astype(np.float)
         self.A = np.ones(self.n_obj - 1)
 
         if k:
@@ -62,20 +63,40 @@ class WFG(Problem):
         X = np.column_stack([K, suffix])
         return X * self.xu
 
-    def _calc_pareto_set(self, n_pareto_points=500, *args, **kwargs):
+    def _calc_pareto_set_extremes(self):
         ps = np.ones((2 ** self.k, self.k))
         for i, s in enumerate(powerset(np.arange(self.k))):
             ps[i, s] = 0
+        return self._positional_to_optimal(ps)
 
-        rnd = self._rand_optimal_position(n_pareto_points - len(ps))
-        ps = np.row_stack([ps, rnd])
-        ps = self._positional_to_optimal(ps)
-        return ps
+    def _calc_pareto_set_interior(self, n_points):
+        return self._positional_to_optimal(self._rand_optimal_position(n_points))
 
-    def _calc_pareto_front(self, *args, **kwargs):
-        # ps = self.pareto_set(n_pareto_points=n_pareto_points)
-        # return self.evaluate(ps, return_values_of=["F"])
-        return None
+    def _calc_pareto_set(self, n_points=500, *args, **kwargs):
+        extremes = self._calc_pareto_set_extremes()
+        interior = self._calc_pareto_set_interior(n_points - len(extremes))
+        return np.row_stack([extremes, interior])
+
+    def _calc_pareto_front(self, ref_dirs=None, n_iterations=200, points_each_iteration=200, *args, **kwargs):
+        pf = self.evaluate(self._calc_pareto_set_extremes(), return_values_of=["F"])
+
+        if ref_dirs is None:
+            ref_dirs = get_ref_dirs(self.n_obj)
+
+        for k in range(n_iterations):
+            _pf = self.evaluate(self._calc_pareto_set_interior(points_each_iteration), return_values_of=["F"])
+            pf = np.row_stack([pf, _pf])
+
+            ideal, nadir = pf.min(axis=0), pf.max(axis=0)
+
+            N = (pf - ideal) / (nadir-ideal)
+            dist_matrix = load_function("calc_perpendicular_distance")(N, ref_dirs)
+
+            closest = np.argmin(dist_matrix, axis=0)
+            pf = pf[closest]
+
+        pf = pf[np.lexsort(pf.T[::-1])]
+        return pf
 
 
 class WFG1(WFG):
@@ -191,8 +212,10 @@ class WFG3(WFG):
 
         out["F"] = self._calculate(y, self.S, h)
 
-        # from optproblems.wfg import WFG3 as WFG3opt
-        # out["F"] =  np.array([WFG3opt(self.n_obj, self.n_var, self.k).objective_function(_x) for _x in x])
+    # def _calc_pareto_front(self, ref_dirs=None):
+    #     if ref_dirs is None:
+    #         ref_dirs = get_ref_dirs(self.n_obj)
+    #     return ref_dirs * self.S
 
 
 class WFG4(WFG):
@@ -218,8 +241,10 @@ class WFG4(WFG):
 
         out["F"] = self._calculate(y, self.S, h)
 
-    def _calc_pareto_front(self, ref_dirs):
-        return generic_sphere(ref_dirs) * self.S
+    # def _calc_pareto_front(self, ref_dirs=None):
+    #     if ref_dirs is None:
+    #         ref_dirs = get_ref_dirs(self.n_obj)
+    #     return generic_sphere(ref_dirs) * self.S
 
 
 class WFG5(WFG):
@@ -238,8 +263,10 @@ class WFG5(WFG):
 
         out["F"] = self._calculate(y, self.S, h)
 
-    def _calc_pareto_front(self, ref_dirs):
-        return generic_sphere(ref_dirs) * self.S
+    # def _calc_pareto_front(self, ref_dirs=None):
+    #     if ref_dirs is None:
+    #         ref_dirs = get_ref_dirs(self.n_obj)
+    #     return generic_sphere(ref_dirs) * self.S
 
 
 class WFG6(WFG):
@@ -261,8 +288,10 @@ class WFG6(WFG):
 
         out["F"] = self._calculate(y, self.S, h)
 
-    def _calc_pareto_front(self, ref_dirs):
-        return generic_sphere(ref_dirs) * self.S
+    # def _calc_pareto_front(self, ref_dirs=None):
+    #     if ref_dirs is None:
+    #         ref_dirs = get_ref_dirs(self.n_obj)
+    #     return generic_sphere(ref_dirs) * self.S
 
 
 class WFG7(WFG):
@@ -285,8 +314,10 @@ class WFG7(WFG):
 
         out["F"] = self._calculate(y, self.S, h)
 
-    def _calc_pareto_front(self, ref_dirs):
-        return generic_sphere(ref_dirs) * self.S
+    # def _calc_pareto_front(self, ref_dirs=None):
+    #     if ref_dirs is None:
+    #         ref_dirs = get_ref_dirs(self.n_obj)
+    #     return generic_sphere(ref_dirs) * self.S
 
 
 class WFG8(WFG):
@@ -309,9 +340,6 @@ class WFG8(WFG):
         h = [_shape_concave(y[:, :-1], m + 1) for m in range(self.n_obj)]
 
         out["F"] = self._calculate(y, self.S, h)
-
-    def _calc_pareto_front(self, ref_dirs):
-        return generic_sphere(ref_dirs) * self.S
 
     def _positional_to_optimal(self, K):
         k, l = self.k, self.l
@@ -361,9 +389,6 @@ class WFG9(WFG):
 
         out["F"] = self._calculate(y, self.S, h)
 
-    def _calc_pareto_front(self, ref_dirs):
-        return generic_sphere(ref_dirs) * self.S
-
     def _positional_to_optimal(self, K):
         k, l = self.k, self.l
 
@@ -378,6 +403,11 @@ class WFG9(WFG):
 
         ret = X * (2 * (np.arange(self.n_var) + 1))
         return ret
+
+    def _calc_pareto_front(self, ref_dirs=None):
+        if ref_dirs is None:
+            ref_dirs = get_ref_dirs(self.n_obj)
+        return generic_sphere(ref_dirs) * self.S
 
 
 # ---------------------------------------------------------------------------------------------------------

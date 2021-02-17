@@ -24,6 +24,7 @@ from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 class DE(GeneticAlgorithm):
     def __init__(self,
                  pop_size=100,
+                 n_offsprings=100,
                  sampling=LatinHypercubeSampling(),
                  variant="DE/rand/1/bin",
                  CR=0.5,
@@ -71,6 +72,7 @@ class DE(GeneticAlgorithm):
                                              jitter=jitter)
 
         super().__init__(pop_size=pop_size,
+                         n_offsprings=n_offsprings,
                          sampling=sampling,
                          mating=mating,
                          survival=None,
@@ -80,11 +82,17 @@ class DE(GeneticAlgorithm):
         self.default_termination = SingleObjectiveDefaultTermination()
 
     def _infill(self):
-        return self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
+        infills = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
+        if len(self.pop) != len(infills):
+            self.indices = np.random.permutation(len(self.pop))[:len(infills)]
+        else:
+            self.indices = np.arange(len(self.pop))
+
+        return infills
 
     def _advance(self, infills=None, **kwargs):
         assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
-        self.pop = ImprovementReplacement().do(self.problem, self.pop, infills)
+        self.pop[self.indices] = ImprovementReplacement().do(self.problem, self.pop[self.indices], infills)
 
 
 # =========================================================================================================

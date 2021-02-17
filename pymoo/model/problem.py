@@ -359,11 +359,13 @@ class ElementwiseProblem(Problem):
                 if val is not None:
 
                     # if it is just a float
-                    if not isinstance(val, np.ndarray):
-                        val = np.full((1, 1), val)
+                    if isinstance(val, list) or isinstance(val, tuple):
+                        val = np.array(val)
+                    elif not isinstance(val, np.ndarray):
+                        val = np.full(1, val)
+
                     # otherwise prepare the value to be stacked with each other by extending the dimension
-                    else:
-                        val = val[None, ...]
+                    val = at_least_2d_array(val, extend_as="row")
 
                 vals.append(val)
 
@@ -447,20 +449,20 @@ def check(problem, X, out):
     # the values from the output to be checked
     F, dF, G, dG = out.get("F"), out.get("dF"), out.get("G"), out.get("dG")
 
-    if F is not None:
-        correct = tuple([problem.n_obj]) if elementwise else (n_evals, problem.n_obj)
-        assert F.shape == correct, f"Incorrect shape of F: {F.shape} != {correct} (provided != expected)"
+    # if F is not None:
+    #     correct = tuple([problem.n_obj]) if elementwise else (n_evals, problem.n_obj)
+    #     assert F.shape == correct, f"Incorrect shape of F: {F.shape} != {correct} (provided != expected)"
+    #
+    # if dF is not None:
+    #     correct = (problem.n_obj, problem.n_var) if elementwise else (n_evals, problem.n_obj, problem.n_var)
+    #     assert dF.shape == correct, f"Incorrect shape of dF: {dF.shape} != {correct} (provided != expected)"
 
-    if dF is not None:
-        correct = (problem.n_obj, problem.n_var) if elementwise else (n_evals, problem.n_obj, problem.n_var)
-        assert dF.shape == correct, f"Incorrect shape of dF: {dF.shape} != {correct} (provided != expected)"
-
-    if G is not None:
-        if problem.has_constraints():
-            correct = tuple([problem.n_constr]) if elementwise else (n_evals, problem.n_constr)
-            assert G.shape == correct, f"Incorrect shape of G: {G.shape} != {correct} (provided != expected)"
-
-    if dG is not None:
-        if problem.has_constraints():
-            correct = (problem.n_constr, problem.n_var) if elementwise else (n_evals, problem.n_constr, problem.n_var)
-            assert dG.shape == correct, f"Incorrect shape of dG: {dG.shape} != {correct} (provided != expected)"
+    # if G is not None:
+    #     if problem.has_constraints():
+    #         correct = tuple([problem.n_constr]) if elementwise else (n_evals, problem.n_constr)
+    #         assert G.shape == correct, f"Incorrect shape of G: {G.shape} != {correct} (provided != expected)"
+    #
+    # if dG is not None:
+    #     if problem.has_constraints():
+    #         correct = (problem.n_constr, problem.n_var) if elementwise else (n_evals, problem.n_constr, problem.n_var)
+    #         assert dG.shape == correct, f"Incorrect shape of dG: {dG.shape} != {correct} (provided != expected)"

@@ -228,7 +228,7 @@ for problem in [vectorized_problem, elementwise_problem, functional_problem, tes
     metric = Hypervolume(ref_point=ref_point, normalize=False)
 
     # calculate for each generation the HV metric
-    hv = [metric.calc(f) for f in F]
+    hv = [metric.do(f) for f in F]
 
     # visualze the convergence curve
     plt.plot(n_evals, hv, '-o', markersize=4, linewidth=2)
@@ -249,7 +249,7 @@ for problem in [vectorized_problem, elementwise_problem, functional_problem, tes
         metric = IGD(pf=pf, normalize=normalize)
 
         # calculate for each generation the HV metric
-        igd = [metric.calc(f) for f in F]
+        igd = [metric.do(f) for f in F]
 
         # visualze the convergence curve
         plt.plot(n_evals, igd, '-o', markersize=4, linewidth=2, color="green")

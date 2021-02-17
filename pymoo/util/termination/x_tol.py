@@ -36,7 +36,7 @@ class DesignSpaceToleranceTermination(SlidingWindowTermination):
 
     def _metric(self, data):
         last, current = data[-2], data[-1]
-        return IGD(current).calc(last)
+        return IGD(current).do(last)
 
     def _decide(self, metrics):
         return to_numpy(metrics).mean() > self.tol

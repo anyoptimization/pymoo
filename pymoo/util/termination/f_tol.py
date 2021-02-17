@@ -2,7 +2,6 @@ import numpy as np
 
 from pymoo.performance_indicator.hv import Hypervolume
 from pymoo.performance_indicator.igd import IGD
-from pymoo.performance_indicator.igd_plus import IGDPlus
 from pymoo.util.normalization import normalize
 from pymoo.util.termination.sliding_window_termination import SlidingWindowTermination
 
@@ -66,7 +65,7 @@ class MultiObjectiveSpaceToleranceTermination(SlidingWindowTermination):
         l_N = normalize(last["F"], c_ideal, c_nadir)
 
         # calculate IGD from one to another
-        delta_f = IGD(c_N).calc(l_N)
+        delta_f = IGD(c_N).do(l_N)
 
         return {
             "delta_ideal": delta_ideal,
@@ -116,13 +115,12 @@ class MultiObjectiveSpaceToleranceTerminationWithRenormalization(MultiObjectiveS
         if self.all_to_current:
             c_N = normalize(c_F, c_ideal, c_nadir)
             if self.perf_indicator == "igd":
-                delta_f = [IGD(c_N).calc(N[k]) for k in range(len(N))]
+                delta_f = [IGD(c_N).do(N[k]) for k in range(len(N))]
             elif self.perf_indicator == "hv":
-                # delta_f = [IGDPlus(c_N).calc(N[k]) for k in range(len(N))]
                 hv = Hypervolume(ref_point=np.ones(c_F.shape[1]))
-                delta_f = [hv.calc(N[k]) for k in range(len(N))]
+                delta_f = [hv.do(N[k]) for k in range(len(N))]
         else:
-            delta_f = [IGD(N[k + 1]).calc(N[k]) for k in range(len(N) - 1)]
+            delta_f = [IGD(N[k + 1]).do(N[k]) for k in range(len(N) - 1)]
 
         ret["delta_f"] = delta_f
 

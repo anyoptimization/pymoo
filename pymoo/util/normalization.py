@@ -2,9 +2,6 @@ from abc import abstractmethod
 
 import numpy as np
 
-from pymoo.util.misc import logical_op, replace_nan_by
-
-
 # ---------------------------------------------------------------------------------------------------------
 # Object Oriented Interface
 # ---------------------------------------------------------------------------------------------------------
@@ -68,7 +65,7 @@ class ZeroToOneNormalization(Normalization):
         self.range_is_zero = range_is_zero
 
     def forward(self, X):
-        if self.disabled:
+        if X is None or self.disabled:
             return X
 
         xl, xu, _range, ignore, range_is_zero = self.xl, self.xu, self._range, self.ignore, self.range_is_zero
@@ -103,7 +100,6 @@ class ZeroToOneNormalization(Normalization):
 
 
 def normalize(x, xl=None, xu=None, return_bounds=False, estimate_bounds_if_none=True):
-
     if estimate_bounds_if_none:
         if xl is None:
             xl = np.min(x, axis=0)
@@ -138,3 +134,32 @@ def standardize(x, return_bounds=False):
 
 def destandardize(x, mean, std):
     return (x * std) + mean
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Pre Normalization
+# A class inheriting from it can use the in-built feature of normalizing
+# ---------------------------------------------------------------------------------------------------------
+
+
+class PreNormalization:
+
+    def __init__(self, zero_to_one=False, ideal=None, nadir=None, **kwargs):
+
+        # normalization related stuff if that should be performed beforehand
+        self.ideal, self.nadir = ideal, nadir
+
+        if zero_to_one:
+            assert self.ideal is not None and self.nadir is not None, "For normalization either provide pf or bounds!"
+
+            n_dim = len(self.ideal)
+            self.normalization = ZeroToOneNormalization(self.ideal, self.nadir)
+
+            # now the ideal and nadir points have change to only zeros and ones
+            self.ideal, self.nadir = np.zeros(n_dim), np.ones(n_dim)
+
+        else:
+            self.normalization = NoNormalization()
+
+    def do(self, *args, **kwargs):
+        pass
