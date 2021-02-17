@@ -11,7 +11,7 @@ from pymoo.model.sampling import Sampling
 
 
 def parameter_less(F, CV, fmax=None, inplace=False):
-    assert F.shape == CV.shape
+    assert len(F) == len(CV)
 
     if not inplace:
         F = np.copy(F)
@@ -21,8 +21,8 @@ def parameter_less(F, CV, fmax=None, inplace=False):
 
     param_less = fmax + CV
 
-    infeas = (CV > 0)
-    F[..., infeas] = param_less[..., infeas]
+    infeas = (CV > 0).flatten()
+    F[infeas] = param_less[infeas]
 
     return F
 
@@ -204,7 +204,9 @@ def find_duplicates(X, epsilon=1e-16):
 
 
 def at_least_2d_array(x, extend_as="row", return_if_reshaped=False):
-    if not isinstance(x, np.ndarray):
+    if x is None:
+        return x
+    elif not isinstance(x, np.ndarray):
         x = np.array([x])
 
     has_been_reshaped = False

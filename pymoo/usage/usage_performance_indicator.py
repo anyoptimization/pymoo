@@ -20,7 +20,7 @@ Scatter(legend=True).add(pf, label="Pareto-front").add(A, label="Result").show()
 from pymoo.factory import get_performance_indicator
 
 gd = get_performance_indicator("gd", pf)
-print("GD", gd.calc(A))
+print("GD", gd.do(A))
 # END gd
 
 
@@ -29,7 +29,7 @@ print("GD", gd.calc(A))
 from pymoo.factory import get_performance_indicator
 
 gd_plus = get_performance_indicator("gd+", pf)
-print("GD+", gd_plus.calc(A))
+print("GD+", gd_plus.do(A))
 # END gd_plus
 
 
@@ -37,7 +37,7 @@ print("GD+", gd_plus.calc(A))
 from pymoo.factory import get_performance_indicator
 
 igd = get_performance_indicator("igd", pf)
-print("IGD", igd.calc(A))
+print("IGD", igd.do(A))
 # END igd
 
 
@@ -46,7 +46,7 @@ print("IGD", igd.calc(A))
 from pymoo.factory import get_performance_indicator
 
 igd_plus = get_performance_indicator("igd+", pf)
-print("IGD+", igd_plus.calc(A))
+print("IGD+", igd_plus.do(A))
 # END igd_plus
 
 
@@ -55,5 +55,5 @@ import numpy as np
 from pymoo.factory import get_performance_indicator
 
 hv = get_performance_indicator("hv", ref_point=np.array([1.2, 1.2]))
-print("hv", hv.calc(A))
+print("hv", hv.do(A))
 # END hv

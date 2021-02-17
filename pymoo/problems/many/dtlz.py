@@ -2,6 +2,7 @@ import autograd.numpy as anp
 
 from pymoo.model.problem import Problem
 from pymoo.problems.util import load_pareto_front_from_file
+from pymoo.util.reference_direction import UniformReferenceDirectionFactory
 
 
 class DTLZ(Problem):
@@ -38,15 +39,13 @@ class DTLZ(Problem):
         return f
 
 
-def generic_sphere(ref_dirs):
-    return ref_dirs / anp.tile(anp.linalg.norm(ref_dirs, axis=1)[:, None], (1, ref_dirs.shape[1]))
-
-
 class DTLZ1(DTLZ):
     def __init__(self, n_var=7, n_obj=3, **kwargs):
         super().__init__(n_var, n_obj, **kwargs)
 
     def _calc_pareto_front(self, ref_dirs=None):
+        if ref_dirs is None:
+            ref_dirs = get_ref_dirs(self.n_obj)
         return 0.5 * ref_dirs
 
     def obj_func(self, X_, g):
@@ -71,7 +70,9 @@ class DTLZ2(DTLZ):
     def __init__(self, n_var=10, n_obj=3, **kwargs):
         super().__init__(n_var, n_obj, **kwargs)
 
-    def _calc_pareto_front(self, ref_dirs):
+    def _calc_pareto_front(self, ref_dirs=None):
+        if ref_dirs is None:
+            ref_dirs = get_ref_dirs(self.n_obj)
         return generic_sphere(ref_dirs)
 
     def _evaluate(self, x, out, *args, **kwargs):
@@ -84,7 +85,9 @@ class DTLZ3(DTLZ):
     def __init__(self, n_var=10, n_obj=3, **kwargs):
         super().__init__(n_var, n_obj, **kwargs)
 
-    def _calc_pareto_front(self, ref_dirs):
+    def _calc_pareto_front(self, ref_dirs=None):
+        if ref_dirs is None:
+            ref_dirs = get_ref_dirs(self.n_obj)
         return generic_sphere(ref_dirs)
 
     def _evaluate(self, x, out, *args, **kwargs):
@@ -99,7 +102,9 @@ class DTLZ4(DTLZ):
         self.alpha = alpha
         self.d = d
 
-    def _calc_pareto_front(self, ref_dirs):
+    def _calc_pareto_front(self, ref_dirs=None):
+        if ref_dirs is None:
+            ref_dirs = get_ref_dirs(self.n_obj)
         return generic_sphere(ref_dirs)
 
     def _evaluate(self, x, out, *args, **kwargs):
@@ -242,3 +247,17 @@ class ConvexDTLZ4(ConvexProblem):
 
     def __init__(self, n_var=10, n_obj=3, **kwargs):
         super().__init__(DTLZ4(n_var=n_var, n_obj=n_obj, **kwargs))
+
+
+def generic_sphere(ref_dirs):
+    return ref_dirs / anp.tile(anp.linalg.norm(ref_dirs, axis=1)[:, None], (1, ref_dirs.shape[1]))
+
+
+def get_ref_dirs(n_obj):
+    if n_obj == 2:
+        ref_dirs = UniformReferenceDirectionFactory(2, n_points=100).do()
+    elif n_obj == 3:
+        ref_dirs = UniformReferenceDirectionFactory(3, n_partitions=15).do()
+    else:
+        raise Exception("Please provide reference directions for more than 3 objectives!")
+    return ref_dirs

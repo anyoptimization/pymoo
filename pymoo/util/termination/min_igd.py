@@ -14,5 +14,5 @@ class IGDTermination(Termination):
 
     def _do_continue(self, algorithm):
         F = algorithm.opt.get("F")
-        return self.perf.calc(F) > self.min_igd
+        return self.perf.do(F) > self.min_igd
 

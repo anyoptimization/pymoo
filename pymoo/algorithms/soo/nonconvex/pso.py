@@ -12,7 +12,6 @@ from pymoo.operators.repair.to_bound import set_to_bounds_if_outside
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.misc import norm_eucl_dist
-from pymoo.util.optimum import filter_optimum
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 from pymoo.visualization.fitness_landscape import FitnessLandscape
 from pymoo.visualization.video.callback_video import AnimationCallback
@@ -25,10 +24,7 @@ from pymoo.visualization.video.callback_video import AnimationCallback
 class PSODisplay(SingleObjectiveDisplay):
 
     def _do(self, problem, evaluator, algorithm):
-        pop = algorithm.pop
-        algorithm.pop = algorithm.pbest
         super()._do(problem, evaluator, algorithm)
-        algorithm.pop = pop
 
         if algorithm.adaptive:
             self.output.append("f", algorithm.f if algorithm.f is not None else "-", width=8)
@@ -162,8 +158,7 @@ class PSO(Algorithm):
         self.c1 = c1
         self.c2 = c2
 
-        self.V = None
-        self.pbest = None
+        self.particles = None
         self.sbest = None
 
     def _setup(self, problem, **kwargs):
@@ -174,25 +169,26 @@ class PSO(Algorithm):
         return self.initialization.do(self.problem, self.pop_size, algorithm=self)
 
     def _post_initialize(self):
-        pop = self.pop
+        pbest = self.pop
 
+        particles = pbest.copy()
         if self.initial_velocity == "random":
-            init_V = np.random.random((len(pop), self.problem.n_var)) * self.V_max[None, :]
+            init_V = np.random.random((len(particles), self.problem.n_var)) * self.V_max[None, :]
         elif self.initial_velocity == "zero":
-            init_V = np.zeros((len(pop), self.problem.n_var))
+            init_V = np.zeros((len(particles), self.problem.n_var))
 
-        pop.set("V", init_V)
-        self.pbest = pop.copy()
+        particles.set("V", init_V)
+        self.particles = particles
 
         # after that do all the other initializations
         super()._post_initialize()
 
     def _infill(self):
-        pop = self.pop
-        X, F, V = pop.get("X", "F", "V")
+        particles = self.particles
+        X, F, V = particles.get("X", "F", "V")
 
         # get the personal best of each particle
-        pbest = self.pbest
+        pbest = self.pop
         P_X, P_F = pbest.get("X", "F")
 
         # get the best for each solution - could be global or local or something else - (here: Global)
@@ -203,8 +199,8 @@ class PSO(Algorithm):
         inerta = self.w * V
 
         # calculate random values for the updates
-        r1 = np.random.random((len(pop), self.problem.n_var))
-        r2 = np.random.random((len(pop), self.problem.n_var))
+        r1 = np.random.random((len(particles), self.problem.n_var))
+        r2 = np.random.random((len(particles), self.problem.n_var))
 
         cognitive = self.c1 * r1 * (P_X - X)
         social = self.c2 * r2 * (G_X - X)
@@ -235,13 +231,13 @@ class PSO(Algorithm):
         assert infills is not None, "This algorithms uses the AskAndTell interface thus 'infills' must to be provided."
 
         # set the new population to be equal to the offsprings
-        self.pop = infills
+        self.particles = infills
 
         # if an offspring has improved the personal store that index
-        has_improved = ImprovementReplacement().do(self.problem, self.pbest, infills, return_indices=True)
+        has_improved = ImprovementReplacement().do(self.problem, self.pop, infills, return_indices=True)
 
         # set the personal best which have been improved
-        self.pbest[has_improved] = infills[has_improved].copy()
+        self.pop[has_improved] = infills[has_improved].copy()
 
         if self.adaptive:
             self._adapt()
@@ -298,9 +294,6 @@ class PSO(Algorithm):
         self.c2 = c2
         self.w = w
 
-    def _set_optimum(self, force=False):
-        self.opt = filter_optimum(self.pbest, least_infeasible=True)
-
 
 # =========================================================================================================
 # Animation
@@ -313,6 +306,7 @@ class PSOAnimation(AnimationCallback):
                  n_samples_for_surface=200,
                  dpi=200,
                  **kwargs):
+
         super().__init__(nth_gen=nth_gen, dpi=dpi, **kwargs)
         self.n_samples_for_surface = n_samples_for_surface
         self.last_pop = None
@@ -332,9 +326,9 @@ class PSOAnimation(AnimationCallback):
                          close_on_destroy=False).do()
 
         # get the population
-        off = algorithm.pop
-        pop = algorithm.pop if self.last_pop is None else self.last_pop
-        pbest = Population.create(*off.get("pbest"))
+        off = algorithm.particles
+        pop = algorithm.particles if self.last_pop is None else self.last_pop
+        pbest = algorithm.pop
 
         for i in range(len(pop)):
             plt.plot([off[i].X[0], pop[i].X[0]], [off[i].X[1], pop[i].X[1]], color="blue", alpha=0.5)

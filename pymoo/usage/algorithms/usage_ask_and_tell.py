@@ -18,6 +18,6 @@ for k in range(200):
     algorithm.evaluator.eval(problem, pop)
 
     interface.tell(pop)
-    print(k + 1, IGD(pf).calc(algorithm.opt.get("F")))
+    print(k + 1, IGD(pf).do(algorithm.opt.get("F")))
 
 print(algorithm.opt.get("F"))
