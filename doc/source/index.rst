@@ -69,12 +69,12 @@ getting started guide:
   }
   </style>
   <div>
-  
+
 
 .. image:: resources/images/getting_started.svg
    :name: pymoo-banner
    :target: getting_started.html
-   :width: 40%
+   :width: 250px
    :alt: Getting Started
    :align: left
    
@@ -190,7 +190,7 @@ Content
 
    news
    installation
-   getting_started.ipynb
+   getting_started/index.ipynb
    interface/index.ipynb
    problems/index.ipynb
    algorithms/index.ipynb

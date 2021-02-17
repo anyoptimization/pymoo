@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.model.decision_making import DecisionMaking, normalize
+from pymoo.model.decision_making import DecisionMaking
 
 
 class PseudoWeights(DecisionMaking):
@@ -10,13 +10,15 @@ class PseudoWeights(DecisionMaking):
         self.weights = weights
 
     def _do(self, F, return_pseudo_weights=False, **kwargs):
+        ideal, nadir = self.ideal, self.nadir
 
-        # here the normalized values are ignored but the ideal and nadir points are estimated to calculate trade-off
-        _, norm, ideal_point, nadir_point = normalize(F, self.ideal_point, self.nadir_point,
-                                                      estimate_bounds_if_none=True, return_bounds=True)
+        if ideal is None:
+            ideal = F.min(axis=0)
+        if nadir is None:
+            nadir = F.max(axis=0)
 
         # normalized distance to the worst solution
-        pseudo_weights = ((nadir_point - F) / norm)
+        pseudo_weights = ((nadir - F) / (nadir - ideal))
 
         # normalize weights to sum up to one
         pseudo_weights = pseudo_weights / np.sum(pseudo_weights, axis=1)[:, None]
@@ -28,6 +30,3 @@ class PseudoWeights(DecisionMaking):
             return I, pseudo_weights
         else:
             return I
-
-
-

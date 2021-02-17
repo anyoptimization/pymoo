@@ -205,6 +205,7 @@ class Algorithm:
         return self
 
     def initialize(self, pop=None):
+
         # hook mostly used by the class to happen before even to initialize
         self._pre_initialize()
 
@@ -410,7 +411,6 @@ class Algorithm:
 
             self.history, self.callback = _hist, _callback
             self.history.append(obj)
-
 
     # =========================================================================================================
     # TO BE OVERWRITTEN

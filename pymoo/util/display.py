@@ -167,9 +167,9 @@ class MultiObjectiveDisplay(Display):
             igd, gd, hv = "-", "-", "-"
             if len(feasible) > 0:
                 _F = algorithm.opt.get("F")
-                igd, gd = IGD(self.pf).calc(_F), GD(self.pf).calc(_F)
+                igd, gd = IGD(self.pf, zero_to_one=True).do(_F), GD(self.pf, zero_to_one=True).do(_F)
                 if problem.n_obj == 2:
-                    hv = Hypervolume(pf=self.pf).calc(_F)
+                    hv = Hypervolume(pf=self.pf, zero_to_one=True).do(_F)
 
             self.output.extend(*[('igd', igd), ('gd', gd)])
             if problem.n_obj == 2:

@@ -115,7 +115,7 @@ class RMetric(Indicator):
         filtered_matrix = pop[np.where(centeroid_matrix < range / 2), :][0]
         return filtered_matrix
 
-    def calc(self, F, others=None, calc_hv=True):
+    def do(self, F, others=None, calc_hv=True):
         """
 
         This method calculates the R-IGD and R-HV based off of the values provided.
@@ -184,7 +184,7 @@ class RMetric(Indicator):
         if len(translated) > 0:
 
             # IGD Computation
-            rigd = IGD(final_PF).calc(translated)
+            rigd = IGD(final_PF).do(translated)
 
             nadir_point = np.amax(self.w_points, axis=0)
             front = translated
@@ -192,7 +192,7 @@ class RMetric(Indicator):
             if calc_hv:
                 if dim <= 3:
                     try:
-                        rhv = Hypervolume(ref_point=nadir_point).calc(front)
+                        rhv = Hypervolume(ref_point=nadir_point).do(front)
                     except:
                         pass
 

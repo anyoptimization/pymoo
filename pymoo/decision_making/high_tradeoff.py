@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.model.decision_making import DecisionMaking, normalize, find_outliers_upper_tail, NeighborFinder
+from pymoo.model.decision_making import DecisionMaking, find_outliers_upper_tail, NeighborFinder
 
 
 class HighTradeoffPoints(DecisionMaking):
@@ -11,9 +11,6 @@ class HighTradeoffPoints(DecisionMaking):
 
     def _do(self, F, **kwargs):
         n, m = F.shape
-
-        if self.normalize:
-            F = normalize(F, self.ideal_point, self.nadir_point, estimate_bounds_if_none=True)
 
         neighbors_finder = NeighborFinder(F, epsilon=0.125, n_min_neigbors="auto", consider_2d=False)
 

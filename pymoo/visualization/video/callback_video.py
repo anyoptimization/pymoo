@@ -7,11 +7,11 @@ class AnimationCallback(Callback):
 
     def __init__(self,
                  do_show=False,
-                 do_close=False,
+                 do_close=True,
                  nth_gen=1,
-                 fname=None,
                  dpi=None,
                  video=None,
+                 fname=None,
                  exception_if_not_applicable=True):
 
         super().__init__()

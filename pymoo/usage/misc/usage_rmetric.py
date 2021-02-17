@@ -15,7 +15,7 @@ class MyCallback(Callback):
 
     def notify(self, algorithm):
         rmetric = RMetric(algorithm.problem, ref_points)
-        rigd, rhv = rmetric.calc(algorithm.opt.get("F"))
+        rigd, rhv = rmetric.do(algorithm.opt.get("F"))
         print(f"R-IGD: {rigd}, R-HV: {rhv}")
 
 
@@ -37,5 +37,5 @@ res = minimize(problem,
                verbose=False)
 
 rmetric = RMetric(problem, ref_points,  delta=0.2)
-rigd, rhv = rmetric.calc(res.F, others=None)
+rigd, rhv = rmetric.do(res.F, others=None)
 print(rigd, rhv)

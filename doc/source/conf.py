@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('../../../pymoo'))
 import pymoo
 from pymoo.configuration import Configuration
 
-DEBUG = False
+DEBUG = True
 
 # -- Project information -----------------------------------------------------
 
@@ -42,10 +42,10 @@ release = version
 extensions = [
 
     # for creating the APi
-    'sphinx.ext.autodoc',
+    # 'sphinx.ext.autodoc',
 
     # API use the auto summaries
-    'sphinx.ext.autosummary',
+    # 'sphinx.ext.autosummary',
 
     # type of comments used for docstrings
     'numpydoc',
@@ -53,15 +53,15 @@ extensions = [
     # easy use of jupyter notebooks
     'nbsphinx',
 
-    # enables to provide links alias in the project
-    'sphinx.ext.intersphinx',
-
-    'sphinx.ext.coverage',
-
-    'matplotlib.sphinxext.plot_directive',
-
-    # for the reference page and citing
-    'sphinxcontrib.bibtex',
+    # # enables to provide links alias in the project
+    # 'sphinx.ext.intersphinx',
+    #
+    # 'sphinx.ext.coverage',
+    #
+    # 'matplotlib.sphinxext.plot_directive',
+    #
+    # # for the reference page and citing
+    # 'sphinxcontrib.bibtex',
 
 
 ]
@@ -106,7 +106,18 @@ intersphinx_mapping = {'python': ('http://docs.python.org/2', None),
 # Exclude build directory and Jupyter backup files:
 exclude_patterns = ['build', '**.ipynb_checkpoints']
 if DEBUG:
-    exclude_patterns.append("**ipynb")
+    # exclude_patterns.append("**ipynb")
+    # exclude_patterns.append("getting_started*")
+    exclude_patterns.append("interface*")
+    exclude_patterns.append("problems*")
+    exclude_patterns.append("algorithms*")
+    exclude_patterns.append("customization*")
+    exclude_patterns.append("operators*")
+    exclude_patterns.append("visualization*")
+    exclude_patterns.append("api*")
+    exclude_patterns.append("decision_making*")
+    exclude_patterns.append("misc*")
+
 
 # Default language for syntax highlighting in reST and Markdown cells
 highlight_language = 'none'
@@ -145,6 +156,9 @@ nbsphinx_execute_arguments = [
 
 # If window is narrower than this, input/output prompts are on separate lines:
 # nbsphinx_responsive_width = '700px'
+
+# The name of the Pygments (syntax highlighting) style to use.
+pygments_style = 'friendly'
 
 
 # ===========================================================================

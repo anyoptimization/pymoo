@@ -1,9 +1,7 @@
 <footer class="footer">
     <div class="container text-center">
       <p>
-        {% if author %}
-          {{ author }}
-        {% endif %}
+        <a href="http://www.julianblank.com">Julian Blank</a>
         {%- if show_copyright %}
           {%- if hasdoc('copyright') %}
             {% trans path=pathto('copyright'), copyright=copyright|e %}&copy; <a href="{{ path }}">Copyright</a> {{ copyright }}.{% endtrans %}<br/>

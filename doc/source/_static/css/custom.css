@@ -1,16 +1,23 @@
 
 #my-wrapper {
-    font: 14px/1.5 'Lucida Grande','Lucida Sans Unicode','Geneva','Verdana',sans-serif;
+    /*font: 14px/1.5 'Lucida Grande','Lucida Sans Unicode','Geneva','Verdana',sans-serif;*/
+
+    color: #515151;
+    font-family: "PT Sans", Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    font-size: 15px;
+    margin-left: 72px;
+    margin-right: 150px;
+    line-height: 1.5em;
+    letter-spacing: 0.2px;
+
     box-shadow: 0px 0px 3px rgb(136, 136, 136);
     border-bottom: 0px solid rgb(0, 0, 0);
     width: 90%;
     padding-top: 0px !important;
-    min-width: 460px;
+    min-width: 300px;
 }
 
-.code{
-
-}
 
 
 #main-topbar {
@@ -77,9 +84,6 @@
   font-size: 12.5px;
   width: 80%;
 }
-
-
-
 
 
 

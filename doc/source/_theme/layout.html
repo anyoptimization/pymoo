@@ -40,9 +40,8 @@
 {%- block css %}
 {{ super() }}
 <link rel="stylesheet" href="{{ pathto('_static/css/custom.css', 1) }}">
+<link rel="stylesheet" href="{{ pathto('_static/css/pure.css', 1) }}">
 <link rel="icon" type="image/png" href="{{ pathto('_static/favicon.ico', 1) }}"/>
-<link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css"
-      integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
 {%- endblock %}
 
 
@@ -80,7 +79,7 @@
 
     <div id="main-header" class="row no-gutters">
         <div class="col-12">
-            <a href="/">
+            <a href="{{ pathto('index.html', 1) }}">
                 <img class="img-header d-none d-md-block" alt="header" src="{{ pathto('_static/header.jpg', 1) }}">
                 <img class="img-header d-block d-md-none" alt="header" src="{{ pathto('_static/logo.svg', 1) }}">
             </a>
