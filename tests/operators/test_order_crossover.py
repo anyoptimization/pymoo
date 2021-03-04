@@ -1,8 +1,6 @@
-import unittest
-
 import numpy as np
 
-from pymoo.operators.crossover.order_crossover import ox, random_sequence
+from pymoo.operators.crossover.order_crossover import ox
 
 
 def order_crossover_contributed_no_shift(x1, x2, seq=None):
@@ -28,44 +26,39 @@ def order_crossover_contributed_no_shift(x1, x2, seq=None):
     return y1, y2
 
 
-class OrderCrossoverTest(unittest.TestCase):
+def test_example_from_goldberg():
+    a = np.array([9, 8, 4, 5, 6, 7, 1, 3, 2, 0])
+    b = np.array([8, 7, 1, 2, 3, 0, 9, 5, 4, 6])
 
-    def test_example_from_goldberg(self):
-        a = np.array([9, 8, 4, 5, 6, 7, 1, 3, 2, 0])
-        b = np.array([8, 7, 1, 2, 3, 0, 9, 5, 4, 6])
-
-        np.testing.assert_allclose(ox(a, b, (3, 5), shift=True), np.array([5, 6, 7, 2, 3, 0, 1, 9, 8, 4]))
-        np.testing.assert_allclose(ox(b, a, (3, 5), shift=True), np.array([2, 3, 0, 5, 6, 7, 9, 4, 8, 1]))
-
-    # http://mat.uab.cat/~alseda/MasterOpt/GeneticOperations.pdf
-    def test_other_example(self):
-        a = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
-        b = np.array([5, 7, 4, 9, 1, 3, 6, 2, 8])
-        res = ox(b, a, (2, 5), shift=False)
-
-        np.testing.assert_allclose(res, np.array([7, 9, 3, 4, 5, 6, 1, 2, 8]))
-
-    def test_example_to_bound(self):
-        a = np.array([9, 8, 4, 5, 6, 7, 1, 3, 2, 0])
-        b = np.array([8, 7, 1, 2, 3, 0, 9, 5, 4, 6])
-        np.testing.assert_allclose(ox(a, b, (3, len(b)), shift=False), np.array([8, 7, 1, 2, 3, 0, 9, 5, 4, 6]))
+    np.testing.assert_allclose(ox(a, b, (3, 5), shift=True), np.array([5, 6, 7, 2, 3, 0, 1, 9, 8, 4]))
+    np.testing.assert_allclose(ox(b, a, (3, 5), shift=True), np.array([2, 3, 0, 5, 6, 7, 9, 4, 8, 1]))
 
 
+# http://mat.uab.cat/~alseda/MasterOpt/GeneticOperations.pdf
+def test_other_example():
+    a = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
+    b = np.array([5, 7, 4, 9, 1, 3, 6, 2, 8])
+    res = ox(b, a, (2, 5), shift=False)
 
-    def test_equal_constribution_no_shift(self):
-        for _ in range(100):
-            a = np.random.permutation(10)
-            b = np.random.permutation(10)
-
-            start, end = np.sort(np.random.choice(len(a), 2, replace=False))
-            y1 = ox(a, b, seq=(start, end), shift=False)
-            y2 = ox(b, a, seq=(start, end), shift=False)
-
-            _y1, _y2 = order_crossover_contributed_no_shift(a, b, seq=(start, end + 1))
-
-            np.testing.assert_allclose(_y1, y2)
-            np.testing.assert_allclose(_y2, y1)
+    np.testing.assert_allclose(res, np.array([7, 9, 3, 4, 5, 6, 1, 2, 8]))
 
 
-if __name__ == '__main__':
-    unittest.main()
+def test_example_to_bound():
+    a = np.array([9, 8, 4, 5, 6, 7, 1, 3, 2, 0])
+    b = np.array([8, 7, 1, 2, 3, 0, 9, 5, 4, 6])
+    np.testing.assert_allclose(ox(a, b, (3, len(b)), shift=False), np.array([8, 7, 1, 2, 3, 0, 9, 5, 4, 6]))
+
+
+def test_equal_constribution_no_shift():
+    for _ in range(100):
+        a = np.random.permutation(10)
+        b = np.random.permutation(10)
+
+        start, end = np.sort(np.random.choice(len(a), 2, replace=False))
+        y1 = ox(a, b, seq=(start, end), shift=False)
+        y2 = ox(b, a, seq=(start, end), shift=False)
+
+        _y1, _y2 = order_crossover_contributed_no_shift(a, b, seq=(start, end + 1))
+
+        np.testing.assert_allclose(_y1, y2)
+        np.testing.assert_allclose(_y2, y1)

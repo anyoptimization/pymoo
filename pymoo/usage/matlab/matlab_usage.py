@@ -37,7 +37,7 @@ class MyProblem(Problem):
             eng.cd(folder, nargout=0)
 
             # this can be used to initialize variables or load data if necessary - only called once
-            eng.initialize(nargout=0)
+            eng._initialize(nargout=0)
 
             # store it in the object
             self.engine = eng

@@ -56,7 +56,7 @@ def binary_tournament(pop, P, algorithm, **kwargs):
                 S[i] = compare(a, pop[a].get("crowding"), b, pop[b].get("crowding"),
                                method='larger_is_better', return_random_if_equal=True)
 
-    return S[:, None].astype(np.int, copy=False)
+    return S[:, None].astype(int, copy=False)
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ class NSGA2(GeneticAlgorithm):
                          eliminate_duplicates=eliminate_duplicates,
                          n_offsprings=n_offsprings,
                          display=display,
-                         advance_after_initialization=True,
+                         advance_after_initial_infill=True,
                          **kwargs)
 
         self.tournament_type = 'comp_by_dom_and_crowding'

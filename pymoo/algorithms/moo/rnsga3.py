@@ -160,8 +160,8 @@ class AspirationPointSurvival(Survival):
             # if there is only one front
             if len(fronts) == 1:
                 n_remaining = n_survive
-                until_last_front = np.array([], dtype=np.int)
-                niche_count = np.zeros(len(ref_dirs), dtype=np.int)
+                until_last_front = np.array([], dtype=int)
+                niche_count = np.zeros(len(ref_dirs), dtype=int)
 
             # if some individuals already survived
             else:

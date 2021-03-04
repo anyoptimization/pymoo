@@ -21,13 +21,18 @@ class TwoVariablesOneObjectiveVisualization(AnimationCallback):
             raise Exception("This visualization can only be used for problems with two variables and one objective!")
 
         # draw the problem surface
-        FitnessLandscape(problem, _type="contour", kwargs_contour=dict(alpha=0.5)).do()
+        plot = FitnessLandscape(problem, _type="contour", kwargs_contour=dict(alpha=0.5))
+        plot.do()
 
         # get the population
         pop = algorithm.pop
 
         X, F, CV = pop.get("X", "F", "CV")
-        plt.scatter(X[:, 0], X[:, 1], color="blue", marker="o", s=70)
+        plt.scatter(X[:, 0], X[:, 1], facecolor="none", edgecolors="black", marker="o", s=50, label="Solutions")
+
+        if hasattr(algorithm, "off") and algorithm.off is not None:
+            X, F, CV = algorithm.off.get("X", "F", "CV")
+            plt.scatter(X[:, 0], X[:, 1], color="green", marker="D", s=30, label="Offsprings")
 
         is_new = np.full(len(pop), True)
         if self.last_pop is not None:
@@ -38,11 +43,7 @@ class TwoVariablesOneObjectiveVisualization(AnimationCallback):
         # plot the new population
         if is_new.sum() > 0:
             X, F, CV = pop[is_new].get("X", "F", "CV")
-            plt.scatter(X[:, 0], X[:, 1], color="red", marker="*", s=70)
-
-        if hasattr(algorithm, "off") and algorithm.off is not None:
-            X, F, CV = algorithm.off.get("X", "F", "CV")
-            plt.scatter(X[:, 0], X[:, 1], color="purple", marker="*", s=40)
+            plt.scatter(X[:, 0], X[:, 1], color="red", marker="*", s=50, label="Survivors")
 
         xl, xu = problem.bounds()
         plt.xlim(xl[0], xu[0])
@@ -53,3 +54,5 @@ class TwoVariablesOneObjectiveVisualization(AnimationCallback):
 
         # store the current population as the last
         self.last_pop = set(pop)
+
+        return plt.gcf()

@@ -3,11 +3,12 @@ import numpy as np
 from pymoo.algorithms.base.local import LocalSearch
 from pymoo.docs import parse_doc_string
 from pymoo.model.individual import Individual
-from pymoo.model.population import Population, pop_from_array_or_individual
+from pymoo.model.population import Population
 from pymoo.model.replacement import is_better
 from pymoo.model.termination import Termination
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
 from pymoo.util.display import SingleObjectiveDisplay
+from pymoo.util.optimum import filter_optimum
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 
@@ -23,31 +24,14 @@ class PatternSearchDisplay(SingleObjectiveDisplay):
 
     def _do(self, problem, evaluator, algorithm):
         super()._do(problem, evaluator, algorithm)
-        self.output.append("delta", np.max(np.abs(algorithm.explr_delta)))
-
-
-class PatternSearchTermination(Termination):
-
-    def __init__(self, eps=1e-5, **kwargs):
-        super().__init__()
-        self.default = SingleObjectiveDefaultTermination(**kwargs)
-        self.eps = eps
-
-    def do_continue(self, algorithm):
-        decision_default = self.default.do_continue(algorithm)
-        delta = np.max(np.abs(algorithm.explr_delta))
-        if delta < self.eps:
-            return decision_default
-        else:
-            return True
+        self.output.append("rho", algorithm._rho)
 
 
 class PatternSearch(LocalSearch):
     def __init__(self,
-                 explr_delta=0.25,
-                 explr_rho=0.5,
-                 pattern_step=2,
-                 eps=1e-5,
+                 init_delta=0.25,
+                 rho=0.5,
+                 step_size=1.0,
                  display=PatternSearchDisplay(),
                  **kwargs):
         """
@@ -63,135 +47,153 @@ class PatternSearch(LocalSearch):
         n_sample_points : int
             Number of sample points to be used to determine the initial search point. (Only used of `x0` is not provided)
 
-        explr_delta : float
+        delta : float
             The `delta` values which is used for the exploration move. If lower and upper bounds are provided the
             value is in relation to the overall search space. For instance, a value of 0.25 means that initially the
             pattern is created in 25% distance of the initial search point.
 
-        explr_rho : float
+        rho : float
             If the move was unsuccessful then the `delta` value is reduced by multiplying it with the value provided.
             For instance, `explr_rho` implies that with a value of `delta/2` is continued.
 
-        pattern_step : float
+        step_size : float
             After the exploration move the new center is determined by following a promising direction.
             This value defines how large to step on this direction will be.
-
-        eps : float
-            This value is used for an additional termination criterion. When all delta values (maximum move along each variable)
-            is less than epsilon the algorithm is terminated. Otherwise, the default termination criteria are also used.
 
         """
 
         super().__init__(display=display, **kwargs)
-        self.explr_rho = explr_rho
-        self.pattern_step = pattern_step
-        self.explr_delta = explr_delta
-        self.default_termination = PatternSearchTermination(eps=eps, x_tol=1e-6, f_tol=1e-6, nth_gen=1, n_last=30)
+        self.rho = rho
+        self.step_size = step_size
+        self.init_delta = init_delta
 
-    def _setup(self, problem, x0=None, **kwargs):
+        self._rho = rho
+        self._delta = None
+        self._center = None
+        self._current = None
+        self._trial = None
+        self._direction = None
+        self._sign = None
 
-        # make delta a vector - the sign is later updated individually
-        if not isinstance(self.explr_delta, np.ndarray):
-            self.explr_delta = np.ones(self.problem.n_var) * self.explr_delta
+    def _setup(self, problem, **kwargs):
 
-    def step(self):
+        if problem.has_bounds():
+            xl, xu = problem.bounds()
+            self._delta = self.init_delta * (xu - xl)
+        else:
+            self._delta = np.abs(self.x0) / 2.0
+            self._delta[self._delta <= 1.0] = 1.0
 
-        # in the beginning of each iteration first do an exploration move
-        self._previous = self.opt[0]
-        self._current = self._exploration_move(self._previous)
+    def _initialize_advance(self, infills=None, **kwargs):
+        super()._initialize_advance(infills, **kwargs)
+        self._center, self._explr = self.x0, None
+        self._sign = np.ones(self.problem.n_var)
 
-        # one iteration is the combination of this two moves repeatedly until delta needs to be reduced
-        while self._previous != self._current:
+    def _local_advance(self, **kwargs):
 
-            # use the pattern move to get a new trial vector
-            trial = self._pattern_move(self._previous, self._current)
+        # this happens only in the first iteration
+        if self._explr is None:
+            self._explr = self._exploration_move(self._center)
 
-            # perform an exploration move around the trial vector - the best known solution is always stored in _current
-            explr = self._exploration_move(trial, opt=self._current)
+        else:
+            # whether the last iteration has resulted in a new optimum
+            has_improved = is_better(self._explr, self._center, eps=0.0)
 
-            # we can break if we did not improve
-            if not is_better(explr, self._current, eps=1e-6):
-                break
+            # that means that the exploration did not found any new point and was thus unsuccessful
+            if not has_improved:
 
-            # else also check if we are terminating - otherwise this loop might run far too long
-            self._set_optimum()
-            if not self.termination.do_continue(self):
-                break
+                # keep track of the rho values in the normalized space
+                self._rho = self._rho * self.rho
 
-            self._previous, self._current = self._current, explr
+                # explore around the current center to try finding a suitable direction
+                self._explr = self._exploration_move(self._center)
 
-        self.explr_delta *= self.explr_rho
+            # if we have found a direction in the last iteration to be worth following
+            else:
 
-    def _pattern_move(self, _current, _next):
+                # get the direction which was successful in the last move
+                self._direction = (self._explr.X - self._center.X)
 
-        # get the direction and assign the corresponding delta value
-        direction = (_next.X - _current.X)
+                # declare the exploration point the new center
+                self._center = self._explr
 
-        # get the delta sign adjusted
-        sign = np.sign(direction)
-        sign[sign == 0] = -1
-        self.explr_delta = sign * np.abs(self.explr_delta)
+                # use the pattern move to get a new trial vector along that given direction
+                self._trial = self._pattern_move(self._center, self._direction)
+
+                # get the delta sign adjusted for the exploration
+                self._sign = calc_sign(self._direction)
+
+                # explore around the current center to try finding a suitable direction
+                self._explr = self._exploration_move(self._trial)
+
+        self.pop = Population.create(self._center, self._explr)
+
+    def _exploration_move(self, center):
+
+        # randomly iterate over all variables
+        for k in range(self.problem.n_var):
+
+            # the value to be tried first is given by the amount times the sign
+            _delta = self._sign[k] * self._rho * self._delta
+
+            # make a step of delta on the k-th variable
+            _explr = step(self.problem, center.X, _delta, k)
+            self.evaluator.eval(self.problem, _explr, algorithm=self)
+
+            if is_better(_explr, center, eps=0.0):
+                center = _explr
+
+            # if not successful try the other direction
+            else:
+
+                # now try the negative value of delta and see if we can improve
+                _explr = step(self.problem, center.X, -1 * _delta, k)
+                self.evaluator.eval(self.problem, _explr, algorithm=self)
+
+                if is_better(_explr, center, eps=0.0):
+                    center = _explr
+
+        return center
+
+    def _pattern_move(self, _current, _direction):
 
         # calculate the new X and repair out of bounds if necessary
-        X = _current.X + self.pattern_step * direction
+        X = _current.X + self.step_size * _direction
         set_to_bounds_if_outside_by_problem(self.problem, X)
 
-        # create the new center individual without evaluating it
+        # create the new center individual and evaluate it
         trial = Individual(X=X)
+        self.evaluator.eval(self.problem, trial, algorithm=self)
 
         return trial
 
-    def _exploration_move(self, center, opt=None):
-        if opt is None:
-            opt = center
+    def _set_optimum(self):
+        pop = self.pop if self.opt is None else Population.merge(self.opt, self.pop)
+        self.opt = filter_optimum(pop, least_infeasible=True)
 
-        def step(x, delta, k):
 
-            # copy and add delta to the new point
-            X = np.copy(x)
+def calc_sign(direction):
+    sign = np.sign(direction)
+    sign[sign == 0] = -1
+    return sign
 
-            # normalize the delta by the bounds if they are provided by the problem
-            eps = delta[k]
 
-            # if the problem has bounds normalize the delta
-            if self.problem.has_bounds():
-                xl, xu = self.problem.bounds()
-                eps *= (xu[k] - xl[k])
+def step(problem, x, delta, k):
+    # copy and add delta to the new point
+    X = np.copy(x)
 
-            # now add to the current solution
-            X[k] = X[k] + eps
+    # if the problem has bounds normalize the delta
+    # if problem.has_bounds():
+    #     xl, xu = problem.bounds()
+    #     delta *= (xu[k] - xl[k])
 
-            # repair if out of bounds if necessary
-            X = set_to_bounds_if_outside_by_problem(self.problem, X)
+    # now add to the current solution
+    X[k] = X[k] + delta[k]
 
-            # return the new solution as individual
-            mutant = pop_from_array_or_individual(X)[0]
+    # repair if out of bounds if necessary
+    X = set_to_bounds_if_outside_by_problem(problem, X)
 
-            return mutant
-
-        for k in range(self.problem.n_var):
-
-            # create the the individual and evaluate it
-            mutant = step(center.X, self.explr_delta, k)
-            self.evaluator.eval(self.problem, mutant, algorithm=self)
-            self.pop = Population.merge(self.pop, mutant)
-
-            if is_better(mutant, opt):
-                center, opt = mutant, mutant
-
-            else:
-                # inverse the sign of the delta
-                self.explr_delta[k] = - self.explr_delta[k]
-
-                # now try the other sign if there was no improvement
-                mutant = step(center.X, self.explr_delta, k)
-                self.evaluator.eval(self.problem, mutant, algorithm=self)
-                self.pop = Population.merge(self.pop, mutant)
-
-                if is_better(mutant, opt):
-                    center, opt = mutant, mutant
-
-        return opt
+    return Individual(X=X)
 
 
 parse_doc_string(PatternSearch.__init__)

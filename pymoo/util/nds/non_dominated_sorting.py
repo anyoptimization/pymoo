@@ -30,7 +30,7 @@ class NonDominatedSorting:
         n_ranked = 0
         for front in fronts:
 
-            _fronts.append(np.array(front, dtype=np.int))
+            _fronts.append(np.array(front, dtype=int))
 
             # increment the n_ranked solution counter
             n_ranked += len(front)
@@ -53,7 +53,7 @@ class NonDominatedSorting:
 
 def rank_from_fronts(fronts, n):
     # create the rank array and set values
-    rank = np.full(n, 1e16, dtype=np.int)
+    rank = np.full(n, 1e16, dtype=int)
     for i, front in enumerate(fronts):
         rank[front] = i
 

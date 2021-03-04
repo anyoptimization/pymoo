@@ -1,6 +1,5 @@
 import numpy as np
 
-
 from pymoo.util.misc import swap
 
 

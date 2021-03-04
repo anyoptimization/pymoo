@@ -4,6 +4,7 @@ from scipy.spatial.distance import cdist
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.factory import get_decomposition
 from pymoo.model.duplicate import NoDuplicateElimination
+from pymoo.model.population import Population
 from pymoo.model.selection import Selection
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
@@ -91,7 +92,9 @@ class MOEAD(GeneticAlgorithm):
     def _setup(self, problem, **kwargs):
         assert not problem.has_constraints(), "This implementation of MOEAD does not support any constraints."
 
-    def _post_initialize(self):
+    def _initialize_advance(self, infills=None, **kwargs):
+        super()._initialize_advance(infills, **kwargs)
+
         self.ideal = np.min(self.pop.get("F"), axis=0)
 
         if isinstance(self.decomposition, str):
@@ -111,6 +114,7 @@ class MOEAD(GeneticAlgorithm):
             self._decomposition = self.decomposition
 
     def _infill(self):
+        # MOEA\D inherits from genetic algorithm but does not implement the infill/advance interface
         pass
 
     def _advance(self, **kwargs):
@@ -118,7 +122,6 @@ class MOEAD(GeneticAlgorithm):
 
         # iterate for each member of the population in random order
         for i in np.random.permutation(len(pop)):
-
             # get the parents using the neighborhood selection
             P = self.selection.do(pop, 1, self.mating.crossover.n_parents, k=[i])
 
@@ -155,32 +158,39 @@ class MOEAD(GeneticAlgorithm):
 
 class ParallelMOEAD(MOEAD):
 
+    def __init__(self, ref_dirs, **kwargs):
+        super().__init__(ref_dirs, **kwargs)
+        self.indices = None
+
     def _infill(self):
-        pop_size, n_parents, n_offsprings = self.pop_size, self.mating.crossover.n_parents, self.mating.crossover.n_offsprings
+        pop_size, cross_parents, cross_off = self.pop_size, self.mating.crossover.n_parents, self.mating.crossover.n_offsprings
 
         # do the mating in a random order
-        I = np.random.permutation(len(self.pop))
+        I = np.random.permutation(len(self.pop))[:self.n_offsprings]
 
         # get the parents using the neighborhood selection
-        P = self.selection.do(self.pop, pop_size, n_parents, k=I)
+        P = self.selection.do(self.pop, self.n_offsprings, cross_parents, k=I)
 
         # do not any duplicates elimination - thus this results in exactly pop_size * n_offsprings offsprings
         off = self.mating.do(self.problem, self.pop, np.inf, parents=P)
 
-        # just selection the first individual from each mating
-        off = off[np.arange(pop_size) * n_offsprings]
-        off.set("i", I)
+        # select a random offspring from each mating
+        off = Population.create(*[np.random.choice(pool) for pool in np.reshape(off, (self.n_offsprings, -1))])
+
+        # store the indices because of the neighborhood matching in advance
+        self.indices = I
 
         return off
 
     def _advance(self, infills=None, **kwargs):
+        assert len(self.indices) == len(
+            infills), "Number of infill solutions must be equal to the one created beforehand."
 
         # update the ideal point before starting to replace
         self.ideal = np.min(np.vstack([self.ideal, infills.get("F")]), axis=0)
 
         # now do the replacements as in the loop-wise version
-        for off in infills:
-            i = off.get("i")
-            self._replace(i, off)
+        for i, off in enumerate(infills):
+            self._replace(self.indices[i], off)
 
 # parse_doc_string(MOEAD.__init__)

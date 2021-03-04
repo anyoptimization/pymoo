@@ -10,8 +10,8 @@ class GoldenSectionSearch(BracketSearch):
         self.left, self.right = None, None
         self.R = (5 ** 0.5 - 1) / 2
 
-    def _initialize(self):
-        super()._initialize()
+    def _initialize_infill(self):
+        super()._initialize_infill()
         a, b = self.a, self.b
 
         # the golden ratio (precomputed constant)

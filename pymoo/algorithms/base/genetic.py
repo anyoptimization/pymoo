@@ -20,6 +20,7 @@ class GeneticAlgorithm(Algorithm):
                  repair=None,
                  mating=None,
                  min_infeas_pop_size=0,
+                 advance_after_initial_infill=False,
                  **kwargs
                  ):
 
@@ -30,6 +31,9 @@ class GeneticAlgorithm(Algorithm):
 
         # minimum number of individuals surviving despite being infeasible - by default disabled
         self.min_infeas_pop_size = min_infeas_pop_size
+
+        # whether the algorithm should be advanced after initialization of not
+        self.advance_after_initial_infill = advance_after_initial_infill
 
         # the survival for the genetic algorithm
         self.survival = survival
@@ -71,10 +75,14 @@ class GeneticAlgorithm(Algorithm):
         self.pop = None
         self.off = None
 
-    def _initialize(self):
+    def _initialize_infill(self):
         pop = self.initialization.do(self.problem, self.pop_size, algorithm=self)
         pop.set("n_gen", self.n_gen)
         return pop
+
+    def _initialize_advance(self, infills=None, **kwargs):
+        if self.advance_after_initial_infill:
+            self.pop = self.survival.do(self.problem, infills, n_survive=len(infills))
 
     def _infill(self):
 
@@ -94,10 +102,10 @@ class GeneticAlgorithm(Algorithm):
         return off
 
     def _advance(self, infills=None, **kwargs):
-        assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
 
         # merge the offsprings with the current population
-        self.pop = Population.merge(self.pop, infills)
+        if infills is not None:
+            self.pop = Population.merge(self.pop, infills)
 
         # execute the survival to find the fittest solutions
         self.pop = self.survival.do(self.problem, self.pop, n_survive=self.pop_size, algorithm=self,

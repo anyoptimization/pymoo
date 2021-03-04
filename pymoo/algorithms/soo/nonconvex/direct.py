@@ -54,7 +54,7 @@ class DIRECT(LocalSearch):
 
         self.x0 = x0
 
-    def _initialize(self, **kwargs):
+    def _initialize_infill(self, **kwargs):
         return Population.create(self.x0)
 
     def _potential_optimal(self):

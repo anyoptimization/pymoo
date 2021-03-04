@@ -1,14 +1,14 @@
 # START perm_prob
 import numpy as np
 
-from pymoo.model.problem import Problem
+from pymoo.model.problem import ElementwiseProblem
 
 
-class MyProblem(Problem):
+class MyProblem(ElementwiseProblem):
 
     def __init__(self, my_list):
         self.correct = np.argsort(my_list)
-        super().__init__(n_var=len(my_list), n_obj=1, n_constr=0, xl=0, xu=1, elementwise_evaluation=True)
+        super().__init__(n_var=len(my_list), n_obj=1, n_constr=0, xl=0, xu=1)
 
     def _evaluate(self, x, out, *args, **kwargs):
         pheno = np.argsort(x)

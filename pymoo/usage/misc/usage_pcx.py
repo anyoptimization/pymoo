@@ -13,7 +13,7 @@ a = X[[0]].repeat(n_points, axis=0)
 b = X[[1]].repeat(n_points, axis=0)
 c = X[[2]].repeat(n_points, axis=0)
 
-obj = PCX(eta=0.1, zeta=0.1, impl="elementwise")
+obj = PCX(eta=0.1, zeta=0.1)
 
 _X = crossover(obj, a, c, b, xl=-1, xu=1)
 sc = Scatter()

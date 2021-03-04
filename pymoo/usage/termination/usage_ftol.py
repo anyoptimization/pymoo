@@ -22,5 +22,5 @@ res = minimize(problem,
 print("Generations", res.algorithm.n_gen)
 plot = Scatter(title="ZDT3")
 plot.add(problem.pareto_front(use_cache=False, flatten=False), plot_type="line", color="black")
-plot.add(res.F, color="red", alpha=0.8, s=20)
+plot.add(res.F, facecolor="none", edgecolor="red", alpha=0.8, s=20)
 plot.show()

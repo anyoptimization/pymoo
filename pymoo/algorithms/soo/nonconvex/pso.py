@@ -165,10 +165,10 @@ class PSO(Algorithm):
         self.V_max = self.max_velocity_rate * (problem.xu - problem.xl)
         self.f, self.strategy = None, None
 
-    def _initialize(self):
+    def _initialize_infill(self):
         return self.initialization.do(self.problem, self.pop_size, algorithm=self)
 
-    def _post_initialize(self):
+    def _initialize_advance(self, infills=None, **kwargs):
         pbest = self.pop
 
         particles = pbest.copy()
@@ -180,8 +180,7 @@ class PSO(Algorithm):
         particles.set("V", init_V)
         self.particles = particles
 
-        # after that do all the other initializations
-        super()._post_initialize()
+        super()._initialize_advance(infills=infills, **kwargs)
 
     def _infill(self):
         particles = self.particles
@@ -248,7 +247,7 @@ class PSO(Algorithm):
     def _adapt(self):
         pop = self.pop
 
-        X, F  = pop.get("X", "F")
+        X, F = pop.get("X", "F")
         sbest = self.sbest
         w, c1, c2, = self.w, self.c1, self.c2
 

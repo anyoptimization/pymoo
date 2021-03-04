@@ -1,71 +1,43 @@
-import os
-import unittest
-
-import autograd.numpy as anp
+import numpy as np
+import optproblems
+import pytest
 
 from pymoo.factory import get_problem, WFG1, WFG2, WFG3, WFG4, WFG5, WFG6, WFG7, WFG8, WFG9
+from tests.problems.test_correctness import load
 
 
-def load(name, n_obj):
-    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "WFG", "%sobj" % n_obj)
+@pytest.mark.parametrize('name', [f"wfg{k}" for k in range(1, 10)])
+@pytest.mark.parametrize('params', [(2, 6, 4), (3, 6, 4), (10, 20, 18)])
+def test_problems(name, params):
+    n_obj, n_var, k = params
+    problem = get_problem(name, n_var, n_obj, k)
 
-    X = anp.loadtxt(os.path.join(path, "%s.x" % name))
+    X, F, CV = load(name, suffix=["WFG", "%sobj" % n_obj])
 
+    if F is None:
+        print("Warning: No correctness check for %s" % name)
+        return
+
+    _F, _G, _CV = problem.evaluate(X, return_values_of=["F", "G", "CV"])
+
+    if problem.n_obj == 1:
+        F = F[:, None]
+
+    np.testing.assert_allclose(_F, F)
+
+    # this is not tested automatically
     try:
-        F = anp.loadtxt(os.path.join(path, "%s.f" % name))
+        optprobs_F = []
+        for x in X:
+            from optproblems.base import Individual
+            ind = Individual(phenome=x)
+            from_optproblems(problem).evaluate(ind)
+            optprobs_F.append(ind.objective_values)
+        optprobs_F = np.array(optprobs_F)
 
-        CV = None
-        if os.path.exists(os.path.join(path, "%s.cv" % name)):
-            CV = anp.loadtxt(os.path.join(path, "%s.cv" % name))
-
+        np.testing.assert_allclose(_F, optprobs_F)
     except:
-        return X, None, None
-
-    return X, F, CV
-
-
-
-
-class CorrectnessTest(unittest.TestCase):
-
-    def test_problems(self):
-
-        for n_obj, n_var, k in [(2, 6, 4), (3, 6, 4), (10, 20, 18)]:
-
-            problems = [
-                get_problem("wfg1", n_var, n_obj, k),
-                get_problem("wfg2", n_var, n_obj, k),
-                get_problem("wfg3", n_var, n_obj, k),
-                get_problem("wfg4", n_var, n_obj, k),
-                get_problem("wfg5", n_var, n_obj, k),
-                get_problem("wfg6", n_var, n_obj, k),
-                get_problem("wfg7", n_var, n_obj, k),
-                get_problem("wfg8", n_var, n_obj, k),
-                get_problem("wfg9", n_var, n_obj, k)
-            ]
-
-            for problem in problems:
-                name = str(problem.__class__.__name__)
-                print("Testing: " + name + "-" + str(n_obj))
-
-                X, F, CV = load(name, n_obj)
-
-                # other = from_optproblems(problem)
-                # F = np.row_stack([other.objective_function(x) for x in X])
-
-                if F is None:
-                    print("Warning: No correctness check for %s" % name)
-                    continue
-
-                _F, _G, _CV = problem.evaluate(X, return_values_of=["F", "G", "CV"])
-
-                if problem.n_obj == 1:
-                    F = F[:, None]
-
-                self.assertTrue(anp.all(anp.abs(_F - F) < 0.00001))
-
-                if problem.n_constr > 0:
-                    self.assertTrue(anp.all(anp.abs(_CV[:, 0] - CV) < 0.0001))
+        print("NOT MATCHING")
 
 
 
@@ -98,9 +70,5 @@ def from_optproblems(wfg):
         return WFG8opt(wfg.n_obj, wfg.n_var, wfg.k)
     elif isinstance(wfg, WFG9):
         return WFG9opt(wfg.n_obj, wfg.n_var, wfg.k)
-
-
-if __name__ == '__main__':
-    unittest.main()
 
 

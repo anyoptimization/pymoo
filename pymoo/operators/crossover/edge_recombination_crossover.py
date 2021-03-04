@@ -86,7 +86,7 @@ class EdgeRecombinationCrossover(Crossover):
 
     def _do(self, problem, X, **kwargs):
         _, n_matings, n_var = X.shape
-        Y = np.full((self.n_offsprings, n_matings, n_var), -1, dtype=np.int)
+        Y = np.full((self.n_offsprings, n_matings, n_var), -1, dtype=int)
 
         for i in range(n_matings):
             a, b = X[:, i, :]

@@ -95,7 +95,7 @@ class Ant(Individual):
 
             # the first time this key is accessed it is initialized before - if sparse implementation is used
             if not self.pheromones.has(key):
-                self.pheromones.initialize(key)
+                self.pheromones._initialize(key)
 
             # get the pheromones on the field and add it to the list
             _tau = self.pheromones.get(key)
@@ -294,7 +294,7 @@ class ACO(Algorithm):
         self.local_update = local_update
         self.evaluate_each_ant = evaluate_each_ant
 
-    def _initialize(self):
+    def _initialize_infill(self):
         self.evaluator = Evaluator(skip_already_evaluated=False) if self.evaluate_each_ant else MockEvaluator()
         self.opt = Population()
         self.step()
@@ -305,7 +305,7 @@ class ACO(Algorithm):
         ants = []
         for k in range(self.n_ants):
             ant = self.ant()
-            ant.initialize(self.problem, self.pheromones)
+            ant._initialize(self.problem, self.pheromones)
             ants.append(ant)
 
         active = list(range(self.n_ants))

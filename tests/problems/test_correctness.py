@@ -1,28 +1,10 @@
 import unittest
 
 import autograd.numpy as anp
+import pytest
 
 from pymoo.factory import get_problem
 import os
-
-
-def load(name):
-    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources")
-
-    X = anp.loadtxt(os.path.join(path, "%s.x" % name))
-
-    try:
-        F = anp.loadtxt(os.path.join(path, "%s.f" % name))
-
-        CV = None
-        if os.path.exists(os.path.join(path, "%s.cv" % name)):
-            CV = anp.loadtxt(os.path.join(path, "%s.cv" % name))
-
-    except:
-        return X, None, None
-
-    return X, F, CV
-
 
 problems = [
     ('DTLZ1', [10, 3]), ('DTLZ2', [10, 3]), ('DTLZ3', [10, 3]), ('DTLZ4', [10, 3]), ('DTLZ5', [10, 3]),
@@ -37,32 +19,39 @@ problems = [
 ]
 
 
+@pytest.mark.parametrize('name,params', problems)
+def test_problems(name, params):
+    X, F, CV = load(name)
+
+    if F is None:
+        print("Warning: No correctness check for %s" % name)
+        return
+
+    problem = get_problem(name, *params)
+    _F, _G, _CV, _dF, _dG = problem.evaluate(X, return_values_of=["F", "G", "CV", "dF", "dG"])
+
+    if problem.n_obj == 1:
+        F = F[:, None]
+
+    assert anp.all(anp.abs(_F - F) < 0.00001)
+
+    if problem.n_constr > 0:
+        assert anp.all(anp.abs(_CV[:, 0] - CV) < 0.0001)
 
 
-class CorrectnessTest(unittest.TestCase):
+def load(name, suffix=[]):
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", *suffix)
 
-    def test_problems(self):
-        for entry in problems:
-            name, params = entry
-            print("Testing: " + name)
+    X = anp.loadtxt(os.path.join(path, "%s.x" % name))
 
-            X, F, CV = load(name)
+    try:
+        F = anp.loadtxt(os.path.join(path, "%s.f" % name))
 
-            if F is None:
-                print("Warning: No correctness check for %s" % name)
-                continue
+        CV = None
+        if os.path.exists(os.path.join(path, "%s.cv" % name)):
+            CV = anp.loadtxt(os.path.join(path, "%s.cv" % name))
 
-            problem = get_problem(name, *params)
-            _F, _G, _CV, _dF, _dG = problem.evaluate(X, return_values_of=["F", "G", "CV", "dF", "dG"])
+    except:
+        return X, None, None
 
-            if problem.n_obj == 1:
-                F = F[:, None]
-
-            self.assertTrue(anp.all(anp.abs(_F - F) < 0.00001))
-
-            if problem.n_constr > 0:
-                self.assertTrue(anp.all(anp.abs(_CV[:, 0] - CV) < 0.0001))
-
-
-if __name__ == '__main__':
-    unittest.main()
+    return X, F, CV

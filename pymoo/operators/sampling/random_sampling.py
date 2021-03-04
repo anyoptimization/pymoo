@@ -18,7 +18,7 @@ class FloatRandomSampling(Sampling):
     Randomly sample points in the real space by considering the lower and upper bounds of the problem.
     """
 
-    def __init__(self, var_type=np.float) -> None:
+    def __init__(self, var_type=np.float64) -> None:
         super().__init__()
         self.var_type = var_type
 

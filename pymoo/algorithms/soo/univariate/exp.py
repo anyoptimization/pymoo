@@ -20,11 +20,11 @@ class ExponentialSearch(Algorithm):
         assert problem.n_var == 1 and not problem.has_constraints() and problem.n_obj == 1, msg
         self.point = x0
 
-    def _initialize(self):
+    def _initialize_infill(self):
         self.step_size = self.alpha
 
         if self.point is None:
-            return Population.new(X=self.problem.xl[None, :])
+            return Population.new(X=np.copy(self.problem.xl[None, :]))
         else:
             return Population.create(self.point)
 

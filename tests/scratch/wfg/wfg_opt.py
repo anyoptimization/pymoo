@@ -33,6 +33,6 @@ for my, other in problems:
     name = my.__class__.__name__
     Scatter(title=name).add(pf, s=15, color="green", alpha=0.5).add(_pf, color="red", s=10).show()
 
-    print(name, IGD(pf).calc(_pf))
+    print(name, IGD(pf).do(_pf))
 
     print()
