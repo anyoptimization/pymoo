@@ -21,7 +21,7 @@ class FitnessSurvival(Survival):
     def __init__(self) -> None:
         super().__init__(True)
 
-    def _do(self, problem, pop, n_survive, out=None, **kwargs):
+    def _do(self, problem, pop, n_survive=None, out=None, **kwargs):
         F = pop.get("F")
 
         if F.shape[1] != 1:
@@ -49,7 +49,7 @@ def comp_by_cv_and_fitness(pop, P, **kwargs):
         else:
             S[i] = compare(a, pop[a].F, b, pop[b].F, method='smaller_is_better', return_random_if_equal=True)
 
-    return S[:, None].astype(np.int)
+    return S[:, None].astype(int)
 
 
 class GA(GeneticAlgorithm):

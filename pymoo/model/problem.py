@@ -19,6 +19,7 @@ class Problem:
                  check_inconsistencies=True,
                  replace_nan_values_by=np.inf,
                  exclude_from_serialization=None,
+                 callback=None,
                  **kwargs):
 
         """
@@ -63,6 +64,9 @@ class Problem:
 
         # the lower bounds, make sure it is a numpy array with the length of n_var
         self.xl, self.xu = xl, xu
+
+        # a callback function to be called after every evaluation
+        self.callback = callback
 
         # if it is a problem with an actual number of variables - make sure xl and xu are numpy arrays
         if n_var > 0:
@@ -128,6 +132,9 @@ class Problem:
         # in case the input had only one dimension, then remove always the first dimension from each output
         if only_single_value:
             out_to_1d_ndarray(out)
+
+        if self.callback is not None:
+            self.callback(X, out)
 
         # now depending on what should be returned prepare the output
         if return_as_dictionary:

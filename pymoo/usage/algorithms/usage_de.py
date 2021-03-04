@@ -6,6 +6,7 @@ from pymoo.optimize import minimize
 
 problem = get_problem("ackley", n_var=10)
 
+
 algorithm = DE(
     pop_size=100,
     sampling=LatinHypercubeSampling(iterations=100, criterion="maxmin"),

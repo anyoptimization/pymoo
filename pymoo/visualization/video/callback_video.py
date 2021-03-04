@@ -35,18 +35,21 @@ class AnimationCallback(Callback):
         if algorithm.n_gen == 1 or algorithm.n_gen % self.nth_gen == 0:
             try:
 
-                ret = self.do(algorithm.problem, algorithm, **kwargs)
+                figure = self.do(algorithm.problem, algorithm, **kwargs)
 
                 if self.do_show:
-                    plt.show()
+                    if figure is None:
+                        plt.show(figure=figure)
+                    else:
+                        figure.show()
 
                 if self.video is not None:
-                    self.video.record()
+                    self.video.record(fig=figure)
 
                 if self.do_close:
-                    plt.close()
+                    plt.close(fig=figure)
 
-                return ret
+                return figure
 
             except Exception as ex:
                 if self.exception_if_not_applicable:

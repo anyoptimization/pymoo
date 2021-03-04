@@ -7,8 +7,6 @@ algorithm = NSGA2(pop_size=100)
 
 res = minimize(problem,
                algorithm,
-               pf=False,
-               seed=2,
-               verbose=False)
+               seed=1)
 
 print(res.algorithm.n_gen)

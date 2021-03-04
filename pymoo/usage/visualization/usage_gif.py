@@ -20,7 +20,6 @@ ret = minimize(problem,
                save_history=True,
                verbose=False)
 
-print(ret.F)
 
 with Video(GIF("animation.gif")) as vid:
     for algorithm in ret.history:
@@ -30,15 +29,18 @@ with Video(GIF("animation.gif")) as vid:
             nds = NonDominatedSorting().do(F, only_non_dominated_front=True)
             other = [k for k in range(len(F)) if k not in nds]
 
+            # A figure with two plots
             fig, (ax1, ax2) = plt.subplots(2, figsize=(8, 6))
             fig.suptitle("%s - %s - Gen %s" % ("ZDT1", "NSGA2", algorithm.n_gen), fontsize=16)
 
+            # Design Space
             pcp = PCP(ax=ax1, bounds=(problem.xl, problem.xu))
             pcp.set_axis_style(color="black", alpha=0.7)
             pcp.add(X[other], color="blue", linewidth=0.5)
             pcp.add(X[nds], color="red", linewidth=2)
             pcp.do()
 
+            # Objective Space
             sc = Scatter(ax=ax2)
             sc.add(F[other], color="blue")
             sc.add(F[nds], color="red")
@@ -46,3 +48,6 @@ with Video(GIF("animation.gif")) as vid:
             sc.do()
 
             vid.record()
+
+            # comment this out to see the plots live
+            plt.close(fig)

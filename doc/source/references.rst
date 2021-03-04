@@ -1,4 +1,4 @@
-References
+Cite Us
 ==============================================================================
 
 We are currently working on a paper.

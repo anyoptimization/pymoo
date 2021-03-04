@@ -42,7 +42,7 @@ class EliteSurvival(Survival):
             pop = pop[[k for k in range(len(pop)) if k not in elim]]
 
         if problem.n_obj == 1:
-            pop = FitnessSurvival().do(problem, pop, len(pop))
+            pop = FitnessSurvival().do(problem, pop, n_survive=len(pop))
             elites = pop[:self.n_elites]
             non_elites = pop[self.n_elites:]
         else:
@@ -126,6 +126,7 @@ class BRKGA(GeneticAlgorithm):
                          survival=survival,
                          display=display,
                          eliminate_duplicates=True,
+                         advance_after_initial_infill=True,
                          **kwargs)
 
         self.n_elites = n_elites
@@ -145,17 +146,17 @@ class BRKGA(GeneticAlgorithm):
         # evaluate all the new solutions
         return Population.merge(off, mutants)
 
-    def _advance(self, off):
+    def _advance(self, infills=None):
         pop = self.pop
 
         # get all the elites from the current population
         elites = np.where(pop.get("type") == "elite")[0]
 
         # finally merge everything together and sort by fitness
-        pop = Population.merge(pop[elites], off)
+        pop = Population.merge(pop[elites], infills)
 
         # the do survival selection - set the elites for the next round
-        self.pop = self.survival.do(self.problem, pop, len(pop), algorithm=self)
+        self.pop = self.survival.do(self.problem, pop, n_survive=len(pop), algorithm=self)
 
 
 parse_doc_string(BRKGA.__init__)

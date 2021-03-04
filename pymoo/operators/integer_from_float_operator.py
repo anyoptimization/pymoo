@@ -21,7 +21,7 @@ def apply_float_operation(problem, fun):
     off = fun()
 
     # now round to nearest integer for all offsprings
-    off = np.rint(off).astype(np.int)
+    off = np.rint(off).astype(int)
 
     # reset the original bounds of the problem and design space values
     problem.xl = _xl

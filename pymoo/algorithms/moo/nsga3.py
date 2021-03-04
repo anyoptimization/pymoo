@@ -34,7 +34,7 @@ def comp_by_cv_then_random(pop, P, **kwargs):
         else:
             S[i] = np.random.choice([a, b])
 
-    return S[:, None].astype(np.int)
+    return S[:, None].astype(int)
 
 
 class NSGA3(GeneticAlgorithm):
@@ -97,6 +97,7 @@ class NSGA3(GeneticAlgorithm):
                          eliminate_duplicates=eliminate_duplicates,
                          n_offsprings=n_offsprings,
                          display=display,
+                         advance_after_initial_infill=True,
                          **kwargs)
 
     def _setup(self, problem, **kwargs):
@@ -171,8 +172,8 @@ class ReferenceDirectionSurvival(Survival):
             # if there is only one front
             if len(fronts) == 1:
                 n_remaining = n_survive
-                until_last_front = np.array([], dtype=np.int)
-                niche_count = np.zeros(len(self.ref_dirs), dtype=np.int)
+                until_last_front = np.array([], dtype=int)
+                niche_count = np.zeros(len(self.ref_dirs), dtype=int)
 
             # if some individuals already survived
             else:
@@ -252,7 +253,7 @@ def associate_to_niches(F, niches, ideal_point, nadir_point, utopian_epsilon=0.0
 
 
 def calc_niche_count(n_niches, niche_of_individuals):
-    niche_count = np.zeros(n_niches, dtype=np.int)
+    niche_count = np.zeros(n_niches, dtype=int)
     index, count = np.unique(niche_of_individuals, return_counts=True)
     niche_count[index] = count
     return niche_count

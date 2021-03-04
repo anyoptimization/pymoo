@@ -5,7 +5,7 @@ from pymoo.model.problem import Problem
 
 class Clutch(Problem):
     def __init__(self):
-        super().__init__(n_var=5, n_obj=2, n_constr=19, type_var=anp.int)
+        super().__init__(n_var=5, n_obj=2, n_constr=19, type_var=aint)
         # ri, ro, t, F, Z
         # self.xl = anp.array([60, 90, 1, 600, 2])
         self.xl = anp.array([0, 0, 0, 0, 0])

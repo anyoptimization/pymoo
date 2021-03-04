@@ -1,5 +1,5 @@
 from pymoo.algorithms.moo.gde3 import GDE3
-from pymoo.factory import get_problem
+from pymoo.factory import get_problem, ZDT1, ZDT3
 from pymoo.optimize import minimize
 from pymoo.visualization.scatter import Scatter
 
@@ -9,7 +9,6 @@ algorithm = GDE3(pop_size=100)
 
 res = minimize(problem,
                algorithm,
-               ('n_gen', 600),
                seed=1,
                verbose=True)
 

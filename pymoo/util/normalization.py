@@ -2,6 +2,7 @@ from abc import abstractmethod
 
 import numpy as np
 
+
 # ---------------------------------------------------------------------------------------------------------
 # Object Oriented Interface
 # ---------------------------------------------------------------------------------------------------------
@@ -34,62 +35,72 @@ class NoNormalization(Normalization):
 # ---- Normalizes between zero and one given bounds or estimating them
 class ZeroToOneNormalization(Normalization):
 
-    def __init__(self, xl, xu) -> None:
+    def __init__(self, xl=None, xu=None) -> None:
         super().__init__()
 
-        # determines whether the normalization is enabled at all
-        self.disabled = True if (xl is None or xu is None) else False
-        if self.disabled:
+        # if both are None we are basically done because normalization is disabled
+        if xl is None and xu is None:
+            self.xl, self.xu = None, None
             return
 
-        # whenever xl or xu is nan do no normalization at all there - this is the mask for that
-        is_nan = np.logical_or(np.isnan(xl), np.isnan(xu))
+        # if not set simply fall back no nan values
+        if xl is None:
+            xl = np.full_like(xu, np.nan)
+        if xu is None:
+            xu = np.full_like(xl, np.nan)
+
+        xl, xu = np.copy(xl).astype(float), np.copy(xu).astype(float)
+
+        # if both are equal then set the upper bound to none (always the 0 or lower bound will be returned then)
+        xu[xl == xu] = np.nan
+
+        # store the lower and upper bounds
+        self.xl, self.xu = xl, xu
+
+        # check out when the input values are nan
+        xl_nan, xu_nan = np.isnan(xl), np.isnan(xu)
+
+        # now create all the masks that are necessary
+        self.xl_only, self.xu_only = np.logical_and(~xl_nan, xu_nan), np.logical_and(xl_nan, ~xu_nan)
+        self.both_nan = np.logical_and(np.isnan(xl), np.isnan(xu))
+        self.neither_nan = ~self.both_nan
 
         # if neither is nan than xu must be greater or equal than xl
-        assert np.all(np.logical_or(xu >= xl, is_nan)), "xl must be less or equal than xu."
-
-        # only work on copies because nan values are replaced now
-        xl, xu = xl.copy(), xu.copy()
-        xl[is_nan] = 0.0
-        xu[is_nan] = 1.0
-
-        # calculate the range which will be divided by later on
-        _range = (xu - xl).astype(np.float)
-        range_is_zero = (xl == xu)
-        _range[range_is_zero] = np.nan
-
-        self.xl = xl
-        self.xu = xu
-        self._range = _range
-        self.ignore = is_nan
-        self.range_is_zero = range_is_zero
+        any_nan = np.logical_or(np.isnan(xl), np.isnan(xu))
+        assert np.all(np.logical_or(xu >= xl, any_nan)), "xl must be less or equal than xu."
 
     def forward(self, X):
-        if X is None or self.disabled:
+        if X is None or (self.xl is None and self.xu is None):
             return X
 
-        xl, xu, _range, ignore, range_is_zero = self.xl, self.xu, self._range, self.ignore, self.range_is_zero
+        xl, xu, xl_only, xu_only = self.xl, self.xu, self.xl_only, self.xu_only
+        both_nan, neither_nan = self.both_nan, self.neither_nan
 
-        # do the normalization
-        N = (X - xl) / _range
+        # simple copy the input
+        N = np.copy(X)
 
-        # set the values which should not have been normalized to the input values X
-        N[..., ignore] = X[..., ignore]
+        # normalize between zero and one if neither of them is nan
+        N[..., neither_nan] = (X[..., neither_nan] - xl[neither_nan]) / (xu[neither_nan] - xl[neither_nan])
 
-        # if the range is zero simply use a zero here
-        N[..., range_is_zero] = 0.0
+        N[..., xl_only] = X[..., xl_only] - xl[xl_only]
+
+        N[..., xu_only] = 1.0 - (xu[xu_only] - X[..., xu_only])
 
         return N
 
     def backward(self, N):
-        if self.disabled:
+        if N is None or (self.xl is None and self.xu is None):
             return N
 
-        xl, _range, ignore, range_is_zero = self.xl, self._range, self.ignore, self.range_is_zero
+        xl, xu, xl_only, xu_only = self.xl, self.xu, self.xl_only, self.xu_only
+        both_nan, neither_nan = self.both_nan, self.neither_nan
 
-        X = N * _range + xl
-        X[..., ignore] = N[..., ignore]
-        X[..., range_is_zero] = xl[range_is_zero]
+        X = N.copy()
+        X[..., neither_nan] = xl[neither_nan] + N[..., neither_nan] * (xu[neither_nan] - xl[neither_nan])
+
+        X[..., xl_only] = N[..., xl_only] + xl[xl_only]
+
+        X[..., xu_only] = xu[xu_only] - (1.0 - N[..., xu_only])
 
         return X
 
@@ -99,20 +110,26 @@ class ZeroToOneNormalization(Normalization):
 # ---------------------------------------------------------------------------------------------------------
 
 
-def normalize(x, xl=None, xu=None, return_bounds=False, estimate_bounds_if_none=True):
+def normalize(X, xl=None, xu=None, return_bounds=False, estimate_bounds_if_none=True):
     if estimate_bounds_if_none:
         if xl is None:
-            xl = np.min(x, axis=0)
+            xl = np.min(X, axis=0)
         if xu is None:
-            xu = np.max(x, axis=0)
+            xu = np.max(X, axis=0)
+
+    if isinstance(xl, float) or isinstance(xl, int):
+        xl = np.full(X.shape[-1], xl)
+
+    if isinstance(xu, float) or isinstance(xu, int):
+        xu = np.full(X.shape[-1], xu)
 
     norm = ZeroToOneNormalization(xl, xu)
-    x = norm.forward(x)
+    X = norm.forward(X)
 
     if not return_bounds:
-        return x
+        return X
     else:
-        return x, norm.xl, norm.xu
+        return X, norm.xl, norm.xu
 
 
 def denormalize(x, xl, xu):

@@ -4,12 +4,14 @@ from pymoo.docs import parse_doc_string
 from pymoo.model.population import Population
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.dominator import get_relation
+from pymoo.util.termination.default import MultiObjectiveDefaultTermination
 
 
 class GDE3(DE):
 
-    def __init__(self, **kwargs):
-        super().__init__(display=MultiObjectiveDisplay(), **kwargs)
+    def __init__(self, CR=0.9, F=0.1, variant="DE/rand/1/bin", **kwargs):
+        super().__init__(CR=CR, F=F, variant=variant, display=MultiObjectiveDisplay(), **kwargs)
+        self.default_termination = MultiObjectiveDefaultTermination()
 
     def _advance(self, infills=None, **kwargs):
         assert infills is not None, "This algorithms uses the AskAndTell interface thus 'infills' must to be provided."

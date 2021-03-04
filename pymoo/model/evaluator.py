@@ -71,7 +71,17 @@ class Evaluator:
 
         # find indices to be evaluated
         if skip_already_evaluated or (skip_already_evaluated is None and self.skip_already_evaluated):
-            I = [k for k in range(len(pop)) if not all([e in pop[k].evaluated for e in evaluate_values_of])]
+            I = []
+            for i, individual in enumerate(pop):
+
+                # if the evaluated has been overwritten to be none or not a set
+                if not isinstance(individual.evaluated, set):
+                    individual.evaluated = set()
+
+                # if not everything has been evaluated
+                if not all([e in individual.evaluated for e in evaluate_values_of]):
+                    I.append(i)
+
         else:
             I = np.arange(len(pop))
 

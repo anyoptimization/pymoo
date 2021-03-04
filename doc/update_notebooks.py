@@ -87,13 +87,13 @@ def update_and_run_notebook(filename, replace=True, execute=False):
 
 if __name__ == "__main__":
 
-    files = glob.glob('source/**/*.ipynb')
+    # files = glob.glob('source/**/*.ipynb')
     # files = glob.glob('source/problems/*.ipynb')
     # files = glob.glob('source/algorithms/pso.ipynb')
     # files = glob.glob('source/visualization/video.ipynb')
     # files = glob.glob('source/visualization/*.ipynb')
     # files = glob.glob('source/components/performance_indicator.ipynb')
-    # files = glob.glob('source/misc/termination_criterion.ipynb')
+    files = glob.glob('source/algorithms/pso.ipynb')
 
     # STARTING_AT = "source/customization/initialization.ipynb"
     # STARTING_AT = "source/problems/custom.ipynb"
@@ -101,7 +101,8 @@ if __name__ == "__main__":
 
     SKIP = ["source/problems/parallelization.ipynb",
             "source/visualization/video.ipynb",
-            "source/algorithms/pso.ipynb"]
+            # "source/algorithms/pso.ipynb"
+            ]
 
     #files = ['source/misc/custom_output.ipynb']
 

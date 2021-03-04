@@ -25,7 +25,7 @@ class FlowshopScheduling(Problem):
             n_obj=1,
             xl=0,
             xu=n_machines,
-            type_var=np.int,
+            type_var=int,
             elementwise_evaluation=True,
             **kwargs
         )

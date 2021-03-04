@@ -15,7 +15,7 @@ class RandomSearch(Algorithm):
         self.n_points_per_iteration = n_points_per_iteration
         self.sampling = sampling
 
-    def _initialize(self):
+    def _initialize_infill(self):
         return self._infill()
 
     def _infill(self):

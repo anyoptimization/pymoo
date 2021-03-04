@@ -40,6 +40,10 @@ pymoo: Multi-objective Optimization in Python
 ------------------------------------------------------------------------------
 
 
+.. admonition:: Overview
+    :class: myOwnStyle
+
+    Some breaking changes in **pymoo 0.5.0**.
 
 
 Our framework offers state of the art single- and multi-objective optimization algorithms and many
@@ -73,7 +77,7 @@ getting started guide:
 
 .. image:: resources/images/getting_started.svg
    :name: pymoo-banner
-   :target: getting_started.html
+   :target: getting_started/index.html
    :width: 250px
    :alt: Getting Started
    :align: left
