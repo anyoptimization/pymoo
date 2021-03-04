@@ -4,9 +4,9 @@ from pymoo.model.individual import Individual
 
 class BracketSearch(Algorithm):
 
-    def __init__(self, **kwargs):
+    def __init__(self, a=None, b=None, **kwargs):
         super().__init__(**kwargs)
-        self.a, self.b = None, None
+        self.a, self.b = a, b
 
     def _setup(self, problem, a=None, b=None, **kwargs):
         msg = "Only problems with one variable, one objective and no constraints can be solved!"

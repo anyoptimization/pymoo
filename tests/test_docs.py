@@ -14,6 +14,7 @@ SKIP = ["parallelization.ipynb"]
 IPYNBS = [e for e in files_from_folder(DOCS, regex='**/*.ipynb', skip=SKIP) if ".ipynb_checkpoints" not in e]
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize('ipynb', IPYNBS)
 def test_usage(ipynb):
     run_ipynb(ipynb, overwrite=OVERWRITE)

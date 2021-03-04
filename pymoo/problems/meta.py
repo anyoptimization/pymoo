@@ -15,9 +15,9 @@ class MetaProblem(Problem):
     def _evaluate(self, x, out, *args, **kwargs):
         self.problem._evaluate(x, out, *args, **kwargs)
 
-    def pareto_front(self, *args, **kwargs):
-        return self.problem.pareto_front(*args, **kwargs)
+    def _calc_pareto_front(self, *args, **kwargs):
+        return self.problem._calc_pareto_front(*args, **kwargs)
 
-    def pareto_set(self, *args, **kwargs):
-        return self.problem.pareto_set(*args, **kwargs)
+    def _calc_pareto_set(self, *args, **kwargs):
+        return self.problem._calc_pareto_set(*args, **kwargs)
 

@@ -5,10 +5,8 @@ from pymoo.factory import get_problem
 
 class KKTPM:
 
-    def __init__(self, var_bounds_as_constraints=True):
-        self.var_bounds_as_constraints = var_bounds_as_constraints
 
-    def calc(self, X, problem, ideal_point=None, utopian_epsilon=1e-4, rho=1e-3):
+    def calc(self, X, problem, ideal=None, utopian_eps=1e-4, rho=1e-3):
         """
 
         Returns the Karush-Kuhn-Tucker Approximate Measure.
@@ -18,9 +16,9 @@ class KKTPM:
         X : np.array
 
         problem : pymoo.model.problem
-        ideal_point : np.array
+        ideal : np.array
             The ideal point if not in the problem defined or intentionally overwritten.
-        utopian_epsilon : float
+        utopian_eps : float
             The epsilon used for decrease the ideal point to get the utopian point.
         rho : float
             Since augmented achievement scalarization function is used the weight for all other weights
@@ -36,47 +34,17 @@ class KKTPM:
         fval = np.full((X.shape[0], 1), np.inf)
 
         # set the ideal point for normalization
-        z = ideal_point
+        z = ideal
 
         # if not provided take the one defined in the problem
         if z is None:
             z = problem.ideal_point()
-        z -= utopian_epsilon
+        z -= utopian_eps
 
         # for convenience get the counts directly
         n_solutions, n_var, n_obj, n_constr = X.shape[0], problem.n_var, problem.n_obj, problem.n_constr
 
         F, CV, G, dF, dG = problem.evaluate(X, return_values_of=["F", "CV", "G", "dF", "dG"])
-
-        # if the measure should include points out of bounds as a constraint
-        if self.var_bounds_as_constraints:
-            # add the bounds constraints as well
-            _G = np.zeros((n_solutions, 2 * n_var))
-            _G[:, :n_var] = problem.xl - X
-            _G[:, n_var:] = X - problem.xu
-
-            _dG = np.zeros((n_solutions, 2 * n_var, n_var))
-            _dG[:, :n_var, :] = - np.eye(n_var)
-            _dG[:, n_var:, :] = np.eye(n_var)
-
-            # increase the constraint counter to be correct and change the constraints
-            if n_constr > 0:
-                G = np.column_stack([G, _G])
-                dG = np.column_stack([dG, _dG])
-            else:
-                G = _G
-                dG = _dG
-
-            n_constr = n_constr + 2 * n_var
-
-            problem.set_boundaries_as_constraints(True)
-            F_, CV_, G_, dF_, dG_ = problem.evaluate(X, return_values_of=["F", "CV", "G", "dF", "dG"])
-
-            np.testing.assert_allclose(F, F_)
-            np.testing.assert_allclose(CV_, CV_)
-            np.testing.assert_allclose(dF_, dF_)
-            np.testing.assert_allclose(dG, dG_)
-            problem.set_boundaries_as_constraints(False)
 
         # loop through each solution to be considered
         for i in range(n_solutions):

@@ -1,7 +1,8 @@
 import numpy as np
 
-from pymoo.model.problem import Problem, ZeroToOneProblem
+from pymoo.model.problem import Problem
 from pymoo.optimize import minimize
+from pymoo.problems.zero_to_one import ZeroToOne
 from pymoo.vendor.vendor_scipy import LBFGSB
 
 
@@ -15,7 +16,7 @@ class MySphere(Problem):
 
 
 # for the local optimizer this is now a perfectly normalized problem
-problem = ZeroToOneProblem(MySphere())
+problem = ZeroToOne(MySphere())
 
 algorithm = LBFGSB()
 

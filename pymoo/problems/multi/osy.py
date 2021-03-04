@@ -1,7 +1,7 @@
 import autograd.numpy as anp
 
-from pymoo.problems.util import load_pareto_front_from_file
 from pymoo.model.problem import Problem
+from pymoo.problems.util import load_pareto_front_from_file
 
 
 class OSY(Problem):

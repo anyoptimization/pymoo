@@ -40,11 +40,9 @@ class QuadraticInterpolationSearch(BracketSearch):
         # create a population with all three individuals
         pop = Population.create(a, b, c)
 
-        # evaluate all the points
-        self.evaluator.eval(self.problem, pop, algorithm=self)
-        self.pop, self.infill = pop, pop
+        return pop
 
-    def step(self):
+    def _advance(self, **kwargs):
 
         # all the elements in the interval
         a, b, c = self.pop
@@ -60,13 +58,13 @@ class QuadraticInterpolationSearch(BracketSearch):
 
             c = Individual(X=(b.X - a.X) / 2)
             self.evaluator.eval(self.problem, c, algorithm=self)
-            self.infill = c
+            self.infills = c
 
         else:
 
             d = quadr_interp(a, b, c)
             self.evaluator.eval(self.problem, d, algorithm=self)
-            self.infill = d
+            self.infills = d
 
             # swap c and d -> make sure d is always on the right of c -> a, c, d, b
             if c.X[0] > d.X[0]:
