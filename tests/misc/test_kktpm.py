@@ -1,24 +1,27 @@
 import numpy as np
 import pytest
 
+from pymoo.experimental.autodiff import AutomaticDifferentiation
 from pymoo.factory import get_problem
 from pymoo.performance_indicator.kktpm import KKTPM
+from pymoo.problems.bounds_as_constr import BoundariesAsConstraints
 from tests import path_to_test_resources
 
 folder = path_to_test_resources("kktpm")
 
 SETUP = {
-    "bnh": {'utopian_epsilon': 0.0, "ideal_point": np.array([-0.05, -0.05]), "rho": 0.0},
-    "zdt1": {'utopian_epsilon': 1e-3},
-    "zdt2": {'utopian_epsilon': 1e-4},
-    "zdt3": {'utopian_epsilon': 1e-4, "ideal_point": np.array([0.0, -1.0])},
-    "osy": {'utopian_epsilon': 0.0, "ideal_point": np.array([-300, -0.05]), "rho": 0.0}
+    "bnh": {'utopian_eps': 0.0, "ideal": np.array([-0.05, -0.05]), "rho": 0.0},
+    "zdt1": {'utopian_eps': 1e-3},
+    "zdt2": {'utopian_eps': 1e-4},
+    "zdt3": {'utopian_eps': 1e-4, "ideal": np.array([0.0, -1.0])},
+    # "osy": {'utopian_eps': 0.0, "ideal": np.array([-300, -0.05]), "rho": 0.0}
 }
 
 
 @pytest.mark.parametrize('str_problem,params', SETUP.items())
 def test_kktpm_correctness(str_problem, params):
-    problem = get_problem(str_problem)
+    problem = BoundariesAsConstraints(AutomaticDifferentiation(get_problem(str_problem)))
+    # problem = AutomaticDifferentiation(BoundariesAsConstraints(get_problem(str_problem)))
 
     def load_file(f):
         import os
@@ -52,7 +55,7 @@ def test_kktpm_correctness(str_problem, params):
     # calculate the KKTPM measure
     # _kktpm, _ = KKTPM(var_bounds_as_constraints=True).calc(np.array([[4.8, 3.0]]), problem, **params)
     # _kktpm, _ = KKTPM(var_bounds_as_constraints=True).calc(X[[55]], problem, rho=0, **params)
-    _kktpm = KKTPM(var_bounds_as_constraints=True).calc(X[indices], problem, **params)
+    _kktpm = KKTPM().calc(X[indices], problem, **params)
     error = np.abs(_kktpm[:, 0] - kktpm)
 
     for i in range(len(error)):

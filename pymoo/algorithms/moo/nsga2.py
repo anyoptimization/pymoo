@@ -17,6 +17,7 @@ from pymoo.util.randomized_argsort import randomized_argsort
 # ---------------------------------------------------------------------------------------------------------
 # Binary Tournament Selection Function
 # ---------------------------------------------------------------------------------------------------------
+from pymoo.util.termination.default import MultiObjectiveDefaultTermination
 
 
 def binary_tournament(pop, P, algorithm, **kwargs):
@@ -149,7 +150,7 @@ class NSGA2(GeneticAlgorithm):
                          display=display,
                          advance_after_initial_infill=True,
                          **kwargs)
-
+        self.default_termination = MultiObjectiveDefaultTermination()
         self.tournament_type = 'comp_by_dom_and_crowding'
 
     def _set_optimum(self, **kwargs):

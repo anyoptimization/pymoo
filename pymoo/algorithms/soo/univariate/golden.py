@@ -23,11 +23,11 @@ class GoldenSectionSearch(BracketSearch):
         # create a population with all four individuals
         pop = Population.create(a, c, d, b)
 
-        self.pop, self.infill = pop, pop
+        self.pop, self.infills = pop, pop
 
         return pop
 
-    def step(self):
+    def _advance(self, **kwargs):
 
         # all the elements in the interval
         a, c, d, b = self.pop
@@ -45,7 +45,7 @@ class GoldenSectionSearch(BracketSearch):
             # create a new left individual and evaluate
             c = Individual(X=b.X - R * (b.X - a.X))
             self.evaluator.eval(self.problem, c, algorithm=self)
-            self.infill = c
+            self.infills = c
 
         # if the right solution is better than the left
         else:
@@ -57,7 +57,7 @@ class GoldenSectionSearch(BracketSearch):
             # create a new right individual and evaluate
             d = Individual(X=a.X + R * (b.X - a.X))
             self.evaluator.eval(self.problem, d, algorithm=self)
-            self.infill = d
+            self.infills = d
 
         # update the population with all the four individuals
         self.pop = Population.create(a, c, d, b)

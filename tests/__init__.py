@@ -9,3 +9,4 @@ def get_pymoo_test():
 
 def path_to_test_resources(*args):
     return os.path.join(get_pymoo_test(), "resources", *args)
+

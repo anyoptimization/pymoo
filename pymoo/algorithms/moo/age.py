@@ -9,11 +9,11 @@ from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.operators.selection.random_selection import RandomSelection
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-
-
 # =========================================================================================================
 # Implementation
 # =========================================================================================================
+from pymoo.util.termination.default import MultiObjectiveDefaultTermination
+
 
 class AGEMOEA(GeneticAlgorithm):
     """
@@ -60,6 +60,7 @@ class AGEMOEA(GeneticAlgorithm):
                          n_offsprings=n_offsprings,
                          display=display,
                          **kwargs)
+        self.default_termination = MultiObjectiveDefaultTermination()
 
 
 # ---------------------------------------------------------------------------------------------------------

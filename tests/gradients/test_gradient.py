@@ -1,14 +1,13 @@
-import unittest
-
 import numpy as np
+import pytest
 
+from tests.gradients.grad_problem import ZDT1WithGradient, ZDT2WithGradient, ZDT3WithGradient, \
+    AutomaticDifferentiationProblem, SphereWithGradientAndConstraint
+
+from pymoo.experimental.numdiff import NumericalDifferentiation, OneSidedJacobian, CentralJacobian, ComplexStepJacobian
 from pymoo.model.evaluator import Evaluator
 from pymoo.model.problem import Problem
 from pymoo.problems.multi.zdt import ZDT1, ZDT2, ZDT3
-from pymoo.util.differentiation.numerical import NumericalDifferentiation, OneSidedJacobian, CentralJacobian, \
-    ComplexStepJacobian
-from tests.gradients.grad_problem import ZDT2WithGradient, ZDT3WithGradient, ZDT1WithGradient, \
-    AutomaticDifferentiationProblem, SphereWithGradientAndConstraint
 
 
 class ElementwiseZDT1(Problem):
@@ -28,95 +27,92 @@ class ElementwiseZDT1(Problem):
         out["F"] = ([f1, f2])
 
 
-class GradientTest(unittest.TestCase):
+@pytest.mark.skip()
+def test_automatic_differentiation_gradient():
+    for entry in [(ZDT1(), ZDT1WithGradient()),
+                  (ZDT2(), ZDT2WithGradient()),
+                  (ZDT3(), ZDT3WithGradient())]:
+        auto_diff, correct, = entry
 
-    def test_automatic_differentiation_gradient(self):
-        for entry in [(ZDT1(), ZDT1WithGradient()),
-                      (ZDT2(), ZDT2WithGradient()),
-                      (ZDT3(), ZDT3WithGradient())]:
-            auto_diff, correct, = entry
+        X = np.random.random((100, correct.n_var))
 
-            X = np.random.random((100, correct.n_var))
+        F, dF = correct.evaluate(X, return_values_of=["F", "dF"])
+        _F, _dF = auto_diff.evaluate(X, return_values_of=["F", "dF"])
 
-            F, dF = correct.evaluate(X, return_values_of=["F", "dF"])
-            _F, _dF = auto_diff.evaluate(X, return_values_of=["F", "dF"])
+        np.testing.assert_allclose(_F, F, rtol=1e-5, atol=0)
+        np.testing.assert_allclose(_dF, dF, rtol=1e-5, atol=0)
 
-            self.assertTrue(np.all(np.abs(_F - F) < 0.00001))
-            self.assertTrue(np.all(np.abs(_dF - dF) < 0.00001))
 
-    def test_numerical_differentiation_gradient(self):
-        for entry in [(ZDT1(), ZDT1WithGradient()),
-                      (ZDT2(), ZDT2WithGradient()),
-                      (ZDT3(), ZDT3WithGradient()),
-                      # (MySphere(), MySphereWithGradient())
-                      ]:
-            problem, correct, = entry
+@pytest.mark.skip()
+def test_numerical_differentiation_gradient():
+    for entry in [(ZDT1(), ZDT1WithGradient()),
+                  (ZDT2(), ZDT2WithGradient()),
+                  (ZDT3(), ZDT3WithGradient()),
+                  # (MySphere(), MySphereWithGradient())
+                  ]:
+        problem, correct, = entry
 
-            np.random.seed(1)
-            X = np.random.random((100, correct.n_var))
-
-            F, dF = correct.evaluate(X, return_values_of=["F", "dF"])
-
-            _dF = NumericalDifferentiation(jacobian=OneSidedJacobian()).do(problem, X, F)
-            self.assertTrue(np.all(np.abs(_dF - dF) < 0.001))
-
-            _dF = NumericalDifferentiation(jacobian=CentralJacobian()).do(problem, X, F)
-            self.assertTrue(np.all(np.abs(_dF - dF) < 0.001))
-
-            _dF = NumericalDifferentiation(jacobian=ComplexStepJacobian()).do(problem, X, F)
-            self.assertTrue(np.all(np.abs(_dF - dF) < 0.001))
-
-            # _dF = ForwardNumericalDifferentiation().do(problem, Solution(X=X[0], F=F[0]))
-            # _dF = ForwardNumericalDifferentiation().do(problem, Population.new(X=X, F=F))
-
-    def test_numerical_differentiation_hessian(self):
         np.random.seed(1)
+        X = np.random.random((100, correct.n_var))
 
-        rosen = lambda x: (1 - x[0]) ** 2 + 105. * (x[1] - x[0] ** 2) ** 2
-        cubic = lambda x: (x ** 3).sum()
-        sphere = lambda x: (x ** 2).sum()
-        for func in [
-            sphere,
-            cubic,
-            rosen,
-        ]:
-            problem = AutomaticDifferentiationProblem(func, n_var=5)
+        F, dF = correct.evaluate(X, return_values_of=["F", "dF"])
 
-            X = np.random.random((1, problem.n_var))
-            F, dF, ddF = problem.evaluate(X, return_values_of=["F", "dF", "ddF"])
+        _dF = NumericalDifferentiation(jacobian=OneSidedJacobian()).do(problem, X, F)
+        np.testing.assert_allclose(_dF, dF, rtol=1e-5, atol=0)
 
-            evaluator = Evaluator()
-            _dF, _ddF = NumericalDifferentiation(eps=None).do(problem, X, F, evaluator=evaluator, hessian=True)
-            print(evaluator.n_eval)
-            self.assertTrue(np.all(np.abs(_dF - dF) < 0.0001))
-            self.assertTrue(np.all(np.abs(_ddF - ddF) < 0.001))
-            print(func)
+        _dF = NumericalDifferentiation(jacobian=CentralJacobian()).do(problem, X, F)
+        np.testing.assert_allclose(_dF, dF, rtol=1e-5, atol=0)
+
+        _dF = NumericalDifferentiation(jacobian=ComplexStepJacobian()).do(problem, X, F)
+        np.testing.assert_allclose(_dF, dF, rtol=1e-5, atol=0)
+
+        # _dF = ForwardNumericalDifferentiation().do(problem, Solution(X=X[0], F=F[0]))
+        # _dF = ForwardNumericalDifferentiation().do(problem, Population.new(X=X, F=F))
 
 
-        print("Done")
+@pytest.mark.skip()
+def test_numerical_differentiation_hessian():
+    np.random.seed(1)
 
-
-    def test_numerical_differentiation_with_gradient(self):
-        np.random.seed(1)
-
-        problem = SphereWithGradientAndConstraint()
+    rosen = lambda x: (1 - x[0]) ** 2 + 105. * (x[1] - x[0] ** 2) ** 2
+    cubic = lambda x: (x ** 3).sum()
+    sphere = lambda x: (x ** 2).sum()
+    for func in [
+        sphere,
+        cubic,
+        rosen,
+    ]:
+        problem = AutomaticDifferentiationProblem(func, n_var=5)
 
         X = np.random.random((1, problem.n_var))
-        F, G, dF, ddF, dG, ddG = problem.evaluate(X, return_values_of=["F", "G", "dF", "ddF", "dG", "ddG"])
+        F, dF, ddF = problem.evaluate(X, return_values_of=["F", "dF", "ddF"])
 
         evaluator = Evaluator()
-        _dF, _ddF, _dG, _ddG = NumericalDifferentiation(eps=None).do(problem, X, F, G=G, evaluator=evaluator, hessian=True)
-
+        _dF, _ddF = NumericalDifferentiation(eps=None).do(problem, X, F, evaluator=evaluator, hessian=True)
         print(evaluator.n_eval)
-        self.assertTrue(np.all(np.abs(_dF - dF) < 0.0001))
-        self.assertTrue(np.all(np.abs(_ddF - ddF) < 0.001))
-        self.assertTrue(np.all(np.abs(_dG - dG) < 0.0001))
-        self.assertTrue(np.all(np.abs(_ddG - ddG) < 0.001))
+        np.testing.assert_allclose(_dF, dF, rtol=1e-5, atol=0)
+        np.testing.assert_allclose(_ddF, ddF, rtol=1e-5, atol=0)
+        print(func)
+
+    print("Done")
 
 
+@pytest.mark.skip()
+def test_numerical_differentiation_with_gradient():
+    np.random.seed(1)
 
-        print("Done")
+    problem = SphereWithGradientAndConstraint()
 
+    X = np.random.random((1, problem.n_var))
+    F, G, dF, ddF, dG, ddG = problem.evaluate(X, return_values_of=["F", "G", "dF", "ddF", "dG", "ddG"])
 
-if __name__ == '__main__':
-    unittest.main()
+    evaluator = Evaluator()
+    _dF, _ddF, _dG, _ddG = NumericalDifferentiation(eps=None).do(problem, X, F, G=G, evaluator=evaluator, hessian=True)
+
+    print(evaluator.n_eval)
+    np.testing.assert_allclose(_dF, dF, rtol=1e-5, atol=0)
+    np.testing.assert_allclose(_ddF, ddF, rtol=1e-5, atol=0)
+    np.testing.assert_allclose(_dG, dG, rtol=1e-5, atol=0)
+    np.testing.assert_allclose(_ddG, ddG, rtol=1e-5, atol=0)
+
+    print("Done")

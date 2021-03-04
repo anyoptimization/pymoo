@@ -3,12 +3,12 @@ import subprocess
 
 import numpy as np
 
-from pymoo.model.problem import Problem
+from pymoo.model.problem import ElementwiseProblem
 
 
-class MOPTA08(Problem):
+class MOPTA08(ElementwiseProblem):
     def __init__(self, exec):
-        super().__init__(n_var=124, n_obj=1, n_constr=68, xl=0, xu=1, type_var=np.double, elementwise_evaluation=True)
+        super().__init__(n_var=124, n_obj=1, n_constr=68, xl=0, xu=1, type_var=np.double)
         self.exec = exec
 
     def _evaluate(self, x, out, *args, **kwargs):
