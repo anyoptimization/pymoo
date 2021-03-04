@@ -1,9 +1,6 @@
 import os
 from pathlib import Path
 
-import nbformat
-from nbconvert.preprocessors import CellExecutionError, ExecutePreprocessor
-
 from pymoo.configuration import get_pymoo
 
 ROOT = get_pymoo()
@@ -42,6 +39,9 @@ def run_usage(f):
 
 
 def run_ipynb(fname, overwrite=False):
+    import nbformat
+    from nbconvert.preprocessors import CellExecutionError, ExecutePreprocessor
+
     ep = ExecutePreprocessor(timeout=10000, kernel_name='python3')
 
     print(fname.split("/")[-1])
