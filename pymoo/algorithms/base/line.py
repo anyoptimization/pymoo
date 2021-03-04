@@ -26,7 +26,7 @@ class LineSearch(Algorithm):
 
         return self
 
-    def _initialize(self):
+    def _initialize_infill(self):
 
         # x could be a vector or an individual
         if isinstance(self.point, np.ndarray):

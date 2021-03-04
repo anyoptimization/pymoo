@@ -44,6 +44,8 @@ with Video(File("ga.mp4")) as vid:
 
         # finally record the current visualization to the video
         vid.record()
+
+        del sc
 # END ga
 
 

@@ -77,7 +77,7 @@ def comp_by_cv_and_clearing_fitness(pop, P, **kwargs):
                 S[i] = compare(a, pop[a].get("rank"), b, pop[b].get("rank"),
                                method='smaller_is_better', return_random_if_equal=True)
 
-    return S[:, None].astype(np.int)
+    return S[:, None].astype(int)
 
 
 # =========================================================================================================

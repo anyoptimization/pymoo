@@ -26,7 +26,7 @@ class DE(GeneticAlgorithm):
                  pop_size=100,
                  n_offsprings=100,
                  sampling=LatinHypercubeSampling(),
-                 variant="DE/rand/1/bin",
+                 variant="DE/best/1/bin",
                  CR=0.5,
                  F=0.3,
                  dither="vector",
@@ -86,7 +86,7 @@ class DE(GeneticAlgorithm):
         if len(self.pop) != len(infills):
             self.indices = np.random.permutation(len(self.pop))[:len(infills)]
         else:
-            self.indices = np.arange(len(self.pop))
+            self.indices = np.arange(len(infills))
 
         return infills
 

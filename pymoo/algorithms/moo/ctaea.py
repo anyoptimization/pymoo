@@ -45,7 +45,7 @@ def comp_by_cv_dom_then_random(pop, P, **kwargs):
         else:
             S[i] = np.random.choice([a, b])
 
-    return S[:, None].astype(np.int)
+    return S[:, None].astype(int)
 
 
 class RestrictedMating(TournamentSelection):
@@ -131,12 +131,13 @@ class CTAEA(GeneticAlgorithm):
                 "Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
                 (self.ref_dirs.shape[1], problem.n_obj))
 
-    def _initialize(self):
+    def _initialize_infill(self):
         return self.initialization.do(self.problem, self.pop_size, algorithm=self)
 
-    def _post_initialize(self):
-        super()._post_initialize()
-        self.pop, self.da = self.survival.do(self.problem, self.pop, Population(), n_survive=len(self.pop), algorithm=self)
+    def _initialize_advance(self, infills=None, **kwargs):
+        super()._initialize_advance(infills, **kwargs)
+        self.pop, self.da = self.survival.do(self.problem, self.pop, Population(), n_survive=len(self.pop),
+                                             algorithm=self)
 
     def _infill(self):
         Hm = Population.merge(self.pop, self.da)

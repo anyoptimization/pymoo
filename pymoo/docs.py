@@ -2,11 +2,12 @@
 
 import inspect
 import re
+from pymoo.configuration import Configuration
 
 # =========================================================================================================
 # Docstrings Dictionary
 # =========================================================================================================
-from pymoo.configuration import Configuration
+
 
 algorithms = {
     "pop_size": """ int

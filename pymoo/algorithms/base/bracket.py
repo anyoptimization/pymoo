@@ -13,7 +13,7 @@ class BracketSearch(Algorithm):
         assert problem.n_var == 1 and not problem.has_constraints() and problem.n_obj == 1, msg
         self.a, self.b = a, b
 
-    def _initialize(self):
+    def _initialize_infill(self):
 
         # the boundaries of the problem for initialization
         xl, xu = self.problem.bounds()

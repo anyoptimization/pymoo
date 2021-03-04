@@ -81,8 +81,6 @@ class Algorithm:
         self.display = kwargs.get("display")
         # callback to be executed each generation
         self.callback = kwargs.get("callback")
-        # whether after the initialization advance should be called or not
-        self.advance_after_initialization = kwargs.get("advance_after_initialization")
 
         # !
         # Attributes to be set later on for each problem run
@@ -204,36 +202,6 @@ class Algorithm:
 
         return self
 
-    def initialize(self, pop=None):
-
-        # hook mostly used by the class to happen before even to initialize
-        self._pre_initialize()
-
-        self.pop = pop
-
-        # call the initialize method of the concrete algorithm implementation
-        if pop is None:
-            pop = self._initialize()
-
-        # evaluate the population
-        if pop is not None:
-            pop.set("n_gen", 1)
-            self.evaluator.eval(self.problem, pop, algorithm=self)
-
-        # assign the population to the algorithm
-        self.pop = pop
-
-        # hook for things to happen after the individuals are evaluated
-        self._post_initialize()
-
-        # set the optimum after the initialization has been done
-        self._set_optimum()
-
-        # set the algorithm object to be initialized
-        self.is_initialized = True
-
-        return self
-
     def run(self):
 
         # now the termination criterion should be set
@@ -256,45 +224,85 @@ class Algorithm:
         return self._finalize()
 
     def next(self):
+        # get the infill solutions
+        infills = self.infill()
+
+        # call the advance with them after evaluation
+        if infills is not None:
+            self.evaluator.eval(self.problem, infills, algorithm=self)
+            self.advance(infills=infills)
+
+        # if the algorithm does not follow the infill-advance scheme just call advance
+        else:
+            self.advance()
+
+    def _initialize(self):
+
+        # the time starts whenever this method is called
+        self.start_time = time.time()
+
+        # set the attribute for the optimization method to start
+        self.n_gen = 1
+        self.has_terminated = False
+        self.pop, self.opt = Population(), None
+
+        # if the history is supposed to be saved
+        if self.save_history:
+            self.history = []
+
+    def infill(self):
         if self.problem is None:
             raise Exception("Please call `setup(problem)` before calling next().")
 
         # the first time next is called simply initial the algorithm - makes the interface cleaner
         if not self.is_initialized:
-            self.initialize()
 
-        # call next of the implementation of the algorithm
+            # hook mostly used by the class to happen before even to initialize
+            self._initialize()
+
+            # execute the initialization infill of the algorithm
+            infills = self._initialize_infill()
+
         else:
-            self.step()
-
-        # set whether the algorithm is terminated or not
-        self.has_terminated = not self.termination.do_continue(self)
-
-        # if the algorithm has terminated call the finalize method
-        if self.has_terminated:
-            self.finalize()
-
-    def infill(self):
-        # request the infill solutions if the algorithm has implemented it
-        off = self._infill()
+            # request the infill solutions if the algorithm has implemented it
+            infills = self._infill()
 
         # the the current generation to the offsprings
-        if off is not None:
-            off.set("n_gen", self.n_gen)
+        if infills is not None:
+            infills.set("n_gen", self.n_gen)
 
-        return off
+        return infills
 
     def advance(self, infills=None, **kwargs):
 
         # if infills have been provided set them as offsprings and feed them into advance
-        if infills is not None:
-            self.off = infills
+        self.off = infills
 
-        # call the implementation of the advance method - if the infill is not None
-        self._advance(infills=infills, **kwargs)
+        # if the algorithm has not been already initialized
+        if not self.is_initialized:
 
-        # execute everything which needs to be done after having the algorithm advanced to the nexg generation
+            # assign the population to the algorithm
+            self.pop = infills
+
+            # do whats necessary after the initialization
+            self._initialize_advance(infills=infills, **kwargs)
+
+            # set this algorithm to be initialized
+            self.is_initialized = True
+
+        else:
+            # call the implementation of the advance method - if the infill is not None
+            self._advance(infills=infills, **kwargs)
+
+        # execute everything which needs to be done after having the algorithm advanced to the next generation
         self._post_advance()
+
+        # set whether the algorithm has terminated or not
+        self.has_terminated = not self.termination.do_continue(self)
+
+        # if the algorithm has terminated call the finalize method
+        if self.has_terminated:
+            return self.finalize()
 
         # increase the generation counter by one
         self.n_gen += 1
@@ -347,42 +355,8 @@ class Algorithm:
     # PROTECTED
     # =========================================================================================================
 
-    def _pre_initialize(self):
-
-        # the time starts whenever this method is called
-        self.start_time = time.time()
-
-        # set the attribute for the optimization method to start
-        self.n_gen = 1
-        self.has_terminated = False
-        self.pop, self.opt = Population(), None
-
-        # if the history is supposed to be saved
-        if self.save_history:
-            self.history = []
-
-    def _post_initialize(self):
-        pop = self.pop
-
-        # initially set the population, offsprings and infill to the initialized pop
-        self.off = pop
-
-        # advance once if the algorithms says to do so
-        if self.advance_after_initialization:
-            self._advance(infills=pop)
-
-        # and also do the post advance steps
-        self._post_advance()
-
-    def step(self):
-
-        infills = self.infill()
-
-        if infills is not None:
-            self.evaluator.eval(self.problem, infills, algorithm=self)
-            self.advance(infills=infills)
-        else:
-            self.advance()
+    def _initialize_advance(self, infills=None, **kwargs):
+        pass
 
     def _set_optimum(self):
         self.opt = filter_optimum(self.pop, least_infeasible=True)
@@ -419,7 +393,7 @@ class Algorithm:
     def _setup(self, problem, **kwargs):
         pass
 
-    def _initialize(self):
+    def _initialize_infill(self):
         pass
 
     def _infill(self):

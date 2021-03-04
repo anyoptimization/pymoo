@@ -46,6 +46,10 @@ class Individual:
             self.data[key] = value
         return self
 
+    def set_by_dict(self, **kwargs):
+        for k, v in kwargs.items():
+            self.set(k, v)
+
     def copy(self, deep=False):
         ind = copy.copy(self)
         ind.data = copy.copy(self.data) if not deep else copy.deepcopy(self.data)

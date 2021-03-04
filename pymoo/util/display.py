@@ -106,7 +106,7 @@ class Display:
                 self.output.do()
 
         # catch any exception to make sure the algorithm does not fail because of printing
-        except:
+        except Exception as ex:
             print("WARNING: Error while preparing the output to be printed.")
 
         self.display_header = False

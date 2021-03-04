@@ -35,7 +35,7 @@ def comp_by_rank_and_ref_line_dist(pop, P, **kwargs):
         if np.isnan(S[i]):
             S[i] = np.random.choice([a, b])
 
-    return S[:, None].astype(np.int)
+    return S[:, None].astype(int)
 
 
 class UNSGA3(NSGA3):

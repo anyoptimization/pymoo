@@ -31,7 +31,6 @@ def plot(*args, show=True, labels=None, no_fill=False, **kwargs):
 
 def plot_3d(*args, no_fill=False, labels=None, **kwargs):
     fig = plt.figure()
-    from mpl_toolkits.mplot3d import Axes3D
     ax = fig.add_subplot(111, projection='3d')
 
     for i, F in enumerate(args):

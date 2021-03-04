@@ -2,10 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from pymoo.model.problem import Problem
+from pymoo.model.problem import ElementwiseProblem
 
 
-class TravelingSalesman(Problem):
+class TravelingSalesman(ElementwiseProblem):
 
     def __init__(self, cities, **kwargs):
         """
@@ -27,8 +27,7 @@ class TravelingSalesman(Problem):
             n_obj=1,
             xl=0,
             xu=n_cities,
-            type_var=np.int,
-            elementwise_evaluation=True,
+            type_var=int,
             **kwargs
         )
 

@@ -54,6 +54,6 @@ def exact_line_search(problem, sol, direction, algorithm=GoldenSectionSearch(), 
 
 def inexact_line_search(problem, sol, direction, evaluator=None):
     algorithm = BacktrackingLineSearch()
-    algorithm = algorithm.setup(problem, point=sol, direction=direction).initialize()
+    algorithm = algorithm.setup(problem, point=sol, direction=direction)._initialize()
     res = minimize(problem, algorithm, evaluator=evaluator)
     return res.opt[0]

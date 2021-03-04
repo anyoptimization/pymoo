@@ -82,7 +82,7 @@ class RVEA(GeneticAlgorithm):
 
         # check whether the n_gen termination is used - otherwise this algorithm can be not run
         if not isinstance(self.termination, MaximumGenerationTermination):
-            raise Exception("Please use the n_gen or n_eval as a termination criterion to execute RVEA!")
+            raise Exception("Please use the n_gen or n_eval as a termination criterion to run RVEA!")
 
     def _advance(self, **kwargs):
         super()._advance(**kwargs)
@@ -179,6 +179,7 @@ class APDSurvival(Survival):
 
             # if niche not empty
             if len(assigned_to_niche) > 0:
+
                 # the angle of niche to nearest neighboring niche
                 gamma = self.gamma[k]
 

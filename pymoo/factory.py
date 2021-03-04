@@ -151,6 +151,7 @@ def get_crossover_options():
     from pymoo.operators.crossover.point_crossover import PointCrossover
     from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
     from pymoo.operators.crossover.uniform_crossover import UniformCrossover
+    from pymoo.operators.crossover.parent_centric_crossover import PCX
     from pymoo.operators.integer_from_float_operator import IntegerFromFloatCrossover
     from pymoo.operators.crossover.edge_recombination_crossover import EdgeRecombinationCrossover
     from pymoo.operators.crossover.order_crossover import OrderCrossover
@@ -159,6 +160,7 @@ def get_crossover_options():
         ("real_sbx", SimulatedBinaryCrossover, dict(prob=0.9, eta=30)),
         ("int_sbx", IntegerFromFloatCrossover, dict(clazz=SimulatedBinaryCrossover, prob=0.9, eta=30)),
         ("real_de", DifferentialEvolutionCrossover),
+        ("real_pcx", PCX),
         ("(real|bin|int)_ux", UniformCrossover),
         ("(bin|int)_hux", HalfUniformCrossover),
         ("(real|bin|int)_exp", ExponentialCrossover),

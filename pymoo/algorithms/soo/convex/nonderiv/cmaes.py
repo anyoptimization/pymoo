@@ -21,10 +21,6 @@ from pymoo.vendor.vendor_cmaes import my_fmin
 class CMAESDisplay(Display):
 
     def _do(self, problem, evaluator, algorithm):
-
-        if algorithm.es.gi_frame is None:
-            return
-
         super()._do(problem, evaluator, algorithm)
 
         fmin = algorithm.es.gi_frame.f_locals
@@ -386,9 +382,8 @@ class CMAES(LocalSearch):
         elif isinstance(self.termination, MaximumFunctionCallTermination):
             self.options['maxfevals'] = self.termination.n_max_evals
 
-    def _initialize(self):
-        super()._initialize()
-        self.pop = Population()
+    def _initialize_advance(self, **kwargs):
+        super()._initialize_advance(**kwargs)
 
         kwargs = dict(
             options=self.options,
@@ -404,44 +399,43 @@ class CMAES(LocalSearch):
 
         x0 = self.norm.forward(self.x0.X)
         self.es = my_fmin(x0, self.sigma, **kwargs)
-        return self.infill()
 
-    def _infill(self):
+        # do this to allow the printout in the first generation
+        self.next_X = next(self.es)
 
-        if self.pop is None or len(self.pop) == 0:
-            X = next(self.es)
+    def _local_infill(self):
+        X = np.array(self.next_X)
+        self.send_array_to_yield = X.ndim > 1
+        X = np.atleast_2d(X)
 
-        else:
-            F = self.pop.get("F")[:, 0].tolist()
+        # evaluate the population
+        self.pop = Population.new("X", self.norm.backward(X))
 
-            if not self.send_array_to_yield:
-                F = F[0]
+        return self.pop
 
-            try:
-                X = self.es.send(F)
-            except StopIteration:
-                X = None
-                self.termination.force_termination = True
+    def _local_advance(self, infills=None, **kwargs):
 
-        if X is not None:
-            X = np.array(X)
-            self.send_array_to_yield = X.ndim > 1
-            X = np.atleast_2d(X)
-
-            # evaluate the population
-            self.pop = Population.new("X", self.norm.backward(X))
-
-            return self.pop
-
-    def _advance(self, infills=None, **kwargs):
         if infills is None:
             self.termination.force_termination = True
 
         else:
+
             # set infeasible individual's objective values to np.nan - then CMAES can handle it
             for ind in infills:
                 if not ind.feasible[0]:
                     ind.F[0] = np.nan
+
+            F = infills.get("F")[:, 0].tolist()
+            if not self.send_array_to_yield:
+                F = F[0]
+
+            try:
+                self.next_X = self.es.send(F)
+            except:
+                self.next_X = None
+
+            if self.next_X is None:
+                self.termination.force_termination = True
 
     def _set_optimum(self):
         pop = self.pop if self.opt is None else Population.merge(self.opt, self.pop)
@@ -487,17 +481,16 @@ class SimpleCMAES(LocalSearch):
             self.opts['bounds'] = [xl, xu]
         self.opts['seed'] = self.seed
 
-    def _infill(self):
+    def _initialize_advance(self, infills=None, **kwargs):
+        super()._initialize_advance(infills, **kwargs)
+        x = self.norm.forward(self.x0.X)
+        self.es = cma.CMAEvolutionStrategy(x, self.sigma, inopts=self.opts)
 
-        # if the object has not been set yet so so
-        if self.es is None:
-            x = self.norm.forward(self.x0.X)
-            self.es = cma.CMAEvolutionStrategy(x, self.sigma, inopts=self.opts)
-
+    def _local_infill(self):
         X = self.norm.backward(np.array(self.es.ask()))
         return Population.new("X", X)
 
-    def _advance(self, infills=None, **kwargs):
+    def _local_advance(self, infills=None, **kwargs):
         X, F = infills.get("X", "F")
         X = self.norm.forward(X)
 

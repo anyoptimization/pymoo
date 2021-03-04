@@ -1,4 +1,5 @@
-from pymoo.model.problem import MetaProblem, Problem
+from pymoo.model.problem import Problem
+from pymoo.problems.meta import MetaProblem
 from pymoo.util.misc import at_least_2d_array
 
 

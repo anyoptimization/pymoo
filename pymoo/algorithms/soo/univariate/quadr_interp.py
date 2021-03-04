@@ -30,8 +30,8 @@ class QuadraticInterpolationSearch(BracketSearch):
         """
         super().__init__(a, b, **kwargs)
 
-    def _initialize(self):
-        super()._initialize()
+    def _initialize_infill(self):
+        super()._initialize_infill()
         a, b = self.a, self.b
 
         # set c to be directly in the middle between the two brackets

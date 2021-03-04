@@ -14,8 +14,8 @@ class BacktrackingLineSearch(LineSearch):
         self.beta = beta
         self.default_termination = NoTermination()
 
-    def _initialize(self):
-        super()._initialize()
+    def _initialize_infill(self):
+        super()._initialize_infill()
         self.t = 1.0
         self.point.set("t", self.t)
 
@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
     direction = - point.get("dF")[0]
 
-    algorithm = BacktrackingLineSearch().setup(problem, point=point, direction=direction).initialize()
+    algorithm = BacktrackingLineSearch().setup(problem, point=point, direction=direction)._initialize()
 
     res = minimize(problem, algorithm)
 

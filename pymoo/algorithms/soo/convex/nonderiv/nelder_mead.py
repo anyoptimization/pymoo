@@ -35,6 +35,9 @@ class NelderAndMeadTermination(Termination):
     def _do_continue(self, algorithm):
         pop, problem = algorithm.pop, algorithm.problem
 
+        if len(pop) != problem.n_var + 1:
+            return True
+
         X, F = pop.get("X", "F")
 
         ftol = np.abs(F[1:] - F[0]).max() <= self.ftol
@@ -119,7 +122,7 @@ class NelderMead(LocalSearch):
         # the termination used for nelder and mead if nothing else provided
         self.default_termination = NelderAndMeadTermination()
 
-    def _initialize(self):
+    def _local_initialize_infill(self):
         self.alpha, self.beta, self.gamma, self.delta = self.func_params(self.problem)
 
         # the corresponding x values of the provided or best found solution
@@ -140,13 +143,11 @@ class NelderMead(LocalSearch):
 
         return Population.merge(self.x0, simplex)
 
-    def _post_initialize(self):
-        super()._post_initialize()
-
+    def _local_initialize_advance(self, infills=None, **kwargs):
         # sort the current simplex by fitness
-        self.pop = FitnessSurvival().do(self.problem, self.pop, len(self.pop))
+        self.pop = FitnessSurvival().do(self.problem, infills, n_survive=len(infills))
 
-    def _advance(self, **kwargs):
+    def _local_advance(self, **kwargs):
 
         # number of variables increased by one - matches equations in the paper
         xl, xu = self.problem.bounds()
@@ -243,7 +244,7 @@ class NelderMead(LocalSearch):
                 pop[i].X = pop[0].X + self.delta * (pop[i].X - pop[0].X)
             pop[1:] = self.evaluator.eval(self.problem, pop[1:], algorithm=self)
 
-        self.pop = FitnessSurvival().do(self.problem, pop, len(pop))
+        self.pop = FitnessSurvival().do(self.problem, pop, n_survive=len(pop))
 
     def initialize_simplex(self, x0):
 

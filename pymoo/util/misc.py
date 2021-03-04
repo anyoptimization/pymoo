@@ -184,8 +184,8 @@ def vectorized_cdist(A, B, func_dist=func_euclidean_distance, fill_diag_with_inf
 def covert_to_type(problem, X):
     if problem.type_var == np.double:
         return X.astype(np.double)
-    elif problem.type_var == np.int:
-        return np.round(X).astype(np.int)
+    elif problem.type_var == int:
+        return np.round(X).astype(int)
     elif problem.type_var == np.bool:
         return X < (problem.xu - problem.xl) / 2
 

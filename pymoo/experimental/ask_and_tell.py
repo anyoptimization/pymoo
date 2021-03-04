@@ -18,8 +18,8 @@ class AskAndTell:
         if algo.is_initialized:
             return algo.infill()
         else:
-            algo._pre_initialize()
-            return algo._initialize()
+            algo._initialize()
+            return algo._initialize_infill()
 
     def tell(self, pop):
         algo = self.algorithm

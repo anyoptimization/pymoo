@@ -1,14 +1,15 @@
-from pymoo.algorithms.moo.gde3 import GDE3
-from pymoo.factory import get_problem, ZDT1, ZDT3
+from pymoo.algorithms.moo.age import AGEMOEA
+from pymoo.factory import get_problem
 from pymoo.optimize import minimize
 from pymoo.visualization.scatter import Scatter
 
-problem = get_problem("wfg1", n_var=10, n_obj=2)
+problem = get_problem("tnk")
 
-algorithm = GDE3(pop_size=100)
+algorithm = AGEMOEA(pop_size=100, n_offsprings=100)
 
 res = minimize(problem,
                algorithm,
+               ('n_gen', 200),
                seed=1,
                verbose=True)
 
