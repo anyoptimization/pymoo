@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pymoo.model.problem import Problem
+from pymoo.model.problem import ElementwiseProblem
 
 
-class FlowshopScheduling(Problem):
+class FlowshopScheduling(ElementwiseProblem):
 
     def __init__(self, processing_times, **kwargs):
         """
@@ -26,7 +26,6 @@ class FlowshopScheduling(Problem):
             xl=0,
             xu=n_machines,
             type_var=int,
-            elementwise_evaluation=True,
             **kwargs
         )
 

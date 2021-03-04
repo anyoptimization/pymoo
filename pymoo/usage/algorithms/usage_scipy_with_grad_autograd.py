@@ -16,7 +16,7 @@ class MySphere(Problem):
 
 problem = MySphere()
 
-algorithm = LBFGSB(estm_gradients=False)
+algorithm = LBFGSB(estm_gradients=True)
 
 res = minimize(problem,
                algorithm,

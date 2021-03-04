@@ -37,16 +37,14 @@ class Optimizer(LocalSearch):
             'maxiter': int(1e8),  # because of C code interfacing this can not be inf
             'disp': disp}
 
-    def setup(self, problem, **kwargs):
-        super().setup(problem, **kwargs)
-
+    def _setup(self, problem, **kwargs):
         if isinstance(self.termination, MaximumGenerationTermination):
             self.options["maxiter"] = self.termination.n_max_gen
 
         self.termination = NoTermination()
         self.return_least_infeasible = True
 
-    def step(self):
+    def _advance(self, **kwargs):
         problem, evaluator = self.problem, self.evaluator
 
         # add the box constraints defined in the problem

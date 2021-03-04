@@ -117,11 +117,13 @@ class AutomaticDifferentiation(MetaProblem):
                 for key in deriv:
                     val = out.get(key)
 
-                    if val.ndim == 1:
-                        val = val[:, None]
+                    if val is not None:
 
-                    jac = calc_jacobian(out["__autograd__"], val)
-                    out["d" + key] = jac
+                        if val.ndim == 1:
+                            val = val[:, None]
+
+                        jac = calc_jacobian(out["__autograd__"], val)
+                        out["d" + key] = jac
 
                 # make sure all results are pure numpy arrays
                 out_to_numpy(out)

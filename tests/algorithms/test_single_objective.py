@@ -1,5 +1,3 @@
-import unittest
-
 import numpy as np
 
 from pymoo.algorithms.soo.convex.nonderiv.nelder_mead import NelderMead
@@ -31,7 +29,7 @@ class SphereWithConstraints(Problem):
         return 0.1
 
 
-def test(problem, algorithm):
+def run(problem, algorithm):
     res = minimize(problem, algorithm, seed=1)
     f = res.F[0]
     print(res.CV)
@@ -39,31 +37,27 @@ def test(problem, algorithm):
     return f, f_opt
 
 
-class SingleObjectiveAlgorithmTest(unittest.TestCase):
-
-    def test_sphere(self):
-        problem = Sphere()
-        for algorithm in [NelderMead(), PatternSearch(), PSO(), GA()]:
-            f, f_opt = test(problem, algorithm)
-            self.assertAlmostEqual(f, f_opt, places=5)
-            print(problem.__class__.__name__, algorithm.__class__.__name__, "Yes")
-
-    def test_sphere_with_constraints(self):
-        problem = SphereWithConstraints()
-        for algorithm in [GA(), NelderMead(), PatternSearch()]:
-            f, f_opt = test(problem, algorithm)
-            self.assertAlmostEqual(f, f_opt, places=3)
-            print(problem.__class__.__name__, algorithm.__class__.__name__, "Yes")
-
-    def test_sphere_no_bounds(self):
-        problem = SphereNoBounds()
-        x0 = np.random.random(problem.n_var)
-
-        for algorithm in [NelderMead(x0=x0), PatternSearch(x0=x0)]:
-            f, f_opt = test(problem, algorithm)
-            self.assertAlmostEqual(f, f_opt, places=5)
-            print(problem.__class__.__name__, algorithm.__class__.__name__, "Yes")
+def test_sphere():
+    problem = Sphere()
+    for algorithm in [NelderMead(), PatternSearch(), PSO(), GA()]:
+        f, f_opt = run(problem, algorithm)
+        np.testing.assert_almost_equal(f, f_opt, decimal=5)
+        print(problem.__class__.__name__, algorithm.__class__.__name__, "Yes")
 
 
-if __name__ == '__main__':
-    unittest.main()
+def test_sphere_with_constraints():
+    problem = SphereWithConstraints()
+    for algorithm in [GA(), NelderMead(), PatternSearch()]:
+        f, f_opt = run(problem, algorithm)
+        np.testing.assert_almost_equal(f, f_opt, decimal=5)
+        print(problem.__class__.__name__, algorithm.__class__.__name__, "Yes")
+
+
+def test_sphere_no_bounds():
+    problem = SphereNoBounds()
+    x0 = np.random.random(problem.n_var)
+
+    for algorithm in [NelderMead(x0=x0), PatternSearch(x0=x0)]:
+        f, f_opt = run(problem, algorithm)
+        np.testing.assert_almost_equal(f, f_opt, decimal=5)
+        print(problem.__class__.__name__, algorithm.__class__.__name__, "Yes")
