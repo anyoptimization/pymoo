@@ -975,7 +975,7 @@ struct __pyx_opt_args_5pymoo_6cython_21non_dominated_sorting_c_fast_non_dominate
   int n_stop_if_ranked;
 };
 
-/* "pymoo/cython/non_dominated_sorting.pyx":481
+/* "pymoo/cython/non_dominated_sorting.pyx":478
  * 
  * 
  * cdef int c_get_relation(double[:,:] F, int a, int b, double epsilon = 0.0):             # <<<<<<<<<<<<<<
@@ -5368,7 +5368,7 @@ __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_t_12, 1, (PyObject *(*)(char *)) __
   return __pyx_r;
 }
 
-/* "pymoo/cython/non_dominated_sorting.pyx":348
+/* "pymoo/cython/non_dominated_sorting.pyx":345
  * 
  * 
  * cdef vector[vector[int]] c_efficient_non_dominated_sort(double[:,:] F, str strategy):             # <<<<<<<<<<<<<<
@@ -5410,7 +5410,7 @@ static std::vector<std::vector<int> >  __pyx_f_5pymoo_6cython_21non_dominated_so
   __Pyx_RefNannySetupContext("c_efficient_non_dominated_sort", 0);
   __PYX_INC_MEMVIEW(&__pyx_v_F, 1);
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":355
+  /* "pymoo/cython/non_dominated_sorting.pyx":352
  * 
  *     # number of individuals
  *     n = len(F)             # <<<<<<<<<<<<<<
@@ -5420,21 +5420,21 @@ static std::vector<std::vector<int> >  __pyx_f_5pymoo_6cython_21non_dominated_so
   __pyx_t_1 = __Pyx_MemoryView_Len(__pyx_v_F); 
   __pyx_v_n = __pyx_t_1;
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":358
+  /* "pymoo/cython/non_dominated_sorting.pyx":355
  * 
  *     # sort the input lexicographically
  *     indices = np.lexsort(F.T[::-1])             # <<<<<<<<<<<<<<
  *     F = np.asarray(F)[indices]
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 358, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_lexsort); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 358, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_lexsort); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_5 = __pyx_v_F;
   __PYX_INC_MEMVIEW(&__pyx_t_5, 1);
-  if (unlikely(__pyx_memslice_transpose(&__pyx_t_5) == 0)) __PYX_ERR(0, 358, __pyx_L1_error)
+  if (unlikely(__pyx_memslice_transpose(&__pyx_t_5) == 0)) __PYX_ERR(0, 355, __pyx_L1_error)
   __pyx_t_6.data = __pyx_t_5.data;
   __pyx_t_6.memview = __pyx_t_5.memview;
   __PYX_INC_MEMVIEW(&__pyx_t_6, 0);
@@ -5453,7 +5453,7 @@ static std::vector<std::vector<int> >  __pyx_f_5pymoo_6cython_21non_dominated_so
     1,
     1) < 0))
 {
-    __PYX_ERR(0, 358, __pyx_L1_error)
+    __PYX_ERR(0, 355, __pyx_L1_error)
 }
 
 __pyx_t_6.shape[1] = __pyx_t_5.shape[1];
@@ -5463,7 +5463,7 @@ __pyx_t_6.strides[1] = __pyx_t_5.strides[1];
 __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
-  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_t_6, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 358, __pyx_L1_error)
+  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_t_6, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __PYX_XDEC_MEMVIEW(&__pyx_t_6, 1);
   __pyx_t_6.memview = NULL;
@@ -5481,25 +5481,25 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_8, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
   __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 358, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_indices = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":359
+  /* "pymoo/cython/non_dominated_sorting.pyx":356
  *     # sort the input lexicographically
  *     indices = np.lexsort(F.T[::-1])
  *     F = np.asarray(F)[indices]             # <<<<<<<<<<<<<<
  * 
  *     # the fronts to be set for each iteration
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 359, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 356, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_asarray); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 359, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_asarray); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 356, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_v_F, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 359, __pyx_L1_error)
+  __pyx_t_4 = __pyx_memoryview_fromslice(__pyx_v_F, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 356, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_8 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -5514,20 +5514,20 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_8, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4);
   __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 359, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 356, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_indices); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 359, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_indices); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 356, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 359, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 356, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_F, 1);
   __pyx_v_F = __pyx_t_6;
   __pyx_t_6.memview = NULL;
   __pyx_t_6.data = NULL;
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":362
+  /* "pymoo/cython/non_dominated_sorting.pyx":359
  * 
  *     # the fronts to be set for each iteration
  *     fronts = vector[vector[int]]()             # <<<<<<<<<<<<<<
@@ -5538,11 +5538,11 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
     __pyx_t_9 = std::vector<std::vector<int> > ();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 362, __pyx_L1_error)
+    __PYX_ERR(0, 359, __pyx_L1_error)
   }
   __pyx_v_fronts = __pyx_t_9;
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":364
+  /* "pymoo/cython/non_dominated_sorting.pyx":361
  *     fronts = vector[vector[int]]()
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -5554,18 +5554,18 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
     __pyx_v_i = __pyx_t_11;
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":366
+    /* "pymoo/cython/non_dominated_sorting.pyx":363
  *     for i in range(n):
  * 
  *         if strategy == "sequential":             # <<<<<<<<<<<<<<
  *             k = sequential_search(F, i, fronts)
  *         else:
  */
-    __pyx_t_12 = (__Pyx_PyString_Equals(__pyx_v_strategy, __pyx_n_s_sequential, Py_EQ)); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 366, __pyx_L1_error)
+    __pyx_t_12 = (__Pyx_PyString_Equals(__pyx_v_strategy, __pyx_n_s_sequential, Py_EQ)); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 363, __pyx_L1_error)
     __pyx_t_13 = (__pyx_t_12 != 0);
     if (__pyx_t_13) {
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":367
+      /* "pymoo/cython/non_dominated_sorting.pyx":364
  * 
  *         if strategy == "sequential":
  *             k = sequential_search(F, i, fronts)             # <<<<<<<<<<<<<<
@@ -5574,7 +5574,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
  */
       __pyx_v_k = __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__pyx_v_F, __pyx_v_i, __pyx_v_fronts);
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":366
+      /* "pymoo/cython/non_dominated_sorting.pyx":363
  *     for i in range(n):
  * 
  *         if strategy == "sequential":             # <<<<<<<<<<<<<<
@@ -5584,7 +5584,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
       goto __pyx_L5;
     }
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":369
+    /* "pymoo/cython/non_dominated_sorting.pyx":366
  *             k = sequential_search(F, i, fronts)
  *         else:
  *             k = binary_search(F, i, fronts)             # <<<<<<<<<<<<<<
@@ -5596,7 +5596,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
     }
     __pyx_L5:;
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":371
+    /* "pymoo/cython/non_dominated_sorting.pyx":368
  *             k = binary_search(F, i, fronts)
  * 
  *         if k >= fronts.size():             # <<<<<<<<<<<<<<
@@ -5606,7 +5606,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
     __pyx_t_13 = ((__pyx_v_k >= __pyx_v_fronts.size()) != 0);
     if (__pyx_t_13) {
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":372
+      /* "pymoo/cython/non_dominated_sorting.pyx":369
  * 
  *         if k >= fronts.size():
  *             empty = vector[int]()             # <<<<<<<<<<<<<<
@@ -5617,11 +5617,11 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
         __pyx_t_14 = std::vector<int> ();
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 372, __pyx_L1_error)
+        __PYX_ERR(0, 369, __pyx_L1_error)
       }
       __pyx_v_empty = __pyx_t_14;
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":373
+      /* "pymoo/cython/non_dominated_sorting.pyx":370
  *         if k >= fronts.size():
  *             empty = vector[int]()
  *             fronts.push_back(empty)             # <<<<<<<<<<<<<<
@@ -5632,10 +5632,10 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
         __pyx_v_fronts.push_back(__pyx_v_empty);
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 373, __pyx_L1_error)
+        __PYX_ERR(0, 370, __pyx_L1_error)
       }
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":371
+      /* "pymoo/cython/non_dominated_sorting.pyx":368
  *             k = binary_search(F, i, fronts)
  * 
  *         if k >= fronts.size():             # <<<<<<<<<<<<<<
@@ -5644,7 +5644,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
  */
     }
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":375
+    /* "pymoo/cython/non_dominated_sorting.pyx":372
  *             fronts.push_back(empty)
  * 
  *         fronts[k].push_back(i)             # <<<<<<<<<<<<<<
@@ -5655,11 +5655,11 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
       (__pyx_v_fronts[__pyx_v_k]).push_back(__pyx_v_i);
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 375, __pyx_L1_error)
+      __PYX_ERR(0, 372, __pyx_L1_error)
     }
   }
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":378
+  /* "pymoo/cython/non_dominated_sorting.pyx":375
  * 
  *     # convert to the return array
  *     ret = vector[vector[int]]()             # <<<<<<<<<<<<<<
@@ -5670,11 +5670,11 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
     __pyx_t_9 = std::vector<std::vector<int> > ();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 378, __pyx_L1_error)
+    __PYX_ERR(0, 375, __pyx_L1_error)
   }
   __pyx_v_ret = __pyx_t_9;
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":379
+  /* "pymoo/cython/non_dominated_sorting.pyx":376
  *     # convert to the return array
  *     ret = vector[vector[int]]()
  *     for i in range(fronts.size()):             # <<<<<<<<<<<<<<
@@ -5686,7 +5686,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_16; __pyx_t_7+=1) {
     __pyx_v_i = __pyx_t_7;
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":380
+    /* "pymoo/cython/non_dominated_sorting.pyx":377
  *     ret = vector[vector[int]]()
  *     for i in range(fronts.size()):
  *         e = vector[int]()             # <<<<<<<<<<<<<<
@@ -5697,11 +5697,11 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
       __pyx_t_14 = std::vector<int> ();
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 380, __pyx_L1_error)
+      __PYX_ERR(0, 377, __pyx_L1_error)
     }
     __pyx_v_e = __pyx_t_14;
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":381
+    /* "pymoo/cython/non_dominated_sorting.pyx":378
  *     for i in range(fronts.size()):
  *         e = vector[int]()
  *         for j in range(fronts[i].size()):             # <<<<<<<<<<<<<<
@@ -5713,7 +5713,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
     for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_18; __pyx_t_10+=1) {
       __pyx_v_j = __pyx_t_10;
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":382
+      /* "pymoo/cython/non_dominated_sorting.pyx":379
  *         e = vector[int]()
  *         for j in range(fronts[i].size()):
  *             k = fronts[i][j]             # <<<<<<<<<<<<<<
@@ -5722,20 +5722,20 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
  */
       __pyx_v_k = ((__pyx_v_fronts[__pyx_v_i])[__pyx_v_j]);
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":383
+      /* "pymoo/cython/non_dominated_sorting.pyx":380
  *         for j in range(fronts[i].size()):
  *             k = fronts[i][j]
  *             val = indices[k]             # <<<<<<<<<<<<<<
  *             e.push_back(val)
  *         ret.push_back(e)
  */
-      __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_indices, __pyx_v_k, int, 1, __Pyx_PyInt_From_int, 0, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 383, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_indices, __pyx_v_k, int, 1, __Pyx_PyInt_From_int, 0, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 383, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 380, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_v_val = __pyx_t_11;
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":384
+      /* "pymoo/cython/non_dominated_sorting.pyx":381
  *             k = fronts[i][j]
  *             val = indices[k]
  *             e.push_back(val)             # <<<<<<<<<<<<<<
@@ -5746,11 +5746,11 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
         __pyx_v_e.push_back(__pyx_v_val);
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 384, __pyx_L1_error)
+        __PYX_ERR(0, 381, __pyx_L1_error)
       }
     }
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":385
+    /* "pymoo/cython/non_dominated_sorting.pyx":382
  *             val = indices[k]
  *             e.push_back(val)
  *         ret.push_back(e)             # <<<<<<<<<<<<<<
@@ -5761,11 +5761,11 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
       __pyx_v_ret.push_back(__pyx_v_e);
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 385, __pyx_L1_error)
+      __PYX_ERR(0, 382, __pyx_L1_error)
     }
   }
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":387
+  /* "pymoo/cython/non_dominated_sorting.pyx":384
  *         ret.push_back(e)
  * 
  *     return ret             # <<<<<<<<<<<<<<
@@ -5775,7 +5775,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   __pyx_r = __pyx_v_ret;
   goto __pyx_L0;
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":348
+  /* "pymoo/cython/non_dominated_sorting.pyx":345
  * 
  * 
  * cdef vector[vector[int]] c_efficient_non_dominated_sort(double[:,:] F, str strategy):             # <<<<<<<<<<<<<<
@@ -5800,7 +5800,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   return __pyx_r;
 }
 
-/* "pymoo/cython/non_dominated_sorting.pyx":391
+/* "pymoo/cython/non_dominated_sorting.pyx":388
  * 
  * 
  * cdef int sequential_search(double[:,:] F, int i, vector[vector[int]] fronts):             # <<<<<<<<<<<<<<
@@ -5819,7 +5819,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("sequential_search", 0);
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":397
+  /* "pymoo/cython/non_dominated_sorting.pyx":394
  *         bool non_dominated
  * 
  *     n_fronts = fronts.size()             # <<<<<<<<<<<<<<
@@ -5828,7 +5828,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
  */
   __pyx_v_n_fronts = __pyx_v_fronts.size();
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":398
+  /* "pymoo/cython/non_dominated_sorting.pyx":395
  * 
  *     n_fronts = fronts.size()
  *     if n_fronts == 0:             # <<<<<<<<<<<<<<
@@ -5838,7 +5838,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
   __pyx_t_1 = ((__pyx_v_n_fronts == 0) != 0);
   if (__pyx_t_1) {
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":399
+    /* "pymoo/cython/non_dominated_sorting.pyx":396
  *     n_fronts = fronts.size()
  *     if n_fronts == 0:
  *         return 0             # <<<<<<<<<<<<<<
@@ -5848,7 +5848,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
     __pyx_r = 0;
     goto __pyx_L0;
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":398
+    /* "pymoo/cython/non_dominated_sorting.pyx":395
  * 
  *     n_fronts = fronts.size()
  *     if n_fronts == 0:             # <<<<<<<<<<<<<<
@@ -5857,7 +5857,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
  */
   }
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":401
+  /* "pymoo/cython/non_dominated_sorting.pyx":398
  *         return 0
  * 
  *     k = 0             # <<<<<<<<<<<<<<
@@ -5866,7 +5866,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
  */
   __pyx_v_k = 0;
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":402
+  /* "pymoo/cython/non_dominated_sorting.pyx":399
  * 
  *     k = 0
  *     while True:             # <<<<<<<<<<<<<<
@@ -5875,7 +5875,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
  */
   while (1) {
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":404
+    /* "pymoo/cython/non_dominated_sorting.pyx":401
  *     while True:
  * 
  *         non_dominated = True             # <<<<<<<<<<<<<<
@@ -5884,7 +5884,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
  */
     __pyx_v_non_dominated = 1;
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":407
+    /* "pymoo/cython/non_dominated_sorting.pyx":404
  * 
  *         # solutions in the k-th front, examine in reverse order
  *         j = fronts[k].size() - 1             # <<<<<<<<<<<<<<
@@ -5893,7 +5893,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
  */
     __pyx_v_j = ((__pyx_v_fronts[__pyx_v_k]).size() - 1);
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":409
+    /* "pymoo/cython/non_dominated_sorting.pyx":406
  *         j = fronts[k].size() - 1
  * 
  *         while j >= 0:             # <<<<<<<<<<<<<<
@@ -5904,7 +5904,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
       __pyx_t_1 = ((__pyx_v_j >= 0) != 0);
       if (!__pyx_t_1) break;
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":410
+      /* "pymoo/cython/non_dominated_sorting.pyx":407
  * 
  *         while j >= 0:
  *             relation = c_get_relation(F, i, fronts[k][j])             # <<<<<<<<<<<<<<
@@ -5913,7 +5913,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
  */
       __pyx_v_relation = __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__pyx_v_F, __pyx_v_i, ((__pyx_v_fronts[__pyx_v_k])[__pyx_v_j]), NULL);
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":411
+      /* "pymoo/cython/non_dominated_sorting.pyx":408
  *         while j >= 0:
  *             relation = c_get_relation(F, i, fronts[k][j])
  *             if relation == -1:             # <<<<<<<<<<<<<<
@@ -5923,7 +5923,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
       __pyx_t_1 = ((__pyx_v_relation == -1L) != 0);
       if (__pyx_t_1) {
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":412
+        /* "pymoo/cython/non_dominated_sorting.pyx":409
  *             relation = c_get_relation(F, i, fronts[k][j])
  *             if relation == -1:
  *                 non_dominated = False             # <<<<<<<<<<<<<<
@@ -5932,7 +5932,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
  */
         __pyx_v_non_dominated = 0;
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":413
+        /* "pymoo/cython/non_dominated_sorting.pyx":410
  *             if relation == -1:
  *                 non_dominated = False
  *                 break             # <<<<<<<<<<<<<<
@@ -5941,7 +5941,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
  */
         goto __pyx_L7_break;
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":411
+        /* "pymoo/cython/non_dominated_sorting.pyx":408
  *         while j >= 0:
  *             relation = c_get_relation(F, i, fronts[k][j])
  *             if relation == -1:             # <<<<<<<<<<<<<<
@@ -5950,7 +5950,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
  */
       }
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":414
+      /* "pymoo/cython/non_dominated_sorting.pyx":411
  *                 non_dominated = False
  *                 break
  *             j = j - 1             # <<<<<<<<<<<<<<
@@ -5961,7 +5961,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
     }
     __pyx_L7_break:;
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":416
+    /* "pymoo/cython/non_dominated_sorting.pyx":413
  *             j = j - 1
  * 
  *         if non_dominated:             # <<<<<<<<<<<<<<
@@ -5971,7 +5971,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
     __pyx_t_1 = (__pyx_v_non_dominated != 0);
     if (__pyx_t_1) {
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":417
+      /* "pymoo/cython/non_dominated_sorting.pyx":414
  * 
  *         if non_dominated:
  *             return k             # <<<<<<<<<<<<<<
@@ -5981,7 +5981,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
       __pyx_r = __pyx_v_k;
       goto __pyx_L0;
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":416
+      /* "pymoo/cython/non_dominated_sorting.pyx":413
  *             j = j - 1
  * 
  *         if non_dominated:             # <<<<<<<<<<<<<<
@@ -5990,7 +5990,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
  */
     }
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":421
+    /* "pymoo/cython/non_dominated_sorting.pyx":418
  *         # move the individual to a new front
  *         else:
  *             k += 1             # <<<<<<<<<<<<<<
@@ -6000,7 +6000,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
     /*else*/ {
       __pyx_v_k = (__pyx_v_k + 1);
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":422
+      /* "pymoo/cython/non_dominated_sorting.pyx":419
  *         else:
  *             k += 1
  *             if k >= n_fronts:             # <<<<<<<<<<<<<<
@@ -6010,7 +6010,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
       __pyx_t_1 = ((__pyx_v_k >= __pyx_v_n_fronts) != 0);
       if (__pyx_t_1) {
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":423
+        /* "pymoo/cython/non_dominated_sorting.pyx":420
  *             k += 1
  *             if k >= n_fronts:
  *                 return n_fronts             # <<<<<<<<<<<<<<
@@ -6020,7 +6020,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
         __pyx_r = __pyx_v_n_fronts;
         goto __pyx_L0;
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":422
+        /* "pymoo/cython/non_dominated_sorting.pyx":419
  *         else:
  *             k += 1
  *             if k >= n_fronts:             # <<<<<<<<<<<<<<
@@ -6031,7 +6031,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
     }
   }
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":391
+  /* "pymoo/cython/non_dominated_sorting.pyx":388
  * 
  * 
  * cdef int sequential_search(double[:,:] F, int i, vector[vector[int]] fronts):             # <<<<<<<<<<<<<<
@@ -6046,7 +6046,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_sequential_search(__Py
   return __pyx_r;
 }
 
-/* "pymoo/cython/non_dominated_sorting.pyx":426
+/* "pymoo/cython/non_dominated_sorting.pyx":423
  * 
  * 
  * cdef int binary_search(double[:,:] F, int i, vector[vector[int]] fronts):             # <<<<<<<<<<<<<<
@@ -6068,7 +6068,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
   int __pyx_t_2;
   __Pyx_RefNannySetupContext("binary_search", 0);
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":432
+  /* "pymoo/cython/non_dominated_sorting.pyx":429
  *         bool non_dominated
  * 
  *     n_fronts = fronts.size()             # <<<<<<<<<<<<<<
@@ -6077,7 +6077,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
   __pyx_v_n_fronts = __pyx_v_fronts.size();
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":433
+  /* "pymoo/cython/non_dominated_sorting.pyx":430
  * 
  *     n_fronts = fronts.size()
  *     if n_fronts == 0:             # <<<<<<<<<<<<<<
@@ -6087,7 +6087,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
   __pyx_t_1 = ((__pyx_v_n_fronts == 0) != 0);
   if (__pyx_t_1) {
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":434
+    /* "pymoo/cython/non_dominated_sorting.pyx":431
  *     n_fronts = fronts.size()
  *     if n_fronts == 0:
  *         return 0             # <<<<<<<<<<<<<<
@@ -6097,7 +6097,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
     __pyx_r = 0;
     goto __pyx_L0;
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":433
+    /* "pymoo/cython/non_dominated_sorting.pyx":430
  * 
  *     n_fronts = fronts.size()
  *     if n_fronts == 0:             # <<<<<<<<<<<<<<
@@ -6106,7 +6106,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
   }
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":436
+  /* "pymoo/cython/non_dominated_sorting.pyx":433
  *         return 0
  * 
  *     k_min = 0  # the lower bound for checking             # <<<<<<<<<<<<<<
@@ -6115,7 +6115,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
   __pyx_v_k_min = 0;
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":437
+  /* "pymoo/cython/non_dominated_sorting.pyx":434
  * 
  *     k_min = 0  # the lower bound for checking
  *     k_max = n_fronts  # the upper bound for checking             # <<<<<<<<<<<<<<
@@ -6124,7 +6124,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
   __pyx_v_k_max = __pyx_v_n_fronts;
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":438
+  /* "pymoo/cython/non_dominated_sorting.pyx":435
  *     k_min = 0  # the lower bound for checking
  *     k_max = n_fronts  # the upper bound for checking
  *     k = int(floor((k_max + k_min) / 2.0 + 0.5))  # the front now checked             # <<<<<<<<<<<<<<
@@ -6133,7 +6133,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
   __pyx_v_k = ((int)floor((((__pyx_v_k_max + __pyx_v_k_min) / 2.0) + 0.5)));
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":440
+  /* "pymoo/cython/non_dominated_sorting.pyx":437
  *     k = int(floor((k_max + k_min) / 2.0 + 0.5))  # the front now checked
  * 
  *     while True:             # <<<<<<<<<<<<<<
@@ -6142,7 +6142,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
   while (1) {
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":442
+    /* "pymoo/cython/non_dominated_sorting.pyx":439
  *     while True:
  * 
  *         non_dominated = True             # <<<<<<<<<<<<<<
@@ -6151,7 +6151,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
     __pyx_v_non_dominated = 1;
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":445
+    /* "pymoo/cython/non_dominated_sorting.pyx":442
  * 
  *         # solutions in the k-th front, examine in reverse order
  *         j = fronts[k-1].size() - 1             # <<<<<<<<<<<<<<
@@ -6160,7 +6160,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
     __pyx_v_j = ((__pyx_v_fronts[(__pyx_v_k - 1)]).size() - 1);
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":447
+    /* "pymoo/cython/non_dominated_sorting.pyx":444
  *         j = fronts[k-1].size() - 1
  * 
  *         while j >= 0:             # <<<<<<<<<<<<<<
@@ -6171,7 +6171,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
       __pyx_t_1 = ((__pyx_v_j >= 0) != 0);
       if (!__pyx_t_1) break;
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":448
+      /* "pymoo/cython/non_dominated_sorting.pyx":445
  * 
  *         while j >= 0:
  *             relation = c_get_relation(F, i, fronts[k-1][j])             # <<<<<<<<<<<<<<
@@ -6180,7 +6180,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
       __pyx_v_relation = __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__pyx_v_F, __pyx_v_i, ((__pyx_v_fronts[(__pyx_v_k - 1)])[__pyx_v_j]), NULL);
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":449
+      /* "pymoo/cython/non_dominated_sorting.pyx":446
  *         while j >= 0:
  *             relation = c_get_relation(F, i, fronts[k-1][j])
  *             if relation == -1:             # <<<<<<<<<<<<<<
@@ -6190,7 +6190,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
       __pyx_t_1 = ((__pyx_v_relation == -1L) != 0);
       if (__pyx_t_1) {
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":450
+        /* "pymoo/cython/non_dominated_sorting.pyx":447
  *             relation = c_get_relation(F, i, fronts[k-1][j])
  *             if relation == -1:
  *                 non_dominated = False             # <<<<<<<<<<<<<<
@@ -6199,7 +6199,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
         __pyx_v_non_dominated = 0;
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":451
+        /* "pymoo/cython/non_dominated_sorting.pyx":448
  *             if relation == -1:
  *                 non_dominated = False
  *                 break             # <<<<<<<<<<<<<<
@@ -6208,7 +6208,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
         goto __pyx_L7_break;
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":449
+        /* "pymoo/cython/non_dominated_sorting.pyx":446
  *         while j >= 0:
  *             relation = c_get_relation(F, i, fronts[k-1][j])
  *             if relation == -1:             # <<<<<<<<<<<<<<
@@ -6217,7 +6217,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
       }
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":452
+      /* "pymoo/cython/non_dominated_sorting.pyx":449
  *                 non_dominated = False
  *                 break
  *             j = j - 1             # <<<<<<<<<<<<<<
@@ -6228,7 +6228,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
     }
     __pyx_L7_break:;
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":455
+    /* "pymoo/cython/non_dominated_sorting.pyx":452
  * 
  *         # binary search
  *         if non_dominated:             # <<<<<<<<<<<<<<
@@ -6238,7 +6238,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
     __pyx_t_1 = (__pyx_v_non_dominated != 0);
     if (__pyx_t_1) {
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":456
+      /* "pymoo/cython/non_dominated_sorting.pyx":453
  *         # binary search
  *         if non_dominated:
  *             if k == k_min + 1:             # <<<<<<<<<<<<<<
@@ -6248,7 +6248,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
       __pyx_t_1 = ((__pyx_v_k == (__pyx_v_k_min + 1)) != 0);
       if (__pyx_t_1) {
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":457
+        /* "pymoo/cython/non_dominated_sorting.pyx":454
  *         if non_dominated:
  *             if k == k_min + 1:
  *                 return k - 1             # <<<<<<<<<<<<<<
@@ -6258,7 +6258,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
         __pyx_r = (__pyx_v_k - 1);
         goto __pyx_L0;
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":456
+        /* "pymoo/cython/non_dominated_sorting.pyx":453
  *         # binary search
  *         if non_dominated:
  *             if k == k_min + 1:             # <<<<<<<<<<<<<<
@@ -6267,7 +6267,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
       }
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":459
+      /* "pymoo/cython/non_dominated_sorting.pyx":456
  *                 return k - 1
  *             else:
  *                 k_max = k             # <<<<<<<<<<<<<<
@@ -6277,7 +6277,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
       /*else*/ {
         __pyx_v_k_max = __pyx_v_k;
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":460
+        /* "pymoo/cython/non_dominated_sorting.pyx":457
  *             else:
  *                 k_max = k
  *                 k = int(floor((k_max + k_min) / 2.0 + 0.5))             # <<<<<<<<<<<<<<
@@ -6287,7 +6287,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
         __pyx_v_k = ((int)floor((((__pyx_v_k_max + __pyx_v_k_min) / 2.0) + 0.5)));
       }
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":455
+      /* "pymoo/cython/non_dominated_sorting.pyx":452
  * 
  *         # binary search
  *         if non_dominated:             # <<<<<<<<<<<<<<
@@ -6297,7 +6297,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
       goto __pyx_L9;
     }
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":463
+    /* "pymoo/cython/non_dominated_sorting.pyx":460
  * 
  *         else:
  *             k_min = k             # <<<<<<<<<<<<<<
@@ -6307,7 +6307,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
     /*else*/ {
       __pyx_v_k_min = __pyx_v_k;
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":464
+      /* "pymoo/cython/non_dominated_sorting.pyx":461
  *         else:
  *             k_min = k
  *             if k_max == k_min + 1 and k_max < n_fronts:             # <<<<<<<<<<<<<<
@@ -6325,7 +6325,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
       __pyx_L12_bool_binop_done:;
       if (__pyx_t_1) {
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":465
+        /* "pymoo/cython/non_dominated_sorting.pyx":462
  *             k_min = k
  *             if k_max == k_min + 1 and k_max < n_fronts:
  *                 return k_max - 1             # <<<<<<<<<<<<<<
@@ -6335,7 +6335,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
         __pyx_r = (__pyx_v_k_max - 1);
         goto __pyx_L0;
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":464
+        /* "pymoo/cython/non_dominated_sorting.pyx":461
  *         else:
  *             k_min = k
  *             if k_max == k_min + 1 and k_max < n_fronts:             # <<<<<<<<<<<<<<
@@ -6344,7 +6344,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
       }
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":466
+      /* "pymoo/cython/non_dominated_sorting.pyx":463
  *             if k_max == k_min + 1 and k_max < n_fronts:
  *                 return k_max - 1
  *             elif k_min == n_fronts:             # <<<<<<<<<<<<<<
@@ -6354,7 +6354,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
       __pyx_t_1 = ((__pyx_v_k_min == __pyx_v_n_fronts) != 0);
       if (__pyx_t_1) {
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":467
+        /* "pymoo/cython/non_dominated_sorting.pyx":464
  *                 return k_max - 1
  *             elif k_min == n_fronts:
  *                 return n_fronts             # <<<<<<<<<<<<<<
@@ -6364,7 +6364,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
         __pyx_r = __pyx_v_n_fronts;
         goto __pyx_L0;
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":466
+        /* "pymoo/cython/non_dominated_sorting.pyx":463
  *             if k_max == k_min + 1 and k_max < n_fronts:
  *                 return k_max - 1
  *             elif k_min == n_fronts:             # <<<<<<<<<<<<<<
@@ -6373,7 +6373,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
  */
       }
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":469
+      /* "pymoo/cython/non_dominated_sorting.pyx":466
  *                 return n_fronts
  *             else:
  *                 k = int(floor((k_max + k_min) / 2.0 + 0.5))             # <<<<<<<<<<<<<<
@@ -6387,7 +6387,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
     __pyx_L9:;
   }
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":426
+  /* "pymoo/cython/non_dominated_sorting.pyx":423
  * 
  * 
  * cdef int binary_search(double[:,:] F, int i, vector[vector[int]] fronts):             # <<<<<<<<<<<<<<
@@ -6402,7 +6402,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_binary_search(__Pyx_me
   return __pyx_r;
 }
 
-/* "pymoo/cython/non_dominated_sorting.pyx":481
+/* "pymoo/cython/non_dominated_sorting.pyx":478
  * 
  * 
  * cdef int c_get_relation(double[:,:] F, int a, int b, double epsilon = 0.0):             # <<<<<<<<<<<<<<
@@ -6436,7 +6436,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
     }
   }
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":483
+  /* "pymoo/cython/non_dominated_sorting.pyx":480
  * cdef int c_get_relation(double[:,:] F, int a, int b, double epsilon = 0.0):
  * 
  *     cdef int size = F.shape[1]             # <<<<<<<<<<<<<<
@@ -6445,7 +6445,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
  */
   __pyx_v_size = (__pyx_v_F.shape[1]);
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":487
+  /* "pymoo/cython/non_dominated_sorting.pyx":484
  *     cdef int i
  * 
  *     val = 0             # <<<<<<<<<<<<<<
@@ -6454,7 +6454,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
  */
   __pyx_v_val = 0;
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":489
+  /* "pymoo/cython/non_dominated_sorting.pyx":486
  *     val = 0
  * 
  *     for i in range(size):             # <<<<<<<<<<<<<<
@@ -6466,7 +6466,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":491
+    /* "pymoo/cython/non_dominated_sorting.pyx":488
  *     for i in range(size):
  * 
  *         if F[a,i] + epsilon < F[b,i]:             # <<<<<<<<<<<<<<
@@ -6480,7 +6480,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
     __pyx_t_8 = ((((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_F.data + __pyx_t_4 * __pyx_v_F.strides[0]) ) + __pyx_t_5 * __pyx_v_F.strides[1]) ))) + __pyx_v_epsilon) < (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_F.data + __pyx_t_6 * __pyx_v_F.strides[0]) ) + __pyx_t_7 * __pyx_v_F.strides[1]) )))) != 0);
     if (__pyx_t_8) {
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":493
+      /* "pymoo/cython/non_dominated_sorting.pyx":490
  *         if F[a,i] + epsilon < F[b,i]:
  *             # indifferent because once better and once worse
  *             if val == -1:             # <<<<<<<<<<<<<<
@@ -6490,7 +6490,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
       __pyx_t_8 = ((__pyx_v_val == -1L) != 0);
       if (__pyx_t_8) {
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":494
+        /* "pymoo/cython/non_dominated_sorting.pyx":491
  *             # indifferent because once better and once worse
  *             if val == -1:
  *                 return 0             # <<<<<<<<<<<<<<
@@ -6500,7 +6500,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
         __pyx_r = 0;
         goto __pyx_L0;
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":493
+        /* "pymoo/cython/non_dominated_sorting.pyx":490
  *         if F[a,i] + epsilon < F[b,i]:
  *             # indifferent because once better and once worse
  *             if val == -1:             # <<<<<<<<<<<<<<
@@ -6509,7 +6509,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
  */
       }
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":495
+      /* "pymoo/cython/non_dominated_sorting.pyx":492
  *             if val == -1:
  *                 return 0
  *             val = 1             # <<<<<<<<<<<<<<
@@ -6518,7 +6518,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
  */
       __pyx_v_val = 1;
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":491
+      /* "pymoo/cython/non_dominated_sorting.pyx":488
  *     for i in range(size):
  * 
  *         if F[a,i] + epsilon < F[b,i]:             # <<<<<<<<<<<<<<
@@ -6528,7 +6528,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
       goto __pyx_L5;
     }
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":497
+    /* "pymoo/cython/non_dominated_sorting.pyx":494
  *             val = 1
  * 
  *         elif F[a,i] > F[b,i] + epsilon:             # <<<<<<<<<<<<<<
@@ -6542,7 +6542,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
     __pyx_t_8 = (((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_F.data + __pyx_t_9 * __pyx_v_F.strides[0]) ) + __pyx_t_10 * __pyx_v_F.strides[1]) ))) > ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_F.data + __pyx_t_11 * __pyx_v_F.strides[0]) ) + __pyx_t_12 * __pyx_v_F.strides[1]) ))) + __pyx_v_epsilon)) != 0);
     if (__pyx_t_8) {
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":500
+      /* "pymoo/cython/non_dominated_sorting.pyx":497
  * 
  *             # indifferent because once better and once worse
  *             if val == 1:             # <<<<<<<<<<<<<<
@@ -6552,7 +6552,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
       __pyx_t_8 = ((__pyx_v_val == 1) != 0);
       if (__pyx_t_8) {
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":501
+        /* "pymoo/cython/non_dominated_sorting.pyx":498
  *             # indifferent because once better and once worse
  *             if val == 1:
  *                 return 0             # <<<<<<<<<<<<<<
@@ -6562,7 +6562,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
         __pyx_r = 0;
         goto __pyx_L0;
 
-        /* "pymoo/cython/non_dominated_sorting.pyx":500
+        /* "pymoo/cython/non_dominated_sorting.pyx":497
  * 
  *             # indifferent because once better and once worse
  *             if val == 1:             # <<<<<<<<<<<<<<
@@ -6571,7 +6571,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
  */
       }
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":502
+      /* "pymoo/cython/non_dominated_sorting.pyx":499
  *             if val == 1:
  *                 return 0
  *             val = -1             # <<<<<<<<<<<<<<
@@ -6580,7 +6580,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
  */
       __pyx_v_val = -1;
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":497
+      /* "pymoo/cython/non_dominated_sorting.pyx":494
  *             val = 1
  * 
  *         elif F[a,i] > F[b,i] + epsilon:             # <<<<<<<<<<<<<<
@@ -6591,7 +6591,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
     __pyx_L5:;
   }
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":504
+  /* "pymoo/cython/non_dominated_sorting.pyx":501
  *             val = -1
  * 
  *     return val             # <<<<<<<<<<<<<<
@@ -6601,7 +6601,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
   __pyx_r = __pyx_v_val;
   goto __pyx_L0;
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":481
+  /* "pymoo/cython/non_dominated_sorting.pyx":478
  * 
  * 
  * cdef int c_get_relation(double[:,:] F, int a, int b, double epsilon = 0.0):             # <<<<<<<<<<<<<<
@@ -6615,7 +6615,7 @@ static int __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_get_relation(__Pyx_m
   return __pyx_r;
 }
 
-/* "pymoo/cython/non_dominated_sorting.pyx":508
+/* "pymoo/cython/non_dominated_sorting.pyx":505
  * 
  * 
  * cdef bool c_is_dominating_or_equal(double[:,:] F, int a, int b, vector[vector[int]]& C, int k):             # <<<<<<<<<<<<<<
@@ -6638,7 +6638,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_dominating_or_eq
   int __pyx_t_8;
   __Pyx_RefNannySetupContext("c_is_dominating_or_equal", 0);
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":510
+  /* "pymoo/cython/non_dominated_sorting.pyx":507
  * cdef bool c_is_dominating_or_equal(double[:,:] F, int a, int b, vector[vector[int]]& C, int k):
  *     cdef int i, j
  *     for i in range(k, C[0].size()):             # <<<<<<<<<<<<<<
@@ -6650,7 +6650,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_dominating_or_eq
   for (__pyx_t_3 = __pyx_v_k; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":511
+    /* "pymoo/cython/non_dominated_sorting.pyx":508
  *     cdef int i, j
  *     for i in range(k, C[0].size()):
  *         j = C[b][i]             # <<<<<<<<<<<<<<
@@ -6659,7 +6659,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_dominating_or_eq
  */
     __pyx_v_j = ((__pyx_v_C[__pyx_v_b])[__pyx_v_i]);
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":512
+    /* "pymoo/cython/non_dominated_sorting.pyx":509
  *     for i in range(k, C[0].size()):
  *         j = C[b][i]
  *         if F[b, j] < F[a, j]:             # <<<<<<<<<<<<<<
@@ -6673,7 +6673,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_dominating_or_eq
     __pyx_t_8 = (((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_F.data + __pyx_t_4 * __pyx_v_F.strides[0]) ) + __pyx_t_5 * __pyx_v_F.strides[1]) ))) < (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_F.data + __pyx_t_6 * __pyx_v_F.strides[0]) ) + __pyx_t_7 * __pyx_v_F.strides[1]) )))) != 0);
     if (__pyx_t_8) {
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":513
+      /* "pymoo/cython/non_dominated_sorting.pyx":510
  *         j = C[b][i]
  *         if F[b, j] < F[a, j]:
  *             return False             # <<<<<<<<<<<<<<
@@ -6683,7 +6683,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_dominating_or_eq
       __pyx_r = 0;
       goto __pyx_L0;
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":512
+      /* "pymoo/cython/non_dominated_sorting.pyx":509
  *     for i in range(k, C[0].size()):
  *         j = C[b][i]
  *         if F[b, j] < F[a, j]:             # <<<<<<<<<<<<<<
@@ -6693,7 +6693,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_dominating_or_eq
     }
   }
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":514
+  /* "pymoo/cython/non_dominated_sorting.pyx":511
  *         if F[b, j] < F[a, j]:
  *             return False
  *     return True             # <<<<<<<<<<<<<<
@@ -6703,7 +6703,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_dominating_or_eq
   __pyx_r = 1;
   goto __pyx_L0;
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":508
+  /* "pymoo/cython/non_dominated_sorting.pyx":505
  * 
  * 
  * cdef bool c_is_dominating_or_equal(double[:,:] F, int a, int b, vector[vector[int]]& C, int k):             # <<<<<<<<<<<<<<
@@ -6717,7 +6717,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_dominating_or_eq
   return __pyx_r;
 }
 
-/* "pymoo/cython/non_dominated_sorting.pyx":516
+/* "pymoo/cython/non_dominated_sorting.pyx":513
  *     return True
  * 
  * cdef bool c_is_equal(double[:,:] F, int a, int b):             # <<<<<<<<<<<<<<
@@ -6740,7 +6740,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_equal(__Pyx_memv
   int __pyx_t_8;
   __Pyx_RefNannySetupContext("c_is_equal", 0);
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":518
+  /* "pymoo/cython/non_dominated_sorting.pyx":515
  * cdef bool c_is_equal(double[:,:] F, int a, int b):
  *     cdef int i
  *     cdef int n_obj = F.shape[1]             # <<<<<<<<<<<<<<
@@ -6749,7 +6749,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_equal(__Pyx_memv
  */
   __pyx_v_n_obj = (__pyx_v_F.shape[1]);
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":519
+  /* "pymoo/cython/non_dominated_sorting.pyx":516
  *     cdef int i
  *     cdef int n_obj = F.shape[1]
  *     for i in range(n_obj):             # <<<<<<<<<<<<<<
@@ -6761,7 +6761,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_equal(__Pyx_memv
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "pymoo/cython/non_dominated_sorting.pyx":520
+    /* "pymoo/cython/non_dominated_sorting.pyx":517
  *     cdef int n_obj = F.shape[1]
  *     for i in range(n_obj):
  *         if F[a, i] != F[b, i]:             # <<<<<<<<<<<<<<
@@ -6775,7 +6775,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_equal(__Pyx_memv
     __pyx_t_8 = (((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_F.data + __pyx_t_4 * __pyx_v_F.strides[0]) ) + __pyx_t_5 * __pyx_v_F.strides[1]) ))) != (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_F.data + __pyx_t_6 * __pyx_v_F.strides[0]) ) + __pyx_t_7 * __pyx_v_F.strides[1]) )))) != 0);
     if (__pyx_t_8) {
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":521
+      /* "pymoo/cython/non_dominated_sorting.pyx":518
  *     for i in range(n_obj):
  *         if F[a, i] != F[b, i]:
  *             return False             # <<<<<<<<<<<<<<
@@ -6784,7 +6784,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_equal(__Pyx_memv
       __pyx_r = 0;
       goto __pyx_L0;
 
-      /* "pymoo/cython/non_dominated_sorting.pyx":520
+      /* "pymoo/cython/non_dominated_sorting.pyx":517
  *     cdef int n_obj = F.shape[1]
  *     for i in range(n_obj):
  *         if F[a, i] != F[b, i]:             # <<<<<<<<<<<<<<
@@ -6794,7 +6794,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_equal(__Pyx_memv
     }
   }
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":522
+  /* "pymoo/cython/non_dominated_sorting.pyx":519
  *         if F[a, i] != F[b, i]:
  *             return False
  *     return True             # <<<<<<<<<<<<<<
@@ -6802,7 +6802,7 @@ static bool __pyx_f_5pymoo_6cython_21non_dominated_sorting_c_is_equal(__Pyx_memv
   __pyx_r = 1;
   goto __pyx_L0;
 
-  /* "pymoo/cython/non_dominated_sorting.pyx":516
+  /* "pymoo/cython/non_dominated_sorting.pyx":513
  *     return True
  * 
  * cdef bool c_is_equal(double[:,:] F, int a, int b):             # <<<<<<<<<<<<<<
