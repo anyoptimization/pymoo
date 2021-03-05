@@ -3,4 +3,4 @@ numpydoc
 nbsphinx
 sphinxcontrib-bibtex
 pydata-sphinx-theme
-
+bs4
