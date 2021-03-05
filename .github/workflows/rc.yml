@@ -26,7 +26,7 @@ jobs:
     - name: Build
       run: |
         python setup.py sdist bdist_wheel
-    - uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@v2
       with:
         name: dist
         path: dist
@@ -38,6 +38,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
+      with:
+        name: dist
+        path: dist
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
