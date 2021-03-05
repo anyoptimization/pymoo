@@ -24,6 +24,7 @@ jobs:
   #     - name: Run tests
   #       run: pytest tests/test_performance_indicator.py
 
+
   docs:
     runs-on: ubuntu-latest
     steps:
@@ -32,13 +33,23 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Create the Documentation
+      - name: Create Documentation
         run: |
-          sudo apt-get install pandoc
+          sudo apt-get install pandoc rsync
           python -m pip install --upgrade pip
           cd doc
           pip install -r requirements.txt
           make html
+      - name: Upload Documentation
+        uses: trendyminds/github-actions-rsync@master
+        with:
+          RSYNC_OPTIONS: -avzr --delete
+          RSYNC_TARGET: /home/blankjul/pymoo.org/release
+          RSYNC_SOURCE: doc/build/html/*
+        env:
+          SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
+          SSH_USERNAME: ${{secrets.SSH_USERNAME}}
+          SSH_HOSTNAME: ${{secrets.SSH_HOSTNAME}}
 
       
 
