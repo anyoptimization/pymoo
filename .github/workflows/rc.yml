@@ -43,7 +43,7 @@ jobs:
       - name: Upload Documentation
         uses: trendyminds/github-actions-rsync@master
         with:
-          RSYNC_OPTIONS: -avzr --delete
+          RSYNC_OPTIONS: -avzr --delete --exclude '*.ipynb'
           RSYNC_TARGET: /home/blankjul/pymoo.org/release
           RSYNC_SOURCE: /doc/build/html/*
         env:
