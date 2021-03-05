@@ -1,4 +1,5 @@
 recursive-include pymoo *.py *.cpp *.pf
 recursive-exclude pymoo *.so *.pyx *.pxd
+recursive-exclude pymoo/problems/pf/DASCMOP *.pf
 
 include LICENSE Makefile
