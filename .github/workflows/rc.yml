@@ -45,7 +45,7 @@ jobs:
         with:
           RSYNC_OPTIONS: -avzr --delete
           RSYNC_TARGET: /home/blankjul/pymoo.org/release
-          RSYNC_SOURCE: doc/build/html/*
+          RSYNC_SOURCE: /doc/build/html/*
         env:
           SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
           SSH_USERNAME: ${{secrets.SSH_USERNAME}}
