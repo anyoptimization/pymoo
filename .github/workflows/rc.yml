@@ -25,7 +25,6 @@ jobs:
   #       run: pytest tests/test_performance_indicator.py
 
   docs:
-    needs: tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
