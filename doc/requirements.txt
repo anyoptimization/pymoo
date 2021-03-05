@@ -2,3 +2,5 @@ sphinx
 numpydoc
 nbsphinx
 sphinxcontrib-bibtex
+pydata-sphinx-theme
+
