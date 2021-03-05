@@ -4,3 +4,4 @@ nbsphinx
 sphinxcontrib-bibtex<2.0.0
 pydata-sphinx-theme
 bs4
+pandoc
