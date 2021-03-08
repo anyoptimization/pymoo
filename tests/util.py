@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 
-ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 USAGE = os.path.join(ROOT, "pymoo", "usage")
 
