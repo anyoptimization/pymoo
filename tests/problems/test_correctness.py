@@ -42,7 +42,7 @@ def test_problems(name, params):
 
 
 def load(name, suffix=[]):
-    path = os.path.join(TESTS, "problems", "resources", *suffix)
+    path = path_to_test_resources("problems", *suffix)
 
     X = anp.loadtxt(os.path.join(path, "%s.x" % name))
 

@@ -16,7 +16,7 @@ class PolynomialMutation(Mutation):
 
     def _do(self, problem, X, **kwargs):
 
-        X = X.astype(np.float)
+        X = X.astype(float)
         Y = np.full(X.shape, np.inf)
 
         if self.prob is None:

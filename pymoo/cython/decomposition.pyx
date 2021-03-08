@@ -15,7 +15,7 @@ def calc_perpendicular_distance(double[:,:] P, double[:,:] L):
 
 
 def pbi(double[:,:] F, double[:,:] weights, double[:] ideal_point, double theta, double eps=1e-10):
-    return np.array(c_pbi(F, weights, ideal_point, theta, eps), dtype=np.float)
+    return np.array(c_pbi(F, weights, ideal_point, theta, eps), dtype=np.float64)
 
 
 def calc_distance_to_weights(F, weights, utopian_point=None):
