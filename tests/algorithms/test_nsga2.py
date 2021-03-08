@@ -5,12 +5,12 @@ import pytest
 
 from pymoo.algorithms.moo.nsga2 import calc_crowding_distance
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-from tests.util import path_to_test_resources
+from tests.util import path_to_test_resource
 
 
 @pytest.fixture
 def data():
-   return pickle.load(open(path_to_test_resources('cnsga2_run_zdt4.dat'), 'rb'))
+   return pickle.load(open(path_to_test_resource('cnsga2_run_zdt4.dat'), 'rb'))
 
 
 def test_normalization():

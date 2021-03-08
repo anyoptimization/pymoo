@@ -1,20 +1,17 @@
 import os
 from pathlib import Path
 
-from pymoo.configuration import get_pymoo
 
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-print(ROOT)
 
 USAGE = os.path.join(ROOT, "pymoo", "usage")
 
 TESTS = os.path.join(ROOT, "tests")
 
 RESOURCES = os.path.join(TESTS, "resources")
-print(RESOURCES)
 
 
-def path_to_test_resources(*args):
+def path_to_test_resource(*args):
     return os.path.join(RESOURCES, *args)
 
 
@@ -60,7 +57,7 @@ def run_ipynb(fname, overwrite=False):
 
     try:
         nb = nbformat.read(fname, nbformat.NO_CONVERT)
-        ep.preprocess(nb, {'metadata': {'path': get_pymoo()}})
+        ep.preprocess(nb, {'metadata': {'path': ROOT}})
 
     except CellExecutionError as ex:
         msg = 'Error executing the fname "%s".\n\n' % fname
