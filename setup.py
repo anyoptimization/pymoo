@@ -31,6 +31,7 @@ data = dict(
     keywords="optimization",
     install_requires=['numpy>=1.15', 'scipy>=1.1', 'matplotlib>=3', 'autograd>=1.3', 'cma==2.7'],
     platforms='any',
+    include_package_data=True,
     classifiers=[
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
