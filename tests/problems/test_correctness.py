@@ -6,7 +6,7 @@ import pytest
 from pymoo.factory import get_problem
 import os
 
-from tests.util import path_to_test_resources, TESTS
+from tests.util import path_to_test_resource, TESTS
 
 problems = [
     ('DTLZ1', [10, 3]), ('DTLZ2', [10, 3]), ('DTLZ3', [10, 3]), ('DTLZ4', [10, 3]), ('DTLZ5', [10, 3]),
@@ -42,7 +42,7 @@ def test_problems(name, params):
 
 
 def load(name, suffix=[]):
-    path = path_to_test_resources("problems", *suffix)
+    path = path_to_test_resource("problems", *suffix)
 
     X = anp.loadtxt(os.path.join(path, "%s.x" % name))
 

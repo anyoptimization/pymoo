@@ -7,12 +7,12 @@ from pymoo.model.evaluator import Evaluator
 from pymoo.model.population import Population
 from pymoo.problems.many import C1DTLZ1, C1DTLZ3, C3DTLZ4
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-from tests.util import path_to_test_resources
+from tests.util import path_to_test_resource
 
 
 @pytest.fixture
 def ref_dirs():
-   return np.loadtxt(path_to_test_resources('ctaea', 'weights.txt'))
+   return np.loadtxt(path_to_test_resource('ctaea', 'weights.txt'))
 
 
 @pytest.fixture
@@ -22,19 +22,19 @@ def evaluator():
 
 def test_association(ref_dirs, evaluator):
     problem = C1DTLZ3(n_var=12, n_obj=3)
-    ca_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz3', 'case3', 'preCA.x'))
+    ca_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz3', 'case3', 'preCA.x'))
     CA = Population.create(ca_x)
     evaluator.eval(problem, CA)
 
-    da_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz3', 'case3', 'preDA.x'))
+    da_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz3', 'case3', 'preDA.x'))
     DA = Population.create(da_x)
     evaluator.eval(problem, DA)
 
-    off_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz3', 'case3', 'offspring.x'))
+    off_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz3', 'case3', 'offspring.x'))
     off = Population.create(off_x)
     evaluator.eval(problem, off)
 
-    true_assoc = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz3', 'case3', 'feasible_rank0.txt'))
+    true_assoc = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz3', 'case3', 'feasible_rank0.txt'))
     true_niche = true_assoc[:, 1]
     true_id = true_assoc[:, 0]
     sorted_id = np.argsort(true_id)
@@ -53,19 +53,19 @@ def test_association(ref_dirs, evaluator):
 
 def test_update_ca(ref_dirs, evaluator):
     problem = C1DTLZ3(n_var=12, n_obj=3)
-    ca_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz3', 'case3', 'preCA.x'))
+    ca_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz3', 'case3', 'preCA.x'))
     CA = Population.create(ca_x)
     evaluator.eval(problem, CA)
 
-    da_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz3', 'case3', 'preDA.x'))
+    da_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz3', 'case3', 'preDA.x'))
     DA = Population.create(da_x)
     evaluator.eval(problem, DA)
 
-    off_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz3', 'case3', 'offspring.x'))
+    off_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz3', 'case3', 'offspring.x'))
     off = Population.create(off_x)
     evaluator.eval(problem, off)
 
-    post_ca_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz3', 'case3', 'postCA.x'))
+    post_ca_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz3', 'case3', 'postCA.x'))
     true_pCA = Population.create(post_ca_x)
     evaluator.eval(problem, true_pCA)
 
@@ -80,19 +80,19 @@ def test_update_ca(ref_dirs, evaluator):
     assert pX == tpX
 
     problem = C1DTLZ1(n_var=9, n_obj=3)
-    ca_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz1', 'preCA.x'))
+    ca_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz1', 'preCA.x'))
     CA = Population.create(ca_x)
     evaluator.eval(problem, CA)
 
-    da_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz1', 'preDA.x'))
+    da_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz1', 'preDA.x'))
     DA = Population.create(da_x)
     evaluator.eval(problem, DA)
 
-    off_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz1', 'offspring.x'))
+    off_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz1', 'offspring.x'))
     off = Population.create(off_x)
     evaluator.eval(problem, off)
 
-    post_ca_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz1', 'postCA.x'))
+    post_ca_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz1', 'postCA.x'))
     true_pCA = Population.create(post_ca_x)
     evaluator.eval(problem, true_pCA)
 
@@ -107,19 +107,19 @@ def test_update_ca(ref_dirs, evaluator):
     assert pX == tpX
 
     problem = C3DTLZ4(n_var=12, n_obj=3)
-    ca_x = np.loadtxt(path_to_test_resources('ctaea', 'c3dtlz4', 'case1', 'preCA.x'))
+    ca_x = np.loadtxt(path_to_test_resource('ctaea', 'c3dtlz4', 'case1', 'preCA.x'))
     CA = Population.create(ca_x)
     evaluator.eval(problem, CA)
 
-    da_x = np.loadtxt(path_to_test_resources('ctaea', 'c3dtlz4', 'case1', 'preDA.x'))
+    da_x = np.loadtxt(path_to_test_resource('ctaea', 'c3dtlz4', 'case1', 'preDA.x'))
     DA = Population.create(da_x)
     evaluator.eval(problem, DA)
 
-    off_x = np.loadtxt(path_to_test_resources('ctaea', 'c3dtlz4', 'case1', 'offspring.x'))
+    off_x = np.loadtxt(path_to_test_resource('ctaea', 'c3dtlz4', 'case1', 'offspring.x'))
     off = Population.create(off_x)
     evaluator.eval(problem, off)
 
-    post_ca_x = np.loadtxt(path_to_test_resources('ctaea', 'c3dtlz4', 'case1', 'postCA.x'))
+    post_ca_x = np.loadtxt(path_to_test_resource('ctaea', 'c3dtlz4', 'case1', 'postCA.x'))
     true_pCA = Population.create(post_ca_x)
     evaluator.eval(problem, true_pCA)
 
@@ -137,15 +137,15 @@ def test_update_ca(ref_dirs, evaluator):
 def test_update_da(ref_dirs, evaluator):
     problem = C1DTLZ3(n_var=12, n_obj=3)
     for i in range(2):
-        ca_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz3', f'case{i + 1}', 'preCA.x'))
+        ca_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz3', f'case{i + 1}', 'preCA.x'))
         CA = Population.create(ca_x)
         evaluator.eval(problem, CA)
 
-        da_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz3', f'case{i + 1}', 'preDA.x'))
+        da_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz3', f'case{i + 1}', 'preDA.x'))
         DA = Population.create(da_x)
         evaluator.eval(problem, DA)
 
-        off_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz3', f'case{i + 1}', 'offspring.x'))
+        off_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz3', f'case{i + 1}', 'offspring.x'))
         off = Population.create(off_x)
         evaluator.eval(problem, off)
 
@@ -153,7 +153,7 @@ def test_update_da(ref_dirs, evaluator):
         mixed = Population.merge(CA, off)
         survival.ideal_point = np.min(np.vstack((DA.get("F"), mixed.get("F"))), axis=0)
 
-        post_ca_x = np.loadtxt(path_to_test_resources('ctaea', 'c1dtlz3', f'case{i + 1}', 'postCA.x'))
+        post_ca_x = np.loadtxt(path_to_test_resource('ctaea', 'c1dtlz3', f'case{i + 1}', 'postCA.x'))
         CA = Population.create(post_ca_x)
         evaluator.eval(problem, CA)
 
@@ -183,23 +183,23 @@ def test_update_da(ref_dirs, evaluator):
 
 def test_update(ref_dirs, evaluator):
     problem = C3DTLZ4(n_var=12, n_obj=3)
-    ca_x = np.loadtxt(path_to_test_resources('ctaea', 'c3dtlz4', 'case2', 'preCA.x'))
+    ca_x = np.loadtxt(path_to_test_resource('ctaea', 'c3dtlz4', 'case2', 'preCA.x'))
     CA = Population.create(ca_x)
     evaluator.eval(problem, CA)
 
-    da_x = np.loadtxt(path_to_test_resources('ctaea', 'c3dtlz4', 'case2', 'preDA.x'))
+    da_x = np.loadtxt(path_to_test_resource('ctaea', 'c3dtlz4', 'case2', 'preDA.x'))
     DA = Population.create(da_x)
     evaluator.eval(problem, DA)
 
-    off_x = np.loadtxt(path_to_test_resources('ctaea', 'c3dtlz4', 'case2', 'offspring.x'))
+    off_x = np.loadtxt(path_to_test_resource('ctaea', 'c3dtlz4', 'case2', 'offspring.x'))
     off = Population.create(off_x)
     evaluator.eval(problem, off)
 
-    post_ca_x = np.loadtxt(path_to_test_resources('ctaea', 'c3dtlz4', 'case2', 'postCA.x'))
+    post_ca_x = np.loadtxt(path_to_test_resource('ctaea', 'c3dtlz4', 'case2', 'postCA.x'))
     true_pCA = Population.create(post_ca_x)
     evaluator.eval(problem, true_pCA)
 
-    post_da_x = np.loadtxt(path_to_test_resources('ctaea', 'c3dtlz4', 'case2', 'postDA.x'))
+    post_da_x = np.loadtxt(path_to_test_resource('ctaea', 'c3dtlz4', 'case2', 'postDA.x'))
     true_pDA = Population.create(post_da_x)
     evaluator.eval(problem, true_pDA)
 
@@ -228,11 +228,11 @@ def test_restricted_mating_selection(ref_dirs, evaluator):
     selection = RestrictedMating(func_comp=comp_by_cv_dom_then_random)
 
     problem = C3DTLZ4(n_var=12, n_obj=3)
-    ca_x = np.loadtxt(path_to_test_resources('ctaea', 'c3dtlz4', 'case2', 'preCA.x'))
+    ca_x = np.loadtxt(path_to_test_resource('ctaea', 'c3dtlz4', 'case2', 'preCA.x'))
     CA = Population.create(ca_x)
     evaluator.eval(problem, CA)
 
-    da_x = np.loadtxt(path_to_test_resources('ctaea', 'c3dtlz4', 'case2', 'preDA.x'))
+    da_x = np.loadtxt(path_to_test_resource('ctaea', 'c3dtlz4', 'case2', 'preDA.x'))
     DA = Population.create(da_x)
     evaluator.eval(problem, DA)
 
