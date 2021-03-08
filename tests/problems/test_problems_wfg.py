@@ -1,5 +1,4 @@
 import numpy as np
-import optproblems
 import pytest
 
 from pymoo.factory import get_problem, WFG1, WFG2, WFG3, WFG4, WFG5, WFG6, WFG7, WFG8, WFG9
