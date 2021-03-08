@@ -20,4 +20,4 @@ jobs:
           rm -rf pymoo
           pip install pytest
       - name: Run Tests
-        run: pytest tests/test_performance_indicator.py
+        run: pytest
