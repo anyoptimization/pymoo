@@ -74,7 +74,7 @@ class RankAndCrowdingSurvival(Survival):
     def _do(self, problem, pop, n_survive, D=None, **kwargs):
 
         # get the objective space values and objects
-        F = pop.get("F").astype(np.float, copy=False)
+        F = pop.get("F").astype(float, copy=False)
 
         # the final indices of surviving individuals
         survivors = []
