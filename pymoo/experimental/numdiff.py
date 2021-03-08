@@ -19,7 +19,7 @@ class NumericalDifferentiation(MetaProblem):
             out["dF"] = NumericalDifferentiationUtil().do(self.problem, X, out["F"], return_values_of=["dF"])
 
 
-EPS = np.finfo(np.float32).eps
+EPS = np.finfo(float32).eps
 
 
 class NumericalDifferentiationUtil:

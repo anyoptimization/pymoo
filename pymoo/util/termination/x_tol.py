@@ -29,7 +29,7 @@ class DesignSpaceToleranceTermination(SlidingWindowTermination):
         problem = algorithm.problem
         X = algorithm.opt.get("X")
 
-        if X.dtype != np.object:
+        if X.dtype != object:
             if problem.xl is not None and problem.xu is not None:
                 X = normalize(X, xl=problem.xl, xu=problem.xu)
             return X

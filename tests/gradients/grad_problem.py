@@ -21,7 +21,7 @@ class ZDT1WithGradient(ZDT):
         out["F"] = np.column_stack([f1, f2])
 
         if "dF" in out:
-            dF = np.zeros([x.shape[0], self.n_obj, self.n_var], dtype=np.float)
+            dF = np.zeros([x.shape[0], self.n_obj, self.n_var], dtype=float)
             dF[:, 0, 0], dF[:, 0, 1:] = 1, 0
             dF[:, 1, 0] = -0.5 * np.sqrt(g / x[:, 0])
             dF[:, 1, 1:] = ((9 / (self.n_var - 1)) * (1 - 0.5 * np.sqrt(x[:, 0] / g)))[:, None]
@@ -46,7 +46,7 @@ class ZDT2WithGradient(ZDT):
         out["F"] = np.column_stack([f1, f2])
 
         if "dF" in out:
-            dF = np.zeros([x.shape[0], self.n_obj, self.n_var], dtype=np.float)
+            dF = np.zeros([x.shape[0], self.n_obj, self.n_var], dtype=float)
 
             dF[:, 0, 0], dF[:, 0, 1:] = 1, 0
             dF[:, 1, 0] = -2 * x[:, 0] / g
@@ -83,7 +83,7 @@ class ZDT3WithGradient(ZDT):
         out["F"] = np.column_stack([f1, f2])
 
         if "dF" in out:
-            dF = np.zeros([x.shape[0], self.n_obj, self.n_var], dtype=np.float)
+            dF = np.zeros([x.shape[0], self.n_obj, self.n_var], dtype=float)
 
             dF[:, 0, 0], dF[:, 0, 1:] = 1, 0
             dF[:, 1, 0] = -0.5 * np.sqrt(g / x[:, 0]) - np.sin(10 * np.pi * x[:, 0]) - 10 * np.pi * x[:, 0] * np.cos(
