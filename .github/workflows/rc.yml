@@ -43,7 +43,7 @@ jobs:
         uses: trendyminds/github-actions-rsync@master
         with:
           RSYNC_OPTIONS: -avzr --delete --exclude '*.ipynb'
-          RSYNC_TARGET: /home/blankjul/pymoo.org/${BRANCH_NAME}
+          RSYNC_TARGET: /home/blankjul/pymoo.org/${{BRANCH_NAME}}
           RSYNC_SOURCE: /doc/build/html/*
         env:
           SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
