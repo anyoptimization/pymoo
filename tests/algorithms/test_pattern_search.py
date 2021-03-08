@@ -460,7 +460,7 @@ def r8vec_print_test():
     print('  R8VEC_PRINT prints an R8VEC.')
 
     n = 4
-    v = np.array([123.456, 0.000005, -1.0E+06, 3.14159265], dtype=np.float64)
+    v = np.array([123.456, 0.000005, -1.0E+06, 3.14159265], dtype=float64)
     r8vec_print(n, v, '  Here is an R8VEC:')
     #
     #  Terminate.

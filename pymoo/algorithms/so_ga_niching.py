@@ -77,7 +77,7 @@ def comp_by_cv_and_clearing_fitness(pop, P, **kwargs):
                 S[i] = compare(a, pop[a].get("rank"), b, pop[b].get("rank"),
                                method='smaller_is_better', return_random_if_equal=True)
 
-    return S[:, None].astype(np.int)
+    return S[:, None].astype(int)
 
 
 # =========================================================================================================
@@ -86,11 +86,10 @@ def comp_by_cv_and_clearing_fitness(pop, P, **kwargs):
 
 class EpsilonClearingSurvival(Survival):
 
-    def __init__(self, epsilon, n_max_each_iter=None, norm_by_dim=False) -> None:
+    def __init__(self, epsilon, n_max_each_iter=None) -> None:
         super().__init__(False)
         self.epsilon = epsilon
         self.n_max_each_iter = n_max_each_iter
-        self.norm_by_dim = norm_by_dim
 
     def _do(self, problem, pop, n_survive, out=None, **kwargs):
         F = pop.get("F")
@@ -102,11 +101,8 @@ class EpsilonClearingSurvival(Survival):
         pop = FitnessSurvival().do(problem, pop, len(pop))
 
         # calculate the distance from each individual to another - pre-processing for the clearing
-        # NOTE: the distance is normalized by the maximum distance possible
         X = pop.get("X")
         D = norm_eucl_dist(problem, X, X)
-        if self.norm_by_dim:
-            D = D / (problem.n_var ** 0.5)
 
         # initialize the clearing strategy
         clearing = EpsilonClearing(D, self.epsilon)
@@ -170,8 +166,6 @@ class NicheGA(GA):
     def __init__(self,
                  pop_size=100,
                  norm_niche_size=0.05,
-                 norm_by_dim=False,
-                 return_all_opt=False,
                  display=NicheDisplay(),
                  **kwargs):
         """
@@ -193,7 +187,7 @@ class NicheGA(GA):
 
         surv = kwargs.get("survival")
         if surv is None:
-            surv = EpsilonClearingSurvival(norm_niche_size, n_max_each_iter=None, norm_by_dim=norm_by_dim)
+            surv = EpsilonClearingSurvival(norm_niche_size, n_max_each_iter=None)
 
         selection = kwargs.get("selection")
         if selection is None:
@@ -208,14 +202,8 @@ class NicheGA(GA):
         # self.default_termination = NicheTermination()
         self.default_termination = SingleObjectiveDefaultTermination()
 
-        # whether with rank one after clearing or just the best should be considered as optimal
-        self.return_all_opt = return_all_opt
-
     def _set_optimum(self, **kwargs):
-        if self.return_all_opt:
-            self.opt = self.pop[self.pop.get("iter") == 1]
-        else:
-            super()._set_optimum()
+        self.opt = self.pop[self.pop.get("iter") == 1]
 
 
 parse_doc_string(NicheGA.__init__)

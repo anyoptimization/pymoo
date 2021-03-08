@@ -12,7 +12,7 @@ class NonDominatedSorting:
         self.method = method
 
     def do(self, F, return_rank=False, only_non_dominated_front=False, n_stop_if_ranked=None, **kwargs):
-        F = F.astype(np.float)
+        F = F.astype(float)
 
         # if not set just set it to a very large values because the cython algorithms do not take None
         if n_stop_if_ranked is None:
@@ -30,7 +30,7 @@ class NonDominatedSorting:
         n_ranked = 0
         for front in fronts:
 
-            _fronts.append(np.array(front, dtype=np.int))
+            _fronts.append(np.array(front, dtype=int))
 
             # increment the n_ranked solution counter
             n_ranked += len(front)
@@ -53,7 +53,7 @@ class NonDominatedSorting:
 
 def rank_from_fronts(fronts, n):
     # create the rank array and set values
-    rank = np.full(n, 1e16, dtype=np.int)
+    rank = np.full(n, 1e16, dtype=int)
     for i, front in enumerate(fronts):
         rank[front] = i
 

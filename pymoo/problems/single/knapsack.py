@@ -10,7 +10,7 @@ class Knapsack(Problem):
                  P,  # profit of each item
                  C,  # maximum capacity
                  ):
-        super().__init__(n_var=n_items, n_obj=1, n_constr=1, xl=0, xu=1, type_var=anp.bool)
+        super().__init__(n_var=n_items, n_obj=1, n_constr=1, xl=0, xu=1)
 
         self.W = W
         self.P = P

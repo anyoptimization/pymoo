@@ -64,7 +64,7 @@ class LatinHypercubeSampling(Sampling):
             # current best score is stored here
             score = self._calc_score(X)
 
-            for j in range(1, self.iterations):
+            for j in range(self.iterations - 1):
 
                 # create new random sample and check the score again
                 _X = self._sample(n_samples, problem.n_var)
@@ -77,7 +77,3 @@ class LatinHypercubeSampling(Sampling):
             X[:, i] = X[:, i] * (problem.xu[i] - problem.xl[i]) + problem.xl[i]
 
         return X
-
-
-class LHS(LatinHypercubeSampling):
-    pass

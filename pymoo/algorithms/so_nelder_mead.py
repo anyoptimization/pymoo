@@ -18,6 +18,34 @@ from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 # =========================================================================================================
 
 
+class NelderAndMeadTermination2(Termination):
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.default = SingleObjectiveDefaultTermination(**kwargs)
+
+    def _do_continue(self, algorithm):
+        do_continue = self.default.do_continue(algorithm)
+
+        # if the default says do not continue just follow that
+        if not do_continue:
+            return False
+
+        # additionally check for degenerated simplex
+        else:
+            X = algorithm.pop.get("X")
+
+            # degenerated simplex - get all edges and minimum and maximum length
+            D = vectorized_cdist(X, X)
+            val = D[np.triu_indices(len(X), 1)]
+            min_e, max_e = val.min(), val.max()
+
+            # either if the maximum length is very small or the ratio is degenerated
+            is_degenerated = max_e < 1e-16 or min_e / max_e < 1e-16
+
+            return not is_degenerated
+
+
 class NelderAndMeadTermination(Termination):
 
     def __init__(self,
@@ -57,6 +85,9 @@ class NelderAndMeadTermination(Termination):
         max_evals = algorithm.evaluator.n_eval > self.n_max_evals
 
         return not (ftol or xtol or max_iter or max_evals or is_degenerated)
+
+
+
 
 
 def adaptive_params(problem):
@@ -305,6 +336,7 @@ def default_params(*args):
     gamma = 0.5
     delta = 0.05
     return alpha, beta, gamma, delta
+
 
 
 parse_doc_string(NelderMead.__init__)

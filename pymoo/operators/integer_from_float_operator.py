@@ -11,7 +11,7 @@ def apply_float_operation(problem, fun):
     _xl, _xu = problem.xl, problem.xu
 
     # copy the arrays of the problem and cast them to float
-    xl, xu = problem.xl.astype(np.float), problem.xu.astype(np.float)
+    xl, xu = problem.xl.astype(float), problem.xu.astype(float)
 
     # modify the bounds to match the new crossover specifications and set the problem
     problem.xl = xl - (0.5 - 1e-16)
@@ -21,7 +21,7 @@ def apply_float_operation(problem, fun):
     off = fun()
 
     # now round to nearest integer for all offsprings
-    off = np.rint(off).astype(np.int)
+    off = np.rint(off).astype(int)
 
     # reset the original bounds of the problem and design space values
     problem.xl = _xl

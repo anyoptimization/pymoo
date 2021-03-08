@@ -5,21 +5,13 @@ from pymoo.model.repair import Repair
 import numpy as np
 
 
-def is_in_bounds(X, xl, xu):
-    return np.where(np.all(np.logical_and(X >= xl, X <= xu), axis=1))[0]
-
-
-def is_in_bounds_by_problem(problem, X):
-    return is_in_bounds(X, problem.xl, problem.xu)
-
-
 def is_out_of_bounds(X, xl, xu):
     return np.where(np.any(np.logical_or(X < xl, X > xu), axis=1))[0]
 
 
 def is_out_of_bounds_by_problem(problem, X):
     return is_out_of_bounds(X, problem.xl, problem.xu)
-    
+
 
 class BoundsRepair(Repair):
 

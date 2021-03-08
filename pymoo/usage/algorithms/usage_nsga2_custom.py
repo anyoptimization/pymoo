@@ -26,7 +26,7 @@ class MyProblem(Problem):
             elif c == 'b':
                 n_b += 1
 
-        out["F"] = np.array([- n_a, - n_b], dtype=np.float)
+        out["F"] = np.array([- n_a, - n_b], dtype=float)
 
 
 class MySampling(Sampling):

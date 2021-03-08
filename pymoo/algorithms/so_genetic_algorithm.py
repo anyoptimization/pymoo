@@ -49,7 +49,7 @@ def comp_by_cv_and_fitness(pop, P, **kwargs):
         else:
             S[i] = compare(a, pop[a].F, b, pop[b].F, method='smaller_is_better', return_random_if_equal=True)
 
-    return S[:, None].astype(np.int)
+    return S[:, None].astype(int)
 
 
 class GA(GeneticAlgorithm):

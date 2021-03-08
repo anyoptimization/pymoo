@@ -101,7 +101,7 @@ class HyperVolume:
             hvRecursive = self.hvRecursive
             p = sentinel
             q = p.prev[dimIndex]
-            while q.cargo is not None:
+            while q.cargo != None:
                 if q.ignore < dimIndex:
                     q.ignore = 0
                 q = q.prev[dimIndex]

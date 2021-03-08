@@ -5,6 +5,7 @@ from numpy.linalg import LinAlgError
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
+from pymoo.model.individual import Individual
 from pymoo.model.survival import Survival
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
@@ -34,7 +35,7 @@ def comp_by_cv_then_random(pop, P, **kwargs):
         else:
             S[i] = np.random.choice([a, b])
 
-    return S[:, None].astype(np.int)
+    return S[:, None].astype(int)
 
 
 class NSGA3(GeneticAlgorithm):
@@ -77,10 +78,9 @@ class NSGA3(GeneticAlgorithm):
                 pop_size = len(self.ref_dirs)
 
             if pop_size < len(self.ref_dirs):
-                print(
-                    f"WARNING: pop_size={pop_size} is less than the number of reference directions ref_dirs={len(self.ref_dirs)}.\n"
-                    "This might cause unwanted behavior of the algorithm. \nPlease make sure pop_size is equal or larger "
-                    "than the number of reference directions. ")
+                print(f"WARNING: pop_size={pop_size} is less than the number of reference directions ref_dirs={len(self.ref_dirs)}.\n"
+                      "This might cause unwanted behavior of the algorithm. \nPlease make sure pop_size is equal or larger "
+                      "than the number of reference directions. ")
 
         if 'survival' in kwargs:
             survival = kwargs['survival']
@@ -99,14 +99,14 @@ class NSGA3(GeneticAlgorithm):
                          display=display,
                          **kwargs)
 
-    def setup(self, problem, **kwargs):
+    def _solve(self, problem):
 
         if self.ref_dirs is not None and self.ref_dirs.shape[1] != problem.n_obj:
             raise Exception(
                 "Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
                 (self.ref_dirs.shape[1], problem.n_obj))
 
-        return super().setup(problem, **kwargs)
+        return super()._solve(problem)
 
     def _set_optimum(self, **kwargs):
         if not has_feasible(self.pop):
@@ -115,32 +115,40 @@ class NSGA3(GeneticAlgorithm):
             self.opt = self.survival.opt
 
 
-# =========================================================================================================
-# Survival
-# =========================================================================================================
-
-
 class ReferenceDirectionSurvival(Survival):
 
     def __init__(self, ref_dirs):
         super().__init__(filter_infeasible=True)
         self.ref_dirs = ref_dirs
+        self.extreme_points = None
+        self.intercepts = None
+        self.nadir_point = None
         self.opt = None
-        self.norm = HyperplaneNormalization(ref_dirs.shape[1])
+        self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
+        self.worst_point = np.full(ref_dirs.shape[1], -np.inf)
 
     def _do(self, problem, pop, n_survive, D=None, **kwargs):
-
         # attributes to be set after the survival
         F = pop.get("F")
+
+        # find or usually update the new ideal point - from feasible solutions
+        self.ideal_point = np.min(np.vstack((self.ideal_point, F)), axis=0)
+        self.worst_point = np.max(np.vstack((self.worst_point, F)), axis=0)
 
         # calculate the fronts of the population
         fronts, rank = NonDominatedSorting().do(F, return_rank=True, n_stop_if_ranked=n_survive)
         non_dominated, last_front = fronts[0], fronts[-1]
 
-        # update the hyperplane based boundary estimation
-        hyp_norm = self.norm
-        hyp_norm.update(F, nds=non_dominated)
-        ideal, nadir = hyp_norm.ideal_point, hyp_norm.nadir_point
+        # find the extreme points for normalization
+        self.extreme_points = get_extreme_points_c(F[non_dominated, :], self.ideal_point,
+                                                   extreme_points=self.extreme_points)
+
+        # find the intercepts for normalization and do backup if gaussian elimination fails
+        worst_of_population = np.max(F, axis=0)
+        worst_of_front = np.max(F[non_dominated, :], axis=0)
+
+        self.nadir_point = get_nadir_point(self.extreme_points, self.ideal_point, self.worst_point,
+                                           worst_of_population, worst_of_front)
 
         #  consider only the population until we come to the splitting front
         I = np.concatenate(fronts)
@@ -156,7 +164,7 @@ class ReferenceDirectionSurvival(Survival):
 
         # associate individuals to niches
         niche_of_individuals, dist_to_niche, dist_matrix = \
-            associate_to_niches(F, self.ref_dirs, ideal, nadir)
+            associate_to_niches(F, self.ref_dirs, self.ideal_point, self.nadir_point)
 
         # attributes of a population
         pop.set('rank', rank,
@@ -173,8 +181,8 @@ class ReferenceDirectionSurvival(Survival):
             # if there is only one front
             if len(fronts) == 1:
                 n_remaining = n_survive
-                until_last_front = np.array([], dtype=np.int)
-                niche_count = np.zeros(len(self.ref_dirs), dtype=np.int)
+                until_last_front = np.array([], dtype=int)
+                niche_count = np.zeros(len(self.ref_dirs), dtype=int)
 
             # if some individuals already survived
             else:
@@ -189,6 +197,63 @@ class ReferenceDirectionSurvival(Survival):
             pop = pop[survivors]
 
         return pop
+
+
+def get_extreme_points_c(F, ideal_point, extreme_points=None):
+    # calculate the asf which is used for the extreme point decomposition
+    weights = np.eye(F.shape[1])
+    weights[weights == 0] = 1e6
+
+    # add the old extreme points to never loose them for normalization
+    _F = F
+    if extreme_points is not None:
+        _F = np.concatenate([extreme_points, _F], axis=0)
+
+    # use __F because we substitute small values to be 0
+    __F = _F - ideal_point
+    __F[__F < 1e-3] = 0
+
+    # update the extreme points for the normalization having the highest asf value each
+    F_asf = np.max(__F * weights[:, None, :], axis=2)
+
+    I = np.argmin(F_asf, axis=1)
+    extreme_points = _F[I, :]
+
+    return extreme_points
+
+
+def get_nadir_point(extreme_points, ideal_point, worst_point, worst_of_front, worst_of_population):
+    try:
+
+        # find the intercepts using gaussian elimination
+        M = extreme_points - ideal_point
+        b = np.ones(extreme_points.shape[1])
+        plane = np.linalg.solve(M, b)
+
+        warnings.simplefilter("ignore")
+        intercepts = 1 / plane
+
+        nadir_point = ideal_point + intercepts
+
+        # check if the hyperplane makes sense
+        if not np.allclose(np.dot(M, plane), b) or np.any(intercepts <= 1e-6):
+            raise LinAlgError()
+
+        # if the nadir point should be larger than any value discovered so far set it to that value
+        # NOTE: different to the proposed version in the paper
+        b = nadir_point > worst_point
+        nadir_point[b] = worst_point[b]
+
+    except LinAlgError:
+
+        # fall back to worst of front otherwise
+        nadir_point = worst_of_front
+
+    # if the range is too small set it to worst of population
+    b = nadir_point - ideal_point <= 1e-6
+    nadir_point[b] = worst_of_population[b]
+
+    return nadir_point
 
 
 def niching(pop, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
@@ -254,102 +319,10 @@ def associate_to_niches(F, niches, ideal_point, nadir_point, utopian_epsilon=0.0
 
 
 def calc_niche_count(n_niches, niche_of_individuals):
-    niche_count = np.zeros(n_niches, dtype=np.int)
+    niche_count = np.zeros(n_niches, dtype=int)
     index, count = np.unique(niche_of_individuals, return_counts=True)
     niche_count[index] = count
     return niche_count
-
-
-# =========================================================================================================
-# Normalization
-# =========================================================================================================
-
-
-class HyperplaneNormalization:
-
-    def __init__(self, n_dim) -> None:
-        super().__init__()
-        self.ideal_point = np.full(n_dim, np.inf)
-        self.worst_point = np.full(n_dim, -np.inf)
-        self.nadir_point = None
-        self.extreme_points = None
-
-    def update(self, F, nds=None):
-        # find or usually update the new ideal point - from feasible solutions
-        self.ideal_point = np.min(np.vstack((self.ideal_point, F)), axis=0)
-        self.worst_point = np.max(np.vstack((self.worst_point, F)), axis=0)
-
-        # this decides whether only non-dominated points or all points are used to determine the extreme points
-        if nds is None:
-            nds = np.arange(len(F))
-
-        # find the extreme points for normalization
-        self.extreme_points = get_extreme_points_c(F[nds, :], self.ideal_point,
-                                                   extreme_points=self.extreme_points)
-
-        # find the intercepts for normalization and do backup if gaussian elimination fails
-        worst_of_population = np.max(F, axis=0)
-        worst_of_front = np.max(F[nds, :], axis=0)
-
-        self.nadir_point = get_nadir_point(self.extreme_points, self.ideal_point, self.worst_point,
-                                           worst_of_population, worst_of_front)
-
-
-def get_extreme_points_c(F, ideal_point, extreme_points=None):
-    # calculate the asf which is used for the extreme point decomposition
-    weights = np.eye(F.shape[1])
-    weights[weights == 0] = 1e6
-
-    # add the old extreme points to never loose them for normalization
-    _F = F
-    if extreme_points is not None:
-        _F = np.concatenate([extreme_points, _F], axis=0)
-
-    # use __F because we substitute small values to be 0
-    __F = _F - ideal_point
-    __F[__F < 1e-3] = 0
-
-    # update the extreme points for the normalization having the highest asf value each
-    F_asf = np.max(__F * weights[:, None, :], axis=2)
-
-    I = np.argmin(F_asf, axis=1)
-    extreme_points = _F[I, :]
-
-    return extreme_points
-
-
-def get_nadir_point(extreme_points, ideal_point, worst_point, worst_of_front, worst_of_population):
-    try:
-
-        # find the intercepts using gaussian elimination
-        M = extreme_points - ideal_point
-        b = np.ones(extreme_points.shape[1])
-        plane = np.linalg.solve(M, b)
-
-        warnings.simplefilter("ignore")
-        intercepts = 1 / plane
-
-        nadir_point = ideal_point + intercepts
-
-        # check if the hyperplane makes sense
-        if not np.allclose(np.dot(M, plane), b) or np.any(intercepts <= 1e-6):
-            raise LinAlgError()
-
-        # if the nadir point should be larger than any value discovered so far set it to that value
-        # NOTE: different to the proposed version in the paper
-        b = nadir_point > worst_point
-        nadir_point[b] = worst_point[b]
-
-    except LinAlgError:
-
-        # fall back to worst of front otherwise
-        nadir_point = worst_of_front
-
-    # if the range is too small set it to worst of population
-    b = nadir_point - ideal_point <= 1e-6
-    nadir_point[b] = worst_of_population[b]
-
-    return nadir_point
 
 
 parse_doc_string(NSGA3.__init__)

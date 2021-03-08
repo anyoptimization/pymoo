@@ -14,7 +14,7 @@ class DecisionMaking:
 
 
 def normalize(F, ideal_point=None, nadir_point=None, estimate_bounds_if_none=True, return_bounds=False):
-    N = F.astype(np.float)
+    N = F.astype(float)
 
     if estimate_bounds_if_none:
         if ideal_point is None:

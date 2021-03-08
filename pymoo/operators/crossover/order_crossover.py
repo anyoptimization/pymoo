@@ -56,7 +56,7 @@ def ox(receiver, donor, seq=None, shift=False):
             y.append(v)
 
     # now insert the donation at the right place
-    y = np.concatenate([y[:start], donation, y[start:]]).astype(copy=False, dtype=np.int)
+    y = np.concatenate([y[:start], donation, y[start:]]).astype(copy=False, dtype=int)
 
     return y
 
@@ -69,7 +69,7 @@ class OrderCrossover(Crossover):
 
     def _do(self, problem, X, **kwargs):
         _, n_matings, n_var = X.shape
-        Y = np.full((self.n_offsprings, n_matings, n_var), -1, dtype=np.int)
+        Y = np.full((self.n_offsprings, n_matings, n_var), -1, dtype=int)
 
         for i in range(n_matings):
             a, b = X[:, i, :]

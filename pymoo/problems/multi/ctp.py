@@ -1,24 +1,20 @@
-import os
-
 import autograd.numpy as anp
 
 from pymoo.model.problem import Problem
 from pymoo.problems.util import load_pareto_front_from_file
 
 
-def g_linear(x):
-    return 1 + anp.sum(x, axis=1)
-
-
-def g_multimodal(x):
-    A = 10
-    return 1 + A * x.shape[1] + anp.sum(x ** 2 - A * anp.cos(2 * anp.pi * x), axis=1)
-
-
 class CTP(Problem):
 
     def __init__(self, n_var=2, n_constr=1, option="linear"):
         super().__init__(n_var=n_var, n_obj=2, n_constr=n_constr, xl=0, xu=1, type_var=anp.double)
+
+        def g_linear(x):
+            return 1 + anp.sum(x, axis=1)
+
+        def g_multimodal(x):
+            A = 10
+            return 1 + A * x.shape[1] + anp.sum(x ** 2 - A * anp.cos(2 * anp.pi * x), axis=1)
 
         if option == "linear":
             self.calc_g = g_linear
@@ -34,34 +30,12 @@ class CTP(Problem):
     def calc_objectives(self, x):
         f1 = x[:, 0]
         gg = self.calc_g(x[:, 1:])
-        f2 = gg * (1 - (f1 / gg) ** 0.5)
+        f2 = gg * (1 - anp.sqrt(f1 / gg))
         return f1, f2
 
     def calc_constraint(self, theta, a, b, c, d, e, f1, f2):
-
-        # Equations in readable format
-        exp1 = (f2 - e) * anp.cos(theta) - f1 * anp.sin(theta)
-
-        exp2 = (f2 - e) * anp.sin(theta) + f1 * anp.cos(theta)
-        exp2 = b * anp.pi * (exp2 ** c)
-        exp2 = anp.abs(anp.sin(exp2))
-        exp2 = a * (exp2 ** d)
-
-        # as in the paper
-        # val = - (exp1 - exp2)
-
-        # as in the C code of NSGA2
-        val = 1 - exp1 / exp2
-
-        # ONE EQUATION
-        # _val = - (anp.cos(theta) * (f2 - e) - anp.sin(theta) * f1 -
-        #           a * anp.abs(anp.sin(b * anp.pi * (anp.sin(theta) * (f2 - e) + anp.cos(theta) * f1) ** c)) ** d)
-
-        return val
-
-    def _calc_pareto_front(self, *args, **kwargs):
-        fname = f"{str(self.__class__.__name__).lower()}.pf"
-        return load_pareto_front_from_file(os.path.join("CTP", fname))
+        return - (anp.cos(theta) * (f2 - e) - anp.sin(theta) * f1 -
+                  a * anp.abs(anp.sin(b * anp.pi * (anp.sin(theta) * (f2 - e) + anp.cos(theta) * f1) ** c)) ** d)
 
 
 class CTP1(CTP):
@@ -84,6 +58,9 @@ class CTP1(CTP):
         self.a = a[1:]
         self.b = b[1:]
 
+    def _calc_pareto_front(self):
+        return load_pareto_front_from_file("ctp1.pf")
+
     def _evaluate(self, x, out, *args, **kwargs):
         f1 = x[:, 0]
         gg = self.calc_g(x[:, 1:])
@@ -100,6 +77,9 @@ class CTP1(CTP):
 
 class CTP2(CTP):
 
+    def _calc_pareto_front(self):
+        return load_pareto_front_from_file("ctp2.pf")
+
     def _evaluate(self, x, out, *args, **kwargs):
         f1, f2 = self.calc_objectives(x)
         out["F"] = anp.column_stack([f1, f2])
@@ -110,6 +90,9 @@ class CTP2(CTP):
 
 
 class CTP3(CTP):
+
+    def _calc_pareto_front(self):
+        return load_pareto_front_from_file("ctp3.pf")
 
     def _evaluate(self, x, out, *args, **kwargs):
         f1, f2 = self.calc_objectives(x)
@@ -123,6 +106,9 @@ class CTP3(CTP):
 
 class CTP4(CTP):
 
+    def _calc_pareto_front(self):
+        return load_pareto_front_from_file("ctp4.pf")
+
     def _evaluate(self, x, out, *args, **kwargs):
         f1, f2 = self.calc_objectives(x)
         out["F"] = anp.column_stack([f1, f2])
@@ -134,6 +120,9 @@ class CTP4(CTP):
 
 
 class CTP5(CTP):
+
+    def _calc_pareto_front(self):
+        return load_pareto_front_from_file("ctp5.pf")
 
     def _evaluate(self, x, out, *args, **kwargs):
         f1, f2 = self.calc_objectives(x)
@@ -147,10 +136,8 @@ class CTP5(CTP):
 
 class CTP6(CTP):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.xu = anp.full(self.n_var, 20)
-        self.xu[0] = 1
+    def _calc_pareto_front(self):
+        return load_pareto_front_from_file("ctp6.pf")
 
     def _evaluate(self, x, out, *args, **kwargs):
         f1, f2 = self.calc_objectives(x)
@@ -163,6 +150,9 @@ class CTP6(CTP):
 
 
 class CTP7(CTP):
+
+    def _calc_pareto_front(self):
+        return load_pareto_front_from_file("ctp7.pf")
 
     def _evaluate(self, x, out, *args, **kwargs):
         f1, f2 = self.calc_objectives(x)
@@ -177,8 +167,9 @@ class CTP7(CTP):
 class CTP8(CTP):
     def __init__(self, **kwargs):
         super().__init__(n_constr=2, **kwargs)
-        self.xu = anp.full(self.n_var, 20)
-        self.xu[0] = 1
+
+    def _calc_pareto_front(self):
+        return load_pareto_front_from_file("ctp8.pf")
 
     def _evaluate(self, x, out, *args, **kwargs):
         f1, f2 = self.calc_objectives(x)

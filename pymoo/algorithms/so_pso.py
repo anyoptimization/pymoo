@@ -11,7 +11,7 @@ from pymoo.operators.repair.inverse_penalty import InversePenaltyOutOfBoundsRepa
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
 from pymoo.util.display import SingleObjectiveDisplay
-from pymoo.util.misc import norm_eucl_dist
+from pymoo.util.misc import norm_eucl_dist, norm_euclidean_distance
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 from pymoo.visualization.fitness_landscape import FitnessLandscape
 from pymoo.visualization.video.callback_video import AnimationCallback
@@ -165,11 +165,13 @@ class PSO(Algorithm):
     def setup(self, problem, **kwargs):
         super().setup(problem, **kwargs)
         self.V_max = self.max_velocity_rate * (problem.xu - problem.xl)
-        return self
 
     def _initialize(self):
         pop = self.initialization.do(self.problem, self.pop_size, algorithm=self)
         self.evaluator.eval(self.problem, pop, algorithm=self)
+
+        if self.pertube_best:
+            pop = FitnessSurvival().do(self.problem, pop, self.pop_size - 1)
 
         if self.initial_velocity == "random":
             init_V = np.random.random((len(pop), self.problem.n_var)) * self.V_max[None, :]
@@ -184,29 +186,10 @@ class PSO(Algorithm):
         self.strategy = None
 
     def _next(self):
-
-        # get the offspring solutions and evaluate them
-        off = self._step()
-        self.evaluator.eval(self.problem, off, algorithm=self)
-
-        # the the personal bests of the current population
-        pbest = Population.create(*self.pop.get("pbest"))
-
-        # if an offspring has improved the personal store that index
-        has_improved = ImprovementReplacement().do(self.problem, pbest, off, return_indices=True)
-
-        # replace the personal best of each particle if it has improved
-        off[has_improved].set("pbest", off[has_improved])
-        pop = off
-
-        self.off = off
-        self.pop = pop
+        self._step()
 
         if self.adaptive:
             self._adapt()
-
-    def _social_best(self):
-        return Population.create(*[self.opt] * len(self.pop))
 
     def _step(self):
         pop = self.pop
@@ -216,8 +199,8 @@ class PSO(Algorithm):
         pbest = Population.create(*pop.get("pbest"))
         P_X, P_F = pbest.get("X", "F")
 
-        # get the best for each solution - could be global or local or something else - (here: Global)
-        best = self._social_best()
+        # get the GLOBAL best solution - other variants such as local best can be implemented here too
+        best = self.opt.repeat(len(pop))
         G_X = best.get("X")
 
         # get the inertia weight of the individual
@@ -239,17 +222,30 @@ class PSO(Algorithm):
         _X = InversePenaltyOutOfBoundsRepair().do(self.problem, _X, P=X)
 
         # evaluate the offspring population
-        off = Population(len(pop)).set("X", _X, "V", _V, "pbest", pbest, "best", best)
+        off = Population(len(pop)).set("X", _X, "V", _V, "pbest", pbest)
+        self.evaluator.eval(self.problem, off, algorithm=self)
+
+        # check whether a solution has improved or not - also consider constraints here
+        has_improved = ImprovementReplacement().do(self.problem, pbest, off, return_indices=True)
+
+        # replace the personal best of each particle if it has improved
+        off[has_improved].set("pbest", off[has_improved])
+        off.set("best", best)
+        pop = off
 
         # try to improve the current best with a pertubation
         if self.pertube_best:
             pbest = Population.create(*pop.get("pbest"))
             k = FitnessSurvival().do(self.problem, pbest, 1, return_indices=True)[0]
-            eta = int(np.random.uniform(20, 30))
+            eta = int(np.random.uniform(5, 30))
             mutant = PolynomialMutation(eta).do(self.problem, pbest[[k]])[0]
-            off[k].set("X", mutant.X)
+            self.evaluator.eval(self.problem, mutant, algorithm=self)
 
-        return off
+            # if the mutant is in fact better - replace the personal best
+            if is_better(mutant, pop[k]):
+                pop[k].set("pbest", mutant)
+
+        self.pop = pop
 
     def _adapt(self):
         pop = self.pop
@@ -263,8 +259,8 @@ class PSO(Algorithm):
         mD = D.sum(axis=1) / (len(pop) - 1)
         _min, _max = mD.min(), mD.max()
 
-        # get the average distance to the best
-        g_D = norm_eucl_dist(self.problem, best.get("X"), X).mean()
+        # get the average distance to the global best
+        g_D = norm_euclidean_distance(self.problem)(best.get("X"), X).mean()
         f = (g_D - _min) / (_max - _min + 1e-32)
 
         S = np.array([S1_exploration(f), S2_exploitation(f), S3_convergence(f), S4_jumping_out(f)])
@@ -331,8 +327,7 @@ class PSOAnimation(AnimationCallback):
         FitnessLandscape(problem,
                          _type="contour",
                          kwargs_contour=dict(alpha=0.3),
-                         n_samples=self.n_samples_for_surface,
-                         close_on_destroy=False).do()
+                         n_samples=self.n_samples_for_surface).do()
 
         # get the population
         off = algorithm.pop

@@ -2,6 +2,7 @@ import numpy as np
 
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
+from pymoo.model.individual import Individual
 from pymoo.model.survival import Survival
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
@@ -56,7 +57,58 @@ def binary_tournament(pop, P, algorithm, **kwargs):
                 S[i] = compare(a, pop[a].get("crowding"), b, pop[b].get("crowding"),
                                method='larger_is_better', return_random_if_equal=True)
 
-    return S[:, None].astype(np.int, copy=False)
+    return S[:, None].astype(int, copy=False)
+
+
+# =========================================================================================================
+# Implementation
+# =========================================================================================================
+
+
+class NSGA2(GeneticAlgorithm):
+
+    def __init__(self,
+                 pop_size=100,
+                 sampling=FloatRandomSampling(),
+                 selection=TournamentSelection(func_comp=binary_tournament),
+                 crossover=SimulatedBinaryCrossover(eta=15, prob=0.9),
+                 mutation=PolynomialMutation(prob=None, eta=20),
+                 eliminate_duplicates=True,
+                 n_offsprings=None,
+                 display=MultiObjectiveDisplay(),
+                 **kwargs):
+        """
+
+        Parameters
+        ----------
+        pop_size : {pop_size}
+        sampling : {sampling}
+        selection : {selection}
+        crossover : {crossover}
+        mutation : {mutation}
+        eliminate_duplicates : {eliminate_duplicates}
+        n_offsprings : {n_offsprings}
+
+        """
+
+        super().__init__(pop_size=pop_size,
+                         sampling=sampling,
+                         selection=selection,
+                         crossover=crossover,
+                         mutation=mutation,
+                         survival=RankAndCrowdingSurvival(),
+                         eliminate_duplicates=eliminate_duplicates,
+                         n_offsprings=n_offsprings,
+                         display=display,
+                         **kwargs)
+
+        self.tournament_type = 'comp_by_dom_and_crowding'
+
+    def _set_optimum(self, **kwargs):
+        if not has_feasible(self.pop):
+            self.opt = self.pop[[np.argmin(self.pop.get("CV"))]]
+        else:
+            self.opt = self.pop[self.pop.get("rank") == 0]
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -66,14 +118,14 @@ def binary_tournament(pop, P, algorithm, **kwargs):
 
 class RankAndCrowdingSurvival(Survival):
 
-    def __init__(self, nds=None) -> None:
+    def __init__(self) -> None:
         super().__init__(filter_infeasible=True)
-        self.nds = nds if nds is not None else NonDominatedSorting()
+        self.nds = NonDominatedSorting()
 
     def _do(self, problem, pop, n_survive, D=None, **kwargs):
 
         # get the objective space values and objects
-        F = pop.get("F").astype(np.float, copy=False)
+        F = pop.get("F").astype(float, copy=False)
 
         # the final indices of surviving individuals
         survivors = []
@@ -104,58 +156,6 @@ class RankAndCrowdingSurvival(Survival):
             survivors.extend(front[I])
 
         return pop[survivors]
-
-
-# =========================================================================================================
-# Implementation
-# =========================================================================================================
-
-
-class NSGA2(GeneticAlgorithm):
-
-    def __init__(self,
-                 pop_size=100,
-                 sampling=FloatRandomSampling(),
-                 selection=TournamentSelection(func_comp=binary_tournament),
-                 crossover=SimulatedBinaryCrossover(eta=15, prob=0.9),
-                 mutation=PolynomialMutation(prob=None, eta=20),
-                 survival=RankAndCrowdingSurvival(),
-                 eliminate_duplicates=True,
-                 n_offsprings=None,
-                 display=MultiObjectiveDisplay(),
-                 **kwargs):
-        """
-
-        Parameters
-        ----------
-        pop_size : {pop_size}
-        sampling : {sampling}
-        selection : {selection}
-        crossover : {crossover}
-        mutation : {mutation}
-        eliminate_duplicates : {eliminate_duplicates}
-        n_offsprings : {n_offsprings}
-
-        """
-
-        super().__init__(pop_size=pop_size,
-                         sampling=sampling,
-                         selection=selection,
-                         crossover=crossover,
-                         mutation=mutation,
-                         survival=survival,
-                         eliminate_duplicates=eliminate_duplicates,
-                         n_offsprings=n_offsprings,
-                         display=display,
-                         **kwargs)
-
-        self.tournament_type = 'comp_by_dom_and_crowding'
-
-    def _set_optimum(self, **kwargs):
-        if not has_feasible(self.pop):
-            self.opt = self.pop[[np.argmin(self.pop.get("CV"))]]
-        else:
-            self.opt = self.pop[self.pop.get("rank") == 0]
 
 
 def calc_crowding_distance(F, filter_out_duplicates=True):

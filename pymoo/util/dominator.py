@@ -1,10 +1,6 @@
 import numpy as np
 
 
-def get_relation(ind_a, ind_b):
-    return Dominator.get_relation(ind_a.F, ind_b.F, ind_a.CV[0], ind_b.CV[0])
-
-
 class Dominator:
 
     @staticmethod
@@ -33,7 +29,7 @@ class Dominator:
     @staticmethod
     def calc_domination_matrix_loop(F, G):
         n = F.shape[0]
-        CV = np.sum(G * (G > 0).astype(np.float), axis=1)
+        CV = np.sum(G * (G > 0).astype(float), axis=1)
         M = np.zeros((n, n))
         for i in range(n):
             for j in range(i + 1, n):

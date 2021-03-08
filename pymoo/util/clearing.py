@@ -72,10 +72,4 @@ class EpsilonClearing:
 
         less_than_epsilon = dist_to_other < self.epsilon
 
-        # entries which are currently not cleared and are supposed to
-        cleared = np.where(np.logical_and(~self.C, less_than_epsilon))[0]
-
-        # set them to be cleared
-        self.C[cleared] = True
-
-        return cleared
+        self.C[less_than_epsilon] = True

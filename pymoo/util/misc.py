@@ -13,10 +13,8 @@ def parameter_less(F, CV):
     ret = np.copy(F)
     parameter_less = np.max(F, axis=0) + CV
 
-    infeasible = (CV > 0)[:, 0]
-
-    if np.any(infeasible):
-        ret[infeasible] = parameter_less[infeasible]
+    infeasible = CV > 0
+    ret[infeasible] = parameter_less[infeasible]
 
     return ret
 
@@ -80,83 +78,19 @@ def get_duplicates(M):
     return res
 
 
-# -----------------------------------------------
-# Euclidean Distance
-# -----------------------------------------------
-
-def func_euclidean_distance(a, b):
+def euclidean_distance(a, b):
     return np.sqrt(((a - b) ** 2).sum(axis=1))
 
 
-def func_norm_euclidean_distance(xl, xu):
-    return lambda a, b: np.sqrt((((a - b) / (xu - xl)) ** 2).sum(axis=1))
-
-
-def norm_eucl_dist_by_bounds(A, B, xl, xu, **kwargs):
-    return vectorized_cdist(A, B, func_dist=func_norm_euclidean_distance(xl, xu), **kwargs)
-
-
-def norm_eucl_dist(problem, A, B, **kwargs):
-    return norm_eucl_dist_by_bounds(A, B, *problem.bounds(), **kwargs)
-
-
-# -----------------------------------------------
-# Manhatten Distance
-# -----------------------------------------------
-
-def func_manhatten_distance(a, b):
-    return np.abs(a - b).sum(axis=1)
-
-
-def func_norm_manhatten_distance(xl, xu):
-    return lambda a, b: np.abs((a - b) / (xu - xl)).sum(axis=1)
-
-
-def norm_manhatten_dist_by_bounds(A, B, xl, xu, **kwargs):
-    return vectorized_cdist(A, B, func_dist=func_norm_manhatten_distance(xl, xu), **kwargs)
-
-
-def norm_manhatten_dist(problem, A, B, **kwargs):
-    return norm_manhatten_dist_by_bounds(A, B, *problem.bounds(), **kwargs)
-
-
-# -----------------------------------------------
-# Tchebychev Distance
-# -----------------------------------------------
-
-
-def func_tchebychev_distance(a, b):
-    return np.abs(a - b).max(axis=1)
-
-
-def func_norm_tchebychev_distance(xl, xu):
-    return lambda a, b: np.abs((a - b) / (xu - xl)).max(axis=1)
-
-
-def norm_tchebychev_dist_by_bounds(A, B, xl, xu, **kwargs):
-    return vectorized_cdist(A, B, func_dist=func_norm_tchebychev_distance(xl, xu), **kwargs)
-
-
-def norm_tchebychev_dist(problem, A, B, **kwargs):
-    return norm_tchebychev_dist_by_bounds(A, B, *problem.bounds(), **kwargs)
-
-
-# -----------------------------------------------
-# Others
-# -----------------------------------------------
+def norm_euclidean_distance(problem):
+    return lambda a, b: np.sqrt((((a - b) / (problem.xu - problem.xl)) ** 2).sum(axis=1))
 
 
 def cdist(A, B, **kwargs):
     return scipy.spatial.distance.cdist(A, B, **kwargs)
 
 
-def vectorized_cdist(A, B, func_dist=func_euclidean_distance, fill_diag_with_inf=False, **kwargs):
-
-    assert A.ndim <= 2 and B.ndim <= 2
-
-    A, only_row = at_least_2d_array(A, extend_as="row", return_if_reshaped=True)
-    B, only_column = at_least_2d_array(B, extend_as="row", return_if_reshaped=True)
-
+def vectorized_cdist(A, B, func_dist=euclidean_distance, fill_diag_with_inf=False, **kwargs):
     u = np.repeat(A, B.shape[0], axis=0)
     v = np.tile(B, (A.shape[0], 1))
 
@@ -166,21 +100,18 @@ def vectorized_cdist(A, B, func_dist=func_euclidean_distance, fill_diag_with_inf
     if fill_diag_with_inf:
         np.fill_diagonal(M, np.inf)
 
-    if only_row and only_column:
-        M = M[0,0]
-    elif only_row:
-        M = M[0]
-    elif only_column:
-        M = M[:, [0]]
-
     return M
+
+
+def norm_eucl_dist(problem, A, B, **kwargs):
+    return vectorized_cdist(A, B, func_dist=norm_euclidean_distance(problem), **kwargs)
 
 
 def covert_to_type(problem, X):
     if problem.type_var == np.double:
         return X.astype(np.double)
-    elif problem.type_var == np.int:
-        return np.round(X).astype(np.int)
+    elif problem.type_var == int:
+        return np.round(X).astype(int)
     elif problem.type_var == np.bool:
         return X < (problem.xu - problem.xl) / 2
 
@@ -198,11 +129,9 @@ def find_duplicates(X, epsilon=1e-16):
     return is_duplicate
 
 
-def at_least_2d_array(x, extend_as="row", return_if_reshaped=False):
+def at_least_2d_array(x, extend_as="row"):
     if not isinstance(x, np.ndarray):
         x = np.array([x])
-
-    has_been_reshaped = False
 
     if x.ndim == 1:
         if extend_as == "row":
@@ -210,12 +139,7 @@ def at_least_2d_array(x, extend_as="row", return_if_reshaped=False):
         elif extend_as == "column":
             x = x[:, None]
 
-        has_been_reshaped = True
-
-    if return_if_reshaped:
-        return x, has_been_reshaped
-    else:
-        return x
+    return x
 
 
 def to_1d_array_if_possible(x):
@@ -356,16 +280,3 @@ def termination_from_tuple(termination):
             termination = get_termination(*termination)
 
     return termination
-
-
-def unique_and_all_indices(arr):
-    sort_indexes = np.argsort(arr)
-    arr = np.asarray(arr)[sort_indexes]
-    vals, first_indexes, inverse, counts = np.unique(arr,
-                                                     return_index=True, return_inverse=True, return_counts=True)
-    indexes = np.split(sort_indexes, first_indexes[1:])
-    for x in indexes:
-        x.sort()
-    return vals, indexes
-
-

@@ -31,7 +31,7 @@ class NSGA2Test(unittest.TestCase):
 
             survivor_and_last_front = np.where(D['rank'] != -1.0)[0]
             crowding = D['crowding'][survivor_and_last_front]
-            rank = D['rank'][survivor_and_last_front].astype(np.int)
+            rank = D['rank'][survivor_and_last_front].astype(int)
             F = D['F'][survivor_and_last_front, :]
 
             fronts, _rank = NonDominatedSorting().do(F, return_rank=True)

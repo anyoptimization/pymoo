@@ -9,7 +9,7 @@ problem = get_problem("ackley", n_var=10)
 algorithm = DE(
     pop_size=100,
     sampling=LatinHypercubeSampling(iterations=100, criterion="maxmin"),
-    variant="DE/best/1/bin",
+    variant="DE/rand/1/bin",
     CR=0.5,
     F=0.3,
     dither="vector",
@@ -19,6 +19,6 @@ algorithm = DE(
 res = minimize(problem,
                algorithm,
                seed=1,
-               verbose=True)
+               verbose=False)
 
 print("Best solution found: \nX = %s\nF = %s" % (res.X, res.F))

@@ -38,5 +38,3 @@ class LocalSearch(Algorithm):
         self._set_optimum()
         if self.opt is not None and len(self.opt) > 0:
             self.x0 = self.opt[0]
-
-

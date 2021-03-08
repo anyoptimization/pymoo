@@ -8,9 +8,6 @@ def denormalize(x, x_min, x_max):
     else:
         _range = (x_max - x_min)
 
-    if x_min is None:
-        x_min = 0
-
     return x * _range + x_min
 
 
@@ -31,7 +28,7 @@ def normalize(x, x_min=None, x_max=None, return_bounds=False, estimate_bounds_if
     # calculate the denominator
     denom = (x_max - x_min)
     if isinstance(denom, np.ndarray):
-        denom = denom.astype(np.float)
+        denom = denom.astype(float)
 
     # we can not divide by zero -> plus small epsilon
     denom += 1e-30

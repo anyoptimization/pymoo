@@ -78,12 +78,12 @@ class RNSGA3(NSGA3):
                          n_offsprings=n_offsprings,
                          **kwargs)
 
-    def setup(self, problem, **kwargs):
+    def _solve(self, problem):
         if self.survival.ref_points.shape[1] != problem.n_obj:
             raise Exception("Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
                             (self.survival.ref_points.shape[1], problem.n_obj))
 
-        return super().setup(problem, **kwargs)
+        return super()._solve(problem)
 
     def _finalize(self):
         pass
@@ -162,8 +162,8 @@ class AspirationPointSurvival(Survival):
             # if there is only one front
             if len(fronts) == 1:
                 n_remaining = n_survive
-                until_last_front = np.array([], dtype=np.int)
-                niche_count = np.zeros(len(ref_dirs), dtype=np.int)
+                until_last_front = np.array([], dtype=int)
+                niche_count = np.zeros(len(ref_dirs), dtype=int)
 
             # if some individuals already survived
             else:

@@ -1,0 +1,108 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+      
+jobs:
+
+  # tests:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Install Python
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: 3.9
+  #     - name: Install dependencies
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         pip install .
+  #         pip install pytest
+  #     - name: Run tests
+  #       run: pytest tests/test_performance_indicator.py
+
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Create Documentation
+        run: |
+          sudo apt-get install pandoc rsync
+          python -m pip install --upgrade pip
+          cd doc
+          pip install -r requirements.txt
+          make html
+      - name: Upload Documentation
+        uses: trendyminds/github-actions-rsync@master
+        with:
+          RSYNC_OPTIONS: -avzr --delete --exclude '*.ipynb'
+          RSYNC_TARGET: /home/blankjul/pymoo.org/master
+          RSYNC_SOURCE: /doc/build/html/*
+        env:
+          SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
+          SSH_USERNAME: ${{secrets.SSH_USERNAME}}
+          SSH_HOSTNAME: ${{secrets.SSH_HOSTNAME}}
+
+      
+
+  build:
+    needs: tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.7', '3.8', '3.9']
+        exclude:
+          - os: ubuntu-latest
+            python-version: '3.7'
+            python-version: '3.8'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel numpy
+    - uses: knicknic/os-specific-run@v1
+      with:
+        linux: python setup.py sdist 
+        macos: python setup.py bdist_wheel
+        windows: python setup.py bdist_wheel
+    - uses: actions/upload-artifact@v2
+      with:
+        name: dist
+        path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
+      with:
+        name: dist
+        path: dist
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Publish
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python -m pip install --upgrade pip
+        pip install twine
+        twine upload --skip-existing --repository testpypi dist/*
+

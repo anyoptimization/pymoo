@@ -1,10 +1,10 @@
 import numpy as np
 
-from pymoo.algorithms.convex.adam import Adam
-from pymoo.factory import Rosenbrock
+from pymoo.algorithms.so_adam import Adam
+from pymoo.factory import get_problem
 from pymoo.optimize import minimize
 
-problem = Rosenbrock()
+problem = get_problem("rosenbrock")
 
 X = np.random.random((1, problem.n_var))
 

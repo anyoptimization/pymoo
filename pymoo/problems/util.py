@@ -6,6 +6,7 @@ import autograd.numpy as anp
 
 
 def decompose(problem, decomposition, weights, return_copy=True):
+
     if return_copy:
         problem = copy.deepcopy(problem)
 
@@ -19,6 +20,8 @@ def decompose(problem, decomposition, weights, return_copy=True):
     problem.n_obj = 1
 
     return problem
+
+
 
 
 def load_pareto_front_from_file(fname):
@@ -40,3 +43,4 @@ def binomial(n, k):
         return ntok // ktok
     else:
         return 0
+

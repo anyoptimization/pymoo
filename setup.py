@@ -24,7 +24,7 @@ data = dict(
     version=__version__,
     author=__author__,
     url=__url__,
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     author_email="blankjul@egr.msu.edu",
     description="Multi-Objective Optimization in Python",
     license='Apache License 2.0',
@@ -38,8 +38,9 @@ data = dict(
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'Topic :: Scientific/Engineering :: Mathematics'
@@ -65,7 +66,6 @@ def packages():
 data['long_description'] = readme()
 data['long_description_content_type'] = 'text/x-rst'
 data['packages'] = packages()
-data['include_package_data'] = True
 
 
 # ---------------------------------------------------------------------------------------------------------

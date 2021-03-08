@@ -6,6 +6,7 @@ from scipy.spatial.distance import cdist, pdist, squareform
 from pymoo.algorithms.genetic_algorithm import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
 from pymoo.factory import get_decomposition
+from pymoo.model.individual import Individual
 from pymoo.model.population import Population
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
@@ -45,7 +46,7 @@ def comp_by_cv_dom_then_random(pop, P, **kwargs):
         else:
             S[i] = np.random.choice([a, b])
 
-    return S[:, None].astype(np.int)
+    return S[:, None].astype(int)
 
 
 class RestrictedMating(TournamentSelection):
@@ -141,14 +142,14 @@ class CTAEA(GeneticAlgorithm):
         self.pop = pop
         self.da = da
 
-    def setup(self, problem, **kwargs):
+    def _solve(self, problem):
 
         if self.ref_dirs is not None and self.ref_dirs.shape[1] != problem.n_obj:
             raise Exception(
                 "Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
                 (self.ref_dirs.shape[1], problem.n_obj))
 
-        return super().setup(problem)
+        return super()._solve(problem)
 
     def _next(self):
 

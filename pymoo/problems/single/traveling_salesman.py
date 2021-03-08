@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.spatial.distance import cdist
+from scipy.spatial.distance import pdist, squareform, cdist
 
 from pymoo.model.problem import Problem
 
@@ -27,7 +27,7 @@ class TravelingSalesman(Problem):
             n_obj=1,
             xl=0,
             xu=n_cities,
-            type_var=np.int,
+            type_var=int,
             elementwise_evaluation=True,
             **kwargs
         )
