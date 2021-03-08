@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.decomposition.perp_dist import PerpendicularDistance
 from pymoo.decomposition.weighted_sum import WeightedSum
-from tests import path_to_test_resources
+from tests.util import path_to_test_resources
 
 
 def test_one_to_one():
