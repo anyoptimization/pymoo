@@ -4,12 +4,14 @@ from pathlib import Path
 from pymoo.configuration import get_pymoo
 
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+print(ROOT)
 
 USAGE = os.path.join(ROOT, "pymoo", "usage")
 
 TESTS = os.path.join(ROOT, "tests")
 
 RESOURCES = os.path.join(TESTS, "resources")
+print(RESOURCES)
 
 
 def path_to_test_resources(*args):
