@@ -5,9 +5,7 @@ from pymoo.experimental.autodiff import AutomaticDifferentiation
 from pymoo.factory import get_problem
 from pymoo.performance_indicator.kktpm import KKTPM
 from pymoo.problems.bounds_as_constr import BoundariesAsConstraints
-from tests import path_to_test_resources
-
-folder = path_to_test_resources("kktpm")
+from tests.util import path_to_test_resources
 
 SETUP = {
     "bnh": {'utopian_eps': 0.0, "ideal": np.array([-0.05, -0.05]), "rho": 0.0},
@@ -24,8 +22,7 @@ def test_kktpm_correctness(str_problem, params):
     # problem = AutomaticDifferentiation(BoundariesAsConstraints(get_problem(str_problem)))
 
     def load_file(f):
-        import os
-        return np.loadtxt(os.path.join(folder, "%s_%s.txt" % (str_problem, f)))
+        return np.loadtxt(path_to_test_resources("kktpm", "%s_%s.txt" % (str_problem, f)))
 
     X = load_file("x")
     _F, _G, _dF, _dG = problem.evaluate(X, return_values_of=["F", "G", "dF", "dG"])
