@@ -3,7 +3,7 @@ from pathlib import Path
 
 from pymoo.configuration import get_pymoo
 
-ROOT = get_pymoo()
+ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 USAGE = os.path.join(ROOT, "pymoo", "usage")
 
