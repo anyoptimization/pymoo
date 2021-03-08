@@ -20,6 +20,5 @@ jobs:
       - name: Install pymoo
         run: |
           pip install .
-          rm -rf pymoo
       - name: Run Tests
         run: pytest

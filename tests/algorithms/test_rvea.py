@@ -3,7 +3,7 @@ import numpy as np
 from pymoo.algorithms.moo.rvea import APDSurvival, RVEA
 from pymoo.factory import DTLZ2
 from pymoo.model.population import Population
-from tests.util import path_to_test_resources
+from tests.util import path_to_test_resource
 
 
 def test_survival():
@@ -12,8 +12,8 @@ def test_survival():
     for k in range(1, 11):
         print("TEST RVEA GEN", k)
 
-        ref_dirs = np.loadtxt(path_to_test_resources('rvea', f"ref_dirs_{k}.txt"))
-        F = np.loadtxt(path_to_test_resources('rvea', f"F_{k}.txt"))
+        ref_dirs = np.loadtxt(path_to_test_resource('rvea', f"ref_dirs_{k}.txt"))
+        F = np.loadtxt(path_to_test_resource('rvea', f"F_{k}.txt"))
         pop = Population.new(F=F)
 
         algorithm = RVEA(ref_dirs)
@@ -25,5 +25,5 @@ def test_survival():
         survivors = survival.do(problem, algorithm.pop, n_survive=len(pop), algorithm=algorithm, return_indices=True)
 
         apd = pop[survivors].get("apd")
-        correct_apd = np.loadtxt(path_to_test_resources('rvea', f"apd_{k}.txt"))
+        correct_apd = np.loadtxt(path_to_test_resource('rvea', f"apd_{k}.txt"))
         np.testing.assert_allclose(apd, correct_apd)
