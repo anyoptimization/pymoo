@@ -7,7 +7,14 @@ ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 USAGE = os.path.join(ROOT, "pymoo", "usage")
 
-RESOURCES = os.path.join(ROOT, "tests", "resources")
+TESTS = os.path.join(ROOT, "tests")
+
+RESOURCES = os.path.join(TESTS, "resources")
+
+
+def path_to_test_resources(*args):
+    return os.path.join(RESOURCES, *args)
+
 
 NO_INIT = ["__init__.py"]
 
@@ -61,5 +68,3 @@ def run_ipynb(fname, overwrite=False):
         if overwrite:
             with open(fname, mode='wt') as f:
                 nbformat.write(nb, f)
-
-
