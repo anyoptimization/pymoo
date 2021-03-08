@@ -5,7 +5,7 @@ on:
       - develop
 
 jobs:
-  build:
+  testing:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
