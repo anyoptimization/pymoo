@@ -19,7 +19,7 @@ jobs:
           pip install -r tests/requirements.txt
       - name: Install pymoo
         run: |
-          pip install .
+          pip install -e . -v
           rm -rf pymoo
       - name: List Directory
         run: |
