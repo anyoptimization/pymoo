@@ -16,19 +16,11 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r Cython numpy
+          pip install numpy
           pip install -r tests/requirements.txt
       - name: Install pymoo
         run: |
-          pip install -v .
+          pip install .
           rm -rf pymoo
-      - name: List Directory
-        run: |
-          pwd
-          ls -la .
-          ls -la tests/resources/problems
-          ls /home/runner/work/pymoo/pymoo/tests/resources/problems/WFG/
-          ls /home/runner/work/pymoo/pymoo/tests/resources/problems/WFG/10obj
-          cat /home/runner/work/pymoo/pymoo/tests/resources/problems/WFG/10obj/WFG9.x
       - name: Run Tests
         run: pytest
