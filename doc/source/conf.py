@@ -109,22 +109,22 @@ intersphinx_mapping = {'python': ('http://docs.python.org/2', None),
 exclude_patterns = ['build', '**.ipynb_checkpoints']
 if DEBUG:
     # exclude_patterns.append("**ipynb")
-    exclude_patterns.append("getting_started*")
-    exclude_patterns.append("interface*")
-    exclude_patterns.append("problems*")
-
-    exclude_patterns.append("problems/single/*")
-    exclude_patterns.append("problems/multi/*")
-    exclude_patterns.append("problems/many/*")
-    exclude_patterns.append("problems/constrained/*")
-
-    exclude_patterns.append("algorithms*")
-    exclude_patterns.append("customization*")
-    exclude_patterns.append("operators*")
-    exclude_patterns.append("visualization*")
-    exclude_patterns.append("api*")
-    exclude_patterns.append("decision_making*")
-    exclude_patterns.append("misc*")
+    # exclude_patterns.append("getting_started*")
+    # exclude_patterns.append("interface*")
+    # exclude_patterns.append("problems*")
+    #
+    # exclude_patterns.append("problems/single/*")
+    # exclude_patterns.append("problems/multi/*")
+    # exclude_patterns.append("problems/many/*")
+    # exclude_patterns.append("problems/constrained/*")
+    #
+    # exclude_patterns.append("algorithms*")
+    # exclude_patterns.append("customization*")
+    # exclude_patterns.append("operators*")
+    # exclude_patterns.append("visualization*")
+    # exclude_patterns.append("api*")
+    # exclude_patterns.append("decision_making*")
+    # exclude_patterns.append("misc*")
 
     pass
 
