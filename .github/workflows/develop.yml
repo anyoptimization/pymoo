@@ -26,5 +26,8 @@ jobs:
           pwd
           ls -la .
           ls -la tests/resources/problems
+          ls /home/runner/work/pymoo/pymoo/tests/resources/problems/WFG/
+          ls /home/runner/work/pymoo/pymoo/tests/resources/problems/WFG/10obj
+          cat /home/runner/work/pymoo/pymoo/tests/resources/problems/WFG/10obj/wfg9.x
       - name: Run Tests
         run: pytest
