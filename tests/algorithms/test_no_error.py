@@ -33,7 +33,9 @@ MULTI_OBJECTIVE_PROBLEMS = [ZDT1()]
 
 
 ref_dirs = get_reference_directions("das-dennis", 2, n_partitions=99)
-MULTI_OBJECTIVE_ALGORITHMS = [NSGA2(), GDE3(), RVEA(ref_dirs), MOEAD(ref_dirs), ParallelMOEAD(ref_dirs)]
+MULTI_OBJECTIVE_ALGORITHMS = [NSGA2(),
+                              # GDE3(),
+                              RVEA(ref_dirs), MOEAD(ref_dirs), ParallelMOEAD(ref_dirs)]
 
 
 @pytest.mark.parametrize('problem', MULTI_OBJECTIVE_PROBLEMS)
