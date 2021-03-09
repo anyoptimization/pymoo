@@ -11,7 +11,7 @@ PROBLEMS = ["dc1dtlz1", "dc1dtlz3", "dc2dtlz1", "dc2dtlz3", "dc3dtlz1", "dc3dtlz
 def test_problems(name):
     problem = get_problem(name)
 
-    X, F, CV = load(name)
+    X, F, CV = load(name.upper())
     _F, _CV, _G = problem.evaluate(X, return_values_of=["F", "CV", "G"])
 
     if _G.shape[1] > 1:
