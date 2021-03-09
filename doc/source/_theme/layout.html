@@ -18,7 +18,8 @@
 {%- if prev %}
 <div class="col text-left my-auto">
     <a href="{{ prev.link|e }}">
-        <button type="button" href="{{ prev.link|e }}" class="text-left prev-next-link left-prev btn btn-outline-secondary"><< {{
+        <button type="button" href="{{ prev.link|e }}"
+                class="text-left prev-next-link left-prev btn btn-outline-secondary"><< {{
             prev_title or prev.title }}
         </button>
     </a>
@@ -69,6 +70,7 @@
 
 
 {% block docs_main %}
+{%- include "newsletter.html" %}
 <main id="my-wrapper" class="container-xl mx-auto p-0 m-0 mt-3 mb-1 bd-content" role="main">
 
 
@@ -115,7 +117,6 @@
 
         <div id="main-toc" class="d-none d-md-block col-md-2 pl-0 bd-toc sticky show">
             {{ generate_toc_html() }}
-            {%- include "newsletter.html" %}
         </div>
 
     </div>
@@ -123,6 +124,8 @@
     <div id="main-footer" class="row">
         {%- include "footer.html" %}
     </div>
+
+
 
 </main>
 {% endblock %}
