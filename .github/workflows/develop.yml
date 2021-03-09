@@ -24,3 +24,33 @@ jobs:
           rm -rf pymoo
       - name: Run Tests
         run: pytest
+
+
+  docs:
+    needs: testing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install Dependencies
+        run: |
+          sudo apt-get install pandoc rsync
+          python -m pip install --upgrade pip
+          pip install -r doc/requirements.txt
+      - name: Create Documentation
+        run: |
+          cd doc
+          make html
+      - name: Upload Documentation
+        uses: trendyminds/github-actions-rsync@master
+        with:
+          RSYNC_OPTIONS: -avzr --delete --exclude '*.ipynb'
+          RSYNC_TARGET: /home/blankjul/pymoo.org/$(echo $GITHUB_REF | cut -d'/' -f 3)
+          RSYNC_SOURCE: /doc/build/html/*
+        env:
+          SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
+          SSH_USERNAME: ${{secrets.SSH_USERNAME}}
+          SSH_HOSTNAME: ${{secrets.SSH_HOSTNAME}}
