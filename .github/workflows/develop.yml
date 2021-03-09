@@ -25,7 +25,6 @@ jobs:
       - name: Run Tests
         run: pytest
 
-
   docs:
     needs: testing
     runs-on: ubuntu-latest

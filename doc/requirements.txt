@@ -3,7 +3,12 @@ numpydoc
 nbsphinx
 sphinxcontrib-bibtex<2.0.0
 pydata-sphinx-theme
+<<<<<<< HEAD
 ipython
 pygments
 bs4
 pandoc
+=======
+bs4
+pandoc
+>>>>>>> 21a46c5bd68297425ec846e6df1b5db8506f086a
