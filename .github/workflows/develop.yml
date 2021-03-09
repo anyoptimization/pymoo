@@ -23,6 +23,8 @@ jobs:
           rm -rf pymoo
       - name: List Directory
         run: |
-          ls .
+          pwd
+          ls -la .
+          ls -la tests/resources/problems
       - name: Run Tests
         run: pytest
