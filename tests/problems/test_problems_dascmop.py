@@ -10,7 +10,7 @@ from tests.problems.test_correctness import load
 @pytest.mark.parametrize("j", range(len(DIFFICULTIES)))
 def test_dascomp(i, j):
     name, difficulty = f"dascmop{i}", DIFFICULTIES[j]
-    problem = get_problem(name, difficulty)
+    problem = get_problem(name.upper(), difficulty)
 
     X, F, CV = load(name, suffix=["DASCMOP", str(j)])
     _F, _CV = problem.evaluate(X, return_values_of=["F", "CV"])

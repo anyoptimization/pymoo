@@ -11,7 +11,7 @@ def test_problems(name, params):
     n_obj, n_var, k = params
     problem = get_problem(name, n_var, n_obj, k)
 
-    X, F, CV = load(name, suffix=["WFG", "%sobj" % n_obj])
+    X, F, CV = load(name.upper(), suffix=["WFG", "%sobj" % n_obj])
 
     if F is None:
         print("Warning: No correctness check for %s" % name)
