@@ -11,7 +11,7 @@ PROBLEMS = [f"mw{k}" for k in range(1, 15)]
 def test_mw(name):
     problem = get_problem(name)
 
-    X, F, CV = load(name, suffix=["mw"])
+    X, F, CV = load(name.upper(), suffix=["mw"])
     _F, _CV = problem.evaluate(X, return_values_of=["F", "CV"])
 
     np.testing.assert_allclose(_F, F)
