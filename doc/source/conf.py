@@ -13,12 +13,15 @@ import os
 import sys
 from datetime import date
 
-sys.path.insert(0, os.path.abspath('.'))
+SOURCE = os.path.dirname(os.path.realpath(__file__))
+
+sys.path.insert(0, SOURCE)
 from _theme import *
 
-sys.path.insert(0, os.path.abspath('../../../pymoo'))
+ROOT = os.path.dirname(os.path.dirname(SOURCE))
+
+sys.path.insert(0, os.path.join(ROOT))
 import pymoo
-from pymoo.configuration import Configuration
 
 DEBUG = True
 
@@ -44,10 +47,10 @@ extensions = [
     'sphinx.ext.mathjax',
 
     # for creating the APi
-    # 'sphinx.ext.autodoc',
+    'sphinx.ext.autodoc',
 
     # API use the auto summaries
-    # 'sphinx.ext.autosummary',
+    'sphinx.ext.autosummary',
 
     # type of comments used for docstrings
     'numpydoc',
@@ -58,9 +61,9 @@ extensions = [
     # # enables to provide links alias in the project
     'sphinx.ext.intersphinx',
 
-    # 'sphinx.ext.coverage',
+    'sphinx.ext.coverage',
 
-    # 'matplotlib.sphinxext.plot_directive',
+    'matplotlib.sphinxext.plot_directive',
 
     # for the reference page and citing
     'sphinxcontrib.bibtex',
