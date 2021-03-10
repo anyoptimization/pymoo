@@ -1,4 +1,4 @@
-from pymoo.algorithms.soo.convex.nonderiv.cmaes import CMAES
+from pymoo.algorithms.soo.nonconvex.cmaes import CMAES
 from pymoo.factory import Problem
 from pymoo.model.evaluator import Evaluator, set_cv
 

@@ -1,7 +1,7 @@
 import numpy as np
 
-from pymoo.algorithms.soo.convex.nonderiv.nelder_mead import NelderMead
-from pymoo.algorithms.soo.convex.nonderiv.pattern_search import PatternSearch
+from pymoo.algorithms.soo.nonconvex.nelder_mead import NelderMead
+from pymoo.algorithms.soo.nonconvex.pattern_search import PatternSearch
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.algorithms.soo.nonconvex.pso import PSO
 from pymoo.factory import Sphere, Problem

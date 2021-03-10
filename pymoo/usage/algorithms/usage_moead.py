@@ -12,6 +12,7 @@ algorithm = MOEAD(
     decomposition="pbi",
     prob_neighbor_mating=0.7,
     seed=1,
+    verbose=False
 )
 
 res = minimize(problem, algorithm, termination=('n_gen', 200), verbose=True)

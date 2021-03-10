@@ -1,4 +1,3 @@
-
 .. meta::
    :description: pymoo: An open source framework for multi-objective optimization in Python.
           It provides not only state of the art single- and multi-objective optimization algorithms but also many
@@ -57,37 +56,13 @@ more features related to multi-objective optimization such as visualization and 
 
 Please note that some modules can be compiled to speed up computations (optional). The command
 above attempts is made to compile the modules; however, if unsuccessful, the
-plain python version is installed. More information are available in our 
+pure python version is installed. More information are available in our 
 :ref:`Installation Guide <installation>`.
 
-To get familiar with our framework we recommended having a look at our
-getting started guide:
-
 
 
 .. raw:: html
-
-  <style>
-  #pymoo-banner:hover {
-      transform: scale(1.05);
-  }
-  </style>
-  <div>
-
-
-.. image:: resources/images/getting_started.svg
-   :name: pymoo-banner
-   :target: getting_started/index.html
-   :width: 250px
-   :alt: Getting Started
-   :align: left
-   
-
-.. raw:: html
-
-  </div>
-  <div style="clear:both; visibility: hidden;"></div>
-
+   :file: home/cards.html
 
 
 
@@ -102,7 +77,7 @@ Furthermore, our framework offers a variety of different features which cover va
 
 
 
-Reference
+Cite Us
 ********************************************************************************
 
 If you have used our framework for research purposes, you can cite our journal |paper| (IEEE Early Access) with:
@@ -193,7 +168,7 @@ Content
    :maxdepth: 2
 
    news
-   installation
+   installation.ipynb
    getting_started/index.ipynb
    interface/index.ipynb
    problems/index.ipynb
@@ -204,9 +179,10 @@ Content
    decision_making/index.ipynb
    misc/performance_indicator.ipynb
    misc/index.ipynb
+   faq.ipynb
    api/index
    versions.ipynb
-   contributions.ipynb
+   contribute.ipynb
    references
    contact
    license

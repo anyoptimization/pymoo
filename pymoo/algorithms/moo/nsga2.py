@@ -212,3 +212,5 @@ def calc_crowding_distance(F, filter_out_duplicates=True):
 
 
 parse_doc_string(NSGA2.__init__)
+
+print("sdfs")

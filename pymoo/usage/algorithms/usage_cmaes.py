@@ -1,10 +1,10 @@
 import numpy as np
 
-from pymoo.algorithms.soo.convex.nonderiv.cmaes import CMAES
-from pymoo.factory import Sphere
+from pymoo.algorithms.soo.nonconvex.cmaes import CMAES
+from pymoo.factory import get_problem
 from pymoo.optimize import minimize
 
-problem = Sphere()
+problem = get_problem("sphere")
 
 algorithm = CMAES(x0=np.random.random(problem.n_var))
 

@@ -1,16 +1,15 @@
 import pytest
 
-from pymoo.algorithms.moo.gde3 import GDE3
 from pymoo.algorithms.moo.moead import MOEAD, ParallelMOEAD
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.moo.rvea import RVEA
-from pymoo.algorithms.soo.convex.nonderiv.cmaes import CMAES
-from pymoo.algorithms.soo.convex.nonderiv.nelder_mead import NelderMead
-from pymoo.algorithms.soo.convex.nonderiv.pattern_search import PatternSearch
+from pymoo.algorithms.soo.nonconvex.cmaes import CMAES
+from pymoo.algorithms.soo.nonconvex.nelder_mead import NelderMead
+from pymoo.algorithms.soo.nonconvex.pattern_search import PatternSearch
 from pymoo.algorithms.soo.nonconvex.de import DE
 from pymoo.algorithms.soo.nonconvex.direct import DIRECT
 from pymoo.algorithms.soo.nonconvex.pso import PSO
-from pymoo.factory import Sphere, Rosenbrock, Himmelblau, ZDT1, ZDT2, ZDT3, get_reference_directions
+from pymoo.factory import Sphere, Rosenbrock, Himmelblau, ZDT1, get_reference_directions
 from pymoo.optimize import minimize
 import numpy as np
 

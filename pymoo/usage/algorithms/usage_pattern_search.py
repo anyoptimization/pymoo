@@ -1,4 +1,4 @@
-from pymoo.algorithms.soo.convex.nonderiv.pattern_search import PatternSearch
+from pymoo.algorithms.soo.nonconvex.pattern_search import PatternSearch
 from pymoo.factory import Himmelblau
 from pymoo.optimize import minimize
 

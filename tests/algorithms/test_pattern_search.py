@@ -3,7 +3,7 @@ from copy import copy
 import numpy as np
 import pytest
 
-from pymoo.algorithms.soo.convex.nonderiv.pattern_search import PatternSearch
+from pymoo.algorithms.soo.nonconvex.pattern_search import PatternSearch
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.optimize import minimize
 from pymoo.problems.single import Sphere, Himmelblau
