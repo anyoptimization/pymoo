@@ -5,11 +5,9 @@ from pymoo.docs import parse_doc_string
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
 from pymoo.model.replacement import is_better
-from pymoo.model.termination import Termination
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.optimum import filter_optimum
-from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 
 # =========================================================================================================

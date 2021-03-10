@@ -10,7 +10,6 @@ from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinary
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
 from pymoo.operators.sampling.random_sampling import FloatRandomSampling
 from pymoo.util.display import MultiObjectiveDisplay
-from pymoo.util.misc import parameter_less
 
 
 # =========================================================================================================
@@ -59,9 +58,6 @@ class MOEAD(GeneticAlgorithm):
                  display=MultiObjectiveDisplay(),
                  **kwargs):
         """
-
-        MOEAD Algorithm.
-
         Parameters
         ----------
         ref_dirs

@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.algorithms.soo.convex.nonderiv.nelder_mead import max_alpha
+from pymoo.algorithms.soo.nonconvex.nelder_mead import max_alpha
 from pymoo.model.crossover import Crossover
 
 
