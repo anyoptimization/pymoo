@@ -70,11 +70,16 @@ class Problem:
 
         # if it is a problem with an actual number of variables - make sure xl and xu are numpy arrays
         if n_var > 0:
-            if self.xl is not None and not isinstance(self.xl, np.ndarray):
-                self.xl = np.ones(n_var) * xl
-            self.xu = xu
-            if self.xu is not None and not isinstance(self.xu, np.ndarray):
-                self.xu = np.ones(n_var) * xu
+
+            if self.xl is not None:
+                if not isinstance(self.xl, np.ndarray):
+                    self.xl = np.ones(n_var) * xl
+                self.xl = self.xl.astype(float)
+
+            if self.xu is not None:
+                if not isinstance(self.xu, np.ndarray):
+                    self.xu = np.ones(n_var) * xu
+                self.xu = self.xu.astype(float)
 
         # whether the problem should strictly be checked for inconsistency during evaluation
         self.check_inconsistencies = check_inconsistencies
@@ -123,6 +128,9 @@ class Problem:
         # if the NaN values should be replaced
         if self.replace_nan_values_by is not None:
             replace_nan_values(out, self.replace_nan_values_by)
+
+        # make sure F and G are in fact floats (at least try to do that, no exception will be through if it fails)
+        out_to_float(out, ["F", "G"])
 
         if "CV" in ret_vals or "feasible" in ret_vals:
             CV = calc_constr(out["G"]) if self.has_constraints() else np.zeros([n_evals, 1])
@@ -426,6 +434,15 @@ def out_to_1d_ndarray(out):
     for key in out.keys():
         if out[key] is not None:
             out[key] = out[key][0, :]
+
+
+def out_to_float(out, keys):
+    for key in keys:
+        if key in out:
+            try:
+                out[key] = out[key].astype(float)
+            except:
+                pass
 
 
 def calc_constr(G):

@@ -63,7 +63,7 @@ def comp_by_cv_and_clearing_fitness(pop, P, **kwargs):
         a, b = P[i, 0], P[i, 1]
 
         # if at least one solution is infeasible
-        if pop[a].CV > 0.0 or pop[b].CV > 0.0:
+        if pop[a].CV[0] > 0.0 or pop[b].CV[0] > 0.0:
             S[i] = compare(a, pop[a].CV, b, pop[b].CV,
                            method='smaller_is_better',
                            return_random_if_equal=True)
@@ -203,7 +203,7 @@ class NicheGA(GA):
                          selection=selection,
                          survival=surv,
                          display=display,
-                         advance_after_initialization=True,
+                         advance_after_initial_infill=True,
                          **kwargs)
 
         # self.default_termination = NicheTermination()

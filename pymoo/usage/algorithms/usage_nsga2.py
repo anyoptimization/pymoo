@@ -15,5 +15,6 @@ res = minimize(problem,
 
 plot = Scatter()
 plot.add(problem.pareto_front(), plot_type="line", color="black", alpha=0.7)
-plot.add(res.F, color="red")
+plot.add(res.F, facecolor="none", edgecolor="red")
 plot.show()
+

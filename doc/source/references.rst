@@ -1,8 +1,7 @@
 Cite Us
 ==============================================================================
 
-We are currently working on a paper.
-Meanwhile, if you have used our framework for research purposes, you can cite us with:
+If you have used our framework for research purposes, you can cite by:
 
 ::
 

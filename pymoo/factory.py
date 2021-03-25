@@ -1,10 +1,4 @@
-"""
-This module is a factory method what allows to import various objects, such as algorithms, crossover, mutation.
 
-The definitions for each object are purposely defined as a list and not as a dictionary to keep an order for the documentation.
-
-
-"""
 import re
 
 from pymoo.configuration import Configuration

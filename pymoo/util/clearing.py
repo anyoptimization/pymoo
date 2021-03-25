@@ -32,6 +32,7 @@ class EpsilonClearing:
     def __init__(self,
                  D,
                  epsilon) -> None:
+
         super().__init__()
 
         if isinstance(D, tuple):

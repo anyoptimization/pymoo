@@ -132,17 +132,20 @@ class SingleObjectiveDisplay(Display):
             self.output.append("cv (min)", opt.CV[0])
             self.output.append("cv (avg)", np.mean(CV))
 
-        if len(feasible) > 0:
-            _F = F[feasible]
+        if opt.feasible[0]:
+
             self.output.append("fopt", opt.F[0])
             if self.pareto_front_is_available:
                 self.output.append("fopt_gap", opt.F[0] - self.pf.flatten()[0])
             if self.favg:
-                self.output.append("favg", np.mean(_F))
+                if len(feasible) > 0:
+                    self.output.append("favg", np.mean(F[feasible]))
+                else:
+                    self.output.append("favg", "-")
         else:
             self.output.append("fopt", "-")
             if self.pareto_front_is_available:
-                self.output.append("fopt_delta", "-")
+                self.output.append("fopt_gap", "-")
             if self.favg:
                 self.output.append("favg", "-")
 

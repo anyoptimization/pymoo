@@ -22,4 +22,4 @@ class RandomSearch(Algorithm):
         return self.sampling.do(self.problem, self.n_points_per_iteration)
 
     def _advance(self, infills=None):
-        self.pop = infills if self.opt is None else Population.merge(self.pop, self.opt)
+        self.pop = infills if self.opt is None else Population.merge(infills, self.opt)

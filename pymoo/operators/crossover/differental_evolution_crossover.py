@@ -4,7 +4,6 @@ from pymoo.model.crossover import Crossover
 from pymoo.operators.repair.inverse_penalty import InversePenaltyOutOfBoundsRepair
 
 
-
 class DifferentialEvolutionCrossover(Crossover):
 
     def __init__(self,
@@ -48,7 +47,7 @@ class DifferentialEvolutionCrossover(Crossover):
             i = 1 + 2 * k
 
             # an add the difference to the first vector
-            _X = _X + F * (X[i] - X[i+1])
+            _X = _X + F * (X[i] - X[i + 1])
 
         _X = self.repair.do(problem, _X, P=X[0])
 
