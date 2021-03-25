@@ -32,6 +32,9 @@ def max_alpha(point, direction, xl, xu, mode="one_hits_bound"):
     # otherwise return the minimum of values considered
     else:
         if mode == "one_hits_bound":
-            return val[val >= 0].min()
+            if not np.any(val >= 0):
+                return 0.0
+            else:
+                return val[val >= 0].min()
         else:
             return val.max()

@@ -16,6 +16,6 @@ IPYNBS = [e for e in files_from_folder(DOCS, regex='**/*.ipynb', skip=SKIP) if "
 
 @pytest.mark.slow
 @pytest.mark.parametrize('ipynb', IPYNBS)
-def test_usage(ipynb):
+def test_docs(ipynb):
     run_ipynb(ipynb, overwrite=OVERWRITE)
     assert True

@@ -24,7 +24,7 @@ from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 class DE(GeneticAlgorithm):
     def __init__(self,
                  pop_size=100,
-                 n_offsprings=100,
+                 n_offsprings=None,
                  sampling=LatinHypercubeSampling(),
                  variant="DE/best/1/bin",
                  CR=0.5,
@@ -64,6 +64,7 @@ class DE(GeneticAlgorithm):
          subtracted to the weight used for the crossover for each individual.
 
         """
+
 
         mating = DifferentialEvolutionMating(variant=variant,
                                              CR=CR,
@@ -142,7 +143,7 @@ class DESelection(Selection):
 class DifferentialEvolutionMating(Mating):
 
     def __init__(self,
-                 variant="DE/rand/1/bin",
+                 variant="DE/best/1/bin",
                  CR=0.5,
                  F=0.3,
                  dither="vector",
@@ -172,7 +173,7 @@ class DifferentialEvolutionMating(Mating):
 
         super().__init__(selection, crossover, mutation, **kwargs)
 
-    def _do(self, problem, pop, n_offsprings, parents=None, **kwargs):
+    def _do(self, problem, pop, n_offsprings, **kwargs):
 
         P = self.selection.do(pop, len(pop), self.crossover.n_parents)
 

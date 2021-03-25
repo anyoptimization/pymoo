@@ -1,3 +1,5 @@
+from pymoo.util.termination.max_eval import MaximumFunctionCallTermination
+
 try:
     from scipy.optimize import minimize as scipy_minimize, NonlinearConstraint, LinearConstraint
 except:
@@ -40,6 +42,8 @@ class Optimizer(LocalSearch):
     def _setup(self, problem, **kwargs):
         if isinstance(self.termination, MaximumGenerationTermination):
             self.options["maxiter"] = self.termination.n_max_gen
+        elif isinstance(self.termination, MaximumFunctionCallTermination):
+            self.options["maxfev"] = self.termination.n_max_evals
 
         self.termination = NoTermination()
         self.return_least_infeasible = True
@@ -113,7 +117,7 @@ class Optimizer(LocalSearch):
         opt = Population.create(Individual(X=res.x))
         self.evaluator.eval(self.problem, opt, algorithm=self)
 
-        self.pop = opt
+        self.pop, self.off = opt, opt
 
         self.termination.force_termination = True
 
@@ -221,4 +225,3 @@ class TrustConstr(Optimizer):
 
     def __init__(self, **kwargs):
         super().__init__("trust-constr", with_bounds=True, with_constr=True, **kwargs)
-

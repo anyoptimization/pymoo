@@ -106,8 +106,11 @@ class Population(np.ndarray):
 
     @classmethod
     def create(cls, *args):
-        pop = np.concatenate([pop_from_array_or_individual(arg) for arg in args]).view(Population)
-        return pop
+        if len(args) == 0:
+            return Population(0)
+        else:
+            pop = np.concatenate([pop_from_array_or_individual(arg) for arg in args]).view(Population)
+            return pop
 
     @classmethod
     def new(cls, *args, **kwargs):

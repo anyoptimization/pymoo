@@ -5,7 +5,7 @@ from pymoo.model.population import Population
 from pymoo.model.survival import Survival
 
 
-def is_better(_new, _old, eps=1e-8):
+def is_better(_new, _old, eps=0.0):
     both_infeasible = not _old.feasible[0] and not _new.feasible[0]
     both_feasible = _old.feasible[0] and _new.feasible[0]
 

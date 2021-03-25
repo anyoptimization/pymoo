@@ -1,5 +1,6 @@
 import math
 
+import numpy as np
 import autograd.numpy as anp
 
 from pymoo.model.problem import Problem
@@ -10,15 +11,15 @@ class G1(Problem):
         self.n_var = 13
         self.n_constr = 9
         self.n_obj = 1
-        self.xl = anp.zeros(self.n_var)
-        self.xu = anp.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 100, 100, 100, 1])
+        self.xl = anp.zeros(self.n_var, dtype=float)
+        self.xu = anp.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 100, 100, 100, 1], dtype=float)
         super(G1, self).__init__(n_var=self.n_var, n_obj=self.n_obj, n_constr=self.n_constr, xl=self.xl, xu=self.xu,
                                  type_var=anp.double)
 
     def _evaluate(self, x, out, *args, **kwargs):
         x1 = x[:, 0: 4]
         x2 = x[:, 4: 13]
-        f = 5 * anp.sum(x1, axis=1) - 5 * anp.sum(anp.multiply(x1, x1), axis=1) - anp.sum(x2, axis=1)
+        f = 5 * anp.sum(x1, axis=1) - 5 * anp.sum(x1 ** 2, axis=1) - anp.sum(x2, axis=1)
 
         # Constraints
         g1 = 2 * x[:, 0] + 2 * x[:, 1] + x[:, 9] + x[:, 10] - 10
@@ -35,10 +36,10 @@ class G1(Problem):
         out["G"] = anp.column_stack([g1, g2, g3, g4, g5, g6, g7, g8, g9])
 
     def _calc_pareto_front(self):
-        return -15
+        return -15.0
 
     def _calc_pareto_set(self):
-        return [1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 1]
+        return np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 1], dtype=float)
 
 
 class G2(Problem):

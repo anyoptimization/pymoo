@@ -112,6 +112,7 @@ class ZDT5(ZDT):
         return pf
 
     def _evaluate(self, x, out, *args, **kwargs):
+        x = x.astype(float)
 
         _x = [x[:, :30]]
         for i in range(self.m - 1):

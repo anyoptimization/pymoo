@@ -71,7 +71,7 @@ class RankAndCrowdingSurvival(Survival):
         super().__init__(filter_infeasible=True)
         self.nds = nds if nds is not None else NonDominatedSorting()
 
-    def _do(self, problem, pop, n_survive, D=None, **kwargs):
+    def _do(self, problem, pop, *args, n_survive=None, **kwargs):
 
         # get the objective space values and objects
         F = pop.get("F").astype(float, copy=False)
@@ -212,5 +212,3 @@ def calc_crowding_distance(F, filter_out_duplicates=True):
 
 
 parse_doc_string(NSGA2.__init__)
-
-print("sdfs")
