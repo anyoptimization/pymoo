@@ -2,6 +2,7 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
+from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
@@ -255,3 +256,6 @@ def convergence_score(front, p):
         crowd_dist[i] = -np.linalg.norm(front[i], p)
 
     return crowd_dist
+
+
+parse_doc_string(AGEMOEA.__init__)
