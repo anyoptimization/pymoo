@@ -28,5 +28,5 @@ Algorithms
 .. autoclass:: pymoo.algorithms.moo.moead.MOEAD
     :noindex:
 
-.. autoclass:: pymoo.algorithms.age_moea.AGE_MOEA
+.. autoclass:: pymoo.algorithms.moo.age.AGEMOEA
     :noindex:
