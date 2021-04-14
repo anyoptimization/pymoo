@@ -63,6 +63,7 @@ def get_algorithm_options():
     from pymoo.algorithms.soo.nonconvex.cmaes import CMAES
     from pymoo.algorithms.soo.nonconvex.brkga import BRKGA
     from pymoo.algorithms.soo.nonconvex.pattern_search import PatternSearch
+    from pymoo.algorithms.moo.age import AGEMOEA
 
     ALGORITHMS = [
         ("ga", GA),
@@ -78,6 +79,7 @@ def get_algorithm_options():
         ("rnsga3", RNSGA3),
         ("moead", MOEAD),
         ("ctaea", CTAEA),
+        ("agemoea", AGEMOEA),
     ]
 
     return ALGORITHMS
