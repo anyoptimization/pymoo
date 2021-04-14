@@ -60,6 +60,7 @@ class AGEMOEA(GeneticAlgorithm):
                          eliminate_duplicates=eliminate_duplicates,
                          n_offsprings=n_offsprings,
                          display=display,
+                         advance_after_initial_infill=True,
                          **kwargs)
         self.default_termination = MultiObjectiveDefaultTermination()
 
