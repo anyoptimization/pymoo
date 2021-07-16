@@ -28,7 +28,7 @@ class LeastInfeasibleSurvival:
         if self.clearing:
 
             # calculate the distance from each individual to another - pre-processing for the clearing
-            X = pop.get("X")
+            X = pop.get("X").astype(float)
             D = norm_eucl_dist(problem, X, X)
 
             # select by clearing using the order defined before
