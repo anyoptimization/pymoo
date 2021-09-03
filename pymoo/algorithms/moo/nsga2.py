@@ -3,59 +3,62 @@ import numpy as np
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
-from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.random_sampling import FloatRandomSampling
-from pymoo.operators.selection.tournament_selection import compare, TournamentSelection
+from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
+from pymoo.operators.mutation.pm import PolynomialMutation
+from pymoo.operators.sampling.rnd import FloatRandomSampling
+from pymoo.operators.selection.tournament import compare, TournamentSelection
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.dominator import Dominator
 from pymoo.util.misc import find_duplicates, has_feasible
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.randomized_argsort import randomized_argsort
+from pymoo.util.termination.default import MultiObjectiveDefaultTermination
 
 
 # ---------------------------------------------------------------------------------------------------------
 # Binary Tournament Selection Function
 # ---------------------------------------------------------------------------------------------------------
-from pymoo.util.termination.default import MultiObjectiveDefaultTermination
 
 
 def binary_tournament(pop, P, algorithm, **kwargs):
-    if P.shape[1] != 2:
+    n_tournaments, n_parents = P.shape
+
+    if n_parents != 2:
         raise ValueError("Only implemented for binary tournament!")
 
     tournament_type = algorithm.tournament_type
-    S = np.full(P.shape[0], np.nan)
+    S = np.full(n_tournaments, np.nan)
 
-    for i in range(P.shape[0]):
+    for i in range(n_tournaments):
 
         a, b = P[i, 0], P[i, 1]
+        a_cv, a_f, b_cv, b_f, = pop[a].CV[0], pop[a].F, pop[b].CV[0], pop[b].F
+        rank_a, cd_a  = pop[a].get("rank", "crowding")
+        rank_b, cd_b = pop[b].get("rank", "crowding")
 
         # if at least one solution is infeasible
-        if pop[a].CV > 0.0 or pop[b].CV > 0.0:
-            S[i] = compare(a, pop[a].CV, b, pop[b].CV, method='smaller_is_better', return_random_if_equal=True)
+        if a_cv > 0.0 or b_cv > 0.0:
+            S[i] = compare(a, a_cv, b, b_cv, method='smaller_is_better', return_random_if_equal=True)
 
         # both solutions are feasible
         else:
 
             if tournament_type == 'comp_by_dom_and_crowding':
-                rel = Dominator.get_relation(pop[a].F, pop[b].F)
+                rel = Dominator.get_relation(a_f, b_f)
                 if rel == 1:
                     S[i] = a
                 elif rel == -1:
                     S[i] = b
 
             elif tournament_type == 'comp_by_rank_and_crowding':
-                S[i] = compare(a, pop[a].get("rank"), b, pop[b].get("rank"),
-                               method='smaller_is_better')
+                S[i] = compare(a, rank_a, b, rank_b, method='smaller_is_better')
 
             else:
                 raise Exception("Unknown tournament type.")
 
             # if rank or domination relation didn't make a decision compare by crowding
             if np.isnan(S[i]):
-                S[i] = compare(a, pop[a].get("crowding"), b, pop[b].get("crowding"),
-                               method='larger_is_better', return_random_if_equal=True)
+                S[i] = compare(a, cd_a, b, cd_b, method='larger_is_better', return_random_if_equal=True)
 
     return S[:, None].astype(int, copy=False)
 
@@ -170,7 +173,7 @@ def calc_crowding_distance(F, filter_out_duplicates=True):
 
         if filter_out_duplicates:
             # filter out solutions which are duplicates - duplicates get a zero finally
-            is_unique = np.where(np.logical_not(find_duplicates(F, epsilon=1e-24)))[0]
+            is_unique = np.where(np.logical_not(find_duplicates(F, epsilon=1e-32)))[0]
         else:
             # set every point to be unique without checking it
             is_unique = np.arange(n_points)

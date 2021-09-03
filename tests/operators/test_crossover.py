@@ -3,8 +3,8 @@ import pytest
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.factory import get_crossover, get_problem
-from pymoo.operators.mutation.inversion_mutation import InversionMutation
-from pymoo.operators.sampling.random_permutation_sampling import PermutationRandomSampling
+from pymoo.operators.mutation.inversion import InversionMutation
+from pymoo.operators.sampling.rnd import PermutationRandomSampling
 from pymoo.optimize import minimize
 from pymoo.problems.single.traveling_salesman import create_random_tsp_problem
 

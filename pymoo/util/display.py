@@ -1,8 +1,8 @@
 import numpy as np
 
-from pymoo.performance_indicator.gd import GD
-from pymoo.performance_indicator.igd import IGD
-from pymoo.performance_indicator.hv import Hypervolume
+from pymoo.indicators.gd import GD
+from pymoo.indicators.igd import IGD
+from pymoo.indicators.hv import Hypervolume
 from pymoo.util.termination.f_tol import MultiObjectiveSpaceToleranceTermination
 
 

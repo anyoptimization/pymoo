@@ -3,6 +3,8 @@ import numpy as np
 import scipy.stats
 from prettytable import PrettyTable
 
+from pymoo.algorithms.moo.gde3 import GDE3
+from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.soo.nonconvex.cmaes import SimpleCMAES
 from pymoo.algorithms.soo.nonconvex.de import DE
 from pymoo.algorithms.soo.nonconvex.ga import GA
@@ -10,72 +12,60 @@ from pymoo.algorithms.soo.nonconvex.nelder_mead import NelderMead
 from pymoo.algorithms.soo.nonconvex.pattern_search import PatternSearch
 from pymoo.algorithms.soo.nonconvex.pso import PSO
 from pymoo.experimental.benchmarking.analyzer.convergence import ConvergenceAnalyzer
-from pymoo.experimental.benchmarking.analyzer.groupby import GroupByAnalyzer
+from pymoo.experimental.benchmarking.analyzer.groupby import GroupBy
+from pymoo.experimental.benchmarking.analyzer.moo import MultiObjectiveAnalyzer
+from pymoo.experimental.benchmarking.analyzer.others import MultiObjectiveConvergenceAnalyzer
 from pymoo.experimental.benchmarking.analyzer.soo import SingleObjectiveAnalyzer
 from pymoo.experimental.benchmarking.benchmark import Benchmark, DefaultWriter, DefaultLoader
-from pymoo.experimental.benchmarking.recoder import DefaultSingleObjectiveRecorder
+from pymoo.experimental.benchmarking.recoder import DefaultSingleObjectiveRecorder, DefaultMultiObjectiveRecorder
 from pymoo.experimental.benchmarking.util import filter_by
-from pymoo.factory import get_problem
+from pymoo.factory import get_problem, ZDT1, ZDT2, ZDT3
 from pymoo.util.termination.max_eval import MaximumFunctionCallTermination
 
 if __name__ == "__main__":
+    FOLDER = "/Users/blankjul/moo_benchmark"
 
-    FOLDER = "/Users/blankjul/my_benchmark"
-
-    recorder = DefaultSingleObjectiveRecorder()
-
-    termination = MaximumFunctionCallTermination(100 * 1000)
+    recorder = None
+    recorder = DefaultMultiObjectiveRecorder()
 
     benchmark = Benchmark(n_runs=11, recorder=recorder)
 
-    # benchmark.add_problem("sphere-10d", Sphere(n_var=10), ("n_evals", 1000))
-    # benchmark.add_problem("himmelblau", Himmelblau(), ("n_evals", 400))
-    # benchmark.add_problem("rosenbrock", Rosenbrock(), ("n_evals", 500))
-    # benchmark.add_problem("ackley-10d", Ackley(n_var=10), ("n_evals", 1000))
-    # benchmark.add_problem("rastrigin-5d", Rastrigin(n_var=5), ("n_evals", 1000))
+    benchmark.add_problem("zdt1", ZDT1(), termination=("n_gen", 200))
+    # benchmark.add_problem("zdt2", ZDT2(), termination=("n_gen", 200))
+    # benchmark.add_problem("zdt3", ZDT3(), termination=("n_gen", 200))
 
-    instance = 1
-    n_evals = 1000
-    for n_var in [10, 20, 40]:
-        for function in range(1, 25):
-            label = f"bbob-f{function:02d}-{instance}"
-            benchmark.add_problem(label + "-" + str(n_var), get_problem(label, n_var=n_var), ("n_evals", n_evals))
-
-    benchmark.add_algorithm("de", DE())
-    benchmark.add_algorithm("ga", GA())
-    benchmark.add_algorithm("pso", PSO())
-    benchmark.add_algorithm("cmaes", SimpleCMAES())
-    benchmark.add_algorithm("ps", PatternSearch())
-    benchmark.add_algorithm("nm", NelderMead())
+    benchmark.add_algorithm("nsga2", NSGA2())
+    benchmark.add_algorithm("gde3", GDE3())
 
     loader = DefaultLoader(FOLDER)
-    # loader = None
-
     writer = DefaultWriter(FOLDER)
 
     results = benchmark.run(writer=writer,
                             loader=loader,
                             run_if_loading_fails=True)
 
-    # _ = SingleObjectiveAnalyzer().run(results, benchmark=benchmark, inplace=True)
-    results = SingleObjectiveAnalyzer().run(results, benchmark=benchmark, inplace=False)
+    # set the igd values for each of the problems
+    MultiObjectiveAnalyzer().run(results, benchmark=benchmark, inplace=True)
 
-    attrs = {"fgap": ["np.median", "np.mean", "np.std", "collect"]}
-    mean = GroupByAnalyzer(attrs).run(results, group_by=["problem", "algorithm"])
+    # now aggregate all the runs to have some representative values
+    attrs = [("igd", np.array, "igd"),
+             ("igd", np.mean, "avg"),
+             ("igd", np.std, "std")]
 
-    for scope, d in filter_by(mean, ["problem"], return_group=True):
-        l = sorted(d, key=lambda x: x["fgap_median"])
+    igd = GroupBy(attrs).run(results, group_by=["problem", "algorithm"])
 
-        best = l[0]["fgap"]
+    for scope, d in filter_by(igd, ["problem"], return_group=True):
 
-        # _, pval = scipy.stats.levene(*[e["fgap"] for e in l])
+        # find the best algorithm for this problem
+        l = sorted(d, key=lambda x: x["avg"])
+        best = l[0]["igd"]
 
         t = PrettyTable()
         t.title = scope["problem"]
-        t.field_names = ['Algorithm', 'fgap_median', 'fgap_mean', 'fgap_std', 'shapiro', 'levene', 't-test', 'wilcoxon']
+        t.field_names = ['Algorithm', 'avg', 'std', 'shapiro', 'levene', 't-test', 'wilcoxon']
 
         for i, e in enumerate(l):
-            f = e["fgap"]
+            f = e["igd"]
 
             _, pval = scipy.stats.shapiro(f)
             shapiro = "*" if pval >= 0.01 else ""
@@ -92,63 +82,9 @@ if __name__ == "__main__":
             else:
                 wilcoxon = "x"
 
-            t.add_row(
-                [e["algorithm"], "%.10f" % e["fgap_median"], "%.10f" % e["fgap_mean"], "%.10f" % e["fgap_std"], shapiro,
-                 levene, ttest, wilcoxon])
+            t.add_row([e["algorithm"], "%.10f" % e["avg"], "%.10f" % e["std"], shapiro, levene, ttest, wilcoxon])
 
         print(t)
         print()
 
-    conv = ConvergenceAnalyzer().run(results, group_by=["problem", "algorithm"])
 
-    attrs = {"conv_gap": "np.median", "n_evals": "first"}
-    median = GroupByAnalyzer(attrs).run(conv, group_by=["problem", "algorithm"])
-
-    plot = False
-
-    if plot:
-
-        for scope, d in filter_by(median, ["problem"], return_group=True):
-
-            plt.figure()
-            plt.title(scope["problem"])
-            plt.yscale("log")
-
-            for entry in d:
-                plt.plot(entry["n_evals"], entry["conv_gap_mean"], label=entry["algorithm"])
-
-            plt.legend()
-            plt.show()
-
-    ranks = {}
-
-    for scope, d in filter_by(mean, ["problem"], return_group=True):
-
-        A = [e["algorithm"] for e in d]
-        perf = np.array([e["fgap_median"] for e in d])
-        rank = np.argsort(np.argsort(perf))
-
-        for a, r in zip(A, rank):
-
-            if a not in ranks:
-                ranks[a] = []
-
-            ranks[a].append(r + 1)
-
-    cnt = np.array([len(v) for k, v in ranks.items()])
-    assert cnt.min() == cnt.max(), "All algorithms must have been run on all problems!"
-    k = cnt.min()
-
-    R = np.column_stack([v for k, v in ranks.items()])
-    R_total = R.mean(axis=0)
-
-    t = PrettyTable(['problem'] + list(ranks.keys()))
-
-    p = list(benchmark.problems.keys())
-
-    for i, row in enumerate(R):
-        t.add_row([p[i]] + list(row))
-
-    t.add_row(["Total"] + [np.round(e, 3) for e in R_total])
-
-    print(t)

@@ -1,5 +1,6 @@
 import autograd.numpy as np
 
+
 from pymoo.model.problem import Problem
 from pymoo.problems.autodiff import AutomaticDifferentiation
 from pymoo.problems.multi import ZDT, ZDT1

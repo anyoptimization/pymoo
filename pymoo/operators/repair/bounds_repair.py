@@ -19,7 +19,22 @@ def is_out_of_bounds(X, xl, xu):
 
 def is_out_of_bounds_by_problem(problem, X):
     return is_out_of_bounds(X, problem.xl, problem.xu)
-    
+
+
+def repair_random_init(Xp, X, xl, xu):
+    XL = xl[None, :].repeat(len(Xp), axis=0)
+    XU = xu[None, :].repeat(len(Xp), axis=0)
+
+    i, j = np.where(Xp < XL)
+    if len(i) > 0:
+        Xp[i, j] = XL[i, j] + np.random.random(len(i)) * (X[i, j] - XL[i, j])
+
+    i, j = np.where(Xp > XU)
+    if len(i) > 0:
+        Xp[i, j] = XU[i, j] - np.random.random(len(i)) * (XU[i, j] - X[i, j])
+
+    return Xp
+
 
 class BoundsRepair(Repair):
 

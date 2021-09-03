@@ -4,7 +4,7 @@ from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.docs import parse_doc_string
 from pymoo.model.population import Population
-from pymoo.operators.sampling.random_sampling import FloatRandomSampling
+from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.optimum import filter_optimum
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
@@ -17,6 +17,7 @@ class ES(GeneticAlgorithm):
                  pop_size=None,
                  rule=1.0 / 7.0,
                  phi=1.0,
+                 gamma=0.85,
                  sampling=FloatRandomSampling(),
                  survival=FitnessSurvival(),
                  display=SingleObjectiveDisplay(),
@@ -40,8 +41,9 @@ class ES(GeneticAlgorithm):
 
         self.default_termination = SingleObjectiveDefaultTermination()
         self.phi = phi
-        self.sigma_max = None
-        self.tau, self.taup = None, None
+        self.gamma = gamma
+
+        self.tau, self.taup, self.sigma_max = None, None, None
 
     def _setup(self, problem, **kwargs):
         n = problem.n_var
@@ -58,39 +60,45 @@ class ES(GeneticAlgorithm):
         infills.set("sigma", [self.sigma_max] * len(infills))
 
     def _infill(self):
-        pop = self.pop
-        n, (xl, xu) = self.problem.n_var, self.problem.bounds()
-
-        # the values form the current population
+        pop, mu, _lambda = self.pop, self.pop_size, self.n_offsprings
+        xl, xu = self.problem.bounds()
         X, sigma = pop.get("X", "sigma")
 
         # cycle through the elites individuals for create the solutions
-        I = np.arange(self.n_offsprings) % self.pop_size
+        I = np.arange(_lambda) % mu
 
         # transform X and sigma to the shape of number of offsprings
         X, sigma = X[I], sigma[I]
 
         # get the sigma only of the elites to be used
-        sigma = es_intermediate_recomb(sigma)
+        sigmap = es_intermediate_recomb(sigma)
 
         # calculate the new sigma based on tau and tau prime
-        sigma = es_sigma(sigma, self.tau, self.taup)
-
-        # make sure none of the sigmas exceeds the maximum
-        sigma = np.minimum(sigma, self.sigma_max)
+        sigmap = np.minimum(self.sigma_max, es_sigma(sigmap, self.tau, self.taup))
 
         # execute the evolutionary strategy to calculate the offspring solutions
-        Xp = X + sigma * np.random.normal(size=sigma.shape)
+        Xp = X + sigmap * np.random.normal(size=sigmap.shape)
 
-        # repair the individuals which are not feasible by sampling from sigma again
-        Xp = es_mut_repair(Xp, X, sigma, xl, xu, 10)
+        # if gamma is not none do the differential variation overwrite Xp and sigmap for the first mu-1 individuals
+        if self.gamma is not None:
+            Xp[:mu - 1] = X[:mu - 1] + self.gamma * (X[0] - X[1:mu])
+            sigmap[:mu - 1] = sigma[:mu - 1]
+
+        # if we have bounds to consider -> repair the individuals which are out of bounds
+        if self.problem.has_bounds():
+            Xp = es_mut_repair(Xp, X, sigmap, xl, xu, 10)
 
         # create the population to proceed further
-        off = Population.new(X=Xp, sigma=sigma)
+        off = Population.new(X=Xp, sigma=sigmap)
 
         return off
 
     def _advance(self, infills=None, **kwargs):
+
+        # if not all solutions suggested by infill() are evaluated we create a more semi (mu+lambda) algorithm
+        if len(infills) < self.pop_size:
+            infills = Population.merge(infills, self.pop)
+
         self.pop = self.survival.do(self.problem, infills, n_survive=self.pop_size)
 
     def _set_optimum(self):
@@ -116,7 +124,6 @@ def es_intermediate_recomb(sigma):
 
 
 def es_mut_repair(Xp, X, sigma, xl, xu, n_trials):
-
     # reshape xl and xu to be the same shape as the input
     XL = xl[None, :].repeat(len(Xp), axis=0)
     XU = xu[None, :].repeat(len(Xp), axis=0)

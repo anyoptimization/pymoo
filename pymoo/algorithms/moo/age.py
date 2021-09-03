@@ -3,16 +3,18 @@ from scipy.spatial.distance import cdist
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.model.survival import Survival
-from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.random_sampling import FloatRandomSampling
-from pymoo.operators.selection.random_selection import RandomSelection
+from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
+from pymoo.operators.mutation.pm import PolynomialMutation
+from pymoo.operators.sampling.rnd import FloatRandomSampling
+from pymoo.operators.selection.rnd import RandomSelection
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.termination.default import MultiObjectiveDefaultTermination
+
+
 # =========================================================================================================
 # Implementation
 # =========================================================================================================
-from pymoo.util.termination.default import MultiObjectiveDefaultTermination
 
 
 class AGEMOEA(GeneticAlgorithm):

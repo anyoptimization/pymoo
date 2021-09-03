@@ -3,7 +3,8 @@ import numpy as np
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival, GA
 from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
-from pymoo.operators.selection.tournament_selection import compare, TournamentSelection
+from pymoo.operators.selection.tournament import compare, TournamentSelection
+
 from pymoo.util.clearing import EpsilonClearing
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.misc import norm_eucl_dist

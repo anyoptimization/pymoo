@@ -44,6 +44,7 @@ class Evaluator:
              pop,
              skip_already_evaluated=None,
              evaluate_values_of=None,
+             count_evals=True,
              **kwargs):
         """
 
@@ -86,7 +87,8 @@ class Evaluator:
             I = np.arange(len(pop))
 
         # update the function evaluation counter
-        self.n_eval += len(I)
+        if count_evals:
+            self.n_eval += len(I)
 
         # actually evaluate all solutions using the function that can be overwritten
         if len(I) > 0:

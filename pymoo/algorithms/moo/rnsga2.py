@@ -1,16 +1,15 @@
 import numpy as np
 
 from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.algorithms.moo.nsga3 import get_extreme_points_c
 from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
-from pymoo.operators.selection.random_selection import RandomSelection
+from pymoo.operators.selection.rnd import RandomSelection
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-
-
 # =========================================================================================================
 # Implementation
 # =========================================================================================================
+from pymoo.util.normalization import get_extreme_points_c
+
 
 class RNSGA2(NSGA2):
 

@@ -1,5 +1,5 @@
 from pymoo.model.termination import Termination
-from pymoo.performance_indicator.igd import IGD
+from pymoo.indicators.igd import IGD
 
 
 class IGDTermination(Termination):

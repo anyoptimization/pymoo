@@ -101,7 +101,6 @@ class C3DTLZ4(DTLZ4):
 
 def constraint_c1_linear(f):
     g = - (1 - f[:, -1] / 0.6 - anp.sum(f[:, :-1] / 0.5, axis=1))
-
     return g
 
 

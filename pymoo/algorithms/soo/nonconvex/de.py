@@ -1,18 +1,15 @@
 import numpy as np
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
+from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.docs import parse_doc_string
-from pymoo.model.mating import Mating
-from pymoo.model.population import Population
 from pymoo.model.replacement import ImprovementReplacement
 from pymoo.model.selection import Selection
-from pymoo.operators.crossover.biased_crossover import BiasedCrossover
-from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
-from pymoo.operators.crossover.exponential_crossover import ExponentialCrossover
-from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
-from pymoo.operators.selection.random_selection import RandomSelection
+from pymoo.operators.crossover.dex import DEX
+from pymoo.operators.mutation.nom import NoMutation
+from pymoo.operators.sampling.lhs import LHS
+from pymoo.operators.selection.rnd import RandomSelection
 from pymoo.util.display import SingleObjectiveDisplay
-from pymoo.util.misc import parameter_less
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 
@@ -25,12 +22,14 @@ class DE(GeneticAlgorithm):
     def __init__(self,
                  pop_size=100,
                  n_offsprings=None,
-                 sampling=LatinHypercubeSampling(),
+                 sampling=LHS(),
                  variant="DE/best/1/bin",
                  CR=0.5,
-                 F=0.3,
+                 F=None,
                  dither="vector",
                  jitter=False,
+                 mutation=NoMutation(),
+                 survival=None,
                  display=SingleObjectiveDisplay(),
                  **kwargs
                  ):
@@ -49,7 +48,7 @@ class DE(GeneticAlgorithm):
          is DE/rand/1/bin.
 
         F : float
-         The weight to be used during the crossover.
+         The F to be used during the crossover.
 
         CR : float
          The probability the individual exchanges variable values from the donor vector.
@@ -61,46 +60,72 @@ class DE(GeneticAlgorithm):
 
         jitter : bool
          Another strategy for adaptive weights (F). Here, only a very small value is added or
-         subtracted to the weight used for the crossover for each individual.
+         subtracted to the F used for the crossover for each individual.
 
         """
 
+        # parse the information from the string
+        _, sel, n_diff, mut, = variant.split("/")
+        n_diffs = int(n_diff)
+        if "-to-" in variant:
+            n_diffs += 1
 
-        mating = DifferentialEvolutionMating(variant=variant,
-                                             CR=CR,
-                                             F=F,
-                                             dither=dither,
-                                             jitter=jitter)
+        selection = DES(sel)
+
+        crossover = DEX(prob=1.0,
+                        n_diffs=n_diffs,
+                        F=F,
+                        CR=CR,
+                        variant=mut,
+                        dither=dither,
+                        jitter=jitter)
 
         super().__init__(pop_size=pop_size,
                          n_offsprings=n_offsprings,
                          sampling=sampling,
-                         mating=mating,
-                         survival=None,
+                         selection=selection,
+                         crossover=crossover,
+                         mutation=mutation,
+                         survival=survival,
                          display=display,
                          **kwargs)
 
         self.default_termination = SingleObjectiveDefaultTermination()
 
+    def _initialize_advance(self, infills=None, **kwargs):
+        self.pop = FitnessSurvival().do(self.problem, infills, n_survive=len(infills))
+
     def _infill(self):
         infills = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
-        if len(self.pop) != len(infills):
-            self.indices = np.random.permutation(len(self.pop))[:len(infills)]
-        else:
-            self.indices = np.arange(len(infills))
+
+        # tag each individual with an index - if a steady state version is executed
+        infills.set("index", np.arange(len(infills)))
+
+        # if number of offsprings is set lower than pop_size - randomly select
+        if self.n_offsprings < self.pop_size:
+            I = np.random.permutation(len(infills))[:self.n_offsprings]
+            infills = infills[I]
 
         return infills
 
     def _advance(self, infills=None, **kwargs):
         assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
-        self.pop[self.indices] = ImprovementReplacement().do(self.problem, self.pop[self.indices], infills)
+
+        # get the indices where each offspring is originating from
+        I = infills.get("index")
+
+        # replace the individuals with the corresponding parents from the mating
+        self.pop[I] = ImprovementReplacement().do(self.problem, self.pop[I], infills)
+
+        # sort the population by fitness to make the selection simpler for mating (not an actual survival, just sorting)
+        self.pop = FitnessSurvival().do(self.problem, self.pop)
 
 
 # =========================================================================================================
 # Selection and Mating
 # =========================================================================================================
 
-class DESelection(Selection):
+class DES(Selection):
 
     def __init__(self, variant) -> None:
         super().__init__()
@@ -112,80 +137,30 @@ class DESelection(Selection):
         # create offsprings and add it to the data of the algorithm
         P = RandomSelection().do(pop, n_select, n_parents)
 
-        F, CV = pop.get("F", "CV")
-        fitness = parameter_less(F, CV)[:, 0]
-        sorted_by_fitness = fitness.argsort()
-        best = sorted_by_fitness[0]
-
         if variant == "best":
-            P[:, 0] = best
+            P[:, 0] = 0
         elif variant == "current-to-best":
             P[:, 0] = np.arange(len(pop))
-            P[:, 1] = best
+            P[:, 1] = 0
             P[:, 2] = np.arange(len(pop))
         elif variant == "current-to-rand":
             P[:, 0] = np.arange(len(pop))
             P[:, 2] = np.arange(len(pop))
         elif variant == "rand-to-best":
-            P[:, 1] = best
+            P[:, 1] = 0
             P[:, 2] = np.arange(len(pop))
         elif variant == "current-to-pbest":
+            # best 10% of the population
             n_pbest = int(np.ceil(0.1 * len(pop)))
-            pbest = sorted_by_fitness[:n_pbest]
+
+            # the corresponding indices to select from
+            pbest = np.arange(n_pbest)
 
             P[:, 0] = np.arange(len(pop))
             P[:, 1] = np.random.choice(pbest, len(pop))
             P[:, 2] = np.arange(len(pop))
 
         return P
-
-
-class DifferentialEvolutionMating(Mating):
-
-    def __init__(self,
-                 variant="DE/best/1/bin",
-                 CR=0.5,
-                 F=0.3,
-                 dither="vector",
-                 jitter=False,
-                 selection=None,
-                 crossover=None,
-                 mutation=None,
-                 **kwargs):
-
-        _, sel, n_diff, mut, = variant.split("/")
-        self.variant = sel
-        self.n_diffs = int(n_diff)
-        if "-to-" in self.variant:
-            self.n_diffs += 1
-
-        if selection is None:
-            selection = DESelection(sel)
-
-        if mutation is None:
-            if mut == "exp":
-                mutation = ExponentialCrossover(CR)
-            elif mut == "bin":
-                mutation = BiasedCrossover(CR)
-
-        if crossover is None:
-            crossover = DifferentialEvolutionCrossover(n_diffs=self.n_diffs, weight=F, dither=dither, jitter=jitter)
-
-        super().__init__(selection, crossover, mutation, **kwargs)
-
-    def _do(self, problem, pop, n_offsprings, **kwargs):
-
-        P = self.selection.do(pop, len(pop), self.crossover.n_parents)
-
-        # do the first crossover which is the actual DE operation
-        off = self.crossover.do(problem, pop, P, algorithm=self)
-
-        # then do the mutation (which is actually a crossover between old and new individual)
-        _pop = Population.merge(pop, off)
-        _P = np.column_stack([np.arange(len(pop)), np.arange(len(pop)) + len(pop)])
-        off = self.mutation.do(problem, _pop, _P, algorithm=self)[:len(pop)]
-
-        return off
 
 
 parse_doc_string(DE.__init__)

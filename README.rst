@@ -68,8 +68,8 @@ For the current developer version:
     pip install .
 
 
-Since for speedup some of the modules are also available compiled you can double check
-if the compilation worked. When executing the command be sure not already being in the local pymoo
+Since for speedup, some of the modules are also available compiled, you can double-check
+if the compilation worked. When executing the command, be sure not already being in the local pymoo
 directory because otherwise not the in site-packages installed version will be used.
 
 .. code:: bash
@@ -83,11 +83,11 @@ Usage
 ********************************************************************************
 
 We refer here to our documentation for all the details.
-However, for instance executing NSGA2:
+However, for instance, executing NSGA2:
 
 .. code:: python
 
-    
+
     from pymoo.algorithms.nsga2 import NSGA2
     from pymoo.factory import get_problem
     from pymoo.optimize import minimize
@@ -144,7 +144,7 @@ Meanwhile, if you have used our framework for research purposes, please cite us 
 Contact
 ********************************************************************************
 
-Feel free to contact me if you have any question:
+Feel free to contact me if you have any questions:
 
 | `Julian Blank <http://julianblank.com>`_  (blankjul [at] egr.msu.edu)
 | Michigan State University

@@ -1,27 +1,25 @@
-import numpy as np
-
+from pymoo.model.problem import calc_constr
 from pymoo.problems.meta import MetaProblem
-from pymoo.util.normalization import denormalize, normalize
+from pymoo.util.misc import from_dict
 
 
-class ZeroToOne(MetaProblem):
+class ConstraintViolationAsObjective(MetaProblem):
 
-    def __init__(self, problem):
+    def __init__(self, problem, eps=1e-6):
         super().__init__(problem)
-        assert self.xl is not None and self.xu is not None, "Both, xl and xu, must be set to redefine the problem!"
-
-        self._xl, self._xu = problem.xl, problem.xu
-        self.xl, self.xu = np.zeros(self.n_var), np.ones(self.n_var)
+        self.n_obj = 1
+        self.n_constr = 0
+        self.eps = eps
 
     def do(self, x, out, *args, **kwargs):
-        out["__X__"] = x
-        _x = (x - self.xl) / (self.xu - self.xl)
-        super().do(_x, out, *args, **kwargs)
+        super().do(x, out, *args, **kwargs)
 
-    def denormalize(self, x):
-        return denormalize(x, self._xl, self._xu)
+        F, G = from_dict(out, "F", "G")
 
-    def normalize(self, x):
-        return normalize(x, self._xl, self._xu)
+        assert G is not None, "To converge a function's constraint to objective it needs G to be set!"
 
+        out["__F__"] = out["F"]
+        out["__G__"] = out["G"]
 
+        out["F"] = calc_constr(G, eps=self.eps, beta=1.0)
+        del out["G"]

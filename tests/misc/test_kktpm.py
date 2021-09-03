@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
 
-from pymoo.experimental.autodiff import AutomaticDifferentiation
 from pymoo.factory import get_problem
-from pymoo.performance_indicator.kktpm import KKTPM
+from pymoo.indicators.kktpm import KKTPM
+from pymoo.problems.autodiff import AutomaticDifferentiation
 from pymoo.problems.bounds_as_constr import BoundariesAsConstraints
 from tests.util import path_to_test_resource
 
@@ -65,7 +65,6 @@ def test_kktpm_correctness(str_problem, params):
             print("Python: ", _kktpm[i])
             print("Correct: ", kktpm[i])
 
-            import os
             # os._exit(1)
 
     # make sure the results are almost equal

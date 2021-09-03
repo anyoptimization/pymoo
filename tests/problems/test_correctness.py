@@ -1,12 +1,10 @@
-import unittest
-
 import autograd.numpy as anp
 import pytest
 
 from pymoo.factory import get_problem
 import os
 
-from tests.util import path_to_test_resource, TESTS
+from tests.util import path_to_test_resource
 
 problems = [
     ('DTLZ1', [10, 3]), ('DTLZ2', [10, 3]), ('DTLZ3', [10, 3]), ('DTLZ4', [10, 3]), ('DTLZ5', [10, 3]),

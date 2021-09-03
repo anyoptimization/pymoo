@@ -2,19 +2,19 @@ import numpy as np
 
 from pymoo.model.crossover import Crossover
 from pymoo.model.population import Population
+from pymoo.operators.crossover.util import row_at_least_once_true
 
 
-def mut_biased(n, m, prob, at_least_once=True):
+def mut_binomial(n, m, prob, at_least_once=True):
     M = np.random.random((n, m)) < prob
 
     if at_least_once:
-        for k in np.where(~np.any(M, axis=1))[0]:
-            M[k, np.random.randint(m)] = True
+        M = row_at_least_once_true(M)
 
     return M
 
 
-class BiasedCrossover(Crossover):
+class BinomialCrossover(Crossover):
 
     def __init__(self, bias, **kwargs):
         super().__init__(2, 1, **kwargs)
@@ -24,7 +24,7 @@ class BiasedCrossover(Crossover):
         X = pop.get("X")[parents.T].copy()
 
         _, n_matings, n_var = X.shape
-        M = mut_biased(n_matings, n_var, self.bias, at_least_once=True)
+        M = mut_binomial(n_matings, n_var, self.bias, at_least_once=True)
 
         Xp = X[0]
         Xp[~M] = X[1][~M]

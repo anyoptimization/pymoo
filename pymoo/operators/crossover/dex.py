@@ -2,7 +2,9 @@ import numpy as np
 
 from pymoo.model.crossover import Crossover
 from pymoo.model.population import Population
-from pymoo.operators.repair.bounds_repair import is_out_of_bounds_by_problem
+from pymoo.operators.crossover.binx import mut_binomial
+from pymoo.operators.crossover.expx import mut_exp
+from pymoo.operators.repair.bounds_repair import is_out_of_bounds_by_problem, repair_random_init
 
 
 def de_differential(X, F, dither=None, jitter=True, gamma=0.0001, return_differentials=False):
@@ -42,34 +44,31 @@ def de_differential(X, F, dither=None, jitter=True, gamma=0.0001, return_differe
         return Xp
 
 
-def de_repair_random_init(Xp, X, xl, xu):
-    XL = xl[None, :].repeat(len(Xp), axis=0)
-    XU = xu[None, :].repeat(len(Xp), axis=0)
-
-    i, j = np.where(Xp < XL)
-    if len(i) > 0:
-        Xp[i, j] = XL[i, j] + np.random.random(len(i)) * (X[i, j] - XL[i, j])
-
-    i, j = np.where(Xp > XU)
-    if len(i) > 0:
-        Xp[i, j] = XU[i, j] - np.random.random(len(i)) * (XU[i, j] - X[i, j])
-
-
-class DifferentialEvolutionCrossover(Crossover):
+class DEX(Crossover):
 
     def __init__(self,
-                 weight=0.85,
+                 F=None,
+                 CR=0.7,
+                 variant="bin",
                  dither=None,
                  jitter=False,
                  n_diffs=1,
+                 n_iter=1,
+                 at_least_once=True,
                  **kwargs):
+
         super().__init__(1 + 2 * n_diffs, 1, **kwargs)
         self.n_diffs = n_diffs
-        self.weight = weight
+        self.F = F
+        self.CR = CR
+        self.variant = variant
+        self.at_least_once = at_least_once
         self.dither = dither
         self.jitter = jitter
+        self.n_iter = n_iter
 
     def do(self, problem, pop, parents, **kwargs):
+
         X = pop.get("X")[parents.T].copy()
         assert len(X.shape) == 3, "Please provide a three-dimensional matrix n_parents x pop_size x n_vars."
 
@@ -78,8 +77,8 @@ class DifferentialEvolutionCrossover(Crossover):
         # a mask over matings that need to be repeated
         m = np.arange(n_matings)
 
-        # if the user provides directly an f value to use
-        F = self.weight if self.weight is not None else np.random.uniform(low=0.5, high=1.0, size=len(m))
+        # if the user provides directly an F value to use
+        F = self.F if self.F is not None else rnd_F(m)
 
         # prepare the out to be set
         Xp = de_differential(X[:, m], F)
@@ -87,16 +86,33 @@ class DifferentialEvolutionCrossover(Crossover):
         # if the problem has boundaries to be considered
         if problem.has_bounds():
 
-            for k in range(20):
+            for k in range(self.n_iter):
                 # find the individuals which are still infeasible
                 m = is_out_of_bounds_by_problem(problem, Xp)
 
-                F = np.random.uniform(low=0.5, high=1.0, size=len(m))
+                F = rnd_F(m)
 
                 # actually execute the differential equation
                 Xp[m] = de_differential(X[:, m], F)
 
             # if still infeasible do a random initialization
-            de_repair_random_init(Xp, X[0], *problem.bounds())
+            Xp = repair_random_init(Xp, X[0], *problem.bounds())
 
-        return Population.new("X", Xp)
+        if self.variant == "bin":
+            M = mut_binomial(n_matings, n_var, self.CR, at_least_once=self.at_least_once)
+        elif self.variant == "exp":
+            M = mut_exp(n_matings, n_var, self.CR, at_least_once=self.at_least_once)
+        else:
+            raise Exception(f"Unknown variant: {self.variant}")
+
+        # take the first parents (this is already a copy)
+        X, _, _ = X
+
+        # set the corresponding values from the donor vector
+        X[M] = Xp[M]
+
+        return Population.new("X", X)
+
+
+def rnd_F(m):
+    return 0.5 * (1 + np.random.uniform(size=len(m)))

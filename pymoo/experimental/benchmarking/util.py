@@ -39,3 +39,13 @@ def fill_forward_if_nan(vals):
         if np.isnan(vals[k]):
             vals[k] = current
     return vals
+
+
+def at_least2d(x, expand="c"):
+    if x.ndim == 1:
+        if expand == "c":
+            return x[:, None]
+        elif expand == "r":
+            return x[None, :]
+    else:
+        return x

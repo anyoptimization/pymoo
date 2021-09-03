@@ -93,16 +93,17 @@ class Population(np.ndarray):
         return self.copy(deep=True)
 
     @classmethod
-    def merge(cls, a, b):
-        a, b = pop_from_array_or_individual(a), pop_from_array_or_individual(b)
+    def merge(cls, a, b, *args):
 
-        if len(a) == 0:
-            return b
-        elif len(b) == 0:
-            return a
-        else:
-            obj = np.concatenate([a, b]).view(Population)
-            return obj
+        # do the regular merge between first and second element
+        m = merge(a, b)
+
+        # process the list of others and merge as well
+        others = list(args)
+        while len(others) > 0:
+            m = merge(m, others.pop(0))
+
+        return m
 
     @classmethod
     def create(cls, *args):
@@ -152,6 +153,22 @@ def pop_from_array_or_individual(array, pop=None):
 
     return pop
 
+
+def merge(a, b):
+    if a is None:
+        return b
+    elif b is None:
+        return a
+
+    a, b = pop_from_array_or_individual(a), pop_from_array_or_individual(b)
+
+    if len(a) == 0:
+        return b
+    elif len(b) == 0:
+        return a
+    else:
+        obj = np.concatenate([a, b]).view(Population)
+        return obj
 
 if __name__ == '__main__':
     pop = Population(10)

@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.operators.crossover.order_crossover import ox
+from pymoo.operators.crossover.ox import ox
 
 
 def order_crossover_contributed_no_shift(x1, x2, seq=None):

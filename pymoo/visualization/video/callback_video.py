@@ -39,7 +39,7 @@ class AnimationCallback(Callback):
 
                 if self.do_show:
                     if figure is None:
-                        plt.show(figure=figure)
+                        plt.show()
                     else:
                         figure.show()
 
@@ -54,3 +54,6 @@ class AnimationCallback(Callback):
             except Exception as ex:
                 if self.exception_if_not_applicable:
                     raise ex
+
+    def do(self, problem, algorithm, **kwargs):
+        pass

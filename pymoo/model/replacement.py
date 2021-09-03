@@ -1,8 +1,9 @@
 import numpy as np
 
+from pymoo.model.duplicate import DefaultDuplicateElimination
 from pymoo.model.individual import Individual
 from pymoo.model.population import Population
-from pymoo.model.survival import Survival
+from pymoo.model.survival import Survival, calc_adapt_eps
 
 
 def is_better(_new, _old, eps=0.0):
@@ -58,8 +59,12 @@ class ImprovementReplacement(ReplacementSurvival):
 
         ret = np.full((len(pop), 1), False)
 
-        pop_F, pop_CV, pop_feasible = pop.get("F", "CV", "feasible")
-        off_F, off_CV, off_feasible = off.get("F", "CV", "feasible")
+        pop_F, pop_CV = pop.get("F", "CV")
+        off_F, off_CV = off.get("F", "CV")
+
+        eps = 0.0
+        # eps = calc_adapt_eps(pop)
+        pop_feasible, off_feasible = pop_CV <= eps, off_CV <= eps
 
         if problem.n_constr > 0:
 
@@ -75,4 +80,21 @@ class ImprovementReplacement(ReplacementSurvival):
         else:
             ret[off_F < pop_F] = True
 
+        # never allow duplicates to become part of the population when replacement is used
+        _, _, is_duplicate = DefaultDuplicateElimination(epsilon=0.0).do(off, pop, return_indices=True)
+        ret[is_duplicate] = False
+
         return ret[:, 0]
+
+
+def parameter_less(f, cv):
+    v = np.copy(f)
+    infeas = cv > 0
+    v[infeas] = f.max() + cv[infeas]
+    return v
+
+
+def hierarchical_sort(f, cv=None):
+    if cv is not None:
+        f = parameter_less(f, cv)
+    return np.argsort(f)

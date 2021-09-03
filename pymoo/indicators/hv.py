@@ -4,7 +4,7 @@ import warnings
 import numpy as np
 
 from pymoo.model.indicator import Indicator
-from pymoo.indicator.distance_indicator import derive_ideal_and_nadir_from_pf
+from pymoo.indicators.distance_indicator import derive_ideal_and_nadir_from_pf
 from pymoo.util.misc import at_least_2d_array
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.vendor.hv import HyperVolume as _HyperVolume

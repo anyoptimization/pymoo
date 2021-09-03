@@ -3,8 +3,8 @@ import os
 import numpy as np
 
 from pymoo.factory import get_performance_indicator
-from pymoo.indicator.gd import GD
-from pymoo.indicator.igd import IGD
+from pymoo.indicators.gd import GD
+from pymoo.indicators.igd import IGD
 from tests.util import RESOURCES
 
 

@@ -1,31 +1,26 @@
 import numpy as np
 
 from pymoo.experimental.benchmarking.analyzer.analyzer import Analyzer
+from pymoo.indicators.igd import IGD
 from pymoo.util.misc import from_dict
 
 
-class SingleObjectiveAnalyzer(Analyzer):
+class MultiObjectiveAnalyzer(Analyzer):
 
-    def do(self, data, benchmark=None, inplace=False, **kwargs):
-        assert benchmark is not None, "The benchmark is necessary to retrieve the known optimum of a funtion"
+    def do(self, data, scope=None, benchmark=None, inplace=False, **kwargs):
+        assert benchmark is not None, "The benchmark is necessary to retrieve the known optimum of a function"
 
         problem = benchmark.problems[data["problem"]]["obj"]
         CV, F = from_dict(data, "CV", "F")
 
-        f = F[0, 0]
-        cv = CV[0, 0]
-
-        fopt = problem.pareto_front()
-        if fopt is not None:
-            fopt = fopt[0, 0].astype(np.float)
-
-        fgap = f - fopt
+        igd = np.inf
+        pf = problem.pareto_front(**kwargs)
+        if pf is not None:
+            igd = IGD(pf, zero_to_one=True).do(F)
 
         ret = {
-            "f": f,
-            "cv": cv,
-            "fopt": fopt,
-            "fgap": fgap
+            "pf": pf,
+            "igd": igd,
         }
 
         if inplace:
@@ -33,6 +28,7 @@ class SingleObjectiveAnalyzer(Analyzer):
                 data[k] = v
 
         return ret
+
 
 
 

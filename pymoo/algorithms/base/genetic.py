@@ -19,7 +19,6 @@ class GeneticAlgorithm(Algorithm):
                  eliminate_duplicates=DefaultDuplicateElimination(),
                  repair=None,
                  mating=None,
-                 min_infeas_pop_size=0,
                  advance_after_initial_infill=False,
                  **kwargs
                  ):
@@ -28,9 +27,6 @@ class GeneticAlgorithm(Algorithm):
 
         # the population size used
         self.pop_size = pop_size
-
-        # minimum number of individuals surviving despite being infeasible - by default disabled
-        self.min_infeas_pop_size = min_infeas_pop_size
 
         # whether the algorithm should be advanced after initialization of not
         self.advance_after_initial_infill = advance_after_initial_infill
@@ -108,5 +104,4 @@ class GeneticAlgorithm(Algorithm):
             self.pop = Population.merge(self.pop, infills)
 
         # execute the survival to find the fittest solutions
-        self.pop = self.survival.do(self.problem, self.pop, n_survive=self.pop_size, algorithm=self,
-                                    n_min_infeas_survive=self.min_infeas_pop_size)
+        self.pop = self.survival.do(self.problem, self.pop, n_survive=self.pop_size, algorithm=self)

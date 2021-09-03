@@ -153,10 +153,10 @@ def norm_tchebychev_dist(problem, A, B, **kwargs):
 
 
 def cdist(A, B, **kwargs):
-    return scipy.spatial.distance.cdist(A, B, **kwargs)
+    return scipy.spatial.distance.cdist(A.astype(float), B.astype(float), **kwargs)
 
 
-def vectorized_cdist(A, B, func_dist=func_euclidean_distance, fill_diag_with_inf=False, **kwargs):
+def vectorized_cdist(A, B, func_dist=func_euclidean_distance, fill_diag_with_inf=False, **kwargs) -> object:
     assert A.ndim <= 2 and B.ndim <= 2
 
     A, only_row = at_least_2d_array(A, extend_as="row", return_if_reshaped=True)
@@ -198,7 +198,7 @@ def find_duplicates(X, epsilon=1e-16):
     D[np.triu_indices(len(X))] = np.inf
 
     # set as duplicate if a point is really close to this one
-    is_duplicate = np.any(D < epsilon, axis=1)
+    is_duplicate = np.any(D <= epsilon, axis=1)
 
     return is_duplicate
 

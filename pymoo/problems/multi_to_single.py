@@ -1,25 +1,22 @@
-from pymoo.model.problem import calc_constr
 from pymoo.problems.meta import MetaProblem
-from pymoo.util.misc import from_dict
 
 
-class ConstraintViolationAsObjective(MetaProblem):
+class MultiToSingleObjective(MetaProblem):
 
-    def __init__(self, problem, eps=1e-6):
+    def __init__(self, problem, decomposition, kwargs=None):
         super().__init__(problem)
+        self.decomposition = decomposition
+        self.kwargs = kwargs if not None else dict()
+
         self.n_obj = 1
-        self.n_constr = 0
-        self.eps = eps
 
     def do(self, x, out, *args, **kwargs):
         super().do(x, out, *args, **kwargs)
 
-        F, G = from_dict(out, "F", "G")
+        F = out["F"]
+        out["__F__"] = F
+        out["F"] = self.decomposition.do(F, **self.kwargs)[:, None]
 
-        assert G is not None, "To converge a function's constraint to objective it needs G to be set!"
 
-        out["__F__"] = out["F"]
-        out["__G__"] = out["G"]
 
-        out["F"] = calc_constr(G, eps=self.eps, beta=1.0)
-        del out["G"]
+
