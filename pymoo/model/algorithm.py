@@ -361,9 +361,6 @@ class Algorithm:
     # PROTECTED
     # =========================================================================================================
 
-    def _initialize_advance(self, infills=None, **kwargs):
-        pass
-
     def _set_optimum(self):
         self.opt = filter_optimum(self.pop, least_infeasible=True)
 
@@ -400,6 +397,9 @@ class Algorithm:
         pass
 
     def _initialize_infill(self):
+        pass
+
+    def _initialize_advance(self, infills=None, **kwargs):
         pass
 
     def _infill(self):
