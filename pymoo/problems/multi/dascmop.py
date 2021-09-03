@@ -20,12 +20,11 @@ class DASCMOP(Problem):
                          n_constr=n_constr,
                          type_var=np.double, xl=0., xu=1., **kwargs)
 
-
         if isinstance(difficulty, int):
             self.difficulty = difficulty
             if not (1 <= difficulty <= len(DIFFICULTIES)):
                 raise Exception(f"Difficulty must be 1 <= difficulty <= {len(DIFFICULTIES)}, but it is {difficulty}!")
-            vals = DIFFICULTIES[difficulty-1]
+            vals = DIFFICULTIES[difficulty - 1]
         else:
             self.difficulty = -1
             vals = difficulty
@@ -49,6 +48,7 @@ class DASCMOP(Problem):
     def _calc_pareto_front(self, *args, **kwargs):
         fname = f"{str(self.__class__.__name__).lower()}_{self.difficulty}.pf"
         return load_pareto_front_from_file(os.path.join("DASCMOP", fname))
+
 
 class DASCMOP1(DASCMOP):
     def __init__(self, difficulty, **kwargs):
