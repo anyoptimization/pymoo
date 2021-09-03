@@ -106,7 +106,7 @@ def get_sampling_options():
         ("int_lhs", IntegerFromFloatSampling, {'clazz': LatinHypercubeSampling}),
         ("perm_random", PermutationRandomSampling)
     ]
- 
+
     return SAMPLING
 
 

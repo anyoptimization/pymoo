@@ -1,11 +1,9 @@
-name: Release
-
+name: testing
 on:
   push:
     branches:
-      - master
-      - release
-      
+      - develop
+
 jobs:
 
   testing:
@@ -77,28 +75,3 @@ jobs:
          SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
          SSH_USERNAME: ${{secrets.SSH_USERNAME}}
          SSH_HOSTNAME: ${{secrets.SSH_HOSTNAME}}
-
-
-  # deploy:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - uses: actions/download-artifact@v2
-  #     with:
-  #       name: dist
-  #       path: dist
-  #   - name: Set up Python
-  #     uses: actions/setup-python@v2
-  #     with:
-  #       python-version: '3.8'
-  #   - name: Publish
-  #     env:
-  #       TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-  #       TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-  #     run: |
-  #       python -m pip install --upgrade pip
-  #       pip install twine
-  #       twine upload --skip-existing --repository testpypi dist/*
-
