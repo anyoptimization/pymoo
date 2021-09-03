@@ -37,6 +37,8 @@ jobs:
          exclude:
            - os: ubuntu-latest
              python-version: '3.7'
+           - os: ubuntu-latest
+             python-version: '3.8'
      steps:
      - uses: actions/checkout@v2
      - name: Set up Python
@@ -58,6 +60,7 @@ jobs:
          path: dist
 
   upload:
+    needs: build
     runs-on: ubuntu-latest
     steps:
      - uses: actions/checkout@v2
