@@ -5,7 +5,9 @@ on:
     branches:
       - master
       - release
-      
+
+
+
 jobs:
 
   testing:
@@ -39,6 +41,8 @@ jobs:
          exclude:
            - os: ubuntu-latest
              python-version: '3.7'
+           - os: ubuntu-latest
+             python-version: '3.8'
      steps:
      - uses: actions/checkout@v2
      - name: Set up Python
@@ -60,6 +64,7 @@ jobs:
          path: dist
 
   upload:
+    needs: build
     runs-on: ubuntu-latest
     steps:
      - uses: actions/checkout@v2
@@ -71,7 +76,7 @@ jobs:
        uses: trendyminds/github-actions-rsync@master
        with:
          RSYNC_OPTIONS: -avzr --delete --exclude '*.ipynb'
-         RSYNC_TARGET: /home/releases/${BRANCH_NAME}
+         RSYNC_TARGET: /home/blankjul/releases/${BRANCH_NAME}
          RSYNC_SOURCE: /dist/*
        env:
          SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
