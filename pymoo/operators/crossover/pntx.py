@@ -10,7 +10,7 @@ class PointCrossover(Crossover):
         super().__init__(2, 2, **kwargs)
         self.n_points = n_points
 
-    def _do(self, problem, X, **kwargs):
+    def _do(self, _, X, **kwargs):
 
         # get the X of parents and count the matings
         _, n_matings, n_var = X.shape

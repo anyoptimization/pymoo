@@ -2,13 +2,13 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
-from pymoo.factory import get_decomposition
+from pymoo.docs import parse_doc_string
 from pymoo.model.duplicate import NoDuplicateElimination
 from pymoo.model.population import Population
 from pymoo.model.selection import Selection
-from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.random_sampling import FloatRandomSampling
+from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
+from pymoo.operators.mutation.pm import PolynomialMutation
+from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.util.display import MultiObjectiveDisplay
 
 
@@ -71,7 +71,7 @@ class MOEAD(GeneticAlgorithm):
         self.ref_dirs = ref_dirs
         self.n_neighbors = min(len(ref_dirs), n_neighbors)
         self.prob_neighbor_mating = prob_neighbor_mating
-        self.decomposition = decomposition
+        self.decomp = decomposition
 
         # neighbours includes the entry by itself intentionally for the survival method
         self.neighbors = np.argsort(cdist(self.ref_dirs, self.ref_dirs), axis=1, kind='quicksort')[:, :self.n_neighbors]
@@ -88,26 +88,19 @@ class MOEAD(GeneticAlgorithm):
     def _setup(self, problem, **kwargs):
         assert not problem.has_constraints(), "This implementation of MOEAD does not support any constraints."
 
+        if isinstance(self.decomp, str):
+            # for one or two objectives use tchebi otherwise pbi
+            if self.decomp == 'auto':
+                if self.problem.n_obj <= 2:
+                    from pymoo.decomposition.tchebicheff import Tchebicheff
+                    self.decomp = Tchebicheff()
+                else:
+                    from pymoo.decomposition.pbi import PBI
+                    self.decomp = PBI()
+
     def _initialize_advance(self, infills=None, **kwargs):
         super()._initialize_advance(infills, **kwargs)
-
         self.ideal = np.min(self.pop.get("F"), axis=0)
-
-        if isinstance(self.decomposition, str):
-            decomp = self.decomposition
-
-            # for one or two objectives use tchebi otherwise pbi
-            if decomp == 'auto':
-                if self.problem.n_obj <= 2:
-                    decomp = 'tchebi'
-                else:
-                    decomp = 'pbi'
-
-            # set the decomposition object
-            self._decomposition = get_decomposition(decomp)
-
-        else:
-            self._decomposition = self.decomposition
 
     def _infill(self):
         # MOEA\D inherits from genetic algorithm but does not implement the infill/advance interface
@@ -138,8 +131,8 @@ class MOEAD(GeneticAlgorithm):
 
         # calculate the decomposed values for each neighbor
         N = self.neighbors[i]
-        FV = self._decomposition.do(pop[N].get("F"), weights=self.ref_dirs[N, :], ideal_point=self.ideal)
-        off_FV = self._decomposition.do(off.F[None, :], weights=self.ref_dirs[N, :], ideal_point=self.ideal)
+        FV = self.decomp.do(pop[N].get("F"), weights=self.ref_dirs[N, :], ideal_point=self.ideal)
+        off_FV = self.decomp.do(off.F[None, :], weights=self.ref_dirs[N, :], ideal_point=self.ideal)
 
         # this makes the algorithm to support constraints - not originally proposed though and not tested enough
         # if self.problem.has_constraints():
@@ -189,4 +182,5 @@ class ParallelMOEAD(MOEAD):
         for i, off in enumerate(infills):
             self._replace(self.indices[i], off)
 
-# parse_doc_string(MOEAD.__init__)
+
+parse_doc_string(MOEAD.__init__)

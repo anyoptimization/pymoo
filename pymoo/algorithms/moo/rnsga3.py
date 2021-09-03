@@ -1,16 +1,15 @@
 import numpy as np
 
-from pymoo.algorithms.moo.nsga3 import NSGA3, get_extreme_points_c, get_nadir_point, \
-    associate_to_niches, calc_niche_count, niching, comp_by_cv_then_random
+from pymoo.algorithms.moo.nsga3 import calc_niche_count, niching, comp_by_cv_then_random, associate_to_niches, NSGA3
 from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
-from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.random_sampling import FloatRandomSampling
-from pymoo.operators.selection.tournament_selection import TournamentSelection
+from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
+from pymoo.operators.mutation.pm import PolynomialMutation
+from pymoo.operators.sampling.rnd import FloatRandomSampling
+from pymoo.operators.selection.tournament import TournamentSelection
 from pymoo.util.misc import intersect
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-from pymoo.util.normalization import denormalize
+from pymoo.util.normalization import denormalize, get_extreme_points_c, get_nadir_point
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
 
 
@@ -147,7 +146,8 @@ class AspirationPointSurvival(Survival):
         self.ref_dirs = denormalize(ref_dirs, self.ideal_point, self.nadir_point)
 
         # associate individuals to niches
-        niche_of_individuals, dist_to_niche, dist_matrix = associate_to_niches(F, ref_dirs, self.ideal_point, self.nadir_point)
+        niche_of_individuals, dist_to_niche, dist_matrix = associate_to_niches(F, ref_dirs, self.ideal_point,
+                                                                               self.nadir_point)
         pop.set('rank', rank, 'niche', niche_of_individuals, 'dist_to_niche', dist_to_niche)
 
         # set the optimum, first front and closest to all reference directions
@@ -176,8 +176,6 @@ class AspirationPointSurvival(Survival):
             pop = pop[survivors]
 
         return pop
-    
-    
 
 
 def get_ref_dirs_from_points(ref_point, ref_dirs, mu=0.1):

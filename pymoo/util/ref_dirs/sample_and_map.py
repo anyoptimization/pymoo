@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.interface import sample
-from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
+from pymoo.operators.sampling.lhs import LatinHypercubeSampling
 from pymoo.util.reference_direction import ReferenceDirectionFactory, map_onto_unit_simplex
 
 

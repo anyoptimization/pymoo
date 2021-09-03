@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.algorithms.moo.nsga3 import NSGA3
-from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
+from pymoo.operators.selection.tournament import compare, TournamentSelection
 
 
 # =========================================================================================================
@@ -44,6 +44,4 @@ class UNSGA3(NSGA3):
                  ref_dirs,
                  selection=TournamentSelection(func_comp=comp_by_rank_and_ref_line_dist),
                  **kwargs):
-
         super().__init__(ref_dirs, selection=selection, **kwargs)
-

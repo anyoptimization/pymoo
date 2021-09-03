@@ -28,9 +28,15 @@ class FloatRandomSampling(Sampling):
 
 class BinaryRandomSampling(Sampling):
 
-    def __init__(self) -> None:
-        super().__init__()
-
     def _do(self, problem, n_samples, **kwargs):
         val = np.random.random((n_samples, problem.n_var))
-        return (val < 0.5).astype(np.bool)
+        return (val < 0.5).astype(bool)
+
+
+class PermutationRandomSampling(Sampling):
+
+    def _do(self, problem, n_samples, **kwargs):
+        X = np.full((n_samples, problem.n_var), 0, dtype=int)
+        for i in range(n_samples):
+            X[i, :] = np.random.permutation(problem.n_var)
+        return X

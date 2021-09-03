@@ -3,5 +3,5 @@ from pymoo.model.mutation import Mutation
 
 class NoMutation(Mutation):
 
-    def do(self, problem, pop, **kwargs):
-        return pop
+    def _do(self, problem, X, **kwargs):
+        return X

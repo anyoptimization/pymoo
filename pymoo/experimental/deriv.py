@@ -3,7 +3,7 @@ from pymoo.algorithms.base.local import LocalSearch
 from pymoo.algorithms.soo.univariate.backtracking import BacktrackingLineSearch
 from pymoo.algorithms.soo.univariate.golden import GoldenSectionSearch
 from pymoo.optimize import minimize
-from pymoo.problems.numdiff import NumericalDifferentiation, NumericalDifferentiationUtil
+
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.termination.f_tol_single import SingleObjectiveSpaceToleranceTermination
 

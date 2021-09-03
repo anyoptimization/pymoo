@@ -1,13 +1,16 @@
+import warnings
 from abc import abstractmethod
 
 import numpy as np
-
 
 # ---------------------------------------------------------------------------------------------------------
 # Object Oriented Interface
 # ---------------------------------------------------------------------------------------------------------
 
 # ---- Abstract Class
+from numpy.linalg import LinAlgError
+
+
 class Normalization:
 
     def __init__(self) -> None:
@@ -180,3 +183,91 @@ class PreNormalization:
 
     def do(self, *args, **kwargs):
         pass
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Normalization in the Objective Space
+# ---------------------------------------------------------------------------------------------------------
+
+
+def find_ideal(F, current=None):
+    p = F.min(axis=0)
+    if current is not None:
+        p = np.minimum(current, p)
+    return p
+
+
+def get_extreme_points_c(F, ideal_point, extreme_points=None):
+    # calculate the asf which is used for the extreme point decomposition
+    weights = np.eye(F.shape[1])
+    weights[weights == 0] = 1e6
+
+    # add the old extreme points to never loose them for normalization
+    _F = F
+    if extreme_points is not None:
+        _F = np.concatenate([extreme_points, _F], axis=0)
+
+    # use __F because we substitute small values to be 0
+    __F = _F - ideal_point
+    __F[__F < 1e-3] = 0
+
+    # update the extreme points for the normalization having the highest asf value each
+    F_asf = np.max(__F * weights[:, None, :], axis=2)
+
+    I = np.argmin(F_asf, axis=1)
+    extreme_points = _F[I, :]
+
+    return extreme_points
+
+
+def get_nadir_point(extreme_points, ideal_point, worst_point, worst_of_front, worst_of_population):
+    try:
+
+        # find the intercepts using gaussian elimination
+        M = extreme_points - ideal_point
+        b = np.ones(extreme_points.shape[1])
+        plane = np.linalg.solve(M, b)
+
+        warnings.simplefilter("ignore")
+        intercepts = 1 / plane
+
+        nadir_point = ideal_point + intercepts
+
+        # check if the hyperplane makes sense
+        if not np.allclose(np.dot(M, plane), b) or np.any(intercepts <= 1e-6):
+            raise LinAlgError()
+
+        # if the nadir point should be larger than any value discovered so far set it to that value
+        # NOTE: different to the proposed version in the paper
+        b = nadir_point > worst_point
+        nadir_point[b] = worst_point[b]
+
+    except LinAlgError:
+
+        # fall back to worst of front otherwise
+        nadir_point = worst_of_front
+
+    # if the range is too small set it to worst of population
+    b = nadir_point - ideal_point <= 1e-6
+    nadir_point[b] = worst_of_population[b]
+
+    return nadir_point
+
+
+class ObjectiveSpaceNormalization:
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._ideal = None
+        self._infeas_ideal = None
+        self._worst = None
+
+    def update(self, pop):
+        F, feas = pop.get("F", "feasible")
+        self._infeas_ideal = find_ideal(F, current=self._infeas_ideal)
+
+        if np.any(feas):
+            self._ideal = find_ideal(F[feas[:, 0]], self._ideal)
+
+    def ideal(self, only_feas=True):
+        return self._ideal if only_feas else self._infeas_ideal

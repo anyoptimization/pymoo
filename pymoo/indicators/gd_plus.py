@@ -1,4 +1,4 @@
-from pymoo.indicator.distance_indicator import DistanceIndicator, modified_distance
+from pymoo.indicators.distance_indicator import DistanceIndicator, modified_distance
 
 
 class GDPlus(DistanceIndicator):

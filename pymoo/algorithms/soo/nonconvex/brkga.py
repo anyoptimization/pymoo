@@ -7,10 +7,10 @@ from pymoo.model.duplicate import DefaultDuplicateElimination, DuplicateEliminat
 from pymoo.model.population import Population
 from pymoo.model.selection import Selection
 from pymoo.model.survival import Survival
-from pymoo.operators.crossover.biased_crossover import BiasedCrossover
-from pymoo.operators.mutation.no_mutation import NoMutation
-from pymoo.operators.sampling.random_sampling import FloatRandomSampling
-from pymoo.operators.selection.random_selection import RandomSelection
+from pymoo.operators.crossover.binx import BinomialCrossover
+from pymoo.operators.mutation.nom import NoMutation
+from pymoo.operators.sampling.rnd import FloatRandomSampling
+from pymoo.operators.selection.rnd import RandomSelection
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
@@ -121,7 +121,7 @@ class BRKGA(GeneticAlgorithm):
                          n_offsprings=n_offsprings,
                          sampling=sampling,
                          selection=EliteBiasedSelection(),
-                         crossover=BiasedCrossover(bias, prob=1.0),
+                         crossover=BinomialCrossover(bias, prob=1.0),
                          mutation=NoMutation(),
                          survival=survival,
                          display=display,

@@ -1,6 +1,5 @@
 import numpy as np
 
-from pymoo.algorithms.base.gradient import DerivationBasedAlgorithm
 
 
 class Adam(DerivationBasedAlgorithm):

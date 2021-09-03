@@ -129,4 +129,4 @@ class AutomaticDifferentiation(MetaProblem):
                 out_to_numpy(out)
 
             else:
-                self.problem._evaluate(X, out, *args, **kwargs)
+                self.problem.do(X, out, *args, **kwargs)

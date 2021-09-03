@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.algorithms.base.deriv import DerivationBasedAlgorithm
+from pymoo.experimental.deriv import DerivationBasedAlgorithm
 from pymoo.algorithms.base.line import LineSearchProblem
 from pymoo.algorithms.soo.univariate.exp import ExponentialSearch
 from pymoo.algorithms.soo.univariate.golden import GoldenSectionSearch

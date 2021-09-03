@@ -1,16 +1,17 @@
+
 import math
 
 import numpy as np
 from scipy.spatial.distance import cdist, pdist, squareform
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
+from pymoo.decomposition.asf import ASF
 from pymoo.docs import parse_doc_string
-from pymoo.factory import get_decomposition
 from pymoo.model.population import Population
-from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.random_sampling import FloatRandomSampling
-from pymoo.operators.selection.tournament_selection import TournamentSelection
+from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
+from pymoo.operators.mutation.pm import PolynomialMutation
+from pymoo.operators.sampling.rnd import FloatRandomSampling
+from pymoo.operators.selection.tournament import TournamentSelection
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.dominator import Dominator
 from pymoo.util.function_loader import load_function
@@ -77,91 +78,13 @@ class RestrictedMating(TournamentSelection):
         return np.reshape(S, (n_select, n_parents))
 
 
-class CTAEA(GeneticAlgorithm):
-
-    def __init__(self,
-                 ref_dirs,
-                 sampling=FloatRandomSampling(),
-                 selection=RestrictedMating(func_comp=comp_by_cv_dom_then_random),
-                 crossover=SimulatedBinaryCrossover(n_offsprings=1, eta=30, prob=1.0),
-                 mutation=PolynomialMutation(eta=20, prob=None),
-                 eliminate_duplicates=True,
-                 display=MultiObjectiveDisplay(),
-                 **kwargs):
-        """
-        CTAEA
-
-        Parameters
-        ----------
-        ref_dirs : {ref_dirs}
-        sampling : {sampling}
-        selection : {selection}
-        crossover : {crossover}
-        mutation : {mutation}
-        eliminate_duplicates : {eliminate_duplicates}
-        """
-
-        self.ref_dirs = ref_dirs
-        pop_size = len(ref_dirs)
-
-        if 'survival' in kwargs:
-            survival = kwargs['survival']
-            del kwargs['survival']
-        else:
-            survival = CADASurvival(ref_dirs)
-
-        # Initialize diversity archives
-        self.da = None
-
-        super().__init__(pop_size=pop_size,
-                         sampling=sampling,
-                         selection=selection,
-                         crossover=crossover,
-                         mutation=mutation,
-                         survival=survival,
-                         eliminate_duplicates=eliminate_duplicates,
-                         n_offsprings=pop_size,
-                         display=display,
-                         **kwargs)
-
-    def _setup(self, problem, **kwargs):
-
-        if self.ref_dirs is not None and self.ref_dirs.shape[1] != problem.n_obj:
-            raise Exception(
-                "Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
-                (self.ref_dirs.shape[1], problem.n_obj))
-
-    def _initialize_infill(self):
-        return self.initialization.do(self.problem, self.pop_size, algorithm=self)
-
-    def _initialize_advance(self, infills=None, **kwargs):
-        super()._initialize_advance(infills, **kwargs)
-        self.pop, self.da = self.survival.do(self.problem, self.pop, Population(), n_survive=len(self.pop),
-                                             algorithm=self)
-
-    def _infill(self):
-        Hm = Population.merge(self.pop, self.da)
-        return self.mating.do(self.problem, Hm, n_offsprings=self.n_offsprings, algorithm=self)
-
-    def _advance(self, infills=None, **kwargs):
-        assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
-        pop = Population.merge(self.pop, infills)
-        self.pop, self.da = self.survival.do(self.problem, pop, self.da, self.pop_size, algorithm=self)
-
-    def _set_optimum(self, **kwargs):
-        if not has_feasible(self.pop):
-            self.opt = self.pop[[np.argmin(self.pop.get("CV"))]]
-        else:
-            self.opt = self.survival.opt
-
-
 class CADASurvival:
 
     def __init__(self, ref_dirs):
         self.ref_dirs = ref_dirs
         self.opt = None
         self.ideal_point = np.full(ref_dirs.shape[1], np.inf)
-        self._decomposition = get_decomposition('asf')
+        self._decomposition = ASF()
         self._calc_perpendicular_distance = load_function("calc_perpendicular_distance")
 
     def do(self, _, pop, da, n_survive=None, **kwargs):
@@ -177,7 +100,7 @@ class CADASurvival:
         return pop, da
 
     def _associate(self, pop):
-        """Associate each individual with a weight vector and calculate decomposed fitness"""
+        """Associate each individual with a F vector and calculate decomposed fitness"""
         F = pop.get("F")
         dist_matrix = self._calc_perpendicular_distance(F - self.ideal_point, self.ref_dirs)
         niche_of_individuals = np.argmin(dist_matrix, axis=1)
@@ -293,6 +216,86 @@ class CADASurvival:
                     break
             itr += 1
         return Hd[S]
+
+
+
+
+class CTAEA(GeneticAlgorithm):
+
+    def __init__(self,
+                 ref_dirs,
+                 sampling=FloatRandomSampling(),
+                 selection=RestrictedMating(func_comp=comp_by_cv_dom_then_random),
+                 crossover=SimulatedBinaryCrossover(n_offsprings=1, eta=30, prob=1.0),
+                 mutation=PolynomialMutation(eta=20, prob=None),
+                 eliminate_duplicates=True,
+                 display=MultiObjectiveDisplay(),
+                 **kwargs):
+        """
+        CTAEA
+
+        Parameters
+        ----------
+        ref_dirs : {ref_dirs}
+        sampling : {sampling}
+        selection : {selection}
+        crossover : {crossover}
+        mutation : {mutation}
+        eliminate_duplicates : {eliminate_duplicates}
+        """
+
+        self.ref_dirs = ref_dirs
+        pop_size = len(ref_dirs)
+
+        if 'survival' in kwargs:
+            survival = kwargs['survival']
+            del kwargs['survival']
+        else:
+            survival = CADASurvival(ref_dirs)
+
+        # Initialize diversity archives
+        self.da = None
+
+        super().__init__(pop_size=pop_size,
+                         sampling=sampling,
+                         selection=selection,
+                         crossover=crossover,
+                         mutation=mutation,
+                         survival=survival,
+                         eliminate_duplicates=eliminate_duplicates,
+                         n_offsprings=pop_size,
+                         display=display,
+                         **kwargs)
+
+    def _setup(self, problem, **kwargs):
+
+        if self.ref_dirs is not None and self.ref_dirs.shape[1] != problem.n_obj:
+            raise Exception(
+                "Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
+                (self.ref_dirs.shape[1], problem.n_obj))
+
+    def _initialize_infill(self):
+        return self.initialization.do(self.problem, self.pop_size, algorithm=self)
+
+    def _initialize_advance(self, infills=None, **kwargs):
+        super()._initialize_advance(infills, **kwargs)
+        self.pop, self.da = self.survival.do(self.problem, self.pop, Population(), n_survive=len(self.pop),
+                                             algorithm=self)
+
+    def _infill(self):
+        Hm = Population.merge(self.pop, self.da)
+        return self.mating.do(self.problem, Hm, n_offsprings=self.n_offsprings, algorithm=self)
+
+    def _advance(self, infills=None, **kwargs):
+        assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
+        pop = Population.merge(self.pop, infills)
+        self.pop, self.da = self.survival.do(self.problem, pop, self.da, self.pop_size, algorithm=self)
+
+    def _set_optimum(self, **kwargs):
+        if not has_feasible(self.pop):
+            self.opt = self.pop[[np.argmin(self.pop.get("CV"))]]
+        else:
+            self.opt = self.survival.opt
 
 
 parse_doc_string(CTAEA.__init__)

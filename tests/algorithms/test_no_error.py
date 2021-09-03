@@ -13,7 +13,7 @@ from pymoo.factory import Sphere, Rosenbrock, Himmelblau, ZDT1, get_reference_di
 from pymoo.optimize import minimize
 import numpy as np
 
-from pymoo.performance_indicator.igd import IGD
+from pymoo.indicators.igd import IGD
 
 SINGLE_OBJECTIVE_PROBLEMS = [Sphere(n_var=10), Himmelblau(), Rosenbrock()]
 

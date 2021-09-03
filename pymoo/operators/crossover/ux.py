@@ -9,8 +9,12 @@ class UniformCrossover(Crossover):
     def __init__(self, **kwargs):
         super().__init__(2, 2, **kwargs)
 
-    def _do(self, problem, X, **kwargs):
+    def _do(self, _, X, **kwargs):
         _, n_matings, n_var = X.shape
         M = np.random.random((n_matings, n_var)) < 0.5
         _X = crossover_mask(X, M)
         return _X
+
+
+class UX(UniformCrossover):
+    pass

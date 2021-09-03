@@ -41,6 +41,7 @@ class InfillCriterion:
 
             # if more offsprings than necessary - truncate them randomly
             if len(off) + len(_off) > n_offsprings:
+
                 # IMPORTANT: Interestingly, this makes a difference in performance
                 n_remaining = n_offsprings - len(off)
                 _off = _off[:n_remaining]

@@ -1,7 +1,7 @@
-from pymoo.model.mutation import Mutation
 import numpy as np
 
-from pymoo.operators.crossover.order_crossover import random_sequence
+from pymoo.model.mutation import Mutation
+from pymoo.operators.crossover.ox import random_sequence
 
 
 def inversion_mutation(y, seq, inplace=True):

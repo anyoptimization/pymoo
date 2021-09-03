@@ -28,8 +28,6 @@ class ISRES(SRES):
     def _infill(self):
         pop, mu, _lambda = self.pop, self.pop_size, self.n_offsprings
         xl, xu = self.problem.bounds()
-
-        # the values from the current population
         X, sigma = pop.get("X", "sigma")
 
         # cycle through the elites individuals for create the solutions

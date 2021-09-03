@@ -21,6 +21,8 @@ class TwoVariablesOneObjectiveVisualization(AnimationCallback):
             raise Exception("This visualization can only be used for problems with two variables and one objective!")
 
         # draw the problem surface
+        # if algorithm.surrogate.targets["F"].doe is not None:
+        #     problem = algorithm.surrogate
         plot = FitnessLandscape(problem, _type="contour", kwargs_contour=dict(alpha=0.5))
         plot.do()
 
@@ -43,7 +45,7 @@ class TwoVariablesOneObjectiveVisualization(AnimationCallback):
         # plot the new population
         if is_new.sum() > 0:
             X, F, CV = pop[is_new].get("X", "F", "CV")
-            plt.scatter(X[:, 0], X[:, 1], color="red", marker="*", s=50, label="Survivors")
+            plt.scatter(X[:, 0], X[:, 1], color="red", marker="*", s=70, label="Survivors")
 
         xl, xu = problem.bounds()
         plt.xlim(xl[0], xu[0])
@@ -54,5 +56,7 @@ class TwoVariablesOneObjectiveVisualization(AnimationCallback):
 
         # store the current population as the last
         self.last_pop = set(pop)
+
+        plt.show()
 
         return plt.gcf()

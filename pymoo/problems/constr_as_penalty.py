@@ -13,7 +13,7 @@ class ConstraintsAsPenalty(MetaProblem):
         self.n_constr = 0
 
     def do(self, x, out, *args, **kwargs):
-        super().do(x, out, *args, **kwargs)
+        self.problem.do(x, out, *args, **kwargs)
 
         if self.problem.has_constraints():
 

@@ -12,7 +12,7 @@ class HalfUniformCrossover(Crossover):
         super().__init__(2, 2, **kwargs)
         self.prob_hux = prob_hux
 
-    def _do(self, problem, X, **kwargs):
+    def _do(self, _, X, **kwargs):
         _, n_matings, n_var = X.shape
 
         # the mask do to the crossover

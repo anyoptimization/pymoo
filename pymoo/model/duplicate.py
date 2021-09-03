@@ -75,7 +75,7 @@ class DefaultDuplicateElimination(DuplicateElimination):
         D = self.calc_dist(pop, other)
         D[np.isnan(D)] = np.inf
 
-        is_duplicate[np.any(D < self.epsilon, axis=1)] = True
+        is_duplicate[np.any(D <= self.epsilon, axis=1)] = True
         return is_duplicate
 
 

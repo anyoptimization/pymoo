@@ -16,7 +16,7 @@ class AASF(ASF):
 
     def _do(self, F, weights, **kwargs):
         asf = super()._do(F, weights, **kwargs)
-        augment = ((F - self.utopian_point) / weights).sum(axis=1)
+        augment = ((F - self.utopian_point) / np.clip(weights, 1e-12, np.inf)).sum(axis=1)
         return asf + self.rho * augment
 
 

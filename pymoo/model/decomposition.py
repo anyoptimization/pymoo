@@ -11,7 +11,8 @@ class Decomposition:
         self._type = _type
         self.ideal_point, self.utopian_point, self.nadir_point = None, None, None
 
-    def do(self, F,
+    def do(self,
+           F,
            weights,
            _type="auto",
            ideal_point=None,

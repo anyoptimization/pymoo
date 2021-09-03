@@ -2,8 +2,8 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from pymoo.model.indicator import Indicator
-from pymoo.indicator.hv import Hypervolume
-from pymoo.indicator.igd import IGD
+from pymoo.indicators.hv import Hypervolume
+from pymoo.indicators.igd import IGD
 
 
 class RMetric(Indicator):

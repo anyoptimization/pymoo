@@ -3,10 +3,10 @@ import numpy as np
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
-from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.random_sampling import FloatRandomSampling
-from pymoo.operators.selection.random_selection import RandomSelection
+from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
+from pymoo.operators.mutation.pm import PolynomialMutation
+from pymoo.operators.sampling.rnd import FloatRandomSampling
+from pymoo.operators.selection.rnd import RandomSelection
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.misc import has_feasible, vectorized_cdist
 from pymoo.util.termination.max_eval import MaximumFunctionCallTermination
@@ -187,7 +187,7 @@ class APDSurvival(Survival):
                 theta = acute_angle[assigned_to_niche, k]
 
                 # the penalty which is applied for the metric
-                M = problem.n_obj if problem.n_obj > 2.0 else 0.5
+                M = problem.n_obj if problem.n_obj > 2.0 else 1.0
                 penalty = M * ((n_gen / n_max_gen) ** self.alpha) * (theta / gamma)
 
                 # calculate the angle-penalized penalized (APD)

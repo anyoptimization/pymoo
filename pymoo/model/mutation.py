@@ -1,6 +1,3 @@
-from abc import abstractmethod
-
-
 class Mutation:
 
     def __init__(self) -> None:
@@ -22,13 +19,13 @@ class Mutation:
 
         Returns
         -------
-        Y : Population
+        Xp : Population
             The mutated population.
 
         """
 
-        Y = self._do(problem, pop.get("X"), **kwargs)
-        return pop.new("X", Y)
+        Xp = self._do(problem, pop.get("X"), **kwargs)
+        return pop.new("X", Xp)
 
     def _do(self, problem, X, **kwargs):
         pass

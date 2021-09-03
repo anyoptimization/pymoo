@@ -267,7 +267,7 @@ class Algorithm:
             # request the infill solutions if the algorithm has implemented it
             infills = self._infill()
 
-        # the the current generation to the offsprings
+        # set the current generation to the offsprings
         if infills is not None:
             infills.set("n_gen", self.n_gen)
 
@@ -350,6 +350,12 @@ class Algorithm:
         res.history = self.history
 
         return res
+
+    def ask(self, *args, **kwargs):
+        return self.infill(*args, **kwargs)
+
+    def tell(self, *args, **kwargs):
+        return self.advance(*args, **kwargs)
 
     # =========================================================================================================
     # PROTECTED

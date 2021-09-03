@@ -8,7 +8,7 @@ import numpy as np
 def stochastic_ranking(double[:] f, double[:] phi, double pr, long[:] I=None):
     if I is None:
         I = np.arange(len(f))
-    return c_stochastic_ranking(f, phi, pr, I)
+    return np.array(c_stochastic_ranking(f, phi, pr, I))
 
 
 

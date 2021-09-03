@@ -1,7 +1,7 @@
 import numpy as np
 
-from pymoo.performance_indicator.hv import Hypervolume
-from pymoo.performance_indicator.igd import IGD
+from pymoo.indicators.hv import Hypervolume
+from pymoo.indicators.igd import IGD
 from pymoo.util.normalization import normalize
 from pymoo.util.termination.sliding_window_termination import SlidingWindowTermination
 

@@ -3,7 +3,7 @@ import abc
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.population import pop_from_array_or_individual
-from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
+from pymoo.operators.sampling.lhs import LatinHypercubeSampling
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.termination.f_tol_single import SingleObjectiveSpaceToleranceTermination
 
@@ -53,33 +53,23 @@ class LocalSearch(Algorithm):
         self.x0 = FitnessSurvival().do(self.problem, infills, n_survive=1)[0]
 
     def _infill(self):
-
-        # if the local algorithm has not been initialized yet
         if not self.is_local_initialized:
-            infills = self._local_initialize_infill()
-
-            # the the algorithm does not implement the local initialization
-            if infills is None:
-                self.is_local_initialized = True
-                return self._local_infill()
-            else:
-                return infills
-
+            return self._local_initialize_infill()
         else:
             return self._local_infill()
 
-    def _advance(self, infills=None, **kwargs):
+    def _advance(self, **kwargs):
         if not self.is_local_initialized:
-            self._local_initialize_advance(infills=infills, **kwargs)
             self.is_local_initialized = True
+            return self._local_initialize_advance(**kwargs)
         else:
-            self._local_advance(infills=infills, **kwargs)
+            return self._local_advance(**kwargs)
 
-    def _local_initialize_infill(self):
-        pass
+    def _local_initialize_infill(self, *args, **kwargs):
+        return self._local_infill(*args, **kwargs)
 
-    def _local_initialize_advance(self):
-        pass
+    def _local_initialize_advance(self, *args, **kwargs):
+        return self._local_advance(*args, **kwargs)
 
     @abc.abstractmethod
     def _local_infill(self):

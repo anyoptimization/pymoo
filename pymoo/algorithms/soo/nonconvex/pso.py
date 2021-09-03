@@ -5,11 +5,14 @@ from pymoo.docs import parse_doc_string
 from pymoo.model.algorithm import Algorithm
 from pymoo.model.initialization import Initialization
 from pymoo.model.population import Population
+from pymoo.model.repair import NoRepair
 from pymoo.model.replacement import ImprovementReplacement
-from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
+from pymoo.operators.crossover.dex import repair_random_init
+from pymoo.operators.mutation.pm import PolynomialMutation
+from pymoo.operators.repair.bounds_repair import is_out_of_bounds_by_problem
 from pymoo.operators.repair.inverse_penalty import InversePenaltyOutOfBoundsRepair
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside
-from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
+from pymoo.operators.sampling.lhs import LHS
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.misc import norm_eucl_dist
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
@@ -84,6 +87,32 @@ def S4_jumping_out(f):
 
 
 # =========================================================================================================
+# Equation
+# =========================================================================================================
+
+def pso_equation(X, P_X, S_X, V, V_max, w, c1, c2, r1=None, r2=None):
+    n_particles, n_var = X.shape
+
+    if r1 is None:
+        r1 = np.random.random((n_particles, n_var))
+
+    if r2 is None:
+        r2 = np.random.random((n_particles, n_var))
+
+    inerta = w * V
+    cognitive = c1 * r1 * (P_X - X)
+    social = c2 * r2 * (S_X - X)
+
+    # calculate the velocity vector
+    Vp = inerta + cognitive + social
+    Vp = set_to_bounds_if_outside(Vp, - V_max, V_max)
+
+    Xp = X + Vp
+
+    return Xp, Vp
+
+
+# =========================================================================================================
 # Implementation
 # =========================================================================================================
 
@@ -92,7 +121,7 @@ class PSO(Algorithm):
 
     def __init__(self,
                  pop_size=25,
-                 sampling=LatinHypercubeSampling(),
+                 sampling=LHS(),
                  w=0.9,
                  c1=2.0,
                  c2=2.0,
@@ -100,6 +129,7 @@ class PSO(Algorithm):
                  initial_velocity="random",
                  max_velocity_rate=0.20,
                  pertube_best=True,
+                 repair=NoRepair(),
                  display=PSODisplay(),
                  **kwargs):
         """
@@ -115,7 +145,7 @@ class PSO(Algorithm):
             optimum to determine suitable values.
 
         w : float
-            The inertia weight to be used in each iteration for the velocity update. This can be interpreted
+            The inertia F to be used in each iteration for the velocity update. This can be interpreted
             as the momentum term regarding the velocity. If `adaptive=True` this is only the
             initially used value.
 
@@ -153,6 +183,7 @@ class PSO(Algorithm):
         self.V_max = None
         self.initial_velocity = initial_velocity
         self.max_velocity_rate = max_velocity_rate
+        self.repair = repair
 
         self.w = w
         self.c1 = c1
@@ -183,44 +214,40 @@ class PSO(Algorithm):
         super()._initialize_advance(infills=infills, **kwargs)
 
     def _infill(self):
-        particles = self.particles
-        X, F, V = particles.get("X", "F", "V")
+        problem, particles, pbest = self.problem, self.particles, self.pop
 
-        # get the personal best of each particle
-        pbest = self.pop
-        P_X, P_F = pbest.get("X", "F")
+        (X, V) = particles.get("X", "V")
+        P_X = pbest.get("X")
 
-        # get the best for each solution - could be global or local or something else - (here: Global)
         sbest = self._social_best()
-        G_X = sbest.get("X")
+        S_X = sbest.get("X")
 
-        # get the inertia weight of the individual
-        inerta = self.w * V
+        Xp, Vp = pso_equation(X, P_X, S_X, V, self.V_max, self.w, self.c1, self.c2)
 
-        # calculate random values for the updates
-        r1 = np.random.random((len(particles), self.problem.n_var))
-        r2 = np.random.random((len(particles), self.problem.n_var))
+        # if the problem has boundaries to be considered
+        if problem.has_bounds():
 
-        cognitive = self.c1 * r1 * (P_X - X)
-        social = self.c2 * r2 * (G_X - X)
+            for k in range(20):
+                # find the individuals which are still infeasible
+                m = is_out_of_bounds_by_problem(problem, Xp)
 
-        # calculate the velocity vector
-        _V = inerta + cognitive + social
-        _V = set_to_bounds_if_outside(_V, - self.V_max, self.V_max)
+                # actually execute the differential equation
+                Xp[m], Vp[m] = pso_equation(X[m], P_X[m], S_X[m], V[m], self.V_max, self.w, self.c1, self.c2)
 
-        # update the values of each particle
-        _X = X + _V
-        _X = InversePenaltyOutOfBoundsRepair().do(self.problem, _X, P=X)
+            # if still infeasible do a random initialization
+            Xp = repair_random_init(Xp, X, *problem.bounds())
 
         # create the offspring population
-        off = Population.new(X=_X, V=_V)
+        off = Population.new(X=Xp, V=Vp)
 
         # try to improve the current best with a pertubation
         if self.pertube_best:
-            k = FitnessSurvival().do(self.problem, pbest, n_survive=1, return_indices=True)[0]
+            k = FitnessSurvival().do(problem, pbest, n_survive=1, return_indices=True)[0]
             eta = int(np.random.uniform(20, 30))
-            mutant = PolynomialMutation(eta).do(self.problem, pbest[[k]])[0]
+            mutant = PolynomialMutation(eta).do(problem, pbest[[k]])[0]
             off[k].set("X", mutant.X)
+
+        self.repair.do(problem, off)
 
         self.sbest = sbest.copy()
 

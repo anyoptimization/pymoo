@@ -1,5 +1,3 @@
-import unittest
-
 import pytest
 
 from pymoo.factory import get_reference_directions

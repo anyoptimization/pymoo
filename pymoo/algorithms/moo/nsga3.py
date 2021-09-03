@@ -6,10 +6,10 @@ from numpy.linalg import LinAlgError
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
 from pymoo.model.survival import Survival
-from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
-from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
-from pymoo.operators.sampling.random_sampling import FloatRandomSampling
-from pymoo.operators.selection.tournament_selection import TournamentSelection, compare
+from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
+from pymoo.operators.mutation.pm import PolynomialMutation
+from pymoo.operators.sampling.rnd import FloatRandomSampling
+from pymoo.operators.selection.tournament import TournamentSelection, compare
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.function_loader import load_function
 from pymoo.util.misc import intersect, has_feasible
@@ -79,8 +79,8 @@ class NSGA3(GeneticAlgorithm):
             if pop_size < len(self.ref_dirs):
                 print(
                     f"WARNING: pop_size={pop_size} is less than the number of reference directions ref_dirs={len(self.ref_dirs)}.\n"
-                    "This might cause unwanted behavior of the algorithm. \nPlease make sure pop_size is equal or larger "
-                    "than the number of reference directions. ")
+                    "This might cause unwanted behavior of the algorithm. \n"
+                    "Please make sure pop_size is equal or larger than the number of reference directions. ")
 
         if 'survival' in kwargs:
             survival = kwargs['survival']
@@ -102,10 +102,11 @@ class NSGA3(GeneticAlgorithm):
 
     def _setup(self, problem, **kwargs):
 
-        if self.ref_dirs is not None and self.ref_dirs.shape[1] != problem.n_obj:
-            raise Exception(
-                "Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
-                (self.ref_dirs.shape[1], problem.n_obj))
+        if self.ref_dirs is not None:
+            if self.ref_dirs.shape[1] != problem.n_obj:
+                raise Exception(
+                    "Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
+                    (self.ref_dirs.shape[1], problem.n_obj))
 
     def _set_optimum(self, **kwargs):
         if not has_feasible(self.pop):

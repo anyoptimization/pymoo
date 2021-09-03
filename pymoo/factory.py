@@ -1,4 +1,3 @@
-
 import re
 
 from pymoo.configuration import Configuration
@@ -10,7 +9,6 @@ from pymoo.problems.single import *
 # =========================================================================================================
 # Generic
 # =========================================================================================================
-
 
 
 def get_from_list(l, name, args, kwargs):
@@ -63,6 +61,7 @@ def get_algorithm_options():
     from pymoo.algorithms.soo.nonconvex.cmaes import CMAES
     from pymoo.algorithms.soo.nonconvex.brkga import BRKGA
     from pymoo.algorithms.soo.nonconvex.pattern_search import PatternSearch
+    from pymoo.algorithms.soo.nonconvex.pso import PSO
 
     ALGORITHMS = [
         ("ga", GA),
@@ -71,6 +70,7 @@ def get_algorithm_options():
         ("nelder-mead", NelderMead),
         ("pattern-search", PatternSearch),
         ("cmaes", CMAES),
+        ("pso", PSO),
         ("nsga2", NSGA2),
         ("rnsga2", RNSGA2),
         ("nsga3", NSGA3),
@@ -92,11 +92,11 @@ def get_algorithm(name, *args, d={}, **kwargs):
 # =========================================================================================================
 
 def get_sampling_options():
-    from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
-    from pymoo.operators.sampling.random_sampling import FloatRandomSampling
+    from pymoo.operators.sampling.lhs import LatinHypercubeSampling
+    from pymoo.operators.sampling.rnd import FloatRandomSampling
     from pymoo.operators.integer_from_float_operator import IntegerFromFloatSampling
-    from pymoo.operators.sampling.random_sampling import BinaryRandomSampling
-    from pymoo.operators.sampling.random_permutation_sampling import PermutationRandomSampling
+    from pymoo.operators.sampling.rnd import BinaryRandomSampling
+    from pymoo.operators.sampling.rnd import PermutationRandomSampling
 
     SAMPLING = [
         ("real_random", FloatRandomSampling),
@@ -106,7 +106,7 @@ def get_sampling_options():
         ("int_lhs", IntegerFromFloatSampling, {'clazz': LatinHypercubeSampling}),
         ("perm_random", PermutationRandomSampling)
     ]
-
+ 
     return SAMPLING
 
 
@@ -119,8 +119,8 @@ def get_sampling(name, *args, d={}, **kwargs):
 # =========================================================================================================
 
 def get_selection_options():
-    from pymoo.operators.selection.random_selection import RandomSelection
-    from pymoo.operators.selection.tournament_selection import TournamentSelection
+    from pymoo.operators.selection.rnd import RandomSelection
+    from pymoo.operators.selection.tournament import TournamentSelection
 
     SELECTION = [
         ("random", RandomSelection),
@@ -139,21 +139,21 @@ def get_selection(name, *args, d={}, **kwargs):
 # =========================================================================================================
 
 def get_crossover_options():
-    from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
-    from pymoo.operators.crossover.exponential_crossover import ExponentialCrossover
-    from pymoo.operators.crossover.half_uniform_crossover import HalfUniformCrossover
-    from pymoo.operators.crossover.point_crossover import PointCrossover
-    from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
-    from pymoo.operators.crossover.uniform_crossover import UniformCrossover
-    from pymoo.operators.crossover.parent_centric_crossover import PCX
+    from pymoo.operators.crossover.dex import DEX
+    from pymoo.operators.crossover.expx import ExponentialCrossover
+    from pymoo.operators.crossover.hux import HalfUniformCrossover
+    from pymoo.operators.crossover.pntx import PointCrossover
+    from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
+    from pymoo.operators.crossover.ux import UniformCrossover
+    from pymoo.operators.crossover.pcx import PCX
     from pymoo.operators.integer_from_float_operator import IntegerFromFloatCrossover
-    from pymoo.operators.crossover.edge_recombination_crossover import EdgeRecombinationCrossover
-    from pymoo.operators.crossover.order_crossover import OrderCrossover
+    from pymoo.operators.crossover.erx import EdgeRecombinationCrossover
+    from pymoo.operators.crossover.ox import OrderCrossover
 
     CROSSOVER = [
         ("real_sbx", SimulatedBinaryCrossover, dict(prob=0.9, eta=30)),
         ("int_sbx", IntegerFromFloatCrossover, dict(clazz=SimulatedBinaryCrossover, prob=0.9, eta=30)),
-        ("real_de", DifferentialEvolutionCrossover),
+        ("real_de", DEX),
         ("real_pcx", PCX),
         ("(real|bin|int)_ux", UniformCrossover),
         ("(bin|int)_hux", HalfUniformCrossover),
@@ -177,11 +177,11 @@ def get_crossover(name, *args, d={}, **kwargs):
 # =========================================================================================================
 
 def get_mutation_options():
-    from pymoo.operators.mutation.no_mutation import NoMutation
-    from pymoo.operators.mutation.bitflip_mutation import BinaryBitflipMutation
-    from pymoo.operators.mutation.polynomial_mutation import PolynomialMutation
+    from pymoo.operators.mutation.nom import NoMutation
+    from pymoo.operators.mutation.bitflip import BinaryBitflipMutation
+    from pymoo.operators.mutation.pm import PolynomialMutation
     from pymoo.operators.integer_from_float_operator import IntegerFromFloatMutation
-    from pymoo.operators.mutation.inversion_mutation import InversionMutation
+    from pymoo.operators.mutation.inversion import InversionMutation
 
     MUTATION = [
         ("none", NoMutation, {}),
@@ -415,12 +415,12 @@ def get_visualization(name, *args, d={}, **kwargs):
 
 
 def get_performance_indicator_options():
-    from pymoo.performance_indicator.gd import GD
-    from pymoo.performance_indicator.gd_plus import GDPlus
-    from pymoo.performance_indicator.igd import IGD
-    from pymoo.performance_indicator.igd_plus import IGDPlus
-    from pymoo.performance_indicator.hv import Hypervolume
-    from pymoo.performance_indicator.rmetric import RMetric
+    from pymoo.indicators.gd import GD
+    from pymoo.indicators.gd_plus import GDPlus
+    from pymoo.indicators.igd import IGD
+    from pymoo.indicators.igd_plus import IGDPlus
+    from pymoo.indicators.hv import Hypervolume
+    from pymoo.indicators.rmetric import RMetric
 
     PERFORMANCE_INDICATOR = [
         ("gd", GD),
@@ -470,8 +470,8 @@ def get_decomposition(name, *args, d={}, **kwargs):
 # =========================================================================================================
 
 def get_decision_making_options():
-    from pymoo.decision_making.high_tradeoff import HighTradeoffPoints
-    from pymoo.decision_making.pseudo_weights import PseudoWeights
+    from pymoo.mcdm.high_tradeoff import HighTradeoffPoints
+    from pymoo.mcdm.pseudo_weights import PseudoWeights
 
     DECISION_MAKING = [
         ("high-tradeoff", HighTradeoffPoints),

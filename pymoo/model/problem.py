@@ -206,7 +206,7 @@ class Problem:
         ----------
 
         args : Same problem implementation need some more information to create the Pareto front. For instance
-                the DTLZ problem suite generates the Pareto front by usage of the reference directions.
+                the DTLZ problem suite generates the Pareto front by examples of the reference directions.
                 We refer to the corresponding problem for more information.
         exception_if_failing : bool
                 Whether to throw an exception when generating the Pareto front has failed.
@@ -445,13 +445,31 @@ def out_to_float(out, keys):
                 pass
 
 
-def calc_constr(G):
+def calc_constr(G, beta=None, eps=0.0):
+
+    # if G is completely none just return none too - nothing can be inferred
     if G is None:
         return None
+
+    # if the array is empty just return all zeros indicating all are feasible
     elif G.ndim == 1 or G.shape[1] == 0:
-        return np.zeros(len(G))[:, None]
+        cv = np.zeros((len(G), 1))
+        return cv
+
     else:
-        return np.maximum(0, G).sum(axis=1)[:, None]
+
+        # all values solutions with G less than eps are considered as feasible - 0.0 by default
+        G = np.copy(G)
+        G[G <= eps] = 0.0
+
+        # sometimes it could be useful to square the constraints for instance and transform the function
+        if beta is not None:
+            G = (G ** beta)
+
+        # finally sum up the constraints for each solution
+        cv = G.sum(axis=1, keepdims=True)
+
+        return cv
 
 
 def replace_nan_values(out, by=np.inf):

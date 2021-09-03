@@ -13,6 +13,7 @@ class PCP(Plot):
                  show_bounds=True,
                  n_ticks=5,
                  normalize_each_axis=True,
+                 bbox=False,
                  **kwargs):
         """
 
@@ -51,6 +52,7 @@ class PCP(Plot):
         super().__init__(bounds=bounds, **kwargs)
         self.show_bounds = show_bounds
         self.n_ticks = n_ticks
+        self.bbox = bbox
         self.normalize_each_axis = normalize_each_axis
 
         set_if_none_from_tuples(self.axis_style, ("color", "red"), ("linewidth", 2), ("alpha", 0.75))
@@ -87,10 +89,11 @@ class PCP(Plot):
 
             if self.show_bounds:
                 lower = self.ax.text(i - margin_left, bottom, self.func_number_to_text(bounds[0][i]))
-                lower.set_bbox(dict(facecolor='white', alpha=0.8))
-
                 upper = self.ax.text(i - margin_left, top, self.func_number_to_text(bounds[1][i]))
-                upper.set_bbox(dict(facecolor='white', alpha=0.8))
+
+                if self.bbox:
+                    lower.set_bbox(dict(facecolor='white', alpha=0.8))
+                    upper.set_bbox(dict(facecolor='white', alpha=0.8))
 
             if self.n_ticks is not None:
                 n_length = 0.03
