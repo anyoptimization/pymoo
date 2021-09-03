@@ -19,6 +19,7 @@ from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 
 class DE(GeneticAlgorithm):
+
     def __init__(self,
                  pop_size=100,
                  n_offsprings=None,

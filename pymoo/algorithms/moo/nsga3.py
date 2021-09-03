@@ -275,6 +275,7 @@ class HyperplaneNormalization:
         self.extreme_points = None
 
     def update(self, F, nds=None):
+
         # find or usually update the new ideal point - from feasible solutions
         self.ideal_point = np.min(np.vstack((self.ideal_point, F)), axis=0)
         self.worst_point = np.max(np.vstack((self.worst_point, F)), axis=0)
