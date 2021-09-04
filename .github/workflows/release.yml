@@ -75,7 +75,7 @@ jobs:
         path: dist
 
   deploy:
-     needs: build
+     needs: [build,build-manylinux]
      runs-on: ubuntu-latest
      steps:
      - uses: actions/checkout@v2
