@@ -1,4 +1,4 @@
-from pymoo.model.problem import Problem
+from pymoo.core.problem import Problem
 
 
 class MetaProblem(Problem):

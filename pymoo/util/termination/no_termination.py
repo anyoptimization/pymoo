@@ -1,4 +1,4 @@
-from pymoo.model.termination import Termination
+from pymoo.core.termination import Termination
 
 
 class NoTermination(Termination):

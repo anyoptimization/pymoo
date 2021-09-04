@@ -6,8 +6,8 @@ import numpy as np
 import scipy
 import scipy.spatial
 
-from pymoo.model.population import Population
-from pymoo.model.sampling import Sampling
+from pymoo.core.population import Population
+from pymoo.core.sampling import Sampling
 
 
 def parameter_less(F, CV, fmax=None, inplace=False):
@@ -352,7 +352,7 @@ def to_numpy(a):
 
 
 def termination_from_tuple(termination):
-    from pymoo.model.termination import Termination
+    from pymoo.core.termination import Termination
 
     # get the termination if provided as a tuple - create an object
     if termination is not None and not isinstance(termination, Termination):

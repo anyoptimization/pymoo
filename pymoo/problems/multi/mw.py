@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 
-from pymoo.model.problem import Problem
+from pymoo.core.problem import Problem
 
 # Based on the C++ implementation by the Ma and Wang
 # http://www.escience.cn/people/yongwang1/index.html

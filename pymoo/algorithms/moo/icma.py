@@ -3,8 +3,8 @@ from numpy.random import permutation
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
-from pymoo.model.population import Population
-from pymoo.model.selection import Selection
+from pymoo.core.population import Population
+from pymoo.core.selection import Selection
 from pymoo.operators.crossover.dex import DEX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling

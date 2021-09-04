@@ -1,6 +1,6 @@
 import time
 
-from pymoo.model.termination import Termination
+from pymoo.core.termination import Termination
 from pymoo.util.misc import time_to_int
 
 

@@ -1,8 +1,8 @@
 import numpy as np
 
-from pymoo.model.crossover import Crossover
-from pymoo.model.mutation import Mutation
-from pymoo.model.sampling import Sampling
+from pymoo.core.crossover import Crossover
+from pymoo.core.mutation import Mutation
+from pymoo.core.sampling import Sampling
 
 
 def prepare_processing(mask, operators):

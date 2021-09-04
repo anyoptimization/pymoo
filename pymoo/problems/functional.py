@@ -1,7 +1,7 @@
 
 import autograd.numpy as np
 
-from pymoo.model.problem import ElementwiseProblem
+from pymoo.core.problem import ElementwiseProblem
 
 
 def func_return_none(*args, **kwargs):

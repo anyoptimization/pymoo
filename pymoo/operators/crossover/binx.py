@@ -1,7 +1,7 @@
 import numpy as np
 
-from pymoo.model.crossover import Crossover
-from pymoo.model.population import Population
+from pymoo.core.crossover import Crossover
+from pymoo.core.population import Population
 from pymoo.operators.crossover.util import row_at_least_once_true
 
 

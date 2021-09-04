@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.model.problem import Problem
+from pymoo.core.problem import Problem
 from pymoo.problems.many import generic_sphere, get_ref_dirs
 from pymoo.util.function_loader import load_function
 from pymoo.util.misc import powerset

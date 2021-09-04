@@ -2,11 +2,11 @@ import numpy as np
 
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.docs import parse_doc_string
-from pymoo.model.algorithm import Algorithm
-from pymoo.model.initialization import Initialization
-from pymoo.model.population import Population
-from pymoo.model.repair import NoRepair
-from pymoo.model.replacement import ImprovementReplacement
+from pymoo.core.algorithm import Algorithm
+from pymoo.core.initialization import Initialization
+from pymoo.core.population import Population
+from pymoo.core.repair import NoRepair
+from pymoo.core.replacement import ImprovementReplacement
 from pymoo.operators.crossover.dex import repair_random_init
 from pymoo.operators.mutation.pm import PolynomialMutation
 from pymoo.operators.repair.bounds_repair import is_out_of_bounds_by_problem

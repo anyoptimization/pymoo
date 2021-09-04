@@ -2,8 +2,8 @@ import numpy as np
 
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.factory import get_problem, Problem, ZDT
-from pymoo.model.evaluator import Evaluator
-from pymoo.model.problem import ElementwiseProblem
+from pymoo.core.evaluator import Evaluator
+from pymoo.core.problem import ElementwiseProblem
 from pymoo.optimize import minimize
 
 

@@ -5,8 +5,8 @@ from tests.gradients.grad_problem import ZDT1WithGradient, ZDT2WithGradient, ZDT
     AutomaticDifferentiationProblem, SphereWithGradientAndConstraint
 
 from pymoo.experimental.numdiff import NumericalDifferentiation, OneSidedJacobian, CentralJacobian, ComplexStepJacobian
-from pymoo.model.evaluator import Evaluator
-from pymoo.model.problem import Problem
+from pymoo.core.evaluator import Evaluator
+from pymoo.core.problem import Problem
 from pymoo.problems.multi.zdt import ZDT1, ZDT2, ZDT3
 
 

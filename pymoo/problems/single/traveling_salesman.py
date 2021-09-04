@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from pymoo.model.problem import ElementwiseProblem
+from pymoo.core.problem import ElementwiseProblem
 
 
 class TravelingSalesman(ElementwiseProblem):

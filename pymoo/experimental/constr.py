@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.cython.stochastic_ranking import stochastic_ranking
-from pymoo.model.population import Population
+from pymoo.core.population import Population
 
 
 def find_ranks(l, s=None, start=1):

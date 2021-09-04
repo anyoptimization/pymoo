@@ -1,4 +1,4 @@
-from pymoo.model.problem import ElementwiseProblem
+from pymoo.core.problem import ElementwiseProblem
 from pymoo.vendor.go_benchmark_functions import *
 
 

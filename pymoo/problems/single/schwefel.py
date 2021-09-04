@@ -1,6 +1,6 @@
 import autograd.numpy as np
 
-from pymoo.model.problem import Problem
+from pymoo.core.problem import Problem
 
 
 class Schwefel(Problem):

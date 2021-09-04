@@ -3,7 +3,7 @@ import numpy as np
 
 from pymoo.algorithms.base.local import LocalSearch
 from pymoo.docs import parse_doc_string
-from pymoo.model.population import Population
+from pymoo.core.population import Population
 from pymoo.util.display import Display
 from pymoo.util.normalization import ZeroToOneNormalization, NoNormalization
 from pymoo.util.optimum import filter_optimum

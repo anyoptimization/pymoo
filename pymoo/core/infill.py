@@ -1,6 +1,6 @@
-from pymoo.model.duplicate import NoDuplicateElimination
-from pymoo.model.population import Population
-from pymoo.model.repair import NoRepair
+from pymoo.core.duplicate import NoDuplicateElimination
+from pymoo.core.population import Population
+from pymoo.core.repair import NoRepair
 
 
 class InfillCriterion:

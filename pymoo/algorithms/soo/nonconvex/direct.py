@@ -2,8 +2,8 @@ import numpy as np
 
 from pymoo.algorithms.base.local import LocalSearch
 from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
-from pymoo.model.individual import Individual
-from pymoo.model.population import Population
+from pymoo.core.individual import Individual
+from pymoo.core.population import Population
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.normalization import normalize, denormalize

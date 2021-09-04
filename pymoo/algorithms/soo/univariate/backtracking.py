@@ -1,6 +1,6 @@
 from pymoo.algorithms.base.line import LineSearch
-from pymoo.model.evaluator import Evaluator
-from pymoo.model.solution import Solution, SolutionSet
+from pymoo.core.evaluator import Evaluator
+from pymoo.core.solution import Solution, SolutionSet
 from pymoo.optimize import minimize
 from pymoo.problems.single import Sphere
 from pymoo.util.termination.no_termination import NoTermination

@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.model.indicator import Indicator
+from pymoo.core.indicator import Indicator
 from pymoo.util.misc import vectorized_cdist, at_least_2d_array
 
 

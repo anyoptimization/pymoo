@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
-from pymoo.model.survival import Survival
+from pymoo.core.survival import Survival
 from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
 from pymoo.operators.mutation.pm import PolynomialMutation
 from pymoo.operators.sampling.rnd import FloatRandomSampling

@@ -3,7 +3,7 @@ import numpy as np
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.docs import parse_doc_string
-from pymoo.model.population import Population
+from pymoo.core.population import Population
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.optimum import filter_optimum

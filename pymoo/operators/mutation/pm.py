@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.model.mutation import Mutation
+from pymoo.core.mutation import Mutation
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
 
 

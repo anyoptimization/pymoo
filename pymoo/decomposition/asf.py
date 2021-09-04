@@ -1,4 +1,4 @@
-from pymoo.model.decomposition import Decomposition
+from pymoo.core.decomposition import Decomposition
 
 
 class ASF(Decomposition):

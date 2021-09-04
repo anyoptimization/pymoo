@@ -1,9 +1,9 @@
 import numpy as np
 
-from pymoo.model.algorithm import Algorithm
-from pymoo.model.individual import Individual
-from pymoo.model.population import Population
-from pymoo.model.replacement import is_better
+from pymoo.core.algorithm import Algorithm
+from pymoo.core.individual import Individual
+from pymoo.core.population import Population
+from pymoo.core.replacement import is_better
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 

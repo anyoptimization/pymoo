@@ -7,7 +7,7 @@ from scipy.spatial.distance import cdist, pdist, squareform
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.decomposition.asf import ASF
 from pymoo.docs import parse_doc_string
-from pymoo.model.population import Population
+from pymoo.core.population import Population
 from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
 from pymoo.operators.mutation.pm import PolynomialMutation
 from pymoo.operators.sampling.rnd import FloatRandomSampling

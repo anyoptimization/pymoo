@@ -1,7 +1,7 @@
 import numpy as np
 
-from pymoo.model.individual import Individual
-from pymoo.model.population import Population
+from pymoo.core.individual import Individual
+from pymoo.core.population import Population
 from pymoo.util.misc import at_least_2d_array
 
 

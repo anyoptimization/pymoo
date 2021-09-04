@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.algorithms.moo.rvea import APDSurvival, RVEA
 from pymoo.factory import DTLZ2
-from pymoo.model.population import Population
+from pymoo.core.population import Population
 from tests.util import path_to_test_resource
 
 

@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.docs import parse_doc_string
-from pymoo.model.plot import Plot
+from pymoo.core.plot import Plot
 from pymoo.util.misc import set_if_none
 from pymoo.visualization.util import get_circle_points, plot_axes_lines, \
     plot_axis_labels, plot_circle, plot_polygon, parse_bounds, normalize, equal_axis, no_ticks

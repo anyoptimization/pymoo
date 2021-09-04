@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.model.decision_making import DecisionMaking, find_outliers_upper_tail, NeighborFinder
+from pymoo.core.decision_making import DecisionMaking, find_outliers_upper_tail, NeighborFinder
 
 
 class HighTradeoffPoints(DecisionMaking):

@@ -10,8 +10,8 @@ import warnings
 import numpy as np
 
 from pymoo.algorithms.base.local import LocalSearch
-from pymoo.model.individual import Individual
-from pymoo.model.population import Population
+from pymoo.core.individual import Individual
+from pymoo.core.population import Population
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.termination.max_gen import MaximumGenerationTermination
 from pymoo.util.termination.no_termination import NoTermination

@@ -4,10 +4,10 @@ import time
 
 import numpy as np
 
-from pymoo.model.callback import Callback
-from pymoo.model.evaluator import Evaluator
-from pymoo.model.population import Population
-from pymoo.model.result import Result
+from pymoo.core.callback import Callback
+from pymoo.core.evaluator import Evaluator
+from pymoo.core.population import Population
+from pymoo.core.result import Result
 from pymoo.util.function_loader import FunctionLoader
 from pymoo.util.misc import termination_from_tuple
 from pymoo.util.optimum import filter_optimum
@@ -224,6 +224,7 @@ class Algorithm:
         return self._finalize()
 
     def next(self):
+
         # get the infill solutions
         infills = self.infill()
 

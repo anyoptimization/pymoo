@@ -1,6 +1,6 @@
 import autograd.numpy as anp
 
-from pymoo.model.problem import Problem
+from pymoo.core.problem import Problem
 from pymoo.problems.util import load_pareto_front_from_file
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
 

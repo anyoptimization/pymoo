@@ -1,6 +1,6 @@
 import autograd.numpy as anp
 
-from pymoo.model.decomposition import Decomposition
+from pymoo.core.decomposition import Decomposition
 
 
 class Tchebicheff(Decomposition):

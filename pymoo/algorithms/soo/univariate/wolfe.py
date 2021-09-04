@@ -1,10 +1,10 @@
 import numpy as np
 
 from pymoo.algorithms.base.line import LineSearchProblem
-from pymoo.model.algorithm import Algorithm
-from pymoo.model.evaluator import Evaluator
-from pymoo.model.individual import Individual
-from pymoo.model.solution import SolutionSet
+from pymoo.core.algorithm import Algorithm
+from pymoo.core.evaluator import Evaluator
+from pymoo.core.individual import Individual
+from pymoo.core.solution import SolutionSet
 from pymoo.util.termination.no_termination import NoTermination
 
 

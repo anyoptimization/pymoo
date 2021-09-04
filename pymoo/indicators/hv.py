@@ -3,7 +3,7 @@ import warnings
 
 import numpy as np
 
-from pymoo.model.indicator import Indicator
+from pymoo.core.indicator import Indicator
 from pymoo.indicators.distance_indicator import derive_ideal_and_nadir_from_pf
 from pymoo.util.misc import at_least_2d_array
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
