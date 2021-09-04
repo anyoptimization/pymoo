@@ -3,8 +3,8 @@ import numpy as np
 from pymoo.algorithms.soo.nonconvex.de import DifferentialEvolutionMating
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.factory import get_problem
-from pymoo.model.population import Population
-from pymoo.model.replacement import hierarchical_sort
+from pymoo.core.population import Population
+from pymoo.core.replacement import hierarchical_sort
 from pymoo.operators.crossover.pcx import PCX
 from pymoo.operators.selection.tournament import TournamentSelection, compare
 from pymoo.optimize import minimize

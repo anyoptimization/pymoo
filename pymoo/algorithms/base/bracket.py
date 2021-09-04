@@ -1,5 +1,5 @@
-from pymoo.model.algorithm import Algorithm
-from pymoo.model.individual import Individual
+from pymoo.core.algorithm import Algorithm
+from pymoo.core.individual import Individual
 
 
 class BracketSearch(Algorithm):

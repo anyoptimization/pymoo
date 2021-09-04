@@ -1,8 +1,8 @@
 import abc
 
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
-from pymoo.model.algorithm import Algorithm
-from pymoo.model.population import pop_from_array_or_individual
+from pymoo.core.algorithm import Algorithm
+from pymoo.core.population import pop_from_array_or_individual
 from pymoo.operators.sampling.lhs import LatinHypercubeSampling
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.termination.f_tol_single import SingleObjectiveSpaceToleranceTermination

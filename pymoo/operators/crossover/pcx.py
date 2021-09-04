@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.model.crossover import Crossover
+from pymoo.core.crossover import Crossover
 from pymoo.operators.repair.inverse_penalty import inverse_penality
 
 

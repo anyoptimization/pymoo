@@ -3,10 +3,10 @@ from copy import deepcopy
 
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival, GA
 from pymoo.docs import parse_doc_string
-from pymoo.model.algorithm import Algorithm
-from pymoo.model.evaluator import set_cv, set_feasibility, Evaluator
-from pymoo.model.individual import Individual
-from pymoo.model.population import Population
+from pymoo.core.algorithm import Algorithm
+from pymoo.core.evaluator import set_cv, set_feasibility, Evaluator
+from pymoo.core.individual import Individual
+from pymoo.core.population import Population
 from pymoo.problems.single.traveling_salesman import create_random_tsp_problem
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.roulette import RouletteWheelSelection
@@ -486,7 +486,7 @@ if __name__ == "__main__":
     problem = create_random_tsp_problem(50, 100, seed=1)
 
     import numpy as np
-    from pymoo.model.repair import Repair
+    from pymoo.core.repair import Repair
 
 
     class StartFromZeroRepair(Repair):

@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.model.sampling import Sampling
+from pymoo.core.sampling import Sampling
 from pymoo.util.misc import cdist
 
 

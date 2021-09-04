@@ -1,7 +1,7 @@
 import numpy as np
 
-from pymoo.model.algorithm import Algorithm
-from pymoo.model.individual import Individual
+from pymoo.core.algorithm import Algorithm
+from pymoo.core.individual import Individual
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside
 from pymoo.problems.meta import MetaProblem
 

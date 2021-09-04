@@ -1,5 +1,5 @@
-from pymoo.model.algorithm import Algorithm
-from pymoo.model.population import Population
+from pymoo.core.algorithm import Algorithm
+from pymoo.core.population import Population
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 
 from pymoo.util.display import SingleObjectiveDisplay

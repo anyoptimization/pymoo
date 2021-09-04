@@ -2,7 +2,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from pymoo.model.callback import Callback
+from pymoo.core.callback import Callback
 from pymoo.indicators.igd import IGD
 
 

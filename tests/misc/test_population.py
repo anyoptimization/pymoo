@@ -1,4 +1,4 @@
-from pymoo.model.population import Population
+from pymoo.core.population import Population
 
 
 def test_has_method():

@@ -1,4 +1,4 @@
-from pymoo.model.termination import Termination
+from pymoo.core.termination import Termination
 from pymoo.util.misc import to_numpy
 from pymoo.util.termination.sliding_window_termination import SlidingWindowTermination
 

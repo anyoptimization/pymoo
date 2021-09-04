@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from pymoo.model.population import Population
+from pymoo.core.population import Population
 
 
 class Sampling:

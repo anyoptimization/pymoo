@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.model.crossover import Crossover
+from pymoo.core.crossover import Crossover
 
 
 class BlendCrossover(Crossover):

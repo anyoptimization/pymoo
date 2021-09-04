@@ -4,9 +4,9 @@ from scipy.linalg import solve_triangular, LinAlgError
 from pymoo.algorithms.base.gradient import DerivationBasedAlgorithm, inexact_line_search
 from pymoo.algorithms.base.line import LineSearchProblem
 from pymoo.algorithms.soo.univariate.wolfe import wolfe_line_search, WolfeSearch
-from pymoo.model.individual import Individual
-from pymoo.model.population import Population
-from pymoo.model.solution import Solution
+from pymoo.core.individual import Individual
+from pymoo.core.population import Population
+from pymoo.core.solution import Solution
 
 
 def direction_cholesky(jac, hess):

@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.algorithms.soo.nonconvex.es import ES
 from pymoo.docs import parse_doc_string
-from pymoo.model.survival import Survival
+from pymoo.core.survival import Survival
 from pymoo.util.function_loader import load_function
 
 

@@ -3,7 +3,7 @@ import numpy as np
 from pymoo.visualization.util import plot_axes_arrow, plot_axis_labels, equal_axis, no_ticks, parse_bounds, \
     normalize, get_uniform_points_around_circle
 from pymoo.docs import parse_doc_string
-from pymoo.model.plot import Plot
+from pymoo.core.plot import Plot
 
 
 class StarCoordinate(Plot):

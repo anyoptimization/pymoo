@@ -1,4 +1,4 @@
-from pymoo.model.decision_making import DecisionMaking
+from pymoo.core.decision_making import DecisionMaking
 from pymoo.util.normalization import normalize
 
 

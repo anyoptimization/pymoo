@@ -1,7 +1,7 @@
 import autograd.numpy as anp
 import numpy as np
 
-from pymoo.model.problem import Problem
+from pymoo.core.problem import Problem
 
 
 class Truss2D(Problem):

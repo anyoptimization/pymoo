@@ -4,7 +4,7 @@ from pymoo.experimental.deriv import DerivationBasedAlgorithm
 from pymoo.algorithms.base.line import LineSearchProblem
 from pymoo.algorithms.soo.univariate.exp import ExponentialSearch
 from pymoo.algorithms.soo.univariate.golden import GoldenSectionSearch
-from pymoo.model.population import Population
+from pymoo.core.population import Population
 from pymoo.util.vectors import max_alpha
 
 

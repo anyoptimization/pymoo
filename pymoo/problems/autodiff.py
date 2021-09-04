@@ -5,7 +5,7 @@ import autograd.numpy as anp
 from autograd.core import VJPNode, vspace, backward_pass
 from autograd.tracer import new_box, isbox
 
-from pymoo.model.problem import ElementwiseProblem, out_to_ndarray, check
+from pymoo.core.problem import ElementwiseProblem, out_to_ndarray, check
 from pymoo.problems.meta import MetaProblem
 
 

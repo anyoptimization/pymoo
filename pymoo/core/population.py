@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.model.individual import Individual
+from pymoo.core.individual import Individual
 
 
 def interleaving_args(*args, kwargs=None):

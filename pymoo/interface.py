@@ -6,8 +6,8 @@ can be used easily just by calling a function and providing the lower and upper 
 
 import numpy as np
 
-from pymoo.model.population import Population
-from pymoo.model.problem import Problem
+from pymoo.core.population import Population
+from pymoo.core.problem import Problem
 
 
 # =========================================================================================================

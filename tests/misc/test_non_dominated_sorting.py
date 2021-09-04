@@ -5,7 +5,7 @@ import pytest
 
 from pymoo.algorithms.moo.nsga3 import NSGA3
 from pymoo.factory import get_reference_directions, DTLZ2
-from pymoo.model.callback import Callback
+from pymoo.core.callback import Callback
 from pymoo.optimize import minimize
 from pymoo.util.function_loader import load_function
 

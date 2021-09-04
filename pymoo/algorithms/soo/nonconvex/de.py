@@ -3,8 +3,8 @@ import numpy as np
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.docs import parse_doc_string
-from pymoo.model.replacement import ImprovementReplacement
-from pymoo.model.selection import Selection
+from pymoo.core.replacement import ImprovementReplacement
+from pymoo.core.selection import Selection
 from pymoo.operators.crossover.dex import DEX
 from pymoo.operators.mutation.nom import NoMutation
 from pymoo.operators.sampling.lhs import LHS

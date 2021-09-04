@@ -3,10 +3,10 @@ import numpy as np
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.docs import parse_doc_string
-from pymoo.model.duplicate import DefaultDuplicateElimination, DuplicateElimination
-from pymoo.model.population import Population
-from pymoo.model.selection import Selection
-from pymoo.model.survival import Survival
+from pymoo.core.duplicate import DefaultDuplicateElimination, DuplicateElimination
+from pymoo.core.population import Population
+from pymoo.core.selection import Selection
+from pymoo.core.survival import Survival
 from pymoo.operators.crossover.binx import BinomialCrossover
 from pymoo.operators.mutation.nom import NoMutation
 from pymoo.operators.sampling.rnd import FloatRandomSampling

@@ -1,4 +1,4 @@
-from pymoo.model.decomposition import Decomposition
+from pymoo.core.decomposition import Decomposition
 from pymoo.util.function_loader import load_function
 
 

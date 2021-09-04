@@ -1,9 +1,9 @@
-from pymoo.model.algorithm import Algorithm
-from pymoo.model.duplicate import DefaultDuplicateElimination, NoDuplicateElimination
-from pymoo.model.initialization import Initialization
-from pymoo.model.mating import Mating
-from pymoo.model.population import Population
-from pymoo.model.repair import NoRepair
+from pymoo.core.algorithm import Algorithm
+from pymoo.core.duplicate import DefaultDuplicateElimination, NoDuplicateElimination
+from pymoo.core.initialization import Initialization
+from pymoo.core.mating import Mating
+from pymoo.core.population import Population
+from pymoo.core.repair import NoRepair
 
 
 class GeneticAlgorithm(Algorithm):

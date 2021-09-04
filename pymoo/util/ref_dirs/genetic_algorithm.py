@@ -1,5 +1,5 @@
 from pymoo.algorithms.soo.nonconvex.ga import GA
-from pymoo.model.problem import Problem
+from pymoo.core.problem import Problem
 from pymoo.optimize import minimize
 from pymoo.util.reference_direction import get_partition_closest_to_points, ReferenceDirectionFactory
 

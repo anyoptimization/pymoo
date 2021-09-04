@@ -1,4 +1,4 @@
-from pymoo.model.problem import calc_constr
+from pymoo.core.problem import calc_constr
 from pymoo.problems.meta import MetaProblem
 from pymoo.util.misc import from_dict
 

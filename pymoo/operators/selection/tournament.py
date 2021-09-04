@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 
-from pymoo.model.selection import Selection
+from pymoo.core.selection import Selection
 from pymoo.util.misc import random_permuations
 
 

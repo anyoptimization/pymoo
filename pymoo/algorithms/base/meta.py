@@ -1,4 +1,4 @@
-from pymoo.model.algorithm import Algorithm
+from pymoo.core.algorithm import Algorithm
 
 
 class MetaAlgorithm(Algorithm):

@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.model.mutation import Mutation
+from pymoo.core.mutation import Mutation
 from pymoo.operators.crossover.ox import random_sequence
 
 

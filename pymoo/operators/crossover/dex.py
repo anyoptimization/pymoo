@@ -1,7 +1,7 @@
 import numpy as np
 
-from pymoo.model.crossover import Crossover
-from pymoo.model.population import Population
+from pymoo.core.crossover import Crossover
+from pymoo.core.population import Population
 from pymoo.operators.crossover.binx import mut_binomial
 from pymoo.operators.crossover.expx import mut_exp
 from pymoo.operators.repair.bounds_repair import is_out_of_bounds_by_problem, repair_random_init

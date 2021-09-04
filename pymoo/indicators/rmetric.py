@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from pymoo.model.indicator import Indicator
+from pymoo.core.indicator import Indicator
 from pymoo.indicators.hv import Hypervolume
 from pymoo.indicators.igd import IGD
 

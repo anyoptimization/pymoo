@@ -1,6 +1,6 @@
 from pymoo.algorithms.base.bracket import BracketSearch
-from pymoo.model.individual import Individual
-from pymoo.model.population import Population
+from pymoo.core.individual import Individual
+from pymoo.core.population import Population
 
 
 def quadr_interp_equ(xa, fa, xb, fb, xc, fc):

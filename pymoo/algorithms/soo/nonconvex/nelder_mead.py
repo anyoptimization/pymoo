@@ -3,10 +3,10 @@ import numpy as np
 from pymoo.algorithms.base.local import LocalSearch
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.docs import parse_doc_string
-from pymoo.model.individual import Individual
-from pymoo.model.population import Population, pop_from_array_or_individual
-from pymoo.model.replacement import is_better
-from pymoo.model.termination import Termination
+from pymoo.core.individual import Individual
+from pymoo.core.population import Population, pop_from_array_or_individual
+from pymoo.core.replacement import is_better
+from pymoo.core.termination import Termination
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.misc import vectorized_cdist

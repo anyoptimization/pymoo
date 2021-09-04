@@ -3,7 +3,7 @@ import unittest
 import autograd.numpy as anp
 import numpy as np
 
-from pymoo.model.problem import Problem, ElementwiseProblem
+from pymoo.core.problem import Problem, ElementwiseProblem
 
 
 class MyProblemElementwise(ElementwiseProblem):

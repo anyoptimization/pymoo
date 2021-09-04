@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pymoo.model.problem import ElementwiseProblem
+from pymoo.core.problem import ElementwiseProblem
 
 
 class FlowshopScheduling(ElementwiseProblem):

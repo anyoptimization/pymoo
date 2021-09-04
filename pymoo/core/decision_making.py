@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial.ckdtree import cKDTree
 
-from pymoo.model.indicator import Indicator
+from pymoo.core.indicator import Indicator
 
 
 class DecisionMaking(Indicator):

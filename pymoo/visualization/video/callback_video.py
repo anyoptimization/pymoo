@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from pymoo.model.callback import Callback
+from pymoo.core.callback import Callback
 
 
 class AnimationCallback(Callback):

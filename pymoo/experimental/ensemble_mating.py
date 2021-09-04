@@ -1,8 +1,8 @@
 import random
 
 from pymoo.algorithms.soo.nonconvex.ga import GA
-from pymoo.model.mating import Mating
-from pymoo.model.repair import NoRepair
+from pymoo.core.mating import Mating
+from pymoo.core.repair import NoRepair
 from pymoo.operators.crossover.differental_evolution_crossover import DifferentialEvolutionCrossover
 from pymoo.operators.crossover.simulated_binary_crossover import SimulatedBinaryCrossover
 from pymoo.operators.mutation.no_mutation import NoMutation
