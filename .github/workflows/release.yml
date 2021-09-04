@@ -75,7 +75,7 @@ jobs:
         pip-wheel-args: '-w ./dist --no-deps'
     - name: Remove non-compatible packages
       run: |
-        rm dist/*linux_x86_64.whl
+        sudo rm dist/*linux_x86_64.whl
     - uses: actions/upload-artifact@v2
       with:
         name: dist
