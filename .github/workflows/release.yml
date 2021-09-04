@@ -70,9 +70,9 @@ jobs:
       with:
         python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39'
     - uses: actions/upload-artifact@v2
-     with:
-       name: dist
-       path: dist
+      with:
+        name: dist
+        path: dist
 
   deploy:
      needs: build
