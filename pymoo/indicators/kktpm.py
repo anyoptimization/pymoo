@@ -12,7 +12,7 @@ class KKTPM:
         ----------
         X : np.array
 
-        problem : pymoo.model.problem
+        problem : pymoo.core.problem
         ideal : np.array
             The ideal point if not in the problem defined or intentionally overwritten.
         utopian_eps : float

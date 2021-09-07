@@ -22,13 +22,13 @@ def minimize(problem,
     Parameters
     ----------
 
-    problem : :class:`~pymoo.model.problem.Problem`
+    problem : :class:`~pymoo.core.problem.Problem`
         A problem object which is defined using pymoo.
 
-    algorithm : :class:`~pymoo.model.algorithm.Algorithm`
+    algorithm : :class:`~pymoo.core.algorithm.Algorithm`
         The algorithm object that should be used for the optimization.
 
-    termination : :class:`~pymoo.model.termination.Termination` or tuple
+    termination : :class:`~pymoo.core.termination.Termination` or tuple
         The termination criterion that is used to stop the algorithm.
 
     seed : integer
@@ -40,7 +40,7 @@ def minimize(problem,
     display : :class:`~pymoo.util.display.Display`
         Each algorithm has a default display object for printouts. However, it can be overwritten if desired.
 
-    callback : :class:`~pymoo.model.callback.Callback`
+    callback : :class:`~pymoo.core.callback.Callback`
         A callback object which is called each iteration of the algorithm.
 
     save_history : bool
@@ -54,7 +54,7 @@ def minimize(problem,
 
     Returns
     -------
-    res : :class:`~pymoo.model.result.Result`
+    res : :class:`~pymoo.core.result.Result`
         The optimization result represented as an object.
 
     """

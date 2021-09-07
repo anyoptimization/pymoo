@@ -42,7 +42,7 @@ class FitnessLandscape(Plot):
 
         Returns
         -------
-        FitnessLandscape : :class:`~pymoo.model.analytics.visualization.fitness_landscape.FitnessLandscape`
+        FitnessLandscape : :class:`~pymoo.core.analytics.visualization.fitness_landscape.FitnessLandscape`
 
         """
 

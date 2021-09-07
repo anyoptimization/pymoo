@@ -19,13 +19,13 @@ class Sampling:
         Parameters
         ----------
 
-        problem : :class:`~pymoo.model.problem.Problem`
+        problem : :class:`~pymoo.core.problem.Problem`
             The problem to which points should be sampled. (lower and upper bounds, discrete, binary, ...)
 
         n_samples : int
             Number of samples
 
-        pop : :class:`~pymoo.model.population.Population`
+        pop : :class:`~pymoo.core.population.Population`
             The sampling results are stored in a population. The template of the population can be changed.
             If 'none' simply a numpy array is returned.
 

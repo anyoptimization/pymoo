@@ -31,11 +31,7 @@ class RunningMetric(AnimationCallback):
         metrics = self.term.metrics
         tau = len(metrics)
 
-        # if for whatever reason the metric is not written yet
-        if metric is None:
-            return
-
-        if (tau + 1) % self.delta_gen == 0 or force_plot:
+        if metric is not None and (tau + 1) % self.delta_gen == 0 or force_plot:
 
             _delta_f = metric["delta_f"]
             _delta_ideal = [m['delta_ideal'] > 0.005 for m in metrics]
@@ -75,3 +71,6 @@ class RunningMetric(AnimationCallback):
             self.hist.append((tau, _delta_f))
             self.hist = self.hist[-(self.n_plots - 1):]
 
+            return True
+
+        return False

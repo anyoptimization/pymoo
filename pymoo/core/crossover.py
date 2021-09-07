@@ -64,3 +64,18 @@ class Crossover:
         off = Population.new("X", X)
 
         return off
+
+
+class ElementwiseCrossover(Crossover):
+    """
+    The purpose of this crossover meta-crossover is the convenience of applying the operation an individual level
+    (elementwise). This wrapper transform all crossovers in pymoo to such an operation.
+    """
+
+    def __init__(self, crossover):
+        self.crossover = crossover
+
+    def do(self, problem, *args, **kwargs):
+        pop = Population.create(*args)
+        parents = np.arange(len(args))[None, :]
+        return self.crossover.do(problem, pop, parents, **kwargs)
