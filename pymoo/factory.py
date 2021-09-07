@@ -524,31 +524,31 @@ if Configuration.parse_custom_docs:
         get_termination, get_sampling, get_sampling_options
 
     parse_doc_string(dummy, get_algorithm, {"type": "algorithm",
-                                            "clazz": ":class:`~pymoo.model.algorithm.Algorithm`",
+                                            "clazz": ":class:`~pymoo.core.algorithm.Algorithm`",
                                             "options": options_to_string(get_algorithm_options())
                                             })
 
     parse_doc_string(dummy, get_sampling, {"type": "sampling",
-                                           "clazz": ":class:`~pymoo.model.sampling.Sampling`",
+                                           "clazz": ":class:`~pymoo.core.sampling.Sampling`",
                                            "options": options_to_string(get_sampling_options())
                                            })
 
     parse_doc_string(dummy, get_selection, {"type": "selection",
-                                            "clazz": ":class:`~pymoo.model.selection.Selection`",
+                                            "clazz": ":class:`~pymoo.core.selection.Selection`",
                                             "options": options_to_string(get_selection_options())
                                             })
 
     parse_doc_string(dummy, get_crossover, {"type": "crossover",
-                                            "clazz": ":class:`~pymoo.model.crossover.Crossover`",
+                                            "clazz": ":class:`~pymoo.core.crossover.Crossover`",
                                             "options": options_to_string(get_crossover_options())
                                             })
 
     parse_doc_string(dummy, get_mutation, {"type": "mutation",
-                                           "clazz": ":class:`~pymoo.model.mutation.Mutation`",
+                                           "clazz": ":class:`~pymoo.core.mutation.Mutation`",
                                            "options": options_to_string(get_mutation_options())
                                            })
 
     parse_doc_string(dummy, get_termination, {"type": "termination",
-                                              "clazz": ":class:`~pymoo.model.termination.termination`",
+                                              "clazz": ":class:`~pymoo.core.termination.termination`",
                                               "options": options_to_string(get_termination_options())
                                               })

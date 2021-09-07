@@ -19,41 +19,41 @@ algorithms = {
     """,
 
     "sampling": """
-                :class:`~pymoo.model.sampling.Sampling`, :class:`~pymoo.model.population.Population`, :obj:`numpy.array`
+                :class:`~pymoo.core.sampling.Sampling`, :class:`~pymoo.core.population.Population`, :obj:`numpy.array`
                     The sampling process defines the initial set of solutions which are the starting point of the
                     optimization algorithm. Here, you have three different options by passing
 
-                        (i) A :class:`~pymoo.model.sampling.Sampling` implementation which is an implementation of a 
+                        (i) A :class:`~pymoo.core.sampling.Sampling` implementation which is an implementation of a 
                         random sampling method. 
 
-                        (ii) A :class:`~pymoo.model.population.Population` object containing the variables to
+                        (ii) A :class:`~pymoo.core.population.Population` object containing the variables to
                         be evaluated initially OR already evaluated solutions (F needs to be set in this case).
 
                         (iii) Pass a two dimensional :obj:`numpy.array` with (n_individuals, n_var) which contains the variable 
                         space values for each individual.        
                 """,
 
-    "selection": """:class:`~pymoo.model.selection.Selection`
+    "selection": """:class:`~pymoo.core.selection.Selection`
                     This object defines the mating selection to be used. 
                     In an evolutionary algorithm each generation parents need to be selected to produce new offsprings using 
                     different recombination and mutation operators. Different strategies for selecting parents are possible e.g. 
                     selecting them just randomly, only in the neighborhood, using a tournament selection to introduce some selection 
                     pressure, ... 
                     """,
-    "crossover": """:class:`~pymoo.model.crossover.Crossover`
+    "crossover": """:class:`~pymoo.core.crossover.Crossover`
                     The crossover has the purpose of create offsprings during the evolution. After the mating selection
                     the parents are passed to the crossover operator which will dependent on the implementation create
                     a different number of offsprings.
                 """,
 
-    "mutation": """:class:`~pymoo.model.mutation.Mutation`
+    "mutation": """:class:`~pymoo.core.mutation.Mutation`
                     Some genetic algorithms rely only on the mutation operation. However, it has shown that increases
                     the performance to perform a mutation after creating the offsprings through crossover as well.
                     Usually the mutation operator needs to be initialized with a probability to be executed. 
                     Having a high probability of mutation will most of the time increase the diversity in the population.
                 """,
 
-    "survival": """:class:`~pymoo.model.survival.Survival`
+    "survival": """:class:`~pymoo.core.survival.Survival`
                     The survival selection is the key for many genetic algorithms. It is responsible to define the
                     goal of convergence by choosing the individual to survive or be truncated each generation.
                     For single-objective single a selection based on the fitness is used commonly. However, for 

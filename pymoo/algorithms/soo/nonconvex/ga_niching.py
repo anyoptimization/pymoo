@@ -104,7 +104,7 @@ class EpsilonClearingSurvival(Survival):
 
         # calculate the distance from each individual to another - pre-processing for the clearing
         # NOTE: the distance is normalized by the maximum distance possible
-        X = pop.get("X")
+        X = pop.get("X").astype(float)
         D = norm_eucl_dist(problem, X, X)
         if self.norm_by_dim:
             D = D / (problem.n_var ** 0.5)

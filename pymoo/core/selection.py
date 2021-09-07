@@ -16,7 +16,7 @@ class Selection:
 
         Parameters
         ----------
-        pop : :class:`~pymoo.model.population.Population`
+        pop : :class:`~pymoo.core.population.Population`
             The population which should be selected from. Some criteria from the design or objective space
             might be used for the selection. Therefore, only the number of individual might be not enough.
 
