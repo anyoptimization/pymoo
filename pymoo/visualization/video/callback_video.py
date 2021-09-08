@@ -38,10 +38,10 @@ class AnimationCallback(Callback):
                 figure = self.do(algorithm.problem, algorithm, **kwargs)
 
                 if self.do_show:
-                    if figure is None:
-                        plt.show()
-                    else:
+                    if figure is not None:
                         figure.show()
+                    else:
+                        plt.show()
 
                 if self.video is not None:
                     self.video.record(fig=figure)
