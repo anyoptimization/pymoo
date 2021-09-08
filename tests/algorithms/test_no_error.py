@@ -1,23 +1,24 @@
+import numpy as np
 import pytest
 
+from pymoo.algorithms.moo.age import AGEMOEA
 from pymoo.algorithms.moo.moead import MOEAD, ParallelMOEAD
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.moo.rvea import RVEA
 from pymoo.algorithms.soo.nonconvex.cmaes import CMAES
-from pymoo.algorithms.soo.nonconvex.nelder_mead import NelderMead
-from pymoo.algorithms.soo.nonconvex.pattern_search import PatternSearch
 from pymoo.algorithms.soo.nonconvex.de import DE
 from pymoo.algorithms.soo.nonconvex.direct import DIRECT
+from pymoo.algorithms.soo.nonconvex.es import ES
+from pymoo.algorithms.soo.nonconvex.nelder_mead import NelderMead
+from pymoo.algorithms.soo.nonconvex.pattern_search import PatternSearch
 from pymoo.algorithms.soo.nonconvex.pso import PSO
 from pymoo.factory import Sphere, Rosenbrock, Himmelblau, ZDT1, get_reference_directions
-from pymoo.optimize import minimize
-import numpy as np
-
 from pymoo.indicators.igd import IGD
+from pymoo.optimize import minimize
 
 SINGLE_OBJECTIVE_PROBLEMS = [Sphere(n_var=10), Himmelblau(), Rosenbrock()]
 
-SINGLE_OBJECTIVE_ALGORITHMS = [PatternSearch(), CMAES(), NelderMead(), DIRECT(), PSO(), DE()]
+SINGLE_OBJECTIVE_ALGORITHMS = [PatternSearch(), CMAES(), NelderMead(), DIRECT(), PSO(), DE(), ES()]
 
 
 @pytest.mark.parametrize('problem', SINGLE_OBJECTIVE_PROBLEMS)
@@ -33,8 +34,10 @@ MULTI_OBJECTIVE_PROBLEMS = [ZDT1()]
 
 ref_dirs = get_reference_directions("das-dennis", 2, n_partitions=99)
 MULTI_OBJECTIVE_ALGORITHMS = [NSGA2(),
-                              # GDE3(),
-                              RVEA(ref_dirs), MOEAD(ref_dirs), ParallelMOEAD(ref_dirs)]
+                              RVEA(ref_dirs),
+                              MOEAD(ref_dirs),
+                              ParallelMOEAD(ref_dirs),
+                              AGEMOEA()]
 
 
 @pytest.mark.parametrize('problem', MULTI_OBJECTIVE_PROBLEMS)

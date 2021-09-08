@@ -2,8 +2,8 @@ import numpy as np
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
-from pymoo.docs import parse_doc_string
 from pymoo.core.population import Population
+from pymoo.docs import parse_doc_string
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.optimum import filter_optimum
@@ -22,6 +22,25 @@ class ES(GeneticAlgorithm):
                  survival=FitnessSurvival(),
                  display=SingleObjectiveDisplay(),
                  **kwargs):
+
+        """
+        Evolutionary Strategy (ES)
+
+        Parameters
+        ----------
+        n_offsprings : int
+            The number of individuals created in each iteration.
+        pop_size : int
+            The number of individuals which are surviving from the offspring population (non-elitist)
+        rule : float
+            The rule (ratio) of individuals surviving. This automatically either calculated `n_offsprings` or `pop_size`.
+        phi : float
+            Expected rate of convergence (usually 1.0).
+        gamma : float
+            If not `None`, some individuals are created using the differentials with this as a length scale.
+        sampling : object
+            The sampling method for creating the initial population.
+        """
 
         if pop_size is None and n_offsprings is not None:
             pop_size = int(np.math.ceil(n_offsprings * rule))

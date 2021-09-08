@@ -11,6 +11,16 @@ from pymoo.core.population import Population
 class ISRES(SRES):
 
     def __init__(self, gamma=0.85, alpha=0.2, **kwargs):
+        """
+        Improved Stochastic Ranking Evolutionary Strategy (SRES)
+
+        Parameters
+        ----------
+        alpha : float
+            Length scale of the differentials during mutation.
+        PF: float
+            The stochastic ranking weight for choosing a random decision while doing the modified bubble sort.
+        """
         super().__init__(**kwargs)
         self.gamma = gamma
         self.alpha = alpha
