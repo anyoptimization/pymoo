@@ -32,6 +32,14 @@ class StochasticRankingSurvival(Survival):
 class SRES(ES):
 
     def __init__(self, PF=0.45, **kwargs):
+        """
+        Stochastic Ranking Evolutionary Strategy (SRES)
+
+        Parameters
+        ----------
+        PF: float
+            The stochastic ranking weight for choosing a random decision while doing the modified bubble sort.
+        """
         super().__init__(survival=StochasticRankingSurvival(PF), **kwargs)
         self.PF = PF
 

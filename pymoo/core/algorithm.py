@@ -282,6 +282,9 @@ class Algorithm:
         # if the algorithm has not been already initialized
         if not self.is_initialized:
 
+            # set the generation counter to 1
+            self.n_gen = 1
+
             # assign the population to the algorithm
             self.pop = infills
 
@@ -292,6 +295,10 @@ class Algorithm:
             self.is_initialized = True
 
         else:
+
+            # increase the generation counter by one
+            self.n_gen += 1
+
             # call the implementation of the advance method - if the infill is not None
             self._advance(infills=infills, **kwargs)
 
@@ -304,9 +311,6 @@ class Algorithm:
         # if the algorithm has terminated call the finalize method
         if self.has_terminated:
             return self.finalize()
-
-        # increase the generation counter by one
-        self.n_gen += 1
 
     def result(self):
         res = Result()

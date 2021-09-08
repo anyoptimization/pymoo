@@ -323,14 +323,14 @@ def looped_eval(func_elementwise_eval, problem, X, out, *args, **kwargs):
 
 
 def starmap_parallelized_eval(func_elementwise_eval, problem, X, out, *args, **kwargs):
-    starmap = problem.starmap
+    starmap = problem.runner
     params = [(problem, x, dict(out), args, kwargs) for x in X]
     return list(starmap(func_elementwise_eval, params))
 
 
 def dask_parallelized_eval(func_elementwise_eval, problem, X, out, *args, **kwargs):
-    client = problem.client
-    jobs = [client.submit(func_elementwise_eval, (problem, x, dict(out), args, kwargs)) for x in X]
+    client = problem.runner
+    jobs = [client.submit(func_elementwise_eval, problem, x, dict(out), args, kwargs) for x in X]
     return [job.result() for job in jobs]
 
 
@@ -339,21 +339,23 @@ class ElementwiseProblem(Problem):
     def __init__(self,
                  func_elementwise_eval=elementwise_eval,
                  func_eval=looped_eval,
-                 starmap=None,
                  exclude_from_serialization=None,
-                 dask=None,
+                 runner=None,
                  **kwargs):
 
         super().__init__(exclude_from_serialization=exclude_from_serialization, **kwargs)
+
+        # the most granular function which evaluates one single individual - this is the function to parallelize
         self.func_elementwise_eval = func_elementwise_eval
-        self.func_eval = func_eval if starmap is None else starmap_parallelized_eval
+
+        # the function that calls func_elementwise_eval for ALL solutions to be evaluated
+        self.func_eval = func_eval
 
         # the two ways of parallelization which are supported
-        self.starmap = starmap
-        self.dask = dask
+        self.runner = runner
 
         # do not serialize the starmap - this will throw an exception
-        self.exclude_from_serialization = self.exclude_from_serialization + ["starmap", "dask"]
+        self.exclude_from_serialization = self.exclude_from_serialization + ["runner"]
 
     def do(self, X, out, *args, **kwargs):
 

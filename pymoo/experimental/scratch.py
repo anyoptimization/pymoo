@@ -1,31 +1,23 @@
-import matplotlib.pyplot as plt
-
-from pymoo.algorithms.soo.nonconvex.ga import GA
+from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.factory import get_problem
-from pymoo.optimize import minimize
 
-from pymoo.util.running_metric import RunningMetric
+problem = get_problem("zdt1")
 
+algorithm = NSGA2(pop_size=100)
 
-class MyRunningMetric(RunningMetric):
+# prepare the algorithm to solve the specific problem (same arguments as for the minimize function)
+algorithm.setup(problem, ('n_gen', 10), seed=1, verbose=False)
 
-    def do(self, _, algorithm, force_plot=False, **kwargs):
-        ret = super().do(_, algorithm, force_plot, **kwargs)
+# until the algorithm has no terminated
+while algorithm.has_next():
+    # do the next iteration
+    algorithm.next()
 
-        if ret:
-            plt.savefig(f"test-{algorithm.n_gen}.png")
+    # do same more things, printing, logging, storing or even modifying the algorithm object
+    print(algorithm.n_gen, algorithm.evaluator.n_eval)
 
-        plt.close()
+# obtain the result objective from the algorithm
+res = algorithm.result()
 
-
-problem = get_problem("sphere")
-
-algorithm = GA(pop_size=100)
-
-res = minimize(problem,
-               algorithm,
-               ('n_gen', 20),
-               seed=1,
-               callback=MyRunningMetric(5, do_show=None, do_close=False, key_press=False),
-               save_history=True,
-               verbose=True)
+# calculate a hash to show that all executions end with the same result
+print("hash", res.F.sum())

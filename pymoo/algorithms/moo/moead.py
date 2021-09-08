@@ -2,10 +2,10 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
-from pymoo.docs import parse_doc_string
 from pymoo.core.duplicate import NoDuplicateElimination
 from pymoo.core.population import Population
 from pymoo.core.selection import Selection
+from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
 from pymoo.operators.mutation.pm import PolynomialMutation
 from pymoo.operators.sampling.rnd import FloatRandomSampling
@@ -172,8 +172,7 @@ class ParallelMOEAD(MOEAD):
         return off
 
     def _advance(self, infills=None, **kwargs):
-        assert len(self.indices) == len(
-            infills), "Number of infill solutions must be equal to the one created beforehand."
+        assert len(self.indices) == len(infills), "Number of infills must be equal to the one created beforehand."
 
         # update the ideal point before starting to replace
         self.ideal = np.min(np.vstack([self.ideal, infills.get("F")]), axis=0)
