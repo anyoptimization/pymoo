@@ -23,7 +23,8 @@ class LocalSearch(Algorithm):
             self.n_sample_points = self.problem.n_var * 5
 
     def _initialize(self, **kwargs):
-        super()._initialize(**kwargs)
+        # super call is not is not needed, because super()._initialize is abstract
+        #super()._initialize(**kwargs)
 
         # no initial point is provided - sample in bounds and take the best
         if self.x0 is None:
@@ -35,6 +36,7 @@ class LocalSearch(Algorithm):
             self.pop = pop_from_array_or_individual(self.x0)
 
         self.evaluator.eval(self.problem, self.pop, algorithm=self)
-        self._set_optimum()
-        if self.opt is not None and len(self.opt) > 0:
-            self.x0 = self.opt[0]
+        self.x0 = self.opt[0]
+        # below is not needed, self._get_optimum always return at least 1 opt
+        # if opt is not None and len(opt) > 0:
+        #     self.x0 = opt[0]

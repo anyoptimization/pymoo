@@ -368,9 +368,6 @@ class ACO(Algorithm):
         self.pop, self.off = colony, colony
         self.opt = opt
 
-    def _set_optimum(self, **kwargs):
-        pass
-
 
 parse_doc_string(ACO.__init__)
 

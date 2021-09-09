@@ -104,11 +104,10 @@ class NSGA2(GeneticAlgorithm):
 
         self.tournament_type = 'comp_by_dom_and_crowding'
 
-    def _set_optimum(self, **kwargs):
+    def _get_optimum(self, **kwargs):
         if not has_feasible(self.pop):
-            self.opt = self.pop[[np.argmin(self.pop.get("CV"))]]
-        else:
-            self.opt = self.pop[self.pop.get("rank") == 0]
+            return self.pop[[np.argmin(self.pop.get("CV"))]]
+        return self.pop[self.pop.get("rank") == 0]
 
 
 # ---------------------------------------------------------------------------------------------------------

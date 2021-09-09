@@ -176,11 +176,10 @@ class CTAEA(GeneticAlgorithm):
         # the do survival selection
         self.pop, self.da = self.survival.do(self.problem, self.pop, self.da, self.pop_size, algorithm=self)
 
-    def _set_optimum(self, **kwargs):
+    def _get_optimum(self, **kwargs):
         if not has_feasible(self.pop):
-            self.opt = self.pop[[np.argmin(self.pop.get("CV"))]]
-        else:
-            self.opt = self.survival.opt
+            return self.pop[[np.argmin(self.pop.get("CV"))]]
+        return self.survival.opt
 
 
 class CADASurvival:

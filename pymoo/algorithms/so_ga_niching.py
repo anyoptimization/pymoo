@@ -202,8 +202,8 @@ class NicheGA(GA):
         # self.default_termination = NicheTermination()
         self.default_termination = SingleObjectiveDefaultTermination()
 
-    def _set_optimum(self, **kwargs):
-        self.opt = self.pop[self.pop.get("iter") == 1]
+    def _get_optimum(self, **kwargs):
+        return self.pop[self.pop.get("iter") == 1]
 
 
 parse_doc_string(NicheGA.__init__)

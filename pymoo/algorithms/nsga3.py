@@ -108,11 +108,10 @@ class NSGA3(GeneticAlgorithm):
 
         return super()._solve(problem)
 
-    def _set_optimum(self, **kwargs):
+    def _get_optimum(self, **kwargs):
         if not has_feasible(self.pop):
-            self.opt = self.pop[[np.argmin(self.pop.get("CV"))]]
-        else:
-            self.opt = self.survival.opt
+            return self.pop[[np.argmin(self.pop.get("CV"))]]
+        return self.survival.opt
 
 
 class ReferenceDirectionSurvival(Survival):

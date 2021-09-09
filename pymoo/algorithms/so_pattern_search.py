@@ -115,7 +115,6 @@ class PatternSearch(LocalSearch):
                 break
 
             # else also check if we are terminating - otherwise this loop might run far too long
-            self._set_optimum()
             if not self.termination.do_continue(self):
                 break
 

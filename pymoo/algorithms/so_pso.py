@@ -296,9 +296,9 @@ class PSO(Algorithm):
         self.c2 = c2
         self.w = w
 
-    def _set_optimum(self, force=False):
+    def _get_optimum(self, force=False):
         pbest = Population.create(*self.pop.get("pbest"))
-        self.opt = filter_optimum(pbest, least_infeasible=True)
+        return filter_optimum(pbest, least_infeasible=True)
 
 
 # =========================================================================================================
