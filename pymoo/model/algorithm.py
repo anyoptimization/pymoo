@@ -111,8 +111,8 @@ class Algorithm:
         self.history = None
         # the current solutions stored - here considered as population
         self.pop = None
-        # the optimum found by the algorithm
-        self.opt = None
+        # to use in property opt and setter below
+        self.__opt = None
         # can be used to store additional data in submodules
         self.data = {}
         # if the initialized method has been called before or not
@@ -202,7 +202,7 @@ class Algorithm:
         # set the attribute for the optimization method to start
         self.n_gen = 1
         self.has_terminated = False
-        self.pop, self.opt = Population(), None
+        self.pop = Population()
 
         # if the history is supposed to be saved
         if self.save_history:
@@ -246,9 +246,6 @@ class Algorithm:
             self._next()
             self.n_gen += 1
 
-        # set the optimum - only done if the algorithm did not do it yet
-        self._set_optimum()
-
         # set whether the algorithm is terminated or not
         self.has_terminated = not self.termination.do_continue(self)
 
@@ -291,7 +288,7 @@ class Algorithm:
 
         # otherwise get the values from the population
         else:
-            X, F, CV, G = self.opt.get("X", "F", "CV", "G")
+            X, F, CV, G = opt.get("X", "F", "CV", "G")
 
             # if single-objective problem and only one solution was found - create a 1d array
             if self.problem.n_obj == 1 and len(X) == 1:
@@ -343,12 +340,6 @@ class Algorithm:
             self.history, self.callback = _hist, _callback
             self.history.append(obj)
 
-    def _set_optimum(self, force=False):
-        pop = self.pop
-        # if self.opt is not None:
-        #     pop = Population.merge(pop, self.opt)
-        self.opt = filter_optimum(pop, least_infeasible=True)
-
     @abstractmethod
     def _initialize(self):
         pass
@@ -360,6 +351,17 @@ class Algorithm:
     def _finalize(self):
         pass
 
+    def _get_optimum(self):
+        pop = self.pop
+        return filter_optimum(pop, least_infeasible=True)
+
+    @property
+    def opt(self):
+        return self.__opt or self._get_optimum()
+
+    @opt.setter
+    def opt(self, value):
+        self.__opt = value
 
 def filter_optimum(pop, least_infeasible=False):
     # first only choose feasible solutions
