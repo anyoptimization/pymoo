@@ -1,7 +1,7 @@
 import autograd.numpy as anp
 
-from pymoo.problems.util import load_pareto_front_from_file
 from pymoo.core.problem import Problem
+from pymoo.util.remote import Remote
 
 
 class Kursawe(Problem):
@@ -19,4 +19,7 @@ class Kursawe(Problem):
         out["F"] = anp.column_stack([f1, f2])
 
     def _calc_pareto_front(self, *args, **kwargs):
-        return load_pareto_front_from_file("kursawe.pf")
+        return Remote.get_instance().load("pf", "kursawe.pf")
+
+
+

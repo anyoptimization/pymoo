@@ -1,12 +1,9 @@
-import os
-
 import numpy as np
 
 from pymoo.core.problem import Problem
-
 # Based on the C++ implementation by the Ma and Wang
 # http://www.escience.cn/people/yongwang1/index.html
-from pymoo.problems.util import load_pareto_front_from_file
+from pymoo.util.remote import Remote
 
 
 class MW(Problem):
@@ -181,7 +178,7 @@ class MW5(MW):
         out["G"] = np.column_stack([g0, g1, g2])
 
     def _calc_pareto_front(self, **kwargs):
-        return load_pareto_front_from_file(os.path.join("MW", "MW5.pf"))
+        return Remote.get_instance().load("pf", "MW", "MW5.pf")
 
 
 class MW6(MW):
@@ -232,7 +229,7 @@ class MW7(MW):
         out["G"] = np.column_stack([g0, g1])
 
     def _calc_pareto_front(self, **kwargs):
-        return load_pareto_front_from_file(os.path.join("MW", "MW7.pf"))
+        return Remote.get_instance().load("pf", "MW", "MW7.pf")
 
 
 class MW8(MW):
@@ -277,7 +274,7 @@ class MW9(MW):
         out["G"] = g0.reshape((-1, 1))
 
     def _calc_pareto_front(self, **kwargs):
-        return load_pareto_front_from_file(os.path.join("MW", "MW9.pf"))
+        return Remote.get_instance().load("pf", "MW", "MW9.pf")
 
 
 class MW10(MW):
@@ -296,7 +293,7 @@ class MW10(MW):
         out["G"] = np.column_stack([g0, g1, g2])
 
     def _calc_pareto_front(self, **kwargs):
-        return load_pareto_front_from_file(os.path.join("MW", "MW10.pf"))
+        return Remote.get_instance().load("pf", "MW", "MW10.pf")
 
 
 class MW11(MW):
@@ -316,7 +313,7 @@ class MW11(MW):
         out["G"] = np.column_stack([g0, g1, g2, g3])
 
     def _calc_pareto_front(self, **kwargs):
-        return load_pareto_front_from_file(os.path.join("MW", "MW11.pf"))
+        return Remote.get_instance().load("pf", "MW", "MW11.pf")
 
 
 class MW12(MW):
@@ -370,7 +367,7 @@ class MW13(MW):
         out["G"] = np.column_stack([g0, g1])
 
     def _calc_pareto_front(self, **kwargs):
-        return load_pareto_front_from_file(os.path.join("MW", "MW13.pf"))
+        return Remote.get_instance().load("pf", "MW", "MW13.pf")
 
 
 class MW14(MW):
@@ -393,4 +390,4 @@ class MW14(MW):
         out["G"] = g0.reshape((-1, 1))
 
     def _calc_pareto_front(self, **kwargs):
-        return load_pareto_front_from_file(os.path.join("MW", "MW14.pf"))
+        return Remote.get_instance().load("pf", "MW", "MW14.pf")

@@ -1,8 +1,8 @@
 import autograd.numpy as anp
 
 from pymoo.core.problem import Problem
-from pymoo.problems.util import load_pareto_front_from_file
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
+from pymoo.util.remote import Remote
 
 
 class DTLZ(Problem):
@@ -119,7 +119,7 @@ class DTLZ5(DTLZ):
 
     def _calc_pareto_front(self):
         if self.n_obj == 3:
-            return load_pareto_front_from_file("dtlz5-3d.pf")
+            return Remote.get_instance().load("pf", "dtlz5-3d.pf")
         else:
             raise Exception("Not implemented yet.")
 
@@ -139,7 +139,7 @@ class DTLZ6(DTLZ):
 
     def _calc_pareto_front(self):
         if self.n_obj == 3:
-            return load_pareto_front_from_file("dtlz6-3d.pf")
+            return Remote.get_instance().load("pf", "dtlz6-3d.pf")
         else:
             raise Exception("Not implemented yet.")
 
@@ -159,7 +159,7 @@ class DTLZ7(DTLZ):
 
     def _calc_pareto_front(self):
         if self.n_obj == 3:
-            return load_pareto_front_from_file("dtlz7-3d.pf")
+            return Remote.get_instance().load("pf", "dtlz7-3d.pf")
         else:
             raise Exception("Not implemented yet.")
 

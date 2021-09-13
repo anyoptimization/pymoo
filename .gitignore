@@ -17,6 +17,10 @@ tests/!archive/*
 tests/!archive_tests/*
 tests/!experimental/*
 
+pymoo/cache/
+pymoo/cache/*
+
+
 benchmark/runs/*
 
 # any video or other output file

@@ -1,7 +1,7 @@
 import autograd.numpy as anp
 
 from pymoo.core.problem import Problem
-from pymoo.problems.util import load_pareto_front_from_file
+from pymoo.util.remote import Remote
 
 
 class OSY(Problem):
@@ -12,7 +12,7 @@ class OSY(Problem):
 
     def _evaluate(self, x, out, *args, **kwargs):
         f1 = - (25 * (x[:, 0] - 2) ** 2 + (x[:, 1] - 2) ** 2 + (x[:, 2] - 1) ** 2 + (x[:, 3] - 4) ** 2 + (
-                    x[:, 4] - 1) ** 2)
+                x[:, 4] - 1) ** 2)
         f2 = anp.sum(anp.square(x), axis=1)
 
         g1 = (x[:, 0] + x[:, 1] - 2.0) / 2.0
@@ -28,4 +28,4 @@ class OSY(Problem):
         out["G"] = - out["G"]
 
     def _calc_pareto_front(self):
-        return load_pareto_front_from_file("osy.pf")
+        return Remote.get_instance().load("pf", "osy.pf")

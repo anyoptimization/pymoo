@@ -10,7 +10,7 @@ class AnimationCallback(Callback):
                  do_close=True,
                  nth_gen=1,
                  dpi=None,
-                 video=None,
+                 recorder=None,
                  fname=None,
                  exception_if_not_applicable=True):
 
@@ -20,16 +20,15 @@ class AnimationCallback(Callback):
         self.do_close = do_close
         self.exception_if_not_applicable = exception_if_not_applicable
 
-        self.video = video
-        if self.video is None and fname is not None:
+        self.recorder = recorder
+        if self.recorder is None and fname is not None:
             try:
-                from pyrecorder.recorders.file import File
-                from pyrecorder.video import Video
+                from pyrecorder.recorder import Recorder
+                from pyrecorder.writers.video import Video
                 from pyrecorder.converters.matplotlib import Matplotlib
+                self.recorder = Recorder(Video(fname), converter=Matplotlib(dpi=dpi))
             except:
-                raise Exception("Please install pyrecorder for animation support: pip install pyrecorder")
-
-            self.video = Video(File(fname), converter=Matplotlib(dpi=dpi))
+                raise Exception("Please install or update pyrecorder for animation support: pip install -U pyrecorder")
 
     def notify(self, algorithm, **kwargs):
         if algorithm.n_gen == 1 or algorithm.n_gen % self.nth_gen == 0:
@@ -43,8 +42,8 @@ class AnimationCallback(Callback):
                     else:
                         plt.show()
 
-                if self.video is not None:
-                    self.video.record(fig=figure)
+                if self.recorder is not None:
+                    self.recorder.record(fig=figure)
 
                 if self.do_close:
                     plt.close(fig=figure)

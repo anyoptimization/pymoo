@@ -1,9 +1,7 @@
-import os
-
 import numpy as np
 
 from pymoo.core.problem import Problem
-from pymoo.problems.util import load_pareto_front_from_file
+from pymoo.util.remote import Remote
 
 DIFFICULTIES = [
     (0.25, 0., 0.), (0., 0.25, 0.), (0., 0., 0.25), (0.25, 0.25, 0.25),
@@ -46,8 +44,7 @@ class DASCMOP(Problem):
         return contrib.sum(axis=1)[:, None]
 
     def _calc_pareto_front(self, *args, **kwargs):
-        fname = f"{str(self.__class__.__name__).lower()}_{self.difficulty}.pf"
-        return load_pareto_front_from_file(os.path.join("DASCMOP", fname))
+        return Remote.get_instance().load(f"pf", "DASCMOP", f"{str(self.__class__.__name__).lower()}_{self.difficulty}.pf")
 
 
 class DASCMOP1(DASCMOP):

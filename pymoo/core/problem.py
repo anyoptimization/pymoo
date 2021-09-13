@@ -2,6 +2,7 @@ from abc import abstractmethod
 
 import autograd.numpy as np
 
+from pymoo.util.cache import Cache
 from pymoo.util.misc import at_least_2d_array
 
 
@@ -90,9 +91,14 @@ class Problem:
         # attribute which are excluded from being serialized )
         self.exclude_from_serialization = exclude_from_serialization if exclude_from_serialization is not None else []
 
-        # the pareto set and front will be calculated only once and is stored here
-        self._pareto_front = None
-        self._pareto_set = None
+        # the loader for the pareto set (ps)
+        def calc_ps(*args, **kwargs): return at_least_2d_array(self._calc_pareto_set(*args, **kwargs))
+        self._pareto_set = Cache(calc_ps, raise_exception=False)
+
+        # the loader for the pareto front (pf)
+        def calc_pf(*args, **kwargs): return at_least_2d_array(self._calc_pareto_front(*args, **kwargs))
+        self._pareto_front = Cache(calc_pf, raise_exception=False)
+
         self._ideal_point, self._nadir_point = None, None
 
     def evaluate(self,
@@ -166,17 +172,10 @@ class Problem:
             which is equal to the ideal point.
 
         """
-        # if the ideal point has not been calculated yet
         if self._nadir_point is None:
-
-            # calculate the pareto front if not happened yet
-            if self._pareto_front is None:
-                self.pareto_front()
-
-            # if already done or it was successful - calculate the ideal point
-            if self._pareto_front is not None:
-                self._nadir_point = np.max(self._pareto_front, axis=0)
-
+            pf = self.pareto_front()
+            if pf is not None:
+                self._nadir_point = np.max(pf, axis=0)
         return self._nadir_point
 
     def ideal_point(self):
@@ -186,71 +185,17 @@ class Problem:
         ideal_point : np.array
             The ideal point for a multi-objective problem. If single-objective it returns the best possible solution.
         """
-
-        # if the ideal point has not been calculated yet
         if self._ideal_point is None:
-
-            # calculate the pareto front if not happened yet
-            if self._pareto_front is None:
-                self.pareto_front()
-
-            # if already done or it was successful - calculate the ideal point
-            if self._pareto_front is not None:
-                self._ideal_point = np.min(self._pareto_front, axis=0)
-
+            pf = self.pareto_front()
+            if pf is not None:
+                self._ideal_point = np.min(pf, axis=0)
         return self._ideal_point
 
-    def pareto_front(self, *args, use_cache=True, exception_if_failing=False, **kwargs):
-        """
-        Parameters
-        ----------
+    def pareto_front(self, *args, **kwargs):
+        return self._pareto_front.exec(*args, **kwargs)
 
-        args : Same problem implementation need some more information to create the Pareto front. For instance
-                the DTLZ problem suite generates the Pareto front by examples of the reference directions.
-                We refer to the corresponding problem for more information.
-        exception_if_failing : bool
-                Whether to throw an exception when generating the Pareto front has failed.
-        use_cache : bool
-                Whether to use the cache if the Pareto front has been generated beforehand.
-
-        Returns
-        -------
-        P : np.array
-            The Pareto front of a given problem. It is only loaded or calculate the first time and then cached.
-            For a single-objective problem only one point is returned but still in a two dimensional array.
-
-        """
-        if not use_cache or self._pareto_front is None:
-            try:
-                pf = self._calc_pareto_front(*args, **kwargs)
-                if pf is not None:
-                    pf = at_least_2d_array(pf)
-
-                self._pareto_front = pf
-            except Exception as e:
-                if exception_if_failing:
-                    raise e
-
-        return self._pareto_front
-
-    def pareto_set(self, *args, use_cache=True, exception_if_failing=False, **kwargs):
-        """
-        Returns
-        -------
-        S : np.array
-            Returns the pareto set for a problem. Points in the X space to be known to be optimal!
-        """
-        if not use_cache or self._pareto_set is None:
-            try:
-                ps = self._calc_pareto_set(*args, **kwargs)
-                if ps is not None:
-                    ps = at_least_2d_array(ps)
-                self._pareto_set = ps
-            except Exception as e:
-                if exception_if_failing:
-                    raise e
-
-        return self._pareto_set
+    def pareto_set(self, *args, **kwargs):
+        return self._pareto_set.exec(*args, **kwargs)
 
     @abstractmethod
     def _evaluate(self, x, out, *args, **kwargs):
@@ -269,16 +214,6 @@ class Problem:
         return self.__class__.__name__
 
     def _calc_pareto_front(self, *args, **kwargs):
-        """
-        Method that either loads or calculates the pareto front. This is only done
-        ones and the pareto front is stored.
-
-        Returns
-        -------
-        pf : np.ndarray
-            Pareto front as array.
-
-        """
         pass
 
     def _calc_pareto_set(self, *args, **kwargs):
