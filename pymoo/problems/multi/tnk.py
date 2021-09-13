@@ -1,7 +1,7 @@
 import autograd.numpy as anp
 
-from pymoo.problems.util import load_pareto_front_from_file
 from pymoo.core.problem import Problem
+from pymoo.util.remote import Remote
 
 
 class TNK(Problem):
@@ -20,4 +20,4 @@ class TNK(Problem):
         out["G"] = anp.column_stack([g1, g2])
 
     def _calc_pareto_front(self, *args, **kwargs):
-        return load_pareto_front_from_file("tnk.pf")
+        return Remote.get_instance().load("pf", "tnk.pf")

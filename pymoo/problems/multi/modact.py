@@ -4,6 +4,7 @@ import numpy as np
 
 from pymoo.core.problem import Problem
 from pymoo.problems.util import load_pareto_front_from_file
+from pymoo.util.remote import Remote
 
 
 class MODAct(Problem):
@@ -56,8 +57,6 @@ class MODAct(Problem):
         out["G"] = np.array(g)*self.c_weights
 
     def _calc_pareto_front(self, *args, **kwargs):
-        """Loads the corresponding PF if it exists"""
-        fname = f"{self.fct.name}_PF.dat"
-        F = load_pareto_front_from_file(os.path.join("modact", fname))
+        F = Remote.get_instance().load("modact", f"{self.fct.name}.pf")
         if F is not None:
             return F*self.weights*-1

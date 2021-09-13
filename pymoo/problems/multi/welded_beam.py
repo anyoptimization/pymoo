@@ -1,7 +1,7 @@
 import autograd.numpy as anp
 
 from pymoo.core.problem import Problem
-from pymoo.problems.util import load_pareto_front_from_file
+from pymoo.util.remote import Remote
 
 
 class WeldedBeam(Problem):
@@ -37,4 +37,4 @@ class WeldedBeam(Problem):
         out["G"] = anp.column_stack([g1, g2, g3, g4])
 
     def _calc_pareto_front(self):
-        return load_pareto_front_from_file("welded_beam.pf")
+        return Remote.get_instance().load("pf", "welded_beam.pf")

@@ -1,9 +1,7 @@
-import os
-
 import autograd.numpy as anp
 
 from pymoo.core.problem import Problem
-from pymoo.problems.util import load_pareto_front_from_file
+from pymoo.util.remote import Remote
 
 
 def g_linear(x):
@@ -60,8 +58,7 @@ class CTP(Problem):
         return val
 
     def _calc_pareto_front(self, *args, **kwargs):
-        fname = f"{str(self.__class__.__name__).lower()}.pf"
-        return load_pareto_front_from_file(os.path.join("CTP", fname))
+        return Remote.get_instance().load(f"pf", "CTP", str(self.__class__.__name__).lower() + ".pf")
 
 
 class CTP1(CTP):
