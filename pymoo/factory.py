@@ -1,6 +1,6 @@
 import re
 
-from pymoo.configuration import Configuration
+from pymoo.config import Config
 from pymoo.problems.many import *
 from pymoo.problems.multi import *
 from pymoo.problems.single import *
@@ -516,7 +516,7 @@ def options_to_string(l):
     return ", ".join(["'%s'" % k[0] for k in l])
 
 
-if Configuration.parse_custom_docs:
+if Config.parse_custom_docs:
     from pymoo.docs import parse_doc_string
 
     from pymoo.factory import get_algorithm_options, get_selection_options, get_crossover_options, \

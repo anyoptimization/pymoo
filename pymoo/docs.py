@@ -2,7 +2,7 @@
 
 import inspect
 import re
-from pymoo.configuration import Configuration
+from pymoo.config import Config
 
 # =========================================================================================================
 # Docstrings Dictionary
@@ -146,7 +146,7 @@ docs = {**algorithms, **visualization}
 # =========================================================================================================
 
 def parse_doc_string(source, dest=None, other={}):
-    if not Configuration.parse_custom_docs:
+    if not Config.parse_custom_docs:
         return
 
     if dest is None:
