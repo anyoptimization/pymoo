@@ -1,10 +1,6 @@
-import os
-
 import numpy as np
 
 from pymoo.core.problem import Problem
-from pymoo.problems.util import load_pareto_front_from_file
-from pymoo.util.remote import Remote
 
 
 class MODAct(Problem):
@@ -27,7 +23,7 @@ class MODAct(Problem):
     C. Picard and J. Schiffmann, “Realistic Constrained Multi-Objective Optimization Benchmark Problems from Design,”
     IEEE Transactions on Evolutionary Computation, pp. 1–1, 2020.
     """
-    def __init__(self, function, **kwargs):
+    def __init__(self, function, pf=None, **kwargs):
         try:
             import modact.problems as pb
         except:
@@ -46,6 +42,7 @@ class MODAct(Problem):
 
         self.weights = np.array(self.fct.weights)
         self.c_weights = np.array(self.fct.c_weights)
+        self.pf = pf
 
         super().__init__(n_var=n_var, n_obj=n_obj, n_constr=n_constr, xl=xl,
                          xu=xu, elementwise_evaluation=True, type_var=np.double,
@@ -57,6 +54,8 @@ class MODAct(Problem):
         out["G"] = np.array(g)*self.c_weights
 
     def _calc_pareto_front(self, *args, **kwargs):
-        F = Remote.get_instance().load("modact", f"{self.fct.name}.pf")
-        if F is not None:
-            return F*self.weights*-1
+        # download the pf files from https://zenodo.org/record/3824302#.YUCfJS2z2JA
+        # then pass the path to it to the constructor of the problem
+        # they are not included because of their size >700 MB
+        return np.loadtxt(self.pf)
+

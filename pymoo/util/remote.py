@@ -1,14 +1,14 @@
 import os
 import urllib.request
 from os.path import join, dirname, abspath
-from urllib.parse import urljoin
 
 import numpy as np
 
-from pymoo.configuration import Configuration
+from pymoo.config import Config
 
 
 class Remote:
+
     # -------------------------------------------------
     # Singleton Pattern
     # -------------------------------------------------
@@ -17,7 +17,7 @@ class Remote:
     @staticmethod
     def get_instance():
         if Remote.__instance is None:
-            server = Configuration.server
+            server = Config.data()
             folder = join(dirname(dirname(abspath(__file__))), 'cache')
             Remote.__instance = Remote(server, folder)
         return Remote.__instance

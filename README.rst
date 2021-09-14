@@ -1,33 +1,30 @@
-.. |travis| image:: https://travis-ci.com/msu-coinlab/pymoo.svg?branch=master
-   :alt: build status
-   :target: https://travis-ci.com/msu-coinlab/pymoo
 
-.. |python| image:: https://img.shields.io/badge/python-3.6-blue.svg
-   :alt: python 3.6
+.. |python| image:: https://img.shields.io/badge/python-3.9-blue.svg
+   :alt: python 3.9
 
 .. |license| image:: https://img.shields.io/badge/license-apache-orange.svg
    :alt: license apache
    :target: https://www.apache.org/licenses/LICENSE-2.0
 
 
-.. |logo| image:: https://github.com/msu-coinlab/pymoo//raw/master/doc/source/_theme/custom_theme/static/img/pymoo_banner_github.png
+.. |logo| image:: https://github.com/anyoptimization/pymoo//raw/master/doc/source/_theme/custom_theme/static/img/pymoo_banner_github.png
   :target: https://pymoo.org
   :alt: pymoo
 
 
-.. |animation| image:: https://github.com/msu-coinlab/pymoo//raw/master/doc/source/_theme/custom_theme/static/img/animation.gif
+.. |animation| image:: https://github.com/anyoptimization/pymoo//raw/master/doc/source/_theme/custom_theme/static/img/animation.gif
   :target: https://pymoo.org
   :alt: pymoo
 
 
-.. _Github: https://github.com/msu-coinlab/pymoo
+.. _Github: https://github.com/anyoptimization/pymoo
 .. _Documentation: https://www.pymoo.org/
-.. _Paper: https://arxiv.org/abs/2002.04504
+.. _Paper: https://ieeexplore.ieee.org/document/9078759
 
 
 
 
-|travis| |python| |license|
+|python| |license|
 
 
 |logo|
@@ -63,7 +60,7 @@ For the current developer version:
 
 .. code:: bash
 
-    git clone https://github.com/msu-coinlab/pymoo
+    git clone https://github.com/anyoptimization/pymoo
     cd pymoo
     pip install .
 
@@ -88,7 +85,7 @@ However, for instance, executing NSGA2:
 .. code:: python
 
 
-    from pymoo.algorithms.nsga2 import NSGA2
+    from pymoo.algorithms.moo.nsga2 import NSGA2
     from pymoo.factory import get_problem
     from pymoo.optimize import minimize
     from pymoo.visualization.scatter import Scatter
@@ -101,7 +98,7 @@ However, for instance, executing NSGA2:
                    algorithm,
                    ('n_gen', 200),
                    seed=1,
-                   verbose=False)
+                   verbose=True)
 
     plot = Scatter()
     plot.add(problem.pareto_front(), plot_type="line", color="black", alpha=0.7)
@@ -116,28 +113,28 @@ A representative run of NSGA2 looks as follows:
 
 
 
-
 .. _Citation:
 
 Citation
 ********************************************************************************
 
-We are currently working on a journal publication for *pymoo*.
-Meanwhile, if you have used our framework for research purposes, please cite us with:
+If you have used our framework for research purposes, you can cite our publication by:
+
+| `J. Blank and K. Deb, pymoo: Multi-Objective Optimization in Python, in IEEE Access, vol. 8, pp. 89497-89509, 2020, doi: 10.1109/ACCESS.2020.2990567 <https://ieeexplore.ieee.org/document/9078759>`_
+|
+| BibTex:
 
 ::
 
     @ARTICLE{pymoo,
         author={J. {Blank} and K. {Deb}},
         journal={IEEE Access},
-        title={Pymoo: Multi-Objective Optimization in Python},
+        title={pymoo: Multi-Objective Optimization in Python},
         year={2020},
         volume={8},
         number={},
         pages={89497-89509},
     }
-
-
 
 .. _Contact:
 

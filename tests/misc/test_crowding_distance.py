@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from pymoo.algorithms.moo.nsga2 import calc_crowding_distance
-from pymoo.configuration import get_pymoo
+from pymoo.config import get_pymoo
 
 
 @pytest.mark.skip(reason="check if this is supposed to work or not at all")
