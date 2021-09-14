@@ -10,6 +10,7 @@ from pymoo.util.misc import at_least_2d_array
 # Implementation
 # ---------------------------------------------------------------------------------------------------------
 
+
 class Problem:
     def __init__(self,
                  n_var=-1,
@@ -92,11 +93,9 @@ class Problem:
         self.exclude_from_serialization = exclude_from_serialization if exclude_from_serialization is not None else []
 
         # the loader for the pareto set (ps)
-        def calc_ps(*args, **kwargs): return at_least_2d_array(self._calc_pareto_set(*args, **kwargs))
         self._pareto_set = Cache(calc_ps, raise_exception=False)
 
         # the loader for the pareto front (pf)
-        def calc_pf(*args, **kwargs): return at_least_2d_array(self._calc_pareto_front(*args, **kwargs))
         self._pareto_front = Cache(calc_pf, raise_exception=False)
 
         self._ideal_point, self._nadir_point = None, None
@@ -192,10 +191,10 @@ class Problem:
         return self._ideal_point
 
     def pareto_front(self, *args, **kwargs):
-        return self._pareto_front.exec(*args, **kwargs)
+        return self._pareto_front.exec(self, *args, **kwargs)
 
     def pareto_set(self, *args, **kwargs):
-        return self._pareto_set.exec(*args, **kwargs)
+        return self._pareto_set.exec(self, *args, **kwargs)
 
     @abstractmethod
     def _evaluate(self, x, out, *args, **kwargs):
@@ -239,6 +238,14 @@ class Problem:
             return state
         else:
             return self.__dict__
+
+
+def calc_ps(problem, *args, **kwargs):
+    return at_least_2d_array(problem._calc_pareto_set(*args, **kwargs))
+
+
+def calc_pf(problem, *args, **kwargs):
+    return at_least_2d_array(problem._calc_pareto_front(*args, **kwargs))
 
 
 # ---------------------------------------------------------------------------------------------------------
