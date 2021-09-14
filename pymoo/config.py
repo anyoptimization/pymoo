@@ -20,15 +20,13 @@ class Config:
 
     @classmethod
     def data(cls):
-        return "http://release.pymoo.org/_static/data/"
+        branch = "master"
+        if 'rc' in __version__:
+            branch = 'release'
+        elif 'dev' in __version__:
+            branch = 'develop'
 
-        # repo = "master"
-        # if 'rc' in __version__:
-        #     repo = 'release'
-        # elif 'dev' in __version__:
-        #     repo = 'develop'
-        #
-        # return f"https://raw.githubusercontent.com/anyoptimization/pymoo/{repo}/pymoo/data"
+        return f"https://raw.githubusercontent.com/anyoptimization/pymoo/{branch}/data/"
 
 
 # returns the directory to be used for imports

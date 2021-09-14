@@ -1,9 +1,10 @@
 import numpy as np
 
-from pymoo.core.problem import Problem
+from pymoo.core.problem import ElementwiseProblem
+from pymoo.util.remote import Remote
 
 
-class MODAct(Problem):
+class MODAct(ElementwiseProblem):
     """Multi-Objective Design of Actuators
 
     MODAct is a framework for real-world constrained multi-objective optimization.
@@ -23,39 +24,44 @@ class MODAct(Problem):
     C. Picard and J. Schiffmann, “Realistic Constrained Multi-Objective Optimization Benchmark Problems from Design,”
     IEEE Transactions on Evolutionary Computation, pp. 1–1, 2020.
     """
+
     def __init__(self, function, pf=None, **kwargs):
-        try:
-            import modact.problems as pb
-        except:
-            raise Exception("Please install the modact library: https://github.com/epfl-lamd/modact")
 
-        if isinstance(function, pb.Problem):
-            self.fct = function
-        else:
-            self.fct = pb.get_problem(function)
-        lb, ub = self.fct.bounds()
-        n_var = len(lb)
-        n_obj = len(self.fct.weights)
-        n_constr = len(self.fct.c_weights)
-        xl = lb
-        xu = ub
-
-        self.weights = np.array(self.fct.weights)
-        self.c_weights = np.array(self.fct.c_weights)
+        self.function = function
         self.pf = pf
 
-        super().__init__(n_var=n_var, n_obj=n_obj, n_constr=n_constr, xl=xl,
-                         xu=xu, elementwise_evaluation=True, type_var=np.double,
-                         **kwargs)
+        # try:
+        #     import modact.problems as pb
+        # except:
+        #     raise Exception("Please install the modact library: https://github.com/epfl-lamd/modact")
+        #
+        # if isinstance(function, pb.Problem):
+        #     self.fct = function
+        # else:
+        #     self.fct = pb.get_problem(function)
+        #
+        # lb, ub = self.fct.bounds()
+        # n_var = len(lb)
+        # n_obj = len(self.fct.weights)
+        # n_constr = len(self.fct.c_weights)
+        # xl = lb
+        # xu = ub
+        #
+        # self.weights = np.array(self.fct.weights)
+        # self.c_weights = np.array(self.fct.c_weights)
+        #
+        # super().__init__(n_var=n_var, n_obj=n_obj, n_constr=n_constr, xl=xl, xu=xu, type_var=np.double, **kwargs)
+
+        super().__init__()
 
     def _evaluate(self, x, out, *args, **kwargs):
         f, g = self.fct(x)
-        out["F"] = np.array(f)*-1*self.weights
-        out["G"] = np.array(g)*self.c_weights
+        out["F"] = np.array(f) * -1 * self.weights
+        out["G"] = np.array(g) * self.c_weights
 
     def _calc_pareto_front(self, *args, **kwargs):
-        # download the pf files from https://zenodo.org/record/3824302#.YUCfJS2z2JA
-        # then pass the path to it to the constructor of the problem
-        # they are not included because of their size >700 MB
-        return np.loadtxt(self.pf)
-
+        # allows to provide a custom pf - because of the size of files published by the author
+        if self.pf is None:
+            return Remote.get_instance().load("pf", "MODACT", f"{self.function}.pf")
+        else:
+            return self.pf
