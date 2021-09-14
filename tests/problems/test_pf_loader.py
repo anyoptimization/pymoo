@@ -49,4 +49,4 @@ def test_load_remote_dtlz6():
 def test_load_remote_ctp():
     problem = CTP1()
     pf = problem.pareto_front()
-    assert len(pf) == 200
+    assert len(pf) == 1000
