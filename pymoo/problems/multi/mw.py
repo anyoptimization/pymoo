@@ -7,14 +7,14 @@ from pymoo.util.remote import Remote
 
 
 class MW(Problem):
-    def __init__(self, n_var, n_obj, n_constr, **kwargs):
+    def __init__(self, n_var, n_obj, n_ieq_constr, **kwargs):
         if 'xl' not in kwargs:
             kwargs['xl'] = 0
         if 'xu' not in kwargs:
             kwargs['xu'] = 1
         super().__init__(n_var=n_var,
                          n_obj=n_obj,
-                         n_constr=n_constr,
+                         n_ieq_constr=n_ieq_constr,
                          type_var=np.double, **kwargs)
 
     @staticmethod

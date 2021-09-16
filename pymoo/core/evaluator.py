@@ -2,26 +2,6 @@ import numpy as np
 
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population
-from pymoo.core.problem import Problem
-from pymoo.util.misc import at_least_2d_array
-
-
-def set_feasibility(pop):
-    for ind in pop:
-        cv = ind.get("CV")
-        if cv is not None:
-            ind.feasible = cv <= 0
-
-
-def set_cv(pop, feasbility=True):
-    for ind in pop:
-        if ind.G is None:
-            ind.CV = np.zeros(1)
-        else:
-            ind.CV = Problem.calc_constraint_violation(at_least_2d_array(ind.G))[0]
-
-    if feasbility:
-        set_feasibility(pop)
 
 
 class Evaluator:
@@ -34,7 +14,7 @@ class Evaluator:
 
     def __init__(self,
                  skip_already_evaluated=True,
-                 evaluate_values_of=["F", "CV", "G"]):
+                 evaluate_values_of=["F", "G", "H"]):
         self.n_eval = 0
         self.evaluate_values_of = evaluate_values_of
         self.skip_already_evaluated = skip_already_evaluated
@@ -61,7 +41,7 @@ class Evaluator:
         """
 
         if evaluate_values_of is None:
-            evaluate_values_of = ["F", "G", "CV", "feasible"]
+            evaluate_values_of = self.evaluate_values_of
 
         is_individual = isinstance(pop, Individual)
         is_numpy_array = isinstance(pop, np.ndarray) and not isinstance(pop, Population)
@@ -93,9 +73,6 @@ class Evaluator:
         # actually evaluate all solutions using the function that can be overwritten
         if len(I) > 0:
             self._eval(problem, pop[I], evaluate_values_of=evaluate_values_of, **kwargs)
-
-            # set the feasibility attribute if cv exists
-            set_feasibility(pop[I])
 
         if is_individual:
             return pop[0]
@@ -136,6 +113,7 @@ class VoidEvaluator(Evaluator):
             for individual in pop:
                 if individual.F is None:
                     individual.F = np.full(problem.n_obj, val)
-                    individual.G = np.full(problem.n_constr, val) if problem.has_constraints() else None
+                    individual.G = np.full(problem.n_ieq_constr, val) if problem.n_ieq_constr > 0 else None
+                    individual.H = np.full(problem.n_eq_constr, val) if problem.n_eq_constr else None
                     individual.CV = [-np.inf]
                     individual.feasible = [False]

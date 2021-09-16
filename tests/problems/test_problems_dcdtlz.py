@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 
+from pymoo.core.problem import ieq_cv
 from pymoo.factory import get_problem
 from tests.problems.test_correctness import load
 
@@ -12,7 +13,8 @@ def test_problems(name):
     problem = get_problem(name)
 
     X, F, CV = load(name.upper())
-    _F, _CV, _G = problem.evaluate(X, return_values_of=["F", "CV", "G"])
+    _F, _G = problem.evaluate(X, return_values_of=["F", "G"])
+    _CV = ieq_cv(_G)
 
     if _G.shape[1] > 1:
         # We need to do a special CV calculation to test for correctness since

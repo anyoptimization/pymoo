@@ -15,7 +15,8 @@ class Problem:
     def __init__(self,
                  n_var=-1,
                  n_obj=1,
-                 n_constr=0,
+                 n_ieq_constr=0,
+                 n_eq_constr=0,
                  xl=None,
                  xu=None,
                  check_inconsistencies=True,
@@ -34,8 +35,11 @@ class Problem:
         n_obj : int
             Number of Objectives
 
-        n_constr : int
-            Number of Constraints
+        n_ieq_constr : int
+            Number of Inequality Constraints
+
+        n_eq_constr : int
+            Number of Equality Constraints
 
         xl : np.array, float, int
             Lower bounds for the variables. if integer all lower bounds are equal.
@@ -58,8 +62,11 @@ class Problem:
         # number of objectives
         self.n_obj = n_obj
 
-        # number of constraints
-        self.n_constr = n_constr
+        # number of inequality constraints
+        self.n_ieq_constr = n_ieq_constr if "n_constr" not in kwargs else max(n_ieq_constr, kwargs["n_constr"])
+
+        # number of equality constraints
+        self.n_eq_constr = n_eq_constr
 
         # type of the variable to be evaluated
         self.data = dict(**kwargs)
@@ -111,9 +118,6 @@ class Problem:
         X, only_single_value = at_least_2d_array(X, extend_as="row", return_if_reshaped=True)
         assert X.shape[1] == self.n_var, f'Input dimension {X.shape[1]} are not equal to n_var {self.n_var}!'
 
-        # number of function evaluations to be done
-        n_evals = X.shape[0]
-
         # the values to be actually returned by in the end - set bu default if not providded
         ret_vals = default_return_values(self.has_constraints()) if return_values_of is None else return_values_of
 
@@ -135,12 +139,7 @@ class Problem:
             replace_nan_values(out, self.replace_nan_values_by)
 
         # make sure F and G are in fact floats (at least try to do that, no exception will be through if it fails)
-        out_to_float(out, ["F", "G"])
-
-        if "CV" in ret_vals or "feasible" in ret_vals:
-            CV = calc_constr(out["G"]) if self.has_constraints() else np.zeros([n_evals, 1])
-            out["CV"] = CV
-            out["feasible"] = CV <= 0
+        out_to_float(out, ["F", "G", "H"])
 
         # in case the input had only one dimension, then remove always the first dimension from each output
         if only_single_value:
@@ -196,6 +195,10 @@ class Problem:
     def pareto_set(self, *args, **kwargs):
         return self._pareto_set.exec(self, *args, **kwargs)
 
+    @property
+    def n_constr(self):
+        return self.n_ieq_constr + self.n_eq_constr
+
     @abstractmethod
     def _evaluate(self, x, out, *args, **kwargs):
         pass
@@ -220,13 +223,14 @@ class Problem:
 
     @staticmethod
     def calc_constraint_violation(G):
-        return calc_constr(G)
+        return calc_ieq_cv(G)
 
     def __str__(self):
         s = "# name: %s\n" % self.name()
         s += "# n_var: %s\n" % self.n_var
         s += "# n_obj: %s\n" % self.n_obj
-        s += "# n_constr: %s\n" % self.n_constr
+        s += "# n_ieq_constr: %s\n" % self.n_ieq_constr
+        s += "# n_eq_constr: %s\n" % self.n_eq_constr
         return s
 
     def __getstate__(self):
@@ -389,31 +393,49 @@ def out_to_float(out, keys):
                 pass
 
 
-def calc_constr(G, beta=None, eps=0.0):
-
-    # if G is completely none just return none too - nothing can be inferred
-    if G is None:
-        return None
-
-    # if the array is empty just return all zeros indicating all are feasible
-    elif G.ndim == 1 or G.shape[1] == 0:
-        cv = np.zeros((len(G), 1))
-        return cv
+def calc_ieq_cv(g, beta=None, eps=0.0):
+    if g is None:
+        return 0.0
 
     else:
 
-        # all values solutions with G less than eps are considered as feasible - 0.0 by default
-        G = np.copy(G)
-        G[G <= eps] = 0.0
+        # zero out all values less than eps  - they are not counted as violations
+        g = g * (g > eps).astype(int)
 
         # sometimes it could be useful to square the constraints for instance and transform the function
         if beta is not None:
-            G = (G ** beta)
+            g = (g ** beta)
 
         # finally sum up the constraints for each solution
-        cv = G.sum(axis=1, keepdims=True)
+        cv = g.sum()
 
         return cv
+
+
+def ieq_cv(G, **kwargs):
+    return np.array([calc_ieq_cv(g, **kwargs) for g in G])[:, None]
+
+
+def calc_eq_cv(h, eps=1e-6):
+    if h is None:
+        return 0.0
+
+    else:
+
+        # check the absolute values
+        _h = np.abs(h)
+
+        # only count the ones bigger than eps
+        _h = _h * (_h > eps).astype(int)
+
+        # finally sum up the constraints for each solution
+        cv = _h.sum()
+
+        return cv
+
+
+def eq_cv(H, **kwargs):
+    return np.array([calc_eq_cv(h, **kwargs) for h in H])[:, None]
 
 
 def replace_nan_values(out, by=np.inf):

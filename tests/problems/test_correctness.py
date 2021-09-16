@@ -1,9 +1,10 @@
+import os
+
 import autograd.numpy as anp
 import pytest
 
+from pymoo.core.problem import ieq_cv
 from pymoo.factory import get_problem
-import os
-
 from tests.util import path_to_test_resource
 
 problems = [
@@ -13,8 +14,6 @@ problems = [
     ('ZDT1', [10]), ('ZDT2', [10]), ('ZDT3', [10]), ('ZDT4', [10]), ('ZDT6', [10]),
     ('TNK', []), ('Rosenbrock', [10]), ('Rastrigin', [10]), ('Griewank', [10]), ('OSY', []), ('Kursawe', []),
     ('Welded_Beam', []), ('Carside', []), ('BNH', []), ('Cantilevered_Beam', []), ('Pressure_Vessel', []),
-    ('G01', []), ('G02', []), ('G03', []), ('G04', []), ('G05', []), ('G06', []), ('G07', []), ('G08', []),
-    ('G09', []), ('G10', []),
     # ('ctp1', []), ('ctp2', []), ('ctp3', []), ('ctp4', []), ('ctp5', []), ('ctp6', []), ('ctp7', []), ('ctp8', []),
 ]
 
@@ -28,15 +27,16 @@ def test_problems(name, params):
         return
 
     problem = get_problem(name, *params)
-    _F, _G, _CV, _dF, _dG = problem.evaluate(X, return_values_of=["F", "G", "CV", "dF", "dG"])
+    _F, _G, _dF, _dG = problem.evaluate(X, return_values_of=["F", "G", "dF", "dG"])
 
     if problem.n_obj == 1:
         F = F[:, None]
 
     assert anp.all(anp.abs(_F - F) < 0.00001)
 
-    if problem.n_constr > 0:
-        assert anp.all(anp.abs(_CV[:, 0] - CV) < 0.0001)
+    if problem.has_constraints():
+        _CV = ieq_cv(_G)[:, 0]
+        assert anp.all(anp.abs(_CV - CV) < 0.0001)
 
 
 def load(name, suffix=[]):

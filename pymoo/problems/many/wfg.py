@@ -11,7 +11,6 @@ class WFG(Problem):
     def __init__(self, n_var, n_obj, k=None, l=None, **kwargs):
         super().__init__(n_var=n_var,
                          n_obj=n_obj,
-                         n_constr=0,
                          xl=0.0,
                          xu=2 * np.arange(1, n_var + 1).astype(float),
                          type_var=float,

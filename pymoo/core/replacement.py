@@ -66,7 +66,7 @@ class ImprovementReplacement(ReplacementSurvival):
         # eps = calc_adapt_eps(pop)
         pop_feasible, off_feasible = pop_CV <= eps, off_CV <= eps
 
-        if problem.n_constr > 0:
+        if problem.has_constraints() > 0:
 
             # 1) Both infeasible and constraints have been improved
             ret[(~pop_feasible & ~off_feasible) & (off_CV < pop_CV)] = True

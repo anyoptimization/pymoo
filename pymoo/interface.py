@@ -18,7 +18,7 @@ from pymoo.core.problem import Problem
 def get_problem_func(n_var, xl, xu, type_var):
     class P(Problem):
         def __init__(self) -> None:
-            super().__init__(n_var=n_var, n_obj=1, n_constr=0, xl=xl, xu=xu, type_var=type_var)
+            super().__init__(n_var=n_var, n_obj=1, xl=xl, xu=xu, type_var=type_var)
 
     return P
 

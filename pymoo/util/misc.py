@@ -212,10 +212,12 @@ def at_least_2d_array(x, extend_as="row", return_if_reshaped=False):
     has_been_reshaped = False
 
     if x.ndim == 1:
-        if extend_as == "row":
+        if extend_as.startswith("r"):
             x = x[None, :]
-        elif extend_as == "column":
+        elif extend_as.startswith("c"):
             x = x[:, None]
+        else:
+            raise Exception("The option `extend_as` should be either `row` or `column`.")
 
         has_been_reshaped = True
 

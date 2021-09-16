@@ -5,7 +5,7 @@ from pymoo.core.problem import Problem
 
 class SRN(Problem):
     def __init__(self):
-        super().__init__(n_var=2, n_obj=2, n_constr=2, xl=-20, xu=+20, type_var=anp.double)
+        super().__init__(n_var=2, n_obj=2, n_ieq_constr=2, xl=-20, xu=+20, type_var=anp.double)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f1 = 2 + (x[:, 0] - 2) ** 2 + (x[:, 1] - 1) ** 2

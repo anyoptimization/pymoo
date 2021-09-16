@@ -5,7 +5,7 @@ from pymoo.core.problem import Problem
 
 class Carside(Problem):
     def __init__(self):
-        super().__init__(n_var=7, n_obj=3, n_constr=10, type_var=anp.double)
+        super().__init__(n_var=7, n_obj=3, n_ieq_constr=10, type_var=anp.double)
         self.xl = anp.array([0.5, 0.45, 0.5, 0.5, 0.875, 0.4, 0.4])
         self.xu = anp.array([1.5, 1.35, 1.5, 1.5, 2.625, 1.2, 1.2])
 

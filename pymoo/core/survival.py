@@ -34,7 +34,7 @@ class Survival:
         n_survive = min(n_survive, len(pop))
 
         # if the split should be done beforehand
-        if self.filter_infeasible and problem.n_constr > 0:
+        if self.filter_infeasible and problem.has_constraints():
 
             # split feasible and infeasible solutions
             feas, infeas = split_by_feasibility(pop, eps=0.0, sort_infeasbible_by_cv=True)

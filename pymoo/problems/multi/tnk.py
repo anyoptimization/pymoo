@@ -6,7 +6,7 @@ from pymoo.util.remote import Remote
 
 class TNK(Problem):
     def __init__(self):
-        super().__init__(n_var=2, n_obj=2, n_constr=2, type_var=anp.double)
+        super().__init__(n_var=2, n_obj=2, n_ieq_constr=2, type_var=anp.double)
         self.xl = anp.array([0, 1e-30])
         self.xu = anp.array([anp.pi, anp.pi])
 

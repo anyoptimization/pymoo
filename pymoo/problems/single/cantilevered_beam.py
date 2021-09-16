@@ -7,7 +7,7 @@ from pymoo.core.problem import Problem
 class CantileveredBeam(Problem):
 
     def __init__(self):
-        super().__init__(n_var=4, n_obj=1, n_constr=2, type_var=np.double)
+        super().__init__(n_var=4, n_obj=1, n_ieq_constr=2, type_var=np.double)
         self.xl = np.array([2, 0.1, 0.1, 3.0])
         self.xu = np.array([12.0, 1.0, 2.0, 7.0])
         self.h1 = np.array([0.1, 0.25, 0.35, 0.5, 0.65, 0.75, 0.9, 1.0])

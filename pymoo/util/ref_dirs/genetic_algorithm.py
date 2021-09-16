@@ -37,7 +37,6 @@ class ReferenceDirectionGA(ReferenceDirectionFactory):
 
                 super().__init__(n_var=n_points * n_dim,
                                  n_obj=1,
-                                 n_constr=0,
                                  xl=0.0,
                                  xu=1.0,
                                  elementwise_evaluation=True)

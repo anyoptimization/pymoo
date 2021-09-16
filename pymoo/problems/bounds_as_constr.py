@@ -7,7 +7,7 @@ class BoundariesAsConstraints(MetaProblem):
 
     def __init__(self, problem):
         super().__init__(problem)
-        self.n_constr = self.n_constr + 2 * self.n_var
+        self.n_ieq_constr += 2 * self.n_var
 
     def do(self, X, out, *args, **kwargs):
         self.problem.do(X, out, *args, **kwargs)
