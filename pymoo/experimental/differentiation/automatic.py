@@ -8,8 +8,8 @@ from pymoo.problems.multi import ZDT, ZDT1
 
 class ElementwiseZDT1(Problem):
 
-    def __init__(self, n_var=30, n_obj=2, n_constr=0, **kwargs):
-        super().__init__(n_var, evaluation_of=["F", "dF"], elementwise_evaluation=True, n_obj=n_obj, n_constr=n_constr,
+    def __init__(self, n_var=30, n_obj=2, **kwargs):
+        super().__init__(n_var, evaluation_of=["F", "dF"], elementwise_evaluation=True, n_obj=n_obj,
                          **kwargs)
 
     def _calc_pareto_front(self, n_pareto_points=100):
@@ -26,7 +26,7 @@ class ElementwiseZDT1(Problem):
 class MySphere(Problem):
 
     def __init__(self, gamma=1):
-        super().__init__(n_var=2, n_obj=1, n_constr=1, elementwise_evaluation=True,
+        super().__init__(n_var=2, n_obj=1, n_ieq_constr=1, elementwise_evaluation=True,
                          evaluation_of=["F", "dF", "dG", "ddF", "ddG"])
         self.gamma = gamma
 

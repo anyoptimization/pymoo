@@ -15,7 +15,6 @@ class GlobalOptimizationProblem(ElementwiseProblem):
 
         super().__init__(n_var=self.object.N,
                          n_obj=1,
-                         n_constr=0,
                          xl=self.object.xmin,
                          xu=self.object.xmax,
                          **kwargs)

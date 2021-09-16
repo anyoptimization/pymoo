@@ -19,8 +19,7 @@ class OmniTest(Problem):
     def __init__(self, n_var=2):
         assert (n_var >= 2), "The dimension of the decision space should at least be 2!"
         super().__init__(
-            n_var=n_var, n_obj=2, n_constr=0, type_var=np.double,
-            xl=np.full(n_var, 0), xu=np.full(n_var, 6)
+            n_var=n_var, n_obj=2, type_var=np.double, xl=np.full(n_var, 0), xu=np.full(n_var, 6)
         )
 
     def _evaluate(self, X, out, *args, **kwargs):

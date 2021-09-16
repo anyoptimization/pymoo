@@ -128,7 +128,7 @@ class SingleObjectiveDisplay(Display):
         F, CV, feasible = algorithm.pop.get("F", "CV", "feasible")
         feasible = np.where(feasible[:, 0])[0]
 
-        if problem.n_constr > 0:
+        if problem.has_constraints():
             self.output.append("cv (min)", opt.CV[0])
             self.output.append("cv (avg)", np.mean(CV))
 
@@ -162,7 +162,7 @@ class MultiObjectiveDisplay(Display):
         F, CV, feasible = algorithm.pop.get("F", "CV", "feasible")
         feasible = np.where(feasible[:, 0])[0]
 
-        if problem.n_constr > 0:
+        if problem.has_constraints():
             self.output.append("cv (min)", CV.min())
             self.output.append("cv (avg)", np.mean(CV))
 

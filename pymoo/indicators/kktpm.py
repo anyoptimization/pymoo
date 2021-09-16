@@ -1,5 +1,7 @@
 import numpy as np
 
+from pymoo.core.problem import ieq_cv
+
 
 class KKTPM:
 
@@ -39,16 +41,17 @@ class KKTPM:
         z -= utopian_eps
 
         # for convenience get the counts directly
-        n_solutions, n_var, n_obj, n_constr = X.shape[0], problem.n_var, problem.n_obj, problem.n_constr
+        n_solutions, n_var, n_obj, n_ieq_constr = X.shape[0], problem.n_var, problem.n_obj, problem.n_ieq_constr
 
-        F, CV, G, dF, dG = problem.evaluate(X, return_values_of=["F", "CV", "G", "dF", "dG"])
+        F, G, dF, dG = problem.evaluate(X, return_values_of=["F", "G", "dF", "dG"])
+        CV = ieq_cv(G)
 
         # loop through each solution to be considered
         for i in range(n_solutions):
 
             # get the corresponding values for this solution
             x, f, cv, df = X[i, :], F[i, :], CV[i, 0], dF[i, :].swapaxes(1, 0)
-            if n_constr > 0:
+            if n_ieq_constr > 0:
                 g, dg = G[i, :], dG[i].T
 
             # if the solution that is provided is infeasible
@@ -64,17 +67,17 @@ class KKTPM:
                 A = np.ones((problem.n_obj, problem.n_obj)) + a_m @ a_m.T
                 b = np.ones(problem.n_obj)
 
-                if n_constr > 0:
+                if n_ieq_constr > 0:
                     # a_j is just the transpose of the differential of constraints
                     a_j = dg.T
 
                     # part of the matrix for additional constraints
-                    gsq = np.zeros((n_constr, n_constr))
+                    gsq = np.zeros((n_ieq_constr, n_ieq_constr))
                     np.fill_diagonal(gsq, g * g)
 
                     # now add the constraints to the optimization problem
                     A = np.vstack([np.hstack([A, a_m @ a_j.T]), np.hstack([a_j @ a_m.T, a_j @ a_j.T + gsq])])
-                    b = np.hstack([b, np.zeros(n_constr)])
+                    b = np.hstack([b, np.zeros(n_ieq_constr)])
 
                 method = "qr"
                 u = solve(A, b, method=method)
@@ -97,7 +100,7 @@ class KKTPM:
                 # split up the lagrange multiplier for objective and not
                 u_m, u_j = u[:n_obj], u[n_obj:]
 
-                if n_constr > 0:
+                if n_ieq_constr > 0:
                     _kktpm = (1 - np.sum(u_m)) ** 2 + np.sum((np.vstack([a_m, a_j]).T @ u) ** 2)
                     _fval = _kktpm + np.sum((u_j * g.T) ** 2)
                 else:

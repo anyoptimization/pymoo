@@ -13,12 +13,12 @@ class COCOProblem(ElementwiseProblem):
         self.name = name
         self.object = coco
 
-        n_var, n_obj, n_constr = coco.number_of_variables, coco.number_of_objectives, coco.number_of_constraints
+        n_var, n_obj, n_ieq_constr = coco.number_of_variables, coco.number_of_objectives, coco.number_of_constraints
         xl, xu = coco.lower_bounds, coco.upper_bounds
 
         super().__init__(n_var=n_var,
                          n_obj=n_obj,
-                         n_constr=n_constr,
+                         n_ieq_constr=n_ieq_constr,
                          xl=xl,
                          xu=xu,
                          **kwargs)

@@ -6,7 +6,7 @@ from pymoo.util.remote import Remote
 
 class WeldedBeam(Problem):
     def __init__(self):
-        super().__init__(n_var=4, n_obj=2, n_constr=4, type_var=anp.double)
+        super().__init__(n_var=4, n_obj=2, n_ieq_constr=4, type_var=anp.double)
         self.xl = anp.array([0.125, 0.1, 0.1, 0.125])
         self.xu = anp.array([5.0, 10.0, 10.0, 5.0])
 

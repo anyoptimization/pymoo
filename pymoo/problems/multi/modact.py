@@ -43,14 +43,14 @@ class MODAct(ElementwiseProblem):
         lb, ub = self.fct.bounds()
         n_var = len(lb)
         n_obj = len(self.fct.weights)
-        n_constr = len(self.fct.c_weights)
+        n_ieq_constr = len(self.fct.c_weights)
         xl = lb
         xu = ub
 
         self.weights = np.array(self.fct.weights)
         self.c_weights = np.array(self.fct.c_weights)
 
-        super().__init__(n_var=n_var, n_obj=n_obj, n_constr=n_constr, xl=xl, xu=xu, type_var=np.double, **kwargs)
+        super().__init__(n_var=n_var, n_obj=n_obj, n_ieq_constr=n_ieq_constr, xl=xl, xu=xu, type_var=np.double, **kwargs)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f, g = self.fct(x)

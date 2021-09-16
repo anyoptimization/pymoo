@@ -7,7 +7,7 @@ class C1DTLZ1(DTLZ1):
 
     def __init__(self, n_var=12, n_obj=3, **kwargs):
         super().__init__(n_var, n_obj, **kwargs)
-        self.n_constr = 1
+        self.n_ieq_constr = 1
 
     def _evaluate(self, X, out, *args, **kwargs):
         super()._evaluate(X, out, *args, **kwargs)
@@ -20,8 +20,8 @@ class C1DTLZ1(DTLZ1):
 class C1DTLZ3(DTLZ3):
 
     def __init__(self, n_var=12, n_obj=3, r=None, **kwargs):
-        super().__init__(n_var, n_obj, **kwargs)
-        self.n_constr = 1
+        super().__init__(n_var=n_var, n_obj=n_obj, **kwargs)
+        self.n_ieq_constr = 1
 
         if r is None:
             if self.n_obj < 5:
@@ -45,7 +45,7 @@ class C2DTLZ2(DTLZ2):
 
     def __init__(self, n_var=12, n_obj=3, r=None, **kwargs):
         super().__init__(n_var, n_obj, **kwargs)
-        self.n_constr = 1
+        self.n_ieq_constr = 1
 
         if r is None:
             if n_obj == 2:
@@ -72,7 +72,7 @@ class C3DTLZ1(DTLZ1):
 
     def __init__(self, n_var=12, n_obj=3, **kwargs):
         super().__init__(n_var, n_obj, **kwargs)
-        self.n_constr = n_obj
+        self.n_ieq_constr = n_obj
 
     def _evaluate(self, X, out, *args, **kwargs):
         super()._evaluate(X, out, *args, **kwargs)
@@ -83,7 +83,7 @@ class C3DTLZ4(DTLZ4):
 
     def __init__(self, n_var=7, n_obj=3, **kwargs):
         super().__init__(n_var, n_obj, **kwargs)
-        self.n_constr = n_obj
+        self.n_ieq_constr = n_obj
 
     def _evaluate(self, X, out, *args, **kwargs):
         super()._evaluate(X, out, *args, **kwargs)

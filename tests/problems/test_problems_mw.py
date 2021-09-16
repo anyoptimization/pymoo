@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 
+from pymoo.core.problem import ieq_cv
 from pymoo.factory import get_problem
 from tests.problems.test_correctness import load
 
@@ -12,7 +13,8 @@ def test_mw(name):
     problem = get_problem(name)
 
     X, F, CV = load(name.upper(), suffix=["MW"])
-    _F, _CV = problem.evaluate(X, return_values_of=["F", "CV"])
+    _F, _G = problem.evaluate(X, return_values_of=["F", "G"])
+    _CV = ieq_cv(_G)[:, 0]
 
     np.testing.assert_allclose(_F, F)
-    np.testing.assert_allclose(_CV[:, 0], CV)
+    np.testing.assert_allclose(_CV, CV)

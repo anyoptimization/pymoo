@@ -12,8 +12,8 @@ from pymoo.problems.multi.zdt import ZDT1, ZDT2, ZDT3
 
 class ElementwiseZDT1(Problem):
 
-    def __init__(self, n_var=30, n_obj=2, n_constr=0, **kwargs):
-        super().__init__(n_var, evaluation_of=["F", "dF"], elementwise_evaluation=True, n_obj=n_obj, n_constr=n_constr,
+    def __init__(self, n_var=30, n_obj=2, n_ieq_constr=0, **kwargs):
+        super().__init__(n_var, evaluation_of=["F", "dF"], elementwise_evaluation=True, n_obj=n_obj, n_ieq_constr=n_ieq_constr,
                          **kwargs)
 
     def _calc_pareto_front(self, n_pareto_points=100):

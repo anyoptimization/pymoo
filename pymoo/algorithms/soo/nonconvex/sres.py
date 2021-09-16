@@ -1,8 +1,9 @@
 import numpy as np
 
 from pymoo.algorithms.soo.nonconvex.es import ES
-from pymoo.docs import parse_doc_string
+from pymoo.core.problem import ieq_cv
 from pymoo.core.survival import Survival
+from pymoo.docs import parse_doc_string
 from pymoo.util.function_loader import load_function
 
 
@@ -18,11 +19,13 @@ class StochasticRankingSurvival(Survival):
         F, G = pop.get("F", "G")
         f = F[:, 0]
 
-        if problem.n_constr == 0:
+        if not problem.has_constraints():
             I = f.argsort()
 
         else:
-            phi = (np.maximum(0, G) ** 2).sum(axis=1)
+            # phi = (np.maximum(0, G) ** 2).sum(axis=1)
+            pop.set("constr_beta", 2)
+            phi = pop.get("CV")[:, 0]
             J = np.arange(len(phi))
             I = load_function("stochastic_ranking")(f, phi, self.PR, J)
 

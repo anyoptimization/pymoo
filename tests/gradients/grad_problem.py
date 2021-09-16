@@ -95,7 +95,7 @@ class ZDT3WithGradient(ZDT):
 class MySphere(Problem):
 
     def __init__(self):
-        super().__init__(n_var=2, n_obj=1, n_constr=1, xl=-1, xu=+1, elementwise_evaluation=True)
+        super().__init__(n_var=2, n_obj=1, n_ieq_constr=1, xl=-1, xu=+1, elementwise_evaluation=True)
 
     def _evaluate(self, x, out, *args, **kwargs):
         out["F"] = (x ** 2).sum()
@@ -105,7 +105,7 @@ class MySphere(Problem):
 class SphereWithGradientAndConstraint(Problem):
 
     def __init__(self):
-        super().__init__(n_var=2, n_obj=1, n_constr=1, xl=-1, xu=+1, elementwise_evaluation=True, autograd=False)
+        super().__init__(n_var=2, n_obj=1, n_ieq_constr=1, xl=-1, xu=+1, elementwise_evaluation=True, autograd=False)
 
     def _evaluate(self, x, out, *args, **kwargs):
         out["F"] = (x ** 2).sum()
@@ -127,7 +127,7 @@ class SphereWithGradientAndConstraint(Problem):
 class AutomaticDifferentiationProblem(Problem):
 
     def __init__(self, func, n_var=2, **kwargs):
-        super().__init__(n_var, n_obj=1, n_constr=0, xl=-10, xu=10, type_var=np.double, elementwise_evaluation=True,
+        super().__init__(n_var, n_obj=1, n_ieq_constr=0, xl=-10, xu=10, type_var=np.double, elementwise_evaluation=True,
                          evaluation_of=["F", "dF", "ddF"], **kwargs)
         self.func = func
 

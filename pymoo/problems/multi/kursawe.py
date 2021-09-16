@@ -6,7 +6,7 @@ from pymoo.util.remote import Remote
 
 class Kursawe(Problem):
     def __init__(self):
-        super().__init__(n_var=3, n_obj=2, n_constr=0, xl=-5, xu=5, type_var=anp.double)
+        super().__init__(n_var=3, n_obj=2, xl=-5, xu=5, type_var=anp.double)
 
     def _evaluate(self, x, out, *args, **kwargs):
         l = []

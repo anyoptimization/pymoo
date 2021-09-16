@@ -12,10 +12,10 @@ DIFFICULTIES = [
 
 
 class DASCMOP(Problem):
-    def __init__(self, n_obj, n_constr, difficulty, **kwargs):
+    def __init__(self, n_obj, n_ieq_constr, difficulty, **kwargs):
         super().__init__(n_var=30,
                          n_obj=n_obj,
-                         n_constr=n_constr,
+                         n_ieq_constr=n_ieq_constr,
                          type_var=np.double, xl=0., xu=1., **kwargs)
 
         if isinstance(difficulty, int):

@@ -4,7 +4,7 @@ from copy import deepcopy
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival, GA
 from pymoo.docs import parse_doc_string
 from pymoo.core.algorithm import Algorithm
-from pymoo.core.evaluator import set_cv, set_feasibility, Evaluator
+from pymoo.core.evaluator import Evaluator
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population
 from pymoo.problems.single.traveling_salesman import create_random_tsp_problem
@@ -335,8 +335,6 @@ class ACO(Algorithm):
         # this evaluation can be disabled or faked if evaluate_each_ant is false - then the finalize method of the
         # ant has to set the objective and/or constraint values accordingly
         self.evaluator.eval(self.problem, colony)
-        set_cv(colony)
-        set_feasibility(colony)
 
         # set the current best including the new colony
         opt = FitnessSurvival().do(problem, Population.merge(colony, self.opt), 1)

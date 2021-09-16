@@ -16,7 +16,7 @@ class DTLZ(Problem):
         else:
             raise Exception("Either provide number of variables or k!")
 
-        super().__init__(n_var=n_var, n_obj=n_obj, n_constr=0, xl=0, xu=1, type_var=anp.double)
+        super().__init__(n_var=n_var, n_obj=n_obj, xl=0, xu=1, type_var=anp.double)
 
     def g1(self, X_M):
         return 100 * (self.k + anp.sum(anp.square(X_M - 0.5) - anp.cos(20 * anp.pi * (X_M - 0.5)), axis=1))
@@ -194,8 +194,8 @@ class InvertedDTLZ1(DTLZ1):
 class ScaledProblem(Problem):
 
     def __init__(self, problem, scale_factor):
-        super().__init__(n_var=problem.n_var, n_obj=problem.n_obj, n_constr=problem.n_constr,
-                         xl=problem.xl, xu=problem.xu, type_var=problem.type_var)
+        super().__init__(n_var=problem.n_var, n_obj=problem.n_obj, n_ieq_constr=problem.n_ieq_constr,
+                         n_eq_constr=problem.n_eq_constr, xl=problem.xl, xu=problem.xu, type_var=problem.type_var)
         self.problem = problem
         self.scale_factor = scale_factor
 
@@ -214,7 +214,7 @@ class ScaledProblem(Problem):
 class ConvexProblem(Problem):
 
     def __init__(self, problem):
-        super().__init__(problem.n_var, problem.n_obj, problem.n_constr, problem.xl, problem.xu)
+        super().__init__(problem.n_var, problem.n_obj, problem.n_ieq_constr, problem.n_eq_constr, problem.xl, problem.xu)
         self.problem = problem
 
     def get_power(self, n):

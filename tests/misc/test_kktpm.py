@@ -36,9 +36,9 @@ def test_kktpm_correctness(str_problem, params):
     np.testing.assert_almost_equal(F, _F, decimal=5)
     np.testing.assert_almost_equal(dF, _dF, decimal=5)
 
-    if problem.n_constr > 0:
-        G = G[:, :problem.n_constr]
-        dG = dG[:, :problem.n_constr * problem.n_var].reshape(_dG.shape)
+    if problem.has_constraints():
+        G = G[:, :problem.n_ieq_constr]
+        dG = dG[:, :problem.n_ieq_constr * problem.n_var].reshape(_dG.shape)
 
         np.testing.assert_almost_equal(G, _G, decimal=5)
         np.testing.assert_almost_equal(dG, _dG, decimal=5)

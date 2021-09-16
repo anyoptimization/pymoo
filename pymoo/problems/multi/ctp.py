@@ -15,8 +15,8 @@ def g_multimodal(x):
 
 class CTP(Problem):
 
-    def __init__(self, n_var=2, n_constr=1, option="linear"):
-        super().__init__(n_var=n_var, n_obj=2, n_constr=n_constr, xl=0, xu=1, type_var=anp.double)
+    def __init__(self, n_var=2, n_ieq_constr=1, option="linear"):
+        super().__init__(n_var=n_var, n_obj=2, n_ieq_constr=n_ieq_constr, xl=0, xu=1, type_var=anp.double)
 
         if option == "linear":
             self.calc_g = g_linear
@@ -63,15 +63,15 @@ class CTP(Problem):
 
 class CTP1(CTP):
 
-    def __init__(self, n_var=2, n_constr=2, **kwargs):
-        super().__init__(n_var, n_constr, **kwargs)
+    def __init__(self, n_var=2, n_ieq_constr=2, **kwargs):
+        super().__init__(n_var, n_ieq_constr, **kwargs)
 
-        a, b = anp.zeros(n_constr + 1), anp.zeros(n_constr + 1)
+        a, b = anp.zeros(n_ieq_constr + 1), anp.zeros(n_ieq_constr + 1)
         a[0], b[0] = 1, 1
-        delta = 1 / (n_constr + 1)
+        delta = 1 / (n_ieq_constr + 1)
         alpha = delta
 
-        for j in range(n_constr):
+        for j in range(n_ieq_constr):
             beta = a[j] * anp.exp(-b[j] * alpha)
             a[j + 1] = (a[j] + beta) / 2
             b[j + 1] = - 1 / alpha * anp.log(beta / a[j + 1])
@@ -89,7 +89,7 @@ class CTP1(CTP):
 
         a, b = self.a, self.b
         g = []
-        for j in range(self.n_constr):
+        for j in range(self.n_ieq_constr):
             _g = - (f2 - (a[j] * anp.exp(-b[j] * f1)))
             g.append(_g)
         out["G"] = anp.column_stack(g)
@@ -173,7 +173,7 @@ class CTP7(CTP):
 
 class CTP8(CTP):
     def __init__(self, **kwargs):
-        super().__init__(n_constr=2, **kwargs)
+        super().__init__(n_ieq_constr=2, **kwargs)
         self.xu = anp.full(self.n_var, 20)
         self.xu[0] = 1
 
@@ -193,5 +193,5 @@ class CTP8(CTP):
 
 
 if __name__ == '__main__':
-    problem = CTP1(n_constr=3)
-    print(problem.n_constr)
+    problem = CTP1(n_ieq_constr=3)
+    print(problem.n_ieq_constr)
