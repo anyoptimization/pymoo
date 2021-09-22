@@ -4,7 +4,6 @@ from scipy.spatial.distance import cdist
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.core.population import Population
 from pymoo.decomposition.tchebicheff import Tchebicheff
-from pymoo.factory import get_decomposition
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling

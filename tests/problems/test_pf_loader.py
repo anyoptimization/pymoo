@@ -7,8 +7,7 @@ def test_load_functional():
     problem = ZDT1()
     pf = problem.pareto_front(n_pareto_points=200)
     assert len(pf) == 200
-    assert id(pf) != id(problem.pareto_front())
-    assert id(pf) == id(problem.pareto_front(n_pareto_points=200))
+    assert id(pf) == id(problem.pareto_front())
 
 
 def test_load_functional_with_param():

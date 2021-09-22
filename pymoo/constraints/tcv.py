@@ -12,18 +12,19 @@ class TotalConstraintViolation:
 
     def __init__(self,
                  ieq_eps: float = 0.0,
-                 ieq_beta: float = None,
+                 ieq_pow: float = None,
                  ieq_scale: np.ndarray = None,
                  eq_eps: float = 1e-4,
-                 eq_beta: float = None,
+                 eq_pow: float = None,
                  eq_scale: np.ndarray = None,
-                 aggr_func: Callable = np.mean):
+                 aggr_func: Callable = np.mean,
+                 feas_eps: float = 0.0):
 
         """
 
         Parameters
         ----------
-        ieq_beta : float
+        ieq_pow : float
             To what power the each inequality constraint violation should be taken
 
         ieq_eps : float
@@ -33,7 +34,7 @@ class TotalConstraintViolation:
             The scaling for the inequality constraints to consider. The cvs will be divided by this scaling.
             (useful if constraints have entirely different scales which might cause a biased aggregation)
 
-        eq_beta : float
+        eq_pow : float
             To what power the each equality constraint violation should be taken
 
         eq_eps : float
@@ -42,19 +43,24 @@ class TotalConstraintViolation:
         eq_scale : np.array
             Same as `ieq_scale` but for equality constraints.
 
+        feas_eps : float
+            The eps amount for a solution to count as feasible or infeasible.
+
         """
 
         super().__init__()
 
-        self.ieq_beta = ieq_beta
+        self.ieq_beta = ieq_pow
         self.ieq_eps = ieq_eps
         self.ieq_scale = ieq_scale
 
-        self.eq_beta = eq_beta
+        self.eq_beta = eq_pow
         self.eq_eps = eq_eps
         self.eq_scale = eq_scale
 
         self.aggr_func = aggr_func
+
+        self.feas_eps = feas_eps
 
     def calc(self,
              G: np.ndarray = None,
@@ -71,7 +77,7 @@ class TotalConstraintViolation:
         if H is not None:
             H = at_least_2d_array(H, extend_as='r')
             cv_eq = g_to_cv(np.abs(H), self.eq_eps, beta=self.eq_beta, scale=self.eq_scale)
-            # cv_eq = g_to_cv(H ** 2, self.eq_eps ** 2, beta=self.eq_beta, scale=self.eq_scale)
+            # cv_eq = g_to_cv(H ** 2, self.eq_eps ** 2, beta=self.eq_pow, scale=self.eq_scale)
             C.append(cv_eq)
 
         # simply return None if there are no constraints
@@ -102,6 +108,7 @@ class TotalConstraintViolation:
         # set the cv values inplace directly
         if inplace:
             pop.set("CV", tcv[:, None])
+            pop.set("feas_eps", self.feas_eps)
 
         return tcv
 

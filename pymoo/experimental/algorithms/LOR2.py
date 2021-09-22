@@ -2,8 +2,8 @@ import numpy as np
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.algorithms.soo.nonconvex.de import DES
-from pymoo.docs import parse_doc_string
 from pymoo.core.survival import Survival
+from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.dex import DEX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling

@@ -27,10 +27,10 @@ class AdaptiveConstraintHandling(MetaAlgorithm):
         eq_scale = np.mean(np.maximum(0.0, H), axis=0)
 
         self.tcv = TotalConstraintViolation(ieq_eps=ieq_scale,
-                                            ieq_beta=None,
+                                            ieq_pow=None,
                                             ieq_scale=ieq_scale,
                                             eq_eps=eq_scale,
-                                            eq_beta=None,
+                                            eq_pow=None,
                                             eq_scale=eq_scale,
                                             aggr_func=np.mean)
 

@@ -2,9 +2,9 @@ import numpy as np
 from numpy.random import permutation
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
-from pymoo.docs import parse_doc_string
 from pymoo.core.population import Population
 from pymoo.core.selection import Selection
+from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.dex import DEX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
