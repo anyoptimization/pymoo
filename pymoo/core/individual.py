@@ -17,6 +17,7 @@ class Individual:
                  ddG: np.ndarray = None,
                  ddH: np.ndarray = None,
                  tcv=None,
+                 feas_eps: float = 0.0,
                  **kwargs) -> None:
 
         # design variables
@@ -40,6 +41,9 @@ class Individual:
         # if the constraint violation should be calculated adaptively, this can be set
         self.tcv = tcv
 
+        # the amount of permitted constraint violation before counted as infeasible
+        self.feas_eps = feas_eps
+
         # a set storing what has been evaluated
         self.evaluated = set()
 
@@ -59,7 +63,10 @@ class Individual:
 
     @property
     def feasible(self):
-        return self.CV <= 0.0
+        if self.tcv is not None:
+            return self.CV <= self.tcv.feas_eps
+        else:
+            return self.CV <= self.feas_eps
 
     def set_by_dict(self, **kwargs):
         for k, v in kwargs.items():

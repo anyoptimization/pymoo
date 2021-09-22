@@ -67,10 +67,8 @@ class Survival:
         pass
 
 
-def split_by_feasibility(pop, eps=0.0, sort_infeasbible_by_cv=True):
-    CV = pop.get("CV")
-
-    b = (CV <= eps)
+def split_by_feasibility(pop, sort_infeasbible_by_cv=True):
+    CV, b = pop.get("CV", "feasible")
 
     feasible = np.where(b)[0]
     infeasible = np.where(~b)[0]
@@ -81,8 +79,3 @@ def split_by_feasibility(pop, eps=0.0, sort_infeasbible_by_cv=True):
     return feasible, infeasible
 
 
-def calc_adapt_eps(pop):
-    cv = pop.get("CV")[:, 0]
-    cv_mean = np.median(cv)
-    fr = (cv <= 0).sum() / len(cv)
-    return cv_mean * fr

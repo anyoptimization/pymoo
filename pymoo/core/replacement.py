@@ -3,7 +3,7 @@ import numpy as np
 from pymoo.core.duplicate import DefaultDuplicateElimination
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population
-from pymoo.core.survival import Survival, calc_adapt_eps
+from pymoo.core.survival import Survival
 
 
 def is_better(_new, _old, eps=0.0):
@@ -59,23 +59,19 @@ class ImprovementReplacement(ReplacementSurvival):
 
         ret = np.full((len(pop), 1), False)
 
-        pop_F, pop_CV = pop.get("F", "CV")
-        off_F, off_CV = off.get("F", "CV")
-
-        eps = 0.0
-        # eps = calc_adapt_eps(pop)
-        pop_feasible, off_feasible = pop_CV <= eps, off_CV <= eps
+        pop_F, pop_CV, pop_feas = pop.get("F", "CV", "feasible")
+        off_F, off_CV, off_feas = off.get("F", "CV", "feasible")
 
         if problem.has_constraints() > 0:
 
             # 1) Both infeasible and constraints have been improved
-            ret[(~pop_feasible & ~off_feasible) & (off_CV < pop_CV)] = True
+            ret[(~pop_feas & ~off_feas) & (off_CV < pop_CV)] = True
 
             # 2) A solution became feasible
-            ret[~pop_feasible & off_feasible] = True
+            ret[~pop_feas & off_feas] = True
 
             # 3) Both feasible but objective space value has improved
-            ret[(pop_feasible & off_feasible) & (off_F < pop_F)] = True
+            ret[(pop_feas & off_feas) & (off_F < pop_F)] = True
 
         else:
             ret[off_F < pop_F] = True
