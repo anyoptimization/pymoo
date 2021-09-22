@@ -1,9 +1,6 @@
 import re
 
 from pymoo.config import Config
-from pymoo.problems.many import *
-from pymoo.problems.multi import *
-from pymoo.problems.single import *
 
 
 # =========================================================================================================
@@ -236,6 +233,21 @@ def get_termination(name, *args, d={}, **kwargs):
 # =========================================================================================================
 
 def get_problem_options():
+    from pymoo.problems.multi import BNH, Carside
+    from pymoo.problems.multi import CTP1, CTP2, CTP3, CTP4, CTP5, CTP6, CTP7, CTP8
+    from pymoo.problems.multi import DASCMOP1, DASCMOP2, DASCMOP3, DASCMOP4, DASCMOP5, DASCMOP6, DASCMOP7, DASCMOP8, \
+        DASCMOP9
+    from pymoo.problems.multi import MODAct, MW1, MW2, MW3, MW4, MW5, MW6, MW7, MW8, MW9, MW10, MW11, MW12, MW13, MW14
+    from pymoo.problems.single import Ackley
+    from pymoo.problems.many import DTLZ1, C1DTLZ1, DC1DTLZ1, DC1DTLZ3, DC2DTLZ1, DC2DTLZ3, DC3DTLZ1, DC3DTLZ3, C1DTLZ3, \
+        C2DTLZ2, C3DTLZ1, C3DTLZ4, ScaledDTLZ1, ConvexDTLZ2, ConvexDTLZ4, DTLZ2, DTLZ3, DTLZ4, DTLZ5, DTLZ6, DTLZ7, \
+        InvertedDTLZ1, WFG1, WFG2, WFG3, WFG4, WFG5, WFG6, WFG7, WFG8, WFG9
+    from pymoo.problems.multi import Kursawe, OSY, SRN, TNK, Truss2D, WeldedBeam, ZDT1, ZDT2, ZDT3, ZDT4, ZDT5, ZDT6
+    from pymoo.problems.single import CantileveredBeam, Griewank, Himmelblau, Knapsack, PressureVessel, Rastrigin, \
+        Rosenbrock, Schwefel, Sphere, Zakharov
+    from pymoo.problems.single import G1, G2, G3, G4, G5, G6, G7, G8, G9, G10, G11, G12, G13, G14, G15, G16, G17, G18, \
+        G19, G20, G21, G22, G23, G24
+
     PROBLEM = [
         ('ackley', Ackley),
         ('bnh', BNH),

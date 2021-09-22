@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
 
+from pymoo.constraints.bounds import BoundariesAsConstraints
 from pymoo.factory import get_problem
 from pymoo.indicators.kktpm import KKTPM
 from pymoo.problems.autodiff import AutomaticDifferentiation
-from pymoo.problems.bounds_as_constr import BoundariesAsConstraints
 from tests.util import path_to_test_resource
 
 SETUP = {

@@ -1,9 +1,10 @@
 import os
 
 import autograd.numpy as anp
+import numpy as np
 import pytest
 
-from pymoo.core.problem import ieq_cv
+from pymoo.constraints.tcv import TotalConstraintViolation
 from pymoo.factory import get_problem
 from tests.util import path_to_test_resource
 
@@ -35,7 +36,7 @@ def test_problems(name, params):
     assert anp.all(anp.abs(_F - F) < 0.00001)
 
     if problem.has_constraints():
-        _CV = ieq_cv(_G)[:, 0]
+        _CV = TotalConstraintViolation(aggr_func=np.sum).calc(_G)
         assert anp.all(anp.abs(_CV - CV) < 0.0001)
 
 

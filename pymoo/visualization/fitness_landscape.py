@@ -75,6 +75,8 @@ class FitnessLandscape(Plot):
             X = np.linspace(problem.xl[0], problem.xu[0], num=n_samples)[:, None]
             Z = problem.evaluate(X, return_values_of=["F"])
             self.ax.plot(X, Z)
+            self.ax.set_xlabel("x")
+            self.ax.set_ylabel("f(x)")
 
         elif problem.n_var == 2 and problem.n_obj == 1:
 

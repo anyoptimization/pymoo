@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.core.problem import ieq_cv
+from pymoo.constraints.tcv import TotalConstraintViolation
 
 
 class KKTPM:
@@ -44,7 +44,7 @@ class KKTPM:
         n_solutions, n_var, n_obj, n_ieq_constr = X.shape[0], problem.n_var, problem.n_obj, problem.n_ieq_constr
 
         F, G, dF, dG = problem.evaluate(X, return_values_of=["F", "G", "dF", "dG"])
-        CV = ieq_cv(G)
+        CV = TotalConstraintViolation().calc(G)[:, None]
 
         # loop through each solution to be considered
         for i in range(n_solutions):
@@ -138,9 +138,8 @@ def solve(A, b, method="elim"):
 if __name__ == '__main__':
     from pymoo.factory import get_problem
     from pymoo.problems.autodiff import AutomaticDifferentiation
-    from pymoo.problems.bounds_as_constr import BoundariesAsConstraints
 
-
+    from pymoo.constraints.bounds import BoundariesAsConstraints
     problem = AutomaticDifferentiation(BoundariesAsConstraints(get_problem("zdt2", n_var=30)))
 
     # X = (0.5 * np.ones(10))[None, :]

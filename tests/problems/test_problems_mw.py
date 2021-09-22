@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from pymoo.core.problem import ieq_cv
+from pymoo.constraints.tcv import TotalConstraintViolation
 from pymoo.factory import get_problem
 from tests.problems.test_correctness import load
 
@@ -14,7 +14,7 @@ def test_mw(name):
 
     X, F, CV = load(name.upper(), suffix=["MW"])
     _F, _G = problem.evaluate(X, return_values_of=["F", "G"])
-    _CV = ieq_cv(_G)[:, 0]
+    _CV = TotalConstraintViolation(aggr_func=np.sum).calc(_G)
 
     np.testing.assert_allclose(_F, F)
     np.testing.assert_allclose(_CV, CV)

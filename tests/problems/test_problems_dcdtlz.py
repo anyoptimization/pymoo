@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from pymoo.core.problem import ieq_cv
+from pymoo.constraints.tcv import TotalConstraintViolation
 from pymoo.factory import get_problem
 from tests.problems.test_correctness import load
 
@@ -14,15 +14,15 @@ def test_problems(name):
 
     X, F, CV = load(name.upper())
     _F, _G = problem.evaluate(X, return_values_of=["F", "G"])
-    _CV = ieq_cv(_G)
+    _CV = TotalConstraintViolation(aggr_func=np.sum).calc(_G)
 
     if _G.shape[1] > 1:
         # We need to do a special CV calculation to test for correctness since
         # the original code does not sum the violations but takes the maximum
-        _CV = np.max(_G, axis=1)[:, None]
-        _CV = np.maximum(_CV, 0)
+        _CV = np.max(_G, axis=1)
+        _CV = np.maximum(_CV, 0.0)
 
     np.testing.assert_allclose(_F, F)
-    np.testing.assert_allclose(_CV[:, 0], CV)
+    np.testing.assert_allclose(_CV, CV)
 
 

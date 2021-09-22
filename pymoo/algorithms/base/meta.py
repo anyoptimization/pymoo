@@ -1,42 +1,54 @@
+from copy import deepcopy
+
 from pymoo.core.algorithm import Algorithm
 
 
 class MetaAlgorithm(Algorithm):
 
     def __init__(self,
-                 clazz,
-                 *args,
-                 display=None,
-                 **kwargs
+                 algorithm,
+                 copy=False,
                  ):
-        super().__init__(*args, display=display, **kwargs)
+        super().__init__()
 
-        self.clazz = clazz
-        self.args = args
-        self.kwargs = kwargs
-        self.algorithm = self.create()
+        # if the algorithm object should be copied to keep the original one unmodified
+        if copy:
+            algorithm = deepcopy(algorithm)
 
-    def create(self, *args, **kwargs):
-        return self.clazz(*self.args, *args, **self.kwargs, **kwargs)
+        # store the current algorithm object to be iterated over
+        self.algorithm = algorithm
+
+    def _copy_from_orig(self):
+        for k, v in self.algorithm.__dict__.items():
+            self.__dict__[k] = v
+
+        self.__dict__["display"] = None
 
     def setup(self, *args, **kwargs):
         self.algorithm.setup(*args, **kwargs)
-        super().setup(*args, **kwargs)
+        self._copy_from_orig()
+        self._setup(*args, **kwargs)
+        return self
+
+    def _infill(self):
+        ret = self.algorithm.infill()
+        self._copy_from_orig()
+        return ret
 
     def _initialize_infill(self):
         return self._infill()
 
-    def _initialize_advance(self, **kwargs):
-        return self._advance(**kwargs)
-
-    def _infill(self):
-        return self.algorithm.infill()
+    def _initialize_advance(self, infills=None, **kwargs):
+        self.algorithm.advance(infills=infills, **kwargs)
+        self._copy_from_orig()
 
     def _advance(self, infills=None, **kwargs):
-        return self.algorithm.advance(infills=infills, **kwargs)
+        self.algorithm.advance(infills=infills, **kwargs)
+        self._copy_from_orig()
+
+    def advance(self, infills=None, **kwargs):
+        super().advance(infills, **kwargs)
+        self._copy_from_orig()
 
     def _set_optimum(self):
         self.opt = self.algorithm.opt
-
-
-

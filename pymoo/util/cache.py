@@ -1,42 +1,29 @@
-class Cache:
+def Cache(func):
+    """
 
-    def __init__(self, func, raise_exception=True) -> None:
-        super().__init__()
+    This is a function decorator for class attributes. It just remembers the result of the FIRST function call
+    and returns this from there on. Other cashes like LRU are difficult to use because the input can be unhashable
+    or bigger numpy arrays. Thus the user has to choose how to use this cache.
+    """
 
-        # the function to be executed
-        self.func = func
+    func_name = func.__name__
 
-        # the result object which is cached
-        self.cache = None
+    def wrapper(self, *args, use_cache=True, set_cache=True, **kwargs):
 
-        # a flag indicating if it has been executed
-        self.has_been_executed = False
+        if "cache" not in self.__dict__:
+            self.__dict__["cache"] = {}
 
-        # whether an exception shall be thrown if it fails
-        self.raise_exception = raise_exception
+        cache = self.__dict__["cache"]
 
-        # the error message if an exception occurs
-        self.error = None
-
-    def exec(self, *args, use_cache=True, **kwargs):
-
-        if use_cache and self.has_been_executed:
-            return self.cache
-
+        if use_cache and func_name in cache:
+            return cache[func_name]
         else:
-            try:
-                self.cache = self.func(*args, **kwargs)
-            except Exception as e:
-                self.error = str(e)
 
-                if self.raise_exception:
-                    raise e
+            obj = func(self, *args, **kwargs)
 
-            self.has_been_executed = True
+            if set_cache:
+                cache[func_name] = obj
 
-            return self.cache
+            return obj
 
-    def reset(self):
-        self.has_been_executed = False
-        self.cache = None
-        self.error = None
+    return wrapper

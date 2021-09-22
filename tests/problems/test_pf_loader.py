@@ -1,31 +1,29 @@
-import numpy as np
-
-from pymoo.problems.many import DTLZ6
+from pymoo.factory import get_reference_directions
+from pymoo.problems.many import DTLZ6, DTLZ1
 from pymoo.problems.multi import ZDT1, Kursawe, OSY, CTP1
-from pymoo.util.cache import Cache
-
-
-def my_loader():
-    return np.arange(10)
-
-
-def test_load_func():
-    loader = Cache(my_loader)
-    pf = loader.exec()
-    assert len(pf) == 10
-
-
-def test_load_cache():
-    loader = Cache(my_loader)
-    assert id(loader.exec()) == id(loader.exec())
 
 
 def test_load_functional():
     problem = ZDT1()
     pf = problem.pareto_front(n_pareto_points=200)
     assert len(pf) == 200
-    assert id(pf) == id(problem.pareto_front())
-    assert id(pf) != id(problem.pareto_front(use_cache=False))
+    assert id(pf) != id(problem.pareto_front())
+    assert id(pf) == id(problem.pareto_front(n_pareto_points=200))
+
+
+def test_load_functional_with_param():
+    problem = DTLZ1()
+    ref_dirs1 = get_reference_directions("uniform", 3, n_partitions=13)
+    ref_dirs2 = get_reference_directions("uniform", 3, n_partitions=12)
+
+    pf = problem.pareto_front(ref_dirs=ref_dirs1)
+    assert len(pf) == 105
+
+    pf = problem.pareto_front(use_cache=True, ref_dirs=ref_dirs2)
+    assert len(pf) == 105
+
+    pf = problem.pareto_front(use_cache=False, ref_dirs=ref_dirs2)
+    assert len(pf) == 91
 
 
 def test_load_remote_kur():

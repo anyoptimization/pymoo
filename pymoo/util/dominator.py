@@ -45,18 +45,6 @@ class Dominator:
     @staticmethod
     def calc_domination_matrix(F, _F=None, epsilon=0.0):
 
-        """
-        if G is None or len(G) == 0:
-            constr = np.zeros((F.shape[0], F.shape[0]))
-        else:
-            # consider the constraint violation
-            # CV = Problem.calc_constraint_violation(G)
-            # constr = (CV < CV) * 1 + (CV > CV) * -1
-
-            CV = Problem.calc_constraint_violation(G)[:, 0]
-            constr = (CV[:, None] < CV) * 1 + (CV[:, None] > CV) * -1
-        """
-
         if _F is None:
             _F = F
 
