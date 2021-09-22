@@ -1,3 +1,4 @@
+import functools
 from abc import abstractmethod
 
 import autograd.numpy as np
@@ -48,7 +49,7 @@ class Problem:
             Upper bounds for the variable. if integer all upper bounds are equal.
 
         type_var : numpy.dtype
-
+            The variable type. So far, just used as a type hint.
 
         """
 
@@ -98,14 +99,6 @@ class Problem:
 
         # attribute which are excluded from being serialized )
         self.exclude_from_serialization = exclude_from_serialization if exclude_from_serialization is not None else []
-
-        # the loader for the pareto set (ps)
-        self._pareto_set = Cache(calc_ps, raise_exception=False)
-
-        # the loader for the pareto front (pf)
-        self._pareto_front = Cache(calc_pf, raise_exception=False)
-
-        self._ideal_point, self._nadir_point = None, None
 
     def evaluate(self,
                  X,
@@ -161,39 +154,31 @@ class Problem:
         self._evaluate(X, out, *args, **kwargs)
         out_to_2d_ndarray(out)
 
-    def nadir_point(self):
-        """
-        Returns
-        -------
-        nadir_point : np.array
-            The nadir point for a multi-objective problem. If single-objective, it returns the best possible solution
-            which is equal to the ideal point.
+    @Cache
+    def nadir_point(self, *args, **kwargs):
+        pf = self.pareto_front(*args, **kwargs)
+        if pf is not None:
+            return np.max(pf, axis=0)
 
-        """
-        if self._nadir_point is None:
-            pf = self.pareto_front()
-            if pf is not None:
-                self._nadir_point = np.max(pf, axis=0)
-        return self._nadir_point
+    @Cache
+    def ideal_point(self, *args, **kwargs):
+        pf = self.pareto_front(*args, **kwargs)
+        if pf is not None:
+            return np.min(pf, axis=0)
 
-    def ideal_point(self):
-        """
-        Returns
-        -------
-        ideal_point : np.array
-            The ideal point for a multi-objective problem. If single-objective it returns the best possible solution.
-        """
-        if self._ideal_point is None:
-            pf = self.pareto_front()
-            if pf is not None:
-                self._ideal_point = np.min(pf, axis=0)
-        return self._ideal_point
-
+    @Cache
     def pareto_front(self, *args, **kwargs):
-        return self._pareto_front.exec(self, *args, **kwargs)
+        pf = self._calc_pareto_front(*args, **kwargs)
+        pf = at_least_2d_array(pf, extend_as='r')
+        if pf is not None and pf.shape[1] == 2:
+            pf = pf[np.argsort(pf[:, 0])]
+        return pf
 
+    @Cache
     def pareto_set(self, *args, **kwargs):
-        return self._pareto_set.exec(self, *args, **kwargs)
+        ps = self._calc_pareto_set(*args, **kwargs)
+        ps = at_least_2d_array(ps, extend_as='r')
+        return ps
 
     @property
     def n_constr(self):
@@ -220,10 +205,6 @@ class Problem:
 
     def _calc_pareto_set(self, *args, **kwargs):
         pass
-
-    @staticmethod
-    def calc_constraint_violation(G):
-        return calc_ieq_cv(G)
 
     def __str__(self):
         s = "# name: %s\n" % self.name()
@@ -391,51 +372,6 @@ def out_to_float(out, keys):
                 out[key] = out[key].astype(float)
             except:
                 pass
-
-
-def calc_ieq_cv(g, beta=None, eps=0.0):
-    if g is None:
-        return 0.0
-
-    else:
-
-        # zero out all values less than eps  - they are not counted as violations
-        g = g * (g > eps).astype(int)
-
-        # sometimes it could be useful to square the constraints for instance and transform the function
-        if beta is not None:
-            g = (g ** beta)
-
-        # finally sum up the constraints for each solution
-        cv = g.sum()
-
-        return cv
-
-
-def ieq_cv(G, **kwargs):
-    return np.array([calc_ieq_cv(g, **kwargs) for g in G])[:, None]
-
-
-def calc_eq_cv(h, eps=1e-6):
-    if h is None:
-        return 0.0
-
-    else:
-
-        # check the absolute values
-        _h = np.abs(h)
-
-        # only count the ones bigger than eps
-        _h = _h * (_h > eps).astype(int)
-
-        # finally sum up the constraints for each solution
-        cv = _h.sum()
-
-        return cv
-
-
-def eq_cv(H, **kwargs):
-    return np.array([calc_eq_cv(h, **kwargs) for h in H])[:, None]
 
 
 def replace_nan_values(out, by=np.inf):

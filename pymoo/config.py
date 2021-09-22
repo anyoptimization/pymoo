@@ -12,12 +12,17 @@ class Config:
     # the root directory where the package is located at
     root = dirname(realpath(__file__))
 
+    warnings = {
+        "not_compiled": True
+    }
+
     # whether a warning should be printed if compiled modules are not available
     show_compile_hint = True
 
     # whether when import a file the doc should be parsed - only activate when creating doc files
     parse_custom_docs = False
 
+    # a method defining the endpoint to load data remotely - default from github repo
     @classmethod
     def data(cls):
         branch = "master"

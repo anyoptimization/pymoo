@@ -54,13 +54,13 @@ class FunctionLoader:
         super().__init__()
         self.is_compiled = is_compiled()
 
-        if Config.show_compile_hint and not self.is_compiled:
+        if Config.warnings["not_compiled"] and not self.is_compiled:
             print("\nCompiled modules for significant speedup can not be used!")
             print("https://pymoo.org/installation.html#installation")
             print()
             print("To disable this warning:")
             print("from pymoo.config import Config")
-            print("Config.show_compile_hint = False\n")
+            print("Config.warnings['not_compiled'] = False\n")
 
     def load(self, func_name=None, _type="auto"):
 

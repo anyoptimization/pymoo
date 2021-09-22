@@ -2,7 +2,7 @@ import autograd.numpy as anp
 import numpy as np
 from autograd import value_and_grad
 
-from pymoo.factory import normalize
+from pymoo.util.normalization import normalize
 from pymoo.util.ref_dirs.energy import squared_dist
 from pymoo.util.ref_dirs.optimizer import Adam
 from pymoo.util.reference_direction import ReferenceDirectionFactory, scale_reference_directions

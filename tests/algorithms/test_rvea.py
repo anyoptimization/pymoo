@@ -1,8 +1,9 @@
 import numpy as np
 
 from pymoo.algorithms.moo.rvea import APDSurvival, RVEA
-from pymoo.factory import DTLZ2
+
 from pymoo.core.population import Population
+from pymoo.problems.many import DTLZ2
 from tests.util import path_to_test_resource
 
 

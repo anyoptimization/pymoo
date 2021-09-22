@@ -4,8 +4,9 @@ from pymoo.algorithms.soo.nonconvex.nelder_mead import NelderMead
 from pymoo.algorithms.soo.nonconvex.pattern_search import PatternSearch
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.algorithms.soo.nonconvex.pso import PSO
-from pymoo.factory import Sphere, Problem
+
 from pymoo.optimize import minimize
+from pymoo.problems.single import Sphere, Problem
 
 
 class SphereNoBounds(Sphere):

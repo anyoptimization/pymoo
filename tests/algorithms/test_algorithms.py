@@ -1,10 +1,11 @@
 import numpy as np
 
 from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.factory import get_problem, Problem, ZDT
+from pymoo.factory import get_problem
 from pymoo.core.evaluator import Evaluator
-from pymoo.core.problem import ElementwiseProblem
+from pymoo.core.problem import ElementwiseProblem, Problem
 from pymoo.optimize import minimize
+from pymoo.problems.multi import ZDT
 
 
 def test_same_seed_same_result():

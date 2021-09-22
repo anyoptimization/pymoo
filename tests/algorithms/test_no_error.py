@@ -12,9 +12,11 @@ from pymoo.algorithms.soo.nonconvex.es import ES
 from pymoo.algorithms.soo.nonconvex.nelder_mead import NelderMead
 from pymoo.algorithms.soo.nonconvex.pattern_search import PatternSearch
 from pymoo.algorithms.soo.nonconvex.pso import PSO
-from pymoo.factory import Sphere, Rosenbrock, Himmelblau, ZDT1, get_reference_directions
+from pymoo.factory import get_reference_directions
 from pymoo.indicators.igd import IGD
 from pymoo.optimize import minimize
+from pymoo.problems.multi import ZDT1
+from pymoo.problems.single import Sphere, Himmelblau, Rosenbrock
 
 SINGLE_OBJECTIVE_PROBLEMS = [Sphere(n_var=10), Himmelblau(), Rosenbrock()]
 

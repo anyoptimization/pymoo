@@ -15,7 +15,6 @@ class FunctionalProblem(ElementwiseProblem):
                  objs,
                  constr_ieq=[],
                  constr_eq=[],
-                 constr_eq_eps=1e-6,
                  func_pf=func_return_none,
                  func_ps=func_return_none,
                  **kwargs):
@@ -27,33 +26,19 @@ class FunctionalProblem(ElementwiseProblem):
         self.objs = objs
         self.constr_ieq = constr_ieq
         self.constr_eq = constr_eq
-        self.constr_eq_eps = constr_eq_eps
         self.func_pf = func_pf
         self.func_ps = func_ps
 
-        n_constr = len(constr_ieq) + len(constr_eq)
-
         super().__init__(n_var=n_var,
                          n_obj=len(self.objs),
-                         n_constr=n_constr,
+                         n_ieq_constr=len(constr_ieq),
+                         n_eq_constr=len(constr_eq),
                          **kwargs)
 
     def _evaluate(self, x, out, *args, **kwargs):
-
-        # calculate violation from the inequality constraints
-        ieq = np.array([constr(x) for constr in self.constr_ieq])
-        ieq[ieq < 0] = 0
-
-        # calculate violation from the quality constraints
-        eq = np.array([constr(x) for constr in self.constr_eq])
-        eq = np.abs(eq)
-        eq = eq - self.constr_eq_eps
-
-        # calculate the objective function
-        f = np.array([obj(x) for obj in self.objs])
-
-        out["F"] = f
-        out["G"] = np.concatenate([ieq, eq])
+        out["H"] = np.array([constr(x) for constr in self.constr_eq])
+        out["G"] = np.array([constr(x) for constr in self.constr_ieq])
+        out["F"] = np.array([obj(x) for obj in self.objs])
 
     def _calc_pareto_front(self, *args, **kwargs):
         return self.func_pf(*args, **kwargs)
