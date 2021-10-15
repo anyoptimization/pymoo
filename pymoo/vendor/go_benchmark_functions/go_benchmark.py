@@ -157,7 +157,7 @@ class Benchmark(object):
             self._dimensions = ndim
         else:
             raise ValueError('dimensionality cannot be changed for this'
-                             'problem')
+                             ' problem')
 
     @property
     def bounds(self):
