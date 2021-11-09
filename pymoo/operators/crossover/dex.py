@@ -106,7 +106,7 @@ class DEX(Crossover):
             raise Exception(f"Unknown variant: {self.variant}")
 
         # take the first parents (this is already a copy)
-        X, _, _ = X
+        X = X[0]
 
         # set the corresponding values from the donor vector
         X[M] = Xp[M]
