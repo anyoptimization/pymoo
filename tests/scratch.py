@@ -1,19 +1,20 @@
-from pymoo.algorithms.moo.nsga2 import NSGA2
+from pymoo.algorithms.soo.nonconvex.de import DE
 from pymoo.factory import get_problem
+from pymoo.operators.sampling.lhs import LHS
 from pymoo.optimize import minimize
-from pymoo.visualization.scatter import Scatter
 
-problem = get_problem("zdt1")
+problem = get_problem("ackley", n_var=10)
 
-algorithm = NSGA2(pop_size=100)
+algorithm = DE(
+pop_size=100,
+sampling=LHS(),
+variant='DE/current-to-pbest/1/bin')
 
 res = minimize(problem,
-               algorithm,
-               ('n_gen', 200),
-               seed=1,
-               verbose=True)
+algorithm,
+seed=1,
+verbose=False)
 
-plot = Scatter()
-plot.add(problem.pareto_front(), plot_type="line", color="black", alpha=0.7)
-plot.add(res.F, color="red")
-plot.show()
+
+
+

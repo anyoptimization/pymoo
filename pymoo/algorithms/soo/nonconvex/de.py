@@ -138,28 +138,30 @@ class DES(Selection):
         # create offsprings and add it to the data of the algorithm
         P = RandomSelection().do(pop, n_select, n_parents)
 
+        n = len(P)
+
         if variant == "best":
             P[:, 0] = 0
         elif variant == "current-to-best":
-            P[:, 0] = np.arange(len(pop))
+            P[:, 0] = np.arange(n)
             P[:, 1] = 0
-            P[:, 2] = np.arange(len(pop))
+            P[:, 2] = np.arange(n)
         elif variant == "current-to-rand":
-            P[:, 0] = np.arange(len(pop))
-            P[:, 2] = np.arange(len(pop))
+            P[:, 0] = np.arange(n)
+            P[:, 2] = np.arange(n)
         elif variant == "rand-to-best":
             P[:, 1] = 0
-            P[:, 2] = np.arange(len(pop))
+            P[:, 2] = np.arange(n)
         elif variant == "current-to-pbest":
             # best 10% of the population
-            n_pbest = int(np.ceil(0.1 * len(pop)))
+            n_pbest = max(1, int(np.ceil(0.1 * n)))
 
             # the corresponding indices to select from
             pbest = np.arange(n_pbest)
 
-            P[:, 0] = np.arange(len(pop))
-            P[:, 1] = np.random.choice(pbest, len(pop))
-            P[:, 2] = np.arange(len(pop))
+            P[:, 0] = np.arange(n)
+            P[:, 1] = np.random.choice(pbest, n)
+            P[:, 2] = np.arange(n)
 
         return P
 
