@@ -22,5 +22,5 @@ class RandomSearch(Algorithm):
     def _infill(self):
         return self.sampling.do(self.problem, self.n_points_per_iteration)
 
-    def _advance(self, infills=None):
+    def _advance(self, infills=None, **kwargs):
         self.pop = infills if self.opt is None else Population.merge(infills, self.opt)

@@ -1,6 +1,5 @@
 import numpy as np
 
-from pymoo.constraints.tcv import TotalConstraintViolation
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population
 from pymoo.core.problem import Problem
@@ -12,8 +11,8 @@ class Evaluator:
     def __init__(self,
                  skip_already_evaluated: bool = True,
                  evaluate_values_of: list = ["F", "G", "H"],
-                 tcv: TotalConstraintViolation = Default.tcv,
-                 attach_tcv: bool = False):
+                 tcv=Default.tcv,
+                 individual=None):
 
         """
         The evaluator has the purpose to glue the problem with the population/individual objects.
@@ -29,19 +28,18 @@ class Evaluator:
         evaluate_values_of : list
             The type of values to be asked the problem to evaluated. By default all objective, ieq. and eq. constraints.
 
-        tcv : TotalConstraintViolation
-            The object which defines the total constraint violation of each individual.
+        tcv : Total Constraint Violation
+            The class to calculate the constraint violation of an object.
 
-        attach_tcv : bool
-            If False the cv value is directly hardcoded to the individual. If True, then the tcv object is attached
-            and modifying the tcv object will respectively change the cv value of all individuals it is attached to.
+        individual : Individual
+            The type of individual to be used in the population after evaluation. If `None` the default type is used.
 
         """
 
         self.evaluate_values_of = evaluate_values_of
         self.skip_already_evaluated = skip_already_evaluated
         self.tcv = tcv
-        self.attach_tcv = attach_tcv
+        self.individual = individual
 
         # current number of function evaluations - initialized to zero
         self.n_eval = 0
@@ -89,16 +87,15 @@ class Evaluator:
 
         # evaluate the solutions (if there are any)
         if len(I) > 0:
+
+            # check for the individual class - if a different one should be used do the conversion
+            for i in I:
+                if self.individual is not None:
+                    if not isinstance(pop[i], self.individual.__class__):
+                        pop[i] = self.individual.copy(pop[i])
+
             # do the actual evaluation - call the sub-function to set the corresponding values to the population
             self._eval(problem, pop[I], evaluate_values_of, **kwargs)
-
-            # directly calculate the tcv and store the values in the population
-            if not self.attach_tcv:
-                self.tcv.do(pop[I], inplace=True)
-
-            # just attach it which causes no calculations now, but later whenever cv is asked for.
-            else:
-                pop[I].set("tcv", self.tcv)
 
         # update the function evaluation counter
         if count_evals:
@@ -120,14 +117,20 @@ class Evaluator:
                                return_as_dictionary=True,
                                **kwargs)
 
+        # for each of the attributes set it too the problem
         for key, val in out.items():
             if val is None:
                 continue
             else:
                 pop.set(key, val)
 
+        # finally set all the attributes to be evaluated for all individuals
         for ind in pop:
             ind.evaluated.update(out.keys())
+
+        # directly calculate the tcv and store the values in the population
+        if self.tcv is not None:
+            self.tcv.do(pop, inplace=True)
 
 
 class VoidEvaluator(Evaluator):
@@ -140,9 +143,9 @@ class VoidEvaluator(Evaluator):
         val = self.value
         if val is not None:
             for individual in pop:
-                if individual.F is None:
+                if len(individual.evaluated) == 0:
                     individual.F = np.full(problem.n_obj, val)
                     individual.G = np.full(problem.n_ieq_constr, val) if problem.n_ieq_constr > 0 else None
                     individual.H = np.full(problem.n_eq_constr, val) if problem.n_eq_constr else None
                     individual.CV = [-np.inf]
-                    individual.feasible = [False]
+                    individual.feas = [False]

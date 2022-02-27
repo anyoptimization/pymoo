@@ -8,6 +8,7 @@ from pymoo.config import Config
 # =========================================================================================================
 
 
+
 def get_from_list(l, name, args, kwargs):
     i = None
 
@@ -136,7 +137,6 @@ def get_selection(name, *args, d={}, **kwargs):
 # =========================================================================================================
 
 def get_crossover_options():
-    from pymoo.operators.crossover.dex import DEX
     from pymoo.operators.crossover.expx import ExponentialCrossover
     from pymoo.operators.crossover.hux import HalfUniformCrossover
     from pymoo.operators.crossover.pntx import PointCrossover
@@ -150,7 +150,6 @@ def get_crossover_options():
     CROSSOVER = [
         ("real_sbx", SimulatedBinaryCrossover, dict(prob=0.9, eta=30)),
         ("int_sbx", IntegerFromFloatCrossover, dict(clazz=SimulatedBinaryCrossover, prob=0.9, eta=30)),
-        ("real_de", DEX),
         ("real_pcx", PCX),
         ("(real|bin|int)_ux", UniformCrossover),
         ("(bin|int)_hux", HalfUniformCrossover),
@@ -175,7 +174,7 @@ def get_crossover(name, *args, d={}, **kwargs):
 
 def get_mutation_options():
     from pymoo.operators.mutation.nom import NoMutation
-    from pymoo.operators.mutation.bitflip import BinaryBitflipMutation
+    from pymoo.operators.mutation.bitflip import BitflipMutation
     from pymoo.operators.mutation.pm import PolynomialMutation
     from pymoo.operators.integer_from_float_operator import IntegerFromFloatMutation
     from pymoo.operators.mutation.inversion import InversionMutation
@@ -184,7 +183,7 @@ def get_mutation_options():
         ("none", NoMutation, {}),
         ("real_pm", PolynomialMutation, dict(eta=20)),
         ("int_pm", IntegerFromFloatMutation, dict(clazz=PolynomialMutation, eta=20)),
-        ("bin_bitflip", BinaryBitflipMutation),
+        ("bin_bitflip", BitflipMutation),
         ("perm_inv", InversionMutation)
     ]
 
@@ -247,6 +246,7 @@ def get_problem_options():
         Rosenbrock, Schwefel, Sphere, Zakharov
     from pymoo.problems.single import G1, G2, G3, G4, G5, G6, G7, G8, G9, G10, G11, G12, G13, G14, G15, G16, G17, G18, \
         G19, G20, G21, G22, G23, G24
+    from pymoo.problems.dynamic.df import DF1, DF2, DF3, DF4, DF5, DF6, DF7, DF8, DF9, DF10, DF11, DF12, DF13, DF14
 
     PROBLEM = [
         ('ackley', Ackley),
@@ -269,6 +269,20 @@ def get_problem_options():
         ('dascmop7', DASCMOP7),
         ('dascmop8', DASCMOP8),
         ('dascmop9', DASCMOP9),
+        ('df1', DF1),
+        ('df2', DF2),
+        ('df3', DF3),
+        ('df4', DF4),
+        ('df5', DF5),
+        ('df6', DF6),
+        ('df7', DF7),
+        ('df8', DF8),
+        ('df9', DF9),
+        ('df10', DF10),
+        ('df11', DF11),
+        ('df12', DF12),
+        ('df13', DF13),
+        ('df14', DF14),
         ('modact', MODAct),
         ('mw1', MW1),
         ('mw2', MW2),
@@ -328,15 +342,15 @@ def get_problem_options():
         ('zdt4', ZDT4),
         ('zdt5', ZDT5),
         ('zdt6', ZDT6),
-        ('g01', G1),
-        ('g02', G2),
-        ('g03', G3),
-        ('g04', G4),
-        ('g05', G5),
-        ('g06', G6),
-        ('g07', G7),
-        ('g08', G8),
-        ('g09', G9),
+        ('g1', G1),
+        ('g2', G2),
+        ('g3', G3),
+        ('g4', G4),
+        ('g5', G5),
+        ('g6', G6),
+        ('g7', G7),
+        ('g8', G8),
+        ('g9', G9),
         ('g10', G10),
         ('g11', G11),
         ('g12', G12),

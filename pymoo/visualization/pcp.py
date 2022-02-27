@@ -75,7 +75,7 @@ class PCP(Plot):
         for k, (F, kwargs) in enumerate(to_plot_norm):
 
             _kwargs = kwargs.copy()
-            set_if_none(_kwargs, "color", self.colors[k])
+            set_if_none(_kwargs, "color", self.colors[k % len(self.colors)])
 
             for i in range(len(F)):
                 self.ax.plot(np.arange(F.shape[1]), F[i, :], **_kwargs)

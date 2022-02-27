@@ -54,7 +54,7 @@ class MOEAD(GeneticAlgorithm):
                  prob_neighbor_mating=0.9,
                  sampling=FloatRandomSampling(),
                  crossover=SimulatedBinaryCrossover(prob=1.0, eta=20),
-                 mutation=PolynomialMutation(prob=None, eta=20),
+                 mutation=PolynomialMutation(prob_per_variable=None, eta=20),
                  display=MultiObjectiveDisplay(),
                  **kwargs):
         """

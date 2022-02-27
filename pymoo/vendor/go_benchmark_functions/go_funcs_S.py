@@ -289,7 +289,7 @@ class Schaffer04(Benchmark):
 #         self.nfev += 1
 #
 #         return (1 / (1 + (x[0] - x[1]) ** 2) + sin((pi * x[1] + x[2]) / 2)
-#                 + exp(((x[0] + x[1]) / x[1] - 2) ** 2))
+#                 + experiment(((x[0] + x[1]) / x[1] - 2) ** 2))
 
 
 class Schwefel01(Benchmark):

@@ -50,7 +50,7 @@ class DuplicateElimination:
             return pop
 
     def _do(self, pop, other, is_duplicate):
-        pass
+        return is_duplicate
 
 
 class DefaultDuplicateElimination(DuplicateElimination):
@@ -79,36 +79,39 @@ class DefaultDuplicateElimination(DuplicateElimination):
         return is_duplicate
 
 
+def to_float(val):
+    if isinstance(val, bool) or isinstance(val, np.bool_):
+        return 0.0 if val else 1.0
+    else:
+        return val
+
+
 class ElementwiseDuplicateElimination(DefaultDuplicateElimination):
 
     def __init__(self, cmp_func=None, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.cmp = cmp_func
-        if self.cmp is None:
-            self.cmp = lambda a, b: self.is_equal(a, b)
+
+        if cmp_func is None:
+            cmp_func = self.is_equal
+
+        self.cmp_func = cmp_func
 
     def is_equal(self, a, b):
         pass
 
     def _do(self, pop, other, is_duplicate):
 
-        def to_float(val):
-            if isinstance(val, bool) or isinstance(val, np.bool_):
-                return 0.0 if val else 1.0
-            else:
-                return val
-
         if other is None:
             for i in range(len(pop)):
                 for j in range(i + 1, len(pop)):
-                    val = to_float(self.cmp(pop[i], pop[j]))
+                    val = to_float(self.cmp_func(pop[i], pop[j]))
                     if val < self.epsilon:
                         is_duplicate[i] = True
                         break
         else:
             for i in range(len(pop)):
                 for j in range(len(other)):
-                    val = to_float(self.cmp(pop[i], other[j]))
+                    val = to_float(self.cmp_func(pop[i], other[j]))
                     if val < self.epsilon:
                         is_duplicate[i] = True
                         break

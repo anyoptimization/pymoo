@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
-from pymoo.algorithms.soo.nonconvex.de import DES
+from pymoo.operators.selection.des import DES
 from pymoo.core.survival import Survival
 from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.dex import DEX

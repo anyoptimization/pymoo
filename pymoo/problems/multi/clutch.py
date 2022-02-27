@@ -4,9 +4,10 @@ from pymoo.core.problem import Problem
 
 
 class Clutch(Problem):
+
     def __init__(self):
         super().__init__(n_var=5, n_obj=2, n_ieq_constr=19, type_var=int)
-        # ri, ro, t, F, Z
+        # ri, ro, t, F, Xp
         # self.xl = anp.array([60, 90, 1, 600, 2])
         self.xl = anp.array([0, 0, 0, 0, 0])
         self.xu = anp.array([20, 20, 4, 400, 7])

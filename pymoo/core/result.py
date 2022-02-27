@@ -25,10 +25,22 @@ class Result:
         self.pop = None
 
         # directly the values of opt
-        self.X, self.F, self.CV, self.G = None, None, None, None
+        self.X, self.F, self.CV, self.G, self.H = None, None, None, None, None
 
         # all the timings that are stored of the run
         self.start_time, self.end_time, self.exec_time = None, None, None
 
         # the history of the optimization run is they were saved
         self.history = []
+
+    @property
+    def cv(self):
+        return self.CV[0]
+
+    @property
+    def f(self):
+        return self.F[0]
+
+    @property
+    def feas(self):
+        return self.cv <= 0

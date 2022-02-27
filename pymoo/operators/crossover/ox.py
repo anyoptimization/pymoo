@@ -19,7 +19,7 @@ def ox(receiver, donor, seq=None, shift=False):
     donor : numpy.array
         The donor of the sequence.
     seq : tuple (optional)
-        Tuple with two entries defining the start and the end of the sequence. Please note in our implementation
+        Tuple with two problems defining the start and the end of the sequence. Please note in our implementation
         the end of the sequence is included. The sequence is randomly chosen if not provided.
 
     shift : bool

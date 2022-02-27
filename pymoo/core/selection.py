@@ -1,21 +1,31 @@
 from abc import abstractmethod
 
+import numpy as np
 
-class Selection:
+from pymoo.core.operator import Operator
 
-    def __init__(self) -> None:
+
+class Selection(Operator):
+
+    def __init__(self, **kwargs) -> None:
         """
         This class is used to select parents for the mating or other evolutionary operators.
         Several strategies can be used to increase the selection pressure.
         """
-        super().__init__()
+        super().__init__(**kwargs)
 
-    def do(self, pop, n_select, n_parents=2, **kwargs):
+    def do(self, problem, pop, n_select, to_pop=True, **kwargs):
         """
         Choose from the population new individuals to be selected.
 
         Parameters
         ----------
+
+
+        problem: class
+            The problem to be solved. Provides information such as lower and upper bounds or feasibility
+            conditions for custom crossovers.
+
         pop : :class:`~pymoo.core.population.Population`
             The population which should be selected from. Some criteria from the design or objective space
             might be used for the selection. Therefore, only the number of individual might be not enough.
@@ -26,15 +36,26 @@ class Selection:
         n_parents : int
             Number of parents needed to create an offspring.
 
+        to_pop : bool
+            Whether IF(!) the implementation returns only indices, it should be converted to individuals.
+
         Returns
         -------
-        I : numpy.array
-            Indices of selected individuals.
+        parents : list
+            List of parents to be used in the crossover
 
         """
 
-        return self._do(pop, n_select, n_parents, **kwargs)
+        ret = self._do(problem, pop, n_select, **kwargs)
+
+        # if some selections return indices they are used to create the individual list
+        if to_pop and isinstance(ret, np.ndarray) and ret.dtype == int:
+            ret = pop[ret]
+
+        return ret
 
     @abstractmethod
-    def _do(self, pop, n_select, n_parents, **kwargs):
+    def _do(self, problem, pop, n_select, n_parents, **kwargs):
         pass
+
+

@@ -36,13 +36,13 @@ class InfillCriterion:
             # repair the individuals if necessary - disabled if repair is NoRepair
             _off = self.repair.do(problem, _off, **kwargs)
 
-            # eliminate the duplicates - disabled if it is NoRepair
+            # eliminate the duplicates
             _off = self.eliminate_duplicates.do(_off, pop, off)
 
             # if more offsprings than necessary - truncate them randomly
             if len(off) + len(_off) > n_offsprings:
 
-                # IMPORTANT: Interestingly, this makes a difference in performance
+                # IMPORTANT: Interestingly, this makes a difference in performance for some algorithms
                 n_remaining = n_offsprings - len(off)
                 _off = _off[:n_remaining]
 

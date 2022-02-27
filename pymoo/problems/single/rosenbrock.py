@@ -15,7 +15,7 @@ class Rosenbrock(Problem):
         out["F"] = anp.sum(anp.column_stack(l), axis=1)
 
     def _calc_pareto_front(self):
-        return 0
+        return 0.0
 
     def _calc_pareto_set(self):
         return anp.full(self.n_var, 1.0)

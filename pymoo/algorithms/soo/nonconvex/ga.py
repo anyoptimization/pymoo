@@ -1,10 +1,11 @@
 import numpy as np
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
-from pymoo.docs import parse_doc_string
 from pymoo.core.survival import Survival
-from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
-from pymoo.operators.mutation.pm import PolynomialMutation
+from pymoo.docs import parse_doc_string
+from pymoo.operators.crossover.sbx import SBX
+from pymoo.operators.mutation.pm import PM
+from pymoo.operators.param_control import NoParameterControl
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import compare, TournamentSelection
 from pymoo.util.display import SingleObjectiveDisplay
@@ -19,15 +20,14 @@ from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 class FitnessSurvival(Survival):
 
     def __init__(self) -> None:
-        super().__init__(True)
+        super().__init__(filter_infeasible=False)
 
-    def _do(self, problem, pop, n_survive=None, out=None, **kwargs):
-        F = pop.get("F")
-
-        if F.shape[1] != 1:
-            raise ValueError("FitnessSurvival can only used for single objective single!")
-
-        return pop[np.argsort(F[:, 0])[:n_survive]]
+    def _do(self, problem, pop, n_survive=None, **kwargs):
+        F, cv = pop.get("F", "cv")
+        assert F.shape[1] == 1, "FitnessSurvival can only used for single objective single!"
+        S = np.lexsort([F[:, 0], cv])
+        pop.set("rank", np.argsort(S))
+        return pop[S[:n_survive]]
 
 
 # =========================================================================================================
@@ -58,26 +58,13 @@ class GA(GeneticAlgorithm):
                  pop_size=100,
                  sampling=FloatRandomSampling(),
                  selection=TournamentSelection(func_comp=comp_by_cv_and_fitness),
-                 crossover=SimulatedBinaryCrossover(prob=0.9, eta=3),
-                 mutation=PolynomialMutation(prob=None, eta=5),
+                 crossover=SBX(),
+                 mutation=PM(),
                  survival=FitnessSurvival(),
                  eliminate_duplicates=True,
                  n_offsprings=None,
                  display=SingleObjectiveDisplay(),
                  **kwargs):
-        """
-
-        Parameters
-        ----------
-        pop_size : {pop_size}
-        sampling : {sampling}
-        selection : {selection}
-        crossover : {crossover}
-        mutation : {mutation}
-        eliminate_duplicates : {eliminate_duplicates}
-        n_offsprings : {n_offsprings}
-
-        """
 
         super().__init__(pop_size=pop_size,
                          sampling=sampling,

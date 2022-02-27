@@ -64,7 +64,8 @@ class TotalConstraintViolation:
 
     def calc(self,
              G: np.ndarray = None,
-             H: np.ndarray = None):
+             H: np.ndarray = None,
+             return_feas=False):
 
         # convert all constraints to one big array
         C = []
@@ -89,7 +90,10 @@ class TotalConstraintViolation:
         # calculate the total constraint violation
         tcv = self.aggr_func(C, axis=1)
 
-        return tcv
+        if return_feas:
+            return tcv, tcv <= self.feas_eps
+        else:
+            return tcv
 
     def do(self, pop, inplace=True):
 
@@ -119,6 +123,11 @@ def g_to_cv(g, eps, beta=None, scale=None):
 
     # apply scaling if necessary
     if scale is not None:
+
+        # allow a scalar value as input
+        if not isinstance(scale, np.ndarray):
+            scale = np.full(g.shape[1], scale)
+
         # make sure to only use positive scaling and not zero
         I = np.where(scale > 0)[0]
         g[:, I] = g[:, I] / scale[I]
@@ -128,3 +137,12 @@ def g_to_cv(g, eps, beta=None, scale=None):
         g = g ** beta
 
     return g
+
+
+def estm_scale(v, eps=0.0, func=np.mean):
+    v = v[v > eps]
+
+    if len(v) == 0:
+        return 1.0
+    else:
+        return func(v)

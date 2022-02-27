@@ -1,6 +1,7 @@
 import autograd.numpy as anp
 
 from pymoo.core.problem import Problem
+from pymoo.util.remote import Remote
 
 
 class Carside(Problem):
@@ -38,3 +39,9 @@ class Carside(Problem):
 
         out["F"] = anp.column_stack([f1, f2, f3])
         out["G"] = anp.column_stack([g1, g2, g3, g4, g5, g6, g7, g8, g9, g10])
+
+    def _calc_pareto_front(self, *args, **kwargs):
+        return Remote.get_instance().load("pf", "carside.pf")
+
+
+

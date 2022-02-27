@@ -1,3 +1,4 @@
+import json
 import os
 import urllib.request
 from os.path import join, dirname, abspath
@@ -8,7 +9,6 @@ from pymoo.config import Config
 
 
 class Remote:
-
     # -------------------------------------------------
     # Singleton Pattern
     # -------------------------------------------------
@@ -29,7 +29,7 @@ class Remote:
         self.server = server
         self.folder = folder
 
-    def load(self, *args):
+    def load(self, *args, to="numpy"):
 
         # the local file we can try loading
         f = join(str(self.folder), *args)
@@ -46,4 +46,8 @@ class Remote:
             url = self.server + "/".join(args)
             urllib.request.urlretrieve(url, f)
 
-        return np.loadtxt(f)
+        if to == "numpy":
+            return np.loadtxt(f)
+        elif to == "json":
+            with open(f) as file:
+                return json.load(file)

@@ -37,7 +37,7 @@ class Survival:
         if self.filter_infeasible and problem.has_constraints():
 
             # split feasible and infeasible solutions
-            feas, infeas = split_by_feasibility(pop, eps=0.0, sort_infeasbible_by_cv=True)
+            feas, infeas = split_by_feasibility(pop, sort_infeas_by_cv=True)
 
             if len(feas) == 0:
                 survivors = Population()
@@ -67,15 +67,37 @@ class Survival:
         pass
 
 
-def split_by_feasibility(pop, sort_infeasbible_by_cv=True):
-    CV, b = pop.get("CV", "feasible")
+class ToReplacement(Survival):
+
+    def __init__(self, survival):
+        super().__init__(False)
+        self.survival = survival
+
+    def _do(self, problem, pop, off, **kwargs):
+        merged = Population.merge(pop, off)
+        I = self.survival.do(problem, merged, n_survive=len(merged), return_indices=True, **kwargs)
+        merged.set("__rank__", I)
+
+        for k in range(len(pop)):
+            if off[k].get("__rank__") < pop[k].get("__rank__"):
+                pop[k] = off[k]
+
+        return pop
+
+
+def split_by_feasibility(pop, sort_infeas_by_cv=True, sort_feas_by_obj=False, return_pop=False):
+    F, CV, b = pop.get("F", "CV", "feasible")
 
     feasible = np.where(b)[0]
     infeasible = np.where(~b)[0]
 
-    if sort_infeasbible_by_cv:
+    if sort_infeas_by_cv:
         infeasible = infeasible[np.argsort(CV[infeasible, 0])]
 
-    return feasible, infeasible
+    if sort_feas_by_obj:
+        feasible = feasible[np.argsort(F[feasible, 0])]
 
-
+    if not return_pop:
+        return feasible, infeasible
+    else:
+        return feasible, infeasible, pop[feasible], pop[infeasible]

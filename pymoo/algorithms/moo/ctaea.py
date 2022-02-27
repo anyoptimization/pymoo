@@ -5,11 +5,11 @@ import numpy as np
 from scipy.spatial.distance import cdist, pdist, squareform
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
+from pymoo.core.population import Population
 from pymoo.decomposition.asf import ASF
 from pymoo.docs import parse_doc_string
-from pymoo.core.population import Population
-from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
-from pymoo.operators.mutation.pm import PolynomialMutation
+from pymoo.operators.crossover.sbx import SBX
+from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import TournamentSelection
 from pymoo.util.display import MultiObjectiveDisplay
@@ -52,7 +52,7 @@ def comp_by_cv_dom_then_random(pop, P, **kwargs):
 class RestrictedMating(TournamentSelection):
     """Restricted mating approach to balance convergence and diversity archives"""
 
-    def _do(self, Hm, n_select, n_parents=2, **kwargs):
+    def _do(self, problem, Hm, n_select, n_parents=2, **kwargs):
         n_pop = len(Hm) // 2
 
         _, rank = NonDominatedSorting().do(Hm.get('F'), return_rank=True)
@@ -114,7 +114,7 @@ class CADASurvival:
         """Update the Convergence archive (CA)"""
         CV = pop.get("CV").flatten()
 
-        Sc = pop[CV == 0]  # Feasible population
+        Sc = pop[CV == 0]  # ConstraintsAsObjective population
         if len(Sc) == n_survive:  # Exactly n_survive feasible individuals
             F = Sc.get("F")
             fronts, rank = NonDominatedSorting().do(F, return_rank=True)
@@ -226,8 +226,8 @@ class CTAEA(GeneticAlgorithm):
                  ref_dirs,
                  sampling=FloatRandomSampling(),
                  selection=RestrictedMating(func_comp=comp_by_cv_dom_then_random),
-                 crossover=SimulatedBinaryCrossover(n_offsprings=1, eta=30, prob=1.0),
-                 mutation=PolynomialMutation(eta=20, prob=None),
+                 crossover=SBX(n_offsprings=1, eta=30, prob=1.0),
+                 mutation=PM(eta=20, prob_per_variable=None),
                  eliminate_duplicates=True,
                  display=MultiObjectiveDisplay(),
                  **kwargs):
@@ -279,8 +279,7 @@ class CTAEA(GeneticAlgorithm):
 
     def _initialize_advance(self, infills=None, **kwargs):
         super()._initialize_advance(infills, **kwargs)
-        self.pop, self.da = self.survival.do(self.problem, self.pop, Population(), n_survive=len(self.pop),
-                                             algorithm=self)
+        self.pop, self.da = self.survival.do(self.problem, self.pop, Population(), n_survive=len(self.pop), algorithm=self)
 
     def _infill(self):
         Hm = Population.merge(self.pop, self.da)

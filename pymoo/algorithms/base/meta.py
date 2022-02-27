@@ -15,19 +15,22 @@ class MetaAlgorithm(Algorithm):
         if copy:
             algorithm = deepcopy(algorithm)
 
-        # store the current algorithm object to be iterated over
         self.algorithm = algorithm
 
     def _copy_from_orig(self):
         for k, v in self.algorithm.__dict__.items():
-            self.__dict__[k] = v
-
-        self.__dict__["display"] = None
+            if k not in ["opt", "display"]:
+                self.__dict__[k] = v
 
     def setup(self, *args, **kwargs):
         self.algorithm.setup(*args, **kwargs)
         self._copy_from_orig()
+
+        self.display = self.algorithm.display
+        self.algorithm.display = None
+
         self._setup(*args, **kwargs)
+
         return self
 
     def _infill(self):
