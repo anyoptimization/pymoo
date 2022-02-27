@@ -443,7 +443,8 @@ class CMAES(LocalSearch):
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        del state["es"]
+        if "es" in state:
+            del state["es"]
         return state
 
     def __setstate__(self, state):

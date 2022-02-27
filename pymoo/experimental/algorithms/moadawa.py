@@ -73,7 +73,7 @@ class MOEADAWA(GeneticAlgorithm):
         set_if_none(kwargs, 'pop_size', len(ref_dirs))
         set_if_none(kwargs, 'sampling', FloatRandomSampling())
         set_if_none(kwargs, 'crossover', SBX(prob=1.0, eta=20))
-        set_if_none(kwargs, 'mutation', PM(prob=None, eta=20))
+        set_if_none(kwargs, 'mutation', PM(eta=20, prob_per_variable=None))
         set_if_none(kwargs, 'survival', None)
         set_if_none(kwargs, 'selection', None)
 

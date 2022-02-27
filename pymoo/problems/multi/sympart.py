@@ -32,9 +32,11 @@ class SYMPARTRotated(Problem):
             [cos(self.w), sin(self.w)],
             [-sin(self.w), cos(self.w)]])
 
-        super().__init__(
-            n_var=2, n_obj=2, type_var=np.double, xl=np.full(2, -10 * max(self.b, self.c)), xu=np.full(2, 10 * max(self.b, self.c))
-        )
+        r = max(self.b, self.c)
+        xl = np.full(2, -10 * r)
+        xu = np.full(2, 10 * r)
+
+        super().__init__(n_var=2, n_obj=2, type_var=np.double, xl=xl, xu=xu)
 
     def _evaluate(self, X, out, *args, **kwargs):
         if self.w == 0:

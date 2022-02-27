@@ -60,7 +60,7 @@ class Output:
 
 class Display:
 
-    def __init__(self, output=None, attributes=None):
+    def __init__(self, output=None, attributes=None, active=True):
         super().__init__()
         self.output = output
         if self.output is None:
@@ -70,8 +70,11 @@ class Display:
         self.pareto_front_is_available = None
         self.pf = None
         self.attributes = attributes
+        self.active = active
 
     def do(self, problem, evaluator, algorithm, pf=None, show=True):
+        if not self.active:
+            return
 
         try:
 
@@ -125,21 +128,21 @@ class SingleObjectiveDisplay(Display):
         super()._do(problem, evaluator, algorithm)
 
         opt = algorithm.opt[0]
-        F, CV, feasible = algorithm.pop.get("F", "CV", "feasible")
-        feasible = np.where(feasible[:, 0])[0]
+
+        f, cv, feas = algorithm.pop.get("f", "cv", "feas")
 
         if problem.has_constraints():
-            self.output.append("cv (min)", opt.CV[0])
-            self.output.append("cv (avg)", np.mean(CV))
+            self.output.append("cv (min)", opt.cv)
+            self.output.append("cv (avg)", cv.mean())
 
-        if opt.feasible[0]:
+        if opt.feas:
 
-            self.output.append("fopt", opt.F[0])
+            self.output.append("fopt", opt.f)
             if self.pareto_front_is_available:
-                self.output.append("fopt_gap", opt.F[0] - self.pf.flatten()[0])
+                self.output.append("fopt_gap", opt.f - self.pf.flatten()[0])
             if self.favg:
-                if len(feasible) > 0:
-                    self.output.append("favg", np.mean(F[feasible]))
+                if feas.sum() > 0:
+                    self.output.append("favg", f[feas].mean())
                 else:
                     self.output.append("favg", "-")
         else:
@@ -159,8 +162,8 @@ class MultiObjectiveDisplay(Display):
     def _do(self, problem, evaluator, algorithm):
         super()._do(problem, evaluator, algorithm)
 
-        F, CV, feasible = algorithm.pop.get("F", "CV", "feasible")
-        feasible = np.where(feasible[:, 0])[0]
+        F, CV, feasible = algorithm.pop.get("F", "cv", "feas")
+        feasible = np.where(feasible)[0]
 
         if problem.has_constraints():
             self.output.append("cv (min)", CV.min())

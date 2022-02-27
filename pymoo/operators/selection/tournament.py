@@ -28,11 +28,11 @@ class TournamentSelection(Selection):
         # selection pressure to be applied
         self.pressure = pressure
 
-        self.f_comp = func_comp
-        if self.f_comp is None:
+        self.func_comp = func_comp
+        if self.func_comp is None:
             raise Exception("Please provide the comparing function for the tournament selection!")
 
-    def _do(self, pop, n_select, n_parents=1, **kwargs):
+    def _do(self, _, pop, n_select, n_parents=1, **kwargs):
         # number of random individuals needed
         n_random = n_select * n_parents * self.pressure
 
@@ -44,7 +44,7 @@ class TournamentSelection(Selection):
         P = np.reshape(P, (n_select * n_parents, self.pressure))
 
         # compare using tournament function
-        S = self.f_comp(pop, P, **kwargs)
+        S = self.func_comp(pop, P, **kwargs)
 
         return np.reshape(S, (n_select, n_parents))
 

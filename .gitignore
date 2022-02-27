@@ -10,10 +10,12 @@ __pycache__/
 *$py.class
 *.run
 *.so
+*.pkl
 
 
 # files which are in tests
 tests/!archive/*
+tests/scratch*
 tests/!archive_tests/*
 tests/!experimental/*
 

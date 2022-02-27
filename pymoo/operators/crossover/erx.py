@@ -31,12 +31,12 @@ def erx(a, b):
         - Remove X from Neighbor Lists
 
         if X's neighbor list is empty:
-           - Z = random node not already in CHILD
+           - Xp = random node not already in CHILD
         else
            - Determine neighbor of X that has fewest neighbors
            - If there is a tie, randomly choose 1
-           - Z = chosen node
-        X = Z
+           - Xp = chosen node
+        X = Xp
      """
 
     assert len(a) == len(b)

@@ -7,9 +7,17 @@ class ConstraintsAsObjective(MetaProblem):
 
     def __init__(self,
                  problem,
-                 tcv):
+                 tcv,
+                 append=True):
+
         super().__init__(problem)
-        self.n_obj = problem.n_obj + 1
+        self.append = append
+
+        if append:
+            self.n_obj = problem.n_obj + 1
+        else:
+            self.n_obj = 1
+
         self.n_ieq_constr = 0
         self.n_eq_constr = 0
         self.tcv = tcv
@@ -26,7 +34,10 @@ class ConstraintsAsObjective(MetaProblem):
         cv = self.tcv.calc(G, H)
 
         # append the constraint violation as objective
-        out["F"] = anp.column_stack([F, cv])
+        if self.append:
+            out["F"] = anp.column_stack([F, cv])
+        else:
+            out["F"] = cv
 
         # erase the values from the output - it is unconstrained now
         out.pop("G", None), out.pop("H", None)

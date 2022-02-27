@@ -14,7 +14,7 @@ class Initialization:
 
         super().__init__()
         self.sampling = sampling
-        self.eliminate_duplicates = eliminate_duplicates if eliminate_duplicates is not None else NoDuplicateElimination()
+        self.eliminate_duplicates = eliminate_duplicates if eliminate_duplicates else NoDuplicateElimination()
         self.repair = repair if repair is not None else NoRepair()
 
     def do(self, problem, n_samples, **kwargs):
@@ -30,7 +30,7 @@ class Initialization:
                 pop = self.sampling.do(problem, n_samples, **kwargs)
 
         # repair all solutions that are not already evaluated
-        not_eval_yet = [k for k in range(len(pop)) if pop[k].F is None]
+        not_eval_yet = [k for k in range(len(pop)) if len(pop[k].evaluated) == 0]
         if len(not_eval_yet) > 0:
             pop[not_eval_yet] = self.repair.do(problem, pop[not_eval_yet], **kwargs)
 

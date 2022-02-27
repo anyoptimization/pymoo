@@ -64,6 +64,12 @@ class MultiObjectiveDefaultTermination(DefaultTermination):
                  nth_gen=5,
                  n_last=30,
                  **kwargs) -> None:
+        """
+
+        Returns
+        -------
+        object
+        """
         super().__init__(DesignSpaceToleranceTermination(tol=x_tol, n_last=n_last),
                          ConstraintViolationToleranceTermination(tol=cv_tol, n_last=n_last),
                          MultiObjectiveSpaceToleranceTermination(tol=f_tol, n_last=n_last, nth_gen=nth_gen),

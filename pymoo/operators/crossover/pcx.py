@@ -1,58 +1,57 @@
 import numpy as np
 
 from pymoo.core.crossover import Crossover
-from pymoo.operators.repair.inverse_penalty import inverse_penality
+from pymoo.core.variable import Real, get
+from pymoo.operators.repair.bounds_repair import repair_random_init
 
 
-def eps_if_less_than_eps(x, eps):
-    x[x < eps] = eps
-    return x
+def pcx(X, eta, zeta, index):
+    eps = 1e-32
 
-
-def pcx(X, k, eta, zeta):
     # the number of parents to be considered
-    n_parents, n_var = X.shape
+    n_parents, n_matings, n_var = X.shape
+
+    # calculate the differences from all parents to index parent
+    diff_to_index = X - X[index]
+    dist_to_index = np.linalg.norm(diff_to_index, axis=-1)
+    dist_to_index = np.maximum(eps, dist_to_index)
 
     # find the centroid of the parents
     centroid = np.mean(X, axis=0)
 
     # calculate the difference between the centroid and the k-th parent
-    diff_to_centroid = centroid - X[k]
-    dist_to_centroid = np.linalg.norm(diff_to_centroid)
+    diff_to_centroid = centroid - X[index]
 
-    # calculate the differences from all parents to parent k
-    diff_to_index = X - X[k]
-    dist_to_index = np.linalg.norm(diff_to_index, axis=1)
+    dist_to_centroid = np.linalg.norm(diff_to_centroid, axis=-1)
+    dist_to_centroid = np.maximum(eps, dist_to_centroid)
 
     # orthogonal directions are computed
-    orth_dir = np.zeros(n_parents)
-
-    S = dist_to_index > 1e-16
-    if S.sum() == 0:
-        return centroid
+    orth_dir = np.zeros_like(dist_to_index)
 
     for i in range(n_parents):
-        if S[i]:
-            temp1 = (diff_to_index[i] * diff_to_centroid).sum()
+        if i != index:
+            temp1 = (diff_to_index[i] * diff_to_centroid).sum(axis=-1)
             temp2 = temp1 / (dist_to_index[i] * dist_to_centroid)
-            temp3 = max(1.0 - temp2 ** 2, 0)
-            orth_dir[i] = dist_to_index[i] * temp3 ** 0.5
+            temp3 = np.maximum(0.0, 1.0 - temp2 ** 2)
+            orth_dir[i] = dist_to_index[i] * (temp3 ** 0.5)
 
     # this is the avg of the perpendicular distances from other parents to the parent k
-    D_not = orth_dir.sum() / (n_parents - 1)
+    D_not = orth_dir.sum(axis=0) / (n_parents - 1)
 
     # generating zero-mean normally distributed variables
-    mu, sigma = 0.0, (D_not * eta)
-    rnd = np.random.normal(mu, sigma, n_var)
+    sigma = D_not[:, None] * eta.repeat(n_var, axis=1)
+    rnd = np.random.normal(loc=0.0, scale=sigma)
 
     # implemented just like the c code - generate_new.h file
-    noise = rnd - (np.sum(rnd * diff_to_centroid) * diff_to_centroid) / dist_to_centroid ** 2
+    inner_prod = np.sum(rnd * diff_to_centroid, axis=-1, keepdims=True)
+    noise = rnd - (inner_prod * diff_to_centroid) / dist_to_centroid[:, None] ** 2
 
-    bias_to_centroid = diff_to_centroid * np.random.normal(0.0, zeta, 1)
+    bias_to_centroid = np.random.normal(0.0, zeta) * diff_to_centroid
 
-    off = X[k] + noise + bias_to_centroid
+    # the array which is finally returned
+    Xp = X[index] + noise + bias_to_centroid
 
-    return off
+    return Xp
 
 
 class ParentCentricCrossover(Crossover):
@@ -62,27 +61,21 @@ class ParentCentricCrossover(Crossover):
                  **kwargs):
 
         super().__init__(n_parents=3, n_offsprings=1, **kwargs)
-        self.eta = float(eta)
-        self.zeta = float(zeta)
+        self.eta = Real(eta, bounds=(0.01, 0.3))
+        self.zeta = Real(zeta, bounds=(0.01, 0.3))
 
-    def _do(self, problem, X, **kwargs):
+    def _do(self, problem, X, params=None, **kwargs):
         n_parents, n_matings, n_var = X.shape
+        zeta, eta = get(self.zeta, self.eta, size=(n_matings, 1))
 
-        off = np.empty([self.n_offsprings, n_matings, n_var])
-        K = np.row_stack([np.random.permutation(self.n_parents) for _ in range(n_matings)])[:, :self.n_offsprings]
+        index = 0
 
-        for j in range(self.n_offsprings):
-            for i in range(n_matings):
-                x = X[:, i, :]
-                k = K[i, j]
+        Xp = pcx(X, eta, zeta, index=index)
 
-                # do the crossover
-                _off = pcx(x, k, self.eta, self.zeta)
+        if problem.has_bounds():
+            Xp = repair_random_init(Xp, X[index], *problem.bounds())
 
-                # make sure the offspring is in bounds and assign
-                off[j, i, :] = inverse_penality(_off, x[k], problem.xl, problem.xu)
-
-        return off
+        return Xp[None, :]
 
 
 class PCX(ParentCentricCrossover):

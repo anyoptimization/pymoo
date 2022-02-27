@@ -1,89 +1,121 @@
 import numpy as np
 
-from pymoo.core.crossover import Crossover
-from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
+from pymoo.core.crossover import VariableWiseCrossover
+from pymoo.core.variable import Real, get, Binary
+from pymoo.operators.repair.bounds_repair import repair_clamp
 
 
-class SimulatedBinaryCrossover(Crossover):
-    def __init__(self, eta, n_offsprings=2, prob_per_variable=0.5, **kwargs):
-        super().__init__(2, n_offsprings, **kwargs)
-        self.eta = float(eta)
-        self.prob_per_variable = prob_per_variable
+# ---------------------------------------------------------------------------------------------------------
+# Function
+# ---------------------------------------------------------------------------------------------------------
 
-    def _do(self, problem, X, **kwargs):
 
-        X = X.astype(float)
-        _, n_matings, n_var = X.shape
+def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-32):
+    n_parents, n_matings, n_var = X.shape
 
-        # boundaries of the problem
-        xl, xu = problem.xl, problem.xu
+    # the probability of a crossover for each of the variables
+    cross = np.random.random((n_matings, n_var)) < prob_var
 
-        #if np.any(X < xl) or np.any(X > xu):
-        #    raise Exception("Simulated binary crossover requires all variables to be in bounds!")
+    # when solutions are too close -> don't to an sbx crossover
+    too_close = np.abs(X[0] - X[1]) <= eps
 
-        # crossover mask that will be used in the end
-        do_crossover = np.full(X[0].shape, True)
+    # disable if two individuals are already too close
+    cross[too_close] = False
 
-        # per variable the probability is then 50%
-        do_crossover[np.random.random((n_matings, problem.n_var)) > self.prob_per_variable] = False
-        # also if values are too close no mating is done
-        do_crossover[np.abs(X[0] - X[1]) <= 1.0e-14] = False
+    # disable crossover when lower and upper bound are identical
+    cross[:, xl == xu] = False
 
-        # assign y1 the smaller and y2 the larger value
-        y1 = np.min(X, axis=0)
-        y2 = np.max(X, axis=0)
+    # assign y1 the smaller and y2 the larger value
+    y1 = np.min(X, axis=0)[cross]
+    y2 = np.max(X, axis=0)[cross]
 
-        # random values for each individual
-        rand = np.random.random((n_matings, problem.n_var))
+    _xl = np.repeat(xl[None, :], n_matings, axis=0)[cross]
+    _xu = np.repeat(xu[None, :], n_matings, axis=0)[cross]
 
-        def calc_betaq(beta):
-            alpha = 2.0 - np.power(beta, -(self.eta + 1.0))
+    eta = eta.repeat(n_var, axis=1)[cross]
+    prob_bin = prob_bin.repeat(n_var, axis=1)[cross]
 
-            mask, mask_not = (rand <= (1.0 / alpha)), (rand > (1.0 / alpha))
+    # random values for each individual
+    rand = np.random.random(len(eta))
 
-            betaq = np.zeros(mask.shape)
-            betaq[mask] = np.power((rand * alpha), (1.0 / (self.eta + 1.0)))[mask]
-            betaq[mask_not] = np.power((1.0 / (2.0 - rand * alpha)), (1.0 / (self.eta + 1.0)))[mask_not]
+    def calc_betaq(beta):
+        alpha = 2.0 - np.power(beta, -(eta + 1.0))
 
-            return betaq
+        mask, mask_not = (rand <= (1.0 / alpha)), (rand > (1.0 / alpha))
 
-        # difference between all variables
-        delta = (y2 - y1)
+        betaq = np.zeros(mask.shape)
+        betaq[mask] = np.power((rand * alpha), (1.0 / (eta + 1.0)))[mask]
+        betaq[mask_not] = np.power((1.0 / (2.0 - rand * alpha)), (1.0 / (eta + 1.0)))[mask_not]
 
-        # now just be sure not dividing by zero (these cases will be filtered later anyway)
-        # delta[np.logical_or(delta < 1.0e-10, np.logical_not(do_crossover))] = 1.0e-10
-        delta[delta < 1.0e-10] = 1.0e-10
+        return betaq
 
-        beta = 1.0 + (2.0 * (y1 - xl) / delta)
-        betaq = calc_betaq(beta)
-        c1 = 0.5 * ((y1 + y2) - betaq * delta)
+    # difference between all variables
+    delta = (y2 - y1)
 
-        beta = 1.0 + (2.0 * (xu - y2) / delta)
-        betaq = calc_betaq(beta)
-        c2 = 0.5 * ((y1 + y2) + betaq * delta)
+    beta = 1.0 + (2.0 * (y1 - _xl) / delta)
+    betaq = calc_betaq(beta)
+    c1 = 0.5 * ((y1 + y2) - betaq * delta)
 
-        # do randomly a swap of variables
-        b = np.random.random((n_matings, problem.n_var)) <= 0.5
-        val = np.copy(c1[b])
-        c1[b] = c2[b]
-        c2[b] = val
+    beta = 1.0 + (2.0 * (_xu - y2) / delta)
+    betaq = calc_betaq(beta)
+    c2 = 0.5 * ((y1 + y2) + betaq * delta)
 
-        # take the parents as _template
-        c = np.copy(X)
+    # with the given probability either assign the value from the first or second parent
+    b = np.random.random(len(prob_bin)) <= prob_bin
+    tmp = np.copy(c1[b])
+    c1[b] = c2[b]
+    c2[b] = tmp
 
-        # copy the positions where the crossover was done
-        c[0, do_crossover] = c1[do_crossover]
-        c[1, do_crossover] = c2[do_crossover]
+    # first copy the unmodified parents
+    Q = np.copy(X)
 
-        c[0] = set_to_bounds_if_outside_by_problem(problem, c[0])
-        c[1] = set_to_bounds_if_outside_by_problem(problem, c[1])
+    # copy the positions where the crossover was done
+    Q[0, cross] = c1
+    Q[1, cross] = c2
+
+    Q[0] = repair_clamp(Q[0], xl, xu)
+    Q[1] = repair_clamp(Q[1], xl, xu)
+
+    return Q
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Class
+# ---------------------------------------------------------------------------------------------------------
+
+
+class SimulatedBinaryCrossover(VariableWiseCrossover):
+
+    def __init__(self,
+                 prob_var=0.5,
+                 eta=15,
+                 prob_exchange=1.0,
+                 prob_bin=0.5,
+                 n_offsprings=2,
+                 **kwargs):
+
+        super().__init__(2, n_offsprings, prob_var=prob_var, **kwargs)
+        self.prob_var = Real(prob_var, bounds=(0.1, 0.7))
+        self.eta = Real(eta, bounds=(3.0, 30.0), strict=(1.0, None))
+        self.prob_exchange = Real(prob_exchange, bounds=(0.0, 1.0), strict=(0.0, 1.0))
+        self.prob_bin = Real(prob_bin, bounds=(0.0, 1.0), strict=(0.0, 1.0))
+
+    def _do(self, problem, X, params=None, **kwargs):
+        _, n_matings, _ = X.shape
+
+        eta, prob_var, prob_exchange, prob_bin = get(self.eta, self.prob_var, self.prob_exchange, self.prob_bin, size=(n_matings, 1))
+
+        # set the binomial probability to zero if no exchange between individuals shall happen
+        prob_bin[np.random.random((len(prob_bin), 1)) > prob_exchange] = 0.0
+
+        Q = cross_sbx(X.astype(float), problem.xl, problem.xu, eta, prob_var, prob_bin)
 
         if self.n_offsprings == 1:
-            # Randomly select one offspring
-            c = c[np.random.choice(2, X.shape[1]), np.arange(X.shape[1])]
-            c = c.reshape((1, X.shape[1], X.shape[2]))
+            rand = np.random.random(size=n_matings) < 0.5
+            Q[0, rand] = Q[1, rand]
+            Q = Q[[0]]
 
-        return c
+        return Q
 
 
 class SBX(SimulatedBinaryCrossover):

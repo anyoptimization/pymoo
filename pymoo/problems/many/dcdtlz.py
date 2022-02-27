@@ -1,6 +1,6 @@
 import autograd.numpy as anp
 
-from pymoo.problems.many.dtlz import DTLZ1, DTLZ2, DTLZ3, DTLZ4
+from pymoo.problems.many.dtlz import DTLZ1, DTLZ3
 
 
 def constraint_dc1(X, a=5, b=0.95):

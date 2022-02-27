@@ -223,7 +223,7 @@ class ICMA(GeneticAlgorithm):
                  pop_size=None,
                  sampling=FloatRandomSampling(),
                  selection=NeighborhoodSelection(),
-                 crossover=DEX(prob=0.9, CR=0.5, variant='bin'),
+                 crossover=DEX(prob=0.9, CR=0.5, cross='bin'),
                  mutation=PM(eta=20),
                  display=MultiObjectiveDisplay(),
                  **kwargs):

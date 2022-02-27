@@ -19,3 +19,7 @@ class SlidingWindow(list):
 
     def to_numpy(self):
         return np.array(self)
+
+    def clear(self):
+        while len(self) > 0:
+            self.pop()

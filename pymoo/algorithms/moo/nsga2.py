@@ -1,10 +1,10 @@
 import numpy as np
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
-from pymoo.docs import parse_doc_string
 from pymoo.core.survival import Survival
-from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
-from pymoo.operators.mutation.pm import PolynomialMutation
+from pymoo.docs import parse_doc_string
+from pymoo.operators.crossover.sbx import SBX
+from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import compare, TournamentSelection
 from pymoo.util.display import MultiObjectiveDisplay
@@ -32,8 +32,8 @@ def binary_tournament(pop, P, algorithm, **kwargs):
     for i in range(n_tournaments):
 
         a, b = P[i, 0], P[i, 1]
-        a_cv, a_f, b_cv, b_f, = pop[a].CV[0], pop[a].F, pop[b].CV[0], pop[b].F
-        rank_a, cd_a  = pop[a].get("rank", "crowding")
+        a_cv, a_f, b_cv, b_f = pop[a].CV[0], pop[a].F, pop[b].CV[0], pop[b].F
+        rank_a, cd_a = pop[a].get("rank", "crowding")
         rank_b, cd_b = pop[b].get("rank", "crowding")
 
         # if at least one solution is infeasible
@@ -121,38 +121,22 @@ class NSGA2(GeneticAlgorithm):
                  pop_size=100,
                  sampling=FloatRandomSampling(),
                  selection=TournamentSelection(func_comp=binary_tournament),
-                 crossover=SimulatedBinaryCrossover(eta=15, prob=0.9),
-                 mutation=PolynomialMutation(prob=None, eta=20),
+                 crossover=SBX(),
+                 mutation=PM(prob=1.0),
                  survival=RankAndCrowdingSurvival(),
-                 eliminate_duplicates=True,
-                 n_offsprings=None,
                  display=MultiObjectiveDisplay(),
                  **kwargs):
-        """
+        super().__init__(
+            pop_size=pop_size,
+            sampling=sampling,
+            selection=selection,
+            crossover=crossover,
+            mutation=mutation,
+            survival=survival,
+            display=display,
+            advance_after_initial_infill=True,
+            **kwargs)
 
-        Parameters
-        ----------
-        pop_size : {pop_size}
-        sampling : {sampling}
-        selection : {selection}
-        crossover : {crossover}
-        mutation : {mutation}
-        eliminate_duplicates : {eliminate_duplicates}
-        n_offsprings : {n_offsprings}
-
-        """
-
-        super().__init__(pop_size=pop_size,
-                         sampling=sampling,
-                         selection=selection,
-                         crossover=crossover,
-                         mutation=mutation,
-                         survival=survival,
-                         eliminate_duplicates=eliminate_duplicates,
-                         n_offsprings=n_offsprings,
-                         display=display,
-                         advance_after_initial_infill=True,
-                         **kwargs)
         self.default_termination = MultiObjectiveDefaultTermination()
         self.tournament_type = 'comp_by_dom_and_crowding'
 

@@ -58,11 +58,12 @@ def parameter_less_constraints(F, CV, F_max=None):
     return F
 
 
-def random_permuations(n, l):
-    perms = []
+def random_permuations(n, l, concat=True):
+    P = []
     for i in range(n):
-        perms.append(np.random.permutation(l))
-    P = np.concatenate(perms)
+        P.append(np.random.permutation(l))
+    if concat:
+        P = np.concatenate(P)
     return P
 
 
@@ -201,6 +202,10 @@ def find_duplicates(X, epsilon=1e-16):
     is_duplicate = np.any(D <= epsilon, axis=1)
 
     return is_duplicate
+
+
+def at_least_2d(*args, **kwargs):
+    return tuple([at_least_2d_array(arg, **kwargs) for arg in args])
 
 
 def at_least_2d_array(x, extend_as="row", return_if_reshaped=False):
@@ -404,3 +409,28 @@ def replace_nan_by(x, val, inplace=False):
             x = x.copy()
         x[is_nan] = val
     return x
+
+
+def set_defaults(kwargs, defaults, overwrite=False, func_get=lambda x: x):
+    for k, v in defaults.items():
+        if overwrite or k not in kwargs:
+            kwargs[k] = func_get(v)
+
+
+def filter_params(params, prefix, delete_prefix=True):
+    ret = {}
+    for k, v in params.items():
+        if k.startswith(prefix):
+            if delete_prefix:
+                k = k[len(prefix):]
+            ret[k] = v
+    return ret
+
+
+def where_is_what(x):
+    H = {}
+    for k, e in enumerate(x):
+        if e not in H:
+            H[e] = []
+        H[e].append(k)
+    return H

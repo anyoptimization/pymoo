@@ -4,6 +4,7 @@ from pymoo.core.initialization import Initialization
 from pymoo.core.mating import Mating
 from pymoo.core.population import Population
 from pymoo.core.repair import NoRepair
+from pymoo.operators.param_control import NoParameterControl
 
 
 class GeneticAlgorithm(Algorithm):
@@ -20,6 +21,7 @@ class GeneticAlgorithm(Algorithm):
                  repair=None,
                  mating=None,
                  advance_after_initial_infill=False,
+                 control=NoParameterControl,
                  **kwargs
                  ):
 
@@ -63,7 +65,8 @@ class GeneticAlgorithm(Algorithm):
                             mutation,
                             repair=self.repair,
                             eliminate_duplicates=self.eliminate_duplicates,
-                            n_max_iterations=100)
+                            n_max_iterations=100,
+                            control=control)
         self.mating = mating
 
         # other run specific data updated whenever solve is called - to share them in all algorithms
@@ -78,7 +81,7 @@ class GeneticAlgorithm(Algorithm):
 
     def _initialize_advance(self, infills=None, **kwargs):
         if self.advance_after_initial_infill:
-            self.pop = self.survival.do(self.problem, infills, n_survive=len(infills))
+            self.pop = self.survival.do(self.problem, infills, n_survive=len(infills), algorithm=self, **kwargs)
 
     def _infill(self):
 
@@ -99,9 +102,12 @@ class GeneticAlgorithm(Algorithm):
 
     def _advance(self, infills=None, **kwargs):
 
+        # the current population
+        pop = self.pop
+
         # merge the offsprings with the current population
         if infills is not None:
-            self.pop = Population.merge(self.pop, infills)
+            pop = Population.merge(self.pop, infills)
 
         # execute the survival to find the fittest solutions
-        self.pop = self.survival.do(self.problem, self.pop, n_survive=self.pop_size, algorithm=self)
+        self.pop = self.survival.do(self.problem, pop, n_survive=self.pop_size, algorithm=self, **kwargs)

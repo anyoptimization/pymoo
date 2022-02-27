@@ -1,10 +1,12 @@
 import numpy as np
 
 from pymoo.core.crossover import Crossover
+from pymoo.core.variable import get
 from pymoo.operators.crossover.util import crossover_mask, row_at_least_once_true
 
 
 def mut_exp(n_matings, n_var, prob, at_least_once=True):
+    assert len(prob) == n_matings
 
     # the mask do to the crossover
     M = np.full((n_matings, n_var), False)
@@ -23,7 +25,7 @@ def mut_exp(n_matings, n_var, prob, at_least_once=True):
             current = (start + j) % n_var
 
             # replace only if random value keeps being smaller than CR
-            if np.random.random() <= prob:
+            if np.random.random() <= prob[i]:
                 M[i, current] = True
             else:
                 break
@@ -42,6 +44,8 @@ class ExponentialCrossover(Crossover):
 
     def _do(self, _, X, **kwargs):
         _, n_matings, n_var = X.shape
-        M = mut_exp(n_matings, n_var, self.prob_exp, at_least_once=True)
+        prob_exp = get(self.prob_exp, size=len(X))
+
+        M = mut_exp(n_matings, n_var, prob_exp, at_least_once=True)
         _X = crossover_mask(X, M)
         return _X

@@ -50,7 +50,7 @@ class SlidingWindowTermination(TerminationCollection):
         # each n-th generation the termination decides whether to terminate or not
         self.nth_gen = nth_gen
 
-        # number of entries of data need to be stored to calculate the metric at all
+        # number of problems of data need to be stored to calculate the metric at all
         self.min_data_for_metric = min_data_for_metric
 
     def _do_continue(self, algorithm):

@@ -31,8 +31,6 @@ class RunningMetric(AnimationCallback):
         metrics = self.term.metrics
         tau = len(metrics)
 
-        fig = None
-
         if metric is not None and (tau + 1) % self.delta_gen == 0 or force_plot:
 
             _delta_f = metric["delta_f"]

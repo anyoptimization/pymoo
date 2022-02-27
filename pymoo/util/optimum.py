@@ -12,7 +12,7 @@ def filter_optimum(pop, least_infeasible=False):
         return None
 
     # first only choose feasible solutions
-    ret = pop[pop.get("feasible")[:, 0]]
+    ret = pop[pop.get("feas")]
 
     # if at least one feasible solution was found
     if len(ret) > 0:
@@ -25,7 +25,7 @@ def filter_optimum(pop, least_infeasible=False):
             ret = ret[I]
 
         else:
-            ret = ret[np.argmin(F)]
+            ret = ret[np.argmin(F[:, 0])]
 
     # no feasible solution was found
     else:

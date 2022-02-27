@@ -1,8 +1,9 @@
 import abc
 
+import numpy as np
+
 from pymoo.core.population import Population
 from pymoo.core.repair import Repair
-import numpy as np
 
 
 def is_in_bounds(X, xl, xu):
@@ -21,9 +22,40 @@ def is_out_of_bounds_by_problem(problem, X):
     return is_out_of_bounds(X, problem.xl, problem.xu)
 
 
+def repeat_bounds(xl, xu, n):
+    XL = np.tile(xl, (n, 1))
+    XU = np.tile(xu, (n, 1))
+    return XL, XU
+
+
+def repair_clamp(Xp, xl, xu):
+    XL, XU = repeat_bounds(xl, xu, len(Xp))
+
+    I = np.where(Xp < XL)
+    Xp[I] = XL[I]
+
+    I = np.where(Xp > XU)
+    Xp[I] = XU[I]
+
+    return Xp
+
+
+def repair_periodic(Xp, xl, xu):
+    XL, XU = repeat_bounds(xl, xu, len(Xp))
+
+    S = (XU - XL)
+
+    I = np.where(Xp < XL)
+    Xp[I] = XU[I] - (XL[I] - Xp[I]) % S[I]
+
+    I = np.where(Xp > XU)
+    Xp[I] = XL[I] + (Xp[I] - XU[I]) % S[I]
+
+    return Xp
+
+
 def repair_random_init(Xp, X, xl, xu):
-    XL = xl[None, :].repeat(len(Xp), axis=0)
-    XU = xu[None, :].repeat(len(Xp), axis=0)
+    XL, XU = repeat_bounds(xl, xu, len(Xp))
 
     i, j = np.where(Xp < XL)
     if len(i) > 0:

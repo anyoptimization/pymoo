@@ -9,6 +9,7 @@ def get_functions():
     from pymoo.util.nds.tree_based_non_dominated_sort import tree_based_non_dominated_sort
     from pymoo.decomposition.util import calc_distance_to_weights
     from pymoo.util.misc import calc_perpendicular_distance
+    from pymoo.util.hv import hv
     from pymoo.util.stochastic_ranking import stochastic_ranking
 
     FUNCTIONS = {
@@ -29,6 +30,9 @@ def get_functions():
         },
         "stochastic_ranking": {
             "python": stochastic_ranking, "cython": "pymoo.cython.stochastic_ranking"
+        },
+        "hv": {
+            "python": hv, "cython": "pymoo.cython.hv"
         },
 
     }
@@ -53,6 +57,7 @@ class FunctionLoader:
     def __init__(self) -> None:
         super().__init__()
         self.is_compiled = is_compiled()
+        self.mode = "auto"
 
         if Config.warnings["not_compiled"] and not self.is_compiled:
             print("\nCompiled modules for significant speedup can not be used!")
@@ -62,20 +67,22 @@ class FunctionLoader:
             print("from pymoo.config import Config")
             print("Config.warnings['not_compiled'] = False\n")
 
-    def load(self, func_name=None, _type="auto"):
+    def load(self, func_name=None, mode=None):
+        if mode is None:
+            mode = self.mode
 
         FUNCTIONS = get_functions()
 
-        if _type == "auto":
-            _type = "cython" if self.is_compiled else "python"
+        if mode == "auto":
+            mode = "cython" if self.is_compiled else "python"
 
         if func_name not in FUNCTIONS:
             raise Exception("Function %s not found: %s" % (func_name, FUNCTIONS.keys()))
 
         func = FUNCTIONS[func_name]
-        if _type not in func:
-            raise Exception("Module not available in %s." % _type)
-        func = func[_type]
+        if mode not in func:
+            raise Exception("Module not available in %s." % mode)
+        func = func[mode]
 
         # either provide a function or a string to the module (used for cython)
         if not callable(func):
@@ -86,7 +93,7 @@ class FunctionLoader:
 
 
 def load_function(func_name=None, _type="auto"):
-    return FunctionLoader.get_instance().load(func_name, _type=_type)
+    return FunctionLoader.get_instance().load(func_name, mode=_type)
 
 
 def is_compiled():

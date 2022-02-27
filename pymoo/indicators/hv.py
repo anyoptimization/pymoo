@@ -7,6 +7,7 @@ from pymoo.core.indicator import Indicator
 from pymoo.indicators.distance_indicator import derive_ideal_and_nadir_from_pf
 from pymoo.util.misc import at_least_2d_array
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.normalization import ZeroToOneNormalization
 from pymoo.vendor.hv import HyperVolume as _HyperVolume
 
 
@@ -55,10 +56,13 @@ def hypervolume_by_command(path_to_hv, X, ref_point):
 class Hypervolume(Indicator):
 
     def __init__(self, ref_point=None, pf=None, nds=True, norm_ref_point=True, ideal=None, nadir=None, **kwargs):
+
+
         pf = at_least_2d_array(pf, extend_as="row")
         ideal, nadir = derive_ideal_and_nadir_from_pf(pf, ideal=ideal, nadir=nadir)
 
         super().__init__(ideal=ideal, nadir=nadir, **kwargs)
+        # self.normalization = ZeroToOneNormalization(ideal, nadir)
 
         # whether the input should be checked for domination or not
         self.nds = nds

@@ -296,9 +296,6 @@ class Algorithm:
 
         else:
 
-            # increase the generation counter by one
-            self.n_gen += 1
-
             # call the implementation of the advance method - if the infill is not None
             self._advance(infills=infills, **kwargs)
 
@@ -307,6 +304,9 @@ class Algorithm:
 
         # set whether the algorithm has terminated or not
         self.has_terminated = not self.termination.do_continue(self)
+
+        # increase the generation counter by one
+        self.n_gen += 1
 
         # if the algorithm has terminated call the finalize method
         if self.has_terminated:
@@ -337,18 +337,18 @@ class Algorithm:
 
         # if optimum is set to none to not report anything
         if res.opt is None:
-            X, F, CV, G = None, None, None, None
+            X, F, CV, G, H = None, None, None, None, None
 
         # otherwise get the values from the population
         else:
-            X, F, CV, G = self.opt.get("X", "F", "CV", "G")
+            X, F, CV, G, H = self.opt.get("X", "F", "CV", "G", "H")
 
             # if single-objective problem and only one solution was found - create a 1d array
             if self.problem.n_obj == 1 and len(X) == 1:
-                X, F, CV, G = X[0], F[0], CV[0], G[0]
+                X, F, CV, G, H = X[0], F[0], CV[0], G[0], H[0]
 
         # set all the individual values
-        res.X, res.F, res.CV, res.G = X, F, CV, G
+        res.X, res.F, res.CV, res.G, res.H = X, F, CV, G, H
 
         # create the result object
         res.problem, res.pf = self.problem, self.pf

@@ -15,7 +15,7 @@ class StochasticTunneling(MetaProblem):
 
         F = out["F"]
         out["__F__"] = F
-        # out["F"] = 1 - np.exp(- self.gamma * (F - self.fmin))
+        # out["F"] = 1 - np.experiment(- self.gamma * (F - self.fmin))
 
         out["F"] = np.tanh(self.gamma * (F - self.fmin))
 

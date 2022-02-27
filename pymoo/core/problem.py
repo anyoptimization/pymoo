@@ -20,6 +20,7 @@ class Problem:
                  n_eq_constr=0,
                  xl=None,
                  xu=None,
+                 vars=None,
                  check_inconsistencies=True,
                  replace_nan_values_by=np.inf,
                  exclude_from_serialization=None,
@@ -57,6 +58,10 @@ class Problem:
             raise Exception("The interface in pymoo 0.5.0 has changed. Please inherit from the ElementwiseProblem "
                             "class AND remove the 'elementwise_evaluation=True' argument to disable this exception.")
 
+        # if variables are provided directly
+        if vars is not None:
+            n_var = len(vars)
+
         # number of variable
         self.n_var = n_var
 
@@ -77,6 +82,9 @@ class Problem:
 
         # a callback function to be called after every evaluation
         self.callback = callback
+
+        # if the variables are provided in their explicit form
+        self.vars = vars
 
         # if it is a problem with an actual number of variables - make sure xl and xu are numpy arrays
         if n_var > 0:
@@ -108,10 +116,13 @@ class Problem:
                  **kwargs):
 
         # make sure the array is at least 2d. store if reshaping was necessary
-        X, only_single_value = at_least_2d_array(X, extend_as="row", return_if_reshaped=True)
-        assert X.shape[1] == self.n_var, f'Input dimension {X.shape[1]} are not equal to n_var {self.n_var}!'
+        if isinstance(X, np.ndarray) and X.dtype != object:
+            X, only_single_value = at_least_2d_array(X, extend_as="row", return_if_reshaped=True)
+            assert X.shape[1] == self.n_var, f'Input dimension {X.shape[1]} are not equal to n_var {self.n_var}!'
+        else:
+            only_single_value = not (isinstance(X, list) or isinstance(X, np.ndarray))
 
-        # the values to be actually returned by in the end - set bu default if not providded
+        # the values to be actually returned by in the end - set bu default if not provided
         ret_vals = default_return_values(self.has_constraints()) if return_values_of is None else return_values_of
 
         # prepare the dictionary to be filled after the evaluation

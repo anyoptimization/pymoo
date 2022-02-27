@@ -170,6 +170,7 @@ def merge(a, b):
         obj = np.concatenate([a, b]).view(Population)
         return obj
 
+
 if __name__ == '__main__':
     pop = Population(10)
     pop.get("F")

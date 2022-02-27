@@ -2,17 +2,18 @@ import os
 
 import numpy as np
 
-from pymoo.core.problem import ElementwiseProblem
+from pymoo.core.problem import Problem
+from pymoo.util.remote import Remote
 
 
-class COCOProblem(ElementwiseProblem):
+class COCOProblem(Problem):
 
-    def __init__(self, name, n_var=10, **kwargs):
-        coco = get_bbob(name, n_var)
-
+    def __init__(self, name, n_var=10, pf_from_file=True, **kwargs):
+        self.function, self.instance, self.object = get_bbob(name, n_var)
         self.name = name
-        self.object = coco
+        self.pf_from_file = pf_from_file
 
+        coco = self.object
         n_var, n_obj, n_ieq_constr = coco.number_of_variables, coco.number_of_objectives, coco.number_of_constraints
         xl, xu = coco.lower_bounds, coco.upper_bounds
 
@@ -34,12 +35,15 @@ class COCOProblem(ElementwiseProblem):
             return ps
 
     def _calc_pareto_front(self, *args, **kwargs):
-        ps = self.pareto_set()
-        if ps is not None:
-            return self.evaluate(ps)
+        if self.pf_from_file:
+            return Remote.get_instance().load("pf", "bbob.pf", to="json")[str(self.function)][str(self.instance)]
+        else:
+            ps = self.pareto_set()
+            if ps is not None:
+                return self.evaluate(ps)
 
-    def _evaluate(self, x, out, *args, **kwargs):
-        out["F"] = self.object(x)
+    def _evaluate(self, X, out, *args, **kwargs):
+        out["F"] = np.array([self.object(x) for x in X])
 
     def __getstate__(self):
         d = self.__dict__.copy()
@@ -73,5 +77,5 @@ def get_bbob(name, n_var=10, **kwargs):
 
     coco = problems.next_problem()
 
-    return coco
+    return n_function, n_instance, coco
 

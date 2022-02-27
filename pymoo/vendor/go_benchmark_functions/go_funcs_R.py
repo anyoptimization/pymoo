@@ -129,7 +129,7 @@ class Ratkowsky02(Benchmark):
     multimodal minimization problem defined as follows:
 
     .. math::
-        f_{\text{Ratkowsky02}}(x) = \sum_{m=1}^{9}(a_m - x[0] / (1 + exp(x[1]
+        f_{\text{Ratkowsky02}}(x) = \sum_{m=1}^{9}(a_m - x[0] / (1 + experiment(x[1]
         - b_m x[2]))^2
 
     where

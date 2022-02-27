@@ -3,7 +3,7 @@ import numpy as np
 from pymoo.algorithms.moo.nsga3 import calc_niche_count, niching, comp_by_cv_then_random, associate_to_niches, NSGA3
 from pymoo.docs import parse_doc_string
 from pymoo.core.survival import Survival
-from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover
+from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover, SBX
 from pymoo.operators.mutation.pm import PolynomialMutation
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import TournamentSelection
@@ -26,8 +26,6 @@ class RNSGA3(NSGA3):
                  mu=0.05,
                  sampling=FloatRandomSampling(),
                  selection=TournamentSelection(func_comp=comp_by_cv_then_random),
-                 crossover=SimulatedBinaryCrossover(eta=30, prob=1.0),
-                 mutation=PolynomialMutation(eta=20, prob=None),
                  eliminate_duplicates=True,
                  n_offsprings=None,
                  **kwargs):

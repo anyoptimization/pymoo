@@ -1,27 +1,27 @@
 import autograd.numpy as anp
 
-from pymoo.problems.many.dtlz import DTLZ1, DTLZ2, DTLZ3, DTLZ4
+from pymoo.problems.many.dtlz import DTLZ1, DTLZ2, DTLZ3, DTLZ4, get_ref_dirs
 
 
 class C1DTLZ1(DTLZ1):
 
     def __init__(self, n_var=12, n_obj=3, **kwargs):
-        super().__init__(n_var, n_obj, **kwargs)
-        self.n_ieq_constr = 1
+        super().__init__(n_var=n_var, n_obj=n_obj, n_ieq_constr=1, **kwargs)
 
     def _evaluate(self, X, out, *args, **kwargs):
         super()._evaluate(X, out, *args, **kwargs)
         out["G"] = constraint_c1_linear(out["F"])
 
-    def _calc_pareto_front(self, ref_dirs, *args, **kwargs):
+    def _calc_pareto_front(self, ref_dirs=None, *args, **kwargs):
+        if ref_dirs is None:
+            ref_dirs = get_ref_dirs(self.n_obj)
         return super()._calc_pareto_front(ref_dirs, *args, **kwargs)
 
 
 class C1DTLZ3(DTLZ3):
 
     def __init__(self, n_var=12, n_obj=3, r=None, **kwargs):
-        super().__init__(n_var=n_var, n_obj=n_obj, **kwargs)
-        self.n_ieq_constr = 1
+        super().__init__(n_var=n_var, n_obj=n_obj, n_ieq_constr=1, **kwargs)
 
         if r is None:
             if self.n_obj < 5:
@@ -37,15 +37,16 @@ class C1DTLZ3(DTLZ3):
         super()._evaluate(X, out, *args, **kwargs)
         out["G"] = constraint_c1_spherical(out["F"], self.r)
 
-    def _calc_pareto_front(self, ref_dirs, *args, **kwargs):
+    def _calc_pareto_front(self, ref_dirs=None, *args, **kwargs):
+        if ref_dirs is None:
+            ref_dirs = get_ref_dirs(self.n_obj)
         return super()._calc_pareto_front(ref_dirs, *args, **kwargs)
 
 
 class C2DTLZ2(DTLZ2):
 
     def __init__(self, n_var=12, n_obj=3, r=None, **kwargs):
-        super().__init__(n_var, n_obj, **kwargs)
-        self.n_ieq_constr = 1
+        super().__init__(n_var=n_var, n_obj=n_obj, n_ieq_constr=1, **kwargs)
 
         if r is None:
             if n_obj == 2:
@@ -61,7 +62,9 @@ class C2DTLZ2(DTLZ2):
         super()._evaluate(X, out, *args, **kwargs)
         out["G"] = constraint_c2(out["F"], self.r)
 
-    def _calc_pareto_front(self, ref_dirs, *args, **kwargs):
+    def _calc_pareto_front(self, ref_dirs=None, *args, **kwargs):
+        if ref_dirs is None:
+            ref_dirs = get_ref_dirs(self.n_obj)
         F = super()._calc_pareto_front(ref_dirs, *args, **kwargs)
         G = constraint_c2(F, r=self.r)
         G[G <= 0] = 0
@@ -71,8 +74,7 @@ class C2DTLZ2(DTLZ2):
 class C3DTLZ1(DTLZ1):
 
     def __init__(self, n_var=12, n_obj=3, **kwargs):
-        super().__init__(n_var, n_obj, **kwargs)
-        self.n_ieq_constr = n_obj
+        super().__init__(n_var=n_var, n_obj=n_obj, n_ieq_constr=n_obj, **kwargs)
 
     def _evaluate(self, X, out, *args, **kwargs):
         super()._evaluate(X, out, *args, **kwargs)
@@ -82,14 +84,15 @@ class C3DTLZ1(DTLZ1):
 class C3DTLZ4(DTLZ4):
 
     def __init__(self, n_var=7, n_obj=3, **kwargs):
-        super().__init__(n_var, n_obj, **kwargs)
-        self.n_ieq_constr = n_obj
+        super().__init__(n_var=n_var, n_obj=n_obj, n_ieq_constr=n_obj, **kwargs)
 
     def _evaluate(self, X, out, *args, **kwargs):
         super()._evaluate(X, out, *args, **kwargs)
         out["G"] = constraint_c3_spherical(out["F"])
 
-    def _calc_pareto_front(self, ref_dirs, *args, **kwargs):
+    def _calc_pareto_front(self, ref_dirs=None, *args, **kwargs):
+        if ref_dirs is None:
+            ref_dirs = get_ref_dirs(self.n_obj)
         F = super()._calc_pareto_front(ref_dirs, *args, **kwargs)
         a = anp.sqrt(anp.sum(F ** 2, 1) - 3 / 4 * anp.max(F ** 2, axis=1))
         a = anp.expand_dims(a, axis=1)
@@ -114,7 +117,7 @@ def constraint_c1_spherical(f, r):
 def constraint_c2(f, r):
     n_obj = f.shape[1]
 
-    v1 = anp.inf * anp.ones(f.shape[0])
+    v1 = anp.full(f.shape[0], anp.inf)
 
     for i in range(n_obj):
         temp = (f[:, i] - 1) ** 2 + (anp.sum(f ** 2, axis=1) - f[:, i] ** 2) - r ** 2
