@@ -90,10 +90,10 @@ class AGEMOEASurvival(Survival):
         fronts = self.nds.do(F, n_stop_if_ranked=N)
 
         # get max int value
-        max_val = np.iinfo(np.int).max
+        max_val = np.iinfo(int).max
 
         # initialize population ranks with max int value
-        front_no = np.full(F.shape[0], max_val, dtype=np.int)
+        front_no = np.full(F.shape[0], max_val, dtype=int)
 
         # assign the rank to each individual
         for i, fr in enumerate(fronts):
@@ -155,7 +155,7 @@ def find_corner_solutions(front):
     W = 1e-6 + np.eye(n)
     r = W.shape[0]
     indexes = np.zeros(n, dtype=np.intp)
-    selected = np.zeros(m, dtype=np.bool)
+    selected = np.zeros(m, dtype=bool)
     for i in range(r):
         dists = point_2_line_distance(front, np.zeros(n), W[i, :])
         dists[selected] = np.inf  # prevent already selected to be reselected
