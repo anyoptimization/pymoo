@@ -128,7 +128,7 @@ class AGEMOEASurvival(Survival):
             front = F[front_no == i, :]
             m, _ = front.shape
             front = front / normalization
-            crowd_dist[front_no == i] = 1. / minkowski_matrix(front, ideal_point[None, :], p=p).squeeze()
+            crowd_dist[front_no == i] = 1. / self.minkowski_distances(front, ideal_point[None, :], p=p).squeeze()
 
         # Select the solutions in the last front based on their crowding distances
         last = np.arange(selected.shape[0])[front_no == max_f_no]
@@ -164,7 +164,7 @@ class AGEMOEASurvival(Survival):
         p = self.compute_geometry(front, extreme, n)
 
         nn = np.linalg.norm(front, p, axis=1)
-        distances = self.compute_pairwise_distances(front, p) / nn[:, None]
+        distances = self.pairwise_distances(front, p) / nn[:, None]
 
         neighbors = 2
         remaining = np.arange(m)
@@ -206,16 +206,29 @@ class AGEMOEASurvival(Survival):
         return p
 
     @staticmethod
-    def compute_pairwise_distances(front, p):
-        return minkowski_matrix(front, front, p)
+    @jit(fastmath=True)
+    def pairwise_distances(front, p):
+        m = np.shape(front)[0]
+        distances = np.zeros((m, m))
+        for i in range(m):
+            distances[i] = np.sum(np.abs(front[i] - front) ** p, 1) ** (1 / p)
+
+        return distances
+
+    @staticmethod
+    @jit(fastmath=True)
+    def minkowski_distances(A, B, p):
+        m1 = np.shape(A)[0]
+        m2 = np.shape(B)[0]
+        distances = np.zeros((m1, m2))
+        for i in range(m1):
+            for j in range(m2):
+                distances[i][j] = sum(np.abs(A[i] - B[j]) ** p) ** (1 / p)
+
+        return distances
 
 
-def minkowski_matrix(A, B, p):
-    """workaround for scipy's cdist refusing p<1"""
-    i_ind, j_ind = np.meshgrid(np.arange(A.shape[0]), np.arange(B.shape[0]))
-    return np.power(np.power(np.abs(A[i_ind] - B[j_ind]), p).sum(axis=2), 1.0 / p)
-
-
+@jit(nopython=True, fastmath=True)
 def find_corner_solutions(front):
     """Return the indexes of the extreme points"""
 
@@ -227,8 +240,8 @@ def find_corner_solutions(front):
     # let's define the axes of the n-dimensional spaces
     W = 1e-6 + np.eye(n)
     r = W.shape[0]
-    indexes = np.zeros(n, dtype=np.intp)
-    selected = np.zeros(m, dtype=np.bool)
+    indexes = np.zeros(n, dtype=numba.intp)
+    selected = np.zeros(m, dtype=numba.boolean)
     for i in range(r):
         dists = point_2_line_distance(front, np.zeros(n), W[i, :])
         dists[selected] = np.inf  # prevent already selected to be reselected
@@ -238,6 +251,7 @@ def find_corner_solutions(front):
     return indexes
 
 
+@jit(fastmath=True)
 def point_2_line_distance(P, A, B):
     d = np.zeros(P.shape[0])
 
@@ -245,7 +259,7 @@ def point_2_line_distance(P, A, B):
         pa = P[i] - A
         ba = B - A
         t = np.dot(pa, ba) / np.dot(ba, ba)
-        d[i] = np.linalg.norm(pa - t * ba, 2)
+        d[i] = sum((pa - t * ba) ** 2)
 
     return d
 
@@ -284,14 +298,9 @@ def normalize(front, extreme):
     return front, normalization
 
 
+@jit(nopython=True, fastmath=True)
 def convergence_score(front, p):
-    m, _ = front.shape
-    crowd_dist = np.zeros(m)
-
-    for i in range(m):
-        crowd_dist[i] = -np.linalg.norm(front[i], p)
-
-    return crowd_dist
+    return -np.sum(front ** p, 1) ** (1 / p)
 
 
 parse_doc_string(AGEMOEA.__init__)
