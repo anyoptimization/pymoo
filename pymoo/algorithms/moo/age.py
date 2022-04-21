@@ -1,4 +1,8 @@
+import math
+
+import numba
 import numpy as np
+from numba import jit, prange
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.algorithms.moo.nsga2 import binary_tournament
@@ -119,7 +123,7 @@ class AGEMOEASurvival(Survival):
         ideal_point = np.min(front1, axis=0)
 
         # Calculate the crowding distance of the first front as well as p and the normalization constants
-        crowd_dist[front_no == 0], p, normalization = survival_score(front1, ideal_point)
+        crowd_dist[front_no == 0], p, normalization = self.survival_score(front1, ideal_point)
         for i in range(1, max_f_no):  # skip first front since it is normalized by survival_score
             front = F[front_no == i, :]
             m, _ = front.shape
@@ -135,6 +139,75 @@ class AGEMOEASurvival(Survival):
 
         # return selected solutions, number of selected should be equal to population size
         return pop[selected]
+
+    def survival_score(self, front, ideal_point):
+        m, n = front.shape
+        crowd_dist = np.zeros(m)
+
+        if m < n:
+            p = 1
+            normalization = np.max(front, axis=0)
+            return crowd_dist, p, normalization
+
+        # shift the ideal point to the origin
+        front = front - ideal_point
+
+        # Detect the extreme points and normalize the front
+        extreme = find_corner_solutions(front)
+        front, normalization = normalize(front, extreme)
+
+        # set the distance for the extreme solutions
+        crowd_dist[extreme] = np.inf
+        selected = np.full(m, False)
+        selected[extreme] = True
+
+        p = self.compute_geometry(front, extreme, n)
+
+        nn = np.linalg.norm(front, p, axis=1)
+        distances = self.compute_pairwise_distances(front, p) / nn[:, None]
+
+        neighbors = 2
+        remaining = np.arange(m)
+        remaining = list(remaining[~selected])
+        for i in range(m - np.sum(selected)):
+            mg = np.meshgrid(np.arange(selected.shape[0])[selected], remaining, copy=False, sparse=False)
+            D_mg = distances[tuple(mg)]  # avoid Numpy's future deprecation of array special indexing
+
+            if D_mg.shape[1] > 1:
+                # equivalent to mink(distances(remaining, selected),neighbors,2); in Matlab
+                maxim = np.argpartition(D_mg, neighbors - 1, axis=1)[:, :neighbors]
+                tmp = np.sum(np.take_along_axis(D_mg, maxim, axis=1), axis=1)
+                index: int = np.argmax(tmp)
+                d = tmp[index]
+            else:
+                index = D_mg[:, 0].argmax()
+                d = D_mg[index, 0]
+
+            best = remaining.pop(index)
+            selected[best] = True
+            crowd_dist[best] = d
+
+        return crowd_dist, p, normalization
+
+    @staticmethod
+    def compute_geometry(front, extreme, n):
+        # approximate p(norm)
+        d = point_2_line_distance(front, np.zeros(n), np.ones(n))
+        d[extreme] = np.inf
+        index = np.argmin(d)
+
+        p = np.log(n) / np.log(1.0 / np.mean(front[index, :]))
+
+        if np.isnan(p) or p <= 0.1:
+            p = 1.0
+        elif p > 20:
+            p = 20.0  # avoid numpy underflow
+
+        return p
+
+    @staticmethod
+    def compute_pairwise_distances(front, p):
+        return minkowski_matrix(front, front, p)
 
 
 def minkowski_matrix(A, B, p):
@@ -209,68 +282,6 @@ def normalize(front, extreme):
     front = front / normalization
 
     return front, normalization
-
-
-def survival_score(front, ideal_point):
-    m, n = front.shape
-    crowd_dist = np.zeros(m)
-
-    if m < n:
-        p = 1
-        normalization = np.max(front, axis=0)
-        return crowd_dist, p, normalization
-
-    # shift the ideal point to the origin
-    front = front - ideal_point
-
-    # Detect the extreme points and normalize the front
-    extreme = find_corner_solutions(front)
-    front, normalization = normalize(front, extreme)
-
-    # set the distance for the extreme solutions
-    crowd_dist[extreme] = np.inf
-    selected = np.full(m, False)
-    selected[extreme] = True
-
-    # approximate p(norm)
-    d = point_2_line_distance(front, np.zeros(n), np.ones(n))
-    d[extreme] = np.inf
-    index = np.argmin(d)
-    # selected(index) = true
-    # crowd_dist(index) = Inf
-    p = np.log(n) / np.log(1.0 / np.mean(front[index, :]))
-
-    if np.isnan(p) or p <= 0.1:
-        p = 1.0
-    elif p > 20:
-        p = 20.0  # avoid numpy underflow
-
-    nn = np.linalg.norm(front, p, axis=1)
-    distances = minkowski_matrix(front, front, p=p)
-    distances = distances / nn[:, None]
-
-    neighbors = 2
-    remaining = np.arange(m)
-    remaining = list(remaining[~selected])
-    for i in range(m - np.sum(selected)):
-        mg = np.meshgrid(np.arange(selected.shape[0])[selected], remaining)
-        D_mg = distances[tuple(mg)]  # avoid Numpy's future deprecation of array special indexing
-
-        if D_mg.shape[1] > 1:
-            # equivalent to mink(distances(remaining, selected),neighbors,2); in Matlab
-            maxim = np.argpartition(D_mg, neighbors - 1, axis=1)[:, :neighbors]
-            tmp = np.sum(np.take_along_axis(D_mg, maxim, axis=1), axis=1)
-            index: int = np.argmax(tmp)
-            d = tmp[index]
-        else:
-            index = D_mg[:, 0].argmax()
-            d = D_mg[index, 0]
-
-        best = remaining.pop(index)
-        selected[best] = True
-        crowd_dist[best] = d
-
-    return crowd_dist, p, normalization
 
 
 def convergence_score(front, p):
