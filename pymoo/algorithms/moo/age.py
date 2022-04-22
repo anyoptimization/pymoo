@@ -141,6 +141,7 @@ class AGEMOEASurvival(Survival):
         return pop[selected]
 
     def survival_score(self, front, ideal_point):
+        front = np.round(front, 12, out=front)
         m, n = front.shape
         crowd_dist = np.zeros(m)
 
@@ -296,11 +297,5 @@ def normalize(front, extreme):
     front = front / normalization
 
     return front, normalization
-
-
-@jit(nopython=True, fastmath=True)
-def convergence_score(front, p):
-    return -np.sum(front ** p, 1) ** (1 / p)
-
 
 parse_doc_string(AGEMOEA.__init__)
