@@ -34,6 +34,8 @@ class AGEMOEA2(GeneticAlgorithm):
         Proceedings of the 2022 Genetic and Evolutionary Computation Conference (GECCO 2022).
         https://doi.org/10.1145/3512290.3528732
 
+        @author: Annibale Panichella
+
         Parameters
         ----------
         pop_size : {pop_size}
