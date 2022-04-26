@@ -75,13 +75,13 @@ def find_zero(point, n, precision):
     past_value = x
     for i in range(0, 100):
         # Original function
-        f = np.log(sum(np.power(point, x)))
+        f = np.log(sum(np.abs(point) ** x))
 
         # Derivative
         numerator = 0
         denominator = 0
         for obj_index in range(0, n):
-            if point[obj_index] != 0:
+            if point[obj_index] > 0:
                 numerator = numerator + np.power(point[obj_index], x) * np.log(point[obj_index])
                 denominator = denominator + np.power(point[obj_index], x)
 
