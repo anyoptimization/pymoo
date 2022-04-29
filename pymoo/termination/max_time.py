@@ -9,7 +9,6 @@ class TimeBasedTermination(Termination):
     def __init__(self, max_time) -> None:
         super().__init__()
         self.start = None
-        self.now = None
 
         if isinstance(max_time, str):
             self.max_time = time_to_int(max_time)
@@ -18,10 +17,9 @@ class TimeBasedTermination(Termination):
         else:
             raise Exception("Either provide the time as a string or an integer.")
 
-    def do_continue(self, algorithm):
-        if self.start is None:
-            self.start = algorithm.start_time
+    def setup(self, _):
+        self.start = time.time()
 
-        self.now = time.time()
-        return self.now - self.start < self.max_time
-
+    def _update(self, algorithm):
+        elapsed = time.time() - self.start
+        return elapsed / self.max_time
