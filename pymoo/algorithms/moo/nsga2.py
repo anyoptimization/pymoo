@@ -12,7 +12,7 @@ from pymoo.util.dominator import Dominator
 from pymoo.util.misc import find_duplicates, has_feasible
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.randomized_argsort import randomized_argsort
-from pymoo.util.termination.default import MultiObjectiveDefaultTermination
+from pymoo.termination.default import DefaultMultiObjectiveTermination
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ class NSGA2(GeneticAlgorithm):
             advance_after_initial_infill=True,
             **kwargs)
 
-        self.default_termination = MultiObjectiveDefaultTermination()
+        self.termination = DefaultMultiObjectiveTermination()
         self.tournament_type = 'comp_by_dom_and_crowding'
 
     def _set_optimum(self, **kwargs):

@@ -17,6 +17,7 @@ class InfillCriterion:
         self.repair = repair if repair is not None else NoRepair()
 
     def do(self, problem, pop, n_offsprings, **kwargs):
+        n_max_iterations = kwargs.get("n_max_iterations", self.n_max_iterations)
 
         # the population object to be used
         off = pop.new()
@@ -51,7 +52,7 @@ class InfillCriterion:
             n_infills += 1
 
             # if no new offsprings can be generated within a pre-specified number of generations
-            if n_infills >= self.n_max_iterations:
+            if n_infills >= n_max_iterations:
                 break
 
         return off

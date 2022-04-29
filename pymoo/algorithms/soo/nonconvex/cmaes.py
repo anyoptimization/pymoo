@@ -2,14 +2,14 @@ import cma
 import numpy as np
 
 from pymoo.algorithms.base.local import LocalSearch
-from pymoo.docs import parse_doc_string
 from pymoo.core.population import Population
+from pymoo.core.termination import NoTermination
+from pymoo.docs import parse_doc_string
+from pymoo.termination.max_eval import MaximumFunctionCallTermination
+from pymoo.termination.max_gen import MaximumGenerationTermination
 from pymoo.util.display import Display
 from pymoo.util.normalization import ZeroToOneNormalization, NoNormalization
 from pymoo.util.optimum import filter_optimum
-from pymoo.util.termination.max_eval import MaximumFunctionCallTermination
-from pymoo.util.termination.max_gen import MaximumGenerationTermination
-from pymoo.util.termination.no_termination import NoTermination
 from pymoo.vendor.vendor_cmaes import my_fmin
 
 
@@ -121,7 +121,7 @@ class CMAES(LocalSearch):
 
         noise_kappa_exponent : int
               Instead of applying reevaluations, the "number of evaluations"
-              is (ab)used as scaling factor kappa (experimental).
+              is (ab)used as init_simplex_scale factor kappa (experimental).
 
         bipop : bool
               If `True`, run as BIPOP-CMA-ES; BIPOP is a special restart
@@ -360,7 +360,7 @@ class CMAES(LocalSearch):
             **kwargs
         )
 
-        self.default_termination = NoTermination()
+        self.termination = NoTermination()
         self.send_array_to_yield = True
         self.parallelize = parallelize
         self.al = None
@@ -403,7 +403,8 @@ class CMAES(LocalSearch):
         # do this to allow the printout in the first generation
         self.next_X = next(self.es)
 
-    def _local_infill(self):
+    def _infill(self):
+
         X = np.array(self.next_X)
         self.send_array_to_yield = X.ndim > 1
         X = np.atleast_2d(X)
@@ -413,7 +414,7 @@ class CMAES(LocalSearch):
 
         return self.pop
 
-    def _local_advance(self, infills=None, **kwargs):
+    def _advance(self, infills=None, **kwargs):
 
         if infills is None:
             self.termination.force_termination = True
@@ -422,10 +423,10 @@ class CMAES(LocalSearch):
 
             # set infeasible individual's objective values to np.nan - then CMAES can handle it
             for ind in infills:
-                if not ind.feasible[0]:
-                    ind.F[0] = np.nan
+                if not ind.feas:
+                    ind.F[:] = np.nan
 
-            F = infills.get("F")[:, 0].tolist()
+            F = infills.get("f").tolist()
             if not self.send_array_to_yield:
                 F = F[0]
 
@@ -456,7 +457,7 @@ class SimpleCMAES(LocalSearch):
 
     def __init__(self, sigma=0.1, opts=None, normalize=True, **kwargs):
         super().__init__(**kwargs)
-        self.default_termination = NoTermination()
+        self.termination = NoTermination()
         self.es = None
         self.sigma = sigma
         self.normalize = normalize
@@ -487,11 +488,11 @@ class SimpleCMAES(LocalSearch):
         x = self.norm.forward(self.x0.X)
         self.es = cma.CMAEvolutionStrategy(x, self.sigma, inopts=self.opts)
 
-    def _local_infill(self):
+    def _infill(self):
         X = self.norm.backward(np.array(self.es.ask()))
         return Population.new("X", X)
 
-    def _local_advance(self, infills=None, **kwargs):
+    def _advance(self, infills=None, **kwargs):
         X, F = infills.get("X", "F")
         X = self.norm.forward(X)
 

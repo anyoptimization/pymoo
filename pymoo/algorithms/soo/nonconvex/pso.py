@@ -27,13 +27,12 @@ from pymoo.core.population import Population
 from pymoo.core.replacement import ImprovementReplacement, is_better
 from pymoo.core.variable import Real, Choice, get
 from pymoo.docs import parse_doc_string
-from pymoo.operators.mutation.pm import PM
 from pymoo.operators.param_control import EvolutionaryParameterControl
 from pymoo.operators.repair.bounds_repair import repair_random_init, repair_clamp
 from pymoo.operators.sampling.rnd import random_by_bounds, FloatRandomSampling
+from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.sliding_window import SlidingWindow
-from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 
 # =========================================================================================================
@@ -210,7 +209,7 @@ class PSO(GeneticAlgorithm):
         self.neighbors = get_neighbors(get(self.topology), pop_size)
 
         # choose the single-objective default termination
-        self.default_termination = SingleObjectiveDefaultTermination()
+        self.termination = DefaultSingleObjectiveTermination()
 
         # the particles that fly around to find good solutions (pop is the pbest)
         self.swarm = None
@@ -296,16 +295,3 @@ class PSO(GeneticAlgorithm):
 
 parse_doc_string(PSO.__init__)
 
-#         # obtain c1 and c2 from a robust configuration
-#         c1_plus_c2 = 24 * (1 - w ** 2) / (7 - 5 * w)
-#         c1 = c1_plus_c2 * c
-#         c2 = c1_plus_c2 - c1
-#
-#     @classmethod
-#     def params(cls, **kwargs):
-#         params = dict(
-#             inertia=Real(lower=0.3, upper=0.95, default=0.7),
-#             w=Real(lower=-0.99, upper=7 / 5 - 2 * np.sqrt(6) / 5, default=-0.2),
-#             c=Real(lower=0.1, upper=0.9, default=0.5)
-#         )
-#         return Parameters(params, default=cls)

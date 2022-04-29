@@ -76,7 +76,6 @@ class GeneticAlgorithm(Algorithm):
 
     def _initialize_infill(self):
         pop = self.initialization.do(self.problem, self.pop_size, algorithm=self)
-        pop.set("n_gen", self.n_gen)
         return pop
 
     def _initialize_advance(self, infills=None, **kwargs):

@@ -7,7 +7,7 @@ from pymoo.docs import parse_doc_string
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.optimum import filter_optimum
-from pymoo.util.termination.default import SingleObjectiveDefaultTermination
+from pymoo.termination.default import DefaultSingleObjectiveTermination
 
 
 class ES(GeneticAlgorithm):
@@ -58,7 +58,7 @@ class ES(GeneticAlgorithm):
                          advance_after_initial_infill=True,
                          **kwargs)
 
-        self.default_termination = SingleObjectiveDefaultTermination()
+        self.termination = DefaultSingleObjectiveTermination()
         self.phi = phi
         self.gamma = gamma
 

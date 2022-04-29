@@ -1,44 +1,51 @@
+from abc import abstractmethod
+
+
 class Termination:
 
     def __init__(self) -> None:
-        """
-        Base class for the implementation of a termination criterion for an algorithm.
-        """
         super().__init__()
 
         # the algorithm can be forced to terminate by setting this attribute to true
         self.force_termination = False
 
-    def do_continue(self, algorithm):
-        """
+        # the value indicating how much perc has been made
+        self.perc = 0.0
 
-        Whenever the algorithm objects wants to know whether it should continue or not it simply
-        asks the termination criterion for it.
+    def update(self, algorithm):
+        """
+        Provide the termination criterion a current status of the algorithm to update the perc.
 
         Parameters
         ----------
-        algorithm : class
-            The algorithm object that is asking if it has terminated or not.
-
-        Returns
-        -------
-        do_continue : bool
-            Whether the algorithm has terminated or not.
-
+        algorithm : object
+            The algorithm object which is used to determine whether a run has terminated.
         """
 
         if self.force_termination:
-            return False
+            progress = 1.0
         else:
-            return self._do_continue(algorithm)
+            progress = self._update(algorithm)
+            assert progress >= 0.0
 
-    # the concrete implementation of the algorithm
-    def _do_continue(self, algorithm, **kwargs):
+        self.perc = progress
+        return self.perc
+
+    def has_terminated(self):
+        return self.perc >= 1.0
+
+    def do_continue(self):
+        return not self.has_terminated()
+
+    def terminate(self):
+        self.force_termination = True
+
+    @abstractmethod
+    def _update(self, algorithm):
         pass
 
-    def has_terminated(self, algorithm):
-        """
-        Instead of asking if the algorithm should continue it can also ask if it has terminated.
-        (just negates the continue method.)
-        """
-        return not self.do_continue(algorithm)
+
+class NoTermination(Termination):
+
+    def _update(self, algorithm):
+        return 0.0

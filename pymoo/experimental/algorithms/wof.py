@@ -7,7 +7,7 @@ from pymoo.core.algorithm import Algorithm
 from pymoo.core.population import Population
 from pymoo.docs import parse_doc_string
 from pymoo.util.display import MultiObjectiveDisplay
-from pymoo.util.termination.default import MultiObjectiveDefaultTermination
+from pymoo.termination.default import DefaultMultiObjectiveTermination
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ class WOF(Algorithm):
         """
 
         super().__init__(display=display, **kwargs)
-        self.default_termination = MultiObjectiveDefaultTermination()
+        self.termination = DefaultMultiObjectiveTermination()
 
         self.proto = NSGA2()
         self.algorithm = None

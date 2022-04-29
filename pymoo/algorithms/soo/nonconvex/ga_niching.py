@@ -1,17 +1,16 @@
 import numpy as np
 
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival, GA
-from pymoo.docs import parse_doc_string
 from pymoo.core.survival import Survival
+from pymoo.docs import parse_doc_string
 from pymoo.operators.selection.tournament import compare, TournamentSelection
-
+from pymoo.termination.cv import ConstraintViolationTermination
+from pymoo.termination.default import DefaultSingleObjectiveTermination, DefaultTermination
+from pymoo.termination.ftol import SingleObjectiveSpaceTermination
+from pymoo.termination.xtol import DesignSpaceTermination
 from pymoo.util.clearing import EpsilonClearing
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.misc import norm_eucl_dist
-from pymoo.util.termination.constr_violation import ConstraintViolationToleranceTermination
-from pymoo.util.termination.default import SingleObjectiveDefaultTermination, DefaultTermination
-from pymoo.util.termination.f_tol_single import SingleObjectiveSpaceToleranceTermination
-from pymoo.util.termination.x_tol import DesignSpaceToleranceTermination
 
 
 # =========================================================================================================
@@ -31,7 +30,7 @@ class NicheDisplay(SingleObjectiveDisplay):
 # Termination
 # =========================================================================================================
 
-class NicheSingleObjectiveSpaceToleranceTermination(SingleObjectiveSpaceToleranceTermination):
+class NicheSingleObjectiveSpaceToleranceTermination(SingleObjectiveSpaceTermination):
 
     def _store(self, algorithm):
         return algorithm.opt.get("F").mean()
@@ -46,8 +45,8 @@ class NicheTermination(DefaultTermination):
                  nth_gen=5,
                  n_last=20,
                  **kwargs) -> None:
-        super().__init__(DesignSpaceToleranceTermination(tol=x_tol, n_last=n_last),
-                         ConstraintViolationToleranceTermination(tol=cv_tol, n_last=n_last),
+        super().__init__(DesignSpaceTermination(tol=x_tol, n_last=n_last),
+                         ConstraintViolationTermination(tol=cv_tol, n_last=n_last),
                          NicheSingleObjectiveSpaceToleranceTermination(tol=f_tol, n_last=n_last, nth_gen=nth_gen),
                          **kwargs)
 
@@ -207,8 +206,8 @@ class NicheGA(GA):
                          advance_after_initial_infill=True,
                          **kwargs)
 
-        # self.default_termination = NicheTermination()
-        self.default_termination = SingleObjectiveDefaultTermination()
+        # self.termination = NicheTermination()
+        self.termination = DefaultSingleObjectiveTermination()
 
         # whether with rank one after clearing or just the best should be considered as optimal
         self.return_all_opt = return_all_opt

@@ -46,7 +46,8 @@ class DeltaToleranceTermination(Termination):
             else:
                 if self.log:
                     tol, delta = math.log(tol), math.log(delta)
-                perc = 1 / (1 + (delta - tol))
+                v = (delta - tol)
+                perc = 1 / (1 + v)
 
         # remember the data from the current iteration and set it to data
         self.data = current

@@ -21,6 +21,7 @@ class ISRES(SRES):
         PF: float
             The stochastic ranking weight for choosing a random decision while doing the modified bubble sort.
         """
+
         super().__init__(**kwargs)
         self.gamma = gamma
         self.alpha = alpha
@@ -41,7 +42,7 @@ class ISRES(SRES):
         X, sigma = pop.get("X", "sigma")
 
         # cycle through the elites individuals for create the solutions
-        I = np.arange(_lambda) % mu
+        I = np.arange(_lambda) % min(mu, len(X))
 
         # transform X and sigma to the shape of number of offsprings
         X, sigma = X[I], sigma[I]

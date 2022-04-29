@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.indicators.igd import IGD
 from pymoo.util.normalization import normalize
-from pymoo.util.termination.delta import DeltaToleranceTermination
+from pymoo.termination.delta import DeltaToleranceTermination
 
 
 def calc_delta(a, b):
@@ -55,6 +55,8 @@ class MultiObjectiveSpaceTermination(DeltaToleranceTermination):
 
         # calculate IGD from one to another
         delta_f = IGD(c_N).do(l_N)
+
+        print(delta_ideal, delta_nadir, delta_f)
 
         return max(delta_ideal, delta_nadir, delta_f)
 

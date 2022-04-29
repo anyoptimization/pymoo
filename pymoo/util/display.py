@@ -3,7 +3,7 @@ import numpy as np
 from pymoo.indicators.gd import GD
 from pymoo.indicators.igd import IGD
 from pymoo.indicators.hv import Hypervolume
-from pymoo.util.termination.f_tol import MultiObjectiveSpaceToleranceTermination
+from pymoo.termination.ftol import MultiObjectiveSpaceTermination
 
 
 def pareto_front_if_possible(problem):
@@ -157,7 +157,7 @@ class MultiObjectiveDisplay(Display):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.term = MultiObjectiveSpaceToleranceTermination()
+        self.term = MultiObjectiveSpaceTermination()
 
     def _do(self, problem, evaluator, algorithm):
         super()._do(problem, evaluator, algorithm)
@@ -183,12 +183,12 @@ class MultiObjectiveDisplay(Display):
 
         else:
             self.output.append("n_nds", len(algorithm.opt), width=7)
-            self.term.do_continue(algorithm)
+            self.term.update(algorithm)
 
             max_from, eps = "-", "-"
 
-            if len(self.term.metrics) > 0:
-                metric = self.term.metrics[-1]
+            if len(self.term.data) > 0:
+                metric = self.term.data[-1]
                 tol = self.term.tol
                 delta_ideal, delta_nadir, delta_f = metric["delta_ideal"], metric["delta_nadir"], metric["delta_f"]
 

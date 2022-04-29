@@ -6,7 +6,7 @@ from pymoo.docs import parse_doc_string
 from pymoo.operators.param_control import NoParameterControl
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.dominator import get_relation
-from pymoo.util.termination.default import MultiObjectiveDefaultTermination
+from pymoo.termination.default import DefaultMultiObjectiveTermination
 
 
 class GDE3(DE):
@@ -22,7 +22,7 @@ class GDE3(DE):
             variant = Variant(selection="rand", F=0.1, CR=0.9, **kwargs)
 
         super().__init__(variant=variant, display=MultiObjectiveDisplay(), **kwargs)
-        self.default_termination = MultiObjectiveDefaultTermination()
+        self.termination = DefaultMultiObjectiveTermination()
 
     def _initialize_advance(self, infills=None, **kwargs):
         RankAndCrowdingSurvival().do(self.problem, infills, return_indices=True)

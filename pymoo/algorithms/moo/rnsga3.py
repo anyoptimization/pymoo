@@ -39,7 +39,7 @@ class RNSGA3(NSGA3):
             Size of the population used for each reference point.
 
         mu : float
-            Defines the scaling of the reference lines used during survival selection. Increasing mu will result
+            Defines the init_simplex_scale of the reference lines used during survival selection. Increasing mu will result
             having solutions with a larger spread.
 
         Other Parameters

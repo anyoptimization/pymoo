@@ -1,4 +1,4 @@
-from pymoo.util.termination.max_eval import MaximumFunctionCallTermination
+from pymoo.termination.max_eval import MaximumFunctionCallTermination
 
 try:
     from scipy.optimize import minimize as scipy_minimize, NonlinearConstraint, LinearConstraint
@@ -13,8 +13,8 @@ from pymoo.algorithms.base.local import LocalSearch
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population
 from pymoo.util.display import SingleObjectiveDisplay
-from pymoo.util.termination.max_gen import MaximumGenerationTermination
-from pymoo.util.termination.no_termination import NoTermination
+from pymoo.termination.max_gen import MaximumGenerationTermination
+from pymoo.termination.no_termination import NoTermination
 
 
 # ---------------------------------------------------------------------------------------------------------

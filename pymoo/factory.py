@@ -199,25 +199,23 @@ def get_mutation(name, *args, d={}, **kwargs):
 # =========================================================================================================
 
 def get_termination_options():
-    from pymoo.util.termination.max_eval import MaximumFunctionCallTermination
-    from pymoo.util.termination.max_gen import MaximumGenerationTermination
-    from pymoo.util.termination.max_time import TimeBasedTermination
-    from pymoo.util.termination.min_igd import IGDTermination
-    from pymoo.util.termination.x_tol import DesignSpaceToleranceTermination
-    from pymoo.util.termination.f_tol import MultiObjectiveSpaceToleranceTermination
-    from pymoo.util.termination.f_tol_single import SingleObjectiveSpaceToleranceTermination
-    from pymoo.util.termination.default import MultiObjectiveDefaultTermination, SingleObjectiveDefaultTermination
+    from pymoo.termination.max_eval import MaximumFunctionCallTermination
+    from pymoo.termination.max_gen import MaximumGenerationTermination
+    from pymoo.termination.max_time import TimeBasedTermination
+    from pymoo.termination.xtol import DesignSpaceTermination
+    from pymoo.termination.ftol import MultiObjectiveSpaceTermination
+    from pymoo.termination.ftol import SingleObjectiveSpaceTermination
+    from pymoo.termination.default import DefaultMultiObjectiveTermination, DefaultSingleObjectiveTermination
 
     TERMINATION = [
         ("n_eval", MaximumFunctionCallTermination),
         ("(n_gen|n_iter)", MaximumGenerationTermination),
-        ("igd", IGDTermination),
         ("time", TimeBasedTermination),
-        ("(x_tol|xtol)", DesignSpaceToleranceTermination),
-        ("(f_tol$|ftol$)", MultiObjectiveSpaceToleranceTermination),
-        ("(f_tol_s|ftol_s)", SingleObjectiveSpaceToleranceTermination),
-        ("(default$|default_multi)", MultiObjectiveDefaultTermination),
-        ("default_single$", SingleObjectiveDefaultTermination)
+        ("(x_tol|xtol)", DesignSpaceTermination),
+        ("(f_tol$|ftol$)", MultiObjectiveSpaceTermination),
+        ("(f_tol_s|ftol_s)", SingleObjectiveSpaceTermination),
+        ("(default$|default_multi)", DefaultMultiObjectiveTermination),
+        ("default_single$", DefaultSingleObjectiveTermination)
     ]
 
     return TERMINATION

@@ -1,8 +1,8 @@
 from pymoo.core.termination import Termination
-from pymoo.util.termination.cv import ConstraintViolationTermination
-from pymoo.util.termination.ftol import SingleObjectiveSpaceTermination, MultiObjectiveSpaceTermination
-from pymoo.util.termination.robust import RobustTermination
-from pymoo.util.termination.xtol import DesignSpaceTermination
+from pymoo.termination.cv import ConstraintViolationTermination
+from pymoo.termination.ftol import SingleObjectiveSpaceTermination, MultiObjectiveSpaceTermination
+from pymoo.termination.robust import RobustTermination
+from pymoo.termination.xtol import DesignSpaceTermination
 
 
 class DefaultTermination(Termination):

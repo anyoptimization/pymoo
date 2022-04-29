@@ -10,8 +10,8 @@ from pymoo.operators.selection.rnd import RandomSelection
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.misc import has_feasible, vectorized_cdist
 from pymoo.util.reference_direction import default_ref_dirs
-from pymoo.util.termination.max_eval import MaximumFunctionCallTermination
-from pymoo.util.termination.max_gen import MaximumGenerationTermination
+from pymoo.termination.max_eval import MaximumFunctionCallTermination
+from pymoo.termination.max_gen import MaximumGenerationTermination
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -27,8 +27,8 @@ class RVEA(GeneticAlgorithm):
                  pop_size=None,
                  sampling=FloatRandomSampling(),
                  selection=RandomSelection(),
-                 crossover=SBX,
-                 mutation=PM,
+                 crossover=SBX(),
+                 mutation=PM(),
                  survival=None,
                  eliminate_duplicates=True,
                  n_offsprings=None,
@@ -87,24 +87,15 @@ class RVEA(GeneticAlgorithm):
         if self.survival is None:
             self.survival = APDSurvival(self.ref_dirs, alpha=self.alpha)
 
-        # if maximum functions termination convert it to generations
-        if isinstance(self.termination, MaximumFunctionCallTermination):
-            n_gen = np.ceil((self.termination.n_max_evals - self.pop_size) / self.n_offsprings)
-            self.termination = MaximumGenerationTermination(n_gen)
-
-        # check whether the n_gen termination is used - otherwise this algorithm can be not run
-        if not isinstance(self.termination, MaximumGenerationTermination):
-            raise Exception("Please use the n_gen or n_eval as a termination criterion to run RVEA!")
+        # the number of adaptions so far (initialized by one)
+        self.n_adapt = 1
 
     def _advance(self, **kwargs):
         super()._advance(**kwargs)
 
-        # get the  current generation and maximum of generations
-        n_gen, n_max_gen = self.n_gen, self.termination.n_max_gen
-
-        # each i-th generation (define by fr and n_max_gen) the reference directions are updated
-        if self.adapt_freq is not None and n_gen % np.ceil(n_max_gen * self.adapt_freq) == 0:
+        if self.termination.perc / self.adapt_freq >= self.n_adapt:
             self.survival.adapt()
+            self.n_adapt += 1
 
     def _set_optimum(self, **kwargs):
         if not has_feasible(self.pop):
@@ -149,12 +140,14 @@ class APDSurvival(Survival):
             self.V = calc_V(calc_V(self.ref_dirs) * (self.nadir - self.ideal))
             self.gamma = calc_gamma(self.V)
 
-    def _do(self, problem, pop, n_survive=None, algorithm=None, n_gen=None, n_max_gen=None, **kwargs):
+    def _do(self, problem, pop, n_survive=None, algorithm=None, **kwargs):
+        termination = algorithm.termination
 
-        if n_gen is None:
-            n_gen = algorithm.n_gen - 1
-        if n_max_gen is None:
-            n_max_gen = algorithm.termination.n_max_gen
+        if type(termination) not in [MaximumGenerationTermination, MaximumFunctionCallTermination]:
+            pass
+            # raise Exception("WARNING: RVEA needs either n_gen or n_evals as a termination criterion.")
+
+        progress = termination.perc
 
         # get the objective space values
         F = pop.get("F")
@@ -200,7 +193,7 @@ class APDSurvival(Survival):
 
                 # the penalty which is applied for the metric
                 M = problem.n_obj if problem.n_obj > 2.0 else 1.0
-                penalty = M * ((n_gen / n_max_gen) ** self.alpha) * (theta / gamma)
+                penalty = M * (progress ** self.alpha) * (theta / gamma)
 
                 # calculate the angle-penalized penalized (APD)
                 apd = dist_to_ideal[assigned_to_niche] * (1 + penalty)
@@ -223,4 +216,3 @@ class APDSurvival(Survival):
 
 
 parse_doc_string(RVEA.__init__)
-

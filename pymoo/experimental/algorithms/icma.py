@@ -12,8 +12,8 @@ from pymoo.operators.selection.rnd import RandomSelection
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.normalization import ObjectiveSpaceNormalization
 from pymoo.util.optimum import filter_optimum
-from pymoo.util.termination.max_eval import MaximumFunctionCallTermination
-from pymoo.util.termination.max_gen import MaximumGenerationTermination
+from pymoo.termination.max_eval import MaximumFunctionCallTermination
+from pymoo.termination.max_gen import MaximumGenerationTermination
 
 
 def norm(V):
