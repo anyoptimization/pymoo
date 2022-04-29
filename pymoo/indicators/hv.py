@@ -57,7 +57,6 @@ class Hypervolume(Indicator):
 
     def __init__(self, ref_point=None, pf=None, nds=True, norm_ref_point=True, ideal=None, nadir=None, **kwargs):
 
-
         pf = at_least_2d_array(pf, extend_as="row")
         ideal, nadir = derive_ideal_and_nadir_from_pf(pf, ideal=ideal, nadir=nadir)
 

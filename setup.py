@@ -25,11 +25,11 @@ data = dict(
     author=__author__,
     url=__url__,
     python_requires='>=3.6',
-    author_email="blankjul@egr.msu.edu",
+    author_email="blankjul@msu.edu",
     description="Multi-Objective Optimization in Python",
     license='Apache License 2.0',
     keywords="optimization",
-    install_requires=['numpy>=1.15', 'scipy>=1.1', 'matplotlib>=3', 'autograd>=1.3', 'cma==2.7'],
+    install_requires=['numpy>=1.15', 'scipy>=1.1', 'matplotlib>=3', 'autograd>=1.3', 'cma==2.7', 'alive-perc'],
     platforms='any',
     classifiers=[
         'Intended Audience :: Developers',

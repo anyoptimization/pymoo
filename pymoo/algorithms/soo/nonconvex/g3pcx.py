@@ -6,14 +6,13 @@ from pymoo.core.initialization import Initialization
 from pymoo.core.population import Population
 from pymoo.core.repair import NoRepair
 from pymoo.core.replacement import is_better
-from pymoo.core.variable import Real, Integer, get, Choice
+from pymoo.core.variable import Real, Integer, get
 from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.pcx import PCX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.rnd import fast_fill_random
 from pymoo.util.display import SingleObjectiveDisplay
-from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 
 # =========================================================================================================
@@ -38,8 +37,6 @@ class G3PCX(Algorithm):
         self.pop_size = Integer(pop_size, bounds=(20, 200))
         self.repair = repair
 
-        self.default_termination = SingleObjectiveDefaultTermination()
-
         self.initialization = Initialization(sampling, repair=self.repair, eliminate_duplicates=False)
 
         self.n_offsprings = Integer(n_offsprings, bounds=(1, 10))
@@ -60,45 +57,37 @@ class G3PCX(Algorithm):
     def _initialize_advance(self, infills=None, **kwargs):
         self.pop = FitnessSurvival().do(self.problem, infills, n_survive=len(infills), algorithm=self, **kwargs)
 
-    def _infill(self):
-        n_offsprings, n_parents = get(self.n_offsprings, self.n_parents)
+    def _next(self):
+        pop_size, n_offsprings, n_parents = get(self.pop_size, self.n_offsprings, self.n_parents)
 
-        S = np.zeros((n_offsprings, n_parents), dtype=int)
-        S[:, 0] = 0
-        fast_fill_random(S, len(self.pop), columns=range(1, n_parents))
+        # how many loops shall be iterated until one iteration has ended
+        loops_per_iter = pop_size // n_offsprings
 
-        off = self.crossover.do(self.problem, self.pop, parents=S, algorithm=self)
+        for _ in range(loops_per_iter):
 
-        off = self.mutation.do(self.problem, off, algorithm=self)
+            S = np.zeros((n_offsprings, n_parents), dtype=int)
+            S[:, 0] = 0
+            fast_fill_random(S, len(self.pop), columns=range(1, n_parents))
 
-        self.repair.do(self.problem, off, algorithm=self)
+            off = self.crossover.do(self.problem, self.pop, parents=S, algorithm=self)
 
-        return off
+            off = self.mutation.do(self.problem, off, algorithm=self)
 
-    def _advance(self, infills=None, **kwargs):
-        pop, family_size = self.pop, get(self.family_size)
+            self.repair.do(self.problem, off, algorithm=self)
 
-        rnd = np.random.choice(np.arange(len(pop)), size=family_size, replace=False)
-        family = Population.merge(pop[rnd], infills)
-        pop[rnd] = FitnessSurvival().do(self.problem, family, n_survive=family_size)
+            off = yield off
 
-        for i in rnd:
-            if is_better(pop[i], pop[0]):
-                tmp = pop[0]
-                pop[0] = pop[i]
-                pop[i] = tmp
+            pop, family_size = self.pop, get(self.family_size)
 
-        # only print the output every 100 evaluations (otherwise that is far too much)
-        mod_n_eval = 100
+            rnd = np.random.choice(np.arange(len(pop)), size=family_size, replace=False)
+            family = Population.merge(pop[rnd], off)
+            pop[rnd] = FitnessSurvival().do(self.problem, family, n_survive=family_size)
 
-        self.display.active = False
-        cnt = self.evaluator.n_eval // mod_n_eval
-        if cnt > self.cnt:
-            self.display.active = True
-            self.cnt = cnt
-
-        #
-        self.n_gen = (self.evaluator.n_eval // get(self.pop_size)) - 1
+            for i in rnd:
+                if is_better(pop[i], pop[0]):
+                    tmp = pop[0]
+                    pop[0] = pop[i]
+                    pop[i] = tmp
 
     def _set_optimum(self, **kwargs):
         self.opt = self.pop[[0]]

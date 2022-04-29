@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pymoo.util.termination.f_tol import MultiObjectiveSpaceToleranceTerminationWithRenormalization
+from pymoo.termination.ftol import MultiObjectiveSpaceToleranceTerminationWithRenormalization
 from pymoo.visualization.video.callback_video import AnimationCallback
 
 

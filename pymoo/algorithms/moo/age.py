@@ -8,10 +8,10 @@ from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import TournamentSelection
+from pymoo.termination.default import DefaultMultiObjectiveTermination
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.misc import has_feasible
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-from pymoo.util.termination.default import MultiObjectiveDefaultTermination
 
 
 # =========================================================================================================
@@ -58,7 +58,7 @@ class AGEMOEA(GeneticAlgorithm):
                          display=display,
                          advance_after_initial_infill=True,
                          **kwargs)
-        self.default_termination = MultiObjectiveDefaultTermination()
+        self.termination = DefaultMultiObjectiveTermination()
 
         self.tournament_type = 'comp_by_rank_and_crowding'
 
@@ -90,10 +90,10 @@ class AGEMOEASurvival(Survival):
         fronts = self.nds.do(F, n_stop_if_ranked=N)
 
         # get max int value
-        max_val = np.iinfo(np.int).max
+        max_val = np.iinfo(int).max
 
         # initialize population ranks with max int value
-        front_no = np.full(F.shape[0], max_val, dtype=np.int)
+        front_no = np.full(F.shape[0], max_val, dtype=int)
 
         # assign the rank to each individual
         for i, fr in enumerate(fronts):
@@ -154,8 +154,8 @@ def find_corner_solutions(front):
     # let's define the axes of the n-dimensional spaces
     W = 1e-6 + np.eye(n)
     r = W.shape[0]
-    indexes = np.zeros(n, dtype=np.intp)
-    selected = np.zeros(m, dtype=np.bool)
+    indexes = np.zeros(n, dtype=int)
+    selected = np.zeros(m, dtype=bool)
     for i in range(r):
         dists = point_2_line_distance(front, np.zeros(n), W[i, :])
         dists[selected] = np.inf  # prevent already selected to be reselected

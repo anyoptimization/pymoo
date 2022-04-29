@@ -3,7 +3,8 @@ import numpy as np
 from pymoo.algorithms.base.local import LocalSearch
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.core.individual import Individual
-from pymoo.core.population import Population, pop_from_array_or_individual
+from pymoo.core.population import Population
+from pymoo.core.population import pop_from_array_or_individual
 from pymoo.core.replacement import is_better
 from pymoo.core.termination import Termination
 from pymoo.docs import parse_doc_string
@@ -27,26 +28,26 @@ class NelderAndMeadTermination(Termination):
                  n_max_evals=1e6):
 
         super().__init__()
-        self.xtol = x_tol
-        self.ftol = f_tol
+        self.x_tol = x_tol
+        self.f_tol = f_tol
         self.n_max_iter = n_max_iter
         self.n_max_evals = n_max_evals
 
-    def _do_continue(self, algorithm):
+    def _update(self, algorithm):
         pop, problem = algorithm.pop, algorithm.problem
-
-        if len(pop) != problem.n_var + 1:
-            return True
 
         X, F = pop.get("X", "F")
 
-        ftol = np.abs(F[1:] - F[0]).max() <= self.ftol
+        f_delta = np.abs(F[1:] - F[0]).max()
+        f_tol = 1 / (1 + (f_delta - self.f_tol))
 
         # if the problem has bounds we can normalize the x space to to be more accurate
         if problem.has_bounds():
-            xtol = np.abs((X[1:] - X[0]) / (problem.xu - problem.xl)).max() <= self.xtol
+            x_delta = np.abs((X[1:] - X[0]) / (problem.xu - problem.xl)).max()
         else:
-            xtol = np.abs(X[1:] - X[0]).max() <= self.xtol
+            x_delta = np.abs(X[1:] - X[0]).max()
+
+        x_tol = 1 / (1 + (x_delta - self.x_tol))
 
         # degenerated simplex - get all edges and minimum and maximum length
         D = vectorized_cdist(X, X)
@@ -54,17 +55,16 @@ class NelderAndMeadTermination(Termination):
         min_e, max_e = val.min(), val.max()
 
         # either if the maximum length is very small or the ratio is degenerated
-        is_degenerated = max_e < 1e-16 or min_e / max_e < 1e-16
+        is_degenerated = int(max_e < 1e-16 or min_e / max_e < 1e-16)
 
-        max_iter = algorithm.n_gen > self.n_max_iter
-        max_evals = algorithm.evaluator.n_eval > self.n_max_evals
+        max_iter = algorithm.n_iter / self.n_max_iter
+        max_evals = algorithm.evaluator.n_eval / self.n_max_evals
 
-        return not (ftol or xtol or max_iter or max_evals or is_degenerated)
+        return max(f_tol, x_tol, max_iter, max_evals, is_degenerated)
 
 
 def adaptive_params(problem):
     n = problem.n_var
-
     alpha = 1
     beta = 1 + 2 / n
     gamma = 0.75 - 1 / (2 * n)
@@ -72,41 +72,49 @@ def adaptive_params(problem):
     return alpha, beta, gamma, delta
 
 
+def default_params(_):
+    alpha = 1
+    beta = 2.0
+    gamma = 0.5
+    delta = 0.05
+    return alpha, beta, gamma, delta
+
+
+def initialize_simplex(problem, x0, scale=0.05):
+    n = len(x0)
+
+    if problem.has_bounds():
+        delta = scale * (problem.xu - problem.xl)
+    else:
+        delta = scale * x0.X
+        delta[delta == 0] = 0.00025
+
+    # repeat the x0 already and add the values
+    X = x0[None, :].repeat(n, axis=0)
+
+    for k in range(n):
+
+        # if the problem has bounds do the check
+        if problem.has_bounds():
+            if X[k, k] + delta[k] < problem.xu[k]:
+                X[k, k] = X[k, k] + delta[k]
+            else:
+                X[k, k] = X[k, k] - delta[k]
+
+        # otherwise just add the init_simplex_scale
+        else:
+            X[k, k] = X[k, k] + delta[k]
+
+    return X
+
+
 class NelderMead(LocalSearch):
 
     def __init__(self,
+                 init_simplex_scale=0.05,
                  func_params=adaptive_params,
                  display=SingleObjectiveDisplay(),
                  **kwargs):
-        """
-
-        Parameters
-        ----------
-        X : np.array or Population
-            The initial point where the search should be based on or the complete initial simplex (number of
-            dimensions plus 1 points). The population objective can be already evaluated with objective
-            space values. If a numpy array is provided it is evaluated by the algorithm.
-            By default it is None which means the search starts at a random point.
-
-        func_params : func
-            A function that returns the parameters alpha, beta, gamma, delta for the search. By default:
-
-            >>>  def adaptive_params(problem):
-            ...     n = problem.n_var
-            ...
-            ...     alpha = 1
-            ...     beta = 1 + 2 / n
-            ...     gamma = 0.75 - 1 / (2 * n)
-            ...     delta = 1 - 1 / n
-            ...     return alpha, beta, gamma, delta
-
-            It can be overwritten if necessary.
-
-
-        criterion_local_restart : Termination
-            Provide a termination object which decides whether a local restart should be performed or not.
-
-        """
 
         super().__init__(display=display, **kwargs)
 
@@ -114,40 +122,35 @@ class NelderMead(LocalSearch):
         self.func_params = func_params
 
         # the attributes for the simplex operations
-        self.alpha, self.beta, self.gamma, self.delta = None, None, None, None
+        self.alpha = None
+        self.beta = None
+        self.gamma = None
+        self.delta = None
 
-        # the scaling used for the initial simplex
-        self.simplex_scaling = None
+        # whether the simplex has been initialized or not
+        self.is_simplex_initialized = False
+
+        # the initial simplex scale used
+        self.init_simplex_scale = init_simplex_scale
 
         # the termination used for nelder and mead if nothing else provided
-        self.default_termination = NelderAndMeadTermination()
+        self.termination = NelderAndMeadTermination()
 
-    def _local_initialize_infill(self):
+    def _setup(self, problem, **kwargs):
         self.alpha, self.beta, self.gamma, self.delta = self.func_params(self.problem)
 
-        # the corresponding x values of the provided or best found solution
-        x0 = self.x0.X
-
-        # if lower and upper bounds are given take 5% of the range and add
-        if self.problem.has_bounds():
-            self.simplex_scaling = 0.05 * (self.problem.xu - self.problem.xl)
-
-        # no bounds are given do it based on x0 - MATLAB procedure
-        else:
-            self.simplex_scaling = 0.05 * self.x0.X
-            # some value needs to be added if x0 is zero
-            self.simplex_scaling[self.simplex_scaling == 0] = 0.00025
-
-        # initialize the simplex
-        simplex = pop_from_array_or_individual(self.initialize_simplex(x0))
-
+    def _initialize_simplex(self):
+        simplex = pop_from_array_or_individual(initialize_simplex(self.problem, self.x0.X, scale=0.05))
         return Population.merge(self.x0, simplex)
 
-    def _local_initialize_advance(self, infills=None, **kwargs):
-        # sort the current simplex by fitness
-        self.pop = FitnessSurvival().do(self.problem, infills, n_survive=len(infills))
+    def _next(self):
+        if not self.is_simplex_initialized:
+            self.pop = yield self._initialize_simplex()
+            self.is_simplex_initialized = True
+        else:
+            yield from self._step()
 
-    def _local_advance(self, **kwargs):
+    def _step(self):
 
         # number of variables increased by one - matches equations in the paper
         xl, xu = self.problem.bounds()
@@ -166,7 +169,7 @@ class NelderMead(LocalSearch):
         # reflect the point, consider factor if bounds are there, make sure in bounds (floating point) evaluate
         x_reflect = centroid + min(self.alpha, alphaU) * (centroid - pop[n + 1].X)
         x_reflect = set_to_bounds_if_outside_by_problem(self.problem, x_reflect)
-        reflect = self.evaluator.eval(self.problem, Individual(X=x_reflect), algorithm=self)
+        reflect = yield Individual(X=x_reflect)
 
         # whether a shrink is necessary or not - decided during this step
         shrink = False
@@ -188,12 +191,7 @@ class NelderMead(LocalSearch):
             # expand using the factor, consider bounds, make sure in case of floating point issues
             x_expand = centroid + min(self.beta, betaU) * (x_reflect - centroid)
             x_expand = set_to_bounds_if_outside_by_problem(self.problem, x_expand)
-
-            # if the expansion is almost equal to reflection (if boundaries were hit) - no evaluation
-            if np.allclose(x_expand, x_reflect, atol=1e-16):
-                expand = reflect
-            else:
-                expand = self.evaluator.eval(self.problem, Individual(X=x_expand), algorithm=self)
+            expand = yield Individual(X=x_expand)
 
             # if the expansion further improved take it - otherwise use expansion
             if is_better(expand, reflect):
@@ -213,7 +211,7 @@ class NelderMead(LocalSearch):
             # -------------------------------------------------------------------------------------------
 
             x_contract_outside = centroid + self.gamma * (x_reflect - centroid)
-            contract_outside = self.evaluator.eval(self.problem, Individual(X=x_contract_outside), algorithm=self)
+            contract_outside = yield Individual(X=x_contract_outside)
 
             if is_better(contract_outside, reflect):
                 pop[n + 1] = contract_outside
@@ -228,7 +226,7 @@ class NelderMead(LocalSearch):
             # -------------------------------------------------------------------------------------------
 
             x_contract_inside = centroid - self.gamma * (x_reflect - centroid)
-            contract_inside = self.evaluator.eval(self.problem, Individual(X=x_contract_inside), algorithm=self)
+            contract_inside = yield Individual(X=x_contract_inside)
 
             if is_better(contract_inside, pop[n + 1]):
                 pop[n + 1] = contract_inside
@@ -240,41 +238,11 @@ class NelderMead(LocalSearch):
         # -------------------------------------------------------------------------------------------
 
         if shrink:
-            for i in range(1, len(pop)):
-                pop[i].X = pop[0].X + self.delta * (pop[i].X - pop[0].X)
-            pop[1:] = self.evaluator.eval(self.problem, pop[1:], algorithm=self)
+            x_best, x_others = pop[0].X, pop[1:].get("X")
+            x_shrink = x_best + self.delta * (x_others - x_best)
+            pop[1:] = yield Population.new(X=x_shrink)
 
         self.pop = FitnessSurvival().do(self.problem, pop, n_survive=len(pop))
-
-    def initialize_simplex(self, x0):
-
-        n, xl, xu = self.problem.n_var, self.problem.xl, self.problem.xu
-
-        # repeat the x0 already and add the values
-        X = x0[None, :].repeat(n, axis=0)
-
-        for k in range(n):
-
-            # if the problem has bounds do the check
-            if self.problem.has_bounds():
-                if X[k, k] + self.simplex_scaling[k] < self.problem.xu[k]:
-                    X[k, k] = X[k, k] + self.simplex_scaling[k]
-                else:
-                    X[k, k] = X[k, k] - self.simplex_scaling[k]
-
-            # otherwise just add the scaling
-            else:
-                X[k, k] = X[k, k] + self.simplex_scaling[k]
-
-        return X
-
-
-def default_params(*args):
-    alpha = 1
-    beta = 2.0
-    gamma = 0.5
-    delta = 0.05
-    return alpha, beta, gamma, delta
 
 
 parse_doc_string(NelderMead.__init__)

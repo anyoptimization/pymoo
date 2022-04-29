@@ -4,14 +4,14 @@ from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.algorithms.moo.nsga3 import HyperplaneNormalization
 from pymoo.core.survival import Survival
 from pymoo.docs import parse_doc_string
-from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover, SBX
-from pymoo.operators.mutation.pm import PolynomialMutation, PM
+from pymoo.operators.crossover.sbx import SBX
+from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import TournamentSelection, compare
+from pymoo.termination.default import DefaultMultiObjectiveTermination
 from pymoo.util.display import MultiObjectiveDisplay
 from pymoo.util.dominator import Dominator
 from pymoo.util.misc import vectorized_cdist
-from pymoo.util.termination.default import MultiObjectiveDefaultTermination
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -149,8 +149,8 @@ class SPEA2(GeneticAlgorithm):
                  pop_size=100,
                  sampling=FloatRandomSampling(),
                  selection=TournamentSelection(spea_binary_tournament),
-                 crossover=SBX,
-                 mutation=PM,
+                 crossover=SBX(),
+                 mutation=PM(),
                  survival=SPEA2Survival(normalize=True),
                  eliminate_duplicates=True,
                  n_offsprings=None,
@@ -183,7 +183,7 @@ class SPEA2(GeneticAlgorithm):
                          display=display,
                          advance_after_initial_infill=True,
                          **kwargs)
-        self.default_termination = MultiObjectiveDefaultTermination()
+        self.termination = DefaultMultiObjectiveTermination()
 
 
 parse_doc_string(SPEA2.__init__)

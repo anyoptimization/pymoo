@@ -12,7 +12,7 @@ from pymoo.problems.meta import MetaProblem
 def out_to_numpy(out):
     for key in out.keys():
         if type(out[key]) == autograd.numpy.numpy_boxes.ArrayBox:
-            out[key] = out[key]._value
+            out[key] = out[key]._data
 
 
 def get_deriv(out):
@@ -39,7 +39,7 @@ def calc_jacobian_elem(start, end):
         b = anp.ones(start.shape)
         n = new_box(b, 0, VJPNode.new_root())
         jac = backward_pass(n, end._node)
-        return jac._value
+        return jac._data
 
 
 def calc_jacobian(start, end):

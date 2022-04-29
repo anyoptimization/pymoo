@@ -1,10 +1,10 @@
 import numpy as np
 
 from pymoo.algorithms.base.local import LocalSearch
-from pymoo.docs import parse_doc_string
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population
 from pymoo.core.replacement import is_better
+from pymoo.docs import parse_doc_string
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.optimum import filter_optimum
@@ -15,22 +15,12 @@ from pymoo.util.optimum import filter_optimum
 # =========================================================================================================
 
 
-class PatternSearchDisplay(SingleObjectiveDisplay):
-
-    def __init__(self, **kwargs):
-        super().__init__(favg=False, **kwargs)
-
-    def _do(self, problem, evaluator, algorithm):
-        super()._do(problem, evaluator, algorithm)
-        self.output.append("rho", algorithm._rho)
-
-
 class PatternSearch(LocalSearch):
     def __init__(self,
                  init_delta=0.25,
-                 rho=0.5,
+                 init_rho=0.5,
                  step_size=1.0,
-                 display=PatternSearchDisplay(),
+                 display=SingleObjectiveDisplay(),
                  **kwargs):
         """
         An implementation of well-known Hooke and Jeeves Pattern Search.
@@ -61,11 +51,13 @@ class PatternSearch(LocalSearch):
         """
 
         super().__init__(display=display, **kwargs)
-        self.rho = rho
-        self.step_size = step_size
+        self.init_rho = init_rho
         self.init_delta = init_delta
+        self.step_size = step_size
 
-        self._rho = rho
+        self.n_not_improved = 0
+
+        self._rho = init_rho
         self._delta = None
         self._center = None
         self._current = None
@@ -74,7 +66,6 @@ class PatternSearch(LocalSearch):
         self._sign = None
 
     def _setup(self, problem, **kwargs):
-
         if problem.has_bounds():
             xl, xu = problem.bounds()
             self._delta = self.init_delta * (xu - xl)
@@ -83,91 +74,93 @@ class PatternSearch(LocalSearch):
             self._delta[self._delta <= 1.0] = 1.0
 
     def _initialize_advance(self, infills=None, **kwargs):
-        super()._initialize_advance(infills, **kwargs)
-        self._center, self._explr = self.x0, None
+        super()._initialize_advance(infills=infills, **kwargs)
+        self._center, self._explr = self.x0, self.x0
         self._sign = np.ones(self.problem.n_var)
 
-    def _local_advance(self, **kwargs):
+    def _next(self):
 
-        # this happens only in the first iteration
-        if self._explr is None:
-            self._explr = self._exploration_move(self._center)
+        # whether the last iteration has resulted in a new optimum or not
+        has_improved = is_better(self._explr, self._center, eps=0.0)
 
+        # that means that the exploration did not find any new point and was thus unsuccessful
+        if not has_improved:
+
+            # increase the counter (by default this will be initialized to 0 and directly increased to 1)
+            self.n_not_improved += 1
+
+            # keep track of the rho values in the normalized space
+            self._rho = self.init_rho ** self.n_not_improved
+
+            # explore around the current center - try finding a suitable direction
+            self._explr = yield from exploration_move(self.problem, self._center, self._sign, self._delta, self._rho)
+
+        # if we have found a direction in the last iteration to be worth following
         else:
-            # whether the last iteration has resulted in a new optimum
-            has_improved = is_better(self._explr, self._center, eps=0.0)
 
-            # that means that the exploration did not found any new point and was thus unsuccessful
-            if not has_improved:
+            # get the direction which was successful in the last move
+            self._direction = (self._explr.X - self._center.X)
 
-                # keep track of the rho values in the normalized space
-                self._rho = self._rho * self.rho
+            # declare the exploration point the new center (it has led to an improvement in the last iteration!)
+            self._center = self._explr
 
-                # explore around the current center to try finding a suitable direction
-                self._explr = self._exploration_move(self._center)
+            # use the pattern move to get a new trial vector along that given direction
+            self._trial = yield pattern_move(self.problem, self._center, self._direction, self.step_size)
 
-            # if we have found a direction in the last iteration to be worth following
-            else:
+            # get the delta sign adjusted for the exploration
+            self._sign = calc_sign(self._direction)
 
-                # get the direction which was successful in the last move
-                self._direction = (self._explr.X - self._center.X)
-
-                # declare the exploration point the new center
-                self._center = self._explr
-
-                # use the pattern move to get a new trial vector along that given direction
-                self._trial = self._pattern_move(self._center, self._direction)
-
-                # get the delta sign adjusted for the exploration
-                self._sign = calc_sign(self._direction)
-
-                # explore around the current center to try finding a suitable direction
-                self._explr = self._exploration_move(self._trial)
+            # explore around the current center to try finding a suitable direction
+            self._explr = yield from exploration_move(self.problem, self._trial, self._sign, self._delta, self._rho)
 
         self.pop = Population.create(self._center, self._explr)
-
-    def _exploration_move(self, center):
-
-        # randomly iterate over all variables
-        for k in range(self.problem.n_var):
-
-            # the value to be tried first is given by the amount times the sign
-            _delta = self._sign[k] * self._rho * self._delta
-
-            # make a step of delta on the k-th variable
-            _explr = step(self.problem, center.X, _delta, k)
-            self.evaluator.eval(self.problem, _explr, algorithm=self)
-
-            if is_better(_explr, center, eps=0.0):
-                center = _explr
-
-            # if not successful try the other direction
-            else:
-
-                # now try the negative value of delta and see if we can improve
-                _explr = step(self.problem, center.X, -1 * _delta, k)
-                self.evaluator.eval(self.problem, _explr, algorithm=self)
-
-                if is_better(_explr, center, eps=0.0):
-                    center = _explr
-
-        return center
-
-    def _pattern_move(self, _current, _direction):
-
-        # calculate the new X and repair out of bounds if necessary
-        X = _current.X + self.step_size * _direction
-        set_to_bounds_if_outside_by_problem(self.problem, X)
-
-        # create the new center individual and evaluate it
-        trial = Individual(X=X)
-        self.evaluator.eval(self.problem, trial, algorithm=self)
-
-        return trial
 
     def _set_optimum(self):
         pop = self.pop if self.opt is None else Population.merge(self.opt, self.pop)
         self.opt = filter_optimum(pop, least_infeasible=True)
+
+
+def exploration_move(problem, center, sign, delta, rho, randomize=True):
+    n_var = problem.n_var
+
+    # the order for the variable iteration
+    if randomize:
+        K = np.random.permutation(n_var)
+    else:
+        K = np.arange(n_var)
+
+    # iterate over each variable
+    for k in K:
+
+        # the value to be tried first is given by the amount times the sign
+        _delta = sign[k] * rho * delta
+
+        # make a step of delta on the k-th variable
+        _explr = yield step_along_axis(problem, center.X, _delta, k)
+
+        if is_better(_explr, center, eps=0.0):
+            center = _explr
+
+        # if not successful try the other direction
+        else:
+
+            # now try the negative value of delta and see if we can improve
+            _explr = yield step_along_axis(problem, center.X, -1 * _delta, k)
+
+            if is_better(_explr, center, eps=0.0):
+                center = _explr
+
+    return center
+
+
+def pattern_move(problem, current, direction, step_size):
+
+    # calculate the new X and repair out of bounds if necessary
+    X = current.X + step_size * direction
+    set_to_bounds_if_outside_by_problem(problem, X)
+
+    # create the new center individual
+    return Individual(X=X)
 
 
 def calc_sign(direction):
@@ -176,17 +169,12 @@ def calc_sign(direction):
     return sign
 
 
-def step(problem, x, delta, k):
+def step_along_axis(problem, x, delta, axis):
     # copy and add delta to the new point
     X = np.copy(x)
 
-    # if the problem has bounds normalize the delta
-    # if problem.has_bounds():
-    #     xl, xu = problem.bounds()
-    #     delta *= (xu[k] - xl[k])
-
     # now add to the current solution
-    X[k] = X[k] + delta[k]
+    X[axis] = X[axis] + delta[axis]
 
     # repair if out of bounds if necessary
     X = set_to_bounds_if_outside_by_problem(problem, X)

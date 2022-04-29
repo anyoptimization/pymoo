@@ -14,7 +14,7 @@ from pymoo.operators.repair.to_bound import set_to_bounds_if_outside
 from pymoo.operators.sampling.lhs import LHS
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.misc import norm_eucl_dist
-from pymoo.util.termination.default import SingleObjectiveDefaultTermination
+from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.visualization.fitness_landscape import FitnessLandscape
 from pymoo.visualization.video.callback_video import AnimationCallback
 
@@ -178,7 +178,7 @@ class FuzzyPSO(Algorithm):
         self.pop_size = pop_size
         self.adaptive = adaptive
         self.pertube_best = pertube_best
-        self.default_termination = SingleObjectiveDefaultTermination()
+        self.termination = DefaultSingleObjectiveTermination()
         self.V_max = None
         self.initial_velocity = initial_velocity
         self.max_velocity_rate = max_velocity_rate

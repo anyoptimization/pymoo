@@ -9,7 +9,7 @@ from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.misc import cdist
-from pymoo.util.termination.default import SingleObjectiveDefaultTermination
+from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.visualization.video.two_var_one_obj import TwoVariablesOneObjectiveVisualization
 
 
@@ -127,7 +127,7 @@ class LOR2(GeneticAlgorithm):
                          display=display,
                          **kwargs)
 
-        self.default_termination = SingleObjectiveDefaultTermination()
+        self.termination = DefaultSingleObjectiveTermination()
 
     def _set_optimum(self):
         super()._set_optimum()

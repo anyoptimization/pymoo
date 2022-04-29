@@ -12,8 +12,8 @@ from pymoo.problems.meta import MetaProblem
 from pymoo.problems.static import StaticProblem
 from pymoo.util.archive import SingleObjectiveArchive
 from pymoo.util.display import SingleObjectiveDisplay, MultiObjectiveDisplay
-from pymoo.util.termination.default import SingleObjectiveDefaultTermination, MultiObjectiveDefaultTermination
-from pymoo.util.termination.no_termination import NoTermination
+from pymoo.termination.default import DefaultSingleObjectiveTermination, DefaultMultiObjectiveTermination
+from pymoo.termination.no_termination import NoTermination
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -128,11 +128,11 @@ class CooperativeCoevolution(Algorithm):
 
     def _setup(self, problem, **kwargs):
         if problem.n_obj == 1:
-            self.default_termination = SingleObjectiveDefaultTermination()
+            self.termination = DefaultSingleObjectiveTermination()
             self.display = SingleObjectiveDisplay()
             self.archive = SingleObjectiveArchive()
         else:
-            self.default_termination = MultiObjectiveDefaultTermination()
+            self.termination = DefaultMultiObjectiveTermination()
             self.display = MultiObjectiveDisplay()
             self.archive = SingleObjectiveArchive()
 

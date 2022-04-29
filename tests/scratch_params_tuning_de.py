@@ -8,7 +8,7 @@ from os.path import dirname, realpath
 
 sys.path.append(dirname(dirname(realpath(__file__))))
 
-from pymoo.algorithms.param_tuning import ParameterTuning
+from pymoo.algorithms.tuning import ParameterTuning
 from pymoo.algorithms.soo.nonconvex.g3pcx import G3PCX
 from pymoo.core.parameters import get_params
 from pymoo.factory import get_problem

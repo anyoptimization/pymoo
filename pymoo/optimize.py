@@ -1,15 +1,9 @@
 import copy
 
 from pymoo.util.misc import termination_from_tuple
-from pymoo.util.termination.default import MultiObjectiveDefaultTermination, SingleObjectiveDefaultTermination
 
 
-def minimize(problem,
-             algorithm,
-             termination=None,
-             copy_algorithm=True,
-             copy_termination=True,
-             **kwargs):
+def minimize(problem, algorithm, termination=None, copy_algorithm=True, **kwargs):
     """
 
     Minimization of function of one or more variables, objectives and constraints.
@@ -49,9 +43,6 @@ def minimize(problem,
     copy_algorithm : bool
         Whether the algorithm object should be copied before optimization.
 
-    copy_termination : bool
-        Whether the termination object should be copied before called.
-
     Returns
     -------
     res : :class:`~pymoo.core.result.Result`
@@ -63,21 +54,12 @@ def minimize(problem,
     if copy_algorithm:
         algorithm = copy.deepcopy(algorithm)
 
+    if termination is not None:
+        kwargs["termination"] = termination_from_tuple(termination)
+
     # initialize the algorithm object given a problem - if not set already
     if algorithm.problem is None:
-        algorithm.setup(problem, termination=termination, **kwargs)
-    else:
-        if termination is not None:
-            algorithm.termination = termination_from_tuple(termination)
-
-    # if no termination could be found add the default termination either for single or multi objective
-    termination = algorithm.termination
-    if termination is None:
-        termination = default_termination(problem)
-
-    if copy_termination:
-        termination = copy.deepcopy(termination)
-    algorithm.termination = termination
+        algorithm.setup(problem, **kwargs)
 
     # actually execute the algorithm
     res = algorithm.run()
@@ -86,12 +68,3 @@ def minimize(problem,
     res.algorithm = algorithm
 
     return res
-
-
-def default_termination(problem):
-    if problem.n_obj > 1:
-        termination = MultiObjectiveDefaultTermination()
-    else:
-        termination = SingleObjectiveDefaultTermination()
-
-    return termination

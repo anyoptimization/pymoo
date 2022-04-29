@@ -13,7 +13,7 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.rnd import RandomSelection
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-from pymoo.util.termination.default import SingleObjectiveDefaultTermination
+from pymoo.termination.default import DefaultSingleObjectiveTermination
 
 
 # =========================================================================================================
@@ -132,7 +132,7 @@ class BRKGA(GeneticAlgorithm):
         self.n_elites = n_elites
         self.n_mutants = n_mutants
         self.bias = bias
-        self.default_termination = SingleObjectiveDefaultTermination()
+        self.termination = DefaultSingleObjectiveTermination()
 
     def _infill(self):
         pop = self.pop

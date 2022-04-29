@@ -1,5 +1,5 @@
 from pymoo.core.termination import Termination
-from pymoo.util.termination.delta import DeltaToleranceTermination
+from pymoo.termination.delta import DeltaToleranceTermination
 
 
 class ConstraintViolationTermination(DeltaToleranceTermination):

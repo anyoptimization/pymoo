@@ -1,9 +1,9 @@
 from pymoo.algorithms.base.line import LineSearch
 from pymoo.core.evaluator import Evaluator
 from pymoo.core.solution import Solution, SolutionSet
+from pymoo.core.termination import NoTermination
 from pymoo.optimize import minimize
 from pymoo.problems.single import Sphere
-from pymoo.util.termination.no_termination import NoTermination
 
 
 class BacktrackingLineSearch(LineSearch):
@@ -12,7 +12,7 @@ class BacktrackingLineSearch(LineSearch):
         super().__init__(**kwargs)
         self.alpha = alpha
         self.beta = beta
-        self.default_termination = NoTermination()
+        self.termination = NoTermination()
 
     def _initialize_infill(self):
         super()._initialize_infill()

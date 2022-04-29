@@ -5,7 +5,6 @@ from pymoo.core.algorithm import Algorithm
 from pymoo.core.evaluator import Evaluator
 from pymoo.core.individual import Individual
 from pymoo.core.solution import SolutionSet
-from pymoo.util.termination.no_termination import NoTermination
 
 
 class WolfeSearch(Algorithm):
@@ -17,13 +16,11 @@ class WolfeSearch(Algorithm):
         self.c2 = c2
         self.max_iter = max_iter
 
-    def setup(self, problem, **kwargs):
+    def _setup(self, problem, **kwargs):
         assert isinstance(problem,
                           LineSearchProblem), "The wolfe search only purpose is to solve a line search problem!"
-
         self.pop = SolutionSet.create(problem.point)
         self.opt = self.pop
-        return super().setup(problem, NoTermination(), **kwargs)
 
     def _set_optimum(self, force=False):
         pass
@@ -99,9 +96,6 @@ class WolfeSearch(Algorithm):
             current = Individual(X=alpha)
 
         return current
-
-
-
 
 
 def wolfe_line_search(problem, sol, direction, c1=1e-4, c2=0.9, max_iter=10, evaluator=None):

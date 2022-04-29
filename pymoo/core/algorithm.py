@@ -8,217 +8,123 @@ from pymoo.core.callback import Callback
 from pymoo.core.evaluator import Evaluator
 from pymoo.core.population import Population
 from pymoo.core.result import Result
+from pymoo.termination.default import DefaultMultiObjectiveTermination, DefaultSingleObjectiveTermination
 from pymoo.util.function_loader import FunctionLoader
-from pymoo.util.misc import termination_from_tuple
 from pymoo.util.optimum import filter_optimum
 
 
 class Algorithm:
-    """
 
-    This class represents the abstract class for any algorithm to be implemented. Most importantly it
-    provides the solve method that is used to optimize a given problem.
-
-    The solve method provides a wrapper function which does validate the input.
-
-
-    Parameters
-    ----------
-
-    problem : :class:`~pymoo.core.problem.Problem`
-        Problem to be solved by the algorithm
-
-    termination: :class:`~pymoo.core.termination.Termination`
-        Object that tells the algorithm when to terminate.
-
-    seed : int
-        Random seed to be used. Same seed is supposed to return the same result. If set to None, a random seed
-        is chosen randomly and stored in the result object to ensure reproducibility.
-
-    verbose : bool
-        If true information during the algorithm execution are displayed
-
-    callback : func
-        A callback function can be passed that is executed every generation. The parameters for the function
-        are the algorithm itself, the number of evaluations so far and the current population.
-
-            def callback(algorithm):
-                pass
-
-    save_history : bool
-        If true, a current snapshot of each generation is saved.
-
-    pf : numpy.array
-        The Pareto-front for the given problem. If provided performance metrics are printed during execution.
-
-    return_least_infeasible : bool
-        Whether the algorithm should return the least infeasible solution, if no solution was found.
-
-    evaluator : :class:`~pymoo.core.evaluator.Evaluator`
-        The evaluator which can be used to make modifications before calling the evaluate function of a problem.
-
-
-    """
-
-    def __init__(self, **kwargs):
-
-        # !
-        # Here all algorithm parameters needed no matter what is problem is passed are defined
-        # problem dependent initialization happens in setup(problem, **kwargs)
-        # !
+    def __init__(self,
+                 termination=None,
+                 display=None,
+                 callback=None,
+                 return_least_infeasible=False,
+                 save_history=False,
+                 verbose=False,
+                 seed=None,
+                 evaluator=None,
+                 **kwargs):
 
         super().__init__()
 
         # prints the compile warning if enabled
         FunctionLoader.get_instance()
 
-        # !
-        # DEFAULT SETTINGS OF ALGORITHM
-        # !
-        # the termination criterion to be used by the algorithm - might be specific for an algorithm
-        self.termination = kwargs.get("termination")
-        # set the display variable supplied to the algorithm - might be specific for an algorithm
-        self.display = kwargs.get("display")
-        # callback to be executed each generation
-        self.callback = kwargs.get("callback")
-
-        # !
-        # Attributes to be set later on for each problem run
-        # !
-        # the optimization problem as an instance
+        # the problem to be solved (will be set later on)
         self.problem = None
+
+        # the termination criterion to be used by the algorithm - might be specific for an algorithm
+        self.termination = termination
+
+        # set the display variable supplied to the algorithm - might be specific for an algorithm
+        self.display = display
+
+        # callback to be executed each generation
+        if callback is None:
+            callback = Callback()
+        self.callback = callback
+
         # whether the algorithm should finally return the least infeasible solution if no feasible found
-        self.return_least_infeasible = None
+        self.return_least_infeasible = return_least_infeasible
+
         # whether the history should be saved or not
-        self.save_history = None
+        self.save_history = save_history
+
         # whether the algorithm should print output in this run or not
-        self.verbose = None
+        self.verbose = verbose
+
         # the random seed that was used
-        self.seed = None
+        self.seed = seed
+
         # an algorithm can defined the default termination which can be overwritten
-        self.default_termination = None
-        # whether the algorithm as terminated or not
-        self.has_terminated = None
-        # the pareto-front of the problem - if it exist or passed
-        self.pf = None
+        self.termination = termination
+
         # the function evaluator object (can be used to inject code)
-        self.evaluator = None
-        # the current number of generation or iteration
-        self.n_gen = None
-        # the history object which contains the list
-        self.history = None
-        # the current solutions stored - here considered as population
-        self.pop = None
-        # a placeholder object for implementation to store solutions in each iteration
-        self.off = None
-        # the optimum found by the algorithm
-        self.opt = None
-        # can be used to store additional data in submodules
-        self.data = {}
-        # if the initialized method has been called before or not
-        self.is_initialized = False
-        # the time when the algorithm has been setup for the first time
-        self.start_time = None
-
-    # =========================================================================================================
-    # PUBLIC
-    # =========================================================================================================
-
-    def setup(self,
-              problem,
-
-              # START Overwrite by minimize
-              termination=None,
-              callback=None,
-              display=None,
-              # END Overwrite by minimize
-
-              # START Default minimize
-              seed=None,
-              verbose=False,
-              save_history=False,
-              return_least_infeasible=False,
-              # END Default minimize
-
-              pf=True,
-              evaluator=None,
-              **kwargs):
-
-        # set the problem that is optimized for the current run
-        self.problem = problem
-
-        # set the provided pareto front
-        self.pf = pf
-
-        # by default make sure an evaluator exists if nothing is passed
         if evaluator is None:
             evaluator = Evaluator()
         self.evaluator = evaluator
 
-        # !
-        # START Default minimize
-        # !
-        # if this run should be verbose or not
-        self.verbose = verbose
-        # whether the least infeasible should be returned or not
-        self.return_least_infeasible = return_least_infeasible
-        # whether the history should be stored or not
-        self.save_history = save_history
+        # the history object which contains the list
+        self.history = list()
 
-        # set the random seed in the algorithm object
-        self.seed = seed
-        if self.seed is None:
-            self.seed = np.random.randint(0, 10000000)
-        # set the random seed for Python and Numpy methods
-        random.seed(self.seed)
-        np.random.seed(self.seed)
-        # !
-        # END Default minimize
-        # !
+        # the current solutions stored - here considered as population
+        self.pop = None
 
-        # !
-        # START Overwrite by minimize
-        # !
+        # a placeholder object for implementation to store solutions in each iteration
+        self.off = None
 
-        # the termination criterion to be used to stop the algorithm
+        # the optimum found by the algorithm
+        self.opt = None
+
+        # the current number of generation or iteration
+        self.n_iter = None
+
+        # can be used to store additional data in submodules
+        self.data = {}
+
+        # if the initialized method has been called before or not
+        self.is_initialized = False
+
+        # the time when the algorithm has been setup for the first time
+        self.start_time = None
+
+    def setup(self, problem, **kwargs):
+
+        # the problem to be solved by the algorithm
+        self.problem = problem
+
+        # set all the provided options to this method
+        for key, value in kwargs.items():
+            self.__dict__[key] = value
+
+        # if seed is a boolean and true, then randomly set a seed (useful to reproduce runs)
+        seed = self.seed
+        if isinstance(seed, bool) and seed:
+            seed = np.random.randint(0, 10000000)
+            self.seed = seed
+
+        # if a seed is set, then use it to call the random number generators
+        if seed is not None:
+            random.seed(seed)
+            np.random.seed(seed)
+
+        # make sure that some type of termination criterion is set
         if self.termination is None:
-            self.termination = termination_from_tuple(termination)
-        # if nothing given fall back to default
-        if self.termination is None:
-            self.termination = self.default_termination
+            self.termination = default_termination(problem)
 
-        if callback is not None:
-            self.callback = callback
-
-        if display is not None:
-            self.display = display
-
-        # !
-        # END Overwrite by minimize
-        # !
-
-        # no call the algorithm specific setup given the problem
+        # finally call the function that can be overwritten by the actual algorithm
         self._setup(problem, **kwargs)
 
         return self
 
     def run(self):
-
-        # now the termination criterion should be set
-        if self.termination is None:
-            raise Exception("No termination criterion defined and algorithm has no default termination implemented!")
-
-        # while termination criterion not fulfilled
         while self.has_next():
             self.next()
-
-        # create the result object to be returned
-        res = self.result()
-
-        return res
+        return self.result()
 
     def has_next(self):
-        return not self.has_terminated
+        return not self.termination.has_terminated()
 
     def finalize(self):
         return self._finalize()
@@ -243,13 +149,9 @@ class Algorithm:
         self.start_time = time.time()
 
         # set the attribute for the optimization method to start
-        self.n_gen = 1
-        self.has_terminated = False
-        self.pop, self.opt = Population(), None
-
-        # if the history is supposed to be saved
-        if self.save_history:
-            self.history = []
+        self.n_iter = 1
+        self.pop = Population()
+        self.opt = None
 
     def infill(self):
         if self.problem is None:
@@ -270,7 +172,8 @@ class Algorithm:
 
         # set the current generation to the offsprings
         if infills is not None:
-            infills.set("n_gen", self.n_gen)
+            infills.set("n_gen", self.n_iter)
+            infills.set("n_iter", self.n_iter)
 
         return infills
 
@@ -283,34 +186,39 @@ class Algorithm:
         if not self.is_initialized:
 
             # set the generation counter to 1
-            self.n_gen = 1
+            self.n_iter = 1
 
             # assign the population to the algorithm
             self.pop = infills
 
             # do whats necessary after the initialization
-            self._initialize_advance(infills=infills, **kwargs)
+            val = self._initialize_advance(infills=infills, **kwargs)
 
             # set this algorithm to be initialized
             self.is_initialized = True
 
+            # always advance to the next iteration after initialization
+            self._post_advance()
+
         else:
 
             # call the implementation of the advance method - if the infill is not None
-            self._advance(infills=infills, **kwargs)
+            val = self._advance(infills=infills, **kwargs)
 
-        # execute everything which needs to be done after having the algorithm advanced to the next generation
-        self._post_advance()
+            # always advance to the next iteration - except if the algorithm returns False
+            if val is None or val:
+                self._post_advance()
 
-        # set whether the algorithm has terminated or not
-        self.has_terminated = not self.termination.do_continue(self)
+        # if the algorithm has terminated, then do the finalization steps and return the result
+        if self.termination.has_terminated():
+            self.finalize()
+            ret = self.result()
 
-        # increase the generation counter by one
-        self.n_gen += 1
+        # otherwise just increase the iteration counter for the next step and return the current optimum
+        else:
+            ret = self.opt
 
-        # if the algorithm has terminated call the finalize method
-        if self.has_terminated:
-            return self.finalize()
+        return ret
 
     def result(self):
         res = Result()
@@ -351,20 +259,16 @@ class Algorithm:
         res.X, res.F, res.CV, res.G, res.H = X, F, CV, G, H
 
         # create the result object
-        res.problem, res.pf = self.problem, self.pf
+        res.problem = self.problem
         res.history = self.history
 
         return res
 
-    def ask(self, *args, **kwargs):
-        return self.infill(*args, **kwargs)
+    def ask(self):
+        return self.infill()
 
     def tell(self, *args, **kwargs):
         return self.advance(*args, **kwargs)
-
-    # =========================================================================================================
-    # PROTECTED
-    # =========================================================================================================
 
     def _set_optimum(self):
         self.opt = filter_optimum(self.pop, least_infeasible=True)
@@ -374,16 +278,15 @@ class Algorithm:
         # update the current optimum of the algorithm
         self._set_optimum()
 
+        # update the current termination condition of the algorithm
+        self.termination.update(self)
+
         # display the output if defined by the algorithm
         if self.verbose and self.display is not None:
-            self.display.do(self.problem, self.evaluator, self, pf=self.pf)
+            self.display.do(self.problem, self.evaluator, self)
 
         # if a callback function is provided it is called after each iteration
-        if self.callback is not None:
-            if isinstance(self.callback, Callback):
-                self.callback.notify(self)
-            else:
-                self.callback(self)
+        self.callback(self)
 
         if self.save_history:
             _hist, _callback = self.history, self.callback
@@ -393,6 +296,8 @@ class Algorithm:
 
             self.history, self.callback = _hist, _callback
             self.history.append(obj)
+
+        self.n_iter += 1
 
     # =========================================================================================================
     # TO BE OVERWRITTEN
@@ -415,3 +320,51 @@ class Algorithm:
 
     def _finalize(self):
         pass
+
+    # =========================================================================================================
+    # CONVENIENCE
+    # =========================================================================================================
+
+    @property
+    def n_gen(self):
+        return self.n_iter
+
+    @n_gen.setter
+    def n_gen(self, value):
+        self.n_iter = value
+
+
+class LoopwiseAlgorithm(Algorithm):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.generator = None
+        self.state = None
+
+    def _next(self):
+        pass
+
+    def _infill(self):
+        if self.state is None:
+            self._advance()
+        return self.state
+
+    def _advance(self, infills=None, **kwargs):
+        if self.generator is None:
+            self.generator = self._next()
+        try:
+            self.state = self.generator.send(infills)
+        except StopIteration:
+            self.generator = None
+            self.state = None
+            return True
+
+        return False
+
+
+def default_termination(problem):
+    if problem.n_obj > 1:
+        termination = DefaultMultiObjectiveTermination()
+    else:
+        termination = DefaultSingleObjectiveTermination()
+    return termination

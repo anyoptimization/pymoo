@@ -24,7 +24,7 @@ from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.core.infill import InfillCriterion
 from pymoo.core.population import Population
 from pymoo.core.replacement import ImprovementReplacement
-from pymoo.core.variable import Choice, get, Binary
+from pymoo.core.variable import Choice, get
 from pymoo.core.variable import Real
 from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.binx import mut_binomial
@@ -34,9 +34,9 @@ from pymoo.operators.param_control import EvolutionaryParameterControl, NoParame
 from pymoo.operators.repair.bounds_repair import repair_random_init
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.rnd import fast_fill_random
+from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.util.display import SingleObjectiveDisplay
 from pymoo.util.misc import where_is_what
-from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 
 # =========================================================================================================
@@ -116,7 +116,7 @@ class Variant(InfillCriterion):
         X = pop.get("X")
 
         # the `donor` vector which will be obtained through the differential equation
-        donor = np.empty_like(X)
+        donor = np.full((n_offsprings, problem.n_var), np.nan)
 
         # for each type defined by the type and number of differentials
         for (sel_type, n_diffs), targets in H.items():
@@ -157,7 +157,7 @@ class Variant(InfillCriterion):
             donor[targets] = Xp
 
         # the `trial` created by by recombining target and donor
-        trial = np.empty_like(X)
+        trial = np.full((n_offsprings, problem.n_var), np.nan)
 
         crossover = get(self.crossover, size=n_offsprings)
         for name, K in where_is_what(crossover).items():
@@ -218,7 +218,7 @@ class DE(GeneticAlgorithm):
 
         if variant is None:
             if "control" not in kwargs:
-                kwargs["control"] = EvolutionaryParameterControl
+                kwargs["control"] = NoParameterControl
             variant = Variant(**kwargs)
 
         elif isinstance(variant, str):
@@ -239,7 +239,7 @@ class DE(GeneticAlgorithm):
                          eliminate_duplicates=False,
                          **kwargs)
 
-        self.default_termination = SingleObjectiveDefaultTermination()
+        self.termination = DefaultSingleObjectiveTermination()
 
     def _initialize_advance(self, infills=None, **kwargs):
         FitnessSurvival().do(self.problem, self.pop, return_indices=True)

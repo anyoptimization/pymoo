@@ -31,7 +31,7 @@ class TotalConstraintViolation:
             The allowed violation of an inequality constraint (usually 0, but might be relaxed during a run)
 
         ieq_scale : np.array
-            The scaling for the inequality constraints to consider. The cvs will be divided by this scaling.
+            The init_simplex_scale for the inequality constraints to consider. The cvs will be divided by this init_simplex_scale.
             (useful if constraints have entirely different scales which might cause a biased aggregation)
 
         eq_pow : float
@@ -121,14 +121,14 @@ def g_to_cv(g, eps, beta=None, scale=None):
     # subtract eps to allow some violation and then zero out all values less than zero
     g = anp.maximum(0.0, g - eps)
 
-    # apply scaling if necessary
+    # apply init_simplex_scale if necessary
     if scale is not None:
 
         # allow a scalar value as input
         if not isinstance(scale, np.ndarray):
             scale = np.full(g.shape[1], scale)
 
-        # make sure to only use positive scaling and not zero
+        # make sure to only use positive init_simplex_scale and not zero
         I = np.where(scale > 0)[0]
         g[:, I] = g[:, I] / scale[I]
 

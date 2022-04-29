@@ -5,17 +5,15 @@ from pymoo.core.survival import Survival
 from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
-from pymoo.operators.param_control import NoParameterControl
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import compare, TournamentSelection
+from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.util.display import SingleObjectiveDisplay
-from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 
 
 # =========================================================================================================
 # Survival
 # =========================================================================================================
-
 
 class FitnessSurvival(Survival):
 
@@ -65,7 +63,6 @@ class GA(GeneticAlgorithm):
                  n_offsprings=None,
                  display=SingleObjectiveDisplay(),
                  **kwargs):
-
         super().__init__(pop_size=pop_size,
                          sampling=sampling,
                          selection=selection,
@@ -77,7 +74,7 @@ class GA(GeneticAlgorithm):
                          display=display,
                          **kwargs)
 
-        self.default_termination = SingleObjectiveDefaultTermination()
+        self.termination = DefaultSingleObjectiveTermination()
 
 
 parse_doc_string(GA.__init__)

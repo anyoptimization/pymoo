@@ -1,6 +1,6 @@
 from pymoo.indicators.igd import IGD
 from pymoo.util.normalization import normalize
-from pymoo.util.termination.delta import DeltaToleranceTermination
+from pymoo.termination.delta import DeltaToleranceTermination
 
 
 class DesignSpaceTermination(DeltaToleranceTermination):

@@ -21,7 +21,6 @@ class RandomSelection(Selection):
         return np.reshape(P, (n_select, n_parents))
 
 
-
 def fast_fill_random(X, N, columns=None, Xp=None, n_max_attempts=10):
     """
 

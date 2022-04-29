@@ -4,14 +4,14 @@ from pymoo.core.algorithm import Algorithm
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population
 from pymoo.core.replacement import is_better
-from pymoo.util.termination.default import SingleObjectiveDefaultTermination
+from pymoo.termination.default import DefaultSingleObjectiveTermination
 
 
 class ExponentialSearch(Algorithm):
 
     def __init__(self, delta=0.05, **kwargs):
         super().__init__(**kwargs)
-        self.default_termination = SingleObjectiveDefaultTermination()
+        self.termination = DefaultSingleObjectiveTermination()
         self.alpha = delta
         self.point = None
 

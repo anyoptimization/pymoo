@@ -61,3 +61,5 @@ class GoldenSectionSearch(BracketSearch):
 
         # update the population with all the four individuals
         self.pop = Population.create(a, c, d, b)
+
+
