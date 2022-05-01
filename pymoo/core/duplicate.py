@@ -20,7 +20,7 @@ class DuplicateElimination:
         original = pop
 
         if len(pop) == 0:
-            return pop
+            return (pop, [], []) if return_indices else pop
 
         if to_itself:
             pop = pop[~self._do(pop, None, np.full(len(pop), False))]
