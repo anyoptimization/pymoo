@@ -47,7 +47,7 @@ def load(name, suffix=[]):
 
     try:
         F = anp.loadtxt(os.path.join(path, "%s.f" % name))
-
+        T = anp.loadtxt(os.path.join(path, "%s.t" % name))
         CV = None
         if os.path.exists(os.path.join(path, "%s.cv" % name)):
             CV = anp.loadtxt(os.path.join(path, "%s.cv" % name))
@@ -55,4 +55,4 @@ def load(name, suffix=[]):
     except:
         return X, None, None
 
-    return X, F, CV
+    return X, F, T, CV
