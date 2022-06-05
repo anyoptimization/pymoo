@@ -1,3 +1,4 @@
+from cvxpy import Problem
 import numpy as np
 
 from deap.cma import StrategyMultiObjective
@@ -10,13 +11,11 @@ from pymoo.core.algorithm import Algorithm
 from pymoo.core.population import pop_from_array_or_individual
 from pymoo.core.population import Population
 
-class MO_CMAES(StrategyMultiObjective, Algorithm):
+class MO_CMAES(Algorithm):
 
-    def __init__(self,
-                 x0=None,
-                 mu=None,
-                 lambda_=1,
-                 spring=1,
+    def __init__(self,                 
+                 mu,
+                 lambda_=1,                 
                  sigma=0.1,
                  sampling=LatinHypercubeSampling(),
                  display=MultiObjectiveDisplay(),
@@ -26,71 +25,53 @@ class MO_CMAES(StrategyMultiObjective, Algorithm):
         self.lambda_ = lambda_
         self.sigma = sigma
         self.params = kwargs
-        self.sampling= sampling    
-        self.spring = spring   
-        self.x0 = x0
+        self.sampling= sampling       
+        self.mo_cma_es = None 
 
-    def _setup(self, problem, x0=None, **kwargs):
-        # print("_setup")
-        if self.x0 is None:
-            self.x0 = x0
+    def _setup(self, problem, **kwargs):
         creator.create("FitnessMin",
                        base.Fitness,
                        weights=(-1.0, ) * problem.n_obj)
         creator.create("Individual", list, fitness=creator.FitnessMin)
         self.ind_init = creator.Individual
-        
+
     def _initialize_infill(self):
-        # print("_initialize_infill")
-        # calculate the default number of sample points
-        # no initial point is provided - sample in bounds and take the best
-        if self.x0 is None:
-            if not self.problem.has_bounds():
-                raise Exception("Either provide an x0 or a problem with variable bounds!")
-            pop = self.sampling.do(self.problem, self.mu)
-        else:
-            pop = pop_from_array_or_individual(self.x0)
-        return pop
-
-    def _infill(self):
-        # print("_infill")
-        self.pop_tmp = []
-        for _ in range(self.spring):
-            self.pop_tmp.extend( self.generate(self.ind_init) )
-
-        pop = Population.new(
-            "X",
-            set_to_bounds_if_outside(np.asarray(self.pop_tmp), 
-                                     self.problem.xl,
-                                     self.problem.xu))
-        return pop
+        return self.sampling.do(Problem, self.mu)
 
     def _initialize_advance(self, infills=None, **kwargs):        
-        # print("_initialize_advance")
-        # we should have a populated and evalauted self.pop at this point
-        # We can now instantiate our StrategyMultiObjective        
-        population = [self.ind_init(f) for f in self.pop.get("X")]
+        population = [self.ind_init(f) for f in infills.get("X")]
+        #Must have set n_initial_doe to mu in surrogate
+        assert len(population) == self.mu
         for ind, fit in zip(population, self.pop.get("F")):
             ind.fitness.values = fit
-        StrategyMultiObjective.__init__(self,
-                                        population,
-                                        self.sigma,
-                                        mu=self.mu,
-                                        lambda_=self.lambda_,
-                                        **self.params)
+        self.mo_cma_es = StrategyMultiObjective(population,
+                                                self.sigma,
+                                                mu=self.mu,
+                                                lambda_=self.lambda_,
+                                                **self.params)
+        self.pop = infills
 
-    def _advance(self, infills=None, **kwargs):        
-        # print("_advance")   
-        
+    def _infill(self):       
+        population = self.mo_cma_es.generate(self.ind_init)
+        infills = Population.new("X",
+                    set_to_bounds_if_outside(np.asarray(population),
+                                            self.problem.xl,
+                                            self.problem.xu))
+        for inf, pop in zip(infills, population):
+            inf.org_pop = pop
+        return infills
+
+    def _advance(self, infills=None, **kwargs):
         for ind in infills:
             if not ind.feasible[0]:
                 ind.F[0] = np.nan
-        inds = self.generate(self.ind_init)
-        for ind, fit, values in zip(inds, 
+        population = [inf.org_pop for inf in infills]
+        # assert len(self.mo_cma_es.generate(self.ind_init)) == infills.shape[0]
+        for ind, fit, values in zip(population,
                                     infills.get("F"),
                                     infills.get("X")):
-            ind.clear()
-            ind.extend(values)
+            # ind.clear()
+            # ind.extend(values)
             ind.fitness.values = fit
-        self.update(inds)
-        self.pop = Population.merge(self.pop, infills)
+        self.mo_cma_es.update(population)
+        self.pop = infills
