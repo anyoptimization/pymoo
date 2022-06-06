@@ -36,7 +36,7 @@ class MO_CMAES(Algorithm):
         self.ind_init = creator.Individual
 
     def _initialize_infill(self):
-        return self.sampling.do(Problem, self.mu)
+        return self.sampling.do(self.problem, self.mu)
 
     def _initialize_advance(self, infills=None, **kwargs):        
         population = [self.ind_init(f) for f in infills.get("X")]
