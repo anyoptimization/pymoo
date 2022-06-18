@@ -1,6 +1,7 @@
-from pymoo.factory import get_reference_directions
+
 from pymoo.problems.many import DTLZ6, DTLZ1
 from pymoo.problems.multi import ZDT1, Kursawe, OSY, CTP1
+from pymoo.util.ref_dirs import get_reference_directions
 
 
 def test_load_functional():

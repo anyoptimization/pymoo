@@ -33,6 +33,9 @@ class ReferenceDirectionFactory:
         self.verbose = verbose
         self.seed = seed
 
+    def __call__(self):
+        return self.do()
+
     def do(self):
 
         # set the random seed if it is provided
@@ -151,6 +154,9 @@ class MultiLayerReferenceDirectionFactory:
     def __init__(self, *args) -> None:
         self.layers = []
         self.layers.extend(args)
+
+    def __call__(self):
+        return self.do()
 
     def add_layer(self, *args):
         self.layers.extend(args)

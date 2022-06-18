@@ -1,23 +1,23 @@
-from abc import abstractmethod
+import numpy as np
+
+from pymoo.core.operator import Operator
 
 
-class Repair:
-    """
-    This class is allows to repair individuals after crossover if necessary.
-    """
+class Repair(Operator):
 
     def do(self, problem, pop, **kwargs):
-        return self._do(problem, pop, **kwargs)
+        X = np.array([ind.X for ind in pop])
+        if self.vtype is not None:
+            X = X.astype(self.vtype)
 
-    @abstractmethod
-    def _do(self, problem, pop, **kwargs):
-        pass
+        Xp = self._do(problem, X, **kwargs)
+
+        pop.set("X", Xp)
+        return pop
+
+    def _do(self, problem, X, **kwargs):
+        return X
 
 
 class NoRepair(Repair):
-    """
-    A dummy class which can be used to simply do no repair.
-    """
-
-    def do(self, problem, pop, **kwargs):
-        return pop
+    pass

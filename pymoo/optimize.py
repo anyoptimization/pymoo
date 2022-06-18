@@ -1,7 +1,5 @@
 import copy
 
-from pymoo.util.misc import termination_from_tuple
-
 
 def minimize(problem, algorithm, termination=None, copy_algorithm=True, **kwargs):
     """
@@ -54,11 +52,10 @@ def minimize(problem, algorithm, termination=None, copy_algorithm=True, **kwargs
     if copy_algorithm:
         algorithm = copy.deepcopy(algorithm)
 
-    if termination is not None:
-        kwargs["termination"] = termination_from_tuple(termination)
-
     # initialize the algorithm object given a problem - if not set already
     if algorithm.problem is None:
+        if termination is not None:
+            kwargs["termination"] = termination
         algorithm.setup(problem, **kwargs)
 
     # actually execute the algorithm

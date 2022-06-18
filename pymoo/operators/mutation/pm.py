@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.core.mutation import VariableWiseMutation
+from pymoo.core.mutation import Mutation
 from pymoo.core.variable import get, Real
 from pymoo.operators.crossover.binx import mut_binomial
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside
@@ -71,7 +71,7 @@ def mut_pm(X, xl, xu, eta, prob, at_least_once):
 # ---------------------------------------------------------------------------------------------------------
 
 
-class PolynomialMutation(VariableWiseMutation):
+class PolynomialMutation(Mutation):
 
     def __init__(self, prob=0.9, eta=20, at_least_once=True, **kwargs):
         super().__init__(prob=prob, **kwargs)

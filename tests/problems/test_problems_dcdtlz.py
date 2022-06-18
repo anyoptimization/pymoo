@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from pymoo.constraints.tcv import TotalConstraintViolation
-from pymoo.factory import get_problem
+from pymoo.problems import get_problem
 from tests.problems.test_correctness import load
 
 PROBLEMS = ["dc1dtlz1", "dc1dtlz3", "dc2dtlz1", "dc2dtlz3", "dc3dtlz1", "dc3dtlz3"]

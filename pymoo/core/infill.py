@@ -16,11 +16,14 @@ class InfillCriterion:
         self.eliminate_duplicates = eliminate_duplicates if eliminate_duplicates is not None else NoDuplicateElimination()
         self.repair = repair if repair is not None else NoRepair()
 
+    def __call__(self, problem, pop, n_offsprings, **kwargs):
+        return self.do(problem, pop, n_offsprings, **kwargs)
+
     def do(self, problem, pop, n_offsprings, **kwargs):
         n_max_iterations = kwargs.get("n_max_iterations", self.n_max_iterations)
 
         # the population object to be used
-        off = pop.new()
+        off = Population.create()
 
         # infill counter - counts how often the mating needs to be done to fill up n_offsprings
         n_infills = 0
@@ -35,7 +38,7 @@ class InfillCriterion:
             _off = self._do(problem, pop, n_remaining, **kwargs)
 
             # repair the individuals if necessary - disabled if repair is NoRepair
-            _off = self.repair.do(problem, _off, **kwargs)
+            _off = self.repair(problem, _off, **kwargs)
 
             # eliminate the duplicates
             _off = self.eliminate_duplicates.do(_off, pop, off)

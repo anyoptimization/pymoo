@@ -4,7 +4,8 @@ from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
 from pymoo.core.algorithm import Algorithm
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population
-from pymoo.util.display import SingleObjectiveDisplay
+from pymoo.util.display.single import SingleObjectiveOutput
+
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.normalization import normalize, denormalize
 
@@ -31,10 +32,10 @@ class DIRECT(Algorithm):
                  n_max_candidates=10,
                  n_max_archive=400,
                  randomize=True,
-                 display=SingleObjectiveDisplay(),
+                 output=SingleObjectiveOutput(),
                  **kwargs):
 
-        super().__init__(display=display, **kwargs)
+        super().__init__(output=output, **kwargs)
         self.n_max_candidates = n_max_candidates
         self.n_max_archive = n_max_archive
         self.randomize = randomize

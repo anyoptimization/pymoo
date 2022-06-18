@@ -1,13 +1,16 @@
-from pymoo.problems.meta import MetaProblem
-from pymoo.util.misc import at_least_2d_array
 import autograd.numpy as anp
+import numpy as np
+
+from pymoo.core.individual import calc_cv
+from pymoo.core.meta import Meta
+from pymoo.core.problem import Problem, defaults_of_out
+from pymoo.util.misc import from_dict
 
 
-class ConstraintsAsObjective(MetaProblem):
+class ConstraintsAsObjective(Meta, Problem):
 
     def __init__(self,
                  problem,
-                 tcv,
                  append=True):
 
         super().__init__(problem)
@@ -20,24 +23,34 @@ class ConstraintsAsObjective(MetaProblem):
 
         self.n_ieq_constr = 0
         self.n_eq_constr = 0
-        self.tcv = tcv
 
-    def do(self, x, out, *args, **kwargs):
-        super().do(x, out, *args, **kwargs)
+    def do(self, X, return_values_of, *args, **kwargs):
 
-        F, G, H = at_least_2d_array(out["F"]), at_least_2d_array(out["G"]), at_least_2d_array(out["H"])
+        out = self.__object__.do(X, return_values_of, *args, **kwargs)
+
+        # get at the values from the output
+        F, G, H = from_dict(out, "F", "G", "H")
 
         # store a backup of the values in out
-        out["__G__"], out["__H__"] = G, H
+        out["__F__"], out["__G__"], out["__H__"] = F, G, H
 
         # calculate the total constraint violation (here normalization shall be already included)
-        cv = self.tcv.calc(G, H)
+        CV = np.array([calc_cv(g, h) for g, h in zip(G, H)])
 
         # append the constraint violation as objective
         if self.append:
-            out["F"] = anp.column_stack([F, cv])
+            out["F"] = anp.column_stack([CV, F])
         else:
-            out["F"] = cv
+            out["F"] = CV
 
-        # erase the values from the output - it is unconstrained now
-        out.pop("G", None), out.pop("H", None)
+        DEFAULTS = defaults_of_out(self, len(X))
+        out["G"] = DEFAULTS["G"]()
+        out["H"] = DEFAULTS["H"]()
+
+        return out
+
+    def pareto_front(self, *args, **kwargs):
+        pf = super().pareto_front(*args, **kwargs)
+        if pf is not None:
+            pf = np.column_stack([np.zeros(len(pf)), pf])
+        return pf

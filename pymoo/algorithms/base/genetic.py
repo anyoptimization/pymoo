@@ -4,7 +4,7 @@ from pymoo.core.initialization import Initialization
 from pymoo.core.mating import Mating
 from pymoo.core.population import Population
 from pymoo.core.repair import NoRepair
-from pymoo.operators.param_control import NoParameterControl
+from pymoo.operators.control import NoParameterControl
 
 
 class GeneticAlgorithm(Algorithm):

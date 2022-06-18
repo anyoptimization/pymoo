@@ -1,9 +1,9 @@
 import numpy as np
 
-from pymoo.core.mutation import VariableWiseMutation
+from pymoo.core.mutation import Mutation
 
 
-class ChoiceRandomMutation(VariableWiseMutation):
+class ChoiceRandomMutation(Mutation):
 
     def _do(self, problem, X, **kwargs):
         assert problem.vars is not None

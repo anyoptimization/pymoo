@@ -3,6 +3,7 @@ import math
 import numpy as np
 
 from pymoo.core.duplicate import ElementwiseDuplicateElimination
+from pymoo.core.individual import Individual
 from pymoo.core.infill import InfillCriterion
 from pymoo.core.population import Population
 from pymoo.core.problem import Problem
@@ -10,10 +11,10 @@ from pymoo.core.sampling import Sampling
 from pymoo.core.variable import Choice, Real, Integer, Binary
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.crossover.ux import UX
-from pymoo.operators.integer_from_float_operator import IntegerFromFloatCrossover, IntegerFromFloatMutation
 from pymoo.operators.mutation.bitflip import BFM
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.mutation.rm import ChoiceRandomMutation
+from pymoo.operators.repair.rounding import RoundingRepair
 from pymoo.operators.selection.rnd import RandomSelection
 
 
@@ -34,7 +35,7 @@ class MixedVariableMating(InfillCriterion):
             crossover = {
                 Binary: UX(),
                 Real: SBX(),
-                Integer: IntegerFromFloatCrossover(SBX),
+                Integer: SBX(vtype=float, repair=RoundingRepair()),
                 Choice: UX(),
             }
 
@@ -42,7 +43,7 @@ class MixedVariableMating(InfillCriterion):
             mutation = {
                 Binary: BFM(),
                 Real: PM(),
-                Integer: IntegerFromFloatMutation(PM),
+                Integer: PM(vtype=float, repair=RoundingRepair()),
                 Choice: ChoiceRandomMutation(),
             }
 
@@ -50,11 +51,15 @@ class MixedVariableMating(InfillCriterion):
         self.crossover = crossover
         self.mutation = mutation
 
-    def _do(self, problem, pop, n_offsprings, parents=None, **kwargs):
-        X = pop.get("X")
+    def _do(self, problem, pop, n_offsprings, parents=False, **kwargs):
+        # So far we assume all crossover need the same amount of parents and create the same number of offsprings
+        XOVER_N_PARENTS = 2
+        XOVER_N_OFFSPRINGS = 2
 
+        # the variables with the concrete information
         vars = problem.vars
 
+        # group all the variables by their types
         vars_by_type = {}
         for k, v in vars.items():
             clazz = type(v)
@@ -62,21 +67,18 @@ class MixedVariableMating(InfillCriterion):
                 vars_by_type[clazz] = []
             vars_by_type[clazz].append(k)
 
+        # create an empty population that will be set in each iteration
         off = Population.new(X=[{} for _ in range(n_offsprings)])
 
-        cross_n_offsprings = 2
-        cross_n_parents = 2
-
-        if parents is None:
-            n_select = math.ceil(n_offsprings / cross_n_offsprings)
-            parents = self.selection._do(problem, pop, n_select, cross_n_parents, **kwargs)
+        if not parents:
+            n_select = math.ceil(n_offsprings / XOVER_N_OFFSPRINGS)
+            pop = self.selection(problem, pop, n_select, XOVER_N_PARENTS, **kwargs)
 
         for clazz, list_of_vars in vars_by_type.items():
-            _X = np.array([[x[var] for var in list_of_vars] for x in X], dtype=clazz.type)
-            _pop = Population.new(X=_X)
+            _parents = [[Individual(X=np.array([parent.X[var] for var in list_of_vars])) for parent in parents] for parents in pop]
 
             crossover = self.crossover[clazz]
-            assert crossover.n_parents == 2 and crossover.n_offsprings == 2
+            assert crossover.n_parents == XOVER_N_PARENTS and crossover.n_offsprings == XOVER_N_OFFSPRINGS
 
             _vars = [vars[e] for e in list_of_vars]
             _xl, _xu = None, None
@@ -86,10 +88,10 @@ class MixedVariableMating(InfillCriterion):
 
             _problem = Problem(vars=_vars, xl=_xl, xu=_xu)
 
-            _off = crossover.do(_problem, _pop, parents, **kwargs)
+            _off = crossover(_problem, _parents, **kwargs)
 
             mutation = self.mutation[clazz]
-            _off = mutation.do(_problem, _off, **kwargs)
+            _off = mutation(_problem, _off, **kwargs)
 
             for k in range(n_offsprings):
                 for i, name in enumerate(list_of_vars):
@@ -102,9 +104,11 @@ class MixedVariableSampling(Sampling):
 
     def _do(self, problem, n_samples, **kwargs):
         V = {name: var.sample(n_samples) for name, var in problem.vars.items()}
+
         X = []
         for k in range(n_samples):
             X.append({name: V[name][k] for name in problem.vars.keys()})
+
         return X
 
 

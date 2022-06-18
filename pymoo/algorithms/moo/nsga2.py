@@ -7,12 +7,12 @@ from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import compare, TournamentSelection
-from pymoo.util.display import MultiObjectiveDisplay
+from pymoo.termination.default import DefaultMultiObjectiveTermination
+from pymoo.util.display.multi import MultiObjectiveOutput
 from pymoo.util.dominator import Dominator
 from pymoo.util.misc import find_duplicates, has_feasible
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.randomized_argsort import randomized_argsort
-from pymoo.termination.default import DefaultMultiObjectiveTermination
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -124,7 +124,7 @@ class NSGA2(GeneticAlgorithm):
                  crossover=SBX(),
                  mutation=PM(prob=1.0),
                  survival=RankAndCrowdingSurvival(),
-                 display=MultiObjectiveDisplay(),
+                 output=MultiObjectiveOutput(),
                  **kwargs):
         super().__init__(
             pop_size=pop_size,
@@ -133,7 +133,7 @@ class NSGA2(GeneticAlgorithm):
             crossover=crossover,
             mutation=mutation,
             survival=survival,
-            display=display,
+            output=output,
             advance_after_initial_infill=True,
             **kwargs)
 

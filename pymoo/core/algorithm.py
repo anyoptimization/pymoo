@@ -1,5 +1,4 @@
 import copy
-import random
 import time
 
 import numpy as np
@@ -9,7 +8,9 @@ from pymoo.core.evaluator import Evaluator
 from pymoo.core.population import Population
 from pymoo.core.result import Result
 from pymoo.termination.default import DefaultMultiObjectiveTermination, DefaultSingleObjectiveTermination
+from pymoo.util.display.display import Display
 from pymoo.util.function_loader import FunctionLoader
+from pymoo.util.misc import termination_from_tuple
 from pymoo.util.optimum import filter_optimum
 
 
@@ -17,8 +18,10 @@ class Algorithm:
 
     def __init__(self,
                  termination=None,
+                 output=None,
                  display=None,
                  callback=None,
+                 archive=None,
                  return_least_infeasible=False,
                  save_history=False,
                  verbose=False,
@@ -37,7 +40,13 @@ class Algorithm:
         # the termination criterion to be used by the algorithm - might be specific for an algorithm
         self.termination = termination
 
-        # set the display variable supplied to the algorithm - might be specific for an algorithm
+        # the text that should be printed during the algorithm run
+        self.output = output
+
+        # an archive kept during algorithm execution (not always the same as optimum)
+        self.archive = archive
+
+        # the form of display shown during algorithm execution
         self.display = display
 
         # callback to be executed each generation
@@ -106,12 +115,21 @@ class Algorithm:
 
         # if a seed is set, then use it to call the random number generators
         if seed is not None:
+            import random
             random.seed(seed)
             np.random.seed(seed)
 
         # make sure that some type of termination criterion is set
         if self.termination is None:
             self.termination = default_termination(problem)
+        else:
+            self.termination = termination_from_tuple(self.termination)
+
+        # set up the display during the algorithm execution
+        if self.display is None:
+            verbose = kwargs.get("verbose", False)
+            progress = kwargs.get("progress", False)
+            self.display = Display(self.output, verbose=verbose, progress=progress)
 
         # finally call the function that can be overwritten by the actual algorithm
         self._setup(problem, **kwargs)
@@ -127,6 +145,10 @@ class Algorithm:
         return not self.termination.has_terminated()
 
     def finalize(self):
+
+        # finalize the display output in the end of the run
+        self.display.finalize()
+
         return self._finalize()
 
     def next(self):
@@ -150,7 +172,7 @@ class Algorithm:
 
         # set the attribute for the optimization method to start
         self.n_iter = 1
-        self.pop = Population()
+        self.pop = Population.empty()
         self.opt = None
 
     def infill(self):
@@ -192,7 +214,7 @@ class Algorithm:
             self.pop = infills
 
             # do whats necessary after the initialization
-            val = self._initialize_advance(infills=infills, **kwargs)
+            self._initialize_advance(infills=infills, **kwargs)
 
             # set this algorithm to be initialized
             self.is_initialized = True
@@ -218,6 +240,10 @@ class Algorithm:
         else:
             ret = self.opt
 
+        # add the infill solutions to an archive
+        if self.archive is not None and infills is not None:
+            self.archive = self.archive.add(infills)
+
         return ret
 
     def result(self):
@@ -229,6 +255,7 @@ class Algorithm:
         res.exec_time = res.end_time - res.start_time
 
         res.pop = self.pop
+        res.archive = self.archive
 
         # get the optimal solution found
         opt = self.opt
@@ -282,19 +309,18 @@ class Algorithm:
         self.termination.update(self)
 
         # display the output if defined by the algorithm
-        if self.verbose and self.display is not None:
-            self.display.do(self.problem, self.evaluator, self)
+        self.display(self)
 
         # if a callback function is provided it is called after each iteration
         self.callback(self)
 
         if self.save_history:
-            _hist, _callback = self.history, self.callback
+            _hist, _callback, _display = self.history, self.callback, self.display
 
-            self.history, self.callback = None, None
+            self.history, self.callback, self.display = None, None, None
             obj = copy.deepcopy(self)
 
-            self.history, self.callback = _hist, _callback
+            self.history, self.callback, self.display = _hist, _callback, _display
             self.history.append(obj)
 
         self.n_iter += 1

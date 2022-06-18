@@ -11,7 +11,7 @@ class G(Problem):
 
     def _calc_pareto_front(self):
         ps = at_least_2d_array(self._calc_pareto_set(), extend_as="r")
-        return self.evaluate(ps, return_values_of=["F"]).min(axis=0)
+        return self.evaluate(ps, return_as_dictionary=True)["F"].min(axis=0)
 
 
 class G1(G):

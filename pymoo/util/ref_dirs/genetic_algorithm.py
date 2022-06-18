@@ -14,6 +14,7 @@ class ReferenceDirectionGA(ReferenceDirectionFactory):
                  n_gen=200,
                  verbose=False,
                  **kwargs):
+
         super().__init__(n_dim, **kwargs)
 
         self.n_points = n_points

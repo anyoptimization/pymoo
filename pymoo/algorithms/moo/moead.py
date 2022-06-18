@@ -11,12 +11,11 @@ from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
-from pymoo.util.display import MultiObjectiveDisplay
-
-
+from pymoo.util.display.multi import MultiObjectiveOutput
 # =========================================================================================================
 # Neighborhood Selection
 # =========================================================================================================
+from pymoo.util.reference_direction import default_ref_dirs
 
 
 class NeighborhoodSelection(Selection):
@@ -47,42 +46,48 @@ class NeighborhoodSelection(Selection):
 class MOEAD(LoopwiseAlgorithm, GeneticAlgorithm):
 
     def __init__(self,
-                 ref_dirs,
+                 ref_dirs=None,
                  n_neighbors=20,
                  decomposition=None,
                  prob_neighbor_mating=0.9,
                  sampling=FloatRandomSampling(),
                  crossover=SBX(prob=1.0, eta=20),
                  mutation=PM(prob_var=None, eta=20),
-                 display=MultiObjectiveDisplay(),
+                 output=MultiObjectiveOutput(),
                  **kwargs):
 
-        # reference directions used for MOEA\D
+        # reference directions used for MOEAD
         self.ref_dirs = ref_dirs
 
         # the decomposition metric used
         self.decomposition = decomposition
 
         # the number of neighbors considered during mating
-        self.n_neighbors = min(len(ref_dirs), n_neighbors)
+        self.n_neighbors = n_neighbors
 
-        # neighbours includes the entry by itself intentionally for the survival method
-        self.neighbors = np.argsort(cdist(self.ref_dirs, self.ref_dirs), axis=1, kind='quicksort')[:, :self.n_neighbors]
+        self.neighbors = None
 
         self.selection = NeighborhoodSelection(prob=prob_neighbor_mating)
 
-        super().__init__(pop_size=len(ref_dirs),
+        super().__init__(pop_size=np.inf,
                          sampling=sampling,
                          crossover=crossover,
                          mutation=mutation,
                          eliminate_duplicates=NoDuplicateElimination(),
-                         display=display,
+                         output=output,
                          advance_after_initialization=False,
                          **kwargs)
 
-
     def _setup(self, problem, **kwargs):
         assert not problem.has_constraints(), "This implementation of MOEAD does not support any constraints."
+
+        # if no reference directions have been provided get them and override the population size and other settings
+        if self.ref_dirs is None:
+            self.ref_dirs = default_ref_dirs(problem.n_obj)
+        self.pop_size = len(self.ref_dirs)
+
+        # neighbours includes the entry by itself intentionally for the survival method
+        self.neighbors = np.argsort(cdist(self.ref_dirs, self.ref_dirs), axis=1, kind='quicksort')[:, :self.n_neighbors]
 
         # if the decomposition is not set yet, set the default
         if self.decomposition is None:
@@ -97,7 +102,6 @@ class MOEAD(LoopwiseAlgorithm, GeneticAlgorithm):
 
         # iterate for each member of the population in random order
         for k in np.random.permutation(len(pop)):
-
             # get the parents using the neighborhood selection
             P = self.selection.do(self.problem, pop, 1, self.mating.crossover.n_parents, neighbors=[self.neighbors[k]])
 
@@ -145,7 +149,8 @@ class ParallelMOEAD(MOEAD):
         indices = np.random.permutation(len(self.pop))[:self.n_offsprings]
 
         # get the parents using the neighborhood selection
-        P = self.selection.do(self.problem, self.pop, self.n_offsprings, cross_parents, neighbors=self.neighbors[indices])
+        P = self.selection.do(self.problem, self.pop, self.n_offsprings, cross_parents,
+                              neighbors=self.neighbors[indices])
 
         # do not any duplicates elimination - thus this results in exactly pop_size * n_offsprings offsprings
         off = self.mating.do(self.problem, self.pop, 1e12, n_max_iterations=1, parents=P)

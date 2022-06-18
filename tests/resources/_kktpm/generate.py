@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.factory import get_problem
+from pymoo.problems import get_problem
 from pymoo.optimize import minimize
 
 

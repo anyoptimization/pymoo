@@ -5,7 +5,7 @@ from pymoo.core.termination import Termination
 
 class IndicatorTermination(Termination):
 
-    def __init__(self, indicator, threshold, goal, log=True, **kwargs) -> None:
+    def __init__(self, indicator, threshold, goal, **kwargs) -> None:
         super().__init__()
 
         # the indicator to be used
@@ -25,9 +25,6 @@ class IndicatorTermination(Termination):
         self._min = float("inf")
         self._max = -float("inf")
 
-        # whether a log scale for convergence should be used
-        self.log = log
-
     def _update(self, algorithm):
 
         # get the objective space values
@@ -42,9 +39,6 @@ class IndicatorTermination(Termination):
         self._min = min(self._min, v)
         self._max = max(self._max, v)
         _min, _max = self._min, self._max
-
-        if self.log:
-            threshold, _min, _max, v = log(threshold), log(_min), log(_max), log(v)
 
         # depending on the goal either set the percentage
         if self.goal == "minimize":

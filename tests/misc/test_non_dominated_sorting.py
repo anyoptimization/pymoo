@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from pymoo.algorithms.moo.nsga3 import NSGA3
-from pymoo.factory import get_reference_directions
+from pymoo.util.ref_dirs import get_reference_directions
 from pymoo.core.callback import Callback
 from pymoo.optimize import minimize
 from pymoo.problems.many import DTLZ2

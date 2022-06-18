@@ -37,30 +37,30 @@ class BoundedVariable(Variable):
 
 
 class Real(BoundedVariable):
-    type = float
+    vtype = float
 
     def _sample(self, n):
-        lower, upper = self.bounds
-        return np.random.uniform(low=lower, high=upper, size=n)
+        low, high = self.bounds
+        return np.random.uniform(low=low, high=high, size=n)
 
 
 class Integer(BoundedVariable):
-    type = int
+    vtype = int
 
     def _sample(self, n):
-        lower, upper = self.bounds
-        return np.random.randint(lower, high=upper, size=n)
+        low, high = self.bounds
+        return np.random.randint(low, high=high+1, size=n)
 
 
 class Binary(Variable):
-    type = bool
+    vtype = bool
 
     def _sample(self, n):
         return np.random.random(size=n) < 0.5
 
 
 class Choice(Variable):
-    type = object
+    vtype = object
 
     def __init__(self, value=None, options=None, all=None, **kwargs) -> None:
         super().__init__(value=value, **kwargs)

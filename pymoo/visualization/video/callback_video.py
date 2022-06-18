@@ -30,11 +30,11 @@ class AnimationCallback(Callback):
             except:
                 raise Exception("Please install or update pyrecorder for animation support: pip install -U pyrecorder")
 
-    def notify(self, algorithm, **kwargs):
+    def update(self, algorithm):
         if algorithm.n_gen == 1 or algorithm.n_gen % self.nth_gen == 0:
             try:
 
-                figure = self.do(algorithm.problem, algorithm, **kwargs)
+                figure = self.do(algorithm.problem, algorithm)
 
                 if self.do_show:
                     if figure is not None:

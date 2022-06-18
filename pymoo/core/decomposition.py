@@ -11,6 +11,9 @@ class Decomposition:
         self._type = _type
         self.ideal_point, self.utopian_point, self.nadir_point = None, None, None
 
+    def __call__(self, *args, **kwargs):
+        return self.do(*args, **kwargs)
+
     def do(self,
            F,
            weights,

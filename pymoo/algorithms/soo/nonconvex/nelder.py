@@ -9,7 +9,7 @@ from pymoo.core.replacement import is_better
 from pymoo.core.termination import Termination
 from pymoo.docs import parse_doc_string
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
-from pymoo.util.display import SingleObjectiveDisplay
+from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.misc import vectorized_cdist
 from pymoo.util.vectors import max_alpha
 
@@ -113,10 +113,10 @@ class NelderMead(LocalSearch):
     def __init__(self,
                  init_simplex_scale=0.05,
                  func_params=adaptive_params,
-                 display=SingleObjectiveDisplay(),
+                 output=SingleObjectiveOutput(),
                  **kwargs):
 
-        super().__init__(display=display, **kwargs)
+        super().__init__(output=output, **kwargs)
 
         # the function to return the parameter
         self.func_params = func_params

@@ -3,7 +3,7 @@ from os.path import join
 import autograd.numpy as anp
 import pytest
 
-from pymoo.factory import get_problem
+from pymoo.problems import get_problem
 from tests.problems.test_correctness import load
 from tests.util import path_to_test_resource
 

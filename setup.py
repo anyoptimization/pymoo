@@ -29,7 +29,8 @@ data = dict(
     description="Multi-Objective Optimization in Python",
     license='Apache License 2.0',
     keywords="optimization",
-    install_requires=['numpy>=1.15', 'scipy>=1.1', 'matplotlib>=3', 'autograd>=1.3', 'cma==2.7', 'alive-perc'],
+    install_requires=['numpy>=1.15', 'scipy>=1.1', 'matplotlib>=3', 'autograd>=1.4', 'cma==3.2.2',
+                      'alive-progress', 'numba', 'dill', 'deprecation', 'wrapt'],
     platforms='any',
     classifiers=[
         'Intended Audience :: Developers',
@@ -41,6 +42,7 @@ data = dict(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'Topic :: Scientific/Engineering :: Mathematics'

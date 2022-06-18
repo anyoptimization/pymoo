@@ -1,10 +1,11 @@
 import numpy as np
 
-from pymoo.factory import get_reference_directions
+
 from pymoo.util.misc import cdist
+
 from pymoo.util.ref_dirs.misc import project_onto_unit_simplex_recursive
 from pymoo.util.reference_direction import ReferenceDirectionFactory, sample_on_unit_simplex, \
-    select_points_with_maximum_distance, get_partition_closest_to_points
+    select_points_with_maximum_distance, get_partition_closest_to_points, UniformReferenceDirectionFactory
 
 
 def kmeans(X, centroids, n_max_iter, a_tol, n_ignore):
@@ -68,7 +69,7 @@ class ReductionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
 
         H = h(self.n_points)
 
-        E = get_reference_directions("das-dennis", self.n_dim, n_partitions=H)
+        E = UniformReferenceDirectionFactory(self.n_dim, n_partitions=H).do()
         E = E[np.any(E == 0, axis=1)]
 
         # add the edge coordinates

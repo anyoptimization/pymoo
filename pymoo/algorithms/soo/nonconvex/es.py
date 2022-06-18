@@ -5,9 +5,9 @@ from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.core.population import Population
 from pymoo.docs import parse_doc_string
 from pymoo.operators.sampling.rnd import FloatRandomSampling
-from pymoo.util.display import SingleObjectiveDisplay
-from pymoo.util.optimum import filter_optimum
 from pymoo.termination.default import DefaultSingleObjectiveTermination
+from pymoo.util.display.single import SingleObjectiveOutput
+from pymoo.util.optimum import filter_optimum
 
 
 class ES(GeneticAlgorithm):
@@ -20,7 +20,7 @@ class ES(GeneticAlgorithm):
                  gamma=0.85,
                  sampling=FloatRandomSampling(),
                  survival=FitnessSurvival(),
-                 display=SingleObjectiveDisplay(),
+                 output=SingleObjectiveOutput(),
                  **kwargs):
 
         """
@@ -45,7 +45,7 @@ class ES(GeneticAlgorithm):
         if pop_size is None and n_offsprings is not None:
             pop_size = int(np.math.ceil(n_offsprings * rule))
         elif n_offsprings is None and pop_size is not None:
-            n_offsprings = int(np.math.fllor(n_offsprings / rule))
+            n_offsprings = int(np.math.floor(n_offsprings / rule))
 
         assert pop_size is not None and n_offsprings is not None, "You have to at least provivde pop_size of n_offsprings."
         assert n_offsprings >= 2 * pop_size, "The number of offsprings should be at least double the population size."
@@ -54,7 +54,7 @@ class ES(GeneticAlgorithm):
                          n_offsprings=n_offsprings,
                          sampling=sampling,
                          survival=survival,
-                         display=display,
+                         output=output,
                          advance_after_initial_infill=True,
                          **kwargs)
 

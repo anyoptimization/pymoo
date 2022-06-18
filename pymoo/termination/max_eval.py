@@ -8,4 +8,7 @@ class MaximumFunctionCallTermination(Termination):
         self.n_max_evals = n_max_evals
 
     def _update(self, algorithm):
-        return algorithm.evaluator.n_eval / self.n_max_evals
+        if self.n_max_evals is None:
+            return 0.0
+        else:
+            return algorithm.evaluator.n_eval / self.n_max_evals

@@ -11,6 +11,9 @@ class Indicator(PreNormalization):
         # what should an indicator return if no solutions are provided is defined here
         self.default_if_empty = 0.0
 
+    def __call__(self, F, *args, **kwargs):
+        return self.do(F, *args, **kwargs)
+
     def do(self, F, *args, **kwargs):
 
         # if it is a 1d array

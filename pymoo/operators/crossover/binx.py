@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.core.crossover import Crossover
 from pymoo.core.variable import Real, get
-from pymoo.operators.crossover.util import row_at_least_once_true
+from pymoo.util.misc import row_at_least_once_true
 
 
 def mut_binomial(n, m, prob, at_least_once=True):

@@ -1,4 +1,3 @@
-import functools
 from abc import abstractmethod
 
 import autograd.numpy as np
@@ -20,6 +19,7 @@ class Problem:
                  n_eq_constr=0,
                  xl=None,
                  xu=None,
+                 vtype=None,
                  vars=None,
                  check_inconsistencies=True,
                  replace_nan_values_by=np.inf,
@@ -49,7 +49,7 @@ class Problem:
         xu : np.array, float, int
             Upper bounds for the variable. if integer all upper bounds are equal.
 
-        type_var : numpy.dtype
+        vtype : type
             The variable type. So far, just used as a type hint.
 
         """
@@ -108,10 +108,13 @@ class Problem:
         # attribute which are excluded from being serialized )
         self.exclude_from_serialization = exclude_from_serialization if exclude_from_serialization is not None else []
 
+        # the variable type
+        self.vartype = vtype
+
     def evaluate(self,
                  X,
                  *args,
-                 return_values_of=None,
+                 return_values_of=("F", "G", "H"),
                  return_as_dictionary=False,
                  **kwargs):
 
@@ -122,21 +125,12 @@ class Problem:
         else:
             only_single_value = not (isinstance(X, list) or isinstance(X, np.ndarray))
 
-        # the values to be actually returned by in the end - set bu default if not provided
-        ret_vals = default_return_values(self.has_constraints()) if return_values_of is None else return_values_of
-
-        # prepare the dictionary to be filled after the evaluation
-        out = dict_with_none(ret_vals)
-
         # do the actual evaluation for the given problem - calls in _evaluate method internally
-        self.do(X, out, *args, **kwargs)
-
-        # make sure the array is 2d before doing the shape check
-        out_to_2d_ndarray(out)
+        out = self.do(X, return_values_of, *args, **kwargs)
 
         # if enabled (recommended) the output shapes are checked for inconsistencies
         if self.check_inconsistencies:
-            check(self, X, out)
+            pass
 
         # if the NaN values should be replaced
         if self.replace_nan_values_by is not None:
@@ -156,14 +150,23 @@ class Problem:
         if return_as_dictionary:
             return out
         else:
-            if len(ret_vals) == 1:
-                return out[ret_vals[0]]
+            if len(return_values_of) == 1:
+                return out[return_values_of[0]]
             else:
-                return tuple([out[e] for e in ret_vals])
+                return tuple([out[e] for e in return_values_of])
 
-    def do(self, X, out, *args, **kwargs):
+    def do(self, X, return_values_of, *args, **kwargs):
+
+        # prepare the dictionary to be filled after the evaluation
+        out = dict_with_defaults(self, X, return_values_of)
+
+        # do the actual evaluation in the problem definition
         self._evaluate(X, out, *args, **kwargs)
+
+        # make sure all outputs are a 2d array
         out_to_2d_ndarray(out)
+
+        return out
 
     @Cache
     def nadir_point(self, *args, **kwargs):
@@ -249,26 +252,25 @@ def calc_pf(problem, *args, **kwargs):
 # ---------------------------------------------------------------------------------------------------------
 
 
-def elementwise_eval(problem, x, out, args, kwargs):
+def elementwise_eval(problem, x, args, kwargs):
+    out = dict()
     problem._evaluate(x, out, *args, **kwargs)
-    out_to_ndarray(out)
-    check(problem, x, out)
     return out
 
 
-def looped_eval(func_elementwise_eval, problem, X, out, *args, **kwargs):
-    return [func_elementwise_eval(problem, x, dict(out), args, kwargs) for x in X]
+def looped_eval(func_elementwise_eval, problem, X, *args, **kwargs):
+    return [func_elementwise_eval(problem, x, args, kwargs) for x in X]
 
 
-def starmap_parallelized_eval(func_elementwise_eval, problem, X, out, *args, **kwargs):
+def starmap_parallelized_eval(func_elementwise_eval, problem, X, *args, **kwargs):
     starmap = problem.runner
-    params = [(problem, x, dict(out), args, kwargs) for x in X]
+    params = [(problem, x, args, kwargs) for x in X]
     return list(starmap(func_elementwise_eval, params))
 
 
-def dask_parallelized_eval(func_elementwise_eval, problem, X, out, *args, **kwargs):
+def dask_parallelized_eval(func_elementwise_eval, problem, X, *args, **kwargs):
     client = problem.runner
-    jobs = [client.submit(func_elementwise_eval, problem, x, dict(out), args, kwargs) for x in X]
+    jobs = [client.submit(func_elementwise_eval, problem, x, args, kwargs) for x in X]
     return [job.result() for job in jobs]
 
 
@@ -295,40 +297,29 @@ class ElementwiseProblem(Problem):
         # do not serialize the starmap - this will throw an exception
         self.exclude_from_serialization = self.exclude_from_serialization + ["runner"]
 
-    def do(self, X, out, *args, **kwargs):
+    def do(self, X, return_values_of, *args, **kwargs):
+        out = dict_with_defaults(self, X, return_values_of)
 
         # do an elementwise evaluation and return the results
-        ret = self.func_eval(self.func_elementwise_eval, self, X, out, *args, **kwargs)
+        ret = self.func_eval(self.func_elementwise_eval, self, X, *args, **kwargs)
 
-        # the first element decides what keys will be set
+        # all the elements to be set to the output
         keys = list(ret[0].keys())
 
-        # now stack all the results for each of them together
         for key in keys:
-            assert all([key in _out for _out in ret]), f"For some elements the {key} value has not been set."
+            if key not in out:
+                out[key] = [None] * len(X)
 
-            vals = []
-            for elem in ret:
-                val = elem[key]
+        # for each evaluation call
+        for i, elem in enumerate(ret):
+            for k, v in elem.items():
+                try:
+                    out[k][i] = v
+                except Exception as e:
+                    raise Exception(f"Problem Error: {k} can not be set", e)
 
-                if val is not None:
-
-                    # if it is just a float
-                    if isinstance(val, list) or isinstance(val, tuple):
-                        val = np.array(val)
-                    elif not isinstance(val, np.ndarray):
-                        val = np.full(1, val)
-
-                    # otherwise prepare the value to be stacked with each other by extending the dimension
-                    val = at_least_2d_array(val, extend_as="row")
-
-                vals.append(val)
-
-            # that means the key has never been set at all
-            if all([val is None for val in vals]):
-                out[key] = None
-            else:
-                out[key] = np.row_stack(vals)
+        # make sure the array is 2d before doing the shape check
+        out_to_2d_ndarray(out)
 
         return out
 
@@ -352,6 +343,27 @@ def dict_with_none(keys):
     out = {}
     for val in keys:
         out[val] = None
+    return out
+
+
+def defaults_of_out(problem, k):
+    DEFAULTS = dict(
+        F=lambda: np.full((k, problem.n_obj), np.nan, dtype=float),
+        G=lambda: np.full((k, problem.n_ieq_constr), np.nan, dtype=float),
+        H=lambda: np.full((k, problem.n_eq_constr), np.nan, dtype=float),
+    )
+    return DEFAULTS
+
+
+def dict_with_defaults(problem, X, keys):
+    DEFAULTS = defaults_of_out(problem, len(X))
+
+    out = {}
+    for key in keys:
+        if key in DEFAULTS:
+            out[key] = DEFAULTS[key]()
+        else:
+            out[key] = None
     return out
 
 
@@ -394,30 +406,3 @@ def replace_nan_values(out, by=np.inf):
         except:
             pass
 
-
-def check(problem, X, out):
-    elementwise = X.ndim == 1
-
-    # only used if not elementwise
-    n_evals = X.shape[0]
-
-    # the values from the output to be checked
-    F, dF, G, dG = out.get("F"), out.get("dF"), out.get("G"), out.get("dG")
-
-    # if F is not None:
-    #     correct = tuple([problem.n_obj]) if elementwise else (n_evals, problem.n_obj)
-    #     assert F.shape == correct, f"Incorrect shape of F: {F.shape} != {correct} (provided != expected)"
-    #
-    # if dF is not None:
-    #     correct = (problem.n_obj, problem.n_var) if elementwise else (n_evals, problem.n_obj, problem.n_var)
-    #     assert dF.shape == correct, f"Incorrect shape of dF: {dF.shape} != {correct} (provided != expected)"
-
-    # if G is not None:
-    #     if problem.has_constraints():
-    #         correct = tuple([problem.n_constr]) if elementwise else (n_evals, problem.n_constr)
-    #         assert G.shape == correct, f"Incorrect shape of G: {G.shape} != {correct} (provided != expected)"
-    #
-    # if dG is not None:
-    #     if problem.has_constraints():
-    #         correct = (problem.n_constr, problem.n_var) if elementwise else (n_evals, problem.n_constr, problem.n_var)
-    #         assert dG.shape == correct, f"Incorrect shape of dG: {dG.shape} != {correct} (provided != expected)"

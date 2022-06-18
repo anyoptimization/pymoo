@@ -1,11 +1,11 @@
 import numpy as np
 
-from pymoo.core.mutation import VariableWiseMutation
+from pymoo.core.mutation import Mutation
 
 
-class BitflipMutation(VariableWiseMutation):
+class BitflipMutation(Mutation):
 
-    def _do(self, problem, X, params=None, **kwargs):
+    def _do(self, problem, X, **kwargs):
         prob_var = self.get_prob_var(problem, size=(len(X), 1))
         Xp = np.copy(X)
         flip = np.random.random(X.shape) < prob_var

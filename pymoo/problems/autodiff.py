@@ -5,14 +5,14 @@ import autograd.numpy as anp
 from autograd.core import VJPNode, vspace, backward_pass
 from autograd.tracer import new_box, isbox
 
-from pymoo.core.problem import ElementwiseProblem, out_to_ndarray, check
-from pymoo.problems.meta import MetaProblem
+from pymoo.core.meta import Meta
+from pymoo.core.problem import ElementwiseProblem, out_to_ndarray, check, Problem
 
 
 def out_to_numpy(out):
     for key in out.keys():
         if type(out[key]) == autograd.numpy.numpy_boxes.ArrayBox:
-            out[key] = out[key]._data
+            out[key] = out[key]._value
 
 
 def get_deriv(out):
@@ -87,7 +87,7 @@ def autograd_elementwise_eval(problem, X, out, *args, **kwargs):
     return out
 
 
-class AutomaticDifferentiation(MetaProblem):
+class AutomaticDifferentiation(Meta, Problem):
 
     def __init__(self, problem):
         super().__init__(problem)

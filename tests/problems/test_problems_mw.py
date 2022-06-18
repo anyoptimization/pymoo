@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from pymoo.constraints.tcv import TotalConstraintViolation
-from pymoo.factory import get_problem
+from pymoo.problems import get_problem
 from tests.problems.test_correctness import load
 
 PROBLEMS = [f"mw{k}" for k in range(1, 15)]

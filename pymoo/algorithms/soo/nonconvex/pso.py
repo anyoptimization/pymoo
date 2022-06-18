@@ -27,11 +27,11 @@ from pymoo.core.population import Population
 from pymoo.core.replacement import ImprovementReplacement, is_better
 from pymoo.core.variable import Real, Choice, get
 from pymoo.docs import parse_doc_string
-from pymoo.operators.param_control import EvolutionaryParameterControl
+from pymoo.operators.control import EvolutionaryParameterControl
 from pymoo.operators.repair.bounds_repair import repair_random_init, repair_clamp
 from pymoo.operators.sampling.rnd import random_by_bounds, FloatRandomSampling
 from pymoo.termination.default import DefaultSingleObjectiveTermination
-from pymoo.util.display import SingleObjectiveDisplay
+from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.sliding_window import SlidingWindow
 
 
@@ -151,7 +151,7 @@ class Swarm(InfillCriterion):
         #         delta.clear()
 
         # repair the individuals if necessary - disabled if repair is NoRepair
-        off = self.repair.do(problem, off, **kwargs)
+        off = self.repair(problem, off, **kwargs)
 
         # advance the parameter control by attaching them to the offsprings
         control.advance(off)
@@ -188,6 +188,7 @@ class PSO(GeneticAlgorithm):
                  swarm=Swarm(),
                  topology="star",
                  init_V="zero",
+                 output=SingleObjectiveOutput(),
                  **kwargs):
 
         super().__init__(pop_size=pop_size,
@@ -196,7 +197,7 @@ class PSO(GeneticAlgorithm):
                          init_V=init_V,
                          n_offsprings=None,
                          eliminate_duplicates=NoDuplicateElimination(),
-                         display=SingleObjectiveDisplay(),
+                         output=output,
                          **kwargs)
 
         # how the initial weights should be created

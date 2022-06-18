@@ -4,17 +4,27 @@ from pymoo.termination.delta import DeltaToleranceTermination
 
 class ConstraintViolationTermination(DeltaToleranceTermination):
 
-    def __init__(self, tol=1e-6, **kwargs):
+    def __init__(self, tol=1e-6, terminate_when_feasible=True, **kwargs):
         super().__init__(tol, **kwargs)
+        self.terminate_when_feasible = terminate_when_feasible
 
     def _update(self, algorithm):
         if algorithm.problem.has_constraints():
-            return super()._update(algorithm)
+            feasible_found = any(algorithm.opt.get("feas"))
+
+            if feasible_found:
+                if self.terminate_when_feasible:
+                    return 1.0
+                else:
+                    return 0.0
+
+            else:
+                return super()._update(algorithm)
         else:
-            return 1.0
+            return 0.0
 
     def _delta(self, prev, current):
-        return max(0, prev - current)
+        return max(0.0, prev - current)
 
     def _data(self, algorithm):
         return algorithm.opt.get("CV").min()

@@ -12,7 +12,7 @@ class TournamentSelection(Selection):
       greedy the genetic algorithm will be.
     """
 
-    def __init__(self, func_comp=None, pressure=2):
+    def __init__(self, func_comp=None, pressure=2, **kwargs):
         """
 
         Parameters
@@ -24,6 +24,8 @@ class TournamentSelection(Selection):
         pressure: int
             The selection pressure to bie applied. Default it is a binary tournament.
         """
+
+        super().__init__(**kwargs)
 
         # selection pressure to be applied
         self.pressure = pressure

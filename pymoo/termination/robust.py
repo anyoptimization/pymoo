@@ -6,8 +6,7 @@ class RobustTermination(Termination):
 
     def __init__(self,
                  termination,
-                 n=30,
-                 **kwargs
+                 period=30,
                  ) -> None:
         """
 
@@ -17,17 +16,17 @@ class RobustTermination(Termination):
         termination : Termination
             The termination criterion that shall become robust
 
-        n : int
+        period : int
             The number of last generations to be considered for termination.
 
         """
-        super().__init__(**kwargs)
+        super().__init__()
 
         # create a collection in case number of max generation or evaluations is used
         self.termination = termination
 
         # the history calculated also in a sliding window
-        self.history = SlidingWindow(n)
+        self.history = SlidingWindow(period)
 
     def _update(self, algorithm):
         perc = self.termination.update(algorithm)

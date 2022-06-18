@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.factory import get_problem
+from pymoo.problems import get_problem
 from pymoo.core.evaluator import Evaluator
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population

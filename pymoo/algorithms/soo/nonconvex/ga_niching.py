@@ -7,9 +7,11 @@ from pymoo.operators.selection.tournament import compare, TournamentSelection
 from pymoo.termination.cv import ConstraintViolationTermination
 from pymoo.termination.default import DefaultSingleObjectiveTermination, DefaultTermination
 from pymoo.termination.ftol import SingleObjectiveSpaceTermination
+from pymoo.termination.robust import RobustTermination
 from pymoo.termination.xtol import DesignSpaceTermination
 from pymoo.util.clearing import EpsilonClearing
-from pymoo.util.display import SingleObjectiveDisplay
+from pymoo.util.display.column import Column
+from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.misc import norm_eucl_dist
 
 
@@ -17,13 +19,12 @@ from pymoo.util.misc import norm_eucl_dist
 # Display
 # =========================================================================================================
 
-class NicheDisplay(SingleObjectiveDisplay):
+class NicheOutput(SingleObjectiveOutput):
 
-    def _do(self, problem, evaluator, algorithm):
-        super()._do(problem, evaluator, algorithm)
-        self.output.attrs = [e for e in self.output.attrs if e[0] != "favg"]
-        self.output.append("n_niches", len(algorithm.opt), width=10)
-        self.output.append("favg", algorithm.opt.get("F").mean(), width=12)
+    def __init__(self):
+        super().__init__()
+        self.columns["n_niches"] = Column(10, lambda algorithm: len(algorithm.opt))
+        self.active += ["n_niches"]
 
 
 # =========================================================================================================
@@ -32,7 +33,7 @@ class NicheDisplay(SingleObjectiveDisplay):
 
 class NicheSingleObjectiveSpaceToleranceTermination(SingleObjectiveSpaceTermination):
 
-    def _store(self, algorithm):
+    def _data(self, algorithm):
         return algorithm.opt.get("F").mean()
 
 
@@ -42,12 +43,12 @@ class NicheTermination(DefaultTermination):
                  x_tol=1e-32,
                  cv_tol=1e-6,
                  f_tol=1e-6,
-                 nth_gen=5,
-                 n_last=20,
+                 period=20,
                  **kwargs) -> None:
-        super().__init__(DesignSpaceTermination(tol=x_tol, n_last=n_last),
-                         ConstraintViolationTermination(tol=cv_tol, n_last=n_last),
-                         NicheSingleObjectiveSpaceToleranceTermination(tol=f_tol, n_last=n_last, nth_gen=nth_gen),
+
+        super().__init__(RobustTermination(DesignSpaceTermination(tol=x_tol), period=period),
+                         RobustTermination(ConstraintViolationTermination(tol=cv_tol), period=period),
+                         RobustTermination(NicheSingleObjectiveSpaceToleranceTermination(tol=f_tol, n_skip=5), period=period),
                          **kwargs)
 
 
@@ -92,7 +93,7 @@ class EpsilonClearingSurvival(Survival):
         self.n_max_each_iter = n_max_each_iter
         self.norm_by_dim = norm_by_dim
 
-    def _do(self, problem, pop, n_survive, out=None, **kwargs):
+    def _do(self, problem, pop, n_survive=None, out=None, **kwargs):
         F = pop.get("F")
 
         if F.shape[1] != 1:
@@ -171,8 +172,8 @@ class NicheGA(GA):
                  pop_size=100,
                  norm_niche_size=0.05,
                  norm_by_dim=False,
-                 return_all_opt=False,
-                 display=NicheDisplay(),
+                 return_all_opt=True,
+                 output=NicheOutput(),
                  **kwargs):
         """
 
@@ -202,7 +203,7 @@ class NicheGA(GA):
         super().__init__(pop_size=pop_size,
                          selection=selection,
                          survival=surv,
-                         display=display,
+                         output=output,
                          advance_after_initial_infill=True,
                          **kwargs)
 

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from pymoo.factory import get_problem
+from pymoo.problems import get_problem
 from pymoo.problems.many import WFG1, WFG2, WFG3, WFG4, WFG5, WFG6, WFG7, WFG8, WFG9
 from tests.problems.test_correctness import load
 

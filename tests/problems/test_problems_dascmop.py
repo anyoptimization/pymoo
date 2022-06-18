@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from pymoo.constraints.tcv import TotalConstraintViolation
-from pymoo.factory import get_problem
+from pymoo.problems import get_problem
 from pymoo.problems.multi import DIFFICULTIES
 from tests.problems.test_correctness import load
 

@@ -2,18 +2,18 @@ import numpy as np
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
-from pymoo.docs import parse_doc_string
 from pymoo.core.duplicate import DefaultDuplicateElimination, DuplicateElimination
 from pymoo.core.population import Population
 from pymoo.core.selection import Selection
 from pymoo.core.survival import Survival
+from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.binx import BinomialCrossover
 from pymoo.operators.mutation.nom import NoMutation
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.rnd import RandomSelection
-from pymoo.util.display import SingleObjectiveDisplay
-from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.termination.default import DefaultSingleObjectiveTermination
+from pymoo.util.display.single import SingleObjectiveOutput
+from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
 
 # =========================================================================================================
@@ -28,7 +28,7 @@ class EliteSurvival(Survival):
         self.n_elites = n_elites
         self.eliminate_duplicates = eliminate_duplicates
 
-    def _do(self, problem, pop, n_survive, algorithm=None, **kwargs):
+    def _do(self, problem, pop, n_survive=None, algorithm=None, **kwargs):
 
         if isinstance(self.eliminate_duplicates, bool) and self.eliminate_duplicates:
             pop = DefaultDuplicateElimination(func=lambda p: p.get("F")).do(pop)
@@ -58,7 +58,7 @@ class EliteSurvival(Survival):
 
 class EliteBiasedSelection(Selection):
 
-    def _do(self, pop, n_select, n_parents, **kwargs):
+    def _do(self, problem, pop, n_select, n_parents, **kwargs):
         _type = pop.get("type")
         elites = np.where(_type == "elite")[0]
         non_elites = np.where(_type == "non_elite")[0]
@@ -68,8 +68,8 @@ class EliteBiasedSelection(Selection):
             non_elites = elites
 
         # do the mating selection - always one elite and one non-elites
-        s_elite = elites[RandomSelection().do(elites, n_select, 1)[:, 0]]
-        s_non_elite = non_elites[RandomSelection().do(non_elites, n_select, 1)[:, 0]]
+        s_elite = np.random.choice(elites, size=n_select)
+        s_non_elite = np.random.choice(non_elites, size=n_select)
 
         return np.column_stack([s_elite, s_non_elite])
 
@@ -83,7 +83,7 @@ class BRKGA(GeneticAlgorithm):
                  bias=0.7,
                  sampling=FloatRandomSampling(),
                  survival=None,
-                 display=SingleObjectiveDisplay(),
+                 output=SingleObjectiveOutput(),
                  eliminate_duplicates=False,
                  **kwargs
                  ):
@@ -124,7 +124,7 @@ class BRKGA(GeneticAlgorithm):
                          crossover=BinomialCrossover(bias, prob=1.0),
                          mutation=NoMutation(),
                          survival=survival,
-                         display=display,
+                         output=output,
                          eliminate_duplicates=True,
                          advance_after_initial_infill=True,
                          **kwargs)
@@ -146,7 +146,7 @@ class BRKGA(GeneticAlgorithm):
         # evaluate all the new solutions
         return Population.merge(off, mutants)
 
-    def _advance(self, infills=None):
+    def _advance(self, infills=None, **kwargs):
         pop = self.pop
 
         # get all the elites from the current population

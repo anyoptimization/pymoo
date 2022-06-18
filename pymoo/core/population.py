@@ -3,32 +3,12 @@ import numpy as np
 from pymoo.core.individual import Individual
 
 
-def interleaving_args(*args, kwargs=None):
-    if len(args) % 2 != 0:
-        raise Exception(f"Even number of arguments are required but {len(args)} arguments were provided.")
-
-    if kwargs is None:
-        kwargs = {}
-
-    for i in range(int(len(args) / 2)):
-        key, values = args[i * 2], args[i * 2 + 1]
-        kwargs[key] = values
-    return kwargs
-
-
 class Population(np.ndarray):
 
-    def __new__(cls, n_individuals=0):
-        obj = super(Population, cls).__new__(cls, n_individuals, dtype=cls).view(cls)
-        for i in range(n_individuals):
-            obj[i] = Individual()
-        return obj
-
-    def copy(self, deep=False):
-        pop = Population(n_individuals=len(self))
-        for i in range(len(self)):
-            pop[i] = self[i].copy(deep=deep)
-        return pop
+    def __new__(cls, individuals=[]):
+        if isinstance(individuals, Individual):
+            individuals = [individuals]
+        return np.array(individuals).view(cls)
 
     def has(self, key):
         return all([ind.has(key) for ind in self])
@@ -40,6 +20,9 @@ class Population(np.ndarray):
         if to_numpy:
             val = np.array(val)
         return val
+
+    def apply(self, func):
+        self.collect(func, to_numpy=False)
 
     def set(self, *args, **kwargs):
 
@@ -63,7 +46,7 @@ class Population(np.ndarray):
 
         return self
 
-    def get(self, *args, to_numpy=True):
+    def get(self, *args, to_numpy=True, **kwargs):
 
         val = {}
         for c in args:
@@ -74,7 +57,7 @@ class Population(np.ndarray):
 
             # for each argument
             for c in args:
-                val[c].append(self[i].get(c))
+                val[c].append(self[i].get(c, **kwargs))
 
         # convert the results to a list
         res = [val[c] for c in args]
@@ -88,9 +71,6 @@ class Population(np.ndarray):
             return res[0]
         else:
             return tuple(res)
-
-    def __deepcopy__(self, memo):
-        return self.copy(deep=True)
 
     @classmethod
     def merge(cls, a, b, *args):
@@ -107,38 +87,36 @@ class Population(np.ndarray):
 
     @classmethod
     def create(cls, *args):
-        if len(args) == 0:
-            return Population(0)
-        else:
-            pop = np.concatenate([pop_from_array_or_individual(arg) for arg in args]).view(Population)
-            return pop
+        return Population.__new__(cls, args)
+
+    @classmethod
+    def empty(cls, size=0):
+        individuals = [Individual() for _ in range(size)]
+        return Population.__new__(cls, individuals)
 
     @classmethod
     def new(cls, *args, **kwargs):
+        kwargs = interleaving_args(*args, kwargs=kwargs)
 
-        if len(args) == 1:
-            return Population(n_individuals=args[0], **kwargs)
-        else:
-            kwargs = interleaving_args(*args, kwargs=kwargs)
-            iterable = [v for _, v in kwargs.items() if hasattr(v, '__len__') and not isinstance(v, str)]
-            if len(iterable) == 0:
-                return Population()
+        if len(kwargs) > 0:
+            sizes = np.unique(np.array([len(v) for _, v in kwargs.items()]))
+            if len(sizes) == 1:
+                size = sizes[0]
             else:
-                n = np.unique(np.array([len(v) for v in iterable]))
+                raise Exception(f"Population.new needs to be called with same-sized inputs, but the sizes are {sizes}")
+        else:
+            size = 0
 
-                if len(n) == 1:
-                    n = n[0]
-                    pop = Population(n_individuals=n)
-                    pop.set(*args, **kwargs)
-                    return pop
-                else:
-                    raise Exception(f"Population.new needs to be called with same-sized inputs, but the sizes are {n}")
+        pop = Population.empty(size)
+        pop.set(**kwargs)
+
+        return pop
 
 
 def pop_from_array_or_individual(array, pop=None):
     # the population type can be different - (different type of individuals)
     if pop is None:
-        pop = Population()
+        pop = Population.empty()
 
     # provide a whole population object - (individuals might be already evaluated)
     if isinstance(array, Population):
@@ -146,7 +124,7 @@ def pop_from_array_or_individual(array, pop=None):
     elif isinstance(array, np.ndarray):
         pop = pop.new("X", np.atleast_2d(array))
     elif isinstance(array, Individual):
-        pop = Population(1)
+        pop = Population.empty(1)
         pop[0] = array
     else:
         return None
@@ -171,8 +149,27 @@ def merge(a, b):
         return obj
 
 
-if __name__ == '__main__':
-    pop = Population(10)
-    pop.get("F")
-    pop.new()
-    print("")
+def interleaving_args(*args, kwargs=None):
+    if len(args) % 2 != 0:
+        raise Exception(f"Even number of arguments are required but {len(args)} arguments were provided.")
+
+    if kwargs is None:
+        kwargs = {}
+
+    for i in range(int(len(args) / 2)):
+        key, values = args[i * 2], args[i * 2 + 1]
+        kwargs[key] = values
+    return kwargs
+
+
+def calc_cv(pop, config=None):
+
+    if config is None:
+        config = Individual.default_config()
+
+    G, H = pop.get("G", "H")
+
+    from pymoo.core.individual import calc_cv as func
+    CV = np.array([func(g, h, config) for g, h in zip(G, H)])
+    
+    return CV

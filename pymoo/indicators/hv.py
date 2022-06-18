@@ -88,3 +88,7 @@ class Hypervolume(Indicator):
         hv = _HyperVolume(self.ref_point)
         val = hv.compute(F)
         return val
+
+
+class HV(Hypervolume):
+    pass

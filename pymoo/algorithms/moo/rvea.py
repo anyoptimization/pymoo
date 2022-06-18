@@ -7,11 +7,11 @@ from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.rnd import RandomSelection
-from pymoo.util.display import MultiObjectiveDisplay
-from pymoo.util.misc import has_feasible, vectorized_cdist
-from pymoo.util.reference_direction import default_ref_dirs
 from pymoo.termination.max_eval import MaximumFunctionCallTermination
 from pymoo.termination.max_gen import MaximumGenerationTermination
+from pymoo.util.display.multi import MultiObjectiveOutput
+from pymoo.util.misc import has_feasible, vectorized_cdist
+from pymoo.util.reference_direction import default_ref_dirs
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -27,12 +27,12 @@ class RVEA(GeneticAlgorithm):
                  pop_size=None,
                  sampling=FloatRandomSampling(),
                  selection=RandomSelection(),
-                 crossover=SBX(),
+                 crossover=SBX(prob_exch=0.5),
                  mutation=PM(),
                  survival=None,
                  eliminate_duplicates=True,
                  n_offsprings=None,
-                 display=MultiObjectiveDisplay(),
+                 output=MultiObjectiveOutput(),
                  **kwargs):
         """
 
@@ -74,7 +74,7 @@ class RVEA(GeneticAlgorithm):
                          survival=survival,
                          eliminate_duplicates=eliminate_duplicates,
                          n_offsprings=n_offsprings,
-                         display=display,
+                         output=output,
                          **kwargs)
 
     def _setup(self, problem, **kwargs):

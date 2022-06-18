@@ -1,7 +1,7 @@
 import numpy as np
 
-from pymoo.core.crossover import VariableWiseCrossover
-from pymoo.core.variable import Real, get, Binary
+from pymoo.core.crossover import Crossover
+from pymoo.core.variable import Real, get
 from pymoo.operators.repair.bounds_repair import repair_clamp
 
 
@@ -61,10 +61,10 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-32):
     c2 = 0.5 * ((y1 + y2) + betaq * delta)
 
     # with the given probability either assign the value from the first or second parent
-    b = np.random.random(len(prob_bin)) <= prob_bin
-    tmp = np.copy(c1[b])
-    c1[b] = c2[b]
-    c2[b] = tmp
+    exch = np.random.random(len(prob_bin)) <= prob_bin
+    tmp = np.copy(c1[exch])
+    c1[exch] = c2[exch]
+    c2[exch] = tmp
 
     # first copy the unmodified parents
     Q = np.copy(X)
@@ -84,29 +84,30 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-32):
 # ---------------------------------------------------------------------------------------------------------
 
 
-class SimulatedBinaryCrossover(VariableWiseCrossover):
+class SimulatedBinaryCrossover(Crossover):
 
     def __init__(self,
                  prob_var=0.5,
                  eta=15,
-                 prob_exchange=1.0,
                  prob_bin=0.5,
+                 prob_exch=1.0,
                  n_offsprings=2,
                  **kwargs):
 
-        super().__init__(2, n_offsprings, prob_var=prob_var, **kwargs)
-        self.prob_var = Real(prob_var, bounds=(0.1, 0.7))
+        super().__init__(2, n_offsprings, **kwargs)
+        self.prob_var = Real(prob_var, bounds=(0.1, 0.9))
         self.eta = Real(eta, bounds=(3.0, 30.0), strict=(1.0, None))
-        self.prob_exchange = Real(prob_exchange, bounds=(0.0, 1.0), strict=(0.0, 1.0))
+        self.prob_exch = Real(prob_exch, bounds=(0.0, 1.0), strict=(0.0, 1.0))
         self.prob_bin = Real(prob_bin, bounds=(0.0, 1.0), strict=(0.0, 1.0))
 
-    def _do(self, problem, X, params=None, **kwargs):
+    def _do(self, problem, X, **kwargs):
         _, n_matings, _ = X.shape
 
-        eta, prob_var, prob_exchange, prob_bin = get(self.eta, self.prob_var, self.prob_exchange, self.prob_bin, size=(n_matings, 1))
+        # get the parameters required by SBX
+        eta, prob_var, prob_exch, prob_bin = get(self.eta, self.prob_var, self.prob_exch, self.prob_bin, size=(n_matings, 1))
 
         # set the binomial probability to zero if no exchange between individuals shall happen
-        prob_bin[np.random.random((len(prob_bin), 1)) > prob_exchange] = 0.0
+        prob_bin[np.random.random((len(prob_bin), 1)) > prob_exch] = 0.0
 
         Q = cross_sbx(X.astype(float), problem.xl, problem.xu, eta, prob_var, prob_bin)
 

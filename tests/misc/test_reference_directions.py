@@ -1,6 +1,6 @@
 import pytest
 
-from pymoo.factory import get_reference_directions
+from pymoo.util.ref_dirs import get_reference_directions
 from pymoo.util.reference_direction import sample_on_unit_simplex
 
 

@@ -8,7 +8,7 @@ from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import compare, TournamentSelection
 from pymoo.termination.default import DefaultSingleObjectiveTermination
-from pymoo.util.display import SingleObjectiveDisplay
+from pymoo.util.display.single import SingleObjectiveOutput
 
 
 # =========================================================================================================
@@ -61,7 +61,7 @@ class GA(GeneticAlgorithm):
                  survival=FitnessSurvival(),
                  eliminate_duplicates=True,
                  n_offsprings=None,
-                 display=SingleObjectiveDisplay(),
+                 output=SingleObjectiveOutput(),
                  **kwargs):
         super().__init__(pop_size=pop_size,
                          sampling=sampling,
@@ -71,7 +71,7 @@ class GA(GeneticAlgorithm):
                          survival=survival,
                          eliminate_duplicates=eliminate_duplicates,
                          n_offsprings=n_offsprings,
-                         display=display,
+                         output=output,
                          **kwargs)
 
         self.termination = DefaultSingleObjectiveTermination()

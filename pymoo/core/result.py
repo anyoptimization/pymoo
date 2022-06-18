@@ -15,6 +15,9 @@ class Result:
         # the problem that was solved
         self.problem = None
 
+        # the archive stored during the run
+        self.archive = None
+
         # the optimal solution for that problem
         self.pf = None
 

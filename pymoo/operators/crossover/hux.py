@@ -3,7 +3,7 @@ import math
 import numpy as np
 
 from pymoo.core.crossover import Crossover
-from pymoo.operators.crossover.util import crossover_mask
+from pymoo.util.misc import crossover_mask
 
 
 class HalfUniformCrossover(Crossover):
@@ -31,3 +31,7 @@ class HalfUniformCrossover(Crossover):
 
         _X = crossover_mask(X, M)
         return _X
+
+
+class HUX(HalfUniformCrossover):
+    pass

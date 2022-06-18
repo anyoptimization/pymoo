@@ -3,11 +3,11 @@ from datetime import datetime
 from itertools import combinations
 
 import numpy as np
-import scipy
-import scipy.spatial
+
 
 from pymoo.core.population import Population
 from pymoo.core.sampling import Sampling
+
 
 
 def parameter_less(F, CV, fmax=None, inplace=False):
@@ -154,7 +154,8 @@ def norm_tchebychev_dist(problem, A, B, **kwargs):
 
 
 def cdist(A, B, **kwargs):
-    return scipy.spatial.distance.cdist(A.astype(float), B.astype(float), **kwargs)
+    from scipy.spatial import distance
+    return distance.cdist(A.astype(float), B.astype(float), **kwargs)
 
 
 def vectorized_cdist(A, B, func_dist=func_euclidean_distance, fill_diag_with_inf=False, **kwargs) -> object:
@@ -363,7 +364,7 @@ def termination_from_tuple(termination):
 
     # get the termination if provided as a tuple - create an object
     if termination is not None and not isinstance(termination, Termination):
-        from pymoo.factory import get_termination
+        from pymoo.termination import get_termination
         if isinstance(termination, str):
             termination = get_termination(termination)
         else:
@@ -434,3 +435,18 @@ def where_is_what(x):
             H[e] = []
         H[e].append(k)
     return H
+
+
+def crossover_mask(X, M):
+    # convert input to output by flatting along the first axis
+    _X = np.copy(X)
+    _X[0][M] = X[1][M]
+    _X[1][M] = X[0][M]
+    return _X
+
+
+def row_at_least_once_true(M):
+    _, d = M.shape
+    for k in np.where(~np.any(M, axis=1))[0]:
+        M[k, np.random.randint(d)] = True
+    return M

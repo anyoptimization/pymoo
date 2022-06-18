@@ -9,26 +9,32 @@ from cma.utilities.math import Mh
 
 all_stoppings = []
 
+def void(_):
+    pass
 
-def my_fmin(
-        x0,
-        sigma0,
-        options=None,
-        args=(),
-        gradf=None,
-        restarts=0,
-        restart_from_best='False',
-        incpopsize=2,
-        eval_initial_x=False,
-        noise_handler=None,
-        parallelize=True,
-        noise_change_sigma_exponent=1,
-        noise_kappa_exponent=0,  # TODO: add max kappa value as parameter
-        bipop=False,
-        callback=None):
+def my_fmin(x0,
+            sigma0,
+            objective_function=void,
+            options=None,
+            args=(),
+            gradf=None,
+            restarts=0,
+            restart_from_best='False',
+            incpopsize=2,
+            eval_initial_x=False,
+            parallel_objective=None,
+            noise_handler=None,
+            noise_change_sigma_exponent=1,
+            noise_kappa_exponent=0,  # TODO: add max kappa value as parameter
+            bipop=False,
+            callback=None):
+
     if 1 < 3:  # try: # pass on KeyboardInterrupt
+        if not objective_function and not parallel_objective:  # cma.fmin(0, 0, 0)
+            return CMAOptions()  # these opts are by definition valid
 
         fmin_options = locals().copy()  # archive original options
+        del fmin_options['objective_function']
         del fmin_options['x0']
         del fmin_options['sigma0']
         del fmin_options['options']
@@ -97,8 +103,13 @@ def my_fmin(
                 opts['maxiter'] = maxiter0
                 # print('large basemul %s --> %s; maxiter %s' % (popsize_multiplier, opts['popsize'], opts['maxiter']))
 
+            if not callable(objective_function) and callable(parallel_objective):
+                def objective_function(x, *args):
+                    """created from `parallel_objective` argument"""
+                    return parallel_objective([x], *args)[0]
+
             # recover from a CMA object
-            if irun == 0 and isinstance(x0, CMAEvolutionStrategy):
+            if irun == 0 and isinstance(x0, MyCMAEvolutionStrategy):
                 es = x0
                 x0 = es.inputargs['x0']  # for the next restarts
                 if np.isscalar(sigma0) and np.isfinite(sigma0) and sigma0 > 0:
@@ -116,7 +127,8 @@ def my_fmin(
                 else:
                     es = MyCMAEvolutionStrategy(x0, sigma_factor * sigma0, opts)
                 # return opts, es
-                if (eval_initial_x
+                if callable(objective_function) and (
+                        eval_initial_x
                         or es.opts['CMA_elitist'] == 'initial'
                         or (es.opts['CMA_elitist'] and
                             eval_initial_x is None)):
@@ -127,6 +139,7 @@ def my_fmin(
                     es.best.update([x], es.sent_solutions,
                                    [es.f0], 1)
                     es.countevals += 1
+            es.objective_function = objective_function  # only for the record
 
             opts = es.opts  # processed options, unambiguous
             # a hack:
@@ -142,6 +155,12 @@ def my_fmin(
             # es.logger is "the same" logger, because the "identity"
             # is only determined by the `verb_filenameprefix` option
             logger = es.logger  # shortcut
+            try:
+                logger.persistent_communication_dict.update(
+                    {'variable_annotations':
+                         objective_function.variable_annotations})
+            except AttributeError:
+                pass
 
             if 11 < 3:
                 if es.countiter == 0 and es.opts['verb_log'] > 0 and \
@@ -169,10 +188,12 @@ def my_fmin(
             if 1 < 3:
                 while not es.stop():  # iteration loop
                     # X, fit = eval_in_parallel(lambda: es.ask(1)[0], es.popsize, args, repetitions=noisehandler.evaluations-1)
-                    X, fit = yield from es.ask_and_eval(gradf=gradf,
-                                                        evaluations=noisehandler.evaluations,
-                                                        aggregation=np.median,
-                                                        parallel_mode=parallelize)  # treats NaN with resampling if not parallel_mode
+                    X, fit = yield from es.ask_and_eval(parallel_objective or objective_function,
+                                             args, gradf=gradf,
+                                             evaluations=noisehandler.evaluations,
+                                             aggregation=np.median,
+                                             parallel_mode=parallel_objective)  # treats NaN with resampling if not parallel_mode
+                    # TODO: check args and in case use args=(noisehandler.evaluations, )
 
                     if 11 < 3 and opts['vv']:  # inject a solution
                         # use option check_point = [0]
@@ -180,15 +201,15 @@ def my_fmin(
                             X[0] = 0 + opts['vv'] * es.sigma ** 0 * np.random.randn(es.N)
                             fit[0] = yield X[0]
                             # print fit[0]
-                    if es.opts['verbose'] > 4:
-                        if es.countiter > 1 and min(fit) > es.best.last.f:
-                            unsuccessful_iterations_count += 1
-                            if unsuccessful_iterations_count > 4:
-                                utils.print_message('%d unsuccessful iterations'
-                                                    % unsuccessful_iterations_count,
+                    if es.opts['verbose'] > 4:  # may be undesirable with dynamic fitness (e.g. Augmented Lagrangian)
+                        if es.countiter < 2 or min(fit) <= es.best.last.f:
+                            degrading_iterations_count = 0  # comes first to avoid code check complaint
+                        else:  # min(fit) > es.best.last.f:
+                            degrading_iterations_count += 1
+                            if degrading_iterations_count > 4:
+                                utils.print_message('%d f-degrading iterations (set verbose<=4 to suppress)'
+                                                    % degrading_iterations_count,
                                                     iteration=es.countiter)
-                        else:
-                            unsuccessful_iterations_count = 0
                     es.tell(X, fit)  # prepare for next iteration
                     if noise_handling:  # it would be better to also use these f-evaluations in tell
                         es.sigma *= noisehandler(X, fit, objective_function, es.ask,
@@ -216,7 +237,7 @@ def my_fmin(
                         logger.plot(324)
 
             # end while not es.stop
-            if opts['eval_final_mean']:
+            if opts['eval_final_mean'] and callable(objective_function):
                 mean_pheno = es.gp.pheno(es.mean,
                                          into_bounds=es.boundary_handler.repair,
                                          archive=es.sent_solutions)
@@ -274,14 +295,14 @@ def my_fmin(
         # TODO refine output, can #args be flexible?
         # is this well usable as it is now?
     else:  # except KeyboardInterrupt:  # Exception as e:
-        if eval(str(options['verb_disp'])) > 0:
+        if eval(safe_str(options['verb_disp'])) > 0:
             print(' in/outcomment ``raise`` in last line of cma.fmin to prevent/restore KeyboardInterrupt exception')
         raise KeyboardInterrupt  # cave: swallowing this exception can silently mess up experiments, if ctrl-C is hit
 
 
 class MyCMAEvolutionStrategy(CMAEvolutionStrategy):
 
-    def ask_and_eval(self, gradf=None, number=None, xmean=None, sigma_fac=1,
+    def ask_and_eval(self, func, args=(), gradf=None, number=None, xmean=None, sigma_fac=1,
                      evaluations=1, aggregation=np.median, kappa=1, parallel_mode=False):
 
         # initialize
@@ -302,22 +323,17 @@ class MyCMAEvolutionStrategy(CMAEvolutionStrategy):
 
         # do the work
         fit = []  # or np.NaN * np.empty(number)
-        X_first = self.ask(popsize, xmean=xmean, gradf=gradf, args=[])
+        X_first = self.ask(popsize, xmean=xmean, gradf=gradf, args=args)
         if xmean is None:
             xmean = self.mean  # might have changed in self.ask
         X = []
         if parallel_mode:
+            if hasattr(func, 'evaluations'):
+                evals0 = func.evaluations
             fit_first = yield X_first
-
             # the rest is only book keeping and warnings spitting
-            """
-            if hasattr(func, 'last_evaluations'):
-                self.countevals += func.last_evaluations - self.popsize
-            elif hasattr(func, 'evaluations'):
-                if self.countevals < func.evaluations:
-                    self.countevals = func.evaluations - self.popsize
-            """
-
+            if hasattr(func, 'evaluations'):
+                self.countevals += func.evaluations - evals0 - self.popsize  # why not .sp.popsize ?
             if nmirrors and self.opts['CMA_mirrormethod'] > 0 and self.countiter < 2:
                 utils.print_warning(
                     "selective mirrors will not work in parallel mode",
@@ -328,7 +344,6 @@ class MyCMAEvolutionStrategy(CMAEvolutionStrategy):
                     "ask_and_eval", "CMAEvolutionStrategy")
         else:
             fit_first = len(X_first) * [None]
-
         for k in range(popsize):
             x, f = X_first.pop(0), fit_first.pop(0)
             rejected = -1
@@ -360,37 +375,34 @@ class MyCMAEvolutionStrategy(CMAEvolutionStrategy):
                     # Or is the reason the deviation of the direction introduced by using the original
                     # length, which also can effect the measured correlation?
                     # Update: if the length of z in CSA is clipped at chiN+1, it works, but only sometimes?
-                    length_normalizer = self.N ** 0.5 / self.mahalanobis_norm(
-                        x - xmean)  # self.const.chiN < N**0.5, the constant here is irrelevant (absorbed by kappa)
+                    length_normalizer = self.N**0.5 / self.mahalanobis_norm(x - xmean)  # self.const.chiN < N**0.5, the constant here is irrelevant (absorbed by kappa)
                     # print(self.N**0.5 / self.mahalanobis_norm(x - xmean))
                     # self.more_to_write += [length_normalizer * 1e-3, length_normalizer * self.mahalanobis_norm(x - xmean) * 1e2]
-
-                if kappa == 1:
-                    f = yield x
-                else:
-                    f = yield xmean + kappa * length_normalizer * (x - xmean)
+                    if kappa == 1:
+                        f = yield x
+                    else:
+                        f = yield xmean + kappa * length_normalizer * (x - xmean)
 
                 if is_feasible(x, f) and evaluations > 1:
+                    if kappa == 1:
+                        _f = yield x
+                        f = aggregation([f] + [_f])
+                    else:
+                        _f = []
+                        for _i in range(int(evaluations - 1)):
+                            v = yield xmean + kappa * length_normalizer * (x - xmean)
+                            _f.append(v)
+                        f = aggregation([f] + _f)
 
-                    _f = []
-                    for _i in range(int(evaluations - 1)):
-                        if kappa == 1:
-                            __f = yield x
-                        else:
-                            __f = yield xmean + kappa * length_normalizer * (x - xmean)
-
-                        _f.append(__f)
-
-                    f = aggregation([f] + _f)
                 if (rejected + 1) % 1000 == 0:
                     utils.print_warning('  %d solutions rejected (f-value NaN or None) at iteration %d' %
-                                        (rejected, self.countiter))
+                          (rejected, self.countiter))
             fit.append(f)
             X.append(x)
         self.evaluations_per_f_value = int(evaluations)
-        if any(f is None or np.isnan(f) for f in fit):
+        if any(f is None or utils.is_nan(f) for f in fit):
             idxs = [i for i in range(len(fit))
-                    if fit[i] is None or np.isnan(fit[i])]
+                    if fit[i] is None or utils.is_nan(fit[i])]
             utils.print_warning("f-values %s contain None or NaN at indices %s"
                                 % (str(fit[:30]) + ('...' if len(fit) > 30 else ''),
                                    str(idxs)),
@@ -398,8 +410,3 @@ class MyCMAEvolutionStrategy(CMAEvolutionStrategy):
                                 'CMAEvolutionStrategy',
                                 self.countiter)
         return X, fit
-
-
-
-
-

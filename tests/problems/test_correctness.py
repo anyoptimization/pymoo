@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from pymoo.constraints.tcv import TotalConstraintViolation
-from pymoo.factory import get_problem
+from pymoo.problems import get_problem
 from tests.util import path_to_test_resource
 
 problems = [

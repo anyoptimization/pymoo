@@ -1,4 +1,3 @@
-
 import math
 
 import numpy as np
@@ -12,7 +11,7 @@ from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import TournamentSelection
-from pymoo.util.display import MultiObjectiveDisplay
+from pymoo.util.display.multi import MultiObjectiveOutput
 from pymoo.util.dominator import Dominator
 from pymoo.util.function_loader import load_function
 from pymoo.util.misc import has_feasible, random_permuations
@@ -73,7 +72,7 @@ class RestrictedMating(TournamentSelection):
         P[1::n_parents, :][pf >= Pc] += n_pop
 
         # compare using tournament function
-        S = self.f_comp(Hm, P, **kwargs)
+        S = self.func_comp(Hm, P, **kwargs)
 
         return np.reshape(S, (n_select, n_parents))
 
@@ -218,8 +217,6 @@ class CADASurvival:
         return Hd[S]
 
 
-
-
 class CTAEA(GeneticAlgorithm):
 
     def __init__(self,
@@ -227,9 +224,9 @@ class CTAEA(GeneticAlgorithm):
                  sampling=FloatRandomSampling(),
                  selection=RestrictedMating(func_comp=comp_by_cv_dom_then_random),
                  crossover=SBX(n_offsprings=1, eta=30, prob=1.0),
-                 mutation=PM(eta=20, prob_per_variable=None),
+                 mutation=PM(prob_var=None, eta=20),
                  eliminate_duplicates=True,
-                 display=MultiObjectiveDisplay(),
+                 output=MultiObjectiveOutput(),
                  **kwargs):
         """
         CTAEA
@@ -264,7 +261,7 @@ class CTAEA(GeneticAlgorithm):
                          survival=survival,
                          eliminate_duplicates=eliminate_duplicates,
                          n_offsprings=pop_size,
-                         display=display,
+                         output=output,
                          **kwargs)
 
     def _setup(self, problem, **kwargs):
@@ -279,7 +276,8 @@ class CTAEA(GeneticAlgorithm):
 
     def _initialize_advance(self, infills=None, **kwargs):
         super()._initialize_advance(infills, **kwargs)
-        self.pop, self.da = self.survival.do(self.problem, self.pop, Population(), n_survive=len(self.pop), algorithm=self)
+        self.pop, self.da = self.survival.do(self.problem, self.pop, Population(), n_survive=len(self.pop),
+                                             algorithm=self)
 
     def _infill(self):
         Hm = Population.merge(self.pop, self.da)

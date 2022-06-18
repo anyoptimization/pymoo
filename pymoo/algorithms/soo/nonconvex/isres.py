@@ -4,8 +4,8 @@ import numpy as np
 
 from pymoo.algorithms.soo.nonconvex.es import es_sigma, es_mut_repair
 from pymoo.algorithms.soo.nonconvex.sres import SRES
-from pymoo.docs import parse_doc_string
 from pymoo.core.population import Population
+from pymoo.docs import parse_doc_string
 
 
 class ISRES(SRES):

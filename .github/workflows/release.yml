@@ -16,7 +16,7 @@ jobs:
       - name: Install Python 3
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: 3.10
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
@@ -36,12 +36,14 @@ jobs:
      strategy:
        matrix:
          os: [ubuntu-latest, windows-latest, macos-latest]
-         python-version: ['3.7', '3.8', '3.9']
+         python-version: ['3.7', '3.8', '3.9', '3.10']
          exclude:
            - os: ubuntu-latest
              python-version: '3.7'
            - os: ubuntu-latest
              python-version: '3.8'
+           - os: ubuntu-latest
+               python-version: '3.9'
      steps:
      - uses: actions/checkout@v2
      - name: Set up Python
@@ -70,7 +72,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2010_x86_64
       with:
-        python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39'
+        python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
         build-requirements: 'cython numpy'
         pip-wheel-args: '-w ./dist --no-deps'
     - name: Remove non-compatible packages
@@ -93,7 +95,7 @@ jobs:
      - name: Set up Python
        uses: actions/setup-python@v2
        with:
-         python-version: '3.9'
+         python-version: '3.10'
      - name: Publish
        env:
          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}

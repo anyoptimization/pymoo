@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from pymoo.constraints.bounds import BoundariesAsConstraints
-from pymoo.factory import get_problem
+from pymoo.constraints.from_bounds import ConstraintsFromBounds
+from pymoo.problems import get_problem
 from pymoo.indicators.kktpm import KKTPM
 from pymoo.problems.autodiff import AutomaticDifferentiation
 from tests.util import path_to_test_resource
@@ -18,8 +18,8 @@ SETUP = {
 
 @pytest.mark.parametrize('str_problem,params', SETUP.items())
 def test_kktpm_correctness(str_problem, params):
-    problem = BoundariesAsConstraints(AutomaticDifferentiation(get_problem(str_problem)))
-    # problem = AutomaticDifferentiation(BoundariesAsConstraints(get_problem(str_problem)))
+    problem = ConstraintsFromBounds(AutomaticDifferentiation(get_problem(str_problem)))
+    # problem = AutomaticDifferentiation(ConstraintsFromBounds(get_problem(str_problem)))
 
     def load_file(f):
         return np.loadtxt(path_to_test_resource("kktpm", "%s_%s.txt" % (str_problem, f)))

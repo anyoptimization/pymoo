@@ -9,7 +9,7 @@ from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import TournamentSelection, compare
 from pymoo.termination.default import DefaultMultiObjectiveTermination
-from pymoo.util.display import MultiObjectiveDisplay
+from pymoo.util.display.multi import MultiObjectiveOutput
 from pymoo.util.dominator import Dominator
 from pymoo.util.misc import vectorized_cdist
 
@@ -154,7 +154,7 @@ class SPEA2(GeneticAlgorithm):
                  survival=SPEA2Survival(normalize=True),
                  eliminate_duplicates=True,
                  n_offsprings=None,
-                 display=MultiObjectiveDisplay(),
+                 output=MultiObjectiveOutput(),
                  **kwargs):
         """
 
@@ -180,7 +180,7 @@ class SPEA2(GeneticAlgorithm):
                          survival=survival,
                          eliminate_duplicates=eliminate_duplicates,
                          n_offsprings=n_offsprings,
-                         display=display,
+                         output=output,
                          advance_after_initial_infill=True,
                          **kwargs)
         self.termination = DefaultMultiObjectiveTermination()

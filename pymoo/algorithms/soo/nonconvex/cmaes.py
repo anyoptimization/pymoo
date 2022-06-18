@@ -7,7 +7,8 @@ from pymoo.core.termination import NoTermination
 from pymoo.docs import parse_doc_string
 from pymoo.termination.max_eval import MaximumFunctionCallTermination
 from pymoo.termination.max_gen import MaximumGenerationTermination
-from pymoo.util.display import Display
+from pymoo.util.display.column import Column
+from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.normalization import ZeroToOneNormalization, NoNormalization
 from pymoo.util.optimum import filter_optimum
 from pymoo.vendor.vendor_cmaes import my_fmin
@@ -18,31 +19,52 @@ from pymoo.vendor.vendor_cmaes import my_fmin
 # =========================================================================================================
 
 
-class CMAESDisplay(Display):
+class CMAESOutput(SingleObjectiveOutput):
 
-    def _do(self, problem, evaluator, algorithm):
-        super()._do(problem, evaluator, algorithm)
+    def __init__(self):
+        super().__init__()
+
+        self.sigma = Column("sigma")
+        self.min_std = Column("min_std", width=8)
+        self.max_std = Column("max_std", width=8)
+        self.axis = Column("axis", width=8)
+
+        self.run = Column("run", width=4)
+        self.fpop = Column("fpop", width=8)
+        self.n_pop = Column("n_pop", width=5)
+
+    def initialize(self, algorithm):
+        super().initialize(algorithm)
+
+        if algorithm.restarts > 0:
+            self.columns += [self.run, self.fpop, self.n_pop]
+
+        self.columns += [self.sigma, self.min_std, self.max_std, self.axis]
+
+    def update(self, algorithm):
+        super().update(algorithm)
+
+        if not algorithm.es.gi_frame:
+            return
 
         fmin = algorithm.es.gi_frame.f_locals
         cma = fmin["es"]
 
-        self.output.append("fopt", algorithm.opt[0].F[0])
-
-        if fmin["restarts"] > 0:
-            self.output.append("run", int(fmin["irun"] - fmin["runs_with_small"]) + 1, width=4)
-            self.output.append("fpop", algorithm.pop.get("F").min())
-            self.output.append("n_pop", int(cma.opts['popsize']), width=5)
-
-        self.output.append("sigma", cma.sigma)
+        self.sigma.set(cma.sigma)
 
         val = cma.sigma_vec * cma.dC ** 0.5
-        self.output.append("min std", (cma.sigma * min(val)), width=8)
-        self.output.append("max std", (cma.sigma * max(val)), width=8)
+        self.min_std.set((cma.sigma * min(val)))
+        self.max_std.set((cma.sigma * max(val)))
+
+        if algorithm.restarts > 0:
+            self.run.set(int(fmin["irun"] - fmin["runs_with_small"]) + 1)
+            self.fpop.set(algorithm.pop.get("F").min())
+            self.n_pop.set(int(cma.opts['popsize']))
 
         axis = (cma.D.max() / cma.D.min()
                 if not cma.opts['CMA_diagonal'] or cma.countiter > cma.opts['CMA_diagonal']
                 else max(cma.sigma_vec * 1) / min(cma.sigma_vec * 1))
-        self.output.append("axis", axis, width=8)
+        self.axis.set(axis)
 
 
 class CMAES(LocalSearch):
@@ -65,7 +87,7 @@ class CMAES(LocalSearch):
                  bipop=False,
                  cmaes_verbose=-9,
                  verb_log=0,
-                 display=CMAESDisplay(),
+                 output=CMAESOutput(),
                  **kwargs
                  ):
         """
@@ -333,7 +355,9 @@ class CMAES(LocalSearch):
               for a list of available options.
 
         """
-        super().__init__(x0=x0, display=display, **kwargs)
+        super().__init__(x0=x0, output=output, **kwargs)
+
+        self.termination = NoTermination()
 
         self.es = None
         self.cma = None
@@ -360,13 +384,11 @@ class CMAES(LocalSearch):
             **kwargs
         )
 
-        self.termination = NoTermination()
         self.send_array_to_yield = True
         self.parallelize = parallelize
         self.al = None
 
     def _setup(self, problem, seed=None, **kwargs):
-        self.n_gen = 0
 
         xl, xu = problem.bounds()
         if self.normalize:
@@ -387,7 +409,7 @@ class CMAES(LocalSearch):
 
         kwargs = dict(
             options=self.options,
-            parallelize=self.parallelize,
+            parallel_objective=self.parallelize,
             restarts=self.restarts,
             restart_from_best=self.restart_from_best,
             incpopsize=self.incpopsize,

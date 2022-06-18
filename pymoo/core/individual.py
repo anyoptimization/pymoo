@@ -1,18 +1,35 @@
 import copy
 
+import numpy as np
+
+
+def default_config():
+    return dict(cache=True,
+                cv_eps=0.0,
+                cv_ieq=dict(scale=None, eps=0.0, pow=None, func=np.mean),
+                cv_eq=dict(scale=None, eps=1e-4, pow=None, func=np.mean)
+                )
+
 
 class Individual:
+    default_config = default_config
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, config=None, **kwargs) -> None:
 
         self._X, self._F, self._G, self._H, self._dF, self._dG, self._dH = None, None, None, None, None, None, None
-        self._ddF, self._ddG, self._ddH, self._CV, self.evaluated = None, None, None, None, None
+        self._ddF, self._ddG, self._ddH, self._CV, = None, None, None, None
+        self.evaluated = None
 
         # initialize all the local variables
         self.reset()
 
         # a local storage for data
         self.data = {}
+
+        # the config for this individual
+        if config is None:
+            config = Individual.default_config()
+        self.config = config
 
         for k, v in kwargs.items():
             if k in self.__dict__:
@@ -24,26 +41,28 @@ class Individual:
 
     def reset(self, data=True):
 
+        empty = np.array([])
+
         # design variables
-        self._X = []
+        self._X = empty
 
         # objectives and constraint values
-        self._F = []
-        self._G = []
-        self._H = []
+        self._F = empty
+        self._G = empty
+        self._H = empty
 
         # first order derivation
-        self._dF = []
-        self._dG = []
-        self._dH = []
+        self._dF = empty
+        self._dG = empty
+        self._dH = empty
 
         # second order derivation
-        self._ddF = []
-        self._ddG = []
-        self._ddH = []
+        self._ddF = empty
+        self._ddG = empty
+        self._ddH = empty
 
         # if the constraint violation value to be used
-        self._CV = []
+        self._CV = None
 
         if data:
             self.data = {}
@@ -92,7 +111,14 @@ class Individual:
 
     @property
     def CV(self):
-        return self._CV
+        config = self.config
+        cache = config["cache"]
+
+        if cache and self._CV is not None:
+            return self._CV
+        else:
+            self._CV = calc_cv(G=self.G, H=self.H, config=config)
+            return self._CV
 
     @CV.setter
     def CV(self, value):
@@ -100,7 +126,8 @@ class Individual:
 
     @property
     def FEAS(self):
-        return self.CV <= 0.0
+        eps = self.config.get("cv_eps", 0.0)
+        return self.CV <= eps
 
     # -------------------------------------------------------
     # Gradients
@@ -146,7 +173,7 @@ class Individual:
     def ddG(self):
         return self._ddG
 
-    @ddF.setter
+    @ddG.setter
     def ddG(self, value):
         self._ddG = value
 
@@ -154,7 +181,7 @@ class Individual:
     def ddH(self):
         return self._ddH
 
-    @ddF.setter
+    @ddH.setter
     def ddH(self, value):
         self._ddH = value
 
@@ -172,7 +199,10 @@ class Individual:
 
     @property
     def cv(self):
-        return self.CV[0]
+        if self.CV is None:
+            return None
+        else:
+            return self.CV[0]
 
     @property
     def feas(self):
@@ -243,3 +273,31 @@ class Individual:
             obj.__dict__[k] = v
 
         return obj
+
+
+def calc_cv(G=np.array([]), H=np.array([]), config=None):
+    if config is None:
+        config = Individual.default_config()
+
+    ieq_cv = constr_to_cv(G, **config["cv_ieq"])
+    eq_cv = constr_to_cv(H, **config["cv_eq"])
+
+    return np.array([ieq_cv + eq_cv])
+
+
+def constr_to_cv(c, eps=0.0, scale=None, pow=None, func=np.mean):
+    if c is None or len(c) == 0:
+        return 0.0
+
+    # subtract eps to allow some violation and then zero out all values less than zero
+    c = np.maximum(0.0, c - eps)
+
+    # apply init_simplex_scale if necessary
+    if scale is not None:
+        c = c / scale
+
+    # if a pow factor has been provided
+    if pow is not None:
+        c = c ** pow
+
+    return func(c)

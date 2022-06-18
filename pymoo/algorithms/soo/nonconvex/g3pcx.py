@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
-from pymoo.core.algorithm import Algorithm
+from pymoo.core.algorithm import LoopwiseAlgorithm
 from pymoo.core.initialization import Initialization
 from pymoo.core.population import Population
 from pymoo.core.repair import NoRepair
@@ -12,7 +12,7 @@ from pymoo.operators.crossover.pcx import PCX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.rnd import fast_fill_random
-from pymoo.util.display import SingleObjectiveDisplay
+from pymoo.util.display.single import SingleObjectiveOutput
 
 
 # =========================================================================================================
@@ -20,7 +20,7 @@ from pymoo.util.display import SingleObjectiveDisplay
 # =========================================================================================================
 
 
-class G3PCX(Algorithm):
+class G3PCX(LoopwiseAlgorithm):
 
     def __init__(self,
                  pop_size=100,
@@ -29,10 +29,10 @@ class G3PCX(Algorithm):
                  n_parents=3,
                  family_size=2,
                  repair=NoRepair(),
-                 display=SingleObjectiveDisplay(),
+                 output=SingleObjectiveOutput(),
                  **kwargs):
 
-        super().__init__(display=display, **kwargs)
+        super().__init__(output=output, **kwargs)
 
         self.pop_size = Integer(pop_size, bounds=(20, 200))
         self.repair = repair
@@ -57,7 +57,7 @@ class G3PCX(Algorithm):
     def _initialize_advance(self, infills=None, **kwargs):
         self.pop = FitnessSurvival().do(self.problem, infills, n_survive=len(infills), algorithm=self, **kwargs)
 
-    def _next(self):
+    def _next(self, **kwargs):
         pop_size, n_offsprings, n_parents = get(self.pop_size, self.n_offsprings, self.n_parents)
 
         # how many loops shall be iterated until one iteration has ended
@@ -69,11 +69,11 @@ class G3PCX(Algorithm):
             S[:, 0] = 0
             fast_fill_random(S, len(self.pop), columns=range(1, n_parents))
 
-            off = self.crossover.do(self.problem, self.pop, parents=S, algorithm=self)
+            off = self.crossover(self.problem, self.pop, parents=S, algorithm=self)
 
-            off = self.mutation.do(self.problem, off, algorithm=self)
+            off = self.mutation(self.problem, off, algorithm=self)
 
-            self.repair.do(self.problem, off, algorithm=self)
+            self.repair(self.problem, off, algorithm=self)
 
             off = yield off
 

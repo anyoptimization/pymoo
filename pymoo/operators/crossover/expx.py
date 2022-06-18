@@ -1,8 +1,8 @@
 import numpy as np
 
 from pymoo.core.crossover import Crossover
-from pymoo.core.variable import get
-from pymoo.operators.crossover.util import crossover_mask, row_at_least_once_true
+from pymoo.core.variable import get, Real
+from pymoo.util.misc import crossover_mask, row_at_least_once_true
 
 
 def mut_exp(n_matings, n_var, prob, at_least_once=True):
@@ -40,11 +40,11 @@ class ExponentialCrossover(Crossover):
 
     def __init__(self, prob_exp=0.75, **kwargs):
         super().__init__(2, 2, **kwargs)
-        self.prob_exp = prob_exp
+        self.prob_exp = Real(prob_exp, bounds=(0.5, 0.9), strict=(0.0, 1.0))
 
     def _do(self, _, X, **kwargs):
         _, n_matings, n_var = X.shape
-        prob_exp = get(self.prob_exp, size=len(X))
+        prob_exp = get(self.prob_exp, size=n_matings)
 
         M = mut_exp(n_matings, n_var, prob_exp, at_least_once=True)
         _X = crossover_mask(X, M)

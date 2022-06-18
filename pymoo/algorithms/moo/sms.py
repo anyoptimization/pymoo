@@ -8,7 +8,7 @@ from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import compare, TournamentSelection
-from pymoo.util.display import MultiObjectiveDisplay
+from pymoo.util.display.multi import MultiObjectiveOutput
 from pymoo.util.dominator import Dominator
 from pymoo.util.function_loader import load_function
 from pymoo.util.hv import calc_hvc_2d_fast, calc_hvc_looped
@@ -143,13 +143,13 @@ class SMSEMOA(GeneticAlgorithm):
                  pop_size=100,
                  sampling=FloatRandomSampling(),
                  selection=TournamentSelection(func_comp=cv_and_dom_tournament),
-                 crossover=SBX(),
+                 crossover=SBX(prob_exch=0.5),
                  mutation=PM(),
                  survival=LeastHypervolumeContributionSurvival(),
                  eliminate_duplicates=True,
                  n_offsprings=None,
                  normalize=True,
-                 display=MultiObjectiveDisplay(),
+                 output=MultiObjectiveOutput(),
                  **kwargs):
         """
 
@@ -172,7 +172,7 @@ class SMSEMOA(GeneticAlgorithm):
                          survival=survival,
                          eliminate_duplicates=eliminate_duplicates,
                          n_offsprings=n_offsprings,
-                         display=display,
+                         output=output,
                          advance_after_initial_infill=True,
                          **kwargs)
 

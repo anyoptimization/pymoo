@@ -6,14 +6,12 @@ from pymoo.core.termination import Termination
 
 class DeltaToleranceTermination(Termination):
 
-    def __init__(self, tol, n_skip=0, log=True):
+    def __init__(self, tol, n_skip=0):
         super().__init__()
 
         # the tolerance threshold the difference (delta) to be under
         assert tol >= 0
         self.tol = tol
-
-        self.log = log
 
         # the previous values to calculate the difference
         self.data = None
@@ -35,8 +33,10 @@ class DeltaToleranceTermination(Termination):
         # if there is no previous element to use
         if prev is None:
             perc = 0.0
+
         elif self.counter > 0 and self.counter % (self.n_skip + 1) != 0:
             perc = self.perc
+
         else:
             tol = self.tol
             delta = self._delta(prev, current)
@@ -44,15 +44,13 @@ class DeltaToleranceTermination(Termination):
             if delta <= tol:
                 return 1.0
             else:
-                if self.log:
-                    tol, delta = math.log(tol), math.log(delta)
                 v = (delta - tol)
                 perc = 1 / (1 + v)
 
         # remember the data from the current iteration and set it to data
         self.data = current
 
-        # increase the function call counter
+        # increase the function update counter
         self.counter += 1
 
         return perc

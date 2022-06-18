@@ -1,9 +1,31 @@
 from copy import deepcopy
+from typing import Any
 
 from pymoo.core.algorithm import Algorithm
 
 
-class MetaAlgorithm(Algorithm):
+class MetaAlgorithm:
+
+    def __new__(cls, algorithm) -> Any:
+
+
+
+
+        return algorithm
+
+
+    def __init__(self, algorithm) -> None:
+        super().__init__()
+        self.algorithm = algorithm
+
+    def __getattr__(self, attr):
+        print(attr)
+        if attr in self.__dict__:
+            return getattr(self, attr)
+        return getattr(self.__dict__["algorithm"], attr)
+
+
+class MetaAlgorithm2(Algorithm):
 
     def __init__(self,
                  algorithm,

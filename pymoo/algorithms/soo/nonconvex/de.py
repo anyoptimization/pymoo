@@ -27,15 +27,15 @@ from pymoo.core.replacement import ImprovementReplacement
 from pymoo.core.variable import Choice, get
 from pymoo.core.variable import Real
 from pymoo.docs import parse_doc_string
+from pymoo.operators.control import EvolutionaryParameterControl, NoParameterControl
 from pymoo.operators.crossover.binx import mut_binomial
 from pymoo.operators.crossover.expx import mut_exp
 from pymoo.operators.mutation.pm import PM
-from pymoo.operators.param_control import EvolutionaryParameterControl, NoParameterControl
 from pymoo.operators.repair.bounds_repair import repair_random_init
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.rnd import fast_fill_random
 from pymoo.termination.default import DefaultSingleObjectiveTermination
-from pymoo.util.display import SingleObjectiveDisplay
+from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.misc import where_is_what
 
 
@@ -192,7 +192,7 @@ class Variant(InfillCriterion):
         off = self.mutation.do(problem, off)
 
         # repair the individuals if necessary - disabled if repair is NoRepair
-        off = self.repair.do(problem, off, **kwargs)
+        off = self.repair(problem, off, **kwargs)
 
         # advance the parameter control by attaching them to the offsprings
         control.advance(off)
@@ -212,7 +212,7 @@ class DE(GeneticAlgorithm):
                  n_offsprings=None,
                  sampling=FloatRandomSampling(),
                  variant=None,
-                 display=SingleObjectiveDisplay(),
+                 output=SingleObjectiveOutput(),
                  **kwargs
                  ):
 
@@ -235,7 +235,7 @@ class DE(GeneticAlgorithm):
                          sampling=sampling,
                          mating=variant,
                          survival=None,
-                         display=display,
+                         output=output,
                          eliminate_duplicates=False,
                          **kwargs)
 
@@ -270,6 +270,7 @@ class DE(GeneticAlgorithm):
 
         # update the information regarding the current population
         FitnessSurvival().do(self.problem, self.pop, return_indices=True)
+
 
     def _set_optimum(self, **kwargs):
         k = self.pop.get("rank") == 0

@@ -36,9 +36,9 @@ class FunctionalProblem(ElementwiseProblem):
                          **kwargs)
 
     def _evaluate(self, x, out, *args, **kwargs):
-        out["H"] = np.array([constr(x) for constr in self.constr_eq])
-        out["G"] = np.array([constr(x) for constr in self.constr_ieq])
         out["F"] = np.array([obj(x) for obj in self.objs])
+        out["G"] = np.array([constr(x) for constr in self.constr_ieq])
+        out["H"] = np.array([constr(x) for constr in self.constr_eq])
 
     def _calc_pareto_front(self, *args, **kwargs):
         return self.func_pf(*args, **kwargs)

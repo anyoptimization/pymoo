@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymoo.core.mutation import VariableWiseMutation
+from pymoo.core.mutation import Mutation
 from pymoo.core.variable import Real, get
 from pymoo.operators.repair.bounds_repair import repair_random_init
 
@@ -37,13 +37,13 @@ def mut_gauss(X, xl, xu, sigma, prob):
 # ---------------------------------------------------------------------------------------------------------
 
 
-class GaussianMutation(VariableWiseMutation):
+class GaussianMutation(Mutation):
 
     def __init__(self, sigma=0.1, **kwargs):
         super().__init__(**kwargs)
         self.sigma = Real(sigma, bounds=(0.01, 0.25), strict=(0.0, 1.0))
 
-    def _do(self, problem, X, params=None, **kwargs):
+    def _do(self, problem, X, **kwargs):
         X = X.astype(float)
 
         sigma = get(self.sigma, size=len(X))

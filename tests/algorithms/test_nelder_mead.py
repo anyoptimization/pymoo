@@ -1,9 +1,9 @@
 import numpy as np
 from scipy.optimize import minimize as scipy_minimize
 
-from pymoo.algorithms.soo.nonconvex.nelder_mead import NelderMead
-from pymoo.factory import get_problem, get_termination
+from pymoo.algorithms.soo.nonconvex.nelder import NelderMead
 from pymoo.optimize import minimize
+from pymoo.problems import get_problem
 
 
 def test_no_bounds():

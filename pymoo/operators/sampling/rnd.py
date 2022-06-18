@@ -14,13 +14,6 @@ def random(problem, n_samples=1):
 
 
 class FloatRandomSampling(Sampling):
-    """
-    Randomly sample points in the real space by considering the lower and upper bounds of the problem.
-    """
-
-    def __init__(self, var_type=np.float64) -> None:
-        super().__init__()
-        self.var_type = var_type
 
     def _do(self, problem, n_samples, **kwargs):
         return random(problem, n_samples=n_samples)
@@ -31,6 +24,13 @@ class BinaryRandomSampling(Sampling):
     def _do(self, problem, n_samples, **kwargs):
         val = np.random.random((n_samples, problem.n_var))
         return (val < 0.5).astype(bool)
+
+
+class IntegerRandomSampling(FloatRandomSampling):
+
+    def _do(self, problem, n_samples, **kwargs):
+        X = super()._do(problem, n_samples, **kwargs)
+        return np.around(X).astype(int)
 
 
 class PermutationRandomSampling(Sampling):

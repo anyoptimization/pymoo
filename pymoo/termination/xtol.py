@@ -1,15 +1,21 @@
+import numpy as np
+
 from pymoo.indicators.igd import IGD
-from pymoo.util.normalization import normalize
 from pymoo.termination.delta import DeltaToleranceTermination
+from pymoo.util.normalization import normalize
 
 
 class DesignSpaceTermination(DeltaToleranceTermination):
 
-    def __init__(self, tol=0.001, **kwargs):
+    def __init__(self, tol=0.005, **kwargs):
         super().__init__(tol, **kwargs)
 
     def _delta(self, prev, current):
-        return IGD(current).do(prev)
+
+        if prev.dtype == float and current.dtype == float:
+            return IGD(current).do(prev)
+        else:
+            return np.mean([np.sum(e != prev, axis=1).max() / len(e) for e in current])
 
     def _data(self, algorithm):
 

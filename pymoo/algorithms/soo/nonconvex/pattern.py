@@ -6,7 +6,7 @@ from pymoo.core.population import Population
 from pymoo.core.replacement import is_better
 from pymoo.docs import parse_doc_string
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
-from pymoo.util.display import SingleObjectiveDisplay
+from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.optimum import filter_optimum
 
 
@@ -20,7 +20,7 @@ class PatternSearch(LocalSearch):
                  init_delta=0.25,
                  init_rho=0.5,
                  step_size=1.0,
-                 display=SingleObjectiveDisplay(),
+                 output=SingleObjectiveOutput(),
                  **kwargs):
         """
         An implementation of well-known Hooke and Jeeves Pattern Search.
@@ -50,7 +50,7 @@ class PatternSearch(LocalSearch):
 
         """
 
-        super().__init__(display=display, **kwargs)
+        super().__init__(output=output, **kwargs)
         self.init_rho = init_rho
         self.init_delta = init_delta
         self.step_size = step_size

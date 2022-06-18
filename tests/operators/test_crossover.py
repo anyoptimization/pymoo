@@ -2,8 +2,7 @@ import pytest
 
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.soo.nonconvex.ga import GA
-from pymoo.core.crossover import ElementwiseCrossover
-from pymoo.factory import get_crossover, get_problem
+
 from pymoo.operators.crossover.dex import DEX
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.inversion import InversionMutation
@@ -36,18 +35,3 @@ def test_crossover_perm(name):
     assert True
 
 
-def test_elementwise_crossover():
-
-    problem = get_problem('zdt1')
-
-    sampling = FloatRandomSampling()
-
-    pop = sampling.do(problem, n_samples=3)
-
-    crossover = ElementwiseCrossover(SBX(20))
-    off = crossover.do(problem, pop[0], pop[1])
-    assert len(off) == 2
-
-    crossover = ElementwiseCrossover(DEX())
-    off = crossover.do(problem, pop[0], pop[1], pop[2])
-    assert len(off) == 1

@@ -27,5 +27,5 @@ def set_to_bounds_if_outside_by_problem(problem, X):
 
 class ToBoundOutOfBoundsRepair(BoundsRepair):
 
-    def repair_out_of_bounds(self, problem, X):
+    def repair_out_of_bounds(self, problem, X, **kwargs):
         return set_to_bounds_if_outside_by_problem(problem, X)

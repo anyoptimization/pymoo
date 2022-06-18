@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pytest
 
-from pymoo.factory import get_problem
+from pymoo.problems import get_problem
 from pymoo.util.misc import at_least_2d_array
 from tests.problems.test_correctness import load
 from tests.util import path_to_test_resource
