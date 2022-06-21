@@ -26,6 +26,7 @@ class MultiObjectiveSpaceToleranceTermination(SlidingWindowTermination):
                  nth_gen=5,
                  n_max_gen=None,
                  n_max_evals=None,
+                 max_time=None,
                  **kwargs) -> None:
         super().__init__(metric_window_size=n_last,
                          data_window_size=2,
@@ -33,6 +34,7 @@ class MultiObjectiveSpaceToleranceTermination(SlidingWindowTermination):
                          nth_gen=nth_gen,
                          n_max_gen=n_max_gen,
                          n_max_evals=n_max_evals,
+                         max_time=max_time,
                          **kwargs)
         self.tol = tol
 

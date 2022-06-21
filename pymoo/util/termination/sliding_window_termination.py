@@ -4,6 +4,7 @@ from pymoo.util.sliding_window import SlidingWindow
 from pymoo.util.termination.collection import TerminationCollection
 from pymoo.util.termination.max_eval import MaximumFunctionCallTermination
 from pymoo.util.termination.max_gen import MaximumGenerationTermination
+from pymoo.util.termination.max_time import TimeBasedTermination
 
 
 class SlidingWindowTermination(TerminationCollection):
@@ -15,6 +16,7 @@ class SlidingWindowTermination(TerminationCollection):
                  nth_gen=1,
                  n_max_gen=None,
                  n_max_evals=None,
+                 max_time=None,
                  truncate_metrics=True,
                  truncate_data=True,
                  ) -> None:
@@ -35,7 +37,8 @@ class SlidingWindowTermination(TerminationCollection):
         """
 
         super().__init__(MaximumGenerationTermination(n_max_gen=n_max_gen),
-                         MaximumFunctionCallTermination(n_max_evals=n_max_evals))
+                         MaximumFunctionCallTermination(n_max_evals=n_max_evals),
+                         TimeBasedTermination(max_time=max_time))
 
         # the window sizes stored in objects
         self.data_window_size = data_window_size
