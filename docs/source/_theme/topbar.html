@@ -1,0 +1,46 @@
+<div class="col text-left my-auto">
+
+    <button
+            id="nb-toogle"
+            type="button"
+            class="navbar-toggler"
+            data-toggle="collapse"
+            data-target="#main-navbar"
+            data-label-expanded="Close"
+            aria-expanded="false">
+        <i class="fas fa-bars fa-lg" style="background-color: white"></i>
+
+    </button>
+
+</div>
+
+
+<!-- SMALL DEVICE -->
+<div class="col text-center my-auto d-block d-md-none">
+    <div class="float-left px-2">
+        <a href="https://github.com/anyoptimization/pymoo">
+            <i class="fab fa-github fa-2x" style="color:#000000;"></i>
+        </a>
+    </div>
+    <div class="float-left px-2">
+        <a href="" data-toggle="modal" data-target="#newsletter">
+            <i class="fas fa-newspaper fa-2x" style="color:#000000;"></i>
+        </a>
+    </div>
+</div>
+
+
+<!-- REGULAR -->
+<div class="col text-center my-auto d-none d-md-block">
+    <a href="https://github.com/anyoptimization/pymoo">
+        <button type="button" class="btn btn-secondary">GitHub</button>
+    </a>
+    <a data-toggle="modal" data-target="#newsletter">
+        <button type="button" class="btn btn-secondary">Newsletter</button>
+    </a>
+</div>
+
+<div class="col text-right my-auto">
+    <b>Version: </b>{{ "%s" % version }}
+</div>
+

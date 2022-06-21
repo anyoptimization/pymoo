@@ -1,0 +1,115 @@
+
+#my-wrapper {
+    /*font: 14px/1.5 'Lucida Grande','Lucida Sans Unicode','Geneva','Verdana',sans-serif;*/
+
+    color: #515151;
+    font-family: "PT Sans", Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    font-size: 15px;
+    margin-left: 72px;
+    margin-right: 150px;
+    line-height: 1.5em;
+    letter-spacing: 0.2px;
+
+    box-shadow: 0px 0px 3px rgb(136, 136, 136);
+    border-bottom: 0px solid rgb(0, 0, 0);
+    width: 90%;
+    padding-top: 0px !important;
+    min-width: 300px;
+}
+
+
+
+#main-topbar {
+    background-color: white;
+    z-index: 10000;
+    top: 0;
+}
+
+#main-navbar {
+    top: 60px !important;
+    border: 0 !important;
+    z-index: 1000;
+    height: 100% !important;
+}
+
+
+#main-toc {
+    border: 0;
+    top: 80px !important;
+    margin-top: 30px !important;
+    z-index: 1000;
+    height: 100% !important;
+}
+
+.sticky{
+  position: -webkit-sticky;
+  position: sticky;
+}
+
+
+.nav a {
+    color: #5a5a5a !important;
+}
+
+.img-header {
+    width: 100%;
+    height: 100%;
+}
+
+
+.new-flag {
+  height: 2em;
+  display: inline;
+}
+
+
+.tocsection {
+    border-left: 0 !important;
+    padding-top: 1em !important;
+}
+
+.footer {
+    border: 0 !important;
+}
+
+
+.section-nav {
+  border-left: 0 !important;
+}
+
+
+.my-table {
+  margin: 10px 0px;
+  font-size: 12.5px;
+  width: 80%;
+}
+
+
+.portfolio-heading {
+    font-weight: 400;
+    font-size: 1.44em;
+    font-family: Open Sans,sans-serif;
+    line-height: 1.15;
+    padding: 0.2em 0;
+}
+
+.portfolio-heading a {
+    text-decoration:none;
+    color:black !important;
+}
+
+
+.classifier {
+    margin-left: 1em;
+}
+
+
+
+
+
+
+
+
+
+

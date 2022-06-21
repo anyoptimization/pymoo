@@ -3,6 +3,8 @@
 **/.mp4
 **/.npy
 **/.gif
+**/.cpp
+**/.c
 
 
 # Byte-compiled / optimized / DLL files
@@ -13,6 +15,8 @@ __pycache__/
 *.so
 *.pkl
 
+ **/*.ipynb_checkpoints/
+
 
 # files which are in tests
 tests/!archive/*
@@ -22,6 +26,9 @@ tests/!experimental/*
 
 pymoo/cache/
 pymoo/cache/*
+pymoo/docs/build
+pymoo/docs/nbconvert
+pymoo/docs/source/.ipynb_checkpoints
 
 
 benchmark/runs/*

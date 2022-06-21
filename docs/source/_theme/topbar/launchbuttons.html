@@ -1,0 +1,34 @@
+<!-- Launch buttons -->
+{% if binder_url or jupyterhub_url or colab_url or use_thebe %}
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        {% if binder_url %}
+        <a class="binder-button" href="{{ binder_url }}"><button type="button"
+                class="btn btn-secondary topbarbtn" title="{{ translate('Launch') }} Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="{{ pathto('_static/images/logo_binder.svg', 1) }}"
+                    alt="Interact on binder">Binder</button></a>
+        {% endif %}
+        {% if jupyterhub_url %}
+        <a class="jupyterhub-button" href="{{ jupyterhub_url }}"><button type="button"
+                class="btn btn-secondary topbarbtn" title="{{ translate('Launch') }} JupyterHub" data-toggle="tooltip"
+                data-placement="left"><img class="jupyterhub-button-logo"
+                    src="{{ pathto('_static/images/logo_jupyterhub.svg', 1) }}"
+                    alt="Interact on JupyterHub">JupyterHub</button></a>
+        {% endif %}
+        {% if colab_url and page_source_suffix==".ipynb" %}
+        <a class="colab-button" href="{{ colab_url }}"><button type="button" class="btn btn-secondary topbarbtn"
+                title="{{ translate('Launch') }} Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="{{ pathto('_static/images/logo_colab.png', 1) }}"
+                    alt="Interact on Colab">Colab</button></a>
+        {% endif %}
+        {% if use_thebe -%}
+        <button type="button" class="btn btn-secondary topbarbtn"
+            onclick="initThebeSBT()" title="{{ translate('Launch') }} Thebe" data-toggle="tooltip" data-placement="left"><i
+                class="fas fa-play"></i><span style="margin-left: .4em;">Live Code</span></button>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

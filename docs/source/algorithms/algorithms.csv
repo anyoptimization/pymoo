@@ -1,0 +1,17 @@
+    :ref:`Genetic Algorithm <nb_ga>`, GA, ga, single, x,A modular implementation of a genetic algorithm. It can be easily customized with different evolutionary operators and applies to a broad category of problems.
+   :ref:`Differential Evolution <nb_de>`, DE, de, single, x, Different variants of differential evolution which is a well-known concept for in continuous optimization especially for global optimization.
+   :ref:`Biased Random Key Genetic Algorithm <nb_brkga>`, BRKGA, brkga, single, x, Mostly used for combinatorial optimization where instead of custom evolutionary operators the complexity is put into an advanced variable encoding.
+   :ref:`Nelder Mead <nb_nelder_mead>`, NelderMead, nelder-mead, single, x, A point-by-point based algorithm which keeps track of a simplex with is either extended  reflected or shrunk.
+   :ref:`Pattern Search <nb_pattern_search>`, PatternSearch, pattern-search, single, x, Iterative approach where the search direction is estimated by forming a specific exploration pattern around the current best solution.
+   :ref:`CMAES <nb_cmaes>`, CMAES, cmaes, single, , Well-known model-based algorithm sampling from a dynamically updated normal distribution in each iteration.
+   :ref:`Evolutionary Strategy <nb_es>`, ES, es, single, , The evolutionary strategy algorithm proposed for real-valued optimization problems.
+   :ref:`Stochastic Ranking Evolutionary Strategy <nb_sres>`, SRES, sres, single, x, An evolutionary strategy with constrained handling using stochastic ranking.
+   :ref:`Improved Stochastic Ranking Evolutionary Strategy <nb_isres>`, ISRES, isres, single, x, An improved version of SRES being able to deal dependent variables efficiently.
+   :ref:`NSGA-II <nb_nsga2>`, NSGA2, nsga2, multi, x, Well-known multi-objective optimization algorithm based on non-dominated sorting and crowding.
+   :ref:`R-NSGA-II <nb_rnsga2>`, RNSGA2, rnsga2, multi, x, An extension of NSGA-II where reference/aspiration points can be provided by the user.
+   :ref:`NSGA-III <nb_nsga3>`, NSGA3, nsga3, many, x, An improvement of NSGA-II developed for multi-objective optimization problems with more than two objectives.
+   :ref:`U-NSGA-III <nb_unsga3>`, UNSGA3, unsga3, many, x, A generalization of NSGA-III to be more efficient for single and bi-objective optimization problems.
+   :ref:`R-NSGA-III <nb_rnsga3>`, RNSGA3, rnsga3, many, x, Allows defining aspiration points for NSGA-III to incorporate the user's preference.
+   :ref:`MOEA\D <nb_moead>`, MOEAD, moead, many,, Another well-known multi-objective optimization algorithm based on decomposition.
+   :ref:`AGE-MOEA <nb_agemoea>`, AGEMOEA, agemoea, many,, Similar to NSGA-II but estimates the shape of the Pareto-front to compute a score replacing the crowding distance.
+   :ref:`C-TAEA <nb_ctaea>`, CTAEA, ctaea, many, x, An algorithm with a more sophisticated constraint-handling for many-objective optimization algoritms.
