@@ -1,11 +1,13 @@
-import autograd.numpy as anp
+import numpy as np
 
 
-def calc_distance_to_weights(F, weights, utopian_point):
-    norm = anp.linalg.norm(weights, axis=1)
-    F = F - utopian_point
+def calc_distance_to_weights(F, weights, utopian_point=None):
+    norm = np.linalg.norm(weights, axis=1)
+
+    if utopian_point is not None:
+        F = F - utopian_point
 
     d1 = (F * weights).sum(axis=1) / norm
-    d2 = anp.linalg.norm(F - (d1[:, None] * weights / norm[:, None]), axis=1)
+    d2 = np.linalg.norm(F - (d1[:, None] * weights / norm[:, None]), axis=1)
 
     return d1, d2

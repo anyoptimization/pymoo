@@ -39,9 +39,9 @@ def test_no_feasible_solution_found():
         def __init__(self):
             super().__init__(n_var=2,
                              n_obj=1,
-                             n_ieq_constr=36,
-                             xl=np.array([0, 0]),
-                             xu=np.array([100, 100]))
+                             n_ieq_constr=1,
+                             xl=[0, 0],
+                             xu=[100, 100])
 
         def _evaluate(self, x, out, *args, **kwargs):
             f1 = x[:, 0] + x[:, 1]
@@ -97,7 +97,7 @@ def test_min_vs_loop_vs_infill():
     min_res = minimize(problem, algorithm, ('n_gen', n_gen), seed=1)
 
     algorithm = NSGA2(pop_size=100)
-    algorithm.setup(problem, ('n_gen', n_gen), seed=1)
+    algorithm.setup(problem, termination=('n_gen', n_gen), seed=1)
     while algorithm.has_next():
         algorithm.next()
     algorithm.finalize()
@@ -106,7 +106,7 @@ def test_min_vs_loop_vs_infill():
     np.testing.assert_allclose(min_res.X, loop_res.X)
 
     algorithm = NSGA2(pop_size=100)
-    algorithm.setup(problem, ('n_gen', n_gen), seed=1)
+    algorithm.setup(problem, termination=('n_gen', n_gen), seed=1)
     while algorithm.has_next():
         infills = algorithm.infill()
         Evaluator().eval(problem, infills)

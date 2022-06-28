@@ -1,7 +1,7 @@
 import numpy as np
 
+from pymoo.algorithms.base.local import LocalSearch
 from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
-from pymoo.core.algorithm import Algorithm
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population
 from pymoo.util.display.single import SingleObjectiveOutput
@@ -26,83 +26,48 @@ def update_bounds(ind, xl, xu, k, delta):
     ind.set("xu", _xu)
 
 
-class DIRECT(Algorithm):
+class DIRECT(LocalSearch):
 
     def __init__(self,
+                 eps=1e-2,
+                 penalty=0.1,
                  n_max_candidates=10,
                  n_max_archive=400,
-                 randomize=True,
+                 archive_reduct=0.66,
                  output=SingleObjectiveOutput(),
                  **kwargs):
-
         super().__init__(output=output, **kwargs)
+        self.eps = eps
+        self.penalty = penalty
         self.n_max_candidates = n_max_candidates
         self.n_max_archive = n_max_archive
-        self.randomize = randomize
+        self.archive_reduct = archive_reduct
+
+    def _setup(self, problem, **kwargs):
+
+        xl, xu = problem.bounds()
+        X = denormalize(0.5 * np.ones(problem.n_var), xl, xu)
+
+        x0 = Individual(X=X)
+        x0.set("xl", xl)
+        x0.set("xu", xu)
+        x0.set("depth", 0)
+
+        self.x0 = x0
 
     def _initialize_infill(self, **kwargs):
-        xl, xu = self.problem.bounds()
-        X = denormalize(0.5 * np.ones(self.problem.n_var), xl, xu)
-        infill = Individual(X=X, xl=xl, xu=xu, depth=0)
-        return Population.create(infill)
+        return Population.create(self.x0)
 
-    def _infill(self):
-
-        # the offspring population to finally evaluate and attach to the population
-        infills = Population()
-
-        # find the potential optimal solution in the current population
-        candidates = self._find_candidates()
-
-        # for each of those solutions execute the division move
-        for current in candidates:
-
-            # find the largest dimension the solution has not been evaluated yet
-            nxl, nxu = norm_bounds(current, self.problem)
-            if self.randomize:
-                r = nxu - nxl
-                axis = np.random.choice(np.where(np.max(r) == r)[0])
-            else:
-                axis = np.argmax(nxu - nxl)
-
-            # the delta value to be used to get left and right - this is one sixth of the range
-            xl, xu = current.get("xl", "xu")
-
-            delta = (xu[axis] - xl[axis]) / 6
-
-            # create the left individual
-            left_x = np.copy(current.X)
-            left_x[axis] = xl[axis] + delta
-            left = Individual(X=left_x)
-
-            # create the right individual
-            right_x = np.copy(current.X)
-            right_x[axis] = xu[axis] - delta
-            right = Individual(X=right_x)
-
-            # update the boundaries for all the points accordingly
-            for ind in [current, left, right]:
-                update_bounds(ind, xl, xu, axis, delta)
-
-            # create the offspring population, evaluate and attach to current population
-            _infill = Population.create(left, right)
-            _infill.set("depth", current.get("depth") + 1)
-
-            infills = Population.merge(infills, _infill)
-
-        return infills
-
-    def _advance(self, infills=None, **kwargs):
-        self.pop = Population.merge(self.pop, infills)
-
-    def _find_candidates(self):
+    def _potential_optimal(self):
         pop = self.pop
 
         if len(pop) == 1:
             return pop
 
         # get the intervals of each individual
-        F, xl, xu = pop.get("F", "xl", "xu")
+        _F, _CV, xl, xu = pop.get("F", "CV", "xl", "xu")
+        nF = normalize(_F)
+        F = nF + self.penalty * _CV
 
         # get the length of the interval of each solution
         nxl, nxu = norm_bounds(pop, self.problem)
@@ -114,12 +79,11 @@ class DIRECT(Algorithm):
 
         # an unlimited archive size can cause issues - thus truncate if necessary
         if len(pop) > self.n_max_archive:
-
             # find the rank of each individual
             _, rank = NonDominatedSorting().do(obj, return_rank=True)
 
             # calculate the number of solutions after truncation and filter the best ones out
-            n_truncated = int(0.5 * self.n_max_archive)
+            n_truncated = int(self.archive_reduct * self.n_max_archive)
             I = np.argsort(rank)[:n_truncated]
 
             # also update all the utility variables defined so far to match the truncation
@@ -137,3 +101,49 @@ class DIRECT(Algorithm):
                 candidates = RankAndCrowdingSurvival().do(self.problem, pop, n_survive=self.n_max_candidates)
 
             return candidates
+
+    def _infill(self):
+
+        # the offspring population to finally evaluate and attach to the population
+        infills = Population()
+
+        # find the potential optimal solution in the current population
+        potential_optimal = self._potential_optimal()
+
+        # for each of those solutions execute the division move
+        for current in potential_optimal:
+
+            # find the largest dimension the solution has not been evaluated yet
+            nxl, nxu = norm_bounds(current, self.problem)
+            k = np.argmax(nxu - nxl)
+
+            # the delta value to be used to get left and right - this is one sixth of the range
+            xl, xu = current.get("xl"), current.get("xu")
+
+            delta = (xu[k] - xl[k]) / 6
+
+            # create the left individual
+            left_x = np.copy(current.X)
+            left_x[k] = xl[k] + delta
+            left = Individual(X=left_x)
+
+            # create the right individual
+            right_x = np.copy(current.X)
+            right_x[k] = xu[k] - delta
+            right = Individual(X=right_x)
+
+            # update the boundaries for all the points accordingly
+            for ind in [current, left, right]:
+                update_bounds(ind, xl, xu, k, delta)
+
+            # create the offspring population, evaluate and attach to current population
+            _infill = Population.create(left, right)
+            _infill.set("depth", current.get("depth") + 1)
+
+            infills = Population.merge(infills, _infill)
+
+        return infills
+
+    def _advance(self, infills=None, **kwargs):
+        assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
+        self.pop = Population.merge(self.pop, infills)

@@ -1,6 +1,6 @@
-import autograd.numpy as anp
 import numpy as np
-from autograd import value_and_grad
+import pymoo.gradient.toolbox as anp
+
 
 from pymoo.util.ref_dirs.construction import ConstructionBasedReferenceDirectionFactory
 from pymoo.util.ref_dirs.misc import project_onto_sum_equals_zero_plane, project_onto_unit_simplex_recursive
@@ -57,6 +57,7 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
         # obj, grad = value_and_grad(calc_potential_energy)(X, self.d)
 
         if self.verify_gradient:
+            from autograd import value_and_grad
             obj, grad = calc_potential_energy_with_grad(X, self.d)
             _obj, _grad = value_and_grad(calc_potential_energy)(X, self.d)
             if np.abs(grad - _grad).mean() > 1e-5:

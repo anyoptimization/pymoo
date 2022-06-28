@@ -23,8 +23,8 @@ class NicheOutput(SingleObjectiveOutput):
 
     def __init__(self):
         super().__init__()
-        self.columns["n_niches"] = Column(10, lambda algorithm: len(algorithm.opt))
-        self.active += ["n_niches"]
+        self.n_niches = Column("n_niches", width=10, func=lambda algorithm: len(algorithm.opt))
+        self.columns += [self.n_niches]
 
 
 # =========================================================================================================
@@ -45,10 +45,10 @@ class NicheTermination(DefaultTermination):
                  f_tol=1e-6,
                  period=20,
                  **kwargs) -> None:
-
         super().__init__(RobustTermination(DesignSpaceTermination(tol=x_tol), period=period),
                          RobustTermination(ConstraintViolationTermination(tol=cv_tol), period=period),
-                         RobustTermination(NicheSingleObjectiveSpaceToleranceTermination(tol=f_tol, n_skip=5), period=period),
+                         RobustTermination(NicheSingleObjectiveSpaceToleranceTermination(tol=f_tol, n_skip=5),
+                                           period=period),
                          **kwargs)
 
 

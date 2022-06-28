@@ -4,6 +4,7 @@ from scipy.optimize import minimize as scipy_minimize
 from pymoo.algorithms.soo.nonconvex.nelder import NelderMead
 from pymoo.optimize import minimize
 from pymoo.problems import get_problem
+from pymoo.termination import get_termination
 
 
 def test_no_bounds():
@@ -57,7 +58,7 @@ def test_against_scipy():
             hist.append(x)
 
     problem.callback = callback
-    minimize(problem, NelderMead(x0=x0, max_restarts=0, termination=get_termination("n_eval", len(hist_scipy))))
+    minimize(problem, NelderMead(x0=x0), termination=("n_eval", len(hist_scipy)))
     hist = np.row_stack(hist)[:len(hist_scipy)]
 
     np.testing.assert_allclose(hist, hist_scipy, rtol=1e-04)

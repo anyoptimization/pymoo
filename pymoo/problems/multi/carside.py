@@ -1,4 +1,5 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
+import numpy as np
 
 from pymoo.core.problem import Problem
 from pymoo.util.remote import Remote
@@ -6,9 +7,9 @@ from pymoo.util.remote import Remote
 
 class Carside(Problem):
     def __init__(self):
-        super().__init__(n_var=7, n_obj=3, n_ieq_constr=10, type_var=anp.double)
-        self.xl = anp.array([0.5, 0.45, 0.5, 0.5, 0.875, 0.4, 0.4])
-        self.xu = anp.array([1.5, 1.35, 1.5, 1.5, 2.625, 1.2, 1.2])
+        super().__init__(n_var=7, n_obj=3, n_ieq_constr=10, vtype=float)
+        self.xl = np.array([0.5, 0.45, 0.5, 0.5, 0.875, 0.4, 0.4])
+        self.xu = np.array([1.5, 1.35, 1.5, 1.5, 2.625, 1.2, 1.2])
 
     def _evaluate(self, x, out, *args, **kwargs):
         g1 = 1.16 - 0.3717 * x[:,1] * x[:,3] - 0.0092928 * x[:,2]
@@ -41,7 +42,7 @@ class Carside(Problem):
         out["G"] = anp.column_stack([g1, g2, g3, g4, g5, g6, g7, g8, g9, g10])
 
     def _calc_pareto_front(self, *args, **kwargs):
-        return Remote.get_instance().load("pf", "carside.pf")
+        return Remote.get_instance().load("pymoo", "pf", "carside.pf")
 
 
 

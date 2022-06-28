@@ -2,7 +2,7 @@ import copy
 import os
 import types
 
-import autograd.numpy as anp
+import numpy as np
 
 
 def decompose(problem, decomposition, weights, return_copy=True):
@@ -25,7 +25,7 @@ def load_pareto_front_from_file(fname):
     current_dir = os.path.dirname(os.path.realpath(__file__))
     fname = os.path.join(current_dir, "pf", "%s" % fname)
     if os.path.isfile(fname):
-        pf = anp.loadtxt(fname)
+        pf = np.loadtxt(fname)
         return pf[pf[:, 0].argsort()]
 
 

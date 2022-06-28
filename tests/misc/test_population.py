@@ -24,7 +24,7 @@ def test_copy():
 
 
 def test_has_method():
-    pop = Population(100)
+    pop = Population.empty(100)
     assert pop.has("X")
     assert not pop.has("opt")
 

@@ -5,6 +5,9 @@ from pymoo.visualization.scatter import Scatter
 
 problem = CTP3()
 
+pf = problem.pareto_front()
+assert pf is not None, "Loading of the pareto-front has failed."
+
 algorithm = NSGA2()
 
 res = minimize(problem,

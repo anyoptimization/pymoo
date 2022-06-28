@@ -1,20 +1,19 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
+import numpy as np
 
 from pymoo.core.problem import Problem
-
-import numpy as np
 
 
 class CSI(Problem):
     def __init__(self):
-        xl = anp.array([0.500, 0.450, 0.500, 0.500, 0.875, 0.400, 0.400])
-        xu = anp.array([1.500, 1.350, 1.500, 1.500, 2.625, 1.200, 1.200])
-        super().__init__(n_var=7, n_obj=3, n_ieq_constr=10, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.array([0.500, 0.450, 0.500, 0.500, 0.875, 0.400, 0.400])
+        xu = np.array([1.500, 1.350, 1.500, 1.500, 2.625, 1.200, 1.200])
+        super().__init__(n_var=7, n_obj=3, n_ieq_constr=10, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
 
         # the definition is index 1 based -> simply add a dummy var in the beginning
-        x = np.column_stack([np.zeros((len(x), 1)), x])
+        x = anp.column_stack([anp.zeros((len(x), 1)), x])
 
         F = 4.72 - 0.5 * x[:, 4] - 0.19 * x[:, 2] * x[:, 3]
 

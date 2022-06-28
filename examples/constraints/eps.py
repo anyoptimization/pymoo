@@ -1,19 +1,15 @@
-from pymoo.algorithms.soo.nonconvex.ga import GA
+from pymoo.algorithms.soo.nonconvex.de import DE
 from pymoo.constraints.eps import AdaptiveEpsilonConstraintHandling
 from pymoo.optimize import minimize
 from pymoo.problems.single import G1
-from pymoo.visualization.scatter import Scatter
-
 
 problem = G1()
 
-algorithm = AdaptiveEpsilonConstraintHandling(GA())
+algorithm = AdaptiveEpsilonConstraintHandling(DE())
 
 res = minimize(problem,
                algorithm,
                ('n_gen', 200),
-               copy_algorithm=False,
-               save_history=False,
                seed=1,
                verbose=True)
 

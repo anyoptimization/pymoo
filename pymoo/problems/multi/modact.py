@@ -50,7 +50,7 @@ class MODAct(ElementwiseProblem):
         self.weights = np.array(self.fct.weights)
         self.c_weights = np.array(self.fct.c_weights)
 
-        super().__init__(n_var=n_var, n_obj=n_obj, n_ieq_constr=n_ieq_constr, xl=xl, xu=xu, type_var=np.double, **kwargs)
+        super().__init__(n_var=n_var, n_obj=n_obj, n_ieq_constr=n_ieq_constr, xl=xl, xu=xu, vtype=float, **kwargs)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f, g = self.fct(x)
@@ -60,7 +60,7 @@ class MODAct(ElementwiseProblem):
     def _calc_pareto_front(self, *args, **kwargs):
         # allows to provide a custom pf - because of the size of files published by the author
         if self.pf is None:
-            pf = Remote.get_instance().load("pf", "MODACT", f"{self.function}.pf")
+            pf = Remote.get_instance().load("pymoo", "pf", "MODACT", f"{self.function}.pf")
             # pf = pf * [1, -1]
             pf = pf * self.weights * -1
             return pf

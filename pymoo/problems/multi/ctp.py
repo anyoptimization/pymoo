@@ -1,22 +1,23 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
+import numpy as np
 
 from pymoo.core.problem import Problem
 from pymoo.util.remote import Remote
 
 
 def g_linear(x):
-    return 1 + anp.sum(x, axis=1)
+    return 1 + np.sum(x, axis=1)
 
 
 def g_multimodal(x):
     A = 10
-    return 1 + A * x.shape[1] + anp.sum(x ** 2 - A * anp.cos(2 * anp.pi * x), axis=1)
+    return 1 + A * x.shape[1] + np.sum(x ** 2 - A * np.cos(2 * np.pi * x), axis=1)
 
 
 class CTP(Problem):
 
     def __init__(self, n_var=2, n_ieq_constr=1, option="linear"):
-        super().__init__(n_var=n_var, n_obj=2, n_ieq_constr=n_ieq_constr, xl=0, xu=1, type_var=anp.double)
+        super().__init__(n_var=n_var, n_obj=2, n_ieq_constr=n_ieq_constr, xl=0, xu=1, vtype=float)
 
         if option == "linear":
             self.calc_g = g_linear
@@ -58,7 +59,7 @@ class CTP(Problem):
         return val
 
     def _calc_pareto_front(self, *args, **kwargs):
-        return Remote.get_instance().load(f"pf", "CTP", str(self.__class__.__name__).lower() + ".pf")
+        return Remote.get_instance().load("pymoo", "pf", "CTP", str(self.__class__.__name__).lower() + ".pf")
 
 
 class CTP1(CTP):
@@ -66,15 +67,15 @@ class CTP1(CTP):
     def __init__(self, n_var=2, n_ieq_constr=2, **kwargs):
         super().__init__(n_var, n_ieq_constr, **kwargs)
 
-        a, b = anp.zeros(n_ieq_constr + 1), anp.zeros(n_ieq_constr + 1)
+        a, b = np.zeros(n_ieq_constr + 1), np.zeros(n_ieq_constr + 1)
         a[0], b[0] = 1, 1
         delta = 1 / (n_ieq_constr + 1)
         alpha = delta
 
         for j in range(n_ieq_constr):
-            beta = a[j] * anp.exp(-b[j] * alpha)
+            beta = a[j] * np.exp(-b[j] * alpha)
             a[j + 1] = (a[j] + beta) / 2
-            b[j + 1] = - 1 / alpha * anp.log(beta / a[j + 1])
+            b[j + 1] = - 1 / alpha * np.log(beta / a[j + 1])
 
             alpha += delta
 
@@ -146,7 +147,7 @@ class CTP6(CTP):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.xu = anp.full(self.n_var, 20)
+        self.xu = np.full(self.n_var, 20)
         self.xu[0] = 1
 
     def _evaluate(self, x, out, *args, **kwargs):
@@ -174,7 +175,7 @@ class CTP7(CTP):
 class CTP8(CTP):
     def __init__(self, **kwargs):
         super().__init__(n_ieq_constr=2, **kwargs)
-        self.xu = anp.full(self.n_var, 20)
+        self.xu = np.full(self.n_var, 20)
         self.xu[0] = 1
 
     def _evaluate(self, x, out, *args, **kwargs):

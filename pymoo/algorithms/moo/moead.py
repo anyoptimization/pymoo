@@ -69,7 +69,7 @@ class MOEAD(LoopwiseAlgorithm, GeneticAlgorithm):
 
         self.selection = NeighborhoodSelection(prob=prob_neighbor_mating)
 
-        super().__init__(pop_size=np.inf,
+        super().__init__(pop_size=len(ref_dirs),
                          sampling=sampling,
                          crossover=crossover,
                          mutation=mutation,

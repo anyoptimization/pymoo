@@ -89,7 +89,7 @@ class Evaluator:
         # call the problem to evaluate the solutions
         out = problem.evaluate(X, return_values_of=evaluate_values_of, return_as_dictionary=True, **kwargs)
 
-        # for each of the attributes set it too the problem
+        # for each of the attributes set it to the problem
         for key, val in out.items():
             if val is not None:
                 pop.set(key, val)

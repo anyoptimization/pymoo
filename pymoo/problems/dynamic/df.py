@@ -16,7 +16,7 @@ class DF(DynamicTestProblem):
                          xu=1)
 
     def _calc_pareto_front(self, *args, **kwargs):
-        return Remote.get_instance().load(f"pf", "DF", f"{str(self.__class__.__name__)}.pf")
+        return Remote.get_instance().load("pymoo", "pf", "DF", f"{str(self.__class__.__name__)}.pf")
 
 
 class DF1(DF):
@@ -97,8 +97,9 @@ class DF4(DF):
         a = np.sin(0.5 * np.pi * self.time())
         b = 1 + np.abs(np.cos(0.5 * np.pi * self.time()))
         H = 1.5 + a
-        c = np.maximum(np.abs(a), a+b)
-        g = 1 + np.sum((x[:, 1:]-(a*(x[:, 0].reshape(len(x), 1))**2/(np.arange(2, n+1)*(c**2))))**2, axis=1)
+        c = np.maximum(np.abs(a), a + b)
+        g = 1 + np.sum((x[:, 1:] - (a * (x[:, 0].reshape(len(x), 1)) ** 2 / (np.arange(2, n + 1) * (c ** 2)))) ** 2,
+                       axis=1)
 
         f1 = g * np.power(np.abs(x[:, 0] - a), H)
         f2 = g * np.power(np.abs(x[:, 0] - a - b), H)
@@ -126,7 +127,6 @@ class DF5(DF):
         self.ux[0] = 1.0
 
     def _evaluate(self, x, out, *args, **kwargs):
-
         G = np.sin(0.5 * np.pi * self.time())
         w = np.floor(10 * G)
         g = 1 + np.sum((x[:, 1:] - G) ** 2, axis=1)
@@ -137,10 +137,10 @@ class DF5(DF):
 
     def _calc_pareto_front(self, *args, n_pareto_points=100, **kwargs):
         x = np.linspace(0, 1, n_pareto_points)
-        G = np.sin(0.5*np.pi*self.time())
-        w = np.floor(10*G)
+        G = np.sin(0.5 * np.pi * self.time())
+        w = np.floor(10 * G)
         f1 = x + 0.02 * np.sin(w * np.pi * x)
-        f2 = 1 - x + 0.02 * np.sin(w * np.pi*x)
+        f2 = 1 - x + 0.02 * np.sin(w * np.pi * x)
         return np.array([f1, f2]).T
 
 
@@ -166,9 +166,9 @@ class DF6(DF):
     def _calc_pareto_front(self, *args, n_pareto_points=100, **kwargs):
         x = np.linspace(0, 1, n_pareto_points)
         G = np.sin(0.5 * np.pi * self.time())
-        a = 0.2 + 2.8*np.abs(G)
-        f1 = (x + 0.1*np.sin(3*np.pi*x)) ** a
-        f2 = (1 - x + 0.1*np.sin(3*np.pi*x)) ** a
+        a = 0.2 + 2.8 * np.abs(G)
+        f1 = (x + 0.1 * np.sin(3 * np.pi * x)) ** a
+        f2 = (1 - x + 0.1 * np.sin(3 * np.pi * x)) ** a
 
         return np.array([f1, f2]).T
 
@@ -223,10 +223,10 @@ class DF8(DF):
 
     def _calc_pareto_front(self, *args, n_pareto_points=100, **kwargs):
         x = np.linspace(0, 1, n_pareto_points)
-        a = 2.25 + 2*np.cos(2 * np.pi*self.time())
+        a = 2.25 + 2 * np.cos(2 * np.pi * self.time())
 
-        f1 = x + 0.1*np.sin(3*np.pi*x)
-        f2 = (1 - x + 0.1*np.sin(3*np.pi*x)) ** a
+        f1 = x + 0.1 * np.sin(3 * np.pi * x)
+        f2 = (1 - x + 0.1 * np.sin(3 * np.pi * x)) ** a
 
         return np.array([f1, f2]).T
 
@@ -254,10 +254,10 @@ class DF9(DF):
 
     def _calc_pareto_front(self, *args, n_pareto_points=100, **kwargs):
         x = np.linspace(0, 1, n_pareto_points)
-        N = 1+np.floor(10*np.abs(np.sin(0.5*np.pi*self.time())))
+        N = 1 + np.floor(10 * np.abs(np.sin(0.5 * np.pi * self.time())))
 
-        f1 = x+np.maximum(0, (0.1+0.5/N)*np.sin(2*N*np.pi*x))
-        f2 = 1-x+np.maximum(0, (0.1+0.5/N)*np.sin(2*N*np.pi*x))
+        f1 = x + np.maximum(0, (0.1 + 0.5 / N) * np.sin(2 * N * np.pi * x))
+        f2 = 1 - x + np.maximum(0, (0.1 + 0.5 / N) * np.sin(2 * N * np.pi * x))
 
         h = get_PF(np.array([f1, f2]), True)
         return h
@@ -283,25 +283,29 @@ class DF10(DF):
         tmp = np.sin(4 * np.pi * (x0 + x1)) / (1 + np.abs(G))  # in the document is 2*
         g = 1 + np.sum((x[:, 2:] - tmp) ** 2, axis=1)
         g = g.reshape(len(g), 1)
-        f1 = (g * np.power(np.sin(0.5 * np.pi * x0), H)).reshape(len(g),)
-        f2 = (g * np.power(np.sin(0.5 * np.pi * x1) * np.cos(0.5 * np.pi * x0), H)).reshape(len(g),)
-        f3 = (g * np.power(np.cos(0.5 * np.pi * x1) * np.cos(0.5 * np.pi * x0), H)).reshape(len(g),)
+        f1 = (g * np.power(np.sin(0.5 * np.pi * x0), H)).reshape(len(g), )
+        f2 = (g * np.power(np.sin(0.5 * np.pi * x1) * np.cos(0.5 * np.pi * x0), H)).reshape(len(g), )
+        f3 = (g * np.power(np.cos(0.5 * np.pi * x1) * np.cos(0.5 * np.pi * x0), H)).reshape(len(g), )
 
         out["F"] = np.column_stack([f1, f2, f3])
 
     def _calc_pareto_front(self, *args, n_pareto_points=100, **kwargs):
         H = 20
         x1, x2 = np.meshgrid(np.linspace(0, 1, H), np.linspace(0, 1, H), indexing='xy')
-        H = 2.25 + 2 * np.cos(0.5*np.pi*self.time())
+        H = 2.25 + 2 * np.cos(0.5 * np.pi * self.time())
         g = 1
-        f1 = g * np.sin(0.5*np.pi*x1) ** H
-        f2 = np.multiply(g*np.sin(0.5*np.pi*x2) ** H, np.cos(0.5*np.pi*x1) ** H)
-        f3 = np.multiply(g*np.cos(0.5*np.pi*x2) ** H, np.cos(0.5*np.pi*x1) ** H)
+        f1 = g * np.sin(0.5 * np.pi * x1) ** H
+        f2 = np.multiply(g * np.sin(0.5 * np.pi * x2) ** H, np.cos(0.5 * np.pi * x1) ** H)
+        f3 = np.multiply(g * np.cos(0.5 * np.pi * x2) ** H, np.cos(0.5 * np.pi * x1) ** H)
 
         return get_PF(np.array([f1, f2, f3]), False)
 
 
 class DF11(DF):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.n_obj = 3
 
     def _evaluate(self, x, out, *args, **kwargs):
         G = np.abs(np.sin(0.5 * np.pi * self.time()))
@@ -317,9 +321,9 @@ class DF11(DF):
     def _calc_pareto_front(self, *args, n_pareto_points=100, **kwargs):
         H = 20
         x1, x2 = np.meshgrid(np.linspace(0, 1, H), np.linspace(0, 1, H), indexing='xy')
-        G = np.abs(np.sin(0.5*np.pi*self.time()))
-        y1 = np.pi*G / 6 + (np.pi / 2 - np.pi*G / 3)*x1
-        y2 = np.pi*G / 6 + (np.pi / 2 - np.pi*G / 3)*x2
+        G = np.abs(np.sin(0.5 * np.pi * self.time()))
+        y1 = np.pi * G / 6 + (np.pi / 2 - np.pi * G / 3) * x1
+        y2 = np.pi * G / 6 + (np.pi / 2 - np.pi * G / 3) * x2
 
         f1 = np.sin(y1)
         f2 = np.dot(np.multiply(1, np.sin(y2)), np.cos(y1))
@@ -330,8 +334,10 @@ class DF11(DF):
 
 class DF12(DF):
 
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.n_obj = 3
         self.lx = -1 * np.ones(self.n_var)
         self.ux = -1 * np.ones(self.n_var)
         self.lx[0] = 0.0
@@ -341,10 +347,10 @@ class DF12(DF):
 
     def _evaluate(self, x, out, *args, **kwargs):
         k = 10 * np.sin(np.pi * self.time())
-#        r = 1 - np.modulo(k,2)
+        #        r = 1 - np.modulo(k,2)
         r = 1
         x0 = x[:, 0].reshape(len(x), 1)
-        tmp1 = x[:, 2:] - np.sin(self.time()*x0)
+        tmp1 = x[:, 2:] - np.sin(self.time() * x0)
         tmp2 = np.abs(np.sin(np.floor(k * (2 * x[:, 0:2] - r)) * np.pi / 2))
         g = 1 + np.sum(tmp1 ** 2, axis=1) + np.prod(tmp2)
 
@@ -357,13 +363,13 @@ class DF12(DF):
     def _calc_pareto_front(self, *args, n_pareto_points=100, **kwargs):
         H = 20
         x1, x2 = np.meshgrid(np.linspace(0, 1, H), np.linspace(0, 1, H), indexing='xy')
-        k = 10*np.sin(np.pi*self.time())
+        k = 10 * np.sin(np.pi * self.time())
         tmp2 = np.abs(
-                     (np.sin((np.floor(k*(2*x1 - 1))*np.pi) / 2) *
-                      np.sin((np.floor(k*(2*x2 - 1))*np.pi) / 2)))
-        g = 1+tmp2
-        f1 = np.multiply(np.multiply(g, np.cos(0.5*np.pi*x2)), np.cos(0.5*np.pi*x1))
-        f2 = np.multiply(np.multiply(g, np.sin(0.5*np.pi*x2)), np.cos(0.5*np.pi*x1))
+            (np.sin((np.floor(k * (2 * x1 - 1)) * np.pi) / 2) *
+             np.sin((np.floor(k * (2 * x2 - 1)) * np.pi) / 2)))
+        g = 1 + tmp2
+        f1 = np.multiply(np.multiply(g, np.cos(0.5 * np.pi * x2)), np.cos(0.5 * np.pi * x1))
+        f2 = np.multiply(np.multiply(g, np.sin(0.5 * np.pi * x2)), np.cos(0.5 * np.pi * x1))
         f3 = np.multiply(g, np.sin(0.5 * np.pi * x1))
 
         return get_PF(np.array([f1, f2, f3]), True)
@@ -373,6 +379,7 @@ class DF13(DF):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.n_obj = 3
         self.lx = -1 * np.ones(self.n_var)
         self.ux = -1 * np.ones(self.n_var)
         self.lx[0] = 0.0
@@ -397,13 +404,14 @@ class DF13(DF):
     def _calc_pareto_front(self, *args, n_pareto_points=100, **kwargs):
         H = 20
         x1, x2 = np.meshgrid(np.linspace(0, 1, H), np.linspace(0, 1, H), indexing='xy')
-        G = np.sin(0.5*np.pi*self.time())
-        p = np.floor(6*G)
+        G = np.sin(0.5 * np.pi * self.time())
+        p = np.floor(6 * G)
 
-        f1 = np.cos(0.5*np.pi*x1) ** 2
-        f2 = np.cos(0.5*np.pi*x2) ** 2
-        f3 = np.sin(0.5*np.pi*x1) ** 2 + np.sin(0.5*np.pi*x1)*np.cos(p*np.pi*x1) ** 2 + np.sin(0.5*np.pi*x2) ** 2 + \
-             np.sin(0.5*np.pi*x2)*np.cos(p*np.pi*x2) ** 2
+        f1 = np.cos(0.5 * np.pi * x1) ** 2
+        f2 = np.cos(0.5 * np.pi * x2) ** 2
+        f3 = np.sin(0.5 * np.pi * x1) ** 2 + np.sin(0.5 * np.pi * x1) * np.cos(p * np.pi * x1) ** 2 + np.sin(
+            0.5 * np.pi * x2) ** 2 + \
+             np.sin(0.5 * np.pi * x2) * np.cos(p * np.pi * x2) ** 2
 
         return get_PF(np.array([f1, f2, f3]), True)
 
@@ -412,6 +420,7 @@ class DF14(DF):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.n_obj = 3
         self.lx = -1 * np.ones(self.n_var)
         self.ux = -1 * np.ones(self.n_var)
         self.lx[0] = 0.0
@@ -437,11 +446,11 @@ class DF14(DF):
     def _calc_pareto_front(self, *args, n_pareto_points=100, **kwargs):
         H = 20
         x1, x2 = np.meshgrid(np.linspace(0, 1, H), np.linspace(0, 1, H), indexing='xy')
-        G = np.sin(0.5*np.pi*self.time())
-        y = 0.5 + G*(x1 - 0.5)
-        f1 = 1 - y + 0.05*np.sin(6*np.pi*y)
-        f2 = np.multiply(1 - x2 + 0.05*np.sin(6*np.pi*x2), y + 0.05*np.sin(6*np.pi*y))
-        f3 = np.multiply(x2 + 0.05*np.sin(6*np.pi*x2), y + 0.05*np.sin(6*np.pi*y))
+        G = np.sin(0.5 * np.pi * self.time())
+        y = 0.5 + G * (x1 - 0.5)
+        f1 = 1 - y + 0.05 * np.sin(6 * np.pi * y)
+        f2 = np.multiply(1 - x2 + 0.05 * np.sin(6 * np.pi * x2), y + 0.05 * np.sin(6 * np.pi * y))
+        f3 = np.multiply(x2 + 0.05 * np.sin(6 * np.pi * x2), y + 0.05 * np.sin(6 * np.pi * y))
 
         return get_PF(np.array([f1, f2, f3]), False)
 

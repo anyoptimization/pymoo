@@ -1,5 +1,7 @@
 import numpy as np
 
+from pymoo.core.individual import calc_cv
+
 
 class KKTPM:
 
@@ -42,13 +44,13 @@ class KKTPM:
         n_solutions, n_var, n_obj, n_ieq_constr = X.shape[0], problem.n_var, problem.n_obj, problem.n_ieq_constr
 
         F, G, dF, dG = problem.evaluate(X, return_values_of=["F", "G", "dF", "dG"])
-        CV = calc_constr()
+        CV = calc_cv(G=G)
 
         # loop through each solution to be considered
         for i in range(n_solutions):
 
             # get the corresponding values for this solution
-            x, f, cv, df = X[i, :], F[i, :], CV[i, 0], dF[i, :].swapaxes(1, 0)
+            x, f, cv, df = X[i, :], F[i, :], CV[i], dF[i, :].swapaxes(1, 0)
             if n_ieq_constr > 0:
                 g, dg = G[i, :], dG[i].T
 
@@ -115,7 +117,7 @@ class KKTPM:
             kktpm[i] = _kktpm
             fval[i] = _fval
 
-        return kktpm
+        return kktpm[:, 0]
 
 
 def solve(A, b, method="elim"):
@@ -135,10 +137,10 @@ def solve(A, b, method="elim"):
 
 if __name__ == '__main__':
     from pymoo.problems import get_problem
-    from pymoo.problems.autodiff import AutomaticDifferentiation
+    from pymoo.gradient.automatic import AutomaticDifferentiation
 
     from pymoo.constraints.from_bounds import ConstraintsFromBounds
-    problem = AutomaticDifferentiation(ConstraintsFromBounds(get_problem("zdt2", n_var=30)))
+    problem = ConstraintsFromBounds(AutomaticDifferentiation(get_problem("zdt2", n_var=30)))
 
     # X = (0.5 * np.ones(10))[None, :]
     X = np.array(

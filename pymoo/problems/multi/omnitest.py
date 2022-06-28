@@ -1,5 +1,5 @@
+import pymoo.gradient.toolbox as anp
 import numpy as np
-from numpy import sum, pi, sin, cos
 
 from pymoo.core.problem import Problem
 
@@ -19,13 +19,13 @@ class OmniTest(Problem):
     def __init__(self, n_var=2):
         assert (n_var >= 2), "The dimension of the decision space should at least be 2!"
         super().__init__(
-            n_var=n_var, n_obj=2, type_var=np.double, xl=np.full(n_var, 0), xu=np.full(n_var, 6)
+            n_var=n_var, n_obj=2, vtype=float, xl=np.full(n_var, 0), xu=np.full(n_var, 6)
         )
 
     def _evaluate(self, X, out, *args, **kwargs):
-        F1 = sum(sin(pi * X), axis=1)
-        F2 = sum(cos(pi * X), axis=1)
-        out["F"] = np.vstack((F1, F2)).T
+        F1 = anp.sum(anp.sin(anp.pi * X), axis=1)
+        F2 = anp.sum(anp.cos(anp.pi * X), axis=1)
+        out["F"] = anp.vstack((F1, F2)).T
 
     def _calc_pareto_set(self, n_pareto_points=500):
         # The Omni-test problem has 3^D Pareto subsets

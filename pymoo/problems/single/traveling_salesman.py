@@ -27,7 +27,7 @@ class TravelingSalesman(ElementwiseProblem):
             n_obj=1,
             xl=0,
             xu=n_cities,
-            type_var=int,
+            vtype=int,
             **kwargs
         )
 

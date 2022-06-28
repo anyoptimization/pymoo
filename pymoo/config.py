@@ -25,13 +25,7 @@ class Config:
     # a method defining the endpoint to load data remotely - default from github repo
     @classmethod
     def data(cls):
-        branch = "master"
-        if 'rc' in __version__:
-            branch = 'release'
-        elif 'dev' in __version__:
-            branch = 'develop'
-
-        return f"https://raw.githubusercontent.com/anyoptimization/pymoo/{branch}/data/"
+        return f"https://raw.githubusercontent.com/anyoptimization/pymoo-data/main/"
 
 
 # returns the directory to be used for imports

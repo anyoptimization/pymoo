@@ -19,7 +19,7 @@ class MyProblem(Problem):
                          n_ieq_constr=0,
                          xl=0,
                          xu=1,
-                         type_var=np.double)
+                         vtype=float)
 
         self.engine = None
 

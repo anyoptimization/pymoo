@@ -13,7 +13,7 @@ class WFG(Problem):
                          n_obj=n_obj,
                          xl=0.0,
                          xu=2 * np.arange(1, n_var + 1).astype(float),
-                         type_var=float,
+                         vtype=float,
                          **kwargs)
 
         self.S = np.arange(2, 2 * self.n_obj + 1, 2).astype(float)

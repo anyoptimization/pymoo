@@ -36,6 +36,9 @@ class NelderAndMeadTermination(Termination):
     def _update(self, algorithm):
         pop, problem = algorithm.pop, algorithm.problem
 
+        if len(pop) <= 1:
+            return 0.0
+
         X, F = pop.get("X", "F")
 
         f_delta = np.abs(F[1:] - F[0]).max()
@@ -86,7 +89,7 @@ def initialize_simplex(problem, x0, scale=0.05):
     if problem.has_bounds():
         delta = scale * (problem.xu - problem.xl)
     else:
-        delta = scale * x0.X
+        delta = scale * x0
         delta[delta == 0] = 0.00025
 
     # repeat the x0 already and add the values

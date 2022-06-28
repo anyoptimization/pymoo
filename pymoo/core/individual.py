@@ -6,8 +6,8 @@ import numpy as np
 def default_config():
     return dict(cache=True,
                 cv_eps=0.0,
-                cv_ieq=dict(scale=None, eps=0.0, pow=None, func=np.mean),
-                cv_eq=dict(scale=None, eps=1e-4, pow=None, func=np.mean)
+                cv_ieq=dict(scale=None, eps=0.0, pow=None, func=np.sum),
+                cv_eq=dict(scale=None, eps=1e-4, pow=None, func=np.sum)
                 )
 
 
@@ -117,7 +117,7 @@ class Individual:
         if cache and self._CV is not None:
             return self._CV
         else:
-            self._CV = calc_cv(G=self.G, H=self.H, config=config)
+            self._CV = np.array([calc_cv(G=self.G, H=self.H, config=config)])
             return self._CV
 
     @CV.setter
@@ -275,14 +275,31 @@ class Individual:
         return obj
 
 
-def calc_cv(G=np.array([]), H=np.array([]), config=None):
+def calc_cv(G=None, H=None, config=None):
+    if G is None:
+        G = np.array([])
+
+    if H is None:
+        H = np.array([])
+
     if config is None:
         config = Individual.default_config()
 
-    ieq_cv = constr_to_cv(G, **config["cv_ieq"])
-    eq_cv = constr_to_cv(H, **config["cv_eq"])
+    if G is None:
+        ieq_cv = [0.0]
+    elif G.ndim == 1:
+        ieq_cv = constr_to_cv(G, **config["cv_ieq"])
+    else:
+        ieq_cv = [constr_to_cv(g, **config["cv_ieq"]) for g in G]
 
-    return np.array([ieq_cv + eq_cv])
+    if H is None:
+        eq_cv = [0.0]
+    elif H.ndim == 1:
+        eq_cv = constr_to_cv(H, **config["cv_eq"])
+    else:
+        eq_cv = [constr_to_cv(h, **config["cv_eq"]) for h in H]
+
+    return np.array(ieq_cv) + np.array(eq_cv)
 
 
 def constr_to_cv(c, eps=0.0, scale=None, pow=None, func=np.mean):

@@ -1,11 +1,12 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
+import numpy as np
 
 from pymoo.core.problem import Problem
 
 
 class SRN(Problem):
     def __init__(self):
-        super().__init__(n_var=2, n_obj=2, n_ieq_constr=2, xl=-20, xu=+20, type_var=anp.double)
+        super().__init__(n_var=2, n_obj=2, n_ieq_constr=2, xl=-20, xu=+20, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f1 = 2 + (x[:, 0] - 2) ** 2 + (x[:, 1] - 1) ** 2
@@ -22,6 +23,6 @@ class SRN(Problem):
         return self.evaluate(ps, return_values_of=["F"])
 
     def _calc_pareto_set(self, *args, n_points=100, **kwargs):
-        x1 = anp.full(n_points, -2.5)
-        x2 = anp.linspace(2.5, 14.7902, n_points)
-        return anp.column_stack([x1, x2])
+        x1 = np.full(n_points, -2.5)
+        x2 = np.linspace(2.5, 14.7902, n_points)
+        return np.column_stack([x1, x2])

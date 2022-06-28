@@ -1,4 +1,5 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
+import numpy as np
 
 from pymoo.core.problem import Problem
 
@@ -6,17 +7,17 @@ from pymoo.core.problem import Problem
 class Clutch(Problem):
 
     def __init__(self):
-        super().__init__(n_var=5, n_obj=2, n_ieq_constr=19, type_var=int)
+        super().__init__(n_var=5, n_obj=2, n_ieq_constr=19, vtype=int)
         # ri, ro, t, F, Xp
-        # self.xl = anp.array([60, 90, 1, 600, 2])
-        self.xl = anp.array([0, 0, 0, 0, 0])
-        self.xu = anp.array([20, 20, 4, 400, 7])
+        # self.xl = np.array([60, 90, 1, 600, 2])
+        self.xl = np.array([0, 0, 0, 0, 0])
+        self.xu = np.array([20, 20, 4, 400, 7])
 
-        self.x1 = anp.arange(60, 81)
-        self.x2 = anp.arange(90, 111)
-        self.x3 = anp.arange(1, 3.5, 0.5)
-        self.x4 = anp.arange(600, 1001)
-        self.x5 = anp.arange(2, 11)
+        self.x1 = np.arange(60, 81)
+        self.x2 = np.arange(90, 111)
+        self.x3 = np.arange(1, 3.5, 0.5)
+        self.x4 = np.arange(600, 1001)
+        self.x5 = np.arange(2, 11)
 
     def _evaluate(self, x, out, *args, **kwargs):
 
@@ -93,8 +94,8 @@ class Clutch(Problem):
 
 
 if __name__ == "__main__":
-    x = anp.array([[10, 0, 1, 400, 1]])
-    # x = anp.array([[10, 0, 0, 260, 1]])
+    x = np.array([[10, 0, 1, 400, 1]])
+    # x = np.array([[10, 0, 0, 260, 1]])
 
     problem = Clutch()
 

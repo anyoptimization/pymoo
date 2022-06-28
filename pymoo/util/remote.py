@@ -18,7 +18,7 @@ class Remote:
     def get_instance():
         if Remote.__instance is None:
             server = Config.data()
-            folder = join(dirname(dirname(abspath(__file__))), 'cache')
+            folder = join(dirname(dirname(abspath(__file__))), 'data')
             Remote.__instance = Remote(server, folder)
         return Remote.__instance
 
@@ -51,3 +51,5 @@ class Remote:
         elif to == "json":
             with open(f) as file:
                 return json.load(file)
+
+        return f

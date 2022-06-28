@@ -1,16 +1,14 @@
-import os
-
 import numpy as np
 import pytest
 
 from pymoo.problems import get_problem
-from pymoo.util.misc import at_least_2d_array
+from pymoo.gradient.automatic import AutomaticDifferentiation
+from pymoo.util.misc import at_least_2d_array, at_least_2d
 from tests.problems.test_correctness import load
-from tests.util import path_to_test_resource
 
 problems = [
-    ('G01', []), ('G02', []), ('G03', []), ('G04', []), ('G05', []), ('G06', []), ('G07', []), ('G08', []),
-    ('G09', []), ('G10', []), ('G11', []), ('G12', []), ('G13', []), ('G14', []), ('G15', []), ('G16', []),
+    ('G1', []), ('G2', []), ('G3', []), ('G4', []), ('G5', []), ('G6', []), ('G7', []), ('G8', []),
+    ('G9', []), ('G10', []), ('G11', []), ('G12', []), ('G13', []), ('G14', []), ('G15', []), ('G16', []),
     ('G17', []), ('G18', []), ('G19', []), ('G20', []), ('G21', []), ('G22', []), ('G23', []), ('G24', [])
 ]
 
@@ -19,35 +17,30 @@ problems = [
 def test_problems(name, params):
     problem = get_problem(name, *params)
 
-    path = path_to_test_resource("problems", "G")
-    xl = np.loadtxt(os.path.join(path, "%s.xl" % name))
+    xl, xu, ps, pf, X, F, G, H = load("problems", "G", name, attrs=["xl", "xu", "ps", "pf", "x", "f", "g", "h"])
+    F, G, H = at_least_2d(F, G, H, extend_as="col")
+    ps, pf = at_least_2d(ps, pf, extend_as="row")
+
     np.testing.assert_allclose(problem.xl, xl)
-
-    xu = np.loadtxt(os.path.join(path, "%s.xu" % name))
     np.testing.assert_allclose(problem.xu, xu)
-
-    ps = problem.pareto_set()
-    _ps = at_least_2d_array(np.loadtxt(os.path.join(path, "%s.ps" % name)), extend_as='r')
-    np.testing.assert_allclose(_ps, ps)
-
-    pf = problem.pareto_front()[0, 0]
-    _pf = np.loadtxt(os.path.join(path, "%s.pf" % name)).flatten()[0]
-    np.testing.assert_allclose(_pf, pf)
-
-    X, F, _ = load(name, "G")
-
+    np.testing.assert_allclose(problem.pareto_set(), ps)
+    np.testing.assert_allclose(problem.pareto_front(), pf)
     assert problem.n_var == X.shape[1]
 
     _F, _G, _H = problem.evaluate(X, return_values_of=["F", "G", "H"])
 
-    np.testing.assert_allclose(F, _F[:, 0])
+    np.testing.assert_allclose(_F, F)
 
-    if _G is not None:
-        G = at_least_2d_array(np.loadtxt(os.path.join(path, "%s.g" % name)), extend_as='c')
-        assert problem.n_ieq_constr == G.shape[1]
+    if problem.n_ieq_constr > 0:
         np.testing.assert_allclose(G, _G)
 
-    if _H is not None:
-        H = at_least_2d_array(np.loadtxt(os.path.join(path, "%s.h" % name)), extend_as='c')
-        assert problem.n_eq_constr == H.shape[1]
+    if problem.n_eq_constr > 0:
         np.testing.assert_allclose(H, _H)
+
+
+@pytest.mark.parametrize('name,params', problems)
+def test_autodiff(name, params):
+    problem = AutomaticDifferentiation(get_problem(name, *params))
+    X = np.random.random((100, problem.n_var))
+    problem.evaluate(X)
+    assert True

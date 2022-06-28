@@ -1,11 +1,9 @@
 from pymoo.algorithms.soo.nonconvex.de import DE
 from pymoo.constraints.as_penalty import ConstraintsAsPenalty
 from pymoo.optimize import minimize
-from pymoo.problems.single import G1
-from pymoo.visualization.scatter import Scatter
+from pymoo.problems.single import G1, G4
 
-
-problem = G1()
+problem = G4()
 
 problem = ConstraintsAsPenalty(problem, penalty=100.0)
 
@@ -17,8 +15,4 @@ res = minimize(problem,
                seed=1,
                verbose=True)
 
-plot = Scatter()
-plot.add(problem.pareto_front(), plot_type="line", color="black", alpha=0.7)
-plot.add(res.F, facecolor="none", edgecolor="red")
-plot.show()
-
+print("Best solution found: \nX = %s\nF = %s\nCV = %s" % (res.X, res.F, res.CV))

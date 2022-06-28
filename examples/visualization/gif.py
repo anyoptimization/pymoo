@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 from pyrecorder.recorder import Recorder
 from pyrecorder.writers.gif import GIF
-from pyrecorder.writers.video import Video
 
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.optimize import minimize
@@ -9,7 +8,6 @@ from pymoo.problems.multi import ZDT1
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.visualization.pcp import PCP
 from pymoo.visualization.scatter import Scatter
-
 
 problem = ZDT1(n_var=6)
 

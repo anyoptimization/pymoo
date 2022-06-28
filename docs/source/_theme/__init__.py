@@ -2,6 +2,8 @@
 import os
 from pathlib import Path
 
+from docutils.parsers.rst.languages.en import directives
+
 try:
     import importlib.resources as resources
 except ImportError:
@@ -9,7 +11,7 @@ except ImportError:
     import importlib_resources as resources
 
 from bs4 import BeautifulSoup as bs
-from docutils.parsers.rst import directives
+
 from docutils import nodes
 from sphinx.application import Sphinx
 from sphinx.locale import get_translation

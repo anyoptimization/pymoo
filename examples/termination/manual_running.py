@@ -33,8 +33,8 @@ algorithm = NSGA2(pop_size=40)
 
 minimize(problem,
          algorithm,
-         ('n_gen', 200),
-         callback=RunningMetricAnimation(10, key_press=True),
+         ('n_gen', 100),
+         callback=RunningMetricAnimation(10, key_press=False, do_show=True),
          seed=1,
          verbose=True)
 

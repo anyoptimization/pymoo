@@ -1,11 +1,11 @@
 from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.problems import get_problem
 from pymoo.optimize import minimize
+from pymoo.problems.multi import ZDT1
 from pymoo.visualization.scatter import Scatter
 
-problem = get_problem("bnh")
+problem = ZDT1()
 
-algorithm = NSGA2(pop_size=100)
+algorithm = NSGA2()
 
 res = minimize(problem,
                algorithm,

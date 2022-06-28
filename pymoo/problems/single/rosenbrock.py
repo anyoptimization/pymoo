@@ -1,11 +1,12 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
+import numpy as np
 
 from pymoo.core.problem import Problem
 
 
 class Rosenbrock(Problem):
     def __init__(self, n_var=2):
-        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=0, xl=-2.048, xu=2.048, type_var=anp.double)
+        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=0, xl=-2.048, xu=2.048, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         l = []
@@ -18,4 +19,4 @@ class Rosenbrock(Problem):
         return 0.0
 
     def _calc_pareto_set(self):
-        return anp.full(self.n_var, 1.0)
+        return np.full(self.n_var, 1.0)

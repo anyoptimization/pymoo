@@ -1,7 +1,8 @@
 from abc import abstractmethod
 
-import autograd.numpy as np
+import numpy as np
 
+import pymoo.gradient.toolbox as anp
 from pymoo.util.cache import Cache
 from pymoo.util.misc import at_least_2d_array
 
@@ -21,10 +22,10 @@ class Problem:
                  xu=None,
                  vtype=None,
                  vars=None,
-                 check_inconsistencies=True,
-                 replace_nan_values_by=np.inf,
+                 replace_nan_values_by=None,
                  exclude_from_serialization=None,
                  callback=None,
+                 strict=True,
                  **kwargs):
 
         """
@@ -54,10 +55,6 @@ class Problem:
 
         """
 
-        if "elementwise_evaluation" in kwargs and kwargs.get("elementwise_evaluation"):
-            raise Exception("The interface in pymoo 0.5.0 has changed. Please inherit from the ElementwiseProblem "
-                            "class AND remove the 'elementwise_evaluation=True' argument to disable this exception.")
-
         # if variables are provided directly
         if vars is not None:
             n_var = len(vars)
@@ -86,6 +83,12 @@ class Problem:
         # if the variables are provided in their explicit form
         self.vars = vars
 
+        # the variable type (only as a type hint at this point)
+        self.vtype = vtype
+
+        # whether the shapes are checked strictly
+        self.strict = strict
+
         # if it is a problem with an actual number of variables - make sure xl and xu are numpy arrays
         if n_var > 0:
 
@@ -99,24 +102,25 @@ class Problem:
                     self.xu = np.ones(n_var) * xu
                 self.xu = self.xu.astype(float)
 
-        # whether the problem should strictly be checked for inconsistency during evaluation
-        self.check_inconsistencies = check_inconsistencies
-
         # this defines if NaN values should be replaced or not
         self.replace_nan_values_by = replace_nan_values_by
 
         # attribute which are excluded from being serialized )
         self.exclude_from_serialization = exclude_from_serialization if exclude_from_serialization is not None else []
 
-        # the variable type
-        self.vartype = vtype
-
     def evaluate(self,
                  X,
                  *args,
-                 return_values_of=("F", "G", "H"),
+                 return_values_of=None,
                  return_as_dictionary=False,
                  **kwargs):
+
+        if return_values_of is None:
+            return_values_of = ["F"]
+            if self.n_ieq_constr > 0:
+                return_values_of.append("G")
+            if self.n_eq_constr > 0:
+                return_values_of.append("H")
 
         # make sure the array is at least 2d. store if reshaping was necessary
         if isinstance(X, np.ndarray) and X.dtype != object:
@@ -125,23 +129,24 @@ class Problem:
         else:
             only_single_value = not (isinstance(X, list) or isinstance(X, np.ndarray))
 
-        # do the actual evaluation for the given problem - calls in _evaluate method internally
-        out = self.do(X, return_values_of, *args, **kwargs)
+        # this is where the actual evaluation takes place
+        _out = self.do(X, return_values_of, *args, **kwargs)
 
-        # if enabled (recommended) the output shapes are checked for inconsistencies
-        if self.check_inconsistencies:
-            pass
+        out = {}
+        for k, v in _out.items():
 
-        # if the NaN values should be replaced
-        if self.replace_nan_values_by is not None:
-            replace_nan_values(out, self.replace_nan_values_by)
+            # copy it to a numpy array (it might be one of jax at this point)
+            v = np.array(v)
 
-        # make sure F and G are in fact floats (at least try to do that, no exception will be through if it fails)
-        out_to_float(out, ["F", "G", "H"])
+            # in case the input had only one dimension, then remove always the first dimension from each output
+            if only_single_value:
+                v = v[0]
 
-        # in case the input had only one dimension, then remove always the first dimension from each output
-        if only_single_value:
-            out_to_1d_ndarray(out)
+            # if the NaN values should be replaced
+            if self.replace_nan_values_by is not None:
+                v[np.isnan(v)] = self.replace_nan_values_by
+
+            out[k] = v.astype(np.float64)
 
         if self.callback is not None:
             self.callback(X, out)
@@ -149,24 +154,61 @@ class Problem:
         # now depending on what should be returned prepare the output
         if return_as_dictionary:
             return out
+
+        if len(return_values_of) == 1:
+            return out[return_values_of[0]]
         else:
-            if len(return_values_of) == 1:
-                return out[return_values_of[0]]
-            else:
-                return tuple([out[e] for e in return_values_of])
+            return tuple([out[e] for e in return_values_of])
 
     def do(self, X, return_values_of, *args, **kwargs):
 
-        # prepare the dictionary to be filled after the evaluation
-        out = dict_with_defaults(self, X, return_values_of)
+        # create an empty dictionary
+        out = {name: None for name in return_values_of}
 
-        # do the actual evaluation in the problem definition
+        # do the function evaluation
         self._evaluate(X, out, *args, **kwargs)
 
-        # make sure all outputs are a 2d array
-        out_to_2d_ndarray(out)
+        # finally format the output dictionary
+        out = self._format_dict(out, len(X), return_values_of)
 
         return out
+
+    def _format_dict(self, out, N, return_values_of):
+
+        # get the default output shape for the default values
+        shape = default_shape(self, N)
+
+        # finally the array to be returned
+        ret = {}
+
+        # for all values that have been set in the user implemented function
+        for name, v in out.items():
+
+            # only if they have truly been set
+            if v is not None:
+
+                # if there is a shape to be expected
+                if name in shape:
+
+                    if isinstance(v, list):
+                        v = anp.column_stack(v)
+
+                    try:
+                        v = v.reshape(shape[name])
+                    except Exception as e:
+                        raise Exception(
+                            f"Problem Error: {name} can not be set, expected shape {shape[name]} but provided {v.shape}",
+                            e)
+
+                ret[name] = v
+
+        # if some values that are necessary have not been set
+        for name in return_values_of:
+            if name not in ret:
+                s = shape.get(name, N)
+                ret[name] = np.full(s, np.inf)
+
+        return ret
 
     @Cache
     def nadir_point(self, *args, **kwargs):
@@ -298,28 +340,28 @@ class ElementwiseProblem(Problem):
         self.exclude_from_serialization = self.exclude_from_serialization + ["runner"]
 
     def do(self, X, return_values_of, *args, **kwargs):
-        out = dict_with_defaults(self, X, return_values_of)
+
+        out = dict()
 
         # do an elementwise evaluation and return the results
-        ret = self.func_eval(self.func_elementwise_eval, self, X, *args, **kwargs)
-
-        # all the elements to be set to the output
-        keys = list(ret[0].keys())
-
-        for key in keys:
-            if key not in out:
-                out[key] = [None] * len(X)
+        d = self.func_eval(self.func_elementwise_eval, self, X, *args, **kwargs)
 
         # for each evaluation call
-        for i, elem in enumerate(ret):
-            for k, v in elem.items():
-                try:
-                    out[k][i] = v
-                except Exception as e:
-                    raise Exception(f"Problem Error: {k} can not be set", e)
+        for i, elem in enumerate(d):
 
-        # make sure the array is 2d before doing the shape check
-        out_to_2d_ndarray(out)
+            # for each key stored for this evaluation
+            for k, v in elem.items():
+
+                # if the element does not exist in out yet -> create it
+                if k not in out:
+                    out[k] = []
+
+                out[k].append(v)
+
+        out = {k: anp.array(v) for k, v in out.items()}
+
+        # finally format the output dictionary
+        out = self._format_dict(out, len(X), return_values_of)
 
         return out
 
@@ -332,77 +374,15 @@ class ElementwiseProblem(Problem):
 # Util
 # ---------------------------------------------------------------------------------------------------------
 
-def default_return_values(has_constr=False):
-    vals = ["F"]
-    if has_constr:
-        vals.append("CV")
-    return vals
 
-
-def dict_with_none(keys):
-    out = {}
-    for val in keys:
-        out[val] = None
-    return out
-
-
-def defaults_of_out(problem, k):
+def default_shape(problem, n):
+    n_var = problem.n_var
     DEFAULTS = dict(
-        F=lambda: np.full((k, problem.n_obj), np.nan, dtype=float),
-        G=lambda: np.full((k, problem.n_ieq_constr), np.nan, dtype=float),
-        H=lambda: np.full((k, problem.n_eq_constr), np.nan, dtype=float),
+        F=(n, problem.n_obj),
+        G=(n, problem.n_ieq_constr),
+        H=(n, problem.n_eq_constr),
+        dF=(n, problem.n_obj, n_var),
+        dG=(n, problem.n_ieq_constr, n_var),
+        dH=(n, problem.n_eq_constr, n_var),
     )
     return DEFAULTS
-
-
-def dict_with_defaults(problem, X, keys):
-    DEFAULTS = defaults_of_out(problem, len(X))
-
-    out = {}
-    for key in keys:
-        if key in DEFAULTS:
-            out[key] = DEFAULTS[key]()
-        else:
-            out[key] = None
-    return out
-
-
-def out_to_ndarray(out):
-    for key, val in out.items():
-        if val is not None:
-            if not isinstance(val, np.ndarray):
-                out[key] = np.array([val])
-
-
-def out_to_2d_ndarray(out):
-    for key, val in out.items():
-        if val is not None:
-            if isinstance(val, np.ndarray):
-                if val.ndim == 1:
-                    out[key] = val[:, None]
-
-
-def out_to_1d_ndarray(out):
-    for key in out.keys():
-        if out[key] is not None:
-            out[key] = out[key][0, :]
-
-
-def out_to_float(out, keys):
-    for key in keys:
-        if key in out:
-            try:
-                out[key] = out[key].astype(float)
-            except:
-                pass
-
-
-def replace_nan_values(out, by=np.inf):
-    for key in out:
-        try:
-            v = out[key]
-            v[np.isnan(v)] = by
-            out[key] = v
-        except:
-            pass
-

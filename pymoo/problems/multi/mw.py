@@ -16,7 +16,7 @@ class MW(Problem):
         super().__init__(n_var=n_var,
                          n_obj=n_obj,
                          n_ieq_constr=n_ieq_constr,
-                         type_var=np.double, **kwargs)
+                         vtype=float, **kwargs)
 
     @staticmethod
     def LA1(A, B, C, D, theta):
@@ -181,7 +181,7 @@ class MW5(MW):
         out["G"] = np.column_stack([g0, g1, g2])
 
     def _calc_pareto_front(self, **kwargs):
-        return Remote.get_instance().load("pf", "MW", "MW5.pf")
+        return Remote.get_instance().load("pymoo", "pf", "MW", "MW5.pf")
 
 
 class MW6(MW):
@@ -232,7 +232,7 @@ class MW7(MW):
         out["G"] = np.column_stack([g0, g1])
 
     def _calc_pareto_front(self, **kwargs):
-        return Remote.get_instance().load("pf", "MW", "MW7.pf")
+        return Remote.get_instance().load("pymoo", "pf", "MW", "MW7.pf")
 
 
 class MW8(MW):
@@ -280,7 +280,7 @@ class MW9(MW):
         out["G"] = g0.reshape((-1, 1))
 
     def _calc_pareto_front(self, **kwargs):
-        return Remote.get_instance().load("pf", "MW", "MW9.pf")
+        return Remote.get_instance().load("pymoo", "pf", "MW", "MW9.pf")
 
 
 class MW10(MW):
@@ -299,7 +299,7 @@ class MW10(MW):
         out["G"] = np.column_stack([g0, g1, g2])
 
     def _calc_pareto_front(self, **kwargs):
-        return Remote.get_instance().load("pf", "MW", "MW10.pf")
+        return Remote.get_instance().load("pymoo", "pf", "MW", "MW10.pf")
 
 
 class MW11(MW):
@@ -319,7 +319,7 @@ class MW11(MW):
         out["G"] = np.column_stack([g0, g1, g2, g3])
 
     def _calc_pareto_front(self, **kwargs):
-        return Remote.get_instance().load("pf", "MW", "MW11.pf")
+        return Remote.get_instance().load("pymoo", "pf", "MW", "MW11.pf")
 
 
 class MW12(MW):
@@ -373,7 +373,7 @@ class MW13(MW):
         out["G"] = np.column_stack([g0, g1])
 
     def _calc_pareto_front(self, **kwargs):
-        return Remote.get_instance().load("pf", "MW", "MW13.pf")
+        return Remote.get_instance().load("pymoo", "pf", "MW", "MW13.pf")
 
 
 class MW14(MW):
@@ -397,4 +397,4 @@ class MW14(MW):
 
     def _calc_pareto_front(self, **kwargs):
         if self.n_obj == 3:
-            return Remote.get_instance().load("pf", "MW", "MW14.pf")
+            return Remote.get_instance().load("pymoo", "pf", "MW", "MW14.pf")

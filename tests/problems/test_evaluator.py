@@ -9,21 +9,7 @@ problem = get_problem("Rastrigin")
 
 X = np.random.random((100, problem.n_var))
 
-F = problem.evaluate(X, return_values_of=["F"])
-
-
-def test_evaluate_array():
-    evaluator = Evaluator(evaluate_values_of=["F", "CV"])
-    _F, _CV = evaluator.eval(problem, X)
-    np.testing.assert_allclose(F, _F)
-    assert evaluator.n_eval == len(X)
-
-
-def test_evaluate_array_single():
-    evaluator = Evaluator(evaluate_values_of=["F", "CV"])
-    _F, _CV = evaluator.eval(problem, X[0])
-    np.testing.assert_allclose(F[0], _F)
-    assert evaluator.n_eval == 1
+F = problem.evaluate(X)
 
 
 def test_evaluate_individual():
@@ -43,10 +29,12 @@ def test_evaluate_pop():
 
 def test_preevaluated():
     evaluator = Evaluator()
+
     pop = Population.new("X", X)
     evaluator.eval(problem, pop)
 
-    pop[range(30)].set("evaluated", None)
+    for ind in pop[:30]:
+        ind.set("evaluated", set())
 
     evaluator = Evaluator()
     evaluator.eval(problem, pop)

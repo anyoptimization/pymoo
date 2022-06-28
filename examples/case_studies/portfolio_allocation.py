@@ -3,6 +3,7 @@ import operator
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from pymoo.util.remote import Remote
 
 from pymoo.algorithms.moo.sms import SMSEMOA
 from pymoo.core.problem import ElementwiseProblem
@@ -10,7 +11,9 @@ from pymoo.core.repair import Repair
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.optimize import minimize
 
-df = pd.read_csv("portfolio_allocation.csv", parse_dates=True, index_col="date")
+file = Remote.get_instance().load("examples", "portfolio_allocation.csv", to=None)
+
+df = pd.read_csv(file, parse_dates=True, index_col="date")
 
 returns = df.pct_change().dropna(how="all")
 mu = (1 + returns).prod() ** (252 / returns.count()) - 1
@@ -67,9 +70,7 @@ class PortfolioRepair(Repair):
 
 problem = PortfolioProblem(mu, cov)
 
-algorithm = SMSEMOA(pop_size=100,
-                    sampling=PortfolioSampling(mu, cov),
-                    repair=PortfolioRepair())
+algorithm = SMSEMOA(sampling=PortfolioSampling(mu, cov), repair=PortfolioRepair())
 
 res = minimize(problem,
                algorithm,

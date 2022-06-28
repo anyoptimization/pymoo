@@ -1,4 +1,4 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
 import numpy as np
 
 from pymoo.core.problem import Problem
@@ -7,19 +7,19 @@ from pymoo.core.problem import Problem
 class WRM(Problem):
 
     def __init__(self):
-        xl = anp.array([0.01, 0.01, 0.01])
-        xu = anp.array([0.45, 0.10, 0.10])
-        super().__init__(n_var=3, n_obj=5, n_ieq_constr=7, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.array([0.01, 0.01, 0.01])
+        xu = np.array([0.45, 0.10, 0.10])
+        super().__init__(n_var=3, n_obj=5, n_ieq_constr=7, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
 
         # the definition is index 1 based -> simply add a dummy var in the beginning
-        x = np.column_stack([np.zeros((len(x), 1)), x])
+        x = anp.column_stack([anp.zeros((len(x), 1)), x])
 
         f1 = 106780.37 * (x[:, 2] + x[:, 3]) + 61704.67
         f2 = 3000 * x[:, 1]
         f3 = 305700 * 2289 * x[:, 2] / (0.06 * 2289) ** 0.65
-        f4 = 250 * 2289 * np.exp(-39.75 * x[:, 2] + 9.9 * x[:, 3] + 2.74)
+        f4 = 250 * 2289 * anp.exp(-39.75 * x[:, 2] + 9.9 * x[:, 3] + 2.74)
         f5 = 25 * (1.39 / (x[:, 1] * x[:, 2]) + 4940 * x[:, 3] - 80)
 
         deno = 1. / (x[:, 1] * x[:, 2])

@@ -1,4 +1,5 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
+import numpy as np
 
 from pymoo.core.problem import Problem
 from pymoo.util.remote import Remote
@@ -6,9 +7,9 @@ from pymoo.util.remote import Remote
 
 class OSY(Problem):
     def __init__(self):
-        super().__init__(n_var=6, n_obj=2, n_ieq_constr=6, type_var=anp.double)
-        self.xl = anp.array([0.0, 0.0, 1.0, 0.0, 1.0, 0.0])
-        self.xu = anp.array([10.0, 10.0, 5.0, 6.0, 5.0, 10.0])
+        super().__init__(n_var=6, n_obj=2, n_ieq_constr=6, vtype=float)
+        self.xl = np.array([0.0, 0.0, 1.0, 0.0, 1.0, 0.0])
+        self.xu = np.array([10.0, 10.0, 5.0, 6.0, 5.0, 10.0])
 
     def _evaluate(self, x, out, *args, **kwargs):
         f1 = - (25 * (x[:, 0] - 2) ** 2 + (x[:, 1] - 2) ** 2 + (x[:, 2] - 1) ** 2 + (x[:, 3] - 4) ** 2 + (
@@ -28,4 +29,4 @@ class OSY(Problem):
         out["G"] = - out["G"]
 
     def _calc_pareto_front(self):
-        return Remote.get_instance().load("pf", "osy.pf")
+        return Remote.get_instance().load("pymoo", "pf", "osy.pf")

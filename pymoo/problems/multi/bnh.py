@@ -1,4 +1,5 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
+import numpy as np
 
 from pymoo.core.problem import Problem
 
@@ -6,9 +7,9 @@ from pymoo.core.problem import Problem
 class BNH(Problem):
 
     def __init__(self):
-        super().__init__(n_var=2, n_obj=2, n_ieq_constr=2, type_var=anp.double)
-        self.xl = anp.zeros(self.n_var)
-        self.xu = anp.array([5.0, 3.0])
+        super().__init__(n_var=2, n_obj=2, n_ieq_constr=2, vtype=float)
+        self.xl = np.zeros(self.n_var)
+        self.xu = np.array([5.0, 3.0])
 
     def _evaluate(self, x, out, *args, **kwargs):
         f1 = 4 * x[:, 0] ** 2 + 4 * x[:, 1] ** 2
@@ -20,11 +21,11 @@ class BNH(Problem):
         out["G"] = anp.column_stack([g1, g2])
 
     def _calc_pareto_front(self, n_points=100):
-        x1 = anp.linspace(0, 5, n_points)
-        x2 = anp.linspace(0, 5, n_points)
+        x1 = np.linspace(0, 5, n_points)
+        x2 = np.linspace(0, 5, n_points)
         x2[x1 >= 3] = 3
 
-        X = anp.column_stack([x1, x2])
+        X = np.column_stack([x1, x2])
         return self.evaluate(X, return_values_of=["F"])
 
 

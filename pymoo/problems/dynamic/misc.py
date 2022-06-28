@@ -1,4 +1,4 @@
-import autograd.numpy as anp
+import numpy as np
 import numpy as np
 
 from pymoo.problems.dyn import DynamicTestProblem
@@ -30,7 +30,7 @@ class FDA2_deb(DynamicTestProblem):
         x = np.linspace(0.01, 1, n_pareto_points)
         # TODO Solve the inf result when x[0] = 0 and H(t)<0
         print(H, x[0], (1 - np.power(x, (1 / H)))[0], self.t)
-        pf = anp.column_stack([x, 1 - np.power(x, (H))])
+        pf = np.column_stack([x, 1 - np.power(x, (H))])
         return pf
 
 
@@ -52,7 +52,7 @@ class DMOP2(DynamicTestProblem):
     def _calc_pareto_front(self, n_pareto_points=100):
         H = 0.75 * np.sin(0.5 * np.pi * self.t) + 1.25
         x = np.linspace(0, 1, n_pareto_points)
-        pf = anp.column_stack([x, 1 - pow(x, H)])
+        pf = np.column_stack([x, 1 - pow(x, H)])
         return pf
 
 
@@ -99,7 +99,7 @@ class HE2b(DynamicTestProblem):
         H = 0.75 * np.sin(0.5 * np.pi * self.t) + 1.25  # time may be incorrect
         x = np.linspace(0, 1, n_pareto_points)
         f2 = (1 - np.power(np.sqrt(x), H)) - (np.power(x, H) * np.sin(0.5 * np.pi * x))
-        pf = anp.column_stack([x, f2])
+        pf = np.column_stack([x, f2])
         return pf
 
     def get_pf_t(self):
@@ -134,7 +134,7 @@ class HE7b(DynamicTestProblem):
         H = 0.75 * np.sin(0.5 * np.pi * self.t) + 1.25  # current time may be incorrect
         x = np.linspace(0, 1, n_pareto_points)
         f2 = (2 - np.sqrt(x)) * (1 - np.power(x / (2 - np.sqrt(x)), H))
-        pf = anp.column_stack([x, f2])
+        pf = np.column_stack([x, f2])
         return pf
 
     def get_pf_t(self):
@@ -164,7 +164,7 @@ class HE9b(DynamicTestProblem):
         H = 0.75 * np.sin(0.5 * np.pi * self.t) + 1.25  # current time may be incorrect
         x = np.linspace(0, 1, n_pareto_points)
         f2 = (2 - np.sqrt(x)) * (1 - np.power(x / (2 - np.sqrt(x)), H))
-        pf = anp.column_stack([x, f2])
+        pf = np.column_stack([x, f2])
         return pf
 
     def get_pf_t(self):

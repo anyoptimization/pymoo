@@ -1,6 +1,7 @@
+from pyrecorder.recorder import Recorder
+from pyrecorder.writers.streamer import Streamer
+
 from pymoo.algorithms.soo.nonconvex.ga import GA
-from pyrecorder.recorders.streamer import Streamer
-from pyrecorder.video import Video
 
 
 from pymoo.problems import get_problem
@@ -13,9 +14,9 @@ class MyCallback(Callback):
 
     def __init__(self) -> None:
         super().__init__()
-        self.video = Video(Streamer())
+        self.rec = Recorder(Streamer())
 
-    def notify(self, algorithm):
+    def update(self, algorithm):
         problem = algorithm.problem
 
         pcp = PCP(title=("Gen %s" % algorithm.n_gen, {'pad': 30}),
@@ -31,7 +32,7 @@ class MyCallback(Callback):
         pcp.add(algorithm.opt.get("X"), color="red", linewidth=4)
         pcp.do()
 
-        self.video.record()
+        self.rec.record()
 
 
 problem = get_problem("rastrigin", n_var=10)

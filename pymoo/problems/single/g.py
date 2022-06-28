@@ -1,8 +1,8 @@
 import math
 
-import autograd.numpy as anp
 import numpy as np
 
+import pymoo.gradient.toolbox as anp
 from pymoo.core.problem import Problem
 from pymoo.util.misc import at_least_2d_array
 
@@ -17,14 +17,15 @@ class G(Problem):
 class G1(G):
     def __init__(self):
         n_var = 13
-        xl = anp.zeros(n_var, dtype=float)
-        xu = anp.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 100, 100, 100, 1], dtype=float)
-        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=9, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.zeros(n_var, dtype=float)
+        xu = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 100, 100, 100, 1], dtype=float)
+        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=9, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         x1 = x[:, 0: 4]
         x2 = x[:, 4: 13]
-        f = 5 * anp.sum(x1, axis=1) - 5 * anp.sum(x1 ** 2, axis=1) - anp.sum(x2, axis=1)
+
+        f = 5 * x1.sum(axis=1) - 5 * (x1**2).sum(axis=1) - x2.sum(axis=1)
 
         # Constraints
         g1 = 2 * x[:, 0] + 2 * x[:, 1] + x[:, 9] + x[:, 10] - 10
@@ -38,7 +39,7 @@ class G1(G):
         g9 = -2 * x[:, 7] - x[:, 8] + x[:, 11]
 
         out["F"] = f
-        out["G"] = anp.column_stack([g1, g2, g3, g4, g5, g6, g7, g8, g9])
+        out["G"] = [g1, g2, g3, g4, g5, g6, g7, g8, g9]
 
     def _calc_pareto_front(self):
         return -15.0
@@ -49,9 +50,9 @@ class G1(G):
 
 class G2(G):
     def __init__(self, n_var=20):
-        xl = anp.full(n_var, 1e-16)
-        xu = 10 * anp.ones(n_var)
-        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=2, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.full(n_var, 1e-16)
+        xu = 10 * np.ones(n_var)
+        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=2, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         l = []
@@ -91,9 +92,9 @@ class G2(G):
 class G3(G):
 
     def __init__(self, n_var=10):
-        xl = anp.zeros(n_var)
-        xu = anp.ones(n_var)
-        super().__init__(n_var=n_var, n_obj=1, n_eq_constr=1, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.zeros(n_var)
+        xu = np.ones(n_var)
+        super().__init__(n_var=n_var, n_obj=1, n_eq_constr=1, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = - anp.sqrt(self.n_var) ** self.n_var * anp.prod(x, axis=1)
@@ -109,9 +110,9 @@ class G3(G):
 class G4(G):
 
     def __init__(self):
-        xl = anp.array([78, 33, 27, 27, 27], dtype=float)
-        xu = anp.array([102, 45, 45, 45, 45], dtype=float)
-        super().__init__(n_var=5, n_obj=1, n_ieq_constr=6, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.array([78, 33, 27, 27, 27], dtype=float)
+        xu = np.array([102, 45, 45, 45, 45], dtype=float)
+        super().__init__(n_var=5, n_obj=1, n_ieq_constr=6, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = 5.3578547 * x[:, 2] ** 2 + 0.8356891 * x[:, 0] * x[:, 4] + 37.293239 * x[:, 0] - 40792.141
@@ -137,9 +138,9 @@ class G4(G):
 class G5(G):
 
     def __init__(self):
-        xl = anp.array([0, 0, -0.55, -0.55], dtype=float)
-        xu = anp.array([1200, 1200, 0.55, 0.55], dtype=float)
-        super().__init__(n_var=4, n_obj=1, n_ieq_constr=2, n_eq_constr=3, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.array([0, 0, -0.55, -0.55], dtype=float)
+        xu = np.array([1200, 1200, 0.55, 0.55], dtype=float)
+        super().__init__(n_var=4, n_obj=1, n_ieq_constr=2, n_eq_constr=3, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = 3 * x[:, 0] + (10 ** -6) * x[:, 0] ** 3 + 2 * x[:, 1] + (2 * 10 ** (-6)) / 3 * x[:, 1] ** 3
@@ -167,9 +168,9 @@ class G5(G):
 class G6(G):
 
     def __init__(self):
-        xl = anp.array([13, 0], dtype=float)
-        xu = anp.array([100, 100], dtype=float)
-        super().__init__(n_var=2, n_obj=1, n_ieq_constr=2, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.array([13, 0], dtype=float)
+        xu = np.array([100, 100], dtype=float)
+        super().__init__(n_var=2, n_obj=1, n_ieq_constr=2, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = (x[:, 0] - 10) ** 3 + (x[:, 1] - 20) ** 3
@@ -182,16 +183,16 @@ class G6(G):
         out["G"] = anp.column_stack([g1, g2])
 
     def _calc_pareto_set(self):
-        return anp.array([14.095, 5 - np.sqrt(100 - (14.095 - 5) ** 2)])
+        return np.array([14.095, 5 - np.sqrt(100 - (14.095 - 5) ** 2)])
 
 
 class G7(G):
 
     def __init__(self):
         n_var = 10
-        xl = -10 * anp.ones(n_var)
-        xu = 10 * anp.ones(n_var)
-        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=8, xl=xl, xu=xu, type_var=anp.double)
+        xl = -10 * np.ones(n_var)
+        xu = 10 * np.ones(n_var)
+        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=8, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = x[:, 0] ** 2 + x[:, 1] ** 2 + x[:, 0] * x[:, 1] - 14 * x[:, 0] - 16 * x[:, 1] + (x[:, 2] - 10) ** 2 \
@@ -228,9 +229,9 @@ class G8(G):
 
     def __init__(self):
         n_var = 2
-        xl = anp.full(n_var, 0.00001)
-        xu = anp.full(n_var, 10.0)
-        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=2, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.full(n_var, 0.00001)
+        xu = np.full(n_var, 10.0)
+        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=2, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = -(anp.sin(2 * math.pi * x[:, 0]) ** 3 * anp.sin(2 * math.pi * x[:, 1])) / (
@@ -251,9 +252,9 @@ class G9(G):
 
     def __init__(self):
         n_var = 7
-        xl = anp.full(n_var, -10.0)
-        xu = anp.full(n_var, +10.0)
-        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=4, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.full(n_var, -10.0)
+        xu = np.full(n_var, +10.0)
+        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=4, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = (x[:, 0] - 10) ** 2 + 5 * (x[:, 1] - 12) ** 2 + x[:, 2] ** 4 \
@@ -287,9 +288,9 @@ class G9(G):
 class G10(G):
 
     def __init__(self):
-        xl = anp.array([100, 1000, 1000, 10, 10, 10, 10, 10], dtype=float)
-        xu = anp.array([10000, 10000, 10000, 1000, 1000, 1000, 1000, 1000], dtype=float)
-        super().__init__(n_var=8, n_obj=1, n_ieq_constr=6, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.array([100, 1000, 1000, 10, 10, 10, 10, 10], dtype=float)
+        xu = np.array([10000, 10000, 10000, 1000, 1000, 1000, 1000, 1000], dtype=float)
+        super().__init__(n_var=8, n_obj=1, n_ieq_constr=6, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = x[:, 0] + x[:, 1] + x[:, 2]
@@ -319,9 +320,9 @@ class G10(G):
 class G11(G):
 
     def __init__(self):
-        xl = anp.array([-1, -1], dtype=float)
-        xu = anp.array([1, 1], dtype=float)
-        super().__init__(n_var=2, n_obj=1, n_ieq_constr=1, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.array([-1, -1], dtype=float)
+        xu = np.array([1, 1], dtype=float)
+        super().__init__(n_var=2, n_obj=1, n_ieq_constr=1, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = x[:, 0] ** 2 + (x[:, 1] - 1) ** 2
@@ -337,18 +338,18 @@ class G11(G):
 class G12(G):
 
     def __init__(self):
-        xl = anp.full(3, 0.0)
-        xu = anp.full(3, 10.0)
-        super().__init__(n_var=3, n_obj=1, n_ieq_constr=1, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.full(3, 0.0)
+        xu = np.full(3, 10.0)
+        super().__init__(n_var=3, n_obj=1, n_ieq_constr=1, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = -1 + 0.01 * ((x[:, 0] - 5) ** 2 + (x[:, 1] - 5) ** 2 + (x[:, 2] - 5) ** 2)
 
-        g = np.full(len(x), np.inf)
+        g = anp.full(len(x), anp.inf)
         for i in range(1, 10):
             for j in range(1, 10):
                 for k in range(1, 10):
-                    g = np.minimum(g, (x[:, 0] - i) ** 2 + (x[:, 1] - j) ** 2 + (x[:, 2] - k) ** 2 - 0.0625)
+                    g = anp.minimum(g, (x[:, 0] - i) ** 2 + (x[:, 1] - j) ** 2 + (x[:, 2] - k) ** 2 - 0.0625)
 
         out["F"] = f
         out["G"] = g
@@ -360,12 +361,12 @@ class G12(G):
 class G13(G):
 
     def __init__(self):
-        xl = anp.array([-2.3, -2.3, -3.2, -3.2, -3.2])
-        xu = anp.array([+2.3, +2.3, +3.2, +3.2, +3.2])
-        super().__init__(n_var=5, n_obj=1, n_eq_constr=3, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.array([-2.3, -2.3, -3.2, -3.2, -3.2])
+        xu = np.array([+2.3, +2.3, +3.2, +3.2, +3.2])
+        super().__init__(n_var=5, n_obj=1, n_eq_constr=3, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
-        f = np.exp(x[:, 0] * x[:, 1] * x[:, 2] * x[:, 3] * x[:, 4])
+        f = anp.exp(x[:, 0] * x[:, 1] * x[:, 2] * x[:, 3] * x[:, 4])
 
         h1 = x[:, 0] ** 2 + x[:, 1] ** 2 + x[:, 2] ** 2 + x[:, 3] ** 2 + x[:, 4] ** 2 - 10
         h2 = x[:, 1] * x[:, 2] - 5 * x[:, 3] * x[:, 4]
@@ -389,14 +390,14 @@ class G13(G):
 class G14(G):
 
     def __init__(self):
-        xl = anp.full(10, 1e-06)
-        xu = anp.full(10, 10.0)
-        super().__init__(n_var=10, n_obj=1, n_eq_constr=3, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.full(10, 1e-06)
+        xu = np.full(10, 10.0)
+        super().__init__(n_var=10, n_obj=1, n_eq_constr=3, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
-        v = np.array([-6.089, -17.164, -34.054, -5.914, -24.721, -14.986, -24.1, -10.708, -26.662, -22.179])
-        y = np.log(x / np.sum(x, axis=1, keepdims=True))
-        f = np.sum(x * (v + y), axis=1)
+        v = anp.array([-6.089, -17.164, -34.054, -5.914, -24.721, -14.986, -24.1, -10.708, -26.662, -22.179])
+        y = anp.log(x / anp.sum(x, axis=1, keepdims=True))
+        f = anp.sum(x * (v + y), axis=1)
 
         h1 = x[:, 0] + 2 * x[:, 1] + 2 * x[:, 2] + x[:, 5] + x[:, 9] - 2
         h2 = x[:, 3] + 2 * x[:, 4] + x[:, 5] + x[:, 6] - 1
@@ -414,9 +415,9 @@ class G15(G):
 
     def __init__(self):
         n_var = 3
-        xl = anp.full(n_var, 0.0)
-        xu = anp.full(n_var, 10.0)
-        super().__init__(n_var=n_var, n_obj=1, n_eq_constr=2, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.full(n_var, 0.0)
+        xu = np.full(n_var, 10.0)
+        super().__init__(n_var=n_var, n_obj=1, n_eq_constr=2, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = 1000 - (x[:, 0] ** 2) - 2 * x[:, 1] ** 2 - x[:, 2] ** 2 - x[:, 0] * x[:, 1] - x[:, 0] * x[:, 2]
@@ -434,9 +435,9 @@ class G15(G):
 class G16(G):
 
     def __init__(self):
-        xl = anp.array([704.4148, 68.6, 0, 193, 25], dtype=float)
-        xu = anp.array([906.3855, 288.88, 134.75, 287.0966, 84.1988], dtype=float)
-        super().__init__(n_var=5, n_obj=1, n_ieq_constr=38, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.array([704.4148, 68.6, 0, 193, 25], dtype=float)
+        xu = np.array([906.3855, 288.88, 134.75, 287.0966, 84.1988], dtype=float)
+        super().__init__(n_var=5, n_obj=1, n_ieq_constr=38, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         y1 = x[:, 1] + x[:, 2] + 41.6
@@ -528,34 +529,34 @@ class G16(G):
 class G17(G):
 
     def __init__(self):
-        xl = anp.array([0, 0, 340, 340, -1000, 0], dtype=float)
-        xu = anp.array([400, 1000, 420, 420, 1000, 0.5236], dtype=float)
-        super().__init__(n_var=6, n_obj=1, n_eq_constr=4, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.array([0, 0, 340, 340, -1000, 0], dtype=float)
+        xu = np.array([400, 1000, 420, 420, 1000, 0.5236], dtype=float)
+        super().__init__(n_var=6, n_obj=1, n_eq_constr=4, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
-        f = np.zeros(len(x))
+        f = anp.zeros(len(x))
 
         x1_less_than_300 = x[:, 0] < 300
-        f[x1_less_than_300] += 30 * x[x1_less_than_300, 0]
-        f[~x1_less_than_300] += 31 * x[~x1_less_than_300, 0]
+        f += x1_less_than_300 * 30 * x[:, 0]
+        f += (~x1_less_than_300) * 31 * x[:, 0]
 
         x2_less_than_100 = x[:, 1] < 100
         x2_greater_equal_200 = x[:, 1] >= 200
 
-        f[x2_less_than_100] += 28 * x[x2_less_than_100, 1]
-        f[x2_greater_equal_200] += 30 * x[x2_greater_equal_200, 1]
+        f += x2_less_than_100 * 28 * x[:, 1]
+        f += x2_greater_equal_200 * 30 * x[:, 1]
 
-        x2_between_100_and_200 = np.logical_and(~x2_less_than_100, ~x2_greater_equal_200)
-        f[x2_between_100_and_200] += 29 * x[x2_between_100_and_200, 1]
+        x2_between_100_and_200 = anp.logical_and(~x2_less_than_100, ~x2_greater_equal_200)
+        f += x2_between_100_and_200 * 29 * x[:, 1]
 
-        h1 = -x[:, 0] + 300 - ((x[:, 2] * x[:, 3]) / 131.078) * np.cos(1.48477 - x[:, 5]) + (
-                (0.90798 * x[:, 2] ** 2) / 131.078) * np.cos(1.47588)
-        h2 = -x[:, 1] - ((x[:, 2] * x[:, 3]) / 131.078) * np.cos(1.48477 + x[:, 5]) + (
-                (0.90798 * x[:, 3] ** 2) / 131.078) * np.cos(1.47588)
-        h3 = -x[:, 4] - ((x[:, 2] * x[:, 3]) / 131.078) * np.sin(1.48477 + x[:, 5]) + (
-                (0.90798 * x[:, 3] ** 2) / 131.078) * np.sin(1.47588)
-        h4 = 200 - ((x[:, 2] * x[:, 3]) / 131.078) * np.sin(1.48477 - x[:, 5]) + (
-                (0.90798 * x[:, 2] ** 2) / 131.078) * np.sin(1.47588)
+        h1 = -x[:, 0] + 300 - ((x[:, 2] * x[:, 3]) / 131.078) * anp.cos(1.48477 - x[:, 5]) + (
+                (0.90798 * x[:, 2] ** 2) / 131.078) * anp.cos(1.47588)
+        h2 = -x[:, 1] - ((x[:, 2] * x[:, 3]) / 131.078) * anp.cos(1.48477 + x[:, 5]) + (
+                (0.90798 * x[:, 3] ** 2) / 131.078) * anp.cos(1.47588)
+        h3 = -x[:, 4] - ((x[:, 2] * x[:, 3]) / 131.078) * anp.sin(1.48477 + x[:, 5]) + (
+                (0.90798 * x[:, 3] ** 2) / 131.078) * anp.sin(1.47588)
+        h4 = 200 - ((x[:, 2] * x[:, 3]) / 131.078) * anp.sin(1.48477 - x[:, 5]) + (
+                (0.90798 * x[:, 2] ** 2) / 131.078) * anp.sin(1.47588)
 
         out["F"] = f
         out["H"] = anp.column_stack([h1, h2, h3, h4])
@@ -568,9 +569,9 @@ class G17(G):
 class G18(G):
 
     def __init__(self):
-        xl = anp.array([-10, -10, -10, -10, -10, -10, -10, -10, 0], dtype=float)
-        xu = anp.array([+10, +10, +10, +10, +10, +10, +10, +10, 20], dtype=float)
-        super().__init__(n_var=9, n_obj=1, n_ieq_constr=13, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.array([-10, -10, -10, -10, -10, -10, -10, -10, 0], dtype=float)
+        xu = np.array([+10, +10, +10, +10, +10, +10, +10, +10, 20], dtype=float)
+        super().__init__(n_var=9, n_obj=1, n_ieq_constr=13, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = -0.5 * (x[:, 0] * x[:, 3] - x[:, 1] * x[:, 2] + x[:, 2] * x[:, 8] - x[:, 4] * x[:, 8] + x[:, 4]
@@ -603,13 +604,10 @@ class G18(G):
 class G19(G):
 
     def __init__(self):
-        n_var = 15
-        xl = anp.full(n_var, 0.0)
-        xu = anp.full(n_var, 10.0)
-        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=5, xl=xl, xu=xu, type_var=anp.double)
+        super().__init__(n_var=15, n_obj=1, n_ieq_constr=5, xl=np.full(15, 0.0), xu=np.full(15, 10.0), vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
-        aMat19 = np.array([-16, 2, 0, 1, 0,
+        aMat19 = anp.array([-16, 2, 0, 1, 0,
                            +0, -2, 0, 0.4, 2,
                            -3.5, 0, 2, 0, 0,
                            +0, -2, 0, -4, -1,
@@ -620,29 +618,30 @@ class G19(G):
                            +1, 2, 3, 4, 5,
                            +1, 1, 1, 1, 1]).reshape((10, 5))
 
-        bVec19 = np.array([-40, -2, -0.25, -4, -4, -1, -40, -60, 5, 1])
+        bVec19 = anp.array([-40, -2, -0.25, -4, -4, -1, -40, -60, 5, 1])
 
-        cMat19 = np.array([+30, -20, -10, 32, -10,
+        cMat19 = anp.array([+30, -20, -10, 32, -10,
                            -20, 39, -6, -31, 32,
                            -10, -6, 10, -6, -10,
                            +32, -31, -6, 39, -20,
                            -10, 32, -10, -20, 30]).reshape((5, 5))
 
-        dVec19 = np.array([4, 8, 10, 6, 2])
-        eVec19 = np.array([-15, -27, -36, -18, -12])
+        dVec19 = anp.array([4, 8, 10, 6, 2])
+        eVec19 = anp.array([-15, -27, -36, -18, -12])
 
-        f = - np.sum(bVec19 * x[:, :10], axis=1) + 2 * np.sum(dVec19 * x[:, 10:] * x[:, 10:] * x[:, 10:], axis=1)
+        f = - anp.sum(bVec19 * x[:, :10], axis=1) + 2 * anp.sum(dVec19 * x[:, 10:] * x[:, 10:] * x[:, 10:], axis=1)
 
         for i in range(5):
-            f = f + x[:, 10 + i] * np.sum(cMat19[i] * x[:, 10:], axis=1)
+            f = f + x[:, 10 + i] * anp.sum(cMat19[i] * x[:, 10:], axis=1)
 
-        g = np.zeros((len(x), 5))
+        g = []
         for j in range(5):
-            g[:, j] = -2 * np.sum(cMat19[j] * x[:, 10:], axis=1) - 3 * dVec19[j] * x[:, 10 + j] * x[:, 10 + j] \
-                      - eVec19[j] + np.sum(aMat19[:, j] * x[:, :10], axis=1)
+            _g = -2 * anp.sum(cMat19[j] * x[:, 10:], axis=1) - 3 * dVec19[j] * x[:, 10 + j] * x[:, 10 + j] \
+                      - eVec19[j] + anp.sum(aMat19[:, j] * x[:, :10], axis=1)
+            g.append(_g)
 
         out["F"] = f
-        out["G"] = g
+        out["G"] = anp.column_stack(g)
 
     def _calc_pareto_set(self):
         return [
@@ -655,41 +654,41 @@ class G20(G):
 
     def __init__(self):
         n_var = 24
-        xl = anp.full(n_var, 0.0)
-        xu = anp.full(n_var, 10.0)
-        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=6, n_eq_constr=14, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.full(n_var, 0.0)
+        xu = np.full(n_var, 10.0)
+        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=6, n_eq_constr=14, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
-        a = np.array([0.0693, 0.0577, 0.05, 0.2,
+        a = anp.array([0.0693, 0.0577, 0.05, 0.2,
                       0.26, 0.55, 0.06, 0.1, 0.12,
                       0.18, 0.1, 0.09, 0.0693, 0.0577,
                       0.05, 0.2, 0.26, 0.55, 0.06,
                       0.1, 0.12, 0.18, 0.1, 0.09])
 
-        f = np.sum(a * x, axis=1)
+        f = anp.sum(a * x, axis=1)
 
-        e = np.array([0.1, 0.3, 0.4, 0.3, 0.6, 0.3])
+        e = anp.array([0.1, 0.3, 0.4, 0.3, 0.6, 0.3])
 
-        b = np.array([44.094, 58.12, 58.12, 137.4, 120.9, 170.9, 62.501, 84.94,
+        b = anp.array([44.094, 58.12, 58.12, 137.4, 120.9, 170.9, 62.501, 84.94,
                       133.425, 82.507, 46.07, 60.097, 44.094, 58.12, 58.12,
                       137.4, 120.9, 170.9, 62.501, 84.94, 133.425, 82.507, 46.07, 60.097])
 
-        cVec = np.array([123.7, 31.7, 45.7, 14.7, 84.7, 27.7, 49.7, 7.1, 2.1, 17.7, 0.85, 0.64])
-        d = np.array([31.244, 36.12, 34.784, 92.7, 82.7, 91.6, 56.708, 82.7, 80.8, 64.517, 49.4, 49.1])
+        cVec = anp.array([123.7, 31.7, 45.7, 14.7, 84.7, 27.7, 49.7, 7.1, 2.1, 17.7, 0.85, 0.64])
+        d = anp.array([31.244, 36.12, 34.784, 92.7, 82.7, 91.6, 56.708, 82.7, 80.8, 64.517, 49.4, 49.1])
         k = 0.7302 * 530 * (14.7 / 40)
-        sumX = np.sum(x, axis=1)
+        sumX = anp.sum(x, axis=1)
 
         g123 = [(x[:, i] + x[:, i + 12]) / (sumX + e[i]) for i in range(3)]
         g456 = [(x[:, i + 3] + x[:, i + 15]) / (sumX + e[i]) for i in range(3, 6)]
 
         h = []
         for i in range(12):
-            h1 = x[:, i + 12] / (b[i + 12] * np.sum((x / b)[:, 12:], axis=1))
-            h2 = cVec[i] * x[:, i] / (40 * b[i] * np.sum((x / b)[:, :12], axis=1))
+            h1 = x[:, i + 12] / (b[i + 12] * anp.sum((x / b)[:, 12:], axis=1))
+            h2 = cVec[i] * x[:, i] / (40 * b[i] * anp.sum((x / b)[:, :12], axis=1))
             h.append(h1 - h2)
 
         h13 = sumX - 1
-        h14 = np.sum((x[:, :12] / d), axis=1) + k * np.sum((x / b)[:, 12:], axis=1) - 1.671
+        h14 = anp.sum((x[:, :12] / d), axis=1) + k * anp.sum((x / b)[:, 12:], axis=1) - 1.671
 
         out["F"] = f
         out["G"] = anp.column_stack(g123 + g456)
@@ -727,9 +726,9 @@ class G20(G):
 class G21(G):
 
     def __init__(self):
-        xl = anp.array([0, 0, 0, 100, 6.3, 5.9, 4.5], dtype=float)
-        xu = anp.array([1000, 40, 40, 300, 6.7, 6.4, 6.25], dtype=float)
-        super().__init__(n_var=7, n_obj=1, n_ieq_constr=1, n_eq_constr=5, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.array([0, 0, 0, 100, 6.3, 5.9, 4.5], dtype=float)
+        xu = np.array([1000, 40, 40, 300, 6.7, 6.4, 6.25], dtype=float)
+        super().__init__(n_var=7, n_obj=1, n_ieq_constr=1, n_eq_constr=5, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = x[:, 0]
@@ -739,9 +738,9 @@ class G21(G):
                                                                                                                        :,
                                                                                                                        3]
         h2 = 100 * x[:, 1] + 155.365 * x[:, 3] + 2500 * x[:, 6] - x[:, 1] * x[:, 3] - 25 * x[:, 3] * x[:, 6] - 15536.5
-        h3 = -x[:, 4] + np.log(-x[:, 3] + 900)
-        h4 = -x[:, 5] + np.log(x[:, 3] + 300)
-        h5 = -x[:, 6] + np.log(-2 * x[:, 3] + 700)
+        h3 = -x[:, 4] + anp.log(-x[:, 3] + 900)
+        h4 = -x[:, 5] + anp.log(x[:, 3] + 300)
+        h5 = -x[:, 6] + anp.log(-2 * x[:, 3] + 700)
 
         out["F"] = f
         out["G"] = g
@@ -762,12 +761,12 @@ class G21(G):
 class G22(G):
 
     def __init__(self):
-        xl = anp.array([0, 0, 0, 0, 0, 0, 0, 100, 100, 100.01, 100, 100, 0, 0, 0, 0.01, 0.01, -4.7, -4.7, -4.7,
+        xl = np.array([0, 0, 0, 0, 0, 0, 0, 100, 100, 100.01, 100, 100, 0, 0, 0, 0.01, 0.01, -4.7, -4.7, -4.7,
                         -4.7, -4.7], dtype=float)
 
-        xu = anp.array([20000, 10 ** 6, 10 ** 6, 10 ** 6, 4 * (10 ** 7), 4 * (10 ** 7), 4 * (10 ** 7), 299.99, 399.99,
+        xu = np.array([20000, 10 ** 6, 10 ** 6, 10 ** 6, 4 * (10 ** 7), 4 * (10 ** 7), 4 * (10 ** 7), 299.99, 399.99,
                         300, 400, 600, 500, 500, 500, 300, 400, 6.25, 6.25, 6.25, 6.25, 6.25], dtype=float)
-        super().__init__(n_var=22, n_obj=1, n_ieq_constr=1, n_eq_constr=19, xl=xl, xu=xu, type_var=anp.double)
+        super().__init__(n_var=22, n_obj=1, n_ieq_constr=1, n_eq_constr=19, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = x[:, 0]
@@ -785,11 +784,11 @@ class G22(G):
         h9 = x[:, 6] - 40 * x[:, 3] * x[:, 14]
         h10 = x[:, 7] - x[:, 10] + x[:, 15]
         h11 = x[:, 8] - x[:, 11] + x[:, 16]
-        h12 = -x[:, 17] + np.log(x[:, 9] - 100)
-        h13 = -x[:, 18] + np.log(-x[:, 7] + 300)
-        h14 = -x[:, 19] + np.log(x[:, 15])
-        h15 = -x[:, 20] + np.log(-x[:, 8] + 400)
-        h16 = -x[:, 21] + np.log(x[:, 16])
+        h12 = -x[:, 17] + anp.log(x[:, 9] - 100)
+        h13 = -x[:, 18] + anp.log(-x[:, 7] + 300)
+        h14 = -x[:, 19] + anp.log(x[:, 15])
+        h15 = -x[:, 20] + anp.log(-x[:, 8] + 400)
+        h16 = -x[:, 21] + anp.log(x[:, 16])
         h17 = -x[:, 7] - x[:, 9] + x[:, 12] * x[:, 17] - x[:, 12] * x[:, 18] + 400
         h18 = x[:, 7] - x[:, 8] - x[:, 10] + x[:, 13] * x[:, 19] - x[:, 13] * x[:, 20] + 400
         h19 = x[:, 8] - x[:, 11] - 4.60517 * x[:, 14] + x[:, 14] * x[:, 21] + 100
@@ -829,9 +828,9 @@ class G22(G):
 class G23(G):
 
     def __init__(self):
-        xl = anp.array([0, 0, 0, 0, 0, 0, 0, 0, 0.01], dtype=float)
-        xu = anp.array([300, 300, 100, 200, 100, 300, 100, 200, 0.03], dtype=float)
-        super().__init__(n_var=9, n_obj=1, n_ieq_constr=2, n_eq_constr=4, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0.01], dtype=float)
+        xu = np.array([300, 300, 100, 200, 100, 300, 100, 200, 0.03], dtype=float)
+        super().__init__(n_var=9, n_obj=1, n_ieq_constr=2, n_eq_constr=4, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = -9 * x[:, 4] - 15 * x[:, 7] + 6 * x[:, 0] + 16 * x[:, 1] + 10 * (x[:, 5] + x[:, 6])
@@ -855,9 +854,9 @@ class G23(G):
 class G24(G):
 
     def __init__(self):
-        xl = anp.array([0, 0], dtype=float)
-        xu = anp.array([3, 4], dtype=float)
-        super().__init__(n_var=2, n_obj=1, n_ieq_constr=2, xl=xl, xu=xu, type_var=anp.double)
+        xl = np.array([0, 0], dtype=float)
+        xu = np.array([3, 4], dtype=float)
+        super().__init__(n_var=2, n_obj=1, n_ieq_constr=2, xl=xl, xu=xu, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f = -x[:, 0] - x[:, 1]

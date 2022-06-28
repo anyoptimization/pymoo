@@ -1,5 +1,4 @@
 name: Release
-
 on:
   push:
     branches:
@@ -19,7 +18,6 @@ jobs:
           python-version: 3.10
       - name: Install Dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install numpy
           pip install -r tests/requirements.txt
       - name: Install pymoo
@@ -27,81 +25,100 @@ jobs:
           pip install .
           rm -rf pymoo
       - name: Run Tests
-        run: pytest
-
+        run: pytest -v --no-header --overwrite
 
   build:
-     needs: testing
-     runs-on: ${{ matrix.os }}
-     strategy:
-       matrix:
-         os: [ubuntu-latest, windows-latest, macos-latest]
-         python-version: ['3.7', '3.8', '3.9', '3.10']
-         exclude:
-           - os: ubuntu-latest
-             python-version: '3.7'
-           - os: ubuntu-latest
-             python-version: '3.8'
-           - os: ubuntu-latest
-               python-version: '3.9'
-     steps:
-     - uses: actions/checkout@v2
-     - name: Set up Python
-       uses: actions/setup-python@v2
-       with:
-         python-version: ${{ matrix.python-version }}
-     - name: Install dependencies
-       run: |
-         python -m pip install --upgrade pip
-         pip install setuptools wheel numpy
-     - uses: knicknic/os-specific-run@v1
-       with:
-         linux: python setup.py sdist
-         macos: python setup.py bdist_wheel
-         windows: python setup.py bdist_wheel
-     - uses: actions/upload-artifact@v2
-       with:
-         name: dist
-         path: dist
-
-
+    needs: testing
+    runs-on: "${{ matrix.os }}"
+    steps:
+      -
+        uses: actions/checkout@v2
+      -
+        name: "Set up Python"
+        uses: actions/setup-python@v2
+        with:
+          python-version: "${{ matrix.python-version }}"
+      -
+        name: "Install dependencies"
+        run: |
+            python -m pip install --upgrade pip
+            pip install setuptools wheel numpy
+      -
+        uses: knicknic/os-specific-run@v1
+        with:
+          linux: "python setup.py sdist"
+          macos: "python setup.py bdist_wheel"
+          windows: "python setup.py bdist_wheel"
+      -
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist
+    strategy:
+      matrix:
+        exclude:
+          -
+            os: ubuntu-latest
+            python-version: "3.7"
+          -
+            os: ubuntu-latest
+            python-version: "3.8"
+          -
+            os: ubuntu-latest
+            python-version: "3.9"
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+        python-version:
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
   build-manylinux:
     needs: testing
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2010_x86_64
-      with:
-        python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
-        build-requirements: 'cython numpy'
-        pip-wheel-args: '-w ./dist --no-deps'
-    - name: Remove non-compatible packages
-      run: |
-        sudo rm dist/*linux_x86_64.whl
-    - uses: actions/upload-artifact@v2
-      with:
-        name: dist
-        path: dist
-
+      -
+        uses: actions/checkout@v2
+      -
+        uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2010_x86_64
+        with:
+          build-requirements: "cython numpy"
+          pip-wheel-args: "-w ./dist --no-deps"
+          python-versions: "cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310"
+      -
+        name: "Remove non-compatible packages"
+        run: "sudo rm dist/*linux_x86_64.whl\n"
+      -
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist
   deploy:
-     needs: [build,build-manylinux]
-     runs-on: ubuntu-latest
-     steps:
-     - uses: actions/checkout@v2
-     - uses: actions/download-artifact@v2
-       with:
-         name: dist
-         path: dist
-     - name: Set up Python
-       uses: actions/setup-python@v2
-       with:
-         python-version: '3.10'
-     - name: Publish
-       env:
-         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-       run: |
-         python -m pip install --upgrade pip
-         pip install twine
-         twine upload --skip-existing --repository testpypi dist/*
-
+    needs:
+      - build
+      - build-manylinux
+    runs-on: ubuntu-latest
+    steps:
+      -
+        uses: actions/checkout@v2
+      -
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+          path: dist
+      -
+        name: "Set up Python"
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      -
+        env:
+          TWINE_PASSWORD: "${{ secrets.PYPI_PASSWORD }}"
+          TWINE_USERNAME: "${{ secrets.PYPI_USERNAME }}"
+        name: Publish
+        run: |
+            python -m pip install --upgrade pip
+            pip install twine
+            twine upload --skip-existing --repository testpypi dist/*

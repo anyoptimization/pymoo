@@ -8,10 +8,10 @@ clean-ext:
 	rm -f pymoo/cython/*.html
 
 compile:
-	python setup.py build_ext --inplace
+	python setup.py build_ext --inplace --no-cython
 
 compile-with-cython:
-	python setup.py build_ext --inplace --cythonize
+	python setup.py build_ext --inplace
 
 dist:
 	python setup.py sdist

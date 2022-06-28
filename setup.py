@@ -29,8 +29,15 @@ data = dict(
     description="Multi-Objective Optimization in Python",
     license='Apache License 2.0',
     keywords="optimization",
-    install_requires=['numpy>=1.15', 'scipy>=1.1', 'matplotlib>=3', 'autograd>=1.4', 'cma==3.2.2',
-                      'alive-progress', 'numba', 'dill', 'deprecation', 'wrapt'],
+    install_requires=['numpy>=1.15',
+                      'scipy>=1.1',
+                      'matplotlib>=3',
+                      'autograd>=1.4',
+                      'cma==3.2.2',
+                      'alive-progress',
+                      'numba',
+                      'dill',
+                      'deprecation'],
     platforms='any',
     classifiers=[
         'Intended Audience :: Developers',
@@ -133,13 +140,14 @@ def construct_build_ext(build_ext):
 
 
 def run_setup(setup_args):
+
     # try to add compilation to the setup - if fails just do default
     try:
 
-        do_cythonize = False
-        if "--cythonize" in sys.argv:
-            do_cythonize = True
-            sys.argv.remove("--cythonize")
+        do_cythonize = True
+        if "--no-cython" in sys.argv:
+            do_cythonize = False
+            sys.argv.remove("--no-cython")
 
         # copy the kwargs for compiling purpose - if it fails setup_args remain unchanged
         kwargs = copy.deepcopy(setup_args)
@@ -168,7 +176,7 @@ def run_setup(setup_args):
         # otherwise use the existing pyx files - normal case during pip installation
         else:
 
-            # find all cpp files in czthon folder
+            # find all cpp files in cython folder
             cpp_files = [f for f in cython_files if f.endswith(".cpp")]
 
             # add for each file an extension object to be compiled

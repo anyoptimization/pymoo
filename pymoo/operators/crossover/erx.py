@@ -94,6 +94,8 @@ class EdgeRecombinationCrossover(Crossover):
 
         return Y
 
+class ERX(EdgeRecombinationCrossover):
+    pass
 
 def number_to_letter(n):
     return chr(ord('@') + n)

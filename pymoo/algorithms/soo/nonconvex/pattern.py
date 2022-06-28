@@ -29,7 +29,7 @@ class PatternSearch(LocalSearch):
         ----------
 
         x0 : numpy.array
-            The initial value where the local search should be initiated. If not provided `n_sample_points` are created
+            The initial value where the local search should be initiated. If not provided `n_sample_points` are
             created using latin hypercube sampling and the best solution found is set to `x0`.
 
         n_sample_points : int
@@ -65,18 +65,17 @@ class PatternSearch(LocalSearch):
         self._direction = None
         self._sign = None
 
-    def _setup(self, problem, **kwargs):
-        if problem.has_bounds():
-            xl, xu = problem.bounds()
-            self._delta = self.init_delta * (xu - xl)
-        else:
-            self._delta = np.abs(self.x0) / 2.0
-            self._delta[self._delta <= 1.0] = 1.0
-
     def _initialize_advance(self, infills=None, **kwargs):
         super()._initialize_advance(infills=infills, **kwargs)
         self._center, self._explr = self.x0, self.x0
         self._sign = np.ones(self.problem.n_var)
+
+        if self.problem.has_bounds():
+            xl, xu = self.problem.bounds()
+            self._delta = self.init_delta * (xu - xl)
+        else:
+            self._delta = np.abs(self.x0.X) / 2.0
+            self._delta[self._delta <= 1.0] = 1.0
 
     def _next(self):
 
@@ -154,7 +153,6 @@ def exploration_move(problem, center, sign, delta, rho, randomize=True):
 
 
 def pattern_move(problem, current, direction, step_size):
-
     # calculate the new X and repair out of bounds if necessary
     X = current.X + step_size * direction
     set_to_bounds_if_outside_by_problem(problem, X)

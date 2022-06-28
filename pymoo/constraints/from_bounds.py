@@ -1,4 +1,6 @@
-import autograd.numpy as anp
+import numpy as np
+
+import pymoo.gradient.toolbox as anp
 
 from pymoo.core.meta import Meta
 from pymoo.core.problem import Problem
@@ -26,9 +28,9 @@ class ConstraintsFromBounds(Meta, Problem):
         out["G"] = anp.column_stack([out["G"], _G])
 
         if "dG" in out:
-            _dG = anp.zeros((len(X), 2 * self.n_var, self.n_var))
-            _dG[:, :self.n_var, :] = - anp.eye(self.n_var)
-            _dG[:, self.n_var:, :] = anp.eye(self.n_var)
-            out["dG"] = anp.column_stack([out["dG"], _dG]) if out.get("dG") is not None else _dG
+            _dG = np.zeros((len(X), 2 * self.n_var, self.n_var))
+            _dG[:, :self.n_var, :] = - np.eye(self.n_var)
+            _dG[:, self.n_var:, :] = np.eye(self.n_var)
+            out["dG"] = np.column_stack([out["dG"], _dG])
 
         return out

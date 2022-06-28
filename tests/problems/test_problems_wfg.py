@@ -12,16 +12,8 @@ def test_problems(name, params):
     n_obj, n_var, k = params
     problem = get_problem(name, n_var, n_obj, k)
 
-    X, F, CV = load(name.upper(), suffix=["WFG", "%sobj" % n_obj])
-
-    if F is None:
-        print("Warning: No correctness check for %s" % name)
-        return
-
-    _F, _G, _CV = problem.evaluate(X, return_values_of=["F", "G", "CV"])
-
-    if problem.n_obj == 1:
-        F = F[:, None]
+    X, F = load("problems", "WFG", f"{n_obj}obj", name.upper(), attrs=["x", "f"])
+    _F = problem.evaluate(X)
 
     np.testing.assert_allclose(_F, F)
 

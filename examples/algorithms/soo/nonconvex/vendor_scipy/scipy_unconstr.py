@@ -1,4 +1,4 @@
-import autograd.numpy as anp
+import numpy as np
 import numpy as np
 
 from pymoo.core.problem import Problem
@@ -9,10 +9,10 @@ from pymoo.vendor.vendor_scipy import CG, BFGS, Powell, NelderMead
 class MySphere(Problem):
 
     def __init__(self, n_var=3):
-        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=0, xl=None, xu=None, type_var=float)
+        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=0, xl=None, xu=None, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
-        out["F"] = anp.sum(anp.square(x + 10), axis=1)
+        out["F"] = np.sum(np.square(x + 10), axis=1)
 
 
 problem = MySphere()

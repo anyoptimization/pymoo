@@ -1,6 +1,6 @@
 import numpy as np
 
-import autograd.numpy as anp
+import numpy as np
 
 from pymoo.core.problem import Problem
 
@@ -18,7 +18,7 @@ The evaluation_of variable defines what variables are calculated by the evaluati
 class GradientDirectlyImplemented(Problem):
 
     def __init__(self, n_var=30, **kwargs):
-        super().__init__(n_var=n_var, n_obj=2, n_ieq_constr=0, xl=0, xu=1, type_var=np.double, evaluation_of=["F", "dF"],
+        super().__init__(n_var=n_var, n_obj=2, n_ieq_constr=0, xl=0, xu=1, vtype=float, evaluation_of=["F", "dF"],
                          **kwargs)
 
     def _evaluate(self, x, out, *args, **kwargs):
@@ -46,7 +46,7 @@ Automatic Differentiation
 ============================================
 
 Autograd can be used to calculate the gradient. Therefore, you have to use the correct import.
-Please note to distinguish between numpy and autograd.numpy it is good practice to import it as anp.
+Please note to distinguish between numpy and autograd.numpy it is good practice to import it as np.
 
 If the function evaluations asks for the gradient autograd does its job and ONLY the function evaluation needs
 to be added to the problem.
@@ -57,15 +57,15 @@ to be added to the problem.
 class AutomaticDifferentiation(Problem):
 
     def __init__(self, n_var=30, **kwargs):
-        super().__init__(n_var=n_var, n_obj=2, n_ieq_constr=0, xl=0, xu=1, type_var=np.double, evaluation_of=["F"],
+        super().__init__(n_var=n_var, n_obj=2, n_ieq_constr=0, xl=0, xu=1, vtype=float, evaluation_of=["F"],
                          **kwargs)
 
     def _evaluate(self, x, out, *args, **kwargs):
         f1 = x[:, 0]
-        g = 1 + 9.0 / (self.n_var - 1) * anp.sum(x[:, 1:], axis=1)
-        f2 = g * (1 - anp.power((f1 / g), 0.5))
+        g = 1 + 9.0 / (self.n_var - 1) * np.sum(x[:, 1:], axis=1)
+        f2 = g * (1 - np.power((f1 / g), 0.5))
 
-        out["F"] = anp.column_stack([f1, f2])
+        out["F"] = np.column_stack([f1, f2])
 
 
 problem = AutomaticDifferentiation(n_var=10)

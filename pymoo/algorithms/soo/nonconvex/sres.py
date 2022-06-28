@@ -23,7 +23,7 @@ class StochasticRankingSurvival(Survival):
             I = f.argsort()
 
         else:
-            phi = calc_cv(pop)[:, 0]
+            phi = calc_cv(pop)
             J = np.arange(len(phi))
             I = load_function("stochastic_ranking")(f, phi, self.PR, J)
 

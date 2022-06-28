@@ -1,13 +1,14 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
+import numpy as np
 
 from pymoo.core.problem import Problem
 
 
 class PressureVessel(Problem):
     def __init__(self):
-        super().__init__(n_var=4, n_obj=1, n_ieq_constr=4, type_var=anp.double)
-        self.xl = anp.array([1, 1, 10.0, 10.0])
-        self.xu = anp.array([99, 99, 200.0, 200.0])
+        super().__init__(n_var=4, n_obj=1, n_ieq_constr=4, vtype=float)
+        self.xl = np.array([1, 1, 10.0, 10.0])
+        self.xu = np.array([99, 99, 200.0, 200.0])
 
     def _evaluate(self, x, out, *args, **kwargs):
 

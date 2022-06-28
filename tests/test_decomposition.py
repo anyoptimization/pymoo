@@ -1,8 +1,8 @@
 import numpy as np
+from pymoo.util.remote import Remote
 
 from pymoo.decomposition.perp_dist import PerpendicularDistance
 from pymoo.decomposition.weighted_sum import WeightedSum
-from tests.util import path_to_test_resource
 
 
 def test_one_to_one():
@@ -46,8 +46,10 @@ def test_perp_dist():
     F = np.random.random((100, 3))
     weights = np.random.random((10, 3))
 
+    correct = Remote.get_instance().load("tests", "perp_dist")
+
     D = PerpendicularDistance(_type="python").do(F, weights, _type="many_to_many")
-    np.testing.assert_allclose(D, np.loadtxt(path_to_test_resource("perp_dist")))
+    np.testing.assert_allclose(D, correct)
 
     D = PerpendicularDistance(_type="cython").do(F, weights, _type="many_to_many")
-    np.testing.assert_allclose(D, np.loadtxt(path_to_test_resource("perp_dist")))
+    np.testing.assert_allclose(D, correct)

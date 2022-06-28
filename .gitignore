@@ -1,10 +1,9 @@
 **/.DS_Store
 **/.vscode
-**/.mp4
-**/.npy
-**/.gif
-**/.cpp
-**/.c
+**/*.mp4
+**/*.npy
+**/*.gif
+**/*.cpp
 
 
 # Byte-compiled / optimized / DLL files
@@ -26,9 +25,9 @@ tests/!experimental/*
 
 pymoo/cache/
 pymoo/cache/*
+pymoo/data
 pymoo/docs/build
 pymoo/docs/nbconvert
-pymoo/docs/source/.ipynb_checkpoints
 
 
 benchmark/runs/*

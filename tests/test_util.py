@@ -1,4 +1,14 @@
 import os
+from os.path import dirname
+from pathlib import Path
+
+import nbformat
+from nbconvert.preprocessors import CellExecutionError
+from nbconvert.preprocessors.execute import executenb
+from nbformat import read as nbread
+from pymoo.util.remote import Remote
+
+from pymoo.config import Config
 
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
@@ -6,26 +16,20 @@ TESTS = os.path.join(ROOT, "tests")
 
 RESOURCES = os.path.join(TESTS, "resources")
 
-
-def path_to_test_resource(*args):
-    return os.path.join(RESOURCES, *args)
-
-import os
-from pathlib import Path
-
-import nbformat
-from jupyter_client.manager import start_new_kernel
-from nbconvert.preprocessors import CellExecutionError
-from nbconvert.preprocessors.execute import executenb
-from nbformat import read as nbread
-
-ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-
 EXAMPLES = os.path.join(ROOT, "examples")
 
 TESTS = os.path.join(ROOT, "tests")
 
 NO_INIT = ["__init__.py"]
+
+DOCS = os.path.join(dirname(Config.root), "docs", "source")
+
+
+def load_to_test_resource(*args, to=None, **kwargs):
+    try:
+        return Remote.get_instance().load("tests", *args, to=to, **kwargs)
+    except:
+        return None
 
 
 def files_from_folder(folder, regex='**/*.py', skip=[]):
@@ -37,30 +41,8 @@ def filter_by_exclude(files, exclude=[]):
     return [f for f in files if not any([os.path.basename(f) == s for s in exclude])]
 
 
-def run_file(f):
-    fname = os.path.basename(f)
-
-    print("RUNNING:", fname)
-
-    with open(f) as f:
-        s = f.read()
-
-        no_plots = "import matplotlib\n" \
-                   "matplotlib.use('Agg')\n" \
-                   "import matplotlib.pyplot as plt\n"
-
-        s = no_plots + s + "\nplt.close()\n"
-
-        exec(s, globals())
-
-
 def run_ipynb(kernel, fname, overwrite=False, remove_trailing_empty_cells=False):
     print(fname.split("/")[-1])
-
-    import warnings
-    warnings.filterwarnings("ignore")
-
-    config = dict(metadata=dict(path=os.path.dirname(fname)))
 
     try:
         nb = nbread(fname, as_version=4)
@@ -83,6 +65,23 @@ def run_ipynb(kernel, fname, overwrite=False, remove_trailing_empty_cells=False)
                 nbformat.write(nb, f)
 
 
+def run_file(f):
+    fname = os.path.basename(f)
+
+    print("RUNNING:", fname)
+
+    with open(f) as f:
+        s = f.read()
+
+        no_plots = "import matplotlib\n" \
+                   "matplotlib.use('Agg')\n" \
+                   "import matplotlib.pyplot as plt\n"
+
+        s = no_plots + s + "\nplt.close()\n"
+
+        exec(s, globals())
+
+
 def remove_trailing_empty_cells(ipynb):
     nb = nbformat.read(ipynb, nbformat.NO_CONVERT)
 
@@ -93,3 +92,5 @@ def remove_trailing_empty_cells(ipynb):
 
     with open(ipynb, 'wt') as f:
         nbformat.write(nb, f)
+
+

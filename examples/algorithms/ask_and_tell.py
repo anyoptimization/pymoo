@@ -3,7 +3,7 @@ from pymoo.core.problem import Problem
 from pymoo.core.termination import NoTermination
 from pymoo.problems.static import StaticProblem
 
-problem = Problem(n_var=10, n_obj=1, n_ieq_constr=0, xl=-0, xu=1)
+problem = Problem(n_var=10, n_obj=1, n_ieq_constr=1, xl=-0, xu=1)
 
 algorithm = PSO().setup(problem, termination=NoTermination(), verbose=False)
 

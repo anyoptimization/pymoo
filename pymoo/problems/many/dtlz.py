@@ -1,4 +1,5 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
+import numpy as np
 
 from pymoo.core.problem import Problem
 from pymoo.util.reference_direction import UniformReferenceDirectionFactory
@@ -16,7 +17,7 @@ class DTLZ(Problem):
         else:
             raise Exception("Either provide number of variables or k!")
 
-        super().__init__(n_var=n_var, n_obj=n_obj, xl=0, xu=1, type_var=anp.double, **kwargs)
+        super().__init__(n_var=n_var, n_obj=n_obj, xl=0, xu=1, vtype=float, **kwargs)
 
     def g1(self, X_M):
         return 100 * (self.k + anp.sum(anp.square(X_M - 0.5) - anp.cos(20 * anp.pi * (X_M - 0.5)), axis=1))
@@ -119,7 +120,7 @@ class DTLZ5(DTLZ):
 
     def _calc_pareto_front(self):
         if self.n_obj == 3:
-            return Remote.get_instance().load("pf", "dtlz5-3d.pf")
+            return Remote.get_instance().load("pymoo", "pf", "dtlz5-3d.pf")
         else:
             raise Exception("Not implemented yet.")
 
@@ -139,7 +140,7 @@ class DTLZ6(DTLZ):
 
     def _calc_pareto_front(self):
         if self.n_obj == 3:
-            return Remote.get_instance().load("pf", "dtlz6-3d.pf")
+            return Remote.get_instance().load("pymoo", "pf", "dtlz6-3d.pf")
         else:
             raise Exception("Not implemented yet.")
 
@@ -159,7 +160,7 @@ class DTLZ7(DTLZ):
 
     def _calc_pareto_front(self):
         if self.n_obj == 3:
-            return Remote.get_instance().load("pf", "dtlz7-3d.pf")
+            return Remote.get_instance().load("pymoo", "pf", "dtlz7-3d.pf")
         else:
             raise Exception("Not implemented yet.")
 
@@ -195,13 +196,13 @@ class ScaledProblem(Problem):
 
     def __init__(self, problem, scale_factor):
         super().__init__(n_var=problem.n_var, n_obj=problem.n_obj, n_ieq_constr=problem.n_ieq_constr,
-                         n_eq_constr=problem.n_eq_constr, xl=problem.xl, xu=problem.xu, type_var=problem.type_var)
+                         n_eq_constr=problem.n_eq_constr, xl=problem.xl, xu=problem.xu, vtype=problem.vtype)
         self.problem = problem
         self.scale_factor = scale_factor
 
     @staticmethod
     def get_scale(n, scale_factor):
-        return anp.power(anp.full(n, scale_factor), anp.arange(n))
+        return np.power(np.full(n, scale_factor), np.arange(n))
 
     def _evaluate(self, X, out, *args, **kwargs):
         self.problem._evaluate(X, out, *args, **kwargs)
@@ -218,7 +219,7 @@ class ConvexProblem(Problem):
         self.problem = problem
 
     def get_power(self, n):
-        p = anp.full(n, 4.0)
+        p = np.full(n, 4.0)
         p[-1] = 2.0
         return p
 
@@ -228,7 +229,7 @@ class ConvexProblem(Problem):
 
     def _calc_pareto_front(self, ref_dirs, *args, **kwargs):
         F = self.problem.pareto_front(ref_dirs)
-        return anp.power(F, self.get_power(self.n_obj))
+        return np.power(F, self.get_power(self.n_obj))
 
 
 class ScaledDTLZ1(ScaledProblem):
@@ -250,7 +251,7 @@ class ConvexDTLZ4(ConvexProblem):
 
 
 def generic_sphere(ref_dirs):
-    return ref_dirs / anp.tile(anp.linalg.norm(ref_dirs, axis=1)[:, None], (1, ref_dirs.shape[1]))
+    return ref_dirs / np.tile(np.linalg.norm(ref_dirs, axis=1)[:, None], (1, ref_dirs.shape[1]))
 
 
 def get_ref_dirs(n_obj):

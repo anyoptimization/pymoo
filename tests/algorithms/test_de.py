@@ -6,7 +6,7 @@ from pymoo.operators.sampling.lhs import LHS
 from pymoo.optimize import minimize
 
 
-@pytest.mark.parametrize('selection', ["rand", "best", "rand-to-best", "current-to-rand", "current-to-best", "current-to-pbest"])
+@pytest.mark.parametrize('selection', ["rand", "best", "target-to-best"])
 @pytest.mark.parametrize('crossover', ["bin", "exp"])
 def test_de(selection, crossover):
     problem = get_problem("ackley", n_var=10)

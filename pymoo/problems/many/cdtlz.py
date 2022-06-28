@@ -1,4 +1,5 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
+import numpy as np
 
 from pymoo.problems.many.dtlz import DTLZ1, DTLZ2, DTLZ3, DTLZ4, get_ref_dirs
 
@@ -94,9 +95,9 @@ class C3DTLZ4(DTLZ4):
         if ref_dirs is None:
             ref_dirs = get_ref_dirs(self.n_obj)
         F = super()._calc_pareto_front(ref_dirs, *args, **kwargs)
-        a = anp.sqrt(anp.sum(F ** 2, 1) - 3 / 4 * anp.max(F ** 2, axis=1))
-        a = anp.expand_dims(a, axis=1)
-        a = anp.tile(a, [1, ref_dirs.shape[1]])
+        a = np.sqrt(np.sum(F ** 2, 1) - 3 / 4 * np.max(F ** 2, axis=1))
+        a = np.expand_dims(a, axis=1)
+        a = np.tile(a, [1, ref_dirs.shape[1]])
         F = F / a
 
         return F

@@ -34,6 +34,6 @@ class LocalSearch(LoopwiseAlgorithm, Algorithm):
         return self.initialization.do(self.problem, self.n_sample_points, algorithm=self)
 
     def _initialize_advance(self, infills=None, **kwargs):
-        self.x0 = FitnessSurvival().do(self.problem, infills, n_survive=1)[0]
+        self.x0 = FitnessSurvival().do(self.problem, infills, n_survive=1, algorithm=self)[0]
 
 

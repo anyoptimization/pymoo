@@ -2,9 +2,9 @@ import numpy as np
 
 from pymoo.algorithms.soo.nonconvex.cmaes import CMAES
 from pymoo.optimize import minimize
-from pymoo.problems.single import Sphere
+from pymoo.problems.single import Himmelblau
 
-problem = Sphere()
+problem = Himmelblau()
 
 algorithm = CMAES(x0=np.random.random(problem.n_var))
 

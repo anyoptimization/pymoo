@@ -184,11 +184,11 @@ def vectorized_cdist(A, B, func_dist=func_euclidean_distance, fill_diag_with_inf
 
 
 def covert_to_type(problem, X):
-    if problem.type_var == np.double:
+    if problem.vtype == float:
         return X.astype(np.double)
-    elif problem.type_var == int:
+    elif problem.vtype == int:
         return np.round(X).astype(int)
-    elif problem.type_var == np.bool:
+    elif problem.vtype == bool:
         return X < (problem.xu - problem.xl) / 2
 
 
@@ -206,7 +206,10 @@ def find_duplicates(X, epsilon=1e-16):
 
 
 def at_least_2d(*args, **kwargs):
-    return tuple([at_least_2d_array(arg, **kwargs) for arg in args])
+    ret = tuple([at_least_2d_array(arg, **kwargs) for arg in args])
+    if len(ret) == 1:
+        ret = ret[0]
+    return ret
 
 
 def at_least_2d_array(x, extend_as="row", return_if_reshaped=False):

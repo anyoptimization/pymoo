@@ -3,33 +3,27 @@ import numpy as np
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.core.survival import Survival
 from pymoo.docs import parse_doc_string
-from pymoo.operators.crossover.sbx import SBX
-from pymoo.operators.mutation.pm import PM
+from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover, SBX
+from pymoo.operators.mutation.pm import PolynomialMutation, PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.rnd import RandomSelection
 from pymoo.termination.max_eval import MaximumFunctionCallTermination
 from pymoo.termination.max_gen import MaximumGenerationTermination
 from pymoo.util.display.multi import MultiObjectiveOutput
 from pymoo.util.misc import has_feasible, vectorized_cdist
-from pymoo.util.reference_direction import default_ref_dirs
 
-
-# ---------------------------------------------------------------------------------------------------------
-# Algorithm
-# ---------------------------------------------------------------------------------------------------------
 
 class RVEA(GeneticAlgorithm):
 
     def __init__(self,
-                 ref_dirs=None,
+                 ref_dirs,
                  alpha=2.0,
                  adapt_freq=0.1,
                  pop_size=None,
                  sampling=FloatRandomSampling(),
                  selection=RandomSelection(),
-                 crossover=SBX(prob_exch=0.5),
-                 mutation=PM(),
-                 survival=None,
+                 crossover=SBX(eta=30, prob=1.0),
+                 mutation=PM(eta=20),
                  eliminate_duplicates=True,
                  n_offsprings=None,
                  output=MultiObjectiveOutput(),
@@ -60,11 +54,13 @@ class RVEA(GeneticAlgorithm):
             if pop_size is None:
                 pop_size = len(self.ref_dirs)
 
-        # the alpha value of RVEA
-        self.alpha = alpha
-
         # the fraction of n_max_gen when the the reference directions are adapted
         self.adapt_freq = adapt_freq
+
+        # you can override the survival if necessary
+        survival = kwargs.pop("survival", None)
+        if survival is None:
+            survival = APDSurvival(ref_dirs, alpha=alpha)
 
         super().__init__(pop_size=pop_size,
                          sampling=sampling,
@@ -79,23 +75,24 @@ class RVEA(GeneticAlgorithm):
 
     def _setup(self, problem, **kwargs):
 
-        # if no reference directions have been provided get them and override the population size and other settings
-        if self.ref_dirs is None:
-            self.ref_dirs = default_ref_dirs(problem.n_obj)
-            self.pop_size, self.n_offsprings = len(self.ref_dirs), len(self.ref_dirs)
+        # if maximum functions termination convert it to generations
+        if isinstance(self.termination, MaximumFunctionCallTermination):
+            n_gen = np.ceil((self.termination.n_max_evals - self.pop_size) / self.n_offsprings)
+            self.termination = MaximumGenerationTermination(n_gen)
 
-        if self.survival is None:
-            self.survival = APDSurvival(self.ref_dirs, alpha=self.alpha)
-
-        # the number of adaptions so far (initialized by one)
-        self.n_adapt = 1
+        # check whether the n_gen termination is used - otherwise this algorithm can be not run
+        if not isinstance(self.termination, MaximumGenerationTermination):
+            raise Exception("Please use the n_gen or n_eval as a termination criterion to run RVEA!")
 
     def _advance(self, **kwargs):
         super()._advance(**kwargs)
 
-        if self.termination.perc / self.adapt_freq >= self.n_adapt:
+        # get the  current generation and maximum of generations
+        n_gen, n_max_gen = self.n_gen, self.termination.n_max_gen
+
+        # each i-th generation (define by fr and n_max_gen) the reference directions are updated
+        if self.adapt_freq is not None and n_gen % np.ceil(n_max_gen * self.adapt_freq) == 0:
             self.survival.adapt()
-            self.n_adapt += 1
 
     def _set_optimum(self, **kwargs):
         if not has_feasible(self.pop):
@@ -136,18 +133,15 @@ class APDSurvival(Survival):
         self.gamma = calc_gamma(self.V)
 
     def adapt(self):
-        if self.ideal is not None and self.nadir is not None:
-            self.V = calc_V(calc_V(self.ref_dirs) * (self.nadir - self.ideal))
-            self.gamma = calc_gamma(self.V)
+        self.V = calc_V(calc_V(self.ref_dirs) * (self.nadir - self.ideal))
+        self.gamma = calc_gamma(self.V)
 
-    def _do(self, problem, pop, n_survive=None, algorithm=None, **kwargs):
-        termination = algorithm.termination
+    def _do(self, problem, pop, n_survive, algorithm=None, n_gen=None, n_max_gen=None, **kwargs):
 
-        if type(termination) not in [MaximumGenerationTermination, MaximumFunctionCallTermination]:
-            pass
-            # raise Exception("WARNING: RVEA needs either n_gen or n_evals as a termination criterion.")
-
-        progress = termination.perc
+        if n_gen is None:
+            n_gen = algorithm.n_gen - 1
+        if n_max_gen is None:
+            n_max_gen = algorithm.termination.n_max_gen
 
         # get the objective space values
         F = pop.get("F")
@@ -185,6 +179,7 @@ class APDSurvival(Survival):
 
             # if niche not empty
             if len(assigned_to_niche) > 0:
+
                 # the angle of niche to nearest neighboring niche
                 gamma = self.gamma[k]
 
@@ -193,7 +188,7 @@ class APDSurvival(Survival):
 
                 # the penalty which is applied for the metric
                 M = problem.n_obj if problem.n_obj > 2.0 else 1.0
-                penalty = M * (progress ** self.alpha) * (theta / gamma)
+                penalty = M * ((n_gen / n_max_gen) ** self.alpha) * (theta / gamma)
 
                 # calculate the angle-penalized penalized (APD)
                 apd = dist_to_ideal[assigned_to_niche] * (1 + penalty)

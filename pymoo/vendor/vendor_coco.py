@@ -36,7 +36,7 @@ class COCOProblem(Problem):
 
     def _calc_pareto_front(self, *args, **kwargs):
         if self.pf_from_file:
-            return Remote.get_instance().load("pf", "bbob.pf", to="json")[str(self.function)][str(self.instance)]
+            return Remote.get_instance().load("pymoo", "pf", "bbob.pf", to="json")[str(self.function)][str(self.instance)]
         else:
             ps = self.pareto_set()
             if ps is not None:

@@ -1,11 +1,12 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
+import numpy as np
 
 from pymoo.core.problem import Problem
 
 
 class Rastrigin(Problem):
     def __init__(self, n_var=2, A=10.0):
-        super().__init__(n_var=n_var, n_obj=1, xl=-5, xu=5, type_var=anp.double)
+        super().__init__(n_var=n_var, n_obj=1, xl=-5, xu=5, vtype=float)
         self.A = A
 
     def _evaluate(self, x, out, *args, **kwargs):
@@ -16,4 +17,4 @@ class Rastrigin(Problem):
         return 0.0
 
     def _calc_pareto_set(self):
-        return anp.full(self.n_var, 0)
+        return np.full(self.n_var, 0)

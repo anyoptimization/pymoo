@@ -213,7 +213,7 @@ class Algorithm:
             # assign the population to the algorithm
             self.pop = infills
 
-            # do whats necessary after the initialization
+            # do what is necessary after the initialization
             self._initialize_advance(infills=infills, **kwargs)
 
             # set this algorithm to be initialized

@@ -3,7 +3,7 @@ from copy import copy
 import numpy as np
 import pytest
 
-from pymoo.algorithms.soo.nonconvex.pattern_search import PatternSearch
+from pymoo.algorithms.soo.nonconvex.pattern import PatternSearch
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 
 from pymoo.optimize import minimize

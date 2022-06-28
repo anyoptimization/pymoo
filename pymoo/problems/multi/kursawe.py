@@ -1,4 +1,4 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
 
 from pymoo.core.problem import Problem
 from pymoo.util.remote import Remote
@@ -6,7 +6,7 @@ from pymoo.util.remote import Remote
 
 class Kursawe(Problem):
     def __init__(self):
-        super().__init__(n_var=3, n_obj=2, xl=-5, xu=5, type_var=anp.double)
+        super().__init__(n_var=3, n_obj=2, xl=-5, xu=5, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         l = []
@@ -19,7 +19,7 @@ class Kursawe(Problem):
         out["F"] = anp.column_stack([f1, f2])
 
     def _calc_pareto_front(self, *args, **kwargs):
-        return Remote.get_instance().load("pf", "kursawe.pf")
+        return Remote.get_instance().load("pymoo", "pf", "kursawe.pf")
 
 
 

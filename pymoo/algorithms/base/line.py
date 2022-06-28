@@ -5,7 +5,6 @@ from pymoo.core.individual import Individual
 from pymoo.core.meta import Meta
 from pymoo.core.problem import Problem
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside
-from pymoo.problems.meta import MetaProblem
 
 
 class LineSearch(Algorithm):

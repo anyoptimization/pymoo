@@ -4,8 +4,8 @@ import pytest
 from pymoo.constraints.from_bounds import ConstraintsFromBounds
 from pymoo.problems import get_problem
 from pymoo.indicators.kktpm import KKTPM
-from pymoo.problems.autodiff import AutomaticDifferentiation
-from tests.util import path_to_test_resource
+from pymoo.gradient.automatic import AutomaticDifferentiation
+from tests.problems.test_correctness import load
 
 SETUP = {
     "bnh": {'utopian_eps': 0.0, "ideal": np.array([-0.05, -0.05]), "rho": 0.0},
@@ -18,21 +18,14 @@ SETUP = {
 
 @pytest.mark.parametrize('str_problem,params', SETUP.items())
 def test_kktpm_correctness(str_problem, params):
-    problem = ConstraintsFromBounds(AutomaticDifferentiation(get_problem(str_problem)))
-    # problem = AutomaticDifferentiation(ConstraintsFromBounds(get_problem(str_problem)))
+    problem = get_problem(str_problem)
+    problem = ConstraintsFromBounds(AutomaticDifferentiation(problem))
 
-    def load_file(f):
-        return np.loadtxt(path_to_test_resource("kktpm", "%s_%s.txt" % (str_problem, f)))
-
-    X = load_file("x")
+    X, F, G, dF, dG, kktpm = load("kktpm", str_problem, attrs=["x", "f", "g", "df", "dg", "kktpm"])
     _F, _G, _dF, _dG = problem.evaluate(X, return_values_of=["F", "G", "dF", "dG"])
 
-    # the gradient needs to be implemented again!
-    assert _dF is not None and _dG is not None
-
-    F, G, dF, dG = load_file("f"), load_file("g"), load_file("df"), load_file("dg")
-
     dF = dF.reshape(_dF.shape)
+
     np.testing.assert_almost_equal(F, _F, decimal=5)
     np.testing.assert_almost_equal(dF, _dF, decimal=5)
 
@@ -44,17 +37,13 @@ def test_kktpm_correctness(str_problem, params):
         np.testing.assert_almost_equal(dG, _dG, decimal=5)
 
     # indices = np.random.permutation(X.shape[0])[:100]
-    indices = np.arange(X.shape[0])
-
-    # load the correct results
-    kktpm = load_file("kktpm")[indices]
+    n, _ = X.shape
+    indices = np.arange(n)
 
     # calculate the KKTPM measure
-    # _kktpm, _ = KKTPM(var_bounds_as_constraints=True).calc(np.array([[4.8, 3.0]]), problem, **params)
-    # _kktpm, _ = KKTPM(var_bounds_as_constraints=True).calc(X[[55]], problem, rho=0, **params)
     _kktpm = KKTPM().calc(X[indices], problem, **params)
-    error = np.abs(_kktpm[:, 0] - kktpm)
 
+    error = np.abs(_kktpm - kktpm)
     for i in range(len(error)):
 
         if error[i] > 0.0001:
@@ -68,5 +57,5 @@ def test_kktpm_correctness(str_problem, params):
             # os._exit(1)
 
     # make sure the results are almost equal
-    np.testing.assert_almost_equal(kktpm, _kktpm[:, 0], decimal=4)
+    np.testing.assert_almost_equal(kktpm, _kktpm, decimal=5)
     print(str_problem, error.mean())

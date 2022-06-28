@@ -1,4 +1,4 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
 import numpy as np
 
 from pymoo.core.problem import Problem
@@ -7,13 +7,13 @@ from pymoo.core.problem import Problem
 class Truss2D(Problem):
 
     def __init__(self):
-        super().__init__(n_var=3, n_obj=2, n_ieq_constr=1, type_var=anp.double)
+        super().__init__(n_var=3, n_obj=2, n_ieq_constr=1, vtype=float)
 
         self.Amax = 0.01
         self.Smax = 1e5
 
-        self.xl = anp.array([0.0, 0.0, 1.0])
-        self.xu = anp.array([self.Amax, self.Amax, 3.0])
+        self.xl = np.array([0.0, 0.0, 1.0])
+        self.xu = np.array([self.Amax, self.Amax, 3.0])
 
     def _evaluate(self, x, out, *args, **kwargs):
 

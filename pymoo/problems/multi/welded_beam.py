@@ -1,4 +1,5 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
+import numpy as np
 
 from pymoo.core.problem import Problem
 from pymoo.util.remote import Remote
@@ -6,9 +7,9 @@ from pymoo.util.remote import Remote
 
 class WeldedBeam(Problem):
     def __init__(self):
-        super().__init__(n_var=4, n_obj=2, n_ieq_constr=4, type_var=anp.double)
-        self.xl = anp.array([0.125, 0.1, 0.1, 0.125])
-        self.xu = anp.array([5.0, 10.0, 10.0, 5.0])
+        super().__init__(n_var=4, n_obj=2, n_ieq_constr=4, vtype=float)
+        self.xl = np.array([0.125, 0.1, 0.1, 0.125])
+        self.xu = np.array([5.0, 10.0, 10.0, 5.0])
 
     def _evaluate(self, x, out, *args, **kwargs):
         f1 = 1.10471 * x[:, 0] ** 2 * x[:, 1] + 0.04811 * x[:, 2] * x[:, 3] * (14.0 + x[:, 1])
@@ -37,4 +38,4 @@ class WeldedBeam(Problem):
         out["G"] = anp.column_stack([g1, g2, g3, g4])
 
     def _calc_pareto_front(self):
-        return Remote.get_instance().load("pf", "welded_beam.pf")
+        return Remote.get_instance().load("pymoo", "pf", "welded_beam.pf")

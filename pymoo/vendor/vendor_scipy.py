@@ -1,4 +1,4 @@
-from pymoo.constraints.tcv import TotalConstraintViolation
+
 from pymoo.core.termination import NoTermination
 from pymoo.termination.max_eval import MaximumFunctionCallTermination
 from pymoo.util.display.single import SingleObjectiveOutput
@@ -13,7 +13,7 @@ import warnings
 import numpy as np
 
 from pymoo.algorithms.base.local import LocalSearch
-from pymoo.core.individual import Individual
+from pymoo.core.individual import Individual, constr_to_cv
 from pymoo.core.population import Population
 
 from pymoo.termination.max_gen import MaximumGenerationTermination
@@ -76,8 +76,8 @@ class Optimizer(LocalSearch):
                 if self.with_constr:
                     def fun_constr(x):
                         g = problem.evaluate(x, return_values_of=["G"])
-                        cv = TotalConstraintViolation().calc(g)
-                        return cv[0]
+                        cv = constr_to_cv(g)
+                        return cv
 
                     non_lin_constr = NonlinearConstraint(fun_constr, -float("inf"), 0)
 

@@ -14,10 +14,10 @@ F = problem.evaluate(np.random.random((100, 10)))
 problem = WeldedBeam()
 
 # by default a problem with constrained will also return the constraint violation
-F, CV = problem.evaluate(np.random.random((100, 4)))
+F, *_ = problem.evaluate(np.random.random((100, 4)))
 
 # if only specific values are required return_values_of can be defined
 F = problem.evaluate(np.random.random((100, 4)), return_values_of=["F"])
 
 # in this case more values are returned (also the gradient of the objective values!)
-F, G, CV, dF = problem.evaluate(np.random.random((100, 4)), return_values_of=["F", "G", "CV", "dF"])
+F, G, dF = problem.evaluate(np.random.random((100, 4)), return_values_of=["F", "G", "dF"])

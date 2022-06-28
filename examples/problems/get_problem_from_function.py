@@ -26,7 +26,6 @@ problem = FunctionalProblem(n_var,
                             xu=np.array([10, 5, 10])
                             )
 
-F, CV = problem.evaluate(np.random.rand(3, 10))
-
+F, G = problem.evaluate(np.random.rand(3, 10))
 print(f"F: {F}\n")
-print(f"CV: {CV}")
+print(f"G: {G}\n")

@@ -1,4 +1,4 @@
-import autograd.numpy as anp
+import numpy as np
 import numpy as np
 from scipy.spatial.qhull import Delaunay
 from scipy.stats import gmean
@@ -87,7 +87,7 @@ def mean_mean(z):
 def potential_energy(x):
     _x = x / x.sum(axis=1)[:, None]
     D = ((_x[:, None] - _x[None, :]) ** 2).sum(axis=2)
-    D = D[anp.triu_indices(len(_x), 1)]
+    D = D[np.triu_indices(len(_x), 1)]
     return (1 / D).mean()
 
 

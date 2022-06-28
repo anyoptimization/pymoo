@@ -83,6 +83,7 @@ class MyCallback(Callback):
         assert_fronts_equal(python_fast_nds, python_tree_based_nds)
 
 
+@pytest.mark.long
 @pytest.mark.parametrize('n_obj', [2, 3, 5, 10])
 def test_equal_during_run(n_obj):
     # create the reference directions to be used for the optimization

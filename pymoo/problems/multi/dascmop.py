@@ -16,7 +16,7 @@ class DASCMOP(Problem):
         super().__init__(n_var=30,
                          n_obj=n_obj,
                          n_ieq_constr=n_ieq_constr,
-                         type_var=np.double, xl=0., xu=1., **kwargs)
+                         vtype=float, xl=0., xu=1., **kwargs)
 
         if isinstance(difficulty, int):
             self.difficulty = difficulty
@@ -44,7 +44,7 @@ class DASCMOP(Problem):
         return contrib.sum(axis=1)[:, None]
 
     def _calc_pareto_front(self, *args, **kwargs):
-        return Remote.get_instance().load(f"pf", "DASCMOP", f"{str(self.__class__.__name__).lower()}_{self.difficulty}.pf")
+        return Remote.get_instance().load("pymoo", "pf", "DASCMOP", f"{str(self.__class__.__name__).lower()}_{self.difficulty}.pf")
 
 
 class DASCMOP1(DASCMOP):

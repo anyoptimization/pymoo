@@ -49,11 +49,11 @@ class AdaptiveConstraintHandling(Meta, Algorithm):
         copy_to_dict(self.default_config, self.config)
 
     def _advance(self, infills=None, **kwargs):
-        self._adapt(self.adapted_config, infills=infills, **kwargs)
-
         copy_to_dict(self.adapted_config, self.config)
         super()._advance(infills=infills, **kwargs)
         copy_to_dict(self.default_config, self.config)
+
+        self._adapt(self.adapted_config, infills=infills, **kwargs)
 
     def _infill(self):
         copy_to_dict(self.adapted_config, self.config)

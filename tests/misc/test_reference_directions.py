@@ -9,6 +9,11 @@ def test_das_dennis():
     assert len(ref_dirs) == 91
 
 
+def test_energy():
+    ref_dirs = get_reference_directions("energy", 3, n_points=100, verify_gradient=True)
+    assert len(ref_dirs) == 100
+
+
 def test_das_dennis_achievable_points():
     ref_dirs = get_reference_directions("das-dennis", 3, n_points=91)
     assert len(ref_dirs) == 91

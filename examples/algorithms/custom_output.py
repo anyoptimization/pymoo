@@ -11,16 +11,14 @@ class MyOutput(Output):
 
     def __init__(self):
         super().__init__()
-        self.columns["x-mean"] = Column(13)
-        self.columns["x-std"] = Column(13)
-        self.active += ["x-mean", "x-std"]
+        self.x_mean = Column("x_mean", width=13)
+        self.x_std = Column("x_std", width=13)
+        self.columns += [self.x_mean, self.x_std]
 
     def update(self, algorithm):
         super().update(algorithm)
-
-        X = algorithm.pop.get("X")
-        self.columns["x-mean"].value = np.mean(X)
-        self.columns["x-std"].value = np.std(X)
+        self.x_mean.set(np.mean(algorithm.pop.get("X")))
+        self.x_std.set(np.std(algorithm.pop.get("X")))
 
 
 problem = get_problem("zdt2")

@@ -1,5 +1,5 @@
 
-import autograd.numpy as np
+import numpy as np
 
 from pymoo.core.problem import ElementwiseProblem
 

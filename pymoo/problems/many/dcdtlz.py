@@ -1,4 +1,4 @@
-import autograd.numpy as anp
+import pymoo.gradient.toolbox as anp
 
 from pymoo.problems.many.dtlz import DTLZ1, DTLZ3
 
@@ -68,8 +68,7 @@ class DC2DTLZ3(DTLZ3):
 
 class DC3DTLZ1(DTLZ1):
     def __init__(self, n_var=12, n_obj=3, **kwargs):
-        super().__init__(n_var, n_obj, **kwargs)
-        self.n_ieq_constr = n_obj + 1
+        super().__init__(n_var, n_obj, n_ieq_constr=n_obj, **kwargs)
 
     def _evaluate(self, x, out, *args, **kwargs):
         X_, X_M = x[:, :self.n_obj - 1], x[:, self.n_obj - 1:]
@@ -80,8 +79,7 @@ class DC3DTLZ1(DTLZ1):
 
 class DC3DTLZ3(DTLZ3):
     def __init__(self, n_var=12, n_obj=3, **kwargs):
-        super().__init__(n_var, n_obj, **kwargs)
-        self.n_ieq_constr = n_obj + 1
+        super().__init__(n_var, n_obj, n_ieq_constr=n_obj, **kwargs)
 
     def _evaluate(self, x, out, *args, **kwargs):
         X_, X_M = x[:, :self.n_obj - 1], x[:, self.n_obj - 1:]

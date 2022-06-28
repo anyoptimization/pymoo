@@ -51,7 +51,7 @@ def comp_by_cv_dom_then_random(pop, P, **kwargs):
 class RestrictedMating(TournamentSelection):
     """Restricted mating approach to balance convergence and diversity archives"""
 
-    def _do(self, problem, Hm, n_select, n_parents=2, **kwargs):
+    def _do(self, problem, Hm, n_select, n_parents, **kwargs):
         n_pop = len(Hm) // 2
 
         _, rank = NonDominatedSorting().do(Hm.get('F'), return_rank=True)

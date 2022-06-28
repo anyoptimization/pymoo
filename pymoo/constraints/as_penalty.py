@@ -1,6 +1,6 @@
 from pymoo.core.individual import calc_cv
 from pymoo.core.meta import Meta
-from pymoo.core.problem import Problem, defaults_of_out
+from pymoo.core.problem import Problem
 from pymoo.util.misc import from_dict
 
 import numpy as np
@@ -21,7 +21,6 @@ class ConstraintsAsPenalty(Meta, Problem):
         self.n_eq_constr = 0
 
     def do(self, X, return_values_of, *args, **kwargs):
-
         out = self.__object__.do(X, return_values_of, *args, **kwargs)
 
         # get at the values from the output
@@ -31,13 +30,12 @@ class ConstraintsAsPenalty(Meta, Problem):
         out["__F__"], out["__G__"], out["__H__"] = F, G, H
 
         # calculate the total constraint violation (here normalization shall be already included)
-        CV = np.array([calc_cv(g, h) for g, h in zip(G, H)])
+        CV = calc_cv(G=G, H=H)
 
         # set the penalized objective values
-        out["F"] = F + self.penalty * CV
+        out["F"] = F + self.penalty * np.reshape(CV, F.shape)
 
-        DEFAULTS = defaults_of_out(self, len(X))
-        out["G"] = DEFAULTS["G"]()
-        out["H"] = DEFAULTS["H"]()
+        del out["G"]
+        del out["H"]
 
         return out

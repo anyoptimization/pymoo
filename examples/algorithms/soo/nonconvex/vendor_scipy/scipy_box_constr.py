@@ -1,4 +1,4 @@
-import autograd.numpy as anp
+import numpy as np
 
 from pymoo.core.problem import Problem
 from pymoo.optimize import minimize
@@ -8,10 +8,10 @@ from pymoo.vendor.vendor_scipy import LBFGSB, TNC
 class MySphere(Problem):
 
     def __init__(self, n_var=3):
-        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=0, xl=-5, xu=5, type_var=anp.double)
+        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=0, xl=-5, xu=5, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
-        out["F"] = anp.sum(anp.square(x - 10), axis=1)
+        out["F"] = np.sum(np.square(x - 10), axis=1)
 
 
 problem = MySphere()

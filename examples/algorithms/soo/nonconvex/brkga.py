@@ -22,7 +22,7 @@ class MyProblem(ElementwiseProblem):
 class MyElementwiseDuplicateElimination(ElementwiseDuplicateElimination):
 
     def is_equal(self, a, b):
-        return a.get("hash")[0] == b.get("hash")[0]
+        return a.get("hash") == b.get("hash")
 
 
 np.random.seed(2)

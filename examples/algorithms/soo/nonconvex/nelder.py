@@ -1,8 +1,8 @@
 from pymoo.algorithms.soo.nonconvex.nelder import NelderMead
-from pymoo.problems import get_problem
 from pymoo.optimize import minimize
+from pymoo.problems.single import Himmelblau
 
-problem = get_problem("sphere")
+problem = Himmelblau()
 
 algorithm = NelderMead()
 
