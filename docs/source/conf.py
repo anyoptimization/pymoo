@@ -11,16 +11,16 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 import os
 import sys
+from os.path import dirname
 
 SOURCE = os.path.dirname(os.path.realpath(__file__))
 
 sys.path.insert(0, SOURCE)
 from _theme import *
 
-ROOT = os.path.dirname(os.path.dirname(SOURCE))
+ROOT = dirname(dirname(SOURCE))
+sys.path.insert(0, ROOT)
 
-
-sys.path.insert(0, os.path.join(ROOT, 'pymoo'))
 import pymoo
 from pymoo.config import Config
 Config.parse_custom_docs = True
@@ -30,12 +30,14 @@ DEBUG = True
 # -- Project information -----------------------------------------------------
 
 project = 'pymoo: Multi-objective Optimization in Python'
-copyright = '2021'
+copyright = '2020'
 author = 'Julian Blank'
 
 version = pymoo.__version__
 release = version
 
+version = '0.5.0'
+release = version
 
 # ===========================================================================
 # General
@@ -46,34 +48,15 @@ release = version
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-
     'sphinx.ext.mathjax',
-
-    # for creating the APi
     'sphinx.ext.autodoc',
-
-    # API use the auto summaries
     'sphinx.ext.autosummary',
-
-    # type of comments used for docstrings
     'numpydoc',
-
-    # easy use of jupyter notebooks
-    'nbsphinx',
-
-    # # enables to provide links alias in the project
+    # 'nbsphinx',
     'sphinx.ext.intersphinx',
-
     'sphinx.ext.coverage',
-
     'matplotlib.sphinxext.plot_directive',
-
-    # for the reference page and citing
     'sphinxcontrib.bibtex',
-
-
-
-
 ]
 
 # ===========================================================================
@@ -94,6 +77,8 @@ html_static_path = ['_static']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+
+
 
 # =========================================================================================================
 # sphinx.ext.intersphinx - Mappings to other projects

@@ -7,7 +7,7 @@ SKIP = ["__init__.py",
         "matlab_example.py",
         "stream.py",
         "mopta08.py",
-        "coco.py"
+        "coco.py",
         "gif.py",
         "__pycache__"]
 

@@ -1,4 +1,4 @@
-recursive-include pymoo *.py *.cpp
-recursive-exclude pymoo *.so *.pyx *.pxd *.pf
-recursive-exclude pymoo/cache *
+prune .
+recursive-include pymoo *.py *.pyx
+recursive-include pymoo/cython/vendor *.c *.h
 include LICENSE Makefile

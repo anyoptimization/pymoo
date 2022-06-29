@@ -109,7 +109,7 @@ def normalize(data, bounds, reverse=False, return_bounds=False):
 
 def parse_bounds(bounds, n_dim):
     if bounds is not None:
-        bounds = np.array(bounds, dtype=np.float)
+        bounds = np.array(bounds, dtype=float)
         if bounds.ndim == 1:
             bounds = bounds[None, :].repeat(n_dim, axis=0).T
     return bounds

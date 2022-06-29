@@ -1,28 +1,25 @@
 import os
-from os.path import dirname
+from os.path import dirname, join
 from pathlib import Path
 
 import nbformat
 from nbconvert.preprocessors import CellExecutionError
 from nbconvert.preprocessors.execute import executenb
 from nbformat import read as nbread
+
 from pymoo.util.remote import Remote
 
-from pymoo.config import Config
+ROOT = dirname(dirname(os.path.realpath(__file__)))
 
-ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+TESTS = join(ROOT, "tests")
 
-TESTS = os.path.join(ROOT, "tests")
+EXAMPLES = join(ROOT, "examples")
 
-RESOURCES = os.path.join(TESTS, "resources")
+TESTS = join(ROOT, "tests")
 
-EXAMPLES = os.path.join(ROOT, "examples")
-
-TESTS = os.path.join(ROOT, "tests")
+DOCS = join(ROOT, "docs", "source")
 
 NO_INIT = ["__init__.py"]
-
-DOCS = os.path.join(dirname(Config.root), "docs", "source")
 
 
 def load_to_test_resource(*args, to=None, **kwargs):
@@ -33,12 +30,12 @@ def load_to_test_resource(*args, to=None, **kwargs):
 
 
 def files_from_folder(folder, regex='**/*.py', skip=[]):
-    files = [os.path.join(folder, fname) for fname in Path(folder).glob(regex)]
+    files = [join(folder, fname) for fname in Path(folder).glob(regex)]
     return filter_by_exclude(files, exclude=skip)
 
 
 def filter_by_exclude(files, exclude=[]):
-    return [f for f in files if not any([os.path.basename(f) == s for s in exclude])]
+    return [f for f in files if not any([f.endswith(s) for s in exclude])]
 
 
 def run_ipynb(kernel, fname, overwrite=False, remove_trailing_empty_cells=False):

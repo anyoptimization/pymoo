@@ -21,9 +21,9 @@ jobs:
       - name: Install pymoo
         run: |
           pip install .
-          rm -rf pymoo
       - name: Run Tests
         run: |
           cd tests
-          pytest -v -x --no-header -m "not long"
+          pytest -v --maxfail 1 --no-header -m "not long"
+          cd ..
 

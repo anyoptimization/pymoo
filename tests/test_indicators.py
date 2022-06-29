@@ -1,14 +1,10 @@
-import os
-
 import numpy as np
-
 
 from pymoo.indicators.gd import GD
 from pymoo.indicators.gd_plus import GDPlus
 from pymoo.indicators.igd import IGD
 from pymoo.indicators.igd_plus import IGDPlus
-from tests.problems.test_correctness import load
-from tests.test_util import RESOURCES, load_to_test_resource
+from tests.test_util import load_to_test_resource
 
 
 def test_values_of_indicators():

@@ -1,11 +1,11 @@
+import argparse
 import copy
 import distutils
 import os
 import sys
 import traceback
 
-import setuptools
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
 from pymoo.version import __version__
@@ -18,17 +18,21 @@ from pymoo.version import __version__
 __name__ = "pymoo"
 __author__ = "Julian Blank"
 __url__ = "https://pymoo.org"
-
 data = dict(
     name=__name__,
     version=__version__,
     author=__author__,
     url=__url__,
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     author_email="blankjul@msu.edu",
     description="Multi-Objective Optimization in Python",
     license='Apache License 2.0',
     keywords="optimization",
+    packages=find_packages(include=['pymoo', 'pymoo.*']),
+    include_package_data=True,
+    exclude_package_data={
+            '': ['*.c', '*.cpp', '*.pyx'],
+    },
     install_requires=['numpy>=1.15',
                       'scipy>=1.1',
                       'matplotlib>=3',
@@ -56,7 +60,6 @@ data = dict(
     ]
 )
 
-
 # ---------------------------------------------------------------------------------------------------------
 # OTHER METADATA
 # ---------------------------------------------------------------------------------------------------------
@@ -68,19 +71,22 @@ def readme():
         return f.read()
 
 
-def packages():
-    return ["pymoo"] + ["pymoo." + e for e in setuptools.find_packages(where='pymoo')]
-
-
 data['long_description'] = readme()
 data['long_description_content_type'] = 'text/x-rst'
-data['packages'] = packages()
-data['include_package_data'] = True
 
 
 # ---------------------------------------------------------------------------------------------------------
-# Extensions
+# OPTIONS
 # ---------------------------------------------------------------------------------------------------------
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--nopyx', action='store_true', help='Whether the pyx files shall be considered at all.')
+parser.add_argument('--nocython', action='store_true', help='Whether pyx files shall be cythonized.')
+parser.add_argument('--nolibs', action='store_true', help='Whether the libraries should be compiled.')
+args, _ = parser.parse_known_args()
+
+sys.argv = [e for e in sys.argv if not e in args]
 
 
 # ============================================================
@@ -138,90 +144,64 @@ def construct_build_ext(build_ext):
 # SETUP
 # ============================================================
 
+ROOT = os.path.dirname(os.path.realpath(__file__))
+backup = copy.deepcopy(data)
 
-def run_setup(setup_args):
+try:
 
-    # try to add compilation to the setup - if fails just do default
-    try:
+    if args.nopyx:
+        ext = []
+    elif args.nocython:
+        path = os.path.join(ROOT, "pymoo", "cython")
+        pyx = [os.path.join(path, f) for f in os.listdir() if f.endswith(".pyx")]
+        ext = [Extension(f"pymoo.cython.{source[:-4]}", [source]) for source in pyx]
+    else:
+        from Cython.Build import cythonize
+        ext = cythonize("pymoo/cython/*.pyx")
 
-        do_cythonize = True
-        if "--no-cython" in sys.argv:
-            do_cythonize = False
-            sys.argv.remove("--no-cython")
+    if not args.nolibs:
 
-        # copy the kwargs for compiling purpose - if it fails setup_args remain unchanged
-        kwargs = copy.deepcopy(setup_args)
-        kwargs['cmdclass'] = {}
+        if len(ext) > 0:
+            data['ext_modules'] = ext
 
-        try:
-            import numpy as np
-            kwargs['include_dirs'] = [np.get_include()]
-        except BaseException:
-            raise CompilingFailed(
-                "NumPy libraries must be installed for compiled extensions! Speedups are not enabled.")
+            try:
+                import numpy as np
 
-        # return the object for building which allows installation with no compilation
-        kwargs['cmdclass']['build_ext'] = construct_build_ext(build_ext)
+                data['include_dirs'] = [np.get_include()]
+            except BaseException:
+                raise CompilingFailed(
+                    "NumPy libraries must be installed for compiled extensions! Speedups are not enabled.")
 
-        # all the modules must be finally added here
-        kwargs['ext_modules'] = []
-        cython_folder = os.path.join("pymoo", "cython")
-        cython_files = os.listdir(cython_folder)
+            # return the object for building which allows installation with no compilation
+            data['cmdclass'] = dict(build_ext=construct_build_ext(build_ext))
 
-        # if the pyx files should be translated and then compiled
-        if do_cythonize:
-            from Cython.Build import cythonize
-            kwargs['ext_modules'] = cythonize("pymoo/cython/*.pyx")
+    setup(**data)
+    print('*' * 75)
+    print("Compilation Successful.")
+    print("Installation with compiled libraries succeeded.")
+    print('*' * 75)
 
-        # otherwise use the existing pyx files - normal case during pip installation
-        else:
+except BaseException:
 
-            # find all cpp files in cython folder
-            cpp_files = [f for f in cython_files if f.endswith(".cpp")]
+    # retrieve the original input arguments and execute default setup
+    setup(**backup)
 
-            # add for each file an extension object to be compiled
-            for source in cpp_files:
-                ext = Extension("pymoo.cython.%s" % source[:-4], [os.path.join(cython_folder, source)])
-                kwargs['ext_modules'].append(ext)
+    # get information why compiling has failed
+    ex_type, ex_value, ex_traceback = sys.exc_info()
 
-        if len(kwargs['ext_modules']) == 0:
-            print('*' * 75)
-            print("WARNING: No modules for compilation available. To compile pyx files, execute:")
-            print("make compile-with-cython")
-            print('*' * 75)
-            raise CompilingFailed()
+    print('*' * 75)
+    print("WARNING: Compilation Failed.")
+    print("WARNING:", ex_type)
+    print("WARNING:", ex_value)
+    print()
+    print("=" * 75)
+    traceback.print_exc()
+    print("=" * 75)
+    print()
+    print("WARNING: For the compiled libraries numpy is required. Please make sure they are installed")
+    print("WARNING: pip install numpy")
+    print("WARNING: Also, make sure you have a compiler for C++!")
 
-        setup(**kwargs)
-        print('*' * 75)
-        print("Compilation Successful.")
-        print("Installation with Compilation succeeded.")
-        print('*' * 75)
-
-    except BaseException:
-
-        # retrieve the original input arguments and execute default setup
-        kwargs = setup_args
-        setup(**kwargs)
-
-        # get information why compiling has failed
-        ex_type, ex_value, ex_traceback = sys.exc_info()
-
-        print('*' * 75)
-        print("WARNING: Compilation Failed.")
-        print("WARNING:", ex_type)
-        print("WARNING:", ex_value)
-        print()
-        print("=" * 75)
-        traceback.print_exc()
-        print("=" * 75)
-        print()
-        print("WARNING: For the compiled libraries numpy is required. Please make sure they are installed")
-        print("WARNING: pip install numpy")
-        print("WARNING: Also, make sure you have a compiler for C++!")
-
-        print('*' * 75)
-        print("Plain Python installation succeeded.")
-        print('*' * 75)
-
-
-run_setup(data)
+    print('*' * 75)
+    print("Plain Python installation succeeded.")
+    print('*' * 75)

@@ -4,8 +4,8 @@ on:
     branches:
       - master
       - release
+      - develop
       - main
-
 
 jobs:
 
@@ -16,19 +16,11 @@ jobs:
       - name: Install Python 3
         uses: actions/setup-python@v2
         with:
-          python-version: '3.10'
+          python-version: '3.9'
       - name: Install Dependencies
         run: |
           pip install numpy
-          pip install -r tests/requirements.txt
-      - name: Install pymoo
-        run: |
-          pip install .
-      - name: Run Tests
-        run: |
-          cd tests
-          pytest -vv --maxfail 1 --overwrite test_docs.py
-          cd ..
+          pip install -r docs/requirements.txt
       - name: Create Documentation
         run: |
           cd docs

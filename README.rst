@@ -1,7 +1,7 @@
 
 
-.. |python| image:: https://img.shields.io/badge/python-3.9-blue.svg
-   :alt: python 3.9
+.. |python| image:: https://img.shields.io/badge/python-3.10-blue.svg
+   :alt: python 3.10
 
 .. |license| image:: https://img.shields.io/badge/license-apache-orange.svg
    :alt: license apache
