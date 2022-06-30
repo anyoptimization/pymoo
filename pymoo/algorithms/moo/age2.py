@@ -1,6 +1,12 @@
-import numba
+
+try:
+    import numba
+    from numba import jit
+except:
+    raise Exception("Please install numba to use AGEMOEA2: pip install numba")
+
 import numpy as np
-from numba import jit
+
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.algorithms.moo.age import AGEMOEASurvival

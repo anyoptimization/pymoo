@@ -1,4 +1,5 @@
 numpy
+numba
 Cython
 pytest
 nbformat
