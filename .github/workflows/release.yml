@@ -16,18 +16,19 @@ jobs:
       - name: Install Python 3
         uses: actions/setup-python@v2
         with:
-          python-version: '3.10'
+          python-version: '3.9'
       - name: Install Dependencies
         run: |
-          pip install numpy
+          pip install numpy Cython scipy==1.8.1
           pip install -r tests/requirements.txt
       - name: Install pymoo
         run: |
           pip install .
+          rm -rf pymoo
       - name: Run Tests
         run: |
           cd tests
-          pytest -vv --maxfail 1 --overwrite test_docs.py
+          pytest -vv --maxfail 1 --overwrite
           cd ..
       - name: Create Documentation
         run: |
@@ -37,10 +38,11 @@ jobs:
         uses: trendyminds/github-actions-rsync@master
         with:
           RSYNC_OPTIONS: -avzr --delete --exclude '*.ipynb'
-          RSYNC_TARGET: /home/blankjul/pymoo.org/${BRANCH_NAME}
-          RSYNC_SOURCE: build/html/*
+          RSYNC_TARGET: /home/blankjul/pymoo.org/${BRANCH_NAME}/
+          RSYNC_SOURCE: /docs/build/html/*
         env:
           SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
           SSH_USERNAME: ${{secrets.SSH_USERNAME}}
           SSH_HOSTNAME: ${{secrets.SSH_HOSTNAME}}
+
 

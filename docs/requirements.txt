@@ -1,4 +1,5 @@
 numpy
+autograd
 matplotlib
 jinja2==3
 sphinx==3.5.4
