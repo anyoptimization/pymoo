@@ -26,12 +26,13 @@ jobs:
           cd docs
           make html
           cd ..
+          mv /docs/build/html /docs/build/${BRANCH_NAME}
       - name: Upload Documentation
         uses: trendyminds/github-actions-rsync@master
         with:
           RSYNC_OPTIONS: -avzr --delete --exclude '*.ipynb'
-          RSYNC_TARGET: /home/blankjul/pymoo.org/${BRANCH_NAME}/
-          RSYNC_SOURCE: /docs/build/html/*
+          RSYNC_TARGET: /home/blankjul/pymoo.org/
+          RSYNC_SOURCE: /docs/build/${BRANCH_NAME}
         env:
           SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
           SSH_USERNAME: ${{secrets.SSH_USERNAME}}

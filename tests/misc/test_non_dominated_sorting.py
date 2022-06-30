@@ -1,7 +1,3 @@
-import importlib
-import sys
-import unittest
-
 import numpy as np
 import pytest
 
@@ -13,8 +9,6 @@ from pymoo.util.function_loader import load_function
 from pymoo.util.ref_dirs import get_reference_directions
 
 
-
-
 def assert_fronts_equal(fronts_a, fronts_b):
     assert len(fronts_a) == len(fronts_b)
 
@@ -24,11 +18,6 @@ def assert_fronts_equal(fronts_a, fronts_b):
 
 
 def test_fast_non_dominated_sorting():
-    print(sys.path)
-    print(importlib.util.find_spec("pymoo.cython.non_dominated_sorting"))
-
-    raise "dff"
-
     F = np.random.random((100, 2))
     fronts = load_function("fast_non_dominated_sort", _type="python")(F)
     _fronts = load_function("fast_non_dominated_sort", _type="cython")(F)
@@ -36,7 +25,6 @@ def test_fast_non_dominated_sorting():
 
 
 def test_efficient_non_dominated_sort():
-
     print("Testing ENS...")
     F = np.ones((1000, 3))
     F[:, 1:] = np.random.random((1000, 2))
@@ -92,23 +80,23 @@ class MyCallback(Callback):
         python_tree_based_nds = load_function("tree_based_non_dominated_sort", _type="python")(F)
         assert_fronts_equal(python_fast_nds, python_tree_based_nds)
 
-#
-# @pytest.mark.long
-# @pytest.mark.parametrize('n_obj', [2, 3, 5, 10])
-# def test_equal_during_run(n_obj):
-#     # create the reference directions to be used for the optimization
-#     ref_dirs = get_reference_directions("energy", n_obj, n_points=100)
-#
-#     # create the algorithm object
-#     algorithm = NSGA3(pop_size=92,
-#                       ref_dirs=ref_dirs)
-#
-#     print(f"NDS with {n_obj} objectives.")
-#
-#     # execute the optimization
-#     minimize(DTLZ2(n_obj=n_obj),
-#              algorithm,
-#              callback=MyCallback(),
-#              seed=1,
-#              termination=('n_gen', 200),
-#              verbose=True)
+
+@pytest.mark.long
+@pytest.mark.parametrize('n_obj', [2, 3, 5, 10])
+def test_equal_during_run(n_obj):
+    # create the reference directions to be used for the optimization
+    ref_dirs = get_reference_directions("energy", n_obj, n_points=100)
+
+    # create the algorithm object
+    algorithm = NSGA3(pop_size=92,
+                      ref_dirs=ref_dirs)
+
+    print(f"NDS with {n_obj} objectives.")
+
+    # execute the optimization
+    minimize(DTLZ2(n_obj=n_obj),
+             algorithm,
+             callback=MyCallback(),
+             seed=1,
+             termination=('n_gen', 200),
+             verbose=True)
