@@ -1,12 +1,13 @@
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.core.termination import TerminateIfAny
-from pymoo.problems import get_problem
 from pymoo.optimize import minimize
+from pymoo.problems.multi import ZDT1
 from pymoo.termination.default import DefaultMultiObjectiveTermination
 from pymoo.termination.max_time import TimeBasedTermination
 from pymoo.visualization.scatter import Scatter
 
-problem = get_problem("zdt1")
+problem = ZDT1()
+
 algorithm = NSGA2(pop_size=100)
 
 termination = TerminateIfAny(DefaultMultiObjectiveTermination(), TimeBasedTermination(0.2))

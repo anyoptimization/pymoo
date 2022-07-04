@@ -6,6 +6,8 @@
 **/*.cpp
 **/nohup.out
 
+docs/source/misc/checkpoint
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

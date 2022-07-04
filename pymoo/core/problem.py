@@ -7,9 +7,55 @@ from pymoo.util.cache import Cache
 from pymoo.util.misc import at_least_2d_array
 
 
-# ---------------------------------------------------------------------------------------------------------
-# Implementation
-# ---------------------------------------------------------------------------------------------------------
+class ElementwiseEvaluationFunction:
+
+    def __init__(self, problem, args, kwargs) -> None:
+        super().__init__()
+        self.problem = problem
+        self.args = args
+        self.kwargs = kwargs
+
+    def __call__(self, x):
+        out = dict()
+        self.problem._evaluate(x, out, *self.args, **self.kwargs)
+        return out
+
+
+class LoopedElementwiseEvaluation:
+
+    def __call__(self, f, X):
+        return [f(x) for x in X]
+
+
+class StarmapParallelization:
+
+    def __init__(self, starmap) -> None:
+        super().__init__()
+        self.starmap = starmap
+
+    def __call__(self, f, X):
+        return list(self.starmap(f, [[x] for x in X]))
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state.pop("starmap")
+        return state
+
+
+class DaskParallelization:
+
+    def __init__(self, client) -> None:
+        super().__init__()
+        self.client = client
+
+    def __call__(self, f, X):
+        jobs = [self.client.submit(f, x) for x in X]
+        return [job.result() for job in jobs]
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state.pop("client")
+        return state
 
 
 class Problem:
@@ -22,6 +68,9 @@ class Problem:
                  xu=None,
                  vtype=None,
                  vars=None,
+                 elementwise=False,
+                 elementwise_func=ElementwiseEvaluationFunction,
+                 elementwise_runner=LoopedElementwiseEvaluation(),
                  replace_nan_values_by=None,
                  exclude_from_serialization=None,
                  callback=None,
@@ -86,6 +135,11 @@ class Problem:
         # the variable type (only as a type hint at this point)
         self.vtype = vtype
 
+        # the functions used if elementwise is enabled
+        self.elementwise = elementwise
+        self.elementwise_func = elementwise_func
+        self.elementwise_runner = elementwise_runner
+
         # whether the shapes are checked strictly
         self.strict = strict
 
@@ -105,8 +159,10 @@ class Problem:
         # this defines if NaN values should be replaced or not
         self.replace_nan_values_by = replace_nan_values_by
 
-        # attribute which are excluded from being serialized )
-        self.exclude_from_serialization = exclude_from_serialization if exclude_from_serialization is not None else []
+        # attribute which are excluded from being serialized
+        self.exclude_from_serialization = exclude_from_serialization
+        if self.exclude_from_serialization is None:
+            self.exclude_from_serialization = {"elementwise_runner"}
 
     def evaluate(self,
                  X,
@@ -166,10 +222,40 @@ class Problem:
         out = {name: None for name in return_values_of}
 
         # do the function evaluation
-        self._evaluate(X, out, *args, **kwargs)
+        if self.elementwise:
+            self._evaluate_elementwise(X, out, *args, **kwargs)
+        else:
+            self._evaluate_vectorized(X, out, *args, **kwargs)
 
         # finally format the output dictionary
         out = self._format_dict(out, len(X), return_values_of)
+
+        return out
+
+    def _evaluate_vectorized(self, X, out, *args, **kwargs):
+        self._evaluate(X, out, *args, **kwargs)
+
+    def _evaluate_elementwise(self, X, out, *args, **kwargs):
+
+        # create the function that evaluates a single individual
+        f = self.elementwise_func(self, args, kwargs)
+
+        # execute the runner
+        elems = self.elementwise_runner(f, X)
+
+        # for each evaluation call
+        for i, elem in enumerate(elems):
+
+            # for each key stored for this evaluation
+            for k, v in elem.items():
+
+                # if the element does not exist in out yet -> create it
+                if out.get(k, None) is None:
+                    out[k] = []
+
+                out[k].append(v)
+
+        out = {k: anp.array(v) for k, v in out.items()}
 
         return out
 
@@ -273,106 +359,20 @@ class Problem:
     def __getstate__(self):
         if self.exclude_from_serialization is not None:
             state = self.__dict__.copy()
+
             # exclude objects which should not be stored
             for key in self.exclude_from_serialization:
                 state[key] = None
+
             return state
         else:
             return self.__dict__
 
 
-def calc_ps(problem, *args, **kwargs):
-    return at_least_2d_array(problem._calc_pareto_set(*args, **kwargs))
-
-
-def calc_pf(problem, *args, **kwargs):
-    return at_least_2d_array(problem._calc_pareto_front(*args, **kwargs))
-
-
-# ---------------------------------------------------------------------------------------------------------
-# Elementwise Problem
-# ---------------------------------------------------------------------------------------------------------
-
-
-def elementwise_eval(problem, x, args, kwargs):
-    out = dict()
-    problem._evaluate(x, out, *args, **kwargs)
-    return out
-
-
-def looped_eval(func_elementwise_eval, problem, X, *args, **kwargs):
-    return [func_elementwise_eval(problem, x, args, kwargs) for x in X]
-
-
-def starmap_parallelized_eval(func_elementwise_eval, problem, X, *args, **kwargs):
-    starmap = problem.runner
-    params = [(problem, x, args, kwargs) for x in X]
-    return list(starmap(func_elementwise_eval, params))
-
-
-def dask_parallelized_eval(func_elementwise_eval, problem, X, *args, **kwargs):
-    client = problem.runner
-    jobs = [client.submit(func_elementwise_eval, problem, x, args, kwargs) for x in X]
-    return [job.result() for job in jobs]
-
-
 class ElementwiseProblem(Problem):
 
-    def __init__(self,
-                 func_elementwise_eval=elementwise_eval,
-                 func_eval=looped_eval,
-                 exclude_from_serialization=None,
-                 runner=None,
-                 **kwargs):
-
-        super().__init__(exclude_from_serialization=exclude_from_serialization, **kwargs)
-
-        # the most granular function which evaluates one single individual - this is the function to parallelize
-        self.func_elementwise_eval = func_elementwise_eval
-
-        # the function that calls func_elementwise_eval for ALL solutions to be evaluated
-        self.func_eval = func_eval
-
-        # the two ways of parallelization which are supported
-        self.runner = runner
-
-        # do not serialize the starmap - this will throw an exception
-        self.exclude_from_serialization = self.exclude_from_serialization + ["runner"]
-
-    def do(self, X, return_values_of, *args, **kwargs):
-
-        out = dict()
-
-        # do an elementwise evaluation and return the results
-        d = self.func_eval(self.func_elementwise_eval, self, X, *args, **kwargs)
-
-        # for each evaluation call
-        for i, elem in enumerate(d):
-
-            # for each key stored for this evaluation
-            for k, v in elem.items():
-
-                # if the element does not exist in out yet -> create it
-                if k not in out:
-                    out[k] = []
-
-                out[k].append(v)
-
-        out = {k: anp.array(v) for k, v in out.items()}
-
-        # finally format the output dictionary
-        out = self._format_dict(out, len(X), return_values_of)
-
-        return out
-
-    @abstractmethod
-    def _evaluate(self, x, out, *args, **kwargs):
-        pass
-
-
-# ---------------------------------------------------------------------------------------------------------
-# Util
-# ---------------------------------------------------------------------------------------------------------
+    def __init__(self, *args, elementwise=True, **kwargs):
+        super().__init__(*args, elementwise=elementwise, **kwargs)
 
 
 def default_shape(problem, n):
