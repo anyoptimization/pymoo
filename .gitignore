@@ -4,6 +4,7 @@
 **/*.npy
 **/*.gif
 **/*.cpp
+**/nohup.out
 
 
 # Byte-compiled / optimized / DLL files
