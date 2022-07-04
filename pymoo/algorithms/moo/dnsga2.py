@@ -2,7 +2,6 @@ import numpy as np
 
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.core.population import Population
-from pymoo.problems.dyn import DynamicProblem
 
 
 class DNSGA2(NSGA2):
@@ -24,10 +23,6 @@ class DNSGA2(NSGA2):
 
     def _advance(self, **kwargs):
 
-        # for dynamic problems without real-time iterate to the next time step
-        if isinstance(self.problem, DynamicProblem):
-            self.problem.next()
-
         pop = self.pop
         X, F = pop.get("X", "F")
 
@@ -45,8 +40,6 @@ class DNSGA2(NSGA2):
         change_detected = delta > self.eps
 
         if change_detected:
-            # just for now actually print there was a change
-            print(self.n_gen, "CHANGE")
 
             # recreate the current population without being evaluated
             pop = Population.new(X=X)
@@ -59,7 +52,7 @@ class DNSGA2(NSGA2):
             self.evaluator.eval(self.problem, pop)
 
             # do a survival to recreate rank and crowding of all individuals
-            self.survival.do(self.problem, pop, n_survive=len(pop))
+            pop = self.survival.do(self.problem, pop, n_survive=len(pop))
 
         # create the offsprings from the current population
         off = self.mating.do(self.problem, pop, self.n_offsprings, algorithm=self)

@@ -36,8 +36,6 @@ author = 'Julian Blank'
 version = pymoo.__version__
 release = version
 
-version = '0.5.0'
-release = version
 
 # ===========================================================================
 # General
@@ -52,12 +50,14 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'numpydoc',
-    # 'nbsphinx',
+    'nbsphinx',
     'sphinx.ext.intersphinx',
     'sphinx.ext.coverage',
     'matplotlib.sphinxext.plot_directive',
     'sphinxcontrib.bibtex',
 ]
+
+bibtex_bibfiles = ['references.bib']
 
 # ===========================================================================
 # HTML

@@ -153,26 +153,34 @@ def parse_doc_string(source, dest=None, other={}):
         dest = source
 
     D = {k: v.strip() for k, v in docs.items()}
-    _doc = source.__doc__.format(**{**D, **other})
+    
+    doc = source.__doc__
+    
 
-    lines = inspect.getsource(source)
+    if doc is not None:
+        
+        doc = doc.format(**{**D, **other})
 
-    cnt = 0
-    b = False
+        lines = inspect.getsource(source)
 
-    for i, c in enumerate(lines):
-        if b and cnt == 0:
-            break
-        if c == "(":
-            cnt += 1
-            b = True
-        elif c == ")":
-            cnt -= 1
+        cnt = 0
+        b = False
 
-    signature = lines[:i]
-    signature = re.sub(r"[\n\t]*", "", signature)
-    signature = re.sub(r"\s+", " ", signature)
-    signature = re.sub(r"def\s*", "", signature)
-    signature = signature.strip()
+        for i, c in enumerate(lines):
+            
+            if b and cnt == 0:
+                break
+            if c == "(":
+                cnt += 1
+                b = True
+            elif c == ")":
+                cnt -= 1
 
-    dest.__doc__ = signature + "\n" + _doc
+        signature = lines[:i]
+        signature = re.sub(r"[\n\t]*", "", signature)
+        signature = re.sub(r"\s+", " ", signature)
+        signature = re.sub(r"def\s*", "", signature)
+        signature = signature.strip()
+
+        if dest is not None:
+            dest.__doc__ = signature + "\n" + doc

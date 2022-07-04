@@ -1,3 +1,5 @@
+**July 11, 2022:** It just happened. The new pymoo (version **0.6.0**) version has been released. Most things happened under the hood; however, the code base has changed quite a bit. The individual class has been reimplemented, and the meta algorithms can now be constructed much simpler. New algorithms have been added (RVEA, SMS-EMOA), and dynamic optimization problems and a simple implementation of D-NSGA-II are available. For more details, please have a look at the changelogs. (:ref:`Release Notes<version_0_6_0>`)
+
 
 
 **September 12, 2021:** After quite some time, a bigger release of pymoo (version **0.5.0**) is available.
@@ -11,15 +13,5 @@ Even though there might be some breaking changes for users, it shall improve the
 has some new features and evolutionary operators, as well as an improved getting, started guide.
 For more details, please have a look at the release notes.
 (:ref:`Release Notes<version_0_4_2>`)
-
-
-
-**May 4, 2020:** A new release of pymoo is available. Version **0.4.1** of our framework contains
-a novel method to generate an arbitrary number of reference directions. Reference directions are
-required to run most of the many-objective optimization algorithms such as NSGA3 or MOEAD.
-Moreover, we have fixed minor bugs and provide a basic implementation of the well-known Hooke and Jeeves Pattern Search
-algorithm for single-objective problems.
-(:ref:`Release Notes<version_0_4_1>`)
-
 
 

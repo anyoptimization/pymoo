@@ -66,7 +66,6 @@ pure python version is installed. More information are available in our
 :ref:`Installation Guide <installation>`.
 
 
-
 .. raw:: html
    :file: home/cards.html
 
@@ -148,7 +147,7 @@ it meets the industry's current needs.
 
 Moreover, any kind of **contribution** is more than welcome:
 
-.. |star| image:: resources/images/star.png
+.. |star| image:: https://github.com/anyoptimization/pymoo-data/blob/main/docs/images/star.png
   :height: 25
   :target: https://github.com/anyoptimization/pymoo
 
@@ -195,6 +194,7 @@ Content
    interface/index.ipynb
    problems/index.ipynb
    algorithms/index.ipynb
+   constraints/index.ipynb
    customization/index.ipynb
    operators/index.ipynb
    visualization/index.ipynb

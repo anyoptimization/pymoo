@@ -15,3 +15,5 @@
    :ref:`MOEA\D <nb_moead>`, MOEAD, moead, many,, Another well-known multi-objective optimization algorithm based on decomposition.
    :ref:`AGE-MOEA <nb_agemoea>`, AGEMOEA, agemoea, many,, Similar to NSGA-II but estimates the shape of the Pareto-front to compute a score replacing the crowding distance.
    :ref:`C-TAEA <nb_ctaea>`, CTAEA, ctaea, many, x, An algorithm with a more sophisticated constraint-handling for many-objective optimization algoritms.
+      :ref:`SMS-EMOA <nb_sms>`, CTAEA, ctaea, many, x, An algorithm that uses hypervolume during the environmental survival.
+      :ref:`RVEA <nb_rvea>`, RVEA, ctaea, many, x, A reference direction based algorithm used an angle-penalized metric.

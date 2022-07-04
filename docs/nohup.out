@@ -1,0 +1,528 @@
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/css/custom.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/vendor/open-sans_all/1.44.1/index.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/css/index.d431a4ee1c1efae0e38bdfebc22debff.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2 HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/vendor/lato_latin-ext/1.44.1/index.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/vendor/fontawesome/5.13.0/css/all.min.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2 HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/sphinx-book-theme.da26317cf37e5c4af2fa3e6253912353.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/js/index.30270b6e4c972e43c488.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/css/pure.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/underscore.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/jquery.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/doctools.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/images/icon_getting_started.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/header.jpg HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/images/icon_newsletter.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 14:35:02] "GET /_static/new-flag.svg HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 14:35:03] "GET /_static/vendor/lato_latin-ext/1.44.1/files/lato-latin-ext-400.woff2 HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 14:35:03] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-regular-400.woff2 HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 14:35:03] "GET /_static/vendor/open-sans_all/1.44.1/files/open-sans-all-400.woff2 HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 14:35:03] "GET /_static/logo.svg HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 14:35:03] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 14:35:03] "GET /resources/images/star.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 18:54:16] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:16] "GET /_static/vendor/open-sans_all/1.44.1/index.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:16] "GET /_static/vendor/lato_latin-ext/1.44.1/index.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:16] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 18:54:16] "GET /resources/images/star.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 18:54:16] "GET /_static/sphinx-book-theme.da26317cf37e5c4af2fa3e6253912353.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:16] "GET /_static/vendor/fontawesome/5.13.0/css/all.min.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:16] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:16] "GET /_static/css/index.d431a4ee1c1efae0e38bdfebc22debff.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:16] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:16] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:16] "GET /_static/css/custom.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:16] "GET /_static/css/pure.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:16] "GET /_static/underscore.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:17] "GET /_static/jquery.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:17] "GET /_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:17] "GET /_static/doctools.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:17] "GET /_static/logo.svg HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:17] "GET /_static/images/icon_getting_started.png HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:17] "GET /_static/new-flag.svg HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:17] "GET /_static/images/icon_newsletter.png HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:17] "GET /_static/header.jpg HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:17] "GET /_static/vendor/lato_latin-ext/1.44.1/files/lato-latin-ext-400.woff2 HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:17] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-regular-400.woff2 HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:17] "GET /_static/vendor/open-sans_all/1.44.1/files/open-sans-all-400.woff2 HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 18:54:17] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 18:54:17] "GET /resources/images/star.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/css/index.d431a4ee1c1efae0e38bdfebc22debff.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/vendor/fontawesome/5.13.0/css/all.min.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/vendor/open-sans_all/1.44.1/index.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/vendor/lato_latin-ext/1.44.1/index.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/sphinx-book-theme.da26317cf37e5c4af2fa3e6253912353.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/js/index.30270b6e4c972e43c488.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/css/custom.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/css/pure.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/jquery.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/underscore.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/doctools.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/header.jpg HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/logo.svg HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/vendor/lato_latin-ext/1.44.1/files/lato-latin-ext-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:23] "GET /_static/images/icon_getting_started.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:24] "GET /_static/images/icon_newsletter.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:24] "GET /_static/vendor/open-sans_all/1.44.1/files/open-sans-all-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:24] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 18:54:24] "GET /resources/images/star.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 18:54:24] "GET /_static/new-flag.svg HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:24] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-regular-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:24] "GET /_static/favicon.ico HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:26] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:26] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 18:54:26] "GET /resources/images/star.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 18:54:31] "GET /algorithms/moo/nsga2.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:31] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 18:54:31] "GET /algorithms/moo/resources/images/nsga2_crowding.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 18:54:31] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 18:54:31] "GET /algorithms/moo/resources/images/nsga2_survival.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 18:54:31] "GET /_images/algorithms_moo_nsga2_10_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:54:31] "GET /_images/algorithms_moo_nsga2_12_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:55:43] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 18:55:43] "GET /algorithms/moo/nsga2.html HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 18:55:43] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 18:55:43] "GET /favicon.ico HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 18:58:41] "GET /algorithms/moo/nsga2.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:58:41] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:58:41] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:58:41] "GET /_images/algorithms_moo_nsga2_12_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:58:41] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:58:41] "GET /_images/algorithms_moo_nsga2_10_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:58:41] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 18:58:41] "GET /algorithms/moo/resources/images/nsga2_survival.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 18:58:41] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 18:58:41] "GET /algorithms/moo/resources/images/nsga2_crowding.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 18:58:43] "GET /algorithms/moo/nsga2.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 18:58:44] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 18:58:44] "GET /algorithms/moo/resources/images/nsga2_crowding.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 18:58:44] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 18:58:44] "GET /algorithms/moo/resources/images/nsga2_survival.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 19:00:22] "GET /algorithms/moo/nsga2.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:00:22] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 19:00:22] "GET /algorithms/moo/resources/images/nsga2_survival.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 19:00:23] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:00:23] "GET /_images/algorithms_moo_nsga2_10_1.png HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:00:23] "GET /_images/algorithms_moo_nsga2_12_1.png HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:00:23] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 19:00:23] "GET /algorithms/moo/resources/images/nsga2_crowding.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 19:00:23] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:00:23] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:00:23] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 19:00:23] "GET /algorithms/moo/resources/images/nsga2_survival.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 19:00:23] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 19:00:23] "GET /algorithms/moo/resources/images/nsga2_crowding.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 19:04:34] "GET /algorithms/moo/nsga2.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:34] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:04:34] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:04:34] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:04:34] "GET /_images/algorithms_moo_nsga2_12_1.png HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:04:34] "GET /_images/algorithms_moo_nsga2_10_1.png HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:04:34] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 19:04:34] "GET /algorithms/moo/resources/images/nsga2_survival.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 19:04:34] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 19:04:34] "GET /algorithms/moo/resources/images/nsga2_crowding.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /algorithms/moo/nsga2.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/vendor/fontawesome/5.13.0/css/all.min.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/css/index.d431a4ee1c1efae0e38bdfebc22debff.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/vendor/open-sans_all/1.44.1/index.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/vendor/lato_latin-ext/1.44.1/index.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/sphinx-book-theme.da26317cf37e5c4af2fa3e6253912353.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/js/index.30270b6e4c972e43c488.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/css/custom.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/css/pure.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/jquery.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/underscore.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/doctools.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:37] "GET /_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:38] "GET /_static/header.jpg HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:38] "GET /_static/logo.svg HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:38] "GET /_static/vendor/lato_latin-ext/1.44.1/files/lato-latin-ext-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:38] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 19:04:38] "GET /algorithms/moo/resources/images/nsga2_survival.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 19:04:38] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-regular-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:38] "GET /_static/vendor/open-sans_all/1.44.1/files/open-sans-all-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:38] "GET /_images/algorithms_moo_nsga2_10_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:38] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 19:04:38] "GET /algorithms/moo/resources/images/nsga2_crowding.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 19:04:38] "GET /_images/algorithms_moo_nsga2_12_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:04:38] "GET /_static/favicon.ico HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:23] "GET /algorithms/moo/nsga2.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:23] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:23] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:23] "GET /_images/algorithms_moo_nsga2_12_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:23] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:23] "GET /_images/algorithms_moo_nsga2_10_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /algorithms/moo/nsga2.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/css/index.d431a4ee1c1efae0e38bdfebc22debff.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/vendor/fontawesome/5.13.0/css/all.min.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/vendor/open-sans_all/1.44.1/index.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/vendor/lato_latin-ext/1.44.1/index.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/sphinx-book-theme.da26317cf37e5c4af2fa3e6253912353.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/js/index.30270b6e4c972e43c488.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/css/custom.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/css/pure.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/jquery.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/doctools.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/underscore.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:26] "GET /_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:27] "GET /_static/header.jpg HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:27] "GET /_static/logo.svg HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:27] "GET /_static/vendor/lato_latin-ext/1.44.1/files/lato-latin-ext-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:27] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-regular-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:27] "GET /_static/vendor/open-sans_all/1.44.1/files/open-sans-all-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:27] "GET /_images/algorithms_moo_nsga2_10_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:27] "GET /_images/algorithms_moo_nsga2_12_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:10:27] "GET /_static/favicon.ico HTTP/1.0" 200 -
+Traceback (most recent call last):
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1291, in <module>
+    test(
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1242, in test
+    with ServerClass(addr, HandlerClass) as httpd:
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/socketserver.py", line 452, in __init__
+    self.server_bind()
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1285, in server_bind
+    return super().server_bind()
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 136, in server_bind
+    socketserver.TCPServer.server_bind(self)
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/socketserver.py", line 466, in server_bind
+    self.socket.bind(self.server_address)
+OSError: [Errno 98] Address already in use
+127.0.0.1 - - [03/Jul/2022 19:16:06] "GET /algorithms/moo/nsga2.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:16:06] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:16:06] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:16:06] "GET /_images/algorithms_moo_nsga2_10_1.png HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:16:06] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:16:06] "GET /_images/algorithms_moo_nsga2_12_1.png HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:21:45] "GET /algorithms/moo/nsga2.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:45] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:45] "GET /_images/algorithms_moo_nsga2_10_1.png HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:21:45] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:45] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:45] "GET /_images/algorithms_moo_nsga2_12_1.png HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /algorithms/moo/nsga2.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/vendor/fontawesome/5.13.0/css/all.min.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/css/index.d431a4ee1c1efae0e38bdfebc22debff.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/vendor/open-sans_all/1.44.1/index.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/vendor/lato_latin-ext/1.44.1/index.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/sphinx-book-theme.da26317cf37e5c4af2fa3e6253912353.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/js/index.30270b6e4c972e43c488.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/css/custom.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/css/pure.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/jquery.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/underscore.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/doctools.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:48] "GET /_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:49] "GET /_static/logo.svg HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:49] "GET /_static/header.jpg HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:49] "GET /_static/vendor/lato_latin-ext/1.44.1/files/lato-latin-ext-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:49] "GET /_images/algorithms_moo_nsga2_10_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:49] "GET /_images/algorithms_moo_nsga2_12_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:49] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-regular-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:49] "GET /_static/vendor/open-sans_all/1.44.1/files/open-sans-all-400.woff2 HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:49] "GET /_static/favicon.ico HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:49] "GET /index.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:50] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:21:50] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:21:50] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:21:50] "GET /_static/images/icon_newsletter.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:50] "GET /_static/images/icon_getting_started.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:50] "GET /_static/new-flag.svg HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:50] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 19:21:50] "GET /resources/images/star.png HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 19:21:52] "GET /algorithms/moo/nsga2.html HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:21:52] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:21:52] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:21:52] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:21:59] "GET /algorithms/moo/rnsga3.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:59] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:21:59] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:21:59] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:21:59] "GET /_images/algorithms_moo_rnsga3_8_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:21:59] "GET /_images/algorithms_moo_rnsga3_7_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:28:52] "GET /algorithms/moo/rnsga3.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:28:52] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:28:53] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:28:53] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:28:53] "GET /_images/algorithms_moo_rnsga3_8_1.png HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:28:53] "GET /_images/algorithms_moo_rnsga3_7_1.png HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:28:54] "GET /index.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:28:54] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:29:45] "GET /misc/constraints.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 19:29:45] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:29:45] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 19:29:45] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:32:46] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 20:32:46] "GET /misc/constraints.html HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 20:32:47] code 404, message File not found
+127.0.0.1 - - [03/Jul/2022 20:32:47] "GET /favicon.ico HTTP/1.0" 404 -
+127.0.0.1 - - [03/Jul/2022 20:32:52] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 20:32:52] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 20:32:52] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 20:32:52] "GET /_static/css/custom.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:32:52] "GET /_static/css/pure.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:32:52] "GET /_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:32:52] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 20:32:52] "GET /_static/logo.svg HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:32:52] "GET /_static/images/icon_getting_started.png HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:32:52] "GET /_static/header.jpg HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:32:52] "GET /_static/sphinx-book-theme.da26317cf37e5c4af2fa3e6253912353.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:32:52] "GET /_static/new-flag.svg HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:32:52] "GET /_static/images/icon_newsletter.png HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:32:59] "GET /algorithms/moo/rvea.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 20:32:59] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:32:59] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:32:59] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:32:59] "GET /_images/algorithms_moo_rvea_5_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 20:33:08] "GET /references.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 20:33:08] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:33:08] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:33:08] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:33:15] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:33:15] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:33:15] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:33:25] "GET /index.html HTTP/1.0" 200 -
+127.0.0.1 - - [03/Jul/2022 20:33:25] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:33:25] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [03/Jul/2022 20:33:25] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+165.22.227.135 - - [03/Jul/2022 21:29:01] "GET / HTTP/1.0" 200 -
+80.66.75.39 - - [03/Jul/2022 23:07:32] code 400, message Bad request syntax ('\x01\x01æ')
+80.66.75.39 - - [03/Jul/2022 23:07:32] "æ" 400 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/images/icon_newsletter.png HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/images/icon_getting_started.png HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/new-flag.svg HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/css/index.d431a4ee1c1efae0e38bdfebc22debff.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2 HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/vendor/fontawesome/5.13.0/css/all.min.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2 HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/vendor/open-sans_all/1.44.1/index.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/vendor/lato_latin-ext/1.44.1/index.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/sphinx-book-theme.da26317cf37e5c4af2fa3e6253912353.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/css/custom.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/js/index.30270b6e4c972e43c488.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/css/pure.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/jquery.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/underscore.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/doctools.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/logo.svg HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:18] "GET /_static/header.jpg HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:19] "GET /_static/vendor/lato_latin-ext/1.44.1/files/lato-latin-ext-400.woff2 HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:19] "GET /_static/vendor/open-sans_all/1.44.1/files/open-sans-all-400.woff2 HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:19] "GET /_static/vendor/fontawesome/5.13.0/webfonts/fa-regular-400.woff2 HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /problems/dynamic/df.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_4_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_7_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_38_2.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_22_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_30_0.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_16_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_36_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_25_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_30_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_28_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_30_3.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_36_0.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_13_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_32_3.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_32_0.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:36] "GET /_images/problems_dynamic_df_10_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:37] "GET /_images/problems_dynamic_df_38_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:37] "GET /_images/problems_dynamic_df_34_2.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:37] "GET /_images/problems_dynamic_df_32_2.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:37] "GET /_images/problems_dynamic_df_34_0.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:37] "GET /_images/problems_dynamic_df_38_0.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:37] "GET /_images/problems_dynamic_df_32_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:37] "GET /_images/problems_dynamic_df_30_2.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:37] "GET /_images/problems_dynamic_df_36_2.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:37] "GET /_images/problems_dynamic_df_36_3.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:37] "GET /_images/problems_dynamic_df_19_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:37] "GET /_images/problems_dynamic_df_38_3.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:37] "GET /_images/problems_dynamic_df_34_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:56] "GET /algorithms/moo/dnsga2.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:17:56] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:56] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:17:56] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:18:03] "GET /algorithms/moo/age.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:18:03] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:18:03] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:18:03] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:18:03] "GET /_images/algorithms_moo_age_7_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:18:03] "GET /_images/algorithms_moo_age_9_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:18:09] "GET /algorithms/moo/rvea.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:18:10] "GET /_images/algorithms_moo_rvea_5_1.png HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:18:10] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:18:10] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:18:10] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:49:34] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:49:34] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:49:34] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:49:34] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:49:42] "GET /algorithms/hyperparameter.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:49:42] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:49:42] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:49:42] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:50:23] "GET /customization/permutation.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:50:23] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:50:23] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:50:23] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:50:23] "GET /_images/customization_permutation_9_0.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:50:23] "GET /_images/customization_permutation_14_0.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:51:01] "GET /customization/subset.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:51:01] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:51:01] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:51:01] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 10:53:43] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:53:43] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:53:43] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:53:43] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:54:40] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:54:41] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:54:41] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 10:54:41] "GET /_static/pygments.css HTTP/1.0" 200 -
+Traceback (most recent call last):
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1291, in <module>
+    test(
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1242, in test
+    with ServerClass(addr, HandlerClass) as httpd:
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/socketserver.py", line 452, in __init__
+    self.server_bind()
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1285, in server_bind
+    return super().server_bind()
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 136, in server_bind
+    socketserver.TCPServer.server_bind(self)
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/socketserver.py", line 466, in server_bind
+    self.socket.bind(self.server_address)
+OSError: [Errno 98] Address already in use
+127.0.0.1 - - [04/Jul/2022 11:02:20] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:02:20] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:02:20] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:02:20] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:02:22] "GET /algorithms/hyperparameter.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:02:26] "GET /algorithms/moo/dnsga2.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:02:26] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:02:26] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:02:26] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:02:32] "GET /algorithms/moo/age.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:02:32] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:02:32] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:02:32] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:02:41] code 404, message File not found
+127.0.0.1 - - [04/Jul/2022 11:02:41] "GET /case_studies/portfolio_allocation.html HTTP/1.0" 404 -
+127.0.0.1 - - [04/Jul/2022 11:04:43] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:04:43] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:04:43] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:04:43] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:05:35] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:05:35] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:05:35] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:05:35] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:07:58] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:07:59] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:07:59] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:07:59] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:08:08] "GET /references.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:08:08] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:08:08] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:08:08] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:08:18] "GET /index.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:08:18] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:08:18] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:08:18] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:08:26] code 404, message File not found
+127.0.0.1 - - [04/Jul/2022 11:08:26] "GET /case_studies/portfolio_allocation.html HTTP/1.0" 404 -
+127.0.0.1 - - [04/Jul/2022 11:10:48] "GET /index.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:10:49] "GET /_static/pygments.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:10:49] "GET /_static/documentation_options.js HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:10:49] "GET /_static/plot_directive.css HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:10:50] "GET /case_studies/portfolio_allocation.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:10:50] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:10:50] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:10:50] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:10:52] "GET /case_studies/subset_selection.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:10:52] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:10:52] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:10:52] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:10:56] "GET /index.html HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:10:56] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:10:56] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:10:56] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:11:04] "GET /customization/initialization.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:04] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:11:04] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:11:04] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:11:12] "GET /problems/dynamic/df.html HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:12] "GET /_images/problems_dynamic_df_7_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:12] "GET /_images/problems_dynamic_df_13_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:12] "GET /_images/problems_dynamic_df_4_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:12] "GET /_images/problems_dynamic_df_19_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:12] "GET /_static/pygments.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:11:12] "GET /_images/problems_dynamic_df_10_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:12] "GET /_images/problems_dynamic_df_16_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:12] "GET /_static/plot_directive.css HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_static/documentation_options.js HTTP/1.0" 304 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_22_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_28_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_25_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_30_0.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_30_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_30_2.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_32_0.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_30_3.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_32_3.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_32_2.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_32_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_34_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_34_2.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_34_0.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_36_0.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_36_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_36_2.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_36_3.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_38_1.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_38_2.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_38_3.png HTTP/1.0" 200 -
+127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_38_0.png HTTP/1.0" 200 -
