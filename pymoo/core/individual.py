@@ -295,9 +295,9 @@ def calc_cv(G=None, H=None, config=None):
     if H is None:
         eq_cv = [0.0]
     elif H.ndim == 1:
-        eq_cv = constr_to_cv(H, **config["cv_eq"])
+        eq_cv = constr_to_cv(np.abs(H), **config["cv_eq"])
     else:
-        eq_cv = [constr_to_cv(h, **config["cv_eq"]) for h in H]
+        eq_cv = [constr_to_cv(np.abs(h), **config["cv_eq"]) for h in H]
 
     return np.array(ieq_cv) + np.array(eq_cv)
 
