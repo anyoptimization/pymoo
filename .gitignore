@@ -6,6 +6,9 @@
 **/*.cpp
 **/nohup.out
 
+
+**/dask-worker-space/**
+
 docs/source/misc/checkpoint
 
 

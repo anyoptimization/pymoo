@@ -1,19 +1,15 @@
 import numpy as np
 
 from pymoo.core.meta import Meta
-from pymoo.core.problem import Problem, ElementwiseProblem
+from pymoo.core.problem import Problem, ElementwiseEvaluationFunction
 
 
-class ElementwiseEvaluationWithGradient:
+class ElementwiseEvaluationFunctionWithGradient(ElementwiseEvaluationFunction):
 
-    def __init__(self, func) -> None:
-        super().__init__()
-        self.func = func
+    def __call__(self, x):
+        f = super().__call__
 
-    def __call__(self, problem, x, args, kwargs):
         from pymoo.gradient import TOOLBOX
-
-        f = lambda xp: self.func(problem, xp, args, kwargs)
 
         if TOOLBOX == "jax.numpy":
             from pymoo.gradient.grad_jax import jax_elementwise_value_and_grad
@@ -33,14 +29,10 @@ class ElementwiseAutomaticDifferentiation(Meta, Problem):
 
     def __init__(self, object, copy=True):
         super().__init__(object, copy)
-        self.func_elementwise_eval = ElementwiseEvaluationWithGradient(self.func_elementwise_eval)
-
-    def do(self, X, return_values_of, *args, **kwargs):
-        ret = super().do(X, return_values_of, *args, **kwargs)
-        return ret
+        self.elementwise_func = ElementwiseEvaluationFunctionWithGradient
 
 
-class VectorizedAutomaticDifferentiation(Meta, Problem):
+class AutomaticDifferentiation(Meta, Problem):
 
     def do(self, x, return_values_of, *args, **kwargs):
         from pymoo.gradient import TOOLBOX
@@ -62,13 +54,3 @@ class VectorizedAutomaticDifferentiation(Meta, Problem):
         return out
 
 
-class AutomaticDifferentiation(Meta, Problem):
-
-    def __new__(cls, object, **kwargs):
-
-        if isinstance(object, ElementwiseProblem):
-            return ElementwiseAutomaticDifferentiation(object)
-        elif isinstance(object, Problem):
-            return VectorizedAutomaticDifferentiation(object)
-        else:
-            raise Exception("For AutomaticDifferentiation the problem must be either Problem or ElementwiseProblem.")

@@ -14,10 +14,10 @@ from tests.gradients.problems_with_gradients import MySphereWithGradient, MySphe
 def test_elementwise_eval_with_gradient(correct, problem):
     X = np.random.random((100, correct.n_var))
 
-    autodiff = AutomaticDifferentiation(problem)
+    autodiff = ElementwiseAutomaticDifferentiation(problem)
 
-    _F, _dF = autodiff.evaluate(X, return_values_of=["F", "dF"])
     F, dF = correct.evaluate(X, return_values_of=["F", "dF"])
+    _F, _dF = autodiff.evaluate(X, return_values_of=["F", "dF"])
 
     np.testing.assert_allclose(_F, F, rtol=1e-5, atol=0)
     np.testing.assert_allclose(_dF, dF, rtol=1e-5, atol=0)

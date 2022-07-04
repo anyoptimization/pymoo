@@ -161,8 +161,6 @@ class Problem:
 
         # attribute which are excluded from being serialized
         self.exclude_from_serialization = exclude_from_serialization
-        if self.exclude_from_serialization is None:
-            self.exclude_from_serialization = {"elementwise_runner"}
 
     def evaluate(self,
                  X,
@@ -244,7 +242,7 @@ class Problem:
         elems = self.elementwise_runner(f, X)
 
         # for each evaluation call
-        for i, elem in enumerate(elems):
+        for elem in elems:
 
             # for each key stored for this evaluation
             for k, v in elem.items():
@@ -255,9 +253,8 @@ class Problem:
 
                 out[k].append(v)
 
-        out = {k: anp.array(v) for k, v in out.items()}
-
-        return out
+        for k in out:
+            out[k] = anp.array(out[k])
 
     def _format_dict(self, out, N, return_values_of):
 
