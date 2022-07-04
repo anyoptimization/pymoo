@@ -388,7 +388,7 @@ class CMAES(LocalSearch):
         self.parallelize = parallelize
         self.al = None
 
-    def _setup(self, problem, seed=None, **kwargs):
+    def _setup(self, problem, **kwargs):
 
         xl, xu = problem.bounds()
         if self.normalize:
@@ -397,7 +397,7 @@ class CMAES(LocalSearch):
             self.norm = NoNormalization()
             self.options['bounds'] = [xl, xu]
 
-        self.options['seed'] = seed
+        self.options['seed'] = self.seed
 
         if isinstance(self.termination, MaximumGenerationTermination):
             self.options['maxiter'] = self.termination.n_max_gen
