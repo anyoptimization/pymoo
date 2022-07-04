@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 
 from pymoo.core.callback import Callback
+from pymoo.visualization.scatter import Scatter
 
 
 class AnimationCallback(Callback):
@@ -56,3 +57,26 @@ class AnimationCallback(Callback):
 
     def do(self, problem, algorithm, **kwargs):
         pass
+
+
+class ObjectiveSpaceAnimation(AnimationCallback):
+
+    def __init__(self, recorder=None, **kwargs):
+        if recorder is None:
+            from pyrecorder.recorder import Recorder
+            from pyrecorder.writers.streamer import Streamer
+            recorder = Recorder(Streamer())
+        super().__init__(recorder=recorder, **kwargs)
+
+    def update(self, algorithm):
+        F = algorithm.opt.get("F")
+        pf = algorithm.problem.pareto_front()
+
+        sc = Scatter()
+        sc.add(F)
+        if pf is not None:
+            sc.add(pf, plot_type="line", color="black", alpha=0.7)
+        sc.do()
+
+        self.recorder.record()
+

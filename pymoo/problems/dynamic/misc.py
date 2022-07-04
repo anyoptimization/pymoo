@@ -1,5 +1,4 @@
 import numpy as np
-import numpy as np
 
 from pymoo.problems.dyn import DynamicTestProblem
 from pymoo.vendor.gta import fda2_deb, dMOP2, DIMP2, HE2, HE7, HE9
@@ -35,8 +34,6 @@ class FDA2_deb(DynamicTestProblem):
 
 
 class DMOP2(DynamicTestProblem):
-    """DMOP2 dynamic benchmark problem
-    """
 
     def __init__(self, nt=10, taut=200):
         super().__init__(n_var=10,
@@ -45,8 +42,7 @@ class DMOP2(DynamicTestProblem):
                          taut=taut)
 
     def _evaluate(self, X, out, *args, t=1, **kwargs):
-        self.t = self.time()
-        f1, f2 = dMOP2(X, self.t)
+        f1, f2 = dMOP2(X, self.time)
         out["F"] = [f1, f2]
 
     def _calc_pareto_front(self, n_pareto_points=100):

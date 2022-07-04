@@ -12,9 +12,6 @@ from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.util.display.multi import MultiObjectiveOutput
-# =========================================================================================================
-# Neighborhood Selection
-# =========================================================================================================
 from pymoo.util.reference_direction import default_ref_dirs
 
 

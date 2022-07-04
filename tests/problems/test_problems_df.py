@@ -16,6 +16,7 @@ problems = [
 
 @pytest.mark.parametrize('name,params', problems)
 def test_problems(name, params):
+
     nt, taut = params
 
     problem = get_problem(name, nt=nt, taut=taut)
@@ -36,6 +37,7 @@ def test_problems(name, params):
 
 @pytest.mark.parametrize('name,params', problems)
 def test_pf(name, params):
+
     nt, taut = 5, 1
 
     for tau in range(1, 11):

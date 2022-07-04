@@ -24,14 +24,14 @@ class MIGD(Callback):
         # the list where each of the recordings are stored: timesteps and igd
         self.records = []
 
-    def notify(self, algorithm, **kwargs):
+    def update(self, algorithm, **kwargs):
 
         # the problem to be solved
         problem = algorithm.problem
         assert problem.n_constr == 0, "The current implementation only works for unconstrained problems!"
 
         # the current time
-        t = problem.time()
+        t = problem.time
 
         # the current pareto-front of the problem (at the specific time step)
         pf = problem.pareto_front()

@@ -157,6 +157,7 @@ def parse_doc_string(source, dest=None, other={}):
     doc = source.__doc__
     
 
+    lines = inspect.getsource(source)
     if doc is not None:
         
         doc = doc.format(**{**D, **other})

@@ -118,11 +118,10 @@ class DF4(DF):
         a = np.sin(0.5 * np.pi * self.time)
         b = 1 + np.abs(np.cos(0.5 * np.pi * self.time))
         H = 1.5 + a
+        x = np.linspace(a, a + b, n_pareto_points)
 
-        x = np.linspace(0, b ** H, n_pareto_points)
-
-        f1 = x
-        f2 = (b - f1 ** (1/H)) ** H
+        f1 = np.abs(x - a) ** H
+        f2 = np.abs(x - a - b) ** H
 
         return np.array([f1, f2]).T
 

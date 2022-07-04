@@ -3,8 +3,8 @@ import numpy as np
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.core.survival import Survival
 from pymoo.docs import parse_doc_string
-from pymoo.operators.crossover.sbx import SimulatedBinaryCrossover, SBX
-from pymoo.operators.mutation.pm import PolynomialMutation, PM
+from pymoo.operators.crossover.sbx import SBX
+from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.rnd import RandomSelection
 from pymoo.termination.max_eval import MaximumFunctionCallTermination

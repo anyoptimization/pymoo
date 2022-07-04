@@ -12,14 +12,11 @@ algorithm = RVEA(ref_dirs)
 
 res = minimize(problem,
                algorithm,
-               ('n_gen', 400),
+               termination=('n_gen', 400),
                seed=1,
-               verbose=True)
+               verbose=False)
 
 plot = Scatter()
 plot.add(problem.pareto_front(ref_dirs), plot_type="line", color="black", alpha=0.7)
 plot.add(res.F, color="red")
 plot.show()
-
-
-

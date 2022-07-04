@@ -25,3 +25,14 @@ class Callback:
 
         self.notify(algorithm)
         self.update(algorithm)
+
+
+class CallbackCollection(Callback):
+
+    def __init__(self, *args) -> None:
+        super().__init__()
+        self.callbacks = args
+
+    def update(self, algorithm):
+        [callback.update(algorithm) for callback in self.callbacks]
+
