@@ -24,8 +24,8 @@ class CTP(Problem):
 
         elif option == "multimodal":
             self.calc_g = g_multimodal
-            self.xl[:, 1:] = -5.12
-            self.xu[:, 1:] = 5.12
+            self.xl[1:] = -5.12
+            self.xu[1:] = 5.12
 
         else:
             print("Unknown option for CTP single.")

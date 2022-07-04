@@ -466,8 +466,7 @@ class CMAES(LocalSearch):
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        if "es" in state:
-            del state["es"]
+        state.pop("es", None)
         return state
 
     def __setstate__(self, state):
