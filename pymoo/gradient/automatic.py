@@ -27,8 +27,11 @@ class ElementwiseEvaluationFunctionWithGradient(ElementwiseEvaluationFunction):
 
 class ElementwiseAutomaticDifferentiation(Meta, Problem):
 
-    def __init__(self, object, copy=True):
-        super().__init__(object, copy)
+    def __init__(self, problem, copy=True):
+        if not problem.elementwise:
+            raise Exception("Elementwise automatic differentiation can only be applied to elementwise problems.")
+
+        super().__init__(problem, copy)
         self.elementwise_func = ElementwiseEvaluationFunctionWithGradient
 
 
@@ -52,5 +55,3 @@ class AutomaticDifferentiation(Meta, Problem):
             out["d" + k] = v
 
         return out
-
-

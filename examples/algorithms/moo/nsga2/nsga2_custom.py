@@ -6,7 +6,7 @@ from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.core.crossover import Crossover
 from pymoo.core.duplicate import ElementwiseDuplicateElimination
 from pymoo.core.mutation import Mutation
-from pymoo.core.problem import Problem, ElementwiseProblem
+from pymoo.core.problem import ElementwiseProblem
 from pymoo.core.sampling import Sampling
 from pymoo.optimize import minimize
 from pymoo.visualization.scatter import Scatter

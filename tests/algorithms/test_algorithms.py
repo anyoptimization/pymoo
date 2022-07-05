@@ -74,8 +74,6 @@ def test_thread_pool():
         def __init__(self):
             super().__init__(n_var=2,
                              n_obj=1,
-                             n_ieq_constr=0,
-                             parallelization=("threads", 4),
                              xl=np.array([0, 0]),
                              xu=np.array([100, 100]))
 

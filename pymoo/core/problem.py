@@ -253,8 +253,10 @@ class Problem:
 
                 out[k].append(v)
 
+        # convert to arrays (the none check is important because otherwise an empty array is initialized)
         for k in out:
-            out[k] = anp.array(out[k])
+            if out[k] is not None:
+                out[k] = anp.array(out[k])
 
     def _format_dict(self, out, N, return_values_of):
 
@@ -280,8 +282,7 @@ class Problem:
                         v = v.reshape(shape[name])
                     except Exception as e:
                         raise Exception(
-                            f"Problem Error: {name} can not be set, expected shape {shape[name]} but provided {v.shape}",
-                            e)
+                            f"Problem Error: {name} can not be set, expected shape {shape[name]} but provided {v.shape}", e)
 
                 ret[name] = v
 

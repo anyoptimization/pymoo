@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from pymoo.gradient.automatic import AutomaticDifferentiation
+from pymoo.gradient.automatic import AutomaticDifferentiation, ElementwiseAutomaticDifferentiation
 from pymoo.gradient.grad_complex import ComplexNumberGradient
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.problems import get_problem
