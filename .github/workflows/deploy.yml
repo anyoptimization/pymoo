@@ -59,12 +59,10 @@ jobs:
     steps:
       -
         uses: actions/checkout@v2
-      -
-        uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2010_x86_64
+      - uses: RalfG/python-wheels-manylinux-build@v0.4.2
         with:
+          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
           build-requirements: "cython numpy"
-          pip-wheel-args: "-w ./dist --no-deps"
-          python-versions: "cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310"
       -
         name: "Remove non-compatible packages"
         run: "sudo rm dist/*linux_x86_64.whl\n"
