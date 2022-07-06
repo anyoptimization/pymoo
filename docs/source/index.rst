@@ -195,10 +195,12 @@ Content
    problems/index.ipynb
    algorithms/index.ipynb
    constraints/index.ipynb
+   gradients/index.ipynb
    customization/index.ipynb
    operators/index.ipynb
    visualization/index.ipynb
    mcdm/index.ipynb
+   case_studies/index.ipynb
    misc/indicators.ipynb
    misc/index.ipynb
    faq.ipynb

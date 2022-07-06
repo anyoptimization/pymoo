@@ -200,7 +200,10 @@ class Problem:
             if self.replace_nan_values_by is not None:
                 v[np.isnan(v)] = self.replace_nan_values_by
 
-            out[k] = v.astype(np.float64)
+            try:
+                out[k] = v.astype(np.float64)
+            except:
+                pass
 
         if self.callback is not None:
             self.callback(X, out)
@@ -369,8 +372,8 @@ class Problem:
 
 class ElementwiseProblem(Problem):
 
-    def __init__(self, *args, elementwise=True, **kwargs):
-        super().__init__(*args, elementwise=elementwise, **kwargs)
+    def __init__(self, elementwise=True, **kwargs):
+        super().__init__(elementwise=elementwise, **kwargs)
 
 
 def default_shape(problem, n):

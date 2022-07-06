@@ -4,7 +4,6 @@ from pymoo.core.initialization import Initialization
 from pymoo.core.mating import Mating
 from pymoo.core.population import Population
 from pymoo.core.repair import NoRepair
-from pymoo.operators.control import NoParameterControl
 
 
 class GeneticAlgorithm(Algorithm):
@@ -21,7 +20,6 @@ class GeneticAlgorithm(Algorithm):
                  repair=None,
                  mating=None,
                  advance_after_initial_infill=False,
-                 control=NoParameterControl,
                  **kwargs
                  ):
 
@@ -65,8 +63,7 @@ class GeneticAlgorithm(Algorithm):
                             mutation,
                             repair=self.repair,
                             eliminate_duplicates=self.eliminate_duplicates,
-                            n_max_iterations=100,
-                            control=control)
+                            n_max_iterations=100)
         self.mating = mating
 
         # other run specific data updated whenever solve is called - to share them in all algorithms

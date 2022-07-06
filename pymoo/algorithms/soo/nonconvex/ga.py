@@ -4,7 +4,10 @@ from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.core.survival import Survival
 from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.sbx import SBX
+from pymoo.operators.crossover.spx import SPX
+from pymoo.operators.mutation.bitflip import BitflipMutation
 from pymoo.operators.mutation.pm import PM
+from pymoo.operators.sampling.rnd import BinaryRandomSampling
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import compare, TournamentSelection
 from pymoo.termination.default import DefaultSingleObjectiveTermination
@@ -75,6 +78,16 @@ class GA(GeneticAlgorithm):
                          **kwargs)
 
         self.termination = DefaultSingleObjectiveTermination()
+
+
+class BGA(GA):
+
+    def __init__(self,
+                 sampling=BinaryRandomSampling(),
+                 crossover=SPX(),
+                 mutation=BitflipMutation(),
+                 **kwargs):
+        super().__init__(sampling=sampling, crossover=crossover, mutation=mutation, **kwargs)
 
 
 parse_doc_string(GA.__init__)

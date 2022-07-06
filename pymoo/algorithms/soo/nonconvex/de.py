@@ -189,7 +189,7 @@ class Variant(InfillCriterion):
         off = Population.new(X=trial)
 
         # do the mutation which helps to add some more diversity
-        off = self.mutation.do(problem, off)
+        off = self.mutation(problem, off)
 
         # repair the individuals if necessary - disabled if repair is NoRepair
         off = self.repair(problem, off, **kwargs)
@@ -211,7 +211,7 @@ class DE(GeneticAlgorithm):
                  pop_size=100,
                  n_offsprings=None,
                  sampling=FloatRandomSampling(),
-                 variant=None,
+                 variant="DE/best/1/bin",
                  output=SingleObjectiveOutput(),
                  **kwargs
                  ):
@@ -270,7 +270,6 @@ class DE(GeneticAlgorithm):
 
         # update the information regarding the current population
         FitnessSurvival().do(self.problem, self.pop, return_indices=True)
-
 
     def _set_optimum(self, **kwargs):
         k = self.pop.get("rank") == 0

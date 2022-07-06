@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import numpy as np
 
 from pymoo.core.operator import Operator
@@ -11,7 +13,12 @@ class Mutation(Operator):
         self.prob = Real(prob, bounds=(0.7, 1.0), strict=(0.0, 1.0))
         self.prob_var = Real(prob_var, bounds=(0.0, 0.25), strict=(0.0, 1.0)) if prob_var is not None else None
 
-    def do(self, problem, pop, **kwargs):
+    def do(self, problem, pop, inplace=True, **kwargs):
+
+        # if not inplace copy the population first
+        if not inplace:
+            pop = deepcopy(pop)
+
         n_mut = len(pop)
 
         # get the variables to be mutated

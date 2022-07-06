@@ -49,8 +49,6 @@ class G3PCX(LoopwiseAlgorithm):
         self.mutation = PM()
         self.mutation.prob = Real(0.25, bounds=(0.0, 1.0))
 
-        self.cnt = 1
-
     def _initialize_infill(self):
         return self.initialization.do(self.problem, get(self.pop_size), algorithm=self)
 

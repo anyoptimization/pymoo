@@ -7,15 +7,17 @@ from pymoo.core.population import Population
 class DNSGA2(NSGA2):
 
     def __init__(self,
-                 perc_sample=0.1,
-                 zeta=0.3,
+                 perc_detect_change=0.1,
+                 perc_diversity=0.3,
                  eps=0.0,
+                 version="A",
                  **kwargs):
 
         super().__init__(**kwargs)
-        self.perc_sample = perc_sample
-        self.zeta = zeta
+        self.perc_detect_change = perc_detect_change
+        self.perc_diversity = perc_diversity
         self.eps = eps
+        self.version = version
 
     def setup(self, problem, **kwargs):
         assert not problem.has_constraints(), "DNSGA2 only works for unconstrained problems."
@@ -27,7 +29,7 @@ class DNSGA2(NSGA2):
         X, F = pop.get("X", "F")
 
         # the number of solutions to sample from the population to detect the change
-        n_samples = int(np.ceil(len(pop) * self.perc_sample))
+        n_samples = int(np.ceil(len(pop) * self.perc_detect_change))
 
         # choose randomly some individuals of the current population to test if there was a change
         I = np.random.choice(np.arange(len(pop)), size=n_samples)
@@ -44,9 +46,18 @@ class DNSGA2(NSGA2):
             # recreate the current population without being evaluated
             pop = Population.new(X=X)
 
-            # randomly replace zeta percent to introduce some diversity
-            rnd_repl = np.where(np.random.random(len(pop)) < self.zeta)[0]
-            pop[rnd_repl] = self.initialization.sampling.do(self.problem, len(rnd_repl))
+            # find indices to be replaced (introduce diversity)
+            I = np.where(np.random.random(len(pop)) < self.perc_diversity)[0]
+
+            # replace with randomly sampled individuals
+            if self.version == "A":
+                pop[I] = self.initialization.sampling(self.problem, len(I))
+
+            # replace by mutations of existing solutions (this occurs inplace)
+            elif self.version == "B":
+                self.mating.mutation(self.problem, pop[I])
+            else:
+                raise Exception(f"Unknown version of D-NSGA-II: {self.version}")
 
             # reevaluate because we know there was a change
             self.evaluator.eval(self.problem, pop)

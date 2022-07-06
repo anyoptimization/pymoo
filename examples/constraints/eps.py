@@ -5,7 +5,7 @@ from pymoo.problems.single import G1
 
 problem = G1()
 
-algorithm = AdaptiveEpsilonConstraintHandling(DE())
+algorithm = AdaptiveEpsilonConstraintHandling(DE(), perc_eps_until=0.5)
 
 res = minimize(problem,
                algorithm,

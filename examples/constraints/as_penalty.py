@@ -1,7 +1,7 @@
 from pymoo.algorithms.soo.nonconvex.de import DE
 from pymoo.constraints.as_penalty import ConstraintsAsPenalty
 from pymoo.optimize import minimize
-from pymoo.problems.single import G1, G4
+from pymoo.problems.single import G4
 
 problem = G4()
 

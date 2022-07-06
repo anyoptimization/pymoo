@@ -2,6 +2,8 @@ import math
 
 import numpy as np
 
+from pymoo.algorithms.base.genetic import GeneticAlgorithm
+from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.core.duplicate import ElementwiseDuplicateElimination
 from pymoo.core.individual import Individual
 from pymoo.core.infill import InfillCriterion
@@ -16,6 +18,7 @@ from pymoo.operators.mutation.pm import PM
 from pymoo.operators.mutation.rm import ChoiceRandomMutation
 from pymoo.operators.repair.rounding import RoundingRepair
 from pymoo.operators.selection.rnd import RandomSelection
+from pymoo.util.display.single import SingleObjectiveOutput
 
 
 class MixedVariableMating(InfillCriterion):
@@ -52,6 +55,7 @@ class MixedVariableMating(InfillCriterion):
         self.mutation = mutation
 
     def _do(self, problem, pop, n_offsprings, parents=False, **kwargs):
+
         # So far we assume all crossover need the same amount of parents and create the same number of offsprings
         XOVER_N_PARENTS = 2
         XOVER_N_OFFSPRINGS = 2
@@ -63,9 +67,19 @@ class MixedVariableMating(InfillCriterion):
         vars_by_type = {}
         for k, v in vars.items():
             clazz = type(v)
+
             if clazz not in vars_by_type:
                 vars_by_type[clazz] = []
             vars_by_type[clazz].append(k)
+
+        # # all different recombinations (the choices need to be split because of data types)
+        recomb = []
+        for clazz, list_of_vars in vars_by_type.items():
+            if clazz == Choice:
+                for e in list_of_vars:
+                    recomb.append((clazz, [e]))
+            else:
+                recomb.append((clazz, list_of_vars))
 
         # create an empty population that will be set in each iteration
         off = Population.new(X=[{} for _ in range(n_offsprings)])
@@ -74,11 +88,13 @@ class MixedVariableMating(InfillCriterion):
             n_select = math.ceil(n_offsprings / XOVER_N_OFFSPRINGS)
             pop = self.selection(problem, pop, n_select, XOVER_N_PARENTS, **kwargs)
 
-        for clazz, list_of_vars in vars_by_type.items():
-            _parents = [[Individual(X=np.array([parent.X[var] for var in list_of_vars])) for parent in parents] for parents in pop]
+        for clazz, list_of_vars in recomb:
 
             crossover = self.crossover[clazz]
             assert crossover.n_parents == XOVER_N_PARENTS and crossover.n_offsprings == XOVER_N_OFFSPRINGS
+
+            _parents = [[Individual(X=np.array([parent.X[var] for var in list_of_vars])) for parent in parents] for
+                        parents in pop]
 
             _vars = [vars[e] for e in list_of_vars]
             _xl, _xu = None, None
@@ -131,3 +147,18 @@ def groups_of_vars(vars):
         ret[var.__class__].append((name, var))
 
     return ret
+
+
+class MixedVariableGA(GeneticAlgorithm):
+
+    def __init__(self,
+                 pop_size=50,
+                 n_offsprings=None,
+                 output=SingleObjectiveOutput(),
+                 sampling=MixedVariableSampling(),
+                 mating=MixedVariableMating(eliminate_duplicates=MixedVariableDuplicateElimination()),
+                 eliminate_duplicates=MixedVariableDuplicateElimination(),
+                 survival=FitnessSurvival(),
+                 **kwargs):
+        super().__init__(pop_size=pop_size, n_offsprings=n_offsprings, sampling=sampling, mating=mating,
+                         eliminate_duplicates=eliminate_duplicates, output=output, survival=survival, **kwargs)

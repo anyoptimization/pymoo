@@ -526,3 +526,57 @@ OSError: [Errno 98] Address already in use
 127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_38_2.png HTTP/1.0" 200 -
 127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_38_3.png HTTP/1.0" 200 -
 127.0.0.1 - - [04/Jul/2022 11:11:13] "GET /_images/problems_dynamic_df_38_0.png HTTP/1.0" 200 -
+Traceback (most recent call last):
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1291, in <module>
+    test(
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1242, in test
+    with ServerClass(addr, HandlerClass) as httpd:
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/socketserver.py", line 452, in __init__
+    self.server_bind()
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1285, in server_bind
+    return super().server_bind()
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 136, in server_bind
+    socketserver.TCPServer.server_bind(self)
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/socketserver.py", line 466, in server_bind
+    self.socket.bind(self.server_address)
+OSError: [Errno 98] Address already in use
+Traceback (most recent call last):
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1291, in <module>
+    test(
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1242, in test
+    with ServerClass(addr, HandlerClass) as httpd:
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/socketserver.py", line 452, in __init__
+    self.server_bind()
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1285, in server_bind
+    return super().server_bind()
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 136, in server_bind
+    socketserver.TCPServer.server_bind(self)
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/socketserver.py", line 466, in server_bind
+    self.socket.bind(self.server_address)
+OSError: [Errno 98] Address already in use
+Traceback (most recent call last):
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1291, in <module>
+    test(
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1242, in test
+    with ServerClass(addr, HandlerClass) as httpd:
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/socketserver.py", line 452, in __init__
+    self.server_bind()
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 1285, in server_bind
+    return super().server_bind()
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/http/server.py", line 136, in server_bind
+    socketserver.TCPServer.server_bind(self)
+  File "/home/blankjul/anaconda3/envs/develop/lib/python3.9/socketserver.py", line 466, in server_bind
+    self.socket.bind(self.server_address)
+OSError: [Errno 98] Address already in use
