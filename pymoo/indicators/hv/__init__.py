@@ -1,56 +1,10 @@
-import os
-import warnings
-
 import numpy as np
 
 from pymoo.core.indicator import Indicator
 from pymoo.indicators.distance_indicator import derive_ideal_and_nadir_from_pf
 from pymoo.util.misc import at_least_2d_array
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-from pymoo.util.normalization import ZeroToOneNormalization
 from pymoo.vendor.hv import HyperVolume as _HyperVolume
-
-
-def hypervolume_by_command(path_to_hv, X, ref_point):
-    """
-    A method to manually call the Hypervolume calculation if it is installed.
-    http://lopez-ibanez.eu/hypervolume
-
-
-    Parameters
-    ----------
-    path_to_hv : Path to the compiled executable
-    X : Points to calculate the Hypervolume
-    ref_point : Reference Point
-
-    """
-
-    ref_point_as_str = " ".join(format(x, ".3f") for x in ref_point)
-
-    current_folder = os.path.dirname(os.path.abspath(__file__))
-
-    path_to_input = os.path.join(current_folder, "in.dat")
-    np.savetxt(path_to_input, X)
-
-    path_to_output = os.path.join(current_folder, "out.dat")
-
-    command = "%s -r \"%s\" %s > %s" % (path_to_hv, ref_point_as_str, path_to_input, path_to_output)
-    # print(command)
-    os.system(command)
-
-    with open(path_to_output, 'r') as f:
-        val = f.read()
-
-    os.remove(path_to_input)
-    os.remove(path_to_output)
-
-    try:
-        hv = float(val)
-    except:
-        warnings.warn(val)
-        return - np.inf
-
-    return hv
 
 
 class Hypervolume(Indicator):
@@ -92,3 +46,18 @@ class Hypervolume(Indicator):
 
 class HV(Hypervolume):
     pass
+
+
+def hvc_looped(ref_point, F, func):
+    hv = func(ref_point, F)
+
+    hvc = []
+
+    for k in range(len(F)):
+        v = np.full(len(F), True)
+        v[k] = False
+        _hv = func(ref_point, F[v])
+        hvc.append(hv - _hv)
+
+    hvc = np.array(hvc)
+    return hvc

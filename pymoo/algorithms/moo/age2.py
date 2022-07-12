@@ -1,3 +1,4 @@
+from pymoo.docs import parse_doc_string
 
 try:
     import numba
@@ -153,3 +154,5 @@ class AGEMOEA2Survival(AGEMOEASurvival):
                                             sum(np.abs(projected_front[column] - mid_point) ** 2) ** 0.5
 
         return distances + distances.T
+
+parse_doc_string(AGEMOEA2.__init__)

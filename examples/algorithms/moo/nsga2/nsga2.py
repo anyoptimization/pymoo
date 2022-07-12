@@ -9,6 +9,7 @@ algorithm = NSGA2()
 
 res = minimize(problem,
                algorithm,
+               ("n_gen", 200),
                seed=1,
                verbose=True)
 

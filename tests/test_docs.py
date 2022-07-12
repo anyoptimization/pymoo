@@ -11,13 +11,11 @@ SKIP = ["parallelization.ipynb",
 
 IPYNBS = [e for e in files_from_folder(DOCS, regex='**/*.ipynb', skip=SKIP) if ".ipynb_checkpoints" not in e]
 
-KERNEL = start_new_kernel(kernel_name='python3')
-
 
 @pytest.mark.long
 @pytest.mark.parametrize('ipynb', IPYNBS)
 def test_docs(ipynb, pytestconfig):
     overwrite = pytestconfig.getoption("overwrite", False)
-    KERNEL[0].restart_kernel(now=True)
+    KERNEL = start_new_kernel(kernel_name='python3')
     run_ipynb(KERNEL, ipynb, overwrite=overwrite, remove_trailing_empty_cells=True)
     assert True

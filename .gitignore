@@ -2,6 +2,7 @@
 **/.vscode
 **/*.mp4
 **/*.npy
+**/*.png
 **/*.gif
 **/*.cpp
 **/nohup.out

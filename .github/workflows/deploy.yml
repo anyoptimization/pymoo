@@ -73,30 +73,3 @@ jobs:
         with:
           name: dist
           path: dist
-#  deploy:
-#    needs:
-#      - build
-#      - build-manylinux
-#    runs-on: ubuntu-latest
-#    steps:
-#      -
-#        uses: actions/checkout@v2
-#      -
-#        uses: actions/download-artifact@v2
-#        with:
-#          name: dist
-#          path: dist
-#      -
-#        name: "Set up Python"
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: "3.10"
-#      -
-#        env:
-#          TWINE_PASSWORD: "${{ secrets.PYPI_PASSWORD }}"
-#          TWINE_USERNAME: "${{ secrets.PYPI_USERNAME }}"
-#        name: Publish
-#        run: |
-#            python -m pip install --upgrade pip
-#            pip install twine
-#            twine upload --skip-existing --repository testpypi dist/*

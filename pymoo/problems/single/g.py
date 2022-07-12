@@ -1,3 +1,9 @@
+"""
+The G problems were originally defined at a CEC competition in 2006:
+Liang, Jing J., Thomas Philip Runarsson, Efrén Mezura-Montes, Maurice Clerc, Ponnuthurai Nagaratnam Suganthan, Carlos A. Coello Coello, and Kalyanmoy Deb.
+Problem Definitions and Evaluation Criteria for the CEC 2006 Special Session on Constrained Real-Parameter Optimization.
+"""
+
 import math
 
 import numpy as np
