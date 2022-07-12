@@ -20,6 +20,9 @@ jobs:
         run: |
           pip install numpy Cython scipy==1.8.1
           pip install -r tests/requirements.txt
+      - name: Install pymoo (DEBUG)
+        run: |
+          python setup.py install
       - name: Install pymoo
         run: |
           pip install .
