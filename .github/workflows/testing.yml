@@ -24,9 +24,10 @@ jobs:
         run: |
           pip install .
           rm -rf pymoo
+      - name: Check Compilation
+        run: |
+          python -c "from pymoo.util.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
       - name: Run Tests
         run: |
-          cd tests
           pytest -v --maxfail 1 --no-header -m "not long"
-          cd ..
-
+ 
