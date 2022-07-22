@@ -1,4 +1,5 @@
 
+
 .. |python| image:: https://img.shields.io/badge/python-3.9-blue.svg
    :alt: python 3.9
 
@@ -147,6 +148,3 @@ Feel free to contact me if you have any questions:
 | Michigan State University
 | Computational Optimization and Innovation Laboratory (COIN)
 | East Lansing, MI 48824, USA
-
-
-
