@@ -1,17 +1,16 @@
-from pymoo.algorithms.moo.age import AGEMOEA
 from pymoo.algorithms.moo.age2 import AGEMOEA2
-from pymoo.problems import get_problem
 from pymoo.optimize import minimize
+from pymoo.problems import get_problem
 from pymoo.visualization.scatter import Scatter
 
-problem = get_problem("zdt1")
+problem = get_problem("dtlz4")
 
 algorithm = AGEMOEA2()
 
 res = minimize(problem,
                algorithm,
                ('n_gen', 200),
-               seed=1,
+               seed=3,
                verbose=True)
 
 plot = Scatter()
