@@ -41,13 +41,17 @@ pymoo: Multi-objective Optimization in Python
 .. admonition:: Overview
     :class: myOwnStyle
 
-    There are some breaking changes in **pymoo 0.5.0**.
+    The things to check out in **pymoo 0.6.0**.
 
-    - The module *pymoo.models* has been renamed to *pymoo.core*
-    - The package structure has been modified to distinguish between single- and multi-objective optimization more clearly. For instance, the implementation of PSO has been moved from *pymoo.algorithms.so_pso* to *pymoo.algorithms.soo.nonconvex.pso*.
-    - Furthermore, the **elementwise_evaluation** flag has been replaced by the *ElementwiseProblem* class to inherit from.
+    - The new version is available pre-compiled for Python 3.7-3.10 for Linux, Mac, and Windows.
+    - The module *pymoo.factory* has been deprecated. Please instantiate the objects directly.
+    - The number of constraints is now defined by n_ieq_constr and n_eq_constr to distinguish between equality and inequality constraints (also the correct amount of objectives and constraints is checked now)
+    - Do not forget to look at the features flagged with *new* for further changes: Mixed Variable Optimization, Hyperparameter Optimization, Updated Constrained Handling Methods, and more.
 
     Enjoy our new release!
+
+    **PS: We are trying to build a team around pymoo to keep the project growing! We are planning to have a monthly meeting and build a stronger community around the framework. If you are interested in joining, please contact info@pymoo.org.**
+
 
 
 
