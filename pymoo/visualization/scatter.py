@@ -57,7 +57,6 @@ def plot_pairwise(sc):
     sc.init_figure(n_rows=sc.n_dim, n_cols=sc.n_dim)
     labels = sc.get_labels()
 
-
     for k, (F, kwargs) in enumerate(sc.to_plot):
 
         assert F.shape[1] >= 2, "A pairwise sc plot needs at least two dimensions."
@@ -125,10 +124,9 @@ class Scatter(Plot):
                 name = v.pop("plot_type")
 
                 if name == "line":
-                    if self.n_dim != 3:
-                        name = "plot"
-                    else:
-                        name = "plot_trisurf"
+                    name = "plot"
+                elif name == "surface":
+                    name = "plot_trisurf"
 
                 v["mode"] = name
             set_if_none(v, "mode", "scatter")

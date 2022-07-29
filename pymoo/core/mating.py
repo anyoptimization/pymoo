@@ -25,10 +25,10 @@ class Mating(InfillCriterion):
         if parents is None:
 
             # select the parents for the mating - just an index array
-            parents = self.selection(problem, pop, n_matings, to_pop=False, n_parents=self.crossover.n_parents, **kwargs)
+            parents = self.selection(problem, pop, n_matings, n_parents=self.crossover.n_parents, **kwargs)
 
         # do the crossover using the parents index and the population - additional data provided if necessary
-        off = self.crossover(problem, pop, parents=parents, **kwargs)
+        off = self.crossover(problem, parents, **kwargs)
 
         # do the mutation on the offsprings created through crossover
         off = self.mutation(problem, off, **kwargs)
