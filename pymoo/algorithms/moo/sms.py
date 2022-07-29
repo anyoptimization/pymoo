@@ -4,6 +4,9 @@ from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.core.population import Population
 from pymoo.core.survival import Survival
 from pymoo.docs import parse_doc_string
+from pymoo.indicators.hv.exact import ExactHypervolume
+from pymoo.indicators.hv.exact_2d import ExactHypervolume2D
+from pymoo.indicators.hv.monte_carlo import ApproximateMonteCarloHypervolume
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
@@ -11,7 +14,6 @@ from pymoo.operators.selection.tournament import compare, TournamentSelection
 from pymoo.util.display.multi import MultiObjectiveOutput
 from pymoo.util.dominator import Dominator
 from pymoo.util.function_loader import load_function
-from pymoo.util.hv import calc_hvc_2d_fast, calc_hvc_looped
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.normalization import normalize
 
@@ -49,49 +51,41 @@ class LeastHypervolumeContributionSurvival(Survival):
 
         for k, front in enumerate(fronts):
 
-            # set the rank to the current front and initially the hvi to infinity
-            pop[front].set("rank", k)
+            # get the actual front as individuals
+            front = pop[front]
+            front.set("rank", k)
 
-            splitting = len(survivors) + len(front) > n_survive
-
-            if splitting:
+            if len(survivors) + len(front) > n_survive:
 
                 # normalize all the function values for the front
-                F = pop[front].get("F")
+                F = front.get("F")
                 F = normalize(F, ideal, nadir)
-
-                I = np.lexsort((-F[:, 1], F[:, 0]))
-                F, front = F[I], front[I]
 
                 # define the reference point and shift it a bit - F is already normalized!
                 ref_point = np.full(problem.n_obj, 1.0 + self.eps)
 
-                # the solutions select front the splitting front
-                S = np.arange(len(front))
+                _, n_obj = F.shape
+
+                # choose the suitable hypervolume method
+                clazz = ExactHypervolume
+                if n_obj == 2:
+                    clazz = ExactHypervolume2D
+                elif n_obj > 3:
+                    clazz = ApproximateMonteCarloHypervolume
+
+                # finally do the computation
+                hv = clazz(ref_point).add(F)
 
                 # current front sorted by crowding distance if splitting
-                while len(survivors) + len(S) > n_survive:
-
-                    # calculate the hypervolume improvement for each of the individuals (exploit if 2d to be faster)
-                    if n_obj == 2:
-                        hvi = calc_hvc_2d_fast(F[S], ref_point)
-                        # hvi = calc_hvc_2d_slow(F[S], ref_point)
-                    else:
-                        func = load_function("hv")
-                        hvi = calc_hvc_looped(F[S], ref_point, func=func)
-
-                    # the individual to be removed from the current front
-                    rem = hvi.argmin()
-
-                    # filter by the individual to be removed
-                    S = np.array([s for k, s in enumerate(S) if k != rem])
-
-                front = front[S]
+                while len(survivors) + len(front) > n_survive:
+                    k = hv.hvc.argmin()
+                    hv.delete(k)
+                    front = np.delete(front, k)
 
             # extend the survivors by all or selected individuals
             survivors.extend(front)
 
-        return pop[survivors]
+        return Population.create(*survivors)
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -196,4 +190,3 @@ class SMSEMOA(GeneticAlgorithm):
 
 
 parse_doc_string(SMSEMOA.__init__)
-

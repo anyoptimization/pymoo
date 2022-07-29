@@ -8,12 +8,12 @@
    :target: https://www.apache.org/licenses/LICENSE-2.0
 
 
-.. |logo| image:: https://raw.githubusercontent.com/anyoptimization/pymoo/master/data/logo.png
+.. |logo| image:: https://github.com/anyoptimization/pymoo-data/blob/main/logo.png?raw=true
   :target: https://pymoo.org
   :alt: pymoo
 
 
-.. |animation| image:: https://raw.githubusercontent.com/anyoptimization/pymoo/master/data/animation.gif
+.. |animation| image:: https://github.com/anyoptimization/pymoo-data/blob/main/animation.gif?raw=true
   :target: https://pymoo.org
   :alt: pymoo
 

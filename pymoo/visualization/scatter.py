@@ -1,13 +1,88 @@
 import numpy as np
 
-from pymoo.docs import parse_doc_string
 from pymoo.core.plot import Plot
+from pymoo.docs import parse_doc_string
 from pymoo.util.misc import set_if_none
+
+
+def plot_1d(sc):
+    sc.init_figure()
+    labels = sc.get_labels()
+    ax = sc.ax
+
+    for k, (F, kwargs) in enumerate(sc.to_plot):
+        func = getattr(ax, kwargs.pop("mode"))
+        func(F, np.zeros_like(F), **kwargs)
+        ax.set_xlabel(labels[0])
+
+
+def plot_2d(sc):
+    sc.init_figure()
+    labels = sc.get_labels()
+    ax = sc.ax
+
+    for k, (F, kwargs) in enumerate(sc.to_plot):
+        func = getattr(ax, kwargs.pop("mode"))
+        func(F[:, 0], F[:, 1], **kwargs)
+        ax.set_xlabel(labels[0])
+        ax.set_ylabel(labels[1])
+
+    return sc
+
+
+def plot_3d(sc, angle):
+    sc.init_figure(plot_3D=True)
+    labels = sc.get_labels()
+    ax = sc.ax
+
+    for k, (F, kwargs) in enumerate(sc.to_plot):
+
+        # here alo `plot_trisurf` is allowed
+        func = getattr(ax, kwargs.pop("mode"))
+        func(F[:, 0], F[:, 1], F[:, 2], **kwargs)
+
+        ax.xaxis.pane.fill = False
+        ax.yaxis.pane.fill = False
+        ax.zaxis.pane.fill = False
+
+        ax.set_xlabel(labels[0])
+        ax.set_ylabel(labels[1])
+        ax.set_zlabel(labels[2])
+
+        if sc.angle is not None:
+            ax.view_init(*angle)
+
+
+def plot_pairwise(sc):
+    sc.init_figure(n_rows=sc.n_dim, n_cols=sc.n_dim)
+    labels = sc.get_labels()
+
+    for k, (F, kwargs) in enumerate(sc.to_plot):
+
+        assert F.shape[1] >= 2, "A pairwise sc plot needs at least two dimensions."
+        mode = kwargs.pop("mode")
+
+        for i in range(sc.n_dim):
+            for j in range(sc.n_dim):
+
+                ax = sc.ax[i, j]
+                func = getattr(ax, mode)
+
+                if i != j:
+                    func(F[:, i], F[:, j], **kwargs)
+                    ax.set_xlabel(labels[i])
+                    ax.set_ylabel(labels[j])
+                else:
+                    func(0, 0, s=1, color="white")
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    ax.text(0, 0, labels[i], ha='center', va='center', fontsize=20)
 
 
 class Scatter(Plot):
 
     def __init__(self,
+                 plot_3d=True,
                  angle=(45, 45),
                  **kwargs):
         """
@@ -18,8 +93,6 @@ class Scatter(Plot):
         ----------------
 
         axis_style : {axis_style}
-        endpoint_style : dict
-            Endpoints are drawn at each extreme point of an objective. This style can be modified.
         labels : {labels}
 
         Other Parameters
@@ -29,108 +102,49 @@ class Scatter(Plot):
         title : {title}
         legend : {legend}
         tight_layout : {tight_layout}
-        cmap : {cmap}
 
         """
 
         super().__init__(**kwargs)
         self.angle = angle
+        self.plot_3d = plot_3d
 
     def _do(self):
 
-        is_1d = (self.n_dim == 1)
-        is_2d = (self.n_dim == 2)
-        is_3d = (self.n_dim == 3)
-        more_than_3d = (self.n_dim > 3)
+        # set some default values
+        to_plot = []
+        for k, (F, v) in enumerate(self.to_plot):
+            v = dict(v)
+            set_if_none(v, "color", self.colors[k % len(self.colors)])
+            set_if_none(v, "alpha", 1.0)
 
-        # create the figure and axis objects
-        if is_1d or is_2d:
-            self.init_figure()
-        elif is_3d:
-            self.init_figure(plot_3D=True)
-        elif more_than_3d:
-            self.init_figure(n_rows=self.n_dim, n_cols=self.n_dim)
+            # this is added to have compatibility to an old version
+            # should be removed when the documentation is updated
+            if "plot_type" in v:
+                name = v.pop("plot_type")
 
-        # now plot data points for each entry
-        for k, (F, kwargs) in enumerate(self.to_plot):
+                if name == "line":
+                    name = "plot"
+                elif name == "surface":
+                    name = "plot_trisurf"
 
-            # copy the arguments and set the default color
-            _kwargs = kwargs.copy()
-            set_if_none(_kwargs, "color", self.colors[k % len(self.colors)])
+                v["mode"] = name
+            set_if_none(v, "mode", "scatter")
 
-            # determine the plotting type - scatter or line
-            _type = _kwargs.get("plot_type")
-            if "plot_type" in _kwargs:
-                del _kwargs["plot_type"]
+            to_plot.append([F, v])
 
-            if is_1d:
-                F = np.column_stack([F, np.zeros(len(F))])
-                labels = self.get_labels() + [""]
+        self.to_plot = to_plot
 
-                self.plot(self.ax, _type, F, **_kwargs)
-                self.set_labels(self.ax, labels, False)
-
-            elif is_2d:
-                self.plot(self.ax, _type, F, **_kwargs)
-                self.set_labels(self.ax, self.get_labels(), False)
-
-            elif is_3d:
-                set_if_none(_kwargs, "alpha", 1.0)
-
-                self.plot(self.ax, _type, F, **_kwargs)
-                self.ax.xaxis.pane.fill = False
-                self.ax.yaxis.pane.fill = False
-                self.ax.zaxis.pane.fill = False
-
-                self.set_labels(self.ax, self.get_labels(), True)
-
-                if self.angle is not None:
-                    self.ax.view_init(*self.angle)
-
-            else:
-                labels = self.get_labels()
-
-                for i in range(self.n_dim):
-                    for j in range(self.n_dim):
-
-                        ax = self.ax[i, j]
-
-                        if i != j:
-                            self.plot(ax, _type, F[:, [i, j]], **_kwargs)
-                            self.set_labels(ax, [labels[i], labels[j]], is_3d)
-                        else:
-                            ax.set_xticks([])
-                            ax.set_yticks([])
-                            ax.scatter(0, 0, s=1, color="white")
-                            ax.text(0, 0, labels[i], ha='center', va='center', fontsize=20)
+        if self.n_dim == 1:
+            plot_1d(self)
+        elif self.n_dim == 2:
+            plot_2d(self)
+        elif self.n_dim == 3 and self.plot_3d:
+            plot_3d(self, self.angle)
+        else:
+            plot_pairwise(self)
 
         return self
-
-    def plot(self, ax, _type, F, **kwargs):
-
-        is_3d = F.shape[1] == 3
-        if _type is None:
-            _type = "scatter"
-
-        if _type == "scatter":
-            if is_3d:
-                ax.scatter(F[:, 0], F[:, 1], F[:, 2], **kwargs)
-            else:
-                ax.scatter(F[:, 0], F[:, 1], **kwargs)
-        else:
-            if is_3d:
-                ax.plot_trisurf(F[:, 0], F[:, 1], F[:, 2], **kwargs)
-            else:
-                ax.plot(F[:, 0], F[:, 1], **kwargs)
-
-    def set_labels(self, ax, labels, is_3d):
-
-        # set the labels for each axis
-        ax.set_xlabel(labels[0])
-        ax.set_ylabel(labels[1])
-
-        if is_3d:
-            ax.set_zlabel(labels[2])
 
 
 parse_doc_string(Scatter.__init__)

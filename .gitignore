@@ -2,9 +2,11 @@
 **/.vscode
 **/*.mp4
 **/*.npy
+**/*.png
 **/*.gif
 **/*.cpp
 **/nohup.out
+benchmark
 
 
 **/dask-worker-space/**

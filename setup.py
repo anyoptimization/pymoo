@@ -41,7 +41,7 @@ data = dict(
                       'cma==3.2.2',
                       'alive-progress',
                       'dill',
-                      'deprecation'],
+                      'Deprecated'],
     platforms='any',
     classifiers=[
         'Intended Audience :: Developers',

@@ -80,7 +80,7 @@ class Plot:
         if isinstance(self.cmap, ListedColormap):
             self.colors = self.cmap.colors
 
-        # the dimensional of the data
+        # the dimensionality of the data
         self.n_dim = None
 
         # the boundaries for normalization
@@ -104,7 +104,7 @@ class Plot:
     def do(self):
 
         if len(self.to_plot) > 0:
-            unique_dim = np.unique(np.array([e[0].shape[1] for e in self.to_plot]))
+            unique_dim = np.unique(np.array([e[0].shape[-1] for e in self.to_plot]))
             if len(unique_dim) > 1:
                 raise Exception("Inputs with different dimensions were added: %s" % unique_dim)
 

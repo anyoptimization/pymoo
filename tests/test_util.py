@@ -38,8 +38,9 @@ def filter_by_exclude(files, exclude=[]):
     return [f for f in files if not any([f.endswith(s) for s in exclude])]
 
 
-def run_ipynb(kernel, fname, overwrite=False, remove_trailing_empty_cells=False):
-    print(fname.split("/")[-1])
+def run_ipynb(kernel, fname, overwrite=False, remove_trailing_empty_cells=False, verbose=True):
+    if verbose:
+        print(fname.split("/")[-1])
 
     try:
         nb = nbread(fname, as_version=4)

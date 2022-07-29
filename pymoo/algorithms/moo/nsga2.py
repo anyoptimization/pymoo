@@ -121,8 +121,8 @@ class NSGA2(GeneticAlgorithm):
                  pop_size=100,
                  sampling=FloatRandomSampling(),
                  selection=TournamentSelection(func_comp=binary_tournament),
-                 crossover=SBX(),
-                 mutation=PM(prob=1.0),
+                 crossover=SBX(eta=15, prob=0.9),
+                 mutation=PM(eta=20),
                  survival=RankAndCrowdingSurvival(),
                  output=MultiObjectiveOutput(),
                  **kwargs):

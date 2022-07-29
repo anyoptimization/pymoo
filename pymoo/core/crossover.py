@@ -61,7 +61,7 @@ class Crossover(Operator):
                     s.extend(np.random.permutation(n_parents))
                 s = s[:n_offsprings]
 
-            Xp[:, k] = X[s, k]
+            Xp[:, k] = np.copy(X[s, k])
 
         # flatten the array to become a 2d-array
         Xp = Xp.reshape(-1, X.shape[-1])

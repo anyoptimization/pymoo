@@ -5,7 +5,7 @@ News
 ==============================================================================
 
 
-**July 11, 2022:** It just happened. The new pymoo (version **0.6.0**) version has been released. Most things happened under the hood; however, the code base has changed quite a bit. The individual class has been reimplemented, and the meta algorithms can now be constructed much simpler. New algorithms have been added (RVEA, SMS-EMOA), and dynamic optimization problems and a simple implementation of D-NSGA-II are available. For more details, please have a look at the changelogs. (:ref:`Release Notes<version_0_6_0>`)
+**July 11, 2022:** It just happened. The new pymoo (version **0.6.0**) version has been released. Many things happened under the hood; however, the code base has changed quite a bit. The individual class has been reimplemented, and the meta algorithms can now be constructed much simpler. New algorithms have been added (G3PXC, RVEA, SMS-EMOA), and dynamic optimization problems and a simple implementation of D-NSGA-II are available. For more details, please have a look at the changelogs. (:ref:`Release Notes<version_0_6_0>`)
 
 
 **September 12, 2021:** After quite some time, a bigger release of pymoo (version **0.5.0**) is available. 

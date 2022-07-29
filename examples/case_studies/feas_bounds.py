@@ -19,7 +19,6 @@ xl = np.array([-1, -10])
 xu = np.array([1, 10])
 
 X = xl + (np.random.uniform(size=(n_points, n_dim)) * (xu - xl))
-
 a, b = X.T
 p = np.minimum(1.0, a ** 2 + (1 / 10 * b) ** 2)
 p[p < 0.1] = 0.0
