@@ -6,4 +6,3 @@ API Reference
 
    model
    algorithms
-   factory
