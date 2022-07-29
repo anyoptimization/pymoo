@@ -73,7 +73,7 @@ def mut_pm(X, xl, xu, eta, prob, at_least_once):
 
 class PolynomialMutation(Mutation):
 
-    def __init__(self, prob=0.9, eta=20, at_least_once=True, **kwargs):
+    def __init__(self, prob=0.9, eta=20, at_least_once=False, **kwargs):
         super().__init__(prob=prob, **kwargs)
         self.at_least_once = at_least_once
         self.eta = Real(eta, bounds=(3.0, 30.0), strict=(1.0, 100.0))
@@ -91,3 +91,4 @@ class PolynomialMutation(Mutation):
 
 class PM(PolynomialMutation):
     pass
+

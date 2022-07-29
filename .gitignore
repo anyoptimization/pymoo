@@ -6,6 +6,7 @@
 **/*.gif
 **/*.cpp
 **/nohup.out
+benchmark
 
 
 **/dask-worker-space/**
