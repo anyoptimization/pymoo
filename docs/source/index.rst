@@ -50,9 +50,6 @@ pymoo: Multi-objective Optimization in Python
 
     Enjoy our new release!
 
-    **PS: We are trying to build a team around pymoo to keep the project growing! We are planning to have a monthly meeting and build a stronger community around the framework. If you are interested in joining, please contact info@pymoo.org.**
-
-
 
 
 Our framework offers state of the art single- and multi-objective optimization algorithms and many

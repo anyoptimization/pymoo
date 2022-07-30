@@ -9,6 +9,8 @@ SKIP = ["parallelization.ipynb",
 
 IPYNBS = [e for e in files_from_folder(DOCS, regex='**/*.ipynb', skip=SKIP) if ".ipynb_checkpoints" not in e]
 
+IPYNBS = ['/Users/blankjul/workspace/pymoo/docs/source/algorithms/usage.ipynb',
+          '/Users/blankjul/workspace/pymoo/docs/source/algorithms/moo/nsga2.ipynb']
 
 failed = []
 
