@@ -139,3 +139,9 @@ class GDE32NN(GDE3):
     def __init__(self, pop_size=100, variant="DE/rand/1/bin", CR=0.5, F=None, gamma=0.0001, **kwargs):
         survival = RankAndCrowding(crowding_func="2nn")
         super().__init__(pop_size, variant, CR, F, gamma, survival=survival, **kwargs)
+
+class GDE3PCD(GDE3):
+    
+    def __init__(self, pop_size=100, variant="DE/rand/1/bin", CR=0.5, F=None, gamma=0.0001, **kwargs):
+        survival = RankAndCrowding(crowding_func="pcd")
+        super().__init__(pop_size, variant, CR, F, gamma, survival=survival, **kwargs)
