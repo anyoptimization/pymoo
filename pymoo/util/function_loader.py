@@ -4,6 +4,7 @@ from pymoo.config import Config
 
 
 def get_functions():
+    
     from pymoo.util.nds.fast_non_dominated_sort import fast_non_dominated_sort
     from pymoo.util.nds.efficient_non_dominated_sort import efficient_non_dominated_sort
     from pymoo.util.nds.tree_based_non_dominated_sort import tree_based_non_dominated_sort
@@ -11,6 +12,8 @@ def get_functions():
     from pymoo.util.misc import calc_perpendicular_distance
     from pymoo.util.hv import hv
     from pymoo.util.stochastic_ranking import stochastic_ranking
+    from pymoo.util.mnn import calc_mnn, calc_2nn
+    from pymoo.util.pruning_cd import calc_pcd
 
     FUNCTIONS = {
         "fast_non_dominated_sort": {
@@ -33,6 +36,15 @@ def get_functions():
         },
         "hv": {
             "python": hv, "cython": "pymoo.cython.hv"
+        },
+        "calc_mnn": {
+            "python": calc_mnn, "cython": "pymoo.cython.mnn"
+        },
+        "calc_2nn": {
+            "python": calc_2nn, "cython": "pymoo.cython.mnn"
+        },
+        "calc_pcd": {
+            "python": calc_pcd, "cython": "pymoo.cython.pruning_cd"
         },
 
     }
