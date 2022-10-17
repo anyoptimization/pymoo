@@ -27,7 +27,7 @@ class RankAndCrowding(Survival):
             Crowding metric. Options are:
             
                 - 'cd': crowding distances
-                - 'pcd' or 'pruned-cd': pruned crowding distances
+                - 'pcd' or 'pruning-cd': improved pruning based on crowding distances
                 - 'ce': crowding entropy
                 - 'mnn': M-Neaest Neighbors
                 - '2nn': 2-Neaest Neighbors
@@ -120,7 +120,7 @@ class ConstrRankAndCrowding(Survival):
             Crowding metric. Options are:
             
                 - 'cd': crowding distances
-                - 'pcd' or 'pruned-cd': pruned crowding distances
+                - 'pcd' or 'pruning-cd': improved pruning based on crowding distances
                 - 'ce': crowding entropy
                 - 'mnn': M-Neaest Neighbors
                 - '2nn': 2-Neaest Neighbors
