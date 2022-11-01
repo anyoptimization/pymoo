@@ -155,7 +155,7 @@ class ConstrRankAndCrowding(Survival):
         if problem.n_constr > 0:
 
             #Split by feasibility
-            feas, infeas = split_by_feasibility(pop, eps=0.0, sort_infeasbible_by_cv=True)
+            feas, infeas = feas, infeas = split_by_feasibility(pop, sort_infeas_by_cv=True, sort_feas_by_obj=False, return_pop=False)
 
             #Obtain len of feasible
             n_feas = len(feas)
