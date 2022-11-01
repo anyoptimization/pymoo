@@ -147,7 +147,7 @@ class DEX(Crossover):
         Xr = X[1:]
         
         # About Xi
-        n_matings, n_var = X.shape
+        n_matings, n_var = Xp.shape
         
         # Obtain mutants
         mutants = self.dem.do(problem, Xr, **kwargs)
@@ -165,9 +165,9 @@ class DEX(Crossover):
             raise Exception(f"Unknown variant: {self.variant}")
 
         # Add mutated elements in corresponding main parent
-        X[M] = V[M]
+        Xp[M] = V[M]
 
-        off = Population.new("X", X)
+        off = Population.new("X", Xp)
         
         return off
     
