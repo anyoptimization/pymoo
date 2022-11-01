@@ -47,9 +47,13 @@ class DEM:
     def __call__(self, problem, pop, parents, **kwargs):
         return self.do(problem, pop, parents, **kwargs)
         
-    def do(self, problem, Xr, **kwargs):
+    def do(self, problem, pop, parents, **kwargs):
 
-        # Create mutation vectors
+        #Get all X values for mutation parents
+        Xr = pop.get("X")[parents.T].copy()
+        assert len(Xr.shape) == 3, "Please provide a three-dimensional matrix n_parents x pop_size x n_vars."
+        
+        #Create mutation vectors
         V, diffs = self.de_mutation(Xr, return_differentials=True)
 
         # If the problem has boundaries to be considered
@@ -140,17 +144,16 @@ class DEX(Crossover):
         super().__init__(2 + 2 * n_diffs, 1,  prob=1.0, **kwargs)
 
     
-    def _do(self, problem, X, **kwargs):
+    def do(self, problem, pop, parents, **kwargs):
         
-        # Get target vectors
-        Xp = X[0]
-        Xr = X[1:]
+        #Get target vectors
+        X = pop.get("X")[parents[:, 0]]
         
-        # About Xi
-        n_matings, n_var = Xp.shape
+        #About Xi
+        n_matings, n_var = X.shape
         
-        # Obtain mutants
-        mutants = self.dem.do(problem, Xr, **kwargs)
+        #Obtain mutants
+        mutants = self.dem.do(problem, pop, parents[:, 1:], **kwargs)
         
         # Obtain V
         V = mutants.get("X")
