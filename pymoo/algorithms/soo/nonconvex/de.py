@@ -48,7 +48,7 @@ class InfillDE:
                              gamma=gamma,
                              n_diffs=n_diffs,
                              at_least_once=True,
-                             repair=repair)
+                             de_repair=de_repair)
         
         # Define posterior mutation strategy and repair
         self.mutation = mutation if mutation is not None else NoMutation()
