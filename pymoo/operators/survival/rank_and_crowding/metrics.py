@@ -46,7 +46,7 @@ class FunctionalDiversity(CrowdingDiversity):
         
         n_points, n_obj = F.shape
 
-        if n_points <= F.shape[1]:
+        if n_points <= 2:
             return np.full(n_points, np.inf)
 
         else:
