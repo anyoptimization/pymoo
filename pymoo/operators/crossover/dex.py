@@ -168,9 +168,9 @@ class DEX(Crossover):
             raise Exception(f"Unknown variant: {self.variant}")
 
         # Add mutated elements in corresponding main parent
-        Xp[M] = V[M]
+        X[M] = V[M]
 
-        off = Population.new("X", Xp)
+        off = Population.new("X", X)
         
         return off
     
