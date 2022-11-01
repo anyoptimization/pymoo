@@ -31,6 +31,9 @@ def calc_mnn(double[:, :] X, int n_remove=0):
     N = X.shape[0]
     M = X.shape[1]
 
+    if N <= M:
+        return np.full(N, HUGE_VAL)
+
     if n_remove <= (N - M):
         if n_remove < 0:
             n_remove = 0

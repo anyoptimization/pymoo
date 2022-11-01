@@ -19,7 +19,7 @@ def get_crowding_function(label):
     elif hasattr(label, "__call__"):
         fun = FunctionalDiversity(label, filter_out_duplicates=True)
     else:
-        raise KeyError("Crwoding function not defined")
+        raise KeyError("Crowding function not defined")
     return fun
     
 
