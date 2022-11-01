@@ -41,7 +41,7 @@ class InfillDE:
         if F is None:
             F = (0.0, 1.0)
         
-        # Define crossover strategy
+        # Define crossover strategy (DE mutation is included)
         self.crossover = DEX(variant=crossover_variant,
                              CR=CR,
                              F=F,
@@ -57,15 +57,14 @@ class InfillDE:
     def do(self, problem, pop, n_offsprings, **kwargs):
         
         # Select parents including donor vector
-        parents = self.selection.do(problem, pop, n_offsprings, self.crossover.n_parents,
-                                    to_pop=False, **kwargs)
+        parents = self.selection(problem, pop, n_offsprings, self.crossover.n_parents, to_pop=True, **kwargs)
         
         # Perform mutation included in DEX and crossover
-        off = self.crossover.do(problem, pop, parents, **kwargs)
+        off = self.crossover(problem, parents, **kwargs)
         
         # Perform posterior mutation and repair if passed
-        off = self.mutation.do(problem, off)
-        off = self.repair.do(problem, off)
+        off = self.mutation(problem, off)
+        off = self.repair(problem, off)
         
         return off
         

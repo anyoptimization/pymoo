@@ -9,12 +9,13 @@ from pymoo.operators.crossover.expx import mut_exp
 # Implementation
 # =========================================================================================================
 
-class DEM:
+class DEM(Crossover):
     
     def __init__(self,
                  F=None,
                  gamma=1e-4,
                  de_repair="bounce-back",
+                 n_diffs=1,
                  **kwargs):
 
         # Default value for F
@@ -43,17 +44,20 @@ class DEM:
         self.F = F
         self.gamma = gamma
         self.de_repair = de_repair
+        
+        super().__init__(1 + 2 * n_diffs, 1,  prob=1.0, **kwargs)
     
-    def __call__(self, problem, pop, parents, **kwargs):
-        return self.do(problem, pop, parents, **kwargs)
         
-    def do(self, problem, pop, parents, **kwargs):
-
-        #Get all X values for mutation parents
-        Xr = pop.get("X")[parents.T].copy()
-        assert len(Xr.shape) == 3, "Please provide a three-dimensional matrix n_parents x pop_size x n_vars."
+    def do(self, problem, pop, parents=None, **kwargs):
         
-        #Create mutation vectors
+        # Convert pop if parents is not None
+        if not parents is None:
+            pop = pop[parents]
+        
+        # Get all X values for mutation parents
+        Xr = np.swapaxes(pop, 0, 1).get("X")
+        
+        # Create mutation vectors
         V, diffs = self.de_mutation(Xr, return_differentials=True)
 
         # If the problem has boundaries to be considered
@@ -135,7 +139,8 @@ class DEX(Crossover):
         # Create instace for mutation
         self.dem = DEM(F=F,
                        gamma=gamma,
-                       de_repair=de_repair)
+                       de_repair=de_repair,
+                       n_diffs=n_diffs)
     
         self.CR = CR
         self.variant = variant
@@ -144,16 +149,20 @@ class DEX(Crossover):
         super().__init__(2 + 2 * n_diffs, 1,  prob=1.0, **kwargs)
 
     
-    def do(self, problem, pop, parents, **kwargs):
+    def do(self, problem, pop, parents=None, **kwargs):
         
-        #Get target vectors
-        X = pop.get("X")[parents[:, 0]]
+        # Convert pop if parents is not None
+        if not parents is None:
+            pop = pop[parents]
+        
+        # Get all X values for mutation parents
+        X = pop[:, 0].get("X")
         
         #About Xi
         n_matings, n_var = X.shape
         
         #Obtain mutants
-        mutants = self.dem.do(problem, pop, parents[:, 1:], **kwargs)
+        mutants = self.dem.do(problem, pop[:, 1:], **kwargs)
         
         # Obtain V
         V = mutants.get("X")
