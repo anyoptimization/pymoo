@@ -43,13 +43,12 @@ class DEM:
         self.F = F
         self.gamma = gamma
         self.de_repair = de_repair
+    
+    def __call__(self, problem, pop, parents, **kwargs):
+        return self.do(problem, pop, parents, **kwargs)
         
-    def do(self, problem, pop, parents, **kwargs):
+    def do(self, problem, Xr, **kwargs):
 
-        # Get all X values for mutation parents
-        Xr = pop.get("X")[parents.T].copy()
-        assert len(Xr.shape) == 3, "Please provide a three-dimensional matrix n_parents x pop_size x n_vars."
-        
         # Create mutation vectors
         V, diffs = self.de_mutation(Xr, return_differentials=True)
 
@@ -139,17 +138,19 @@ class DEX(Crossover):
         self.at_least_once = at_least_once
         
         super().__init__(2 + 2 * n_diffs, 1,  prob=1.0, **kwargs)
+
     
-    def do(self, problem, pop, parents, **kwargs):
+    def _do(self, problem, X, **kwargs):
         
         # Get target vectors
-        X = pop.get("X")[parents[:, 0]]
+        Xp = X[0]
+        Xr = X[1:]
         
         # About Xi
         n_matings, n_var = X.shape
         
         # Obtain mutants
-        mutants = self.dem.do(problem, pop, parents[:, 1:], **kwargs)
+        mutants = self.dem.do(problem, Xr, **kwargs)
         
         # Obtain V
         V = mutants.get("X")
