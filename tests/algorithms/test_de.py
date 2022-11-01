@@ -8,8 +8,8 @@ from pymoo.algorithms.moo.gde3 import GDE3
 
 @pytest.mark.parametrize('selection', ["rand", "best", "current-to-best", "current-to-rand", "ranked"])
 @pytest.mark.parametrize('crossover', ["bin", "exp"])
-@pytest.mark.parametrize('repair', ["bounce-back", "midway", "rand-init", "to-bounds"])
-def test_de_run(selection, crossover, repair):
+@pytest.mark.parametrize('de_repair', ["bounce-back", "midway", "rand-init", "to-bounds"])
+def test_de_run(selection, crossover, de_repair):
     problem = get_problem("rastrigin")
     
     NGEN = 30
@@ -20,7 +20,7 @@ def test_de_run(selection, crossover, repair):
     CR = 0.5
     F = (0.3, 1.0)
 
-    de = DE(pop_size=POPSIZE, variant=f"DE/{selection}/1/{crossover}", CR=CR, F=F, repair=repair)
+    de = DE(pop_size=POPSIZE, variant=f"DE/{selection}/1/{crossover}", CR=CR, F=F, de_repair=de_repair)
 
     res_de = minimize(problem,
                     de,
