@@ -13,7 +13,6 @@ class NSDER(NSDE):
     def __init__(self,
                  ref_dirs,
                  pop_size=100,
-                 sampling=LHS(),
                  variant="DE/rand/1/bin",
                  CR=0.7,
                  F=None,
