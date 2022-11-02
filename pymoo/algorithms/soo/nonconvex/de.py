@@ -3,19 +3,19 @@ from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
 from pymoo.core.replacement import ImprovementReplacement
 from pymoo.operators.mutation.nom import NoMutation
-from pymoo.core.repair import NoRepair
 from pymoo.operators.sampling.lhs import LHS
 from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.operators.selection.des import DES
 from pymoo.operators.crossover.dex import DEX
+from pymoo.core.infill import InfillCriterion
 
 
 # =========================================================================================================
 # Implementation
 # =========================================================================================================
 
-class InfillDE:
+class VariantDE(InfillCriterion):
     
     def __init__(self,
                  variant="DE/rand/1/bin",
@@ -23,8 +23,7 @@ class InfillDE:
                  F=(0.5, 1.0),
                  gamma=1e-4,
                  de_repair="bounce-back",
-                 mutation=None,
-                 repair=None):
+                 mutation=None):
         
         # Parse the information from the string
         _, selection_variant, n_diff, crossover_variant, = variant.split("/")
@@ -37,7 +36,7 @@ class InfillDE:
         # Define parent selection operator
         self.selection = DES(selection_variant)
         
-        #Default value for F
+        # Default value for F
         if F is None:
             F = (0.0, 1.0)
         
@@ -52,9 +51,9 @@ class InfillDE:
         
         # Define posterior mutation strategy and repair
         self.mutation = mutation if mutation is not None else NoMutation()
-        self.repair = repair if repair is not None else NoRepair()
+        
 
-    def do(self, problem, pop, n_offsprings, **kwargs):
+    def _do(self, problem, pop, n_offsprings, **kwargs):
         
         # Select parents including donor vector
         parents = self.selection(problem, pop, n_offsprings, self.crossover.n_parents, to_pop=True, **kwargs)
@@ -64,7 +63,6 @@ class InfillDE:
         
         # Perform posterior mutation and repair if passed
         off = self.mutation(problem, off)
-        off = self.repair(problem, off)
         
         return off
         
