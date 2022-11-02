@@ -1,5 +1,6 @@
 import pytest
 
+import numpy as np
 from pymoo.optimize import minimize
 from pymoo.problems import get_problem
 from pymoo.algorithms.soo.nonconvex.de import DE
@@ -64,4 +65,4 @@ def test_de_perf():
                     save_history=False,
                     verbose=False)
     
-    assert res_gde3.F <= 1e-6
+    assert np.all(res_gde3.F <= 1e-6)
