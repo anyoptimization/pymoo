@@ -171,11 +171,11 @@ class DE(GeneticAlgorithm):
         
         assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must be provided."
 
-        #One-to-one replacement survival
+        # One-to-one replacement survival
         self.pop = ImprovementReplacement().do(self.problem, self.pop, infills)
 
-        #Sort the population by fitness to make the selection simpler for mating (not an actual survival, just sorting)
+        # Sort the population by fitness to make the selection simpler for mating (not an actual survival, just sorting)
         self.pop = FitnessSurvival().do(self.problem, self.pop)
         
-        #Set ranks
+        # Set ranks
         self.pop.set("rank", np.arange(self.pop_size))
