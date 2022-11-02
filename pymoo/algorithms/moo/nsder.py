@@ -100,7 +100,6 @@ class NSDER(NSDE):
             survival = ReferenceDirectionSurvival(ref_dirs)
             
         super().__init__(pop_size=pop_size,
-                         sampling=sampling,
                          variant=variant,
                          CR=CR,
                          F=F,
