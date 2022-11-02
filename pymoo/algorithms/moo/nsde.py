@@ -13,6 +13,7 @@ class NSDE(NSGA2):
     
     def __init__(self,
                  pop_size=100,
+                 sampling=LHS(),
                  variant="DE/rand/1/bin",
                  CR=0.7,
                  F=None,
@@ -96,6 +97,7 @@ class NSDE(NSGA2):
         
         # Init from pymoo's NSGA2
         super().__init__(pop_size=pop_size,
+                         sampling=sampling,
                          mating=mating,
                          survival=survival,
                          eliminate_duplicates=None,
