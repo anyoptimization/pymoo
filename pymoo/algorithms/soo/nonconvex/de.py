@@ -23,7 +23,11 @@ class VariantDE(InfillCriterion):
                  F=(0.5, 1.0),
                  gamma=1e-4,
                  de_repair="bounce-back",
-                 mutation=None):
+                 mutation=None,
+                 **kwargs):
+        
+        # Default initialization of InfillCriterion
+        super().__init__(eliminate_duplicates=False, **kwargs)
         
         # Parse the information from the string
         _, selection_variant, n_diff, crossover_variant, = variant.split("/")
@@ -77,8 +81,6 @@ class DE(GeneticAlgorithm):
                  F=(0.5, 1.0),
                  gamma=1e-4,
                  de_repair="bounce-back",
-                 mutation=None,
-                 repair=None,
                  output=SingleObjectiveOutput(),
                  **kwargs):
         """
@@ -141,8 +143,7 @@ class DE(GeneticAlgorithm):
                            F=F,
                            gamma=gamma,
                            de_repair=de_repair,
-                           mutation=mutation,
-                           repair=repair)
+                           **kwargs)
         
         # Number of offsprings at each generation
         n_offsprings = pop_size
@@ -162,7 +163,7 @@ class DE(GeneticAlgorithm):
 
     def _infill(self):
         
-        infills = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
+        infills = self.mating(self.problem, self.pop, self.n_offsprings, algorithm=self)
 
         return infills
 
