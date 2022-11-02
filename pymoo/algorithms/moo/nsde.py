@@ -13,14 +13,11 @@ class NSDE(NSGA2):
     
     def __init__(self,
                  pop_size=100,
-                 sampling=LHS(),
                  variant="DE/rand/1/bin",
                  CR=0.7,
                  F=None,
                  gamma=1e-4,
                  de_repair="bounce-back",
-                 mutation=None,
-                 repair=None,
                  survival=RankAndCrowding(),
                  **kwargs):
         """
@@ -86,23 +83,21 @@ class NSDE(NSGA2):
             In GDE3, the survival strategy is applied after a one-to-one comparison between child vector and corresponding parent when both are non-dominated by the other.
         """
         
-        #Number of offsprings at each generation
+        # Number of offsprings at each generation
         n_offsprings = pop_size
         
-        #Mating
+        # Mating
         mating = VariantDE(variant=variant,
                            CR=CR,
                            F=F,
                            gamma=gamma,
                            de_repair=de_repair,
-                           mutation=mutation,
-                           repair=repair)
+                           **kwargs)
         
-        #Init from pymoo's NSGA2
+        # Init from pymoo's NSGA2
         super().__init__(pop_size=pop_size,
-                         sampling=sampling,
                          mating=mating,
                          survival=survival,
-                         eliminate_duplicates=False,
+                         eliminate_duplicates=None,
                          n_offsprings=n_offsprings,
                          **kwargs)

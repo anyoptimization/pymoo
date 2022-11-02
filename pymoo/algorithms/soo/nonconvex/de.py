@@ -27,7 +27,7 @@ class VariantDE(InfillCriterion):
                  **kwargs):
         
         # Default initialization of InfillCriterion
-        super().__init__(eliminate_duplicates=False, **kwargs)
+        super().__init__(eliminate_duplicates=None, **kwargs)
         
         # Parse the information from the string
         _, selection_variant, n_diff, crossover_variant, = variant.split("/")
@@ -152,7 +152,7 @@ class DE(GeneticAlgorithm):
                          sampling=sampling,
                          mating=mating,
                          n_offsprings=n_offsprings,
-                         eliminate_duplicates=False,
+                         eliminate_duplicates=None,
                          output=output,
                          **kwargs)
 
