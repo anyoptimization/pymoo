@@ -1,6 +1,6 @@
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.operators.sampling.lhs import LHS
-from pymoo.algorithms.soo.nonconvex.de import InfillDE
+from pymoo.algorithms.soo.nonconvex.de import VariantDE
 from pymoo.operators.survival.rank_and_crowding import RankAndCrowding
 
 
@@ -90,13 +90,13 @@ class NSDE(NSGA2):
         n_offsprings = pop_size
         
         #Mating
-        mating = InfillDE(variant=variant,
-                          CR=CR,
-                          F=F,
-                          gamma=gamma,
-                          de_repair=de_repair,
-                          mutation=mutation,
-                          repair=repair)
+        mating = VariantDE(variant=variant,
+                           CR=CR,
+                           F=F,
+                           gamma=gamma,
+                           de_repair=de_repair,
+                           mutation=mutation,
+                           repair=repair)
         
         #Init from pymoo's NSGA2
         super().__init__(pop_size=pop_size,

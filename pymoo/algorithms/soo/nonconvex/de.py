@@ -136,13 +136,13 @@ class DE(GeneticAlgorithm):
             Pymoo's repair operator after mutation. Defaults to NoRepair().
         """
         
-        mating = InfillDE(variant=variant,
-                          CR=CR,
-                          F=F,
-                          gamma=gamma,
-                          de_repair=de_repair,
-                          mutation=mutation,
-                          repair=repair)
+        mating = VariantDE(variant=variant,
+                           CR=CR,
+                           F=F,
+                           gamma=gamma,
+                           de_repair=de_repair,
+                           mutation=mutation,
+                           repair=repair)
         
         # Number of offsprings at each generation
         n_offsprings = pop_size
