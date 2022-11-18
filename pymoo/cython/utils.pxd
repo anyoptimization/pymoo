@@ -10,9 +10,9 @@ from libcpp.set cimport set as cpp_set
 
 cdef extern from "math.h":
     double HUGE_VAL
-    
 
-#Returns elements to remove based on crowding metric d and heap of remaining elements H
+
+# Returns elements to remove based on crowding metric d and heap of remaining elements H
 cdef inline int c_get_drop(double[:] d, cpp_set[int] H):
 
     cdef:
@@ -27,23 +27,23 @@ cdef inline int c_get_drop(double[:] d, cpp_set[int] H):
         if d[i] <= min_d:
             min_d = d[i]
             min_i = i
-    
+
     return min_i
 
 
-#Returns vector of positions of minimum values along axis 0 of a 2d memoryview
+# Returns vector of positions of minimum values along axis 0 of a 2d memoryview
 cdef inline vector[int] c_get_argmin(double[:, :] X):
 
     cdef:
         int N, M, min_i, n, m
         double min_val
         vector[int] indexes
-    
+
     N = X.shape[0]
     M = X.shape[1]
 
     indexes = vector[int]()
-    
+
     for m in range(M):
 
         min_i = 0
@@ -55,25 +55,25 @@ cdef inline vector[int] c_get_argmin(double[:, :] X):
 
                 min_i = n
                 min_val = X[n, m]
-        
+
         indexes.push_back(min_i)
-    
+
     return indexes
 
 
-#Returns vector of positions of maximum values along axis 0 of a 2d memoryview
+# Returns vector of positions of maximum values along axis 0 of a 2d memoryview
 cdef inline vector[int] c_get_argmax(double[:, :] X):
 
     cdef:
         int N, M, max_i, n, m
         double max_val
         vector[int] indexes
-    
+
     N = X.shape[0]
     M = X.shape[1]
 
     indexes = vector[int]()
-    
+
     for m in range(M):
 
         max_i = 0
@@ -85,13 +85,13 @@ cdef inline vector[int] c_get_argmax(double[:, :] X):
 
                 max_i = n
                 max_val = X[n, m]
-        
+
         indexes.push_back(max_i)
-    
+
     return indexes
 
 
-#Performs normalization of a 2d memoryview
+# Performs normalization of a 2d memoryview
 cdef inline double[:, :] c_normalize_array(double[:, :] X, vector[int] extremes_max, vector[int] extremes_min):
 
     cdef:
@@ -100,7 +100,7 @@ cdef inline double[:, :] c_normalize_array(double[:, :] X, vector[int] extremes_
         int n, m, l, u
         double l_val, u_val, diff_val
         vector[double] min_vals, max_vals
-    
+
     min_vals = vector[double]()
     max_vals = vector[double]()
 
@@ -109,13 +109,13 @@ cdef inline double[:, :] c_normalize_array(double[:, :] X, vector[int] extremes_
         u_val = X[u, m]
         max_vals.push_back(u_val)
         m = m + 1
-    
+
     m = 0
     for l in extremes_min:
         l_val = X[l, m]
         min_vals.push_back(l_val)
         m = m + 1
-    
+
     for m in range(M):
 
         diff_val = max_vals[m] - min_vals[m]
@@ -125,5 +125,5 @@ cdef inline double[:, :] c_normalize_array(double[:, :] X, vector[int] extremes_
         for n in range(N):
 
             X[n, m] = (X[n, m] - min_vals[m]) / diff_val
-    
+
     return X
