@@ -23,29 +23,29 @@ def get_crowding_function(label):
     else:
         raise KeyError("Crowding function not defined")
     return fun
-    
+
 
 class CrowdingDiversity:
-    
+
     def do(self, F, n_remove=0):
-        #Converting types Python int to Cython int would fail in some cases converting to long instead
+        # Converting types Python int to Cython int would fail in some cases converting to long instead
         n_remove = np.intc(n_remove)
         F = np.array(F, dtype=np.double)
         return self._do(F, n_remove=n_remove)
-    
+
     def _do(self, F, n_remove=None):
         pass
 
 
 class FunctionalDiversity(CrowdingDiversity):
-    
+
     def __init__(self, function=None, filter_out_duplicates=True):
         self.function = function
         self.filter_out_duplicates = filter_out_duplicates
         super().__init__()
-    
+
     def _do(self, F, **kwargs):
-        
+
         n_points, n_obj = F.shape
 
         if n_points <= 2:
@@ -62,24 +62,24 @@ class FunctionalDiversity(CrowdingDiversity):
 
             # index the unique points of the array
             _F = F[is_unique]
-            
+
             _d = self.function(_F, **kwargs)
-            
+
             d = np.zeros(n_points)
             d[is_unique] = _d
-        
+
         return d
 
 
 class FuncionalDiversityMNN(FunctionalDiversity):
-    
+
     def _do(self, F, **kwargs):
-        
+
         n_points, n_obj = F.shape
 
         if n_points <= n_obj:
             return np.full(n_points, np.inf)
-        
+
         else:
             return super()._do(F, **kwargs)
 
@@ -113,7 +113,7 @@ def calc_crowding_distance(F, **kwargs):
     cd = np.sum(dist_to_last[J, np.arange(n_obj)] + dist_to_next[J, np.arange(n_obj)], axis=1) / n_obj
 
     return cd
-            
+
 
 def calc_crowding_entropy(F, **kwargs):
     """Wang, Y.-N., Wu, L.-H. & Yuan, X.-F., 2010. Multi-objective self-adaptive differential 
@@ -148,24 +148,24 @@ def calc_crowding_entropy(F, **kwargs):
     # prepare the distance to last and next vectors
     dl = dist.copy()[:-1]
     du = dist.copy()[1:]
-    
-    #Fix nan
+
+    # Fix nan
     dl[np.isnan(dl)] = 0.0
     du[np.isnan(du)] = 0.0
-    
-    #Total distance
+
+    # Total distance
     cd = dl + du
 
-    #Get relative positions
+    # Get relative positions
     pl = (dl[1:-1] / cd[1:-1])
     pu = (du[1:-1] / cd[1:-1])
 
-    #Entropy
+    # Entropy
     entropy = np.row_stack([np.full(n_obj, np.inf),
                             -(pl * np.log2(pl) + pu * np.log2(pu)),
                             np.full(n_obj, np.inf)])
-    
-    #Crowding entropy
+
+    # Crowding entropy
     J = np.argsort(I, axis=0)
     _cej = cd[J, np.arange(n_obj)] * entropy[J, np.arange(n_obj)] / norm
     _cej[np.isnan(_cej)] = 0.0
@@ -176,8 +176,8 @@ def calc_crowding_entropy(F, **kwargs):
 
 def calc_mnn_fast(F, **kwargs):
     return _calc_mnn_fast(F, F.shape[1], **kwargs)
-    
-    
+
+
 def calc_2nn_fast(F, **kwargs):
     return _calc_mnn_fast(F, 2, **kwargs)
 
@@ -187,20 +187,20 @@ def _calc_mnn_fast(F, n_neighbors, **kwargs):
     # calculate the norm for each objective - set to NaN if all values are equal
     norm = np.max(F, axis=0) - np.min(F, axis=0)
     norm[norm == 0] = 1.0
-    
+
     # F normalized
     F = (F - F.min(axis=0)) / norm
-    
+
     # Distances pairwise (Inefficient)
     D = squareform(pdist(F, metric="sqeuclidean"))
-    
+
     # M neighbors
     M = F.shape[1]
     _D = np.partition(D, range(1, M+1), axis=1)[:, 1:M+1]
-    
+
     # Metric d
     d = np.prod(_D, axis=1)
-    
+
     # Set top performers as np.inf
     _extremes = np.concatenate((np.argmin(F, axis=0), np.argmax(F, axis=0)))
     d[_extremes] = np.inf

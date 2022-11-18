@@ -14,7 +14,7 @@ cdef extern from "math.h":
     double HUGE_VAL
 
 
-#Python definition
+# Python definition
 def calc_pcd(double[:, :] X, int n_remove=0):
 
     cdef:
@@ -53,7 +53,7 @@ def calc_pcd(double[:, :] X, int n_remove=0):
     return c_calc_pcd(X, I, n_remove, N, M, extremes)
 
 
-#Returns crowding metrics with recursive elimination
+# Returns crowding metrics with recursive elimination
 cdef c_calc_pcd(double[:, :] X, int[:, :] I, int n_remove, int N, int M, cpp_set[int] extremes):
 
     cdef:
@@ -62,30 +62,30 @@ cdef c_calc_pcd(double[:, :] X, int[:, :] I, int n_remove, int N, int M, cpp_set
         cpp_set[int] H
         double[:, :] D
         double[:] d
-    
-    #Define items to calculate distances
+
+    # Define items to calculate distances
     calc_items = cpp_set[int]()
     for n in range(N):
         calc_items.insert(n)
     for n in extremes:
         calc_items.erase(n)
-    
-    #Define remaining items to evaluate
+
+    # Define remaining items to evaluate
     H = cpp_set[int]()
     for n in range(N):
         H.insert(n)
 
-    #Initialize
+    # Initialize
     n_removed = 0
 
-    #Initialize neighbors and distances
+    # Initialize neighbors and distances
     _D = np.full((N, M), HUGE_VAL, dtype=np.double)
     dd = np.full((N,), HUGE_VAL, dtype=np.double)
 
     D = _D[:, :]
     d = dd[:]
 
-    #Fill in neighbors and distance matrix
+    # Fill in neighbors and distance matrix
     c_calc_pcd_iter(
             X,
             I,
@@ -94,25 +94,25 @@ cdef c_calc_pcd(double[:, :] X, int[:, :] I, int n_remove, int N, int M, cpp_set
             calc_items,
         )
 
-    #Obtain distance metrics
+    # Obtain distance metrics
     c_calc_d(d, D, calc_items, M)
 
-    #While n_remove not acheived
+    # While n_remove not acheived
     while n_removed < (n_remove - 1):
 
-        #Obtain element to drop
+        # Obtain element to drop
         k = c_get_drop(d, H)
         H.erase(k)
 
-        #Update index
+        # Update index
         n_removed = n_removed + 1
 
-        #Get items to be recalculated
+        # Get items to be recalculated
         calc_items = c_get_calc_items(I, k, M, N)
         for n in extremes:
             calc_items.erase(n)
-        
-        #Fill in neighbors and distance matrix
+
+        # Fill in neighbors and distance matrix
         c_calc_pcd_iter(
                 X,
                 I,
@@ -121,13 +121,13 @@ cdef c_calc_pcd(double[:, :] X, int[:, :] I, int n_remove, int N, int M, cpp_set
                 calc_items,
             )
 
-        #Obtain distance metrics
+        # Obtain distance metrics
         c_calc_d(d, D, calc_items, M)
 
     return dd
 
 
-#Iterate
+# Iterate
 cdef c_calc_pcd_iter(
     double[:, :] X,
     int[:, :] I,
@@ -138,11 +138,11 @@ cdef c_calc_pcd_iter(
 
     cdef:
         int i, m, n, l, u
-    
-    #Iterate over items to calculate
+
+    # Iterate over items to calculate
     for i in calc_items:
 
-        #Iterate over elements in X
+        # Iterate over elements in X
         for m in range(M):
 
             for n in range(N):
@@ -155,12 +155,12 @@ cdef c_calc_pcd_iter(
                     D[i, m] = (X[u, m] - X[l, m]) / M
 
 
-#Calculate crowding metric
+# Calculate crowding metric
 cdef c_calc_d(double[:] d, double[:, :] D, cpp_set[int] calc_items, int M):
 
     cdef:
         int i, m
-    
+
     for i in calc_items:
 
         d[i] = 0
@@ -168,7 +168,7 @@ cdef c_calc_d(double[:] d, double[:, :] D, cpp_set[int] calc_items, int M):
             d[i] = d[i] + D[i, m]
 
 
-#Returns indexes of items to be recalculated after removal
+# Returns indexes of items to be recalculated after removal
 cdef cpp_set[int] c_get_calc_items(
     int[:, :] I,
     int k, int M, int N
@@ -177,21 +177,21 @@ cdef cpp_set[int] c_get_calc_items(
     cdef:
         int n, m
         cpp_set[int] calc_items
-    
+
     calc_items = cpp_set[int]()
 
-    #Iterate over all elements in I
+    # Iterate over all elements in I
     for m in range(M):
 
         for n in range(N):
 
             if I[n, m] == k:
 
-                #Add to set of items to be recalculated
+                # Add to set of items to be recalculated
                 calc_items.insert(I[n - 1, m])
                 calc_items.insert(I[n + 1, m])
 
-                #Remove element from sorted array
+                # Remove element from sorted array
                 I[n:-1, m] = I[n + 1:, m]
-    
+
     return calc_items

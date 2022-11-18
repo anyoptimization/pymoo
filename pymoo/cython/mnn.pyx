@@ -52,7 +52,7 @@ def calc_mnn(double[:, :] X, int n_remove=0):
 
     for n in extremes_max:
         extremes.insert(n)
-    
+
     X = c_normalize_array(X, extremes_max, extremes_min)
 
     return c_calc_mnn(X, n_remove, N, M, extremes)
@@ -88,7 +88,7 @@ def calc_2nn(double[:, :] X, int n_remove=0):
         extremes.insert(n)
 
     X = c_normalize_array(X, extremes_max, extremes_min)
-    
+
     M = 2
 
     return c_calc_mnn(X, n_remove, N, M, extremes)
@@ -104,27 +104,27 @@ cdef c_calc_mnn(double[:, :] X, int n_remove, int N, int M, cpp_set[int] extreme
         double[:, :] D
         double[:] d
         int[:, :] Mnn
-    
-    #Define items to calculate distances
+
+    # Define items to calculate distances
     calc_items = cpp_set[int]()
     for n in range(N):
         calc_items.insert(n)
     for n in extremes:
         calc_items.erase(n)
-    
-    #Define remaining items to evaluate
+
+    # Define remaining items to evaluate
     H = cpp_set[int]()
     for n in range(N):
         H.insert(n)
-    
-    #Instantiate distances array
+
+    # Instantiate distances array
     _D = np.empty((N, N), dtype=np.double)
     D = _D[:, :]
 
-    #Shape of X
+    # Shape of X
     MM = X.shape[1]
-    
-    #Fill values on D
+
+    # Fill values on D
     for i in range(N - 1):
         D[i, i] = 0.0
 
@@ -139,10 +139,10 @@ cdef c_calc_mnn(double[:, :] X, int n_remove, int N, int M, cpp_set[int] extreme
 
     D[N-1, N-1] = 0.0
 
-    #Initialize
+    # Initialize
     n_removed = 0
 
-    #Initialize neighbors and distances
+    # Initialize neighbors and distances
     # _Mnn = np.full((N, M), -1, dtype=np.intc)
     _Mnn = np.argpartition(D, range(1, M+1), axis=1)[:, 1:M+1].astype(np.intc)
     dd = np.full((N,), HUGE_VAL, dtype=np.double)
@@ -150,25 +150,25 @@ cdef c_calc_mnn(double[:, :] X, int n_remove, int N, int M, cpp_set[int] extreme
     Mnn = _Mnn[:, :]
     d = dd[:]
 
-    #Obtain distance metrics
+    # Obtain distance metrics
     c_calc_d(d, Mnn, D, calc_items, M)
 
-    #While n_remove not acheived (no need to recalculate if only one item should be removed)
+    # While n_remove not acheived (no need to recalculate if only one item should be removed)
     while n_removed < (n_remove - 1):
 
-        #Obtain element to drop
+        # Obtain element to drop
         k = c_get_drop(d, H)
         H.erase(k)
 
-        #Update index
+        # Update index
         n_removed = n_removed + 1
 
-        #Get items to be recalculated
+        # Get items to be recalculated
         calc_items = c_get_calc_items(Mnn, H, k, M)
         for n in extremes:
             calc_items.erase(n)
-        
-        #Fill in neighbors and distance matrix
+
+        # Fill in neighbors and distance matrix
         c_calc_mnn_iter(
                 X,
                 Mnn,
@@ -178,7 +178,7 @@ cdef c_calc_mnn(double[:, :] X, int n_remove, int N, int M, cpp_set[int] extreme
                 H
             )
 
-        #Obtain distance metrics
+        # Obtain distance metrics
         c_calc_d(d, Mnn, D, calc_items, M)
 
     return dd
@@ -195,51 +195,51 @@ cdef c_calc_mnn_iter(
 
     cdef:
         int i, j, m
-    
-    #Iterate over items to calculate
+
+    # Iterate over items to calculate
     for i in calc_items:
 
-        #Iterate over elements in X
+        # Iterate over elements in X
         for j in H:
 
-            #Go to next if same element
+            # Go to next if same element
             if (j == i):
                 continue
-            
-            #Replace at least the last neighbor
+
+            # Replace at least the last neighbor
             elif (D[i, j] <= D[i, Mnn[i, M-1]]) or (Mnn[i, M-1] == -1):
-                
-                #Iterate over current values
+
+                # Iterate over current values
                 for m in range(M):
 
-                    #Set to current if unassigned
+                    # Set to current if unassigned
                     if (Mnn[i, m] == -1):
 
-                        #Set last neighbor to index
+                        # Set last neighbor to index
                         Mnn[i, m] = j
                         break
 
-                    #Break if checking already corresponding index
+                    # Break if checking already corresponding index
                     elif (j == Mnn[i, m]):
                         break
 
-                    #Distance satisfies condition
+                    # Distance satisfies condition
                     elif (D[i, j] <= D[i, Mnn[i, m]]):
-                            
-                        #Replace higher values
+
+                        # Replace higher values
                         Mnn[i, m + 1:] = Mnn[i, m:-1]
-                        
-                        #Replace current value
+
+                        # Replace current value
                         Mnn[i, m] = j
                         break
 
 
-#Calculate crowding metric
+# Calculate crowding metric
 cdef c_calc_d(double[:] d, int[:, :] Mnn, double[:, :] D, cpp_set[int] calc_items, int M):
 
     cdef:
         int i, m
-    
+
     for i in calc_items:
 
         d[i] = 1
@@ -247,7 +247,7 @@ cdef c_calc_d(double[:] d, int[:, :] Mnn, double[:, :] D, cpp_set[int] calc_item
             d[i] = d[i] * D[i, Mnn[i, m]]
 
 
-#Returns indexes of items to be recalculated after removal
+# Returns indexes of items to be recalculated after removal
 cdef cpp_set[int] c_get_calc_items(
     int[:, :] Mnn,
     cpp_set[int] H,
@@ -256,7 +256,7 @@ cdef cpp_set[int] c_get_calc_items(
     cdef:
         int i, m
         cpp_set[int] calc_items
-    
+
     calc_items = cpp_set[int]()
 
     for i in H:
@@ -269,5 +269,5 @@ cdef cpp_set[int] c_get_calc_items(
                 Mnn[i, M-1] = -1
 
                 calc_items.insert(i)
-    
+
     return calc_items
