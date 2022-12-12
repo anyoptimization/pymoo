@@ -17,7 +17,7 @@ jobs:
         run: |
             python -m pip install --upgrade pip
             pip install setuptools wheel numpy cython
-      - uses: knicknic/os-specific-run@v1
+      - uses: knicknic/os-specific-run@v1.0.3
         with:
           linux: "python setup.py sdist"
           macos: "python setup.py bdist_wheel"
