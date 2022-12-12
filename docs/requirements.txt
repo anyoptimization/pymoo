@@ -1,4 +1,9 @@
 numpy
+numba
+optuna
+pandas
+pyrecorder
+dask[distributed]
 autograd
 matplotlib
 sphinx==3.5.4

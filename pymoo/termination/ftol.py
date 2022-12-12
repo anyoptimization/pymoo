@@ -57,7 +57,7 @@ class MultiObjectiveSpaceTermination(DeltaToleranceTermination):
         if len(F) > 0:
             return dict(ideal=F.min(axis=0), nadir=F.max(axis=0), F=F, feas=True)
         else:
-            return dict(ideal=None, nadir=None, F=F, feas=True)
+            return dict(ideal=None, nadir=None, F=F, feas=False)
 
     def _delta(self, prev, current):
 

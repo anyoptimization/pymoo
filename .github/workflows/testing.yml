@@ -5,20 +5,23 @@ on:
       - develop
       - release
       - master
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
 
 jobs:
-
   testing:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install Python 3
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
       - name: Install Dependencies
         run: |
-          pip install numpy Cython scipy==1.8.1
+          pip install numpy Cython scipy
           pip install -r tests/requirements.txt
       - name: Install pymoo (DEBUG)
         run: |
@@ -33,4 +36,3 @@ jobs:
       - name: Run Tests
         run: |
           pytest -v --maxfail 1 --no-header -m "not long"
- 
