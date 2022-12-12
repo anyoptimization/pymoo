@@ -30,8 +30,8 @@ class PSOFuzzyOutput(SingleObjectiveOutput):
         super().__init__()
 
         self.f = Column(name="f", width=8)
-        self.S = Column(name="S", width=6)
-        self.w = Column(name="w", width=6)
+        self.S = Column(name="S", width=7)
+        self.w = Column(name="w", width=7)
         self.c1 = Column(name="c1", width=8)
         self.c2 = Column(name="c2", width=8)
 
