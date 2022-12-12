@@ -15,7 +15,6 @@ from pymoo.version import __version__
 # ---------------------------------------------------------------------------------------------------------
 
 
-
 __name__ = "pymoo"
 __author__ = "Julian Blank"
 __url__ = "https://pymoo.org"
@@ -33,7 +32,7 @@ data = dict(
     packages=find_packages(include=['pymoo', 'pymoo.*']),
     include_package_data=True,
     exclude_package_data={
-            '': ['*.c', '*.cpp', '*.pyx'],
+        '': ['*.c', '*.cpp', '*.pyx'],
     },
     install_requires=['numpy>=1.15',
                       'scipy>=1.1',
@@ -55,11 +54,13 @@ data = dict(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'Topic :: Scientific/Engineering :: Mathematics'
     ]
 )
+
 
 # ---------------------------------------------------------------------------------------------------------
 # OTHER METADATA
@@ -75,14 +76,14 @@ def readme():
 data['long_description'] = readme()
 data['long_description_content_type'] = 'text/x-rst'
 
-
 # ---------------------------------------------------------------------------------------------------------
 # OPTIONS
 # ---------------------------------------------------------------------------------------------------------
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--nopyx', dest='nopyx', action='store_true', help='Whether the pyx files shall be considered at all.')
+parser.add_argument('--nopyx', dest='nopyx', action='store_true',
+                    help='Whether the pyx files shall be considered at all.')
 parser.add_argument('--nocython', dest='nocython', action='store_true', help='Whether pyx files shall be cythonized.')
 parser.add_argument('--nolibs', dest='nolibs', action='store_true', help='Whether the libraries should be compiled.')
 args, _ = parser.parse_known_args()
@@ -158,6 +159,7 @@ try:
         ext = [Extension(f"pymoo.cython.{source[:-4]}", [source]) for source in pyx]
     else:
         from Cython.Build import cythonize
+
         ext = cythonize("pymoo/cython/*.pyx")
 
     if not args.nolibs:
