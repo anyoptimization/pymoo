@@ -9,4 +9,4 @@ class TerminationCollection(Termination):
         self.terminations = args
 
     def _update(self, algorithm):
-        return min([termination.update(algorithm) for termination in self.terminations])
+        return max([termination.update(algorithm) for termination in self.terminations])
