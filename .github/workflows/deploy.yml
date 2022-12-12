@@ -42,10 +42,10 @@ jobs:
             python-version: "3.11"
 
   build-manylinux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - uses: RalfG/python-wheels-manylinux-build@v0.5.0-manylinux2010_x86_64
+      - uses: RalfG/python-wheels-manylinux-build@v0.6.0-manylinux2010_x86_64
         with:
           build-requirements: "cython numpy"
           pip-wheel-args: "-w ./dist --no-deps"
