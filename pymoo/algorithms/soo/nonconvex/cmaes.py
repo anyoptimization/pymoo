@@ -446,13 +446,14 @@ class CMAES(LocalSearch):
             # set infeasible individual's objective values to np.nan - then CMAES can handle it
             for ind in infills:
                 if not ind.feas:
-                    ind.F[:] = np.nan
+                    ind.F[:] = np.inf
 
             F = infills.get("f").tolist()
             if not self.send_array_to_yield:
                 F = F[0]
 
             try:
+                print(F)
                 self.next_X = self.es.send(F)
             except:
                 self.next_X = None
