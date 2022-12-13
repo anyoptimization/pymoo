@@ -332,8 +332,13 @@ def distance_of_closest_points_to_others(X):
 
 
 def time_to_int(t):
-    td = datetime.strptime(t, '%H:%M:%S') - datetime(1900, 1, 1)
-    return td.total_seconds()
+    vals = [int(e) for e in t.split(":")][::-1]
+    s = vals[0]
+    if len(vals) > 1:
+        s += 60 * vals[1]
+    if len(vals) > 2:
+        s += 3600 * vals[2]
+    return s
 
 
 def powerset(iterable):
