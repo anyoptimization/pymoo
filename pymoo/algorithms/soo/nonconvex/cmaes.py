@@ -88,6 +88,7 @@ class CMAES(LocalSearch):
                  cmaes_verbose=-9,
                  verb_log=0,
                  output=CMAESOutput(),
+                 pop_size=None,
                  **kwargs
                  ):
         """
@@ -355,6 +356,9 @@ class CMAES(LocalSearch):
               for a list of available options.
 
         """
+        if pop_size is not None:
+            kwargs["popsize"] = pop_size
+
         super().__init__(x0=x0, output=output, **kwargs)
 
         self.termination = NoTermination()
@@ -453,7 +457,6 @@ class CMAES(LocalSearch):
                 F = F[0]
 
             try:
-                print(F)
                 self.next_X = self.es.send(F)
             except:
                 self.next_X = None
