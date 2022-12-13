@@ -28,7 +28,6 @@ data = dict(
     description="Multi-Objective Optimization in Python",
     license='Apache License 2.0',
     keywords="optimization",
-    # packages=["pymoo"] + ["pymoo." + e for e in find_packages(where='pymoo')],
     packages=find_packages(include=['pymoo', 'pymoo.*']),
     include_package_data=True,
     exclude_package_data={

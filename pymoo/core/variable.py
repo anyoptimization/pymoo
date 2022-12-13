@@ -35,6 +35,14 @@ class BoundedVariable(Variable):
             strict = bounds
         self.strict = strict
 
+    @property
+    def lb(self):
+        return self.bounds[0]
+
+    @property
+    def ub(self):
+        return self.bounds[1]
+
 
 class Real(BoundedVariable):
     vtype = float
@@ -49,10 +57,10 @@ class Integer(BoundedVariable):
 
     def _sample(self, n):
         low, high = self.bounds
-        return np.random.randint(low, high=high+1, size=n)
+        return np.random.randint(low, high=high + 1, size=n)
 
 
-class Binary(Variable):
+class Binary(BoundedVariable):
     vtype = bool
 
     def _sample(self, n):

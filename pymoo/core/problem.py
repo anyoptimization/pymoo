@@ -104,10 +104,6 @@ class Problem:
 
         """
 
-        # if variables are provided directly
-        if vars is not None:
-            n_var = len(vars)
-
         # number of variable
         self.n_var = n_var
 
@@ -130,7 +126,11 @@ class Problem:
         self.callback = callback
 
         # if the variables are provided in their explicit form
-        self.vars = vars
+        if vars is not None:
+            self.vars = vars
+            self.n_var = len(vars)
+            self.xl = {name: var.lb if hasattr(var, "lb") else None for name, var in vars.items()}
+            self.xu = {name: var.ub if hasattr(var, "ub") else None for name, var in vars.items()}
 
         # the variable type (only as a type hint at this point)
         self.vtype = vtype
@@ -285,7 +285,8 @@ class Problem:
                         v = v.reshape(shape[name])
                     except Exception as e:
                         raise Exception(
-                            f"Problem Error: {name} can not be set, expected shape {shape[name]} but provided {v.shape}", e)
+                            f"Problem Error: {name} can not be set, expected shape {shape[name]} but provided {v.shape}",
+                            e)
 
                 ret[name] = v
 
