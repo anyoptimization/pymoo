@@ -357,6 +357,7 @@ class CMAES(LocalSearch):
 
         """
         if pop_size is not None:
+            kwargs["parallelize"] = True
             kwargs["popsize"] = pop_size
 
         super().__init__(x0=x0, output=output, **kwargs)
