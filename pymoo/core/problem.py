@@ -71,6 +71,7 @@ class Problem:
                  elementwise=False,
                  elementwise_func=ElementwiseEvaluationFunction,
                  elementwise_runner=LoopedElementwiseEvaluation(),
+                 requires_kwargs=False,
                  replace_nan_values_by=None,
                  exclude_from_serialization=None,
                  callback=None,
@@ -140,6 +141,9 @@ class Problem:
         self.elementwise_func = elementwise_func
         self.elementwise_runner = elementwise_runner
 
+        # whether evaluation requires kwargs (passing them can cause overhead in parallelization)
+        self.requires_kwargs = requires_kwargs
+
         # whether the shapes are checked strictly
         self.strict = strict
 
@@ -168,6 +172,10 @@ class Problem:
                  return_values_of=None,
                  return_as_dictionary=False,
                  **kwargs):
+
+        # if the problem does not require any kwargs they are re-initialized
+        if not self.requires_kwargs:
+            kwargs = dict()
 
         if return_values_of is None:
             return_values_of = ["F"]
