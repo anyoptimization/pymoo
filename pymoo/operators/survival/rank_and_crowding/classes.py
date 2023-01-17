@@ -155,7 +155,7 @@ class ConstrRankAndCrowding(Survival):
         if problem.n_constr > 0:
 
             # Split by feasibility
-            feas, infeas = feas, infeas = split_by_feasibility(pop, sort_infeas_by_cv=True, sort_feas_by_obj=False, return_pop=False)
+            feas, infeas = split_by_feasibility(pop, sort_infeas_by_cv=True, sort_feas_by_obj=False, return_pop=False)
 
             # Obtain len of feasible
             n_feas = len(feas)
@@ -175,9 +175,12 @@ class ConstrRankAndCrowding(Survival):
                 # Constraints to new ranking
                 G = pop[infeas].get("G")
                 G = np.maximum(G, 0)
+                H = pop[infeas].get("H")
+                H = np.absolute(H)
+                C = np.column_stack((G, H))
 
                 # Fronts in infeasible population
-                infeas_fronts = self.nds.do(G, n_stop_if_ranked=n_remaining)
+                infeas_fronts = self.nds.do(C, n_stop_if_ranked=n_remaining)
 
                 # Iterate over fronts
                 for k, front in enumerate(infeas_fronts):
