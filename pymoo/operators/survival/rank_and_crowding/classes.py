@@ -65,9 +65,11 @@ class RankAndCrowding(Survival):
         fronts = self.nds.do(F, n_stop_if_ranked=n_survive)
 
         for k, front in enumerate(fronts):
+            
+            I = np.arange(len(front))
 
             # current front sorted by crowding distance if splitting
-            while len(survivors) + len(front) > n_survive:
+            if len(survivors) + len(I) > n_survive:
 
                 # Define how many will be removed
                 n_remove = len(survivors) + len(front) - n_survive
@@ -80,9 +82,7 @@ class RankAndCrowding(Survival):
                     )
 
                 I = randomized_argsort(crowding_of_front, order='descending', method='numpy')
-
                 I = I[:-n_remove]
-                front = front[I]
 
             # otherwise take the whole front unsorted
             else:
@@ -99,7 +99,7 @@ class RankAndCrowding(Survival):
                 pop[i].set("crowding", crowding_of_front[j])
 
             # extend the survivors by all or selected individuals
-            survivors.extend(front)
+            survivors.extend(front[I])
 
         return pop[survivors]
 
