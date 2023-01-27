@@ -130,8 +130,11 @@ class Problem:
         if vars is not None:
             self.vars = vars
             self.n_var = len(vars)
-            self.xl = {name: var.lb if hasattr(var, "lb") else None for name, var in vars.items()}
-            self.xu = {name: var.ub if hasattr(var, "ub") else None for name, var in vars.items()}
+
+            if self.xl is None:
+                self.xl = {name: var.lb if hasattr(var, "lb") else None for name, var in vars.items()}
+            if self.xu is None:
+                self.xu = {name: var.ub if hasattr(var, "ub") else None for name, var in vars.items()}
 
         # the variable type (only as a type hint at this point)
         self.vtype = vtype
