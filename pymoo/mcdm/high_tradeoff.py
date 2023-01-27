@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 
 from pymoo.core.decision_making import DecisionMaking, find_outliers_upper_tail, NeighborFinder
@@ -29,7 +31,7 @@ class HighTradeoffPoints(DecisionMaking):
             sacrifice = np.maximum(0, diff).sum(axis=1)
             gain = np.maximum(0, -diff).sum(axis=1)
 
-            np.warnings.filterwarnings('ignore')
+            warnings.filterwarnings('ignore')
             tradeoff = sacrifice / gain
 
             # otherwise find the one with the smalled one
