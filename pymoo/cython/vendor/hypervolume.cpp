@@ -1,15 +1,10 @@
-#include "defs.h"
 #include "hypervolume.h"
-
 #include <algorithm>
 #include <cmath>
 #include <vector>
-
-#include <errno.h>
-
+#include <stdexcept>
 #include <cstdlib>
 #include <cstring>
-
 
 
 
@@ -50,13 +45,13 @@ double overmars_yap( double * points, double * referencePoint, unsigned noObject
 	SQRT_NO_DATA_POINTS = sqrt( (double)noPoints );
 
 	double * regLow = new double[NO_OBJECTIVES];
-	std::fill( regLow, regLow + NO_OBJECTIVES, MAXDOUBLE );
+	std::fill( regLow, regLow + NO_OBJECTIVES, std::numeric_limits<double>::max() );
 
 	// Calculate Bounding Box
 	double * p = points;
 	for( unsigned i = 0; i < noPoints; i++ ) {
 		for( unsigned j = 0; j < NO_OBJECTIVES; j++ ) {
-			regLow[j] = Shark::min( regLow[j], *p );
+			regLow[j] = std::min( regLow[j], *p );
 
 			++p;
 		}
@@ -1547,7 +1542,7 @@ double fonseca(double *data, double *ref, unsigned int d, unsigned int n)
     unsigned int i;
 
     bound = (double*)ini_malloc (d * sizeof(double));
-    for (i = 0; i < d; i++) bound[i] = -MAXDOUBLE;
+    for (i = 0; i < d; i++) bound[i] = -std::numeric_limits<double>::max();
 #endif
 
     tree  = avl_alloc_tree ((avl_compare_t) compare_tree_asc,
@@ -1584,7 +1579,7 @@ unsigned int LastObjectiveComparator::NO_OBJECTIVES = 0;
 double hypervolume(double* points, double* referencePoint, unsigned int noObjectives, unsigned int noPoints) {
         unsigned int i;
         if (noObjectives == 0) {
-                throw SHARKEXCEPTION("[hypervolume] dimension must be positive");
+                throw std::invalid_argument("[hypervolume] dimension must be positive");
         }
         else if (noObjectives == 1) {
                 // trivial
