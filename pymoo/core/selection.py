@@ -49,7 +49,7 @@ class Selection(Operator):
         ret = self._do(problem, pop, n_select, n_parents, **kwargs)
 
         # if some selections return indices they are used to create the individual list
-        if to_pop and isinstance(ret, np.ndarray) and ret.dtype == int:
+        if to_pop and isinstance(ret, np.ndarray) and np.issubdtype(ret.dtype, np.integer):
             ret = pop[ret]
 
         return ret
