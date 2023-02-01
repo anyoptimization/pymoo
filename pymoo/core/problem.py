@@ -54,7 +54,7 @@ class DaskParallelization:
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        state.pop("client")
+        state.pop("client", None)
         return state
 
 
