@@ -57,12 +57,13 @@ class DaskParallelization:
         state.pop("client", None)
         return state
 
+
 class JoblibParallelization:
 
-    def __init__(self, parallel, delayed, *args, **kwargs) -> None:
+    def __init__(self, aJoblibParallel,  aJoblibDelayed, *args, **kwargs) -> None:
         super().__init__()
-        self.parallel = parallel # joblib runner object
-        self.delayed = delayed # delayed function 
+        self.parallel = aJoblibParallel 
+        self.delayed =  aJoblibDelayed 
 
     def __call__(self, f, X):
         return self.parallel(self.delayed(f)(x) for x in X)
@@ -72,6 +73,7 @@ class JoblibParallelization:
         state.pop("parallel", None)
         state.pop("delayed", None)
         return state
+
 
 class Problem:
     def __init__(self,
