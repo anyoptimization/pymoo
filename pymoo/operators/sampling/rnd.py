@@ -29,8 +29,8 @@ class BinaryRandomSampling(Sampling):
 class IntegerRandomSampling(FloatRandomSampling):
 
     def _do(self, problem, n_samples, **kwargs):
-        X = super()._do(problem, n_samples, **kwargs)
-        return np.around(X).astype(int)
+        n, (xl, xu) = problem.n_var, problem.bounds()
+        return np.column_stack([np.random.randint(xl[k], xu[k]+1, size=(n_samples)) for k in range(n)])
 
 
 class PermutationRandomSampling(Sampling):
