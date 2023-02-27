@@ -214,7 +214,7 @@ class Problem:
             try:
                 out[k] = v.astype(np.float64)
             except:
-                pass
+                out[k] = v
 
         if self.callback is not None:
             self.callback(X, out)
