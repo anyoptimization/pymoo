@@ -1,22 +1,30 @@
 import numpy as np
 
 from pymoo.core.sampling import Sampling
-from pymoo.util.normalization import denormalize
-
-
-def random_by_bounds(n_var, xl, xu, n_samples=1):
-    val = np.random.random((n_samples, n_var))
-    return denormalize(val, xl, xu)
 
 
 def random(problem, n_samples=1):
-    return random_by_bounds(problem.n_var, problem.xl, problem.xu, n_samples=n_samples)
+    X = np.random.random((n_samples, problem.n_var))
+
+    if problem.has_bounds():
+        xl, xu = problem.bounds()
+        assert np.all(xu >= xl)
+        X = xl + (xu - xl) * X
+
+    return X
 
 
 class FloatRandomSampling(Sampling):
 
     def _do(self, problem, n_samples, **kwargs):
-        return random(problem, n_samples=n_samples)
+        X = np.random.random((n_samples, problem.n_var))
+
+        if problem.has_bounds():
+            xl, xu = problem.bounds()
+            assert np.all(xu >= xl)
+            X = xl + (xu - xl) * X
+
+        return X
 
 
 class BinaryRandomSampling(Sampling):
@@ -30,7 +38,7 @@ class IntegerRandomSampling(FloatRandomSampling):
 
     def _do(self, problem, n_samples, **kwargs):
         n, (xl, xu) = problem.n_var, problem.bounds()
-        return np.column_stack([np.random.randint(xl[k], xu[k]+1, size=(n_samples)) for k in range(n)])
+        return np.column_stack([np.random.randint(xl[k], xu[k] + 1, size=n_samples) for k in range(n)])
 
 
 class PermutationRandomSampling(Sampling):

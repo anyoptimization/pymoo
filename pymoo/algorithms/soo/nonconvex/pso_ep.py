@@ -29,7 +29,7 @@ from pymoo.core.variable import Real, Choice, get
 from pymoo.docs import parse_doc_string
 from pymoo.operators.control import EvolutionaryParameterControl
 from pymoo.operators.repair.bounds_repair import repair_random_init, repair_clamp
-from pymoo.operators.sampling.rnd import random_by_bounds, FloatRandomSampling
+from pymoo.operators.sampling.rnd import FloatRandomSampling, random
 from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.sliding_window import SlidingWindow
@@ -230,8 +230,7 @@ class EPPSO(GeneticAlgorithm):
         if init_V == "zero":
             V = np.zeros((len(swarm), n_var))
         elif init_V == "random":
-            xl, xu = self.problem.bounds()
-            Xp = random_by_bounds(n_var, xl, xu, len(swarm))
+            Xp = random(self.problem, len(swarm))
             V = (swarm.get("X") - Xp) / 2
         else:
             raise Exception("Unknown velocity initialization.")
