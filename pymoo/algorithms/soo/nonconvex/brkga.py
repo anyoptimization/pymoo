@@ -121,7 +121,7 @@ class BRKGA(GeneticAlgorithm):
                          n_offsprings=n_offsprings,
                          sampling=sampling,
                          selection=EliteBiasedSelection(),
-                         crossover=BinomialCrossover(bias, prob=1.0),
+                         crossover=BinomialCrossover(bias, prob=1.0, n_offsprings=1),
                          mutation=NoMutation(),
                          survival=survival,
                          output=output,
