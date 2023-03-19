@@ -1,26 +1,30 @@
-from pymoo.core.replacement import ImprovementReplacement
-from pymoo.algorithms.base.differential import DifferentialEvolution
+from pymoo.core.population import Population
+from pymoo.algorithms.base.differential import MODE
+from pymoo.operators.survival.rank_and_crowding import RankAndCrowding
 
 
 # =========================================================================================================
 # Implementation
 # =========================================================================================================
 
-class DE(DifferentialEvolution):
-
+class NSDE(MODE):
+    
     def __init__(self,
                  pop_size=100,
                  variant="DE/rand/1/bin",
                  CR=0.7,
-                 F=(0.5, 1.0),
+                 F=None,
                  gamma=1e-4,
                  de_repair="bounce-back",
-                 survival=ImprovementReplacement(),
+                 survival=RankAndCrowding(),
                  **kwargs):
         """
-        Single-objective Differential Evolution proposed by Storn and Price (1997).
+        NSDE is an algorithm that combines that combines NSGA-II sorting and survival strategies 
+        to DE mutation and crossover.
 
-        Storn, R. & Price, K., 1997. Differential evolution-a simple and efficient heuristic for global optimization over continuous spaces. J. Glob. Optim., 11(4), pp. 341-359.
+        For many-objective problems, try using NSDE-R, GDE3-MNN, or GDE3-2NN.
+
+        For Bi-objective problems, survival = RankAndCrowding(crowding_func='pcd') is very effective.
 
         Parameters
         ----------
@@ -30,7 +34,7 @@ class DE(DifferentialEvolution):
         variant : str, optional
             Differential evolution strategy. Must be a string in the format: "DE/selection/n/crossover", in which, n in an integer of number of difference vectors, and crossover is either 'bin' or 'exp'. Selection variants are:
 
-                - 'ranked'
+                - "ranked'
                 - 'rand'
                 - 'best'
                 - 'current-to-best'
@@ -65,13 +69,14 @@ class DE(DifferentialEvolution):
         genetic_mutation, optional
             Pymoo's genetic mutation operator after crossover. Defaults to NoMutation().
 
-        survival : Survival, optional
-            Replacement survival operator. Defaults to ImprovementReplacement().
-
         repair : Repair, optional
             Pymoo's repair operator after mutation. Defaults to NoRepair().
+
+        survival : Survival, optional
+            Pymoo's survival strategy.
+            Defaults to RankAndCrowding() with crowding distances ('cd').
+            In GDE3, the survival strategy is applied after a one-to-one comparison between child vector and corresponding parent when both are non-dominated by the other.
         """
-        
         super().__init__(
             pop_size=pop_size,
             variant=variant,
@@ -82,3 +87,13 @@ class DE(DifferentialEvolution):
             survival=survival,
             **kwargs,
         )
+        
+    def _advance(self, infills=None, **kwargs):
+
+        assert infills is not None, "This algorithms uses the AskAndTell interface thus 'infills' must to be provided."
+
+        # Merge in mu + lambda style
+        pop = Population.merge(self.pop, infills)
+
+        # Perform a survival to reduce to pop size
+        self.pop = self.survival.do(self.problem, pop, n_survive=self.n_offsprings)

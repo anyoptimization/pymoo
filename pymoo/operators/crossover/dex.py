@@ -1,122 +1,146 @@
 import numpy as np
-
+from abc import abstractmethod
 from pymoo.core.crossover import Crossover
 from pymoo.core.population import Population
+from pymoo.core.variable import get
 from pymoo.operators.crossover.binx import mut_binomial
 from pymoo.operators.crossover.expx import mut_exp
-from pymoo.operators.repair.bounds_repair import is_out_of_bounds_by_problem, repair_random_init
 
 
-def de_differential(X, F, dither=None, jitter=True, gamma=0.0001, return_differentials=False):
-    n_parents, n_matings, n_var = X.shape
-    assert n_parents % 2 == 1, "For the differential an odd number of values need to be provided"
+# =========================================================================================================
+# Implementation
+# =========================================================================================================
 
-    # make sure F is a one-dimensional vector
-    F = np.ones(n_matings) * F
+class DifferentialOperator(Crossover):
 
-    # build the pairs for the differentials
-    pairs = (np.arange(n_parents - 1) + 1).reshape(-1, 2)
+    def __init__(self, n_parents=None, **kwargs):
+        """White label for differential evolution operators
 
-    # the differentials from each pair subtraction
-    diffs = np.zeros((n_matings, n_var))
+        Parameters
+        ----------
+        n_parents : int | None, optional
+            Number of parents necessary in its operations. Useful for compatibility with pymoo.
+        """
+        # __init__ operator
+        super().__init__(n_parents=n_parents, n_offsprings=1, prob=1.0, **kwargs)
 
-    # for each difference
-    for i, j in pairs:
+    @staticmethod
+    def default_prepare(pop, parents):
+        """Utility function that converts population and parents from pymoo Selection to pop and X
 
-        if dither == "vector":
-            F = (F + np.random.random(n_matings) * (1 - F))
-        elif dither == "scalar":
-            F = F + np.random.random() * (1 - F)
+        Parameters
+        ----------
+        pop : Population
+            pymoo population
 
-        # http://www.cs.ndsu.nodak.edu/~siludwig/Publish/papers/SSCI20141.pdf
-        if jitter:
-            F = (F * (1 + gamma * (np.random.random(n_matings) - 0.5)))
+        parents : Population | np.array (n_samples, n_parents) | None
+            Parent population or indices
 
-        # an add the difference to the first vector
-        diffs += F[:, None] * (X[i] - X[j])
+        Returns
+        -------
+        pop, X : Population (n_samples, n_parents), np.array (n_parents, n_samples, n_var)
+            Population and corresponding decision variables
+        """
+        # Convert pop if parents is not None
+        if parents is not None:
+            pop = pop[parents]
 
-    # now add the differentials to the first parent
-    Xp = X[0] + diffs
+        # Get all X values for mutation parents
+        X = np.swapaxes(pop, 0, 1).get("X")
+        return pop, X
 
-    if return_differentials:
-        return Xp, diffs
-    else:
-        return Xp
+    @abstractmethod
+    def do(self, problem, pop, parents=None, **kwargs):
+        pass
+
+    @abstractmethod
+    def _do(self, problem, X, **kwargs):
+        pass
 
 
-class DEX(Crossover):
-
+class DifferentialCrossover(DifferentialOperator):
+    
     def __init__(self,
-                 F=None,
-                 CR=0.7,
                  variant="bin",
-                 dither=None,
-                 jitter=False,
-                 n_diffs=1,
-                 n_iter=1,
+                 CR=0.7,
                  at_least_once=True,
                  **kwargs):
+        """Differential evolution crossover
+        (DE mutation is considered a part of this operator)
 
-        super().__init__(1 + 2 * n_diffs, 1, **kwargs)
-        self.n_diffs = n_diffs
-        self.F = F
+        Parameters
+        ----------
+        variant : str | callable, optional
+            Crossover variant. Must be either "bin", "exp", or callable. By default "bin".
+            If callable, it has the form:
+            ``cross_function(n_matings, n_var, CR, at_least_once=True)``
+        
+        CR : float, optional
+            Crossover parameter. Defined in the range [0, 1]
+            To reinforce mutation, use higher values. To control convergence speed, use lower values.
+
+        at_least_once : bool, optional
+            Either or not offsprings must inherit at least one attribute from mutant vectors, by default True
+        """
+        
+        # __init__ operator
+        super().__init__(n_parents=2, **kwargs)
+        
         self.CR = CR
         self.variant = variant
         self.at_least_once = at_least_once
-        self.dither = dither
-        self.jitter = jitter
-        self.n_iter = n_iter
-
+    
     def do(self, problem, pop, parents=None, **kwargs):
+        
+        # Convert pop if parents is not None
+        pop, X = self.default_prepare(pop, parents)
 
-        # if a parents with array with mating indices is provided -> transform the input first
-        if parents is not None:
-            pop = [pop[mating] for mating in parents]
+        # Create child vectors
+        U = self._do(problem, X, **kwargs)
 
-        # get the actual values from each of the parents
-        X = np.swapaxes(np.array([[parent.get("X") for parent in mating] for mating in pop]), 0, 1).copy()
+        return Population.new("X", U)
+    
+    @abstractmethod
+    def _do(self, problem, X, **kwargs):
+        pass
 
-        n_parents, n_matings, n_var = X.shape
 
-        # a mask over matings that need to be repeated
-        m = np.arange(n_matings)
-
-        # if the user provides directly an F value to use
-        F = self.F if self.F is not None else rnd_F(m)
-
-        # prepare the out to be set
-        Xp = de_differential(X[:, m], F)
-
-        # if the problem has boundaries to be considered
-        if problem.has_bounds():
-
-            for k in range(self.n_iter):
-                # find the individuals which are still infeasible
-                m = is_out_of_bounds_by_problem(problem, Xp)
-
-                F = rnd_F(m)
-
-                # actually execute the differential equation
-                Xp[m] = de_differential(X[:, m], F)
-
-            # if still infeasible do a random initialization
-            Xp = repair_random_init(Xp, X[0], *problem.bounds())
-
+class DEX(DifferentialCrossover):
+    
+    def __init__(self,
+                 variant="bin",
+                 CR=0.7,
+                 at_least_once=True,
+                 **kwargs):
+        
+        super().__init__(
+            variant=variant, CR=CR,
+            at_least_once=at_least_once,
+            **kwargs,
+        )
+        
         if self.variant == "bin":
-            M = mut_binomial(n_matings, n_var, self.CR, at_least_once=self.at_least_once)
+            self.cross_function = mut_binomial
         elif self.variant == "exp":
-            M = mut_exp(n_matings, n_var, self.CR, at_least_once=self.at_least_once)
+            self.cross_function = mut_exp
+        elif hasattr(self.variant, "__call__"):
+            self.cross_function = self.variant
         else:
-            raise Exception(f"Unknown variant: {self.variant}")
+            raise ValueError("Crossover variant must be either 'bin', 'exp', or callable")
 
-        # take the first parents (this is already a copy)
-        X = X[0]
-
-        # set the corresponding values from the donor vector
-        X[M] = Xp[M]
-
-        return Population.new("X", X)
-
-
-def rnd_F(m):
-    return 0.5 * (1 + np.random.uniform(size=len(m)))
+    def _do(self, problem, X, **kwargs):
+        
+        # Decompose input vector
+        V = X[1]
+        X_ = X[0]
+        U = np.array(X_, copy=True)
+        
+        # About X
+        n_matings, n_var = X_.shape
+        
+        # Mask
+        CR = get(self.CR, size=n_matings)
+        M = self.cross_function(n_matings, n_var, CR, self.at_least_once)
+        U[M] = V[M]
+        
+        return U

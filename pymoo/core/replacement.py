@@ -4,6 +4,7 @@ from pymoo.core.duplicate import DefaultDuplicateElimination
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population
 from pymoo.core.survival import Survival
+from pymoo.core.fitness import FitnessSurvival
 
 
 def is_better(_new, _old, eps=0.0):
@@ -21,18 +22,57 @@ def is_better(_new, _old, eps=0.0):
 
 
 class ReplacementSurvival(Survival):
+    
+    def __init__(self, fitness=None):
+        """Base class for Replacement survival
+
+        Parameters
+        ----------
+        fitness : Survival, optional
+            Survival used in ranking and fitness assignement, by default None
+        """
+        super().__init__(filter_infeasible=False)
+        if fitness is None:
+            fitness = FitnessSurvival()
+        self.fitness = fitness
 
     def do(self, problem, pop, off, return_indices=False, inplace=False, **kwargs):
+        """Given a problem a parent population and offspring canditates return next generation.
+        By default, only fitness assigment is performed on parents. To define which ones should be replaced,
+        define method ``_do`` in child classes that returns a boolean if parent should be replaced.
+
+        Parameters
+        ----------
+        problem : Problem
+            Pymoo problem
+        
+        pop : Population
+            Parent population
+        
+        off : Population | None
+            Offspring candidates. If None, only fitness assigment is performed on parents.
+        
+        return_indices : bool, optional
+            Either or not to just return boolean of positions to be replaced, by default False
+        
+        inplace : bool, optional
+            Change population inplace, by default False
+
+        Returns
+        -------
+        Population
+            Population that proceeds into the next generation
+        """
+        
+        # If no offspring is available just do fitness assignment
+        if (off is None) or len(off) == 0:
+            return self.fitness.do(problem, pop, n_survive=None)
 
         # this makes it usable as a traditional survival
-        if isinstance(off, int):
+        elif isinstance(off, int) or isinstance(off, np.integer):
             k = off
             off = pop[k:]
             pop = pop[:k]
-
-        # if the offsprings are simply empty don't do anything
-        if len(off) == 0:
-            return pop
 
         assert len(pop) == len(off), "For the replacement pop and off must have the same number of individuals."
 
@@ -47,13 +87,43 @@ class ReplacementSurvival(Survival):
             if not inplace:
                 pop = pop.copy()
             pop[I] = off[I]
-            return pop
+            return self.fitness.do(problem, pop, n_survive=None)
 
     def _do(self, problem, pop, off, **kwargs):
-        pass
+        return np.zeros(len(pop), dtype=np.bool_)
 
 
 class ImprovementReplacement(ReplacementSurvival):
+    
+    def do(self, problem, pop, off, return_indices=False, inplace=False, **kwargs):
+        """Given a problem a parent population and offspring canditates return next generation,
+        it selects those that proceed into the next generation via one-to-one comparison.
+        Feasible solutions are always preferred to infeasible and infeasible solutions are compared by
+        overall constraint violation.
+
+        Parameters
+        ----------
+        problem : Problem
+            Pymoo problem
+        
+        pop : Population
+            Parent population
+        
+        off : Population | None
+            Offspring candidates. If None, only fitness assigment is performed on parents.
+        
+        return_indices : bool, optional
+            Either or not to just return boolean of positions to be replaced, by default False
+        
+        inplace : bool, optional
+            Change population inplace, by default False
+
+        Returns
+        -------
+        Population
+            Population that proceeds into the next generation
+        """
+        return super().do(problem, pop, off, return_indices=False, inplace=False, **kwargs)
 
     def _do(self, problem, pop, off, **kwargs):
 
