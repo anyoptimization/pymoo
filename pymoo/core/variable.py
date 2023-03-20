@@ -27,9 +27,10 @@ class Variable(object):
 
 class BoundedVariable(Variable):
 
-    def __init__(self, value=None, bounds=(None, None), strict=None, **kwargs) -> None:
+    def __init__(self, value=None, bounds=(None, None), strict=None, precision = 4, **kwargs) -> None:
         super().__init__(value=value, **kwargs)
         self.bounds = bounds
+        self.precision = precision
 
         if strict is None:
             strict = bounds
@@ -49,7 +50,10 @@ class Real(BoundedVariable):
 
     def _sample(self, n):
         low, high = self.bounds
-        return np.random.uniform(low=low, high=high, size=n)
+        precision = self.precision
+        self.step = 10**(-self.precision)
+        n_steps = int(np.round((high - low) / self.step))
+        return np.round(low + np.random.randint(n_steps+1, size = n) * self.step, precision)
 
 
 class Integer(BoundedVariable):
