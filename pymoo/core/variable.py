@@ -27,7 +27,7 @@ class Variable(object):
 
 class BoundedVariable(Variable):
 
-    def __init__(self, value=None, bounds=(None, None), strict=None, precision = 4, **kwargs) -> None:
+    def __init__(self, value=None, bounds=(None, None), strict=None, precision = 6, **kwargs) -> None:
         super().__init__(value=value, **kwargs)
         self.bounds = bounds
         self.precision = precision
@@ -50,10 +50,9 @@ class Real(BoundedVariable):
 
     def _sample(self, n):
         low, high = self.bounds
-        precision = self.precision
         self.step = 10**(-self.precision)
         n_steps = int(np.round((high - low) / self.step))
-        return np.round(low + np.random.randint(n_steps+1, size = n) * self.step, precision)
+        return np.round(low + np.random.randint(n_steps+1, size = n) * self.step, self.precision)
 
 
 class Integer(BoundedVariable):
