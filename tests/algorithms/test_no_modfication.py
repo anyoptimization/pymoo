@@ -7,6 +7,7 @@ import pytest
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.moo.nsga3 import NSGA3
 from pymoo.algorithms.moo.rvea import RVEA
+from pymoo.algorithms.moo.gde3 import GDE3, GDE3MNN, GDE3P
 from pymoo.core.callback import Callback
 from pymoo.indicators.igd import IGD
 from pymoo.optimize import minimize
@@ -34,6 +35,9 @@ RUNS = [
     ("nsga2", NSGA2()),
     ("nsga3", NSGA3(ref_dirs)),
     ("rvea", RVEA(ref_dirs)),
+    ("gde3", GDE3(CR=0.5)),
+    ("gde3p", GDE3P(CR=0.5)),
+    ("gde3mnn", GDE3MNN(CR=0.5)),
 ]
 
 PROBLEMS = ["zdt1", "zdt2", "zdt3"]
