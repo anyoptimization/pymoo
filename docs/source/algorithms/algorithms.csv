@@ -9,9 +9,13 @@
    :ref:`Improved Stochastic Ranking Evolutionary Strategy <nb_isres>`, ISRES, single, x, An improved version of SRES being able to deal dependent variables efficiently.
    :ref:`NSGA-II <nb_nsga2>`, NSGA2, multi, x, Well-known multi-objective optimization algorithm based on non-dominated sorting and crowding.
    :ref:`R-NSGA-II <nb_rnsga2>`, RNSGA2, multi, x, An extension of NSGA-II where reference/aspiration points can be provided by the user.
+   :ref:`GDE3 <nb_gde3>`, GDE3, multi, x, Multi-objective variant of Differential Evolution with one-to-one comparison before Rank and Crowding.
+   :ref:`NSDE <nb_nsde>`, NSDE, multi, x, Multi-objective variant of Differential Evolution with a pure (*µ*+*λ*) survival strategy.
    :ref:`NSGA-III <nb_nsga3>`, NSGA3, many, x, An improvement of NSGA-II developed for multi-objective optimization problems with more than two objectives.
    :ref:`U-NSGA-III <nb_unsga3>`, UNSGA3, many, x, A generalization of NSGA-III to be more efficient for single and bi-objective optimization problems.
    :ref:`R-NSGA-III <nb_rnsga3>`, RNSGA3, many, x, Allows defining aspiration points for NSGA-III to incorporate the user's preference.
+   :ref:`GDE3-MNN <nb_gde3>`, GDE3-MNN, many, x, Variant of GDE3 with a modification in Rank and Crowding to improve performance when more than two objectives are considered.
+   :ref:`GDE3-MNN <nb_nsder>`, NSDE-R, many, x, Combines DE reproduction operators to NSGA-III survival strategy.
    :ref:`MOEA\D <nb_moead>`, MOEAD, many,, Another well-known multi-objective optimization algorithm based on decomposition.
    :ref:`AGE-MOEA <nb_agemoea>`, AGEMOEA, many,, Similar to NSGA-II but estimates the shape of the Pareto-front to compute a score replacing the crowding distance.
    :ref:`C-TAEA <nb_ctaea>`, CTAEA, many, x, An algorithm with a more sophisticated constraint-handling for many-objective optimization algoritms.
