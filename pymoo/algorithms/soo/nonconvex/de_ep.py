@@ -205,7 +205,7 @@ class Variant(InfillCriterion):
 # =========================================================================================================
 
 
-class DE(GeneticAlgorithm):
+class EPDE(GeneticAlgorithm):
 
     def __init__(self,
                  pop_size=100,
@@ -276,4 +276,4 @@ class DE(GeneticAlgorithm):
         self.opt = self.pop[k]
 
 
-parse_doc_string(DE.__init__)
+parse_doc_string(EPDE.__init__)

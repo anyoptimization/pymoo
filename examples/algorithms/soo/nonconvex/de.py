@@ -9,12 +9,12 @@ algorithm = DE(
     pop_size=100,
     variant="DE/rand/1/bin",
     CR=0.3,
-    dither="vector",
-    jitter=True
+    F=(0.2, 0.8)
 )
 
 res = minimize(problem,
                algorithm,
+               ("n_gen", 1000),
                seed=1,
                verbose=True)
 
