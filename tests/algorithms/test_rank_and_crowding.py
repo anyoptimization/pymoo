@@ -59,7 +59,7 @@ def test_cd_and_pcd():
     cd = calc_crowding_distance(res.F)
     pcd = calc_pcd(res.F)
 
-    assert np.sum(np.abs(cd[~np.isinf(cd)] - pcd[~np.isinf(pcd)])) <= 1e-8
+    assert np.sum(np.abs(cd[~np.isinf(cd)] - pcd[~np.isinf(pcd)])) <= 1e-8, "First check"
     
     new_F = res.F.copy()
     
@@ -74,7 +74,7 @@ def test_cd_and_pcd():
     
     new_F_alt = res.F.copy()[np.setdiff1d(np.arange(len(res.F)), ind)]
     
-    assert np.sum(np.abs(new_F - new_F_alt)) <= 1e-8
+    assert np.sum(np.abs(new_F - new_F_alt)) <= 1e-8, "Second check"
 
 
 def test_mnn():
