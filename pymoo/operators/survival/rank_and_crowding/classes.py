@@ -32,7 +32,7 @@ class RankAndCrowding(Survival):
                 - 'mnn': M-Neaest Neighbors
                 - '2nn': 2-Neaest Neighbors
 
-            If callable, it has the form ``fun(F, filter_out_duplicates=None, n_remove=None, **kwargs)``
+            If callable, it has the form ``fun(F, n_remove=None, **kwargs)``
             in which F (n, m) and must return metrics in a (n,) array.
 
             The options 'pcd', 'cd', and 'ce' are recommended for two-objective problems, whereas 'mnn' and '2nn' for many objective.
@@ -125,7 +125,7 @@ class ConstrRankAndCrowding(Survival):
                 - 'mnn': M-Neaest Neighbors
                 - '2nn': 2-Neaest Neighbors
 
-            If callable, it has the form ``fun(F, filter_out_duplicates=None, n_remove=None, **kwargs)``
+            If callable, it has the form ``fun(F, n_remove=None, **kwargs)``
             in which F (n, m) and must return metrics in a (n,) array.
 
             The options 'pcd', 'cd', and 'ce' are recommended for two-objective problems, whereas 'mnn' and '2nn' for many objective.
