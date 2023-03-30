@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def calc_pcd(X, n_remove=0):
 
     N = X.shape[0]
@@ -84,6 +85,9 @@ def calc_pcd(X, n_remove=0):
         _d = np.sum(dist_to_last[J, np.arange(M)] + dist_to_next[J, np.arange(M)], axis=1)
         d[H] = _d
         d[extremes] = np.inf
+    
+    # Divide by number of objectives to obtain correct metric
+    d = d / M
     
     return d
 

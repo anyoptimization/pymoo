@@ -412,46 +412,35 @@ double stream(double * regionLow,
 
 /************************************************************************
 Relevant literature:
-
  [1]  C. M. Fonseca, L. Paquete, and M. Lopez-Ibanez. An
       improved dimension-sweep algorithm for the hypervolume
       indicator. In IEEE Congress on Evolutionary Computation,
       pages 1157-1163, Vancouver, Canada, July 2006.
-
  [2]  L. Paquete, C. M. Fonseca and M. Lopez-Ibanez. An optimal
       algorithm for a special case of Klee's measure problem in three
       dimensions. Technical Report CSI-RT-I-01/2006, CSI, Universidade
       do Algarve, 2006.
-
 *************************************************************************/
 
 /*****************************************************************************
-
     avl.c & avl.h - Source code for the AVL-tree library.
-
     Copyright (C) 1998  Michael H. Buselli <cosine@cosine.org>
     Copyright (C) 2000-2002  Wessel Dankers <wsl@nl.linux.org>
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
     License as published by the Free Software Foundation; either
     version 2.1 of the License, or (at your option) any later version.
-
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Lesser General Public License for more details.
-
     You should have received a copy of the GNU Lesser General Public
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
-
     Augmented AVL-tree. Original by Michael H. Buselli <cosine@cosine.org>.
-
     Modified by Wessel Dankers <wsl@nl.linux.org> to add a bunch of bloat to
     the sourcecode, change the interface and squash a few bugs.
     Mail him if you find new bugs.
-
 *****************************************************************************/
 
 #define VARIANT 3
@@ -1618,4 +1607,3 @@ double hypervolume(double* points, double* referencePoint, unsigned int noObject
                 return overmars_yap(points, referencePoint, noObjectives, noPoints);
         }
 }
-
