@@ -5,7 +5,7 @@ from pymoo.core.problem import Problem
 
 
 def calc_complex_gradient(problem, return_values_of, x, eps, *args, **kwargs):
-    xp = x + np.eye(len(x)) * np.complex(0, eps)
+    xp = x + np.eye(len(x)) * complex(0, eps)
     out = problem.do(xp, return_values_of, *args, **kwargs)
 
     grad = {}
