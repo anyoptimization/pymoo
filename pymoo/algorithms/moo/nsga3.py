@@ -112,7 +112,8 @@ class NSGA3(GeneticAlgorithm):
         if not has_feasible(self.pop):
             self.opt = self.pop[[np.argmin(self.pop.get("CV"))]]
         else:
-            self.opt = self.survival.opt
+            if len(self.survival.opt):
+                self.opt = self.survival.opt
 
 
 # =========================================================================================================
