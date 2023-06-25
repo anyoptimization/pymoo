@@ -6,6 +6,11 @@ import pymoo.gradient.toolbox as anp
 from pymoo.util.cache import Cache
 from pymoo.util.misc import at_least_2d_array
 
+try:
+    import ray
+except ImportError:
+    ray = None
+
 
 class ElementwiseEvaluationFunction:
 
@@ -72,6 +77,43 @@ class JoblibParallelization:
         state = self.__dict__.copy()
         state.pop("parallel", None)
         state.pop("delayed", None)
+        return state
+
+
+class RayParallelization:
+    """Use Ray as backend to parallelize problem evaluation.
+    
+    Ray is an open-source unified framework for scaling AI and Python applicaitons.
+    Read more here: https://docs.ray.io.
+    
+    You will need to install Ray to use this.
+    """
+    def __init__(self, job_resources: dict = {'num_cpus': 1}) -> None:
+        """
+        Parameters
+        ----------
+        job_resources: A resource in Ray is a key-value pair where the key denotes a 
+            resource name and the value is a float quantity. Ray has native support for CPU,
+            GPU, and memory resource types; `'num_cpus'`, `'num_gpus'`, and `'memory'`.
+            Read more here: 
+            https://docs.ray.io/en/latest/ray-core/scheduling/resources.html.
+        """
+        assert ray is not None, (
+            "Ray must be installed! "
+            "You can install Ray with the command: "
+            '`pip install -U "ray[default]"`'
+        )
+        super().__init__()
+        self.job_resources = job_resources
+
+    def __call__(self, f, X):
+        runnable = ray.remote(f.__call__.__func__)
+        runnable = runnable.options(**self.job_resources)
+        futures = [runnable.remote(f, x) for x in X]
+        return ray.get(futures)
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
         return state
 
 
