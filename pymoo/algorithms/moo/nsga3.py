@@ -167,6 +167,8 @@ class ReferenceDirectionSurvival(Survival):
         # set the optimum, first front and closest to all reference directions
         closest = np.unique(dist_matrix[:, np.unique(niche_of_individuals)].argmin(axis=0))
         self.opt = pop[intersect(fronts[0], closest)]
+        if len(self.opt) == 0:
+            self.opt = pop[fronts[0]]
 
         # if we need to select individuals to survive
         if len(pop) > n_survive:
