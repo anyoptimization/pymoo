@@ -174,13 +174,17 @@ class MultiLayerReferenceDirectionFactory:
 # Util
 # =========================================================================================================
 
+def get_rng(seed = None):
+    if seed is None or type(seed) == int:
+        rng = np.random.default_rng(seed)
+    return rng
 
-def sample_on_unit_simplex(n_points, n_dim, unit_simplex_mapping="kraemer"):
+def sample_on_unit_simplex(n_points, n_dim, unit_simplex_mapping="kraemer", seed = None):
     if unit_simplex_mapping == "sum":
-        rnd = map_onto_unit_simplex(np.random.random((n_points, n_dim)), "sum")
+        rnd = map_onto_unit_simplex(get_rng(seed).random((n_points, n_dim)), "sum")
 
     elif unit_simplex_mapping == "kraemer":
-        rnd = map_onto_unit_simplex(np.random.random((n_points, n_dim)), "kraemer")
+        rnd = map_onto_unit_simplex(get_rng(seed).random((n_points, n_dim)), "kraemer")
 
     elif unit_simplex_mapping == "das-dennis":
         n_partitions = get_partition_closest_to_points(n_points, n_dim)
