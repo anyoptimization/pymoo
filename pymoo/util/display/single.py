@@ -42,7 +42,7 @@ class SingleObjectiveOutput(Output):
         self.columns += [self.f_avg, self.f_min]
 
         pf = pareto_front_if_possible(problem)
-        if pf:
+        if pf is not None:
             self.best = pf.flatten()[0]
             self.columns += [self.f_gap]
 
