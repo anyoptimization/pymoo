@@ -1,5 +1,5 @@
 import numpy as np
-
+from pymoo import PYMOO_PRNG
 from pymoo.core.mutation import Mutation
 
 
@@ -14,7 +14,7 @@ class ChoiceRandomMutation(Mutation):
         prob_var = self.get_prob_var(problem, size=len(X))
 
         for k, (_, var) in enumerate(problem.vars.items()):
-            mut = np.where(np.random.random(len(X)) < prob_var)[0]
+            mut = np.where(PYMOO_PRNG.random(len(X)) < prob_var)[0]
 
             v = var.sample(len(mut))
             X[mut, k] = v

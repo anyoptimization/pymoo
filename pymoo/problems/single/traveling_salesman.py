@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.distance import cdist
-
+from pymoo import PYMOO_PRNG
 from pymoo.core.problem import ElementwiseProblem
 
 
@@ -48,9 +48,9 @@ class TravelingSalesman(ElementwiseProblem):
 
 def create_random_tsp_problem(n_cities, grid_width=100.0, grid_height=None, seed=None):
     if seed is not None:
-        np.random.seed(seed)
+        PYMOO_PRNG = np.random.default_rng(seed)
     grid_height = grid_height if grid_height is not None else grid_width
-    cities = np.random.random((n_cities, 2)) * [grid_width, grid_height]
+    cities = PYMOO_PRNG.random((n_cities, 2)) * [grid_width, grid_height]
     return TravelingSalesman(cities)
 
 

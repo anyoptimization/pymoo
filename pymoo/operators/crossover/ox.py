@@ -1,10 +1,10 @@
 import numpy as np
-
+from pymoo import PYMOO_PRNG
 from pymoo.core.crossover import Crossover
 
 
 def random_sequence(n):
-    start, end = np.sort(np.random.choice(n, 2, replace=False))
+    start, end = np.sort(PYMOO_PRNG.choice(n, 2, replace=False))
     return tuple([start, end])
 
 

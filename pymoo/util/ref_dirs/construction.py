@@ -5,6 +5,7 @@ from pymoo.util.ref_dirs.misc import project_onto_sum_equals_zero_plane, project
 from pymoo.util.ref_dirs.optimizer import Adam
 from pymoo.util.reference_direction import ReferenceDirectionFactory, map_onto_unit_simplex
 
+from pymoo import PYMOO_PRNG
 
 def calc_dist_to_others(x, X):
     return - np.sqrt(((x - X) ** 2).sum(axis=1)).min()
@@ -54,7 +55,7 @@ class ConstructionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
 
     def next(self):
 
-        x = np.random.random((self.n_samples, self.n_dim))
+        x = PYMOO_PRNG.random((self.n_samples, self.n_dim))
         x = map_onto_unit_simplex(x, "kraemer")
         x = x[vectorized_cdist(x, self.X).min(axis=1).argmax()]
 

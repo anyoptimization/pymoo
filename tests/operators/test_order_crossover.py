@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.operators.crossover.ox import ox
-
+from pymoo import PYMOO_PRNG
 
 def order_crossover_contributed_no_shift(x1, x2, seq=None):
     assert len(x1) == len(x2)
@@ -9,7 +9,7 @@ def order_crossover_contributed_no_shift(x1, x2, seq=None):
     if seq is not None:
         start, end = seq
     else:
-        start, end = np.sort(np.random.choice(len(x1), 2, replace=False))
+        start, end = np.sort(PYMOO_PRNG.choice(len(x1), 2, replace=False))
 
     y1 = x1.copy()
     y2 = x2.copy()
@@ -51,10 +51,10 @@ def test_example_to_bound():
 
 def test_equal_constribution_no_shift():
     for _ in range(100):
-        a = np.random.permutation(10)
-        b = np.random.permutation(10)
+        a = PYMOO_PRNG.permutation(10)
+        b = PYMOO_PRNG.permutation(10)
 
-        start, end = np.sort(np.random.choice(len(a), 2, replace=False))
+        start, end = np.sort(PYMOO_PRNG.choice(len(a), 2, replace=False))
         y1 = ox(a, b, seq=(start, end), shift=False)
         y2 = ox(b, a, seq=(start, end), shift=False)
 

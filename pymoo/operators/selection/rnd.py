@@ -1,7 +1,7 @@
 import math
 
 import numpy as np
-
+from pymoo import PYMOO_PRNG
 from pymoo.core.selection import Selection
 from pymoo.util.misc import random_permuations
 
@@ -58,9 +58,9 @@ def fast_fill_random(X, N, columns=None, Xp=None, n_max_attempts=10):
         for _ in range(n_max_attempts):
 
             if len(rem) > N:
-                X[rem, col] = np.random.choice(N, replace=True, size=len(rem))
+                X[rem, col] = PYMOO_PRNG.choice(N, replace=True, size=len(rem))
             else:
-                X[rem, col] = np.random.permutation(N)[:len(rem)]
+                X[rem, col] = PYMOO_PRNG.permutation(N)[:len(rem)]
 
             rem = np.where((X[rem, col][:, None] == D[rem]).any(axis=1))[0]
 

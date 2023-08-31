@@ -1,7 +1,7 @@
 import abc
 
 import numpy as np
-
+from pymoo import PYMOO_PRNG
 from pymoo.core.population import Population
 from pymoo.core.repair import Repair
 
@@ -59,11 +59,11 @@ def repair_random_init(Xp, X, xl, xu):
 
     i, j = np.where(Xp < XL)
     if len(i) > 0:
-        Xp[i, j] = XL[i, j] + np.random.random(len(i)) * (X[i, j] - XL[i, j])
+        Xp[i, j] = XL[i, j] + PYMOO_PRNG.random(len(i)) * (X[i, j] - XL[i, j])
 
     i, j = np.where(Xp > XU)
     if len(i) > 0:
-        Xp[i, j] = XU[i, j] - np.random.random(len(i)) * (XU[i, j] - X[i, j])
+        Xp[i, j] = XU[i, j] - PYMOO_PRNG.random(len(i)) * (XU[i, j] - X[i, j])
 
     return Xp
 

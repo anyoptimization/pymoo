@@ -1,7 +1,7 @@
 import math
 
 import numpy as np
-
+from pymoo import PYMOO_PRNG
 from pymoo.core.crossover import Crossover
 from pymoo.util.misc import crossover_mask
 
@@ -26,7 +26,7 @@ class HalfUniformCrossover(Crossover):
 
             n = math.ceil(len(I) / 2)
             if n > 0:
-                _I = I[np.random.permutation(len(I))[:n]]
+                _I = I[PYMOO_PRNG.permutation(len(I))[:n]]
                 M[i, _I] = True
 
         _X = crossover_mask(X, M)

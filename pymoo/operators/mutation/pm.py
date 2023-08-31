@@ -1,5 +1,5 @@
 import numpy as np
-
+from pymoo import PYMOO_PRNG
 from pymoo.core.mutation import Mutation
 from pymoo.core.variable import get, Real
 from pymoo.operators.crossover.binx import mut_binomial
@@ -34,7 +34,7 @@ def mut_pm(X, xl, xu, eta, prob, at_least_once):
 
     mut_pow = 1.0 / (eta + 1.0)
 
-    rand = np.random.random(X.shape)
+    rand = PYMOO_PRNG.random(X.shape)
     mask = rand <= 0.5
     mask_not = np.logical_not(mask)
 

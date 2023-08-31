@@ -41,6 +41,9 @@ data = dict(
                       'alive-progress',
                       'dill',
                       'Deprecated'],
+    extras_require={
+        'AGEMOEA': ["numba"],
+    },
     platforms='any',
     classifiers=[
         'Intended Audience :: Developers',

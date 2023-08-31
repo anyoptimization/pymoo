@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.core.problem import Problem, ElementwiseProblem
-
+from pymoo import PYMOO_PRNG
 
 class MyElementwiseProblem(ElementwiseProblem):
 
@@ -24,7 +24,7 @@ class MyProblem(Problem):
 
 
 def test_elementwise_evaluation():
-    X = np.random.random((100, 2))
+    X = PYMOO_PRNG.random((100, 2))
 
     vectorized = MyProblem()
     elementwise = MyElementwiseProblem()
@@ -32,7 +32,7 @@ def test_elementwise_evaluation():
 
 
 def test_misc_value():
-    X = np.random.random((100, 2))
+    X = PYMOO_PRNG.random((100, 2))
     vectorized = MyProblem()
     elementwise = MyElementwiseProblem()
 

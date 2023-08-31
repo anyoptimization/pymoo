@@ -14,6 +14,7 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.util.display.multi import MultiObjectiveOutput
 from pymoo.util.reference_direction import default_ref_dirs
 
+from pymoo import PYMOO_PRNG
 
 class NeighborhoodSelection(Selection):
 
@@ -28,10 +29,10 @@ class NeighborhoodSelection(Selection):
         prob = get(self.prob, size=n_select)
 
         for k in range(n_select):
-            if np.random.random() < prob[k]:
-                P[k] = np.random.choice(neighbors[k], n_parents, replace=False)
+            if PYMOO_PRNG.random() < prob[k]:
+                P[k] = PYMOO_PRNG.choice(neighbors[k], n_parents, replace=False)
             else:
-                P[k] = np.random.permutation(len(pop))[:n_parents]
+                P[k] = PYMOO_PRNG.permutation(len(pop))[:n_parents]
 
         return P
 
@@ -98,12 +99,13 @@ class MOEAD(LoopwiseAlgorithm, GeneticAlgorithm):
         pop = self.pop
 
         # iterate for each member of the population in random order
-        for k in np.random.permutation(len(pop)):
+        for k in PYMOO_PRNG.permutation(len(pop)):
             # get the parents using the neighborhood selection
             P = self.selection.do(self.problem, pop, 1, self.mating.crossover.n_parents, neighbors=[self.neighbors[k]])
 
             # perform a mating using the default operators - if more than one offspring just pick the first
-            off = np.random.choice(self.mating.do(self.problem, pop, 1, parents=P, n_max_iterations=1))
+            # TODO: this is not just taking the first it's drawing one randomly - is this intended?
+            off = PYMOO_PRNG.choice(self.mating.do(self.problem, pop, 1, parents=P, n_max_iterations=1))
 
             # evaluate the offspring
             off = yield off
@@ -143,7 +145,7 @@ class ParallelMOEAD(MOEAD):
         pop_size, cross_parents, cross_off = self.pop_size, self.mating.crossover.n_parents, self.mating.crossover.n_offsprings
 
         # do the mating in a random order
-        indices = np.random.permutation(len(self.pop))[:self.n_offsprings]
+        indices = PYMOO_PRNG.permutation(len(self.pop))[:self.n_offsprings]
 
         # get the parents using the neighborhood selection
         P = self.selection.do(self.problem, self.pop, self.n_offsprings, cross_parents,
@@ -153,7 +155,7 @@ class ParallelMOEAD(MOEAD):
         off = self.mating.do(self.problem, self.pop, 1e12, n_max_iterations=1, parents=P)
 
         # select a random offspring from each mating
-        off = Population.create(*[np.random.choice(pool) for pool in np.reshape(off, (self.n_offsprings, -1))])
+        off = Population.create(*[PYMOO_PRNG.choice(pool) for pool in np.reshape(off, (self.n_offsprings, -1))])
 
         # store the indices because of the neighborhood matching in advance
         self.indices = indices

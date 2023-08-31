@@ -1,5 +1,5 @@
 import numpy as np
-
+from pymoo import PYMOO_PRNG
 from pymoo.core.crossover import Crossover
 from pymoo.core.variable import Real, get
 from pymoo.operators.repair.bounds_repair import repair_random_init
@@ -40,13 +40,13 @@ def pcx(X, eta, zeta, index):
 
     # generating zero-mean normally distributed variables
     sigma = D_not[:, None] * eta.repeat(n_var, axis=1)
-    rnd = np.random.normal(loc=0.0, scale=sigma)
+    rnd = PYMOO_PRNG.normal(loc=0.0, scale=sigma)
 
     # implemented just like the c code - generate_new.h file
     inner_prod = np.sum(rnd * diff_to_centroid, axis=-1, keepdims=True)
     noise = rnd - (inner_prod * diff_to_centroid) / dist_to_centroid[:, None] ** 2
 
-    bias_to_centroid = np.random.normal(0.0, zeta) * diff_to_centroid
+    bias_to_centroid = PYMOO_PRNG.normal(0.0, zeta) * diff_to_centroid
 
     # the array which is finally returned
     Xp = X[index] + noise + bias_to_centroid

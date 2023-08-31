@@ -9,6 +9,7 @@ from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
 from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.optimum import filter_optimum
 
+from pymoo import PYMOO_PRNG
 
 # =========================================================================================================
 # Implementation
@@ -124,7 +125,7 @@ def exploration_move(problem, center, sign, delta, rho, randomize=True):
 
     # the order for the variable iteration
     if randomize:
-        K = np.random.permutation(n_var)
+        K = PYMOO_PRNG.permutation(n_var)
     else:
         K = np.arange(n_var)
 

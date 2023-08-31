@@ -13,6 +13,7 @@ from pymoo.util.normalization import ZeroToOneNormalization, NoNormalization
 from pymoo.util.optimum import filter_optimum
 from pymoo.vendor.vendor_cmaes import my_fmin
 
+from pymoo import PYMOO_PRNG
 
 # =========================================================================================================
 # Implementation
@@ -282,6 +283,7 @@ class CMAES(LocalSearch):
         popsize : 4+int(3*np.log(N))
             Population size, AKA lambda, number of new solution per iteration
 
+        # TODO is randn actually something that we can pass? doesn't appear to be used in code base.
         randn : np.random.randn
             Randn(lam, N) must return an np.array of shape (lam, N), see also cma.utilities.math.randhss
 

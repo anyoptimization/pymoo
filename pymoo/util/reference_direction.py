@@ -4,7 +4,7 @@ import numpy as np
 from scipy import special
 
 from pymoo.util.misc import find_duplicates, cdist
-
+from pymoo import PYMOO_PRNG
 
 # =========================================================================================================
 # Model
@@ -40,7 +40,7 @@ class ReferenceDirectionFactory:
 
         # set the random seed if it is provided
         if self.seed is not None:
-            np.random.seed(self.seed)
+            PYMOO_PRNG.seed(self.seed)
 
         if self.n_dim == 1:
             return np.array([[1.0]])
@@ -177,10 +177,10 @@ class MultiLayerReferenceDirectionFactory:
 
 def sample_on_unit_simplex(n_points, n_dim, unit_simplex_mapping="kraemer"):
     if unit_simplex_mapping == "sum":
-        rnd = map_onto_unit_simplex(np.random.random((n_points, n_dim)), "sum")
+        rnd = map_onto_unit_simplex(PYMOO_PRNG.random((n_points, n_dim)), "sum")
 
     elif unit_simplex_mapping == "kraemer":
-        rnd = map_onto_unit_simplex(np.random.random((n_points, n_dim)), "kraemer")
+        rnd = map_onto_unit_simplex(PYMOO_PRNG.random((n_points, n_dim)), "kraemer")
 
     elif unit_simplex_mapping == "das-dennis":
         n_partitions = get_partition_closest_to_points(n_points, n_dim)
@@ -230,7 +230,7 @@ def select_points_with_maximum_distance(X, n_select, selected=[]):
 
     # if no selection provided pick randomly in the beginning
     if len(selected) == 0:
-        selected = [np.random.randint(len(X))]
+        selected = [PYMOO_PRNG.randint(len(X))]
 
     # create variables to store what selected and what not
     not_selected = [i for i in range(n_points) if i not in selected]

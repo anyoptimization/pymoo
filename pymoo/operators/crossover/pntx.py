@@ -1,5 +1,5 @@
 import numpy as np
-
+from pymoo import PYMOO_PRNG
 from pymoo.core.crossover import Crossover
 from pymoo.util.misc import crossover_mask
 
@@ -16,7 +16,7 @@ class PointCrossover(Crossover):
         _, n_matings, n_var = X.shape
 
         # start point of crossover
-        r = np.row_stack([np.random.permutation(n_var - 1) + 1 for _ in range(n_matings)])[:, :self.n_points]
+        r = np.row_stack([PYMOO_PRNG.permutation(n_var - 1) + 1 for _ in range(n_matings)])[:, :self.n_points]
         r.sort(axis=1)
         r = np.column_stack([r, np.full(n_matings, n_var)])
 

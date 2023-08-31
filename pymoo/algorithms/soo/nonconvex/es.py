@@ -9,6 +9,7 @@ from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.optimum import filter_optimum
 
+from pymoo import PYMOO_PRNG
 
 class ES(GeneticAlgorithm):
 
@@ -96,7 +97,7 @@ class ES(GeneticAlgorithm):
         sigmap = np.minimum(self.sigma_max, es_sigma(sigmap, self.tau, self.taup))
 
         # execute the evolutionary strategy to calculate the offspring solutions
-        Xp = X + sigmap * np.random.normal(size=sigmap.shape)
+        Xp = X + sigmap * PYMOO_PRNG.normal(size=sigmap.shape)
 
         # if gamma is not none do the differential variation overwrite Xp and sigmap for the first mu-1 individuals
         if self.gamma is not None:
@@ -127,7 +128,7 @@ class ES(GeneticAlgorithm):
 
 def es_sigma(sigma, tau, taup):
     _lambda, _n = sigma.shape
-    return sigma * np.exp(taup * np.random.normal(size=(_lambda, 1)) + tau * np.random.normal(size=(_lambda, _n)))
+    return sigma * np.exp(taup * PYMOO_PRNG.normal(size=(_lambda, 1)) + tau * PYMOO_PRNG.normal(size=(_lambda, _n)))
 
 
 def es_intermediate_recomb(sigma):
@@ -136,7 +137,7 @@ def es_intermediate_recomb(sigma):
 
     for i in range(_lambda):
         for j in range(_n):
-            k = np.random.randint(_lambda)
+            k = PYMOO_PRNG.randint(_lambda)
             sigma_hat[i, j] = (sigma[i, j] + sigma[k, j]) / 2.0
 
     return sigma_hat
@@ -160,7 +161,7 @@ def es_mut_repair(Xp, X, sigma, xl, xu, n_trials):
             break
         else:
             # do the mutation again vectored for all values not in bound
-            Xp[i, j] = X[i, j] + sigma[i, j] * np.random.normal(size=len(i))
+            Xp[i, j] = X[i, j] + sigma[i, j] * PYMOO_PRNG.normal(size=len(i))
 
     # if there are still solutions which boundaries are violated, set them to the original X
     if not all_in_bounds:
@@ -189,7 +190,7 @@ def es_mut_loop(X, sigmap, xl, xu, n_trials=10):
             for _ in range(n_trials):
 
                 # calculate the mutated value
-                x = X[i, j] + sigmap[i, j] * np.random.normal()
+                x = X[i, j] + sigmap[i, j] * PYMOO_PRNG.normal()
 
                 # if it is inside the bounds accept it - otherwise try again
                 if xl[j] <= x <= xu[j]:

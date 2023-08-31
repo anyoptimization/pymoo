@@ -7,15 +7,16 @@ from pymoo.indicators.hv.monte_carlo import ApproximateMonteCarloHypervolume
 from pymoo.problems.many import DTLZ1
 from pymoo.problems.multi import ZDT1
 
+from pymoo import PYMOO_PRNG
 
 def case_2d():
-    np.random.seed(1)
+    PYMOO_PRNG = np.random.default_rng(1)
 
     ref_point = np.array([1.5, 1.5])
 
     F = ZDT1().pareto_front()
     F = F[::10] * 1.2
-    F = F[np.random.permutation(len(F))]
+    F = F[PYMOO_PRNG.permutation(len(F))]
 
     return ref_point, F
 
@@ -27,19 +28,19 @@ def case_2d_smaller_ref():
 
 
 def case_3d():
-    np.random.seed(1)
+    PYMOO_PRNG = np.random.default_rng(1)
 
     ref_point = np.array([1.5, 1.5, 1.5])
 
     F = DTLZ1().pareto_front()
     F = F[::10] * 1.2
-    F = F[np.random.permutation(len(F))]
+    F = F[PYMOO_PRNG.permutation(len(F))]
 
     return ref_point, F
 
 
 def test_hvc_2d():
-    np.random.seed(1)
+    PYMOO_PRNG = np.random.default_rng(1)
     ref_point, F = case_2d()
 
     exact = ExactHypervolume(ref_point).add(F)
@@ -49,7 +50,7 @@ def test_hvc_2d():
     np.testing.assert_allclose(exact.hvc, exact2d.hvc)
 
     for i in range(len(F)):
-        k = np.random.randint(low=0, high=len(F) - i)
+        k = PYMOO_PRNG.randint(low=0, high=len(F) - i)
 
         exact.delete(k)
         exact2d.delete(k)
@@ -69,7 +70,7 @@ def test_hvc_monte_carlo(case):
     np.testing.assert_allclose(exact.hvc, mc.hvc, rtol=0, atol=1e-1)
 
     for i in range(len(F)):
-        k = np.random.randint(low=0, high=len(F) - i)
+        k = PYMOO_PRNG.randint(low=0, high=len(F) - i)
 
         exact.delete(k)
         mc.delete(k)

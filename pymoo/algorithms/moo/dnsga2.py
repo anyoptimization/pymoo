@@ -2,7 +2,7 @@ import numpy as np
 
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.core.population import Population
-
+from pymoo import PYMOO_PRNG
 
 class DNSGA2(NSGA2):
 
@@ -32,7 +32,7 @@ class DNSGA2(NSGA2):
         n_samples = int(np.ceil(len(pop) * self.perc_detect_change))
 
         # choose randomly some individuals of the current population to test if there was a change
-        I = np.random.choice(np.arange(len(pop)), size=n_samples)
+        I = PYMOO_PRNG.choice(np.arange(len(pop)), size=n_samples)
         samples = self.evaluator.eval(self.problem, Population.new(X=X[I]))
 
         # calculate the differences between the old and newly evaluated pop
@@ -47,7 +47,7 @@ class DNSGA2(NSGA2):
             pop = Population.new(X=X)
 
             # find indices to be replaced (introduce diversity)
-            I = np.where(np.random.random(len(pop)) < self.perc_diversity)[0]
+            I = np.where(PYMOO_PRNG.random(len(pop)) < self.perc_diversity)[0]
 
             # replace with randomly sampled individuals
             if self.version == "A":

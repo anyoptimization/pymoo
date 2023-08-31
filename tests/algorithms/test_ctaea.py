@@ -225,7 +225,6 @@ def test_mating_comparison(ref_dirs, evaluator):
 
 
 def test_restricted_mating_selection(ref_dirs, evaluator):
-    np.random.seed(200)
     selection = RestrictedMating(func_comp=comp_by_cv_dom_then_random)
 
     problem = C3DTLZ4(n_var=12, n_obj=3)

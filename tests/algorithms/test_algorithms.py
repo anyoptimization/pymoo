@@ -7,13 +7,14 @@ from pymoo.core.problem import ElementwiseProblem, Problem
 from pymoo.optimize import minimize
 from pymoo.problems.multi import ZDT
 
+from pymoo import PYMOO_PRNG
 
 def test_same_seed_same_result():
     problem = get_problem("zdt3")
     algorithm = NSGA2(pop_size=100, eliminate_duplicates=True)
 
     res1 = minimize(problem, algorithm, ('n_gen', 20), seed=1)
-    np.random.seed(200)
+    PYMOO_PRNG = np.random.default_rng(200)
     res2 = minimize(problem, algorithm, ('n_gen', 20), seed=1)
 
     np.testing.assert_almost_equal(res1.X, res2.X)

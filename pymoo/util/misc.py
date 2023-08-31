@@ -3,7 +3,7 @@ from datetime import datetime
 from itertools import combinations
 
 import numpy as np
-
+from pymoo import PYMOO_PRNG
 
 from pymoo.core.population import Population
 from pymoo.core.sampling import Sampling
@@ -61,7 +61,7 @@ def parameter_less_constraints(F, CV, F_max=None):
 def random_permuations(n, l, concat=True):
     P = []
     for i in range(n):
-        P.append(np.random.permutation(l))
+        P.append(PYMOO_PRNG.permutation(l))
     if concat:
         P = np.concatenate(P)
     return P
@@ -456,5 +456,5 @@ def crossover_mask(X, M):
 def row_at_least_once_true(M):
     _, d = M.shape
     for k in np.where(~np.any(M, axis=1))[0]:
-        M[k, np.random.randint(d)] = True
+        M[k, PYMOO_PRNG.randint(d)] = True
     return M

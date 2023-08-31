@@ -14,6 +14,7 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.rnd import fast_fill_random
 from pymoo.util.display.single import SingleObjectiveOutput
 
+from pymoo import PYMOO_PRNG
 
 # =========================================================================================================
 # Implementation
@@ -77,7 +78,7 @@ class G3PCX(LoopwiseAlgorithm):
 
             pop, family_size = self.pop, get(self.family_size)
 
-            rnd = np.random.choice(np.arange(len(pop)), size=family_size, replace=False)
+            rnd = PYMOO_PRNG.choice(np.arange(len(pop)), size=family_size, replace=False)
             family = Population.merge(pop[rnd], off)
             pop[rnd] = FitnessSurvival().do(self.problem, family, n_survive=family_size)
 

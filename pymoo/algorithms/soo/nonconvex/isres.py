@@ -7,6 +7,7 @@ from pymoo.algorithms.soo.nonconvex.sres import SRES
 from pymoo.core.population import Population
 from pymoo.docs import parse_doc_string
 
+from pymoo import PYMOO_PRNG
 
 class ISRES(SRES):
 
@@ -57,7 +58,7 @@ class ISRES(SRES):
         sigmap[mu - 1:] = np.minimum(self.sigma_max, es_sigma(sigma[mu - 1:], self.tau, self.taup))
 
         # execute the evolutionary strategy to calculate the offspring solutions
-        Xp[mu - 1:] = X[mu - 1:] + sigmap[mu - 1:] * np.random.normal(size=sigmap[mu - 1:].shape)
+        Xp[mu - 1:] = X[mu - 1:] + sigmap[mu - 1:] * PYMOO_PRNG.normal(size=sigmap[mu - 1:].shape)
 
         # repair the individuals which are not feasible by sampling from sigma again
         Xp = es_mut_repair(Xp, X, sigmap, xl, xu, 10)

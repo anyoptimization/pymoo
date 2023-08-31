@@ -13,6 +13,7 @@ from pymoo.util.function_loader import FunctionLoader
 from pymoo.util.misc import termination_from_tuple
 from pymoo.util.optimum import filter_optimum
 
+from pymoo import PYMOO_PRNG
 
 class Algorithm:
 
@@ -110,14 +111,12 @@ class Algorithm:
         # if seed is a boolean and true, then randomly set a seed (useful to reproduce runs)
         seed = self.seed
         if isinstance(seed, bool) and seed:
-            seed = np.random.randint(0, 10000000)
+            seed = PYMOO_PRNG.integers(0, 10000000)
             self.seed = seed
 
         # if a seed is set, then use it to call the random number generators
         if seed is not None:
-            import random
-            random.seed(seed)
-            np.random.seed(seed)
+            PYMOO_PRNG = np.random.default_rng(seed)
 
         # make sure that some type of termination criterion is set
         if self.termination is None:

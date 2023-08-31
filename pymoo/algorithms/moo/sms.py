@@ -17,6 +17,7 @@ from pymoo.util.function_loader import load_function
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.normalization import normalize
 
+from pymoo import PYMOO_PRNG
 
 # ---------------------------------------------------------------------------------------------------------
 # Environmental Survival - Remove the solution with the least HV contribution
@@ -122,7 +123,7 @@ def cv_and_dom_tournament(pop, P, *args, **kwargs):
 
             # if rank or domination relation didn't make a decision compare by crowding
             if np.isnan(S[i]):
-                S[i] = np.random.choice([a, b])
+                S[i] = PYMOO_PRNG.choice([a, b])
 
     return S[:, None].astype(int, copy=False)
 

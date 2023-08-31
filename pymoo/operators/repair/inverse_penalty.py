@@ -1,5 +1,5 @@
 import numpy as np
-
+from pymoo import PYMOO_PRNG
 from pymoo.operators.repair.bounds_repair import BoundsRepair
 
 
@@ -31,7 +31,7 @@ def inverse_penality(x, p, xl, xu, alpha=None):
             alpha = (normv - d) / normv
             alpha += 1e-32
 
-        r = np.random.random()
+        r = PYMOO_PRNG.random()
         Y = d * (1.0 + alpha * np.tan(r * np.arctan((D - d) / (alpha * d))))
 
         ret = x + (p - x) * Y / normv

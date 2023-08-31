@@ -1,5 +1,5 @@
 import numpy as np
-
+from pymoo import PYMOO_PRNG
 from pymoo.core.crossover import Crossover
 from pymoo.core.population import Population
 from pymoo.operators.crossover.binx import mut_binomial
@@ -24,13 +24,13 @@ def de_differential(X, F, dither=None, jitter=True, gamma=0.0001, return_differe
     for i, j in pairs:
 
         if dither == "vector":
-            F = (F + np.random.random(n_matings) * (1 - F))
+            F = (F + PYMOO_PRNG.random(n_matings) * (1 - F))
         elif dither == "scalar":
-            F = F + np.random.random() * (1 - F)
+            F = F + PYMOO_PRNG.random() * (1 - F)
 
         # http://www.cs.ndsu.nodak.edu/~siludwig/Publish/papers/SSCI20141.pdf
         if jitter:
-            F = (F * (1 + gamma * (np.random.random(n_matings) - 0.5)))
+            F = (F * (1 + gamma * (PYMOO_PRNG.random(n_matings) - 0.5)))
 
         # an add the difference to the first vector
         diffs += F[:, None] * (X[i] - X[j])
@@ -119,4 +119,4 @@ class DEX(Crossover):
 
 
 def rnd_F(m):
-    return 0.5 * (1 + np.random.uniform(size=len(m)))
+    return 0.5 * (1 + PYMOO_PRNG.uniform(size=len(m)))

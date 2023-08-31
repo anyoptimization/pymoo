@@ -63,10 +63,10 @@ def test_sphere_with_constraints(algorithm, seed):
 @pytest.mark.parametrize('seed', SEEDS)
 @pytest.mark.parametrize('clazz', [NelderMead, PatternSearch], ids=["nelder", "pattern"])
 def test_sphere_no_bounds(clazz, seed):
-    np.random.seed(seed)
+    PYMOO_PRNG = np.random.default_rng(seed)
 
     problem = SphereNoBounds()
-    x0 = np.random.random(problem.n_var)
+    x0 = PYMOO_PRNG.random(problem.n_var)
 
     algorithm = clazz(x0=x0)
     f, f_opt = run(problem, algorithm)
