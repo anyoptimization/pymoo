@@ -5,6 +5,7 @@ from pymoo.core.individual import Individual
 from pymoo.core.population import Population
 from pymoo.util.archive import SingleObjectiveArchive, MultiObjectiveArchive, SurvivalTruncation
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
+import pymoo
 
 pymoo.PYMOO_PRNG = np.random.default_rng(1)
 

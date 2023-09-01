@@ -56,6 +56,7 @@ data = dict(
             "pandas",
             "ipython",
             "ipykernel",
+            "optuna",
         ]
     },
     platforms='any',
