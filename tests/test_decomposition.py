@@ -4,6 +4,7 @@ from pymoo.util.remote import Remote
 from pymoo.decomposition.perp_dist import PerpendicularDistance
 from pymoo.decomposition.weighted_sum import WeightedSum
 
+import pymoo
 pymoo.PYMOO_PRNG = np.random.default_rng(1)
 
 def test_one_to_one():
