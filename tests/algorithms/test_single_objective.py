@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 
+from pymoo import PYMOO_PRNG
 from pymoo.algorithms.soo.nonconvex.de import DE
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.algorithms.soo.nonconvex.nelder import NelderMead
@@ -63,6 +64,7 @@ def test_sphere_with_constraints(algorithm, seed):
 @pytest.mark.parametrize('seed', SEEDS)
 @pytest.mark.parametrize('clazz', [NelderMead, PatternSearch], ids=["nelder", "pattern"])
 def test_sphere_no_bounds(clazz, seed):
+    global PYMOO_PRNG
     PYMOO_PRNG = np.random.default_rng(seed)
 
     problem = SphereNoBounds()

@@ -22,6 +22,7 @@ PROBLEMS = [
 def test_against_original_implementation(problem, seed, bounds):
     problem = copy(problem)
 
+    global PYMOO_PRNG
     PYMOO_PRNG = np.random.default_rng(seed)
     x0 = FloatRandomSampling().do(problem, 1)[0].X
 

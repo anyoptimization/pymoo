@@ -456,5 +456,5 @@ def crossover_mask(X, M):
 def row_at_least_once_true(M):
     _, d = M.shape
     for k in np.where(~np.any(M, axis=1))[0]:
-        M[k, PYMOO_PRNG.randint(d)] = True
+        M[k, PYMOO_PRNG.integers(d)] = True
     return M

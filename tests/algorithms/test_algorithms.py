@@ -13,8 +13,14 @@ def test_same_seed_same_result():
     problem = get_problem("zdt3")
     algorithm = NSGA2(pop_size=100, eliminate_duplicates=True)
 
+    # get the result specifying a fixed seed
     res1 = minimize(problem, algorithm, ('n_gen', 20), seed=1)
+
+    # set a new seed for the default global random number generator
+    global PYMOO_PRNG
     PYMOO_PRNG = np.random.default_rng(200)
+
+    # get the result with specifying the same seed
     res2 = minimize(problem, algorithm, ('n_gen', 20), seed=1)
 
     np.testing.assert_almost_equal(res1.X, res2.X)
@@ -114,3 +120,6 @@ def test_min_vs_loop_vs_infill():
     infill_res = algorithm.result()
 
     np.testing.assert_allclose(min_res.X, infill_res.X)
+
+if __name__ == '__main__':
+    test_same_seed_same_result()

@@ -137,7 +137,7 @@ def es_intermediate_recomb(sigma):
 
     for i in range(_lambda):
         for j in range(_n):
-            k = PYMOO_PRNG.randint(_lambda)
+            k = PYMOO_PRNG.integers(_lambda)
             sigma_hat[i, j] = (sigma[i, j] + sigma[k, j]) / 2.0
 
     return sigma_hat

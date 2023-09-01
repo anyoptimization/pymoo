@@ -40,7 +40,8 @@ class ReferenceDirectionFactory:
 
         # set the random seed if it is provided
         if self.seed is not None:
-            PYMOO_PRNG.seed(self.seed)
+            global PYMOO_PRNG
+            PYMOO_PRNG = np.random.default_rng(self.seed)
 
         if self.n_dim == 1:
             return np.array([[1.0]])
@@ -234,7 +235,7 @@ def select_points_with_maximum_distance(X, n_select, selected=[]):
 
     # if no selection provided pick randomly in the beginning
     if len(selected) == 0:
-        selected = [PYMOO_PRNG.randint(len(X))]
+        selected = [PYMOO_PRNG.integers(len(X))]
 
     # create variables to store what selected and what not
     not_selected = [i for i in range(n_points) if i not in selected]

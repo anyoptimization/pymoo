@@ -57,7 +57,7 @@ class Integer(BoundedVariable):
 
     def _sample(self, n):
         low, high = self.bounds
-        return PYMOO_PRNG.randint(low, high=high + 1, size=n)
+        return PYMOO_PRNG.integers(low, high=high + 1, size=n)
 
 
 class Binary(BoundedVariable):

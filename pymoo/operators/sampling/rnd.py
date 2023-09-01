@@ -38,7 +38,7 @@ class IntegerRandomSampling(FloatRandomSampling):
 
     def _do(self, problem, n_samples, **kwargs):
         n, (xl, xu) = problem.n_var, problem.bounds()
-        return np.column_stack([PYMOO_PRNG.randint(xl[k], xu[k] + 1, size=n_samples) for k in range(n)])
+        return np.column_stack([PYMOO_PRNG.integers(xl[k], xu[k] + 1, size=n_samples) for k in range(n)])
 
 
 class PermutationRandomSampling(Sampling):

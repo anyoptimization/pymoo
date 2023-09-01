@@ -36,9 +36,10 @@ class MultiObjectiveKnapsack(Knapsack):
 
 def create_random_knapsack_problem(n_items, seed=None, variant="single"):
     if seed is not None:
+        global PYMOO_PRNG
         PYMOO_PRNG = np.random.default_rng(seed)
-    P = PYMOO_PRNG.randint(1, 100, size=n_items)
-    W = PYMOO_PRNG.randint(1, 100, size=n_items)
+    P = PYMOO_PRNG.integers(1, 100, size=n_items)
+    W = PYMOO_PRNG.integers(1, 100, size=n_items)
     C = int(np.sum(W) / 10)
 
     if variant == "single":

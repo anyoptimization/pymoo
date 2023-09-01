@@ -101,6 +101,7 @@ def test_mnn():
     surv_mnn_py = RankAndCrowding(crowding_func=calc_mnn_python)
     surv_2nn_py = RankAndCrowding(crowding_func=calc_2nn_python)
     
+    global PYMOO_PRNG
     PYMOO_PRNG = np.random.default_rng(12)
     pop_mnn = surv_mnn.do(problem, res.pop, n_survive=80)
     

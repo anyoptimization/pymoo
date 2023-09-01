@@ -12,7 +12,7 @@ def mut_exp(n_matings, n_var, prob, at_least_once=True):
     M = np.full((n_matings, n_var), False)
 
     # start point of crossover
-    s = PYMOO_PRNG.randint(0, n_var, size=n_matings)
+    s = PYMOO_PRNG.integers(0, n_var, size=n_matings)
 
     # create for each individual the crossover range
     for i in range(n_matings):

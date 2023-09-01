@@ -100,6 +100,8 @@ class Algorithm:
         self.start_time = None
 
     def setup(self, problem, **kwargs):
+        # Use the global random number generator
+        global PYMOO_PRNG
 
         # the problem to be solved by the algorithm
         self.problem = problem

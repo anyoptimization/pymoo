@@ -48,6 +48,7 @@ class TravelingSalesman(ElementwiseProblem):
 
 def create_random_tsp_problem(n_cities, grid_width=100.0, grid_height=None, seed=None):
     if seed is not None:
+        global PYMOO_PRNG
         PYMOO_PRNG = np.random.default_rng(seed)
     grid_height = grid_height if grid_height is not None else grid_width
     cities = PYMOO_PRNG.random((n_cities, 2)) * [grid_width, grid_height]
