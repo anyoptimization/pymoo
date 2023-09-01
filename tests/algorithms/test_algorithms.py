@@ -7,7 +7,7 @@ from pymoo.core.problem import ElementwiseProblem, Problem
 from pymoo.optimize import minimize
 from pymoo.problems.multi import ZDT
 
-from pymoo import PYMOO_PRNG
+import pymoo
 
 def test_same_seed_same_result():
     problem = get_problem("zdt3")
@@ -17,8 +17,7 @@ def test_same_seed_same_result():
     res1 = minimize(problem, algorithm, ('n_gen', 20), seed=1)
 
     # set a new seed for the default global random number generator
-    global PYMOO_PRNG
-    PYMOO_PRNG = np.random.default_rng(200)
+    pymoo.PYMOO_PRNG = np.random.default_rng(200)
 
     # get the result with specifying the same seed
     res2 = minimize(problem, algorithm, ('n_gen', 20), seed=1)
@@ -120,6 +119,3 @@ def test_min_vs_loop_vs_infill():
     infill_res = algorithm.result()
 
     np.testing.assert_allclose(min_res.X, infill_res.X)
-
-if __name__ == '__main__':
-    test_same_seed_same_result()

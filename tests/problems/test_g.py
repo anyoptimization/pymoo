@@ -6,7 +6,7 @@ from pymoo.gradient.automatic import AutomaticDifferentiation
 from pymoo.util.misc import at_least_2d_array, at_least_2d
 from tests.problems.test_correctness import load
 
-from pymoo import PYMOO_PRNG
+import pymoo
 
 problems = [
     ('G1', []), ('G2', []), ('G3', []), ('G4', []), ('G5', []), ('G6', []), ('G7', []), ('G8', []),
@@ -43,6 +43,6 @@ def test_problems(name, params):
 @pytest.mark.parametrize('name,params', problems)
 def test_autodiff(name, params):
     problem = AutomaticDifferentiation(get_problem(name, *params))
-    X = PYMOO_PRNG.random((100, problem.n_var))
+    X = pymoo.PYMOO_PRNG.random((100, problem.n_var))
     problem.evaluate(X)
     assert True

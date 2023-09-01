@@ -1,5 +1,5 @@
 import numpy as np
-from pymoo import PYMOO_PRNG
+import pymoo
 from pymoo.indicators.hv.exact import DynamicHypervolume
 
 
@@ -49,7 +49,7 @@ class ApproximateMonteCarloHypervolume(DynamicHypervolume):
         ideal = F.min(axis=0)
         V = np.prod(ref_point - ideal)
 
-        S = PYMOO_PRNG.uniform(low=ideal, high=ref_point, size=(self.n_samples, M))
+        S = pymoo.PYMOO_PRNG.uniform(low=ideal, high=ref_point, size=(self.n_samples, M))
 
         dom = np.array([np.all(F[i] <= S, axis=1) for i in range(N)])
 

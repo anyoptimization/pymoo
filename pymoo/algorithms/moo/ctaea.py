@@ -17,7 +17,7 @@ from pymoo.util.function_loader import load_function
 from pymoo.util.misc import has_feasible, random_permuations
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
-from pymoo import PYMOO_PRNG
+import pymoo
 
 # =========================================================================================================
 # Implementation
@@ -38,13 +38,13 @@ def comp_by_cv_dom_then_random(pop, P, **kwargs):
             elif rel == -1:
                 S[i] = b
             else:
-                S[i] = PYMOO_PRNG.choice([a, b])
+                S[i] = pymoo.PYMOO_PRNG.choice([a, b])
         elif pop[a].CV <= 0.0:
             S[i] = a
         elif pop[b].CV <= 0.0:
             S[i] = b
         else:
-            S[i] = PYMOO_PRNG.choice([a, b])
+            S[i] = pymoo.PYMOO_PRNG.choice([a, b])
 
     return S[:, None].astype(int)
 
@@ -69,7 +69,7 @@ class RestrictedMating(TournamentSelection):
         if Pc <= Pd:
             # Choose from DA
             P[::n_parents, :] += n_pop
-        pf = PYMOO_PRNG.random(n_select)
+        pf = pymoo.PYMOO_PRNG.random(n_select)
         P[1::n_parents, :][pf >= Pc] += n_pop
 
         # compare using tournament function
@@ -176,7 +176,7 @@ class CADASurvival:
                         if (delta_d[min_d_i] < 0) or (
                                 delta_d[min_d_i] == 0 and (FV[crowdest[list(min_d_i)]] > niche_worst).any()):
                             min_d_i = list(min_d_i)
-                            PYMOO_PRNG.shuffle(min_d_i)
+                            pymoo.PYMOO_PRNG.shuffle(min_d_i)
                             closest = crowdest[min_d_i]
                             niche_worst = closest[np.argmax(FV[closest])]
                         if FV[niche_worst] > worst_fit:

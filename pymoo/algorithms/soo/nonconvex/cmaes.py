@@ -13,7 +13,7 @@ from pymoo.util.normalization import ZeroToOneNormalization, NoNormalization
 from pymoo.util.optimum import filter_optimum
 from pymoo.vendor.vendor_cmaes import my_fmin
 
-from pymoo import PYMOO_PRNG
+import pymoo
 
 # =========================================================================================================
 # Implementation

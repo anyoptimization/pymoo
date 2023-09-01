@@ -8,7 +8,7 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 
 from pymoo.optimize import minimize
 from pymoo.problems.single import Sphere, Himmelblau
-from pymoo import PYMOO_PRNG
+import pymoo
 
 PROBLEMS = [
     Himmelblau(),
@@ -22,8 +22,8 @@ PROBLEMS = [
 def test_against_original_implementation(problem, seed, bounds):
     problem = copy(problem)
 
-    global PYMOO_PRNG
-    PYMOO_PRNG = np.random.default_rng(seed)
+    
+    pymoo.PYMOO_PRNG = np.random.default_rng(seed)
     x0 = FloatRandomSampling().do(problem, 1)[0].X
 
     if not bounds:

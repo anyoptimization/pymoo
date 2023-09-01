@@ -4,7 +4,7 @@ from pymoo.core.individual import Individual
 from pymoo.core.population import Population
 
 import numpy as np
-from pymoo import PYMOO_PRNG
+import pymoo
 
 def test_init():
     pop = Population.empty(100)
@@ -15,7 +15,7 @@ def test_init():
 
 
 def test_copy():
-    a = Population.new(X=PYMOO_PRNG.random((100, 2)))
+    a = Population.new(X=pymoo.PYMOO_PRNG.random((100, 2)))
     b = deepcopy(a)
     b[0].X[:] = -1
 

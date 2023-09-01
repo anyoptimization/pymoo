@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from pymoo.util.normalization import ZeroToOneNormalization
-from pymoo import PYMOO_PRNG
+import pymoo
 
 n_var = 10
 
@@ -10,14 +10,14 @@ n_var = 10
 @pytest.fixture
 def matrix_input():
     xl, xu = np.full(n_var, -5.0), np.full(n_var, 5.0)
-    X = PYMOO_PRNG.random((200, n_var)) * (xu - xl) + xl
+    X = pymoo.PYMOO_PRNG.random((200, n_var)) * (xu - xl) + xl
     return X, xl, xu
 
 
 @pytest.fixture
 def vector_input():
     xl, xu = np.full(n_var, -5.0), np.full(n_var, 5.0)
-    X = PYMOO_PRNG.random(n_var) * (xu - xl) + xl
+    X = pymoo.PYMOO_PRNG.random(n_var) * (xu - xl) + xl
     return X, xl, xu
 
 

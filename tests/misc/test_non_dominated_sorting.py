@@ -8,7 +8,7 @@ from pymoo.problems.many import DTLZ2
 from pymoo.util.function_loader import load_function
 from pymoo.util.ref_dirs import get_reference_directions
 
-from pymoo import PYMOO_PRNG
+import pymoo
 
 def assert_fronts_equal(fronts_a, fronts_b):
     assert len(fronts_a) == len(fronts_b)
@@ -19,7 +19,7 @@ def assert_fronts_equal(fronts_a, fronts_b):
 
 
 def test_fast_non_dominated_sorting():
-    F = PYMOO_PRNG.random((100, 2))
+    F = pymoo.PYMOO_PRNG.random((100, 2))
     fronts = load_function("fast_non_dominated_sort", _type="python")(F)
     _fronts = load_function("fast_non_dominated_sort", _type="cython")(F)
     assert_fronts_equal(fronts, _fronts)
@@ -28,7 +28,7 @@ def test_fast_non_dominated_sorting():
 def test_efficient_non_dominated_sort():
     print("Testing ENS...")
     F = np.ones((1000, 3))
-    F[:, 1:] = PYMOO_PRNG.random((1000, 2))
+    F[:, 1:] = pymoo.PYMOO_PRNG.random((1000, 2))
 
     nds = load_function("fast_non_dominated_sort", _type="python")(F)
 
@@ -48,7 +48,7 @@ def test_efficient_non_dominated_sort():
 def test_tree_based_non_dominated_sort():
     print("Testing T-ENS...")
     F = np.ones((1000, 3))
-    F[:, 1:] = PYMOO_PRNG.random((1000, 2))
+    F[:, 1:] = pymoo.PYMOO_PRNG.random((1000, 2))
     _fronts = load_function("fast_non_dominated_sort", _type="python")(F)
 
     fronts = load_function("tree_based_non_dominated_sort", _type="python")(F)

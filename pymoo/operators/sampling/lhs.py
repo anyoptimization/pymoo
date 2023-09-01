@@ -1,5 +1,5 @@
 import numpy as np
-from pymoo import PYMOO_PRNG
+import pymoo
 from pymoo.core.sampling import Sampling
 from pymoo.util.misc import cdist
 
@@ -38,11 +38,11 @@ def sampling_lhs(n_samples, n_var, xl=0, xu=1, smooth=True, criterion=criterion_
 
 
 def sampling_lhs_unit(n_samples, n_var, smooth=True):
-    X = PYMOO_PRNG.random(size=(n_samples, n_var))
+    X = pymoo.PYMOO_PRNG.random(size=(n_samples, n_var))
     Xp = X.argsort(axis=0) + 1
 
     if smooth:
-        Xp = Xp - PYMOO_PRNG.random(Xp.shape)
+        Xp = Xp - pymoo.PYMOO_PRNG.random(Xp.shape)
     else:
         Xp = Xp - 0.5
     Xp /= n_samples

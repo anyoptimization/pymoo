@@ -3,7 +3,7 @@ import numpy as np
 from pymoo.algorithms.moo.nsga3 import NSGA3
 from pymoo.operators.selection.tournament import compare, TournamentSelection
 
-from pymoo import PYMOO_PRNG
+import pymoo
 
 # =========================================================================================================
 # Implementation
@@ -34,7 +34,7 @@ def comp_by_rank_and_ref_line_dist(pop, P, **kwargs):
                                    method='smaller_is_better')
 
         if np.isnan(S[i]):
-            S[i] = PYMOO_PRNG.choice([a, b])
+            S[i] = pymoo.PYMOO_PRNG.choice([a, b])
 
     return S[:, None].astype(int)
 

@@ -11,7 +11,7 @@ from pymoo.util.function_loader import load_function
 from pymoo.util.mnn import calc_mnn as calc_mnn_python
 from pymoo.util.mnn import calc_2nn as calc_2nn_python
 
-from pymoo import PYMOO_PRNG
+import pymoo
 
 calc_mnn = load_function("calc_mnn")
 calc_2nn = load_function("calc_2nn")
@@ -101,19 +101,19 @@ def test_mnn():
     surv_mnn_py = RankAndCrowding(crowding_func=calc_mnn_python)
     surv_2nn_py = RankAndCrowding(crowding_func=calc_2nn_python)
     
-    global PYMOO_PRNG
-    PYMOO_PRNG = np.random.default_rng(12)
+    
+    pymoo.PYMOO_PRNG = np.random.default_rng(12)
     pop_mnn = surv_mnn.do(problem, res.pop, n_survive=80)
     
-    PYMOO_PRNG = np.random.default_rng(12)
+    pymoo.PYMOO_PRNG = np.random.default_rng(12)
     pop_mnn_py = surv_mnn_py.do(problem, res.pop, n_survive=80)
     
     assert np.sum(np.abs(pop_mnn.get("F") - pop_mnn_py.get("F"))) <= 1e-8
     
-    PYMOO_PRNG = np.random.default_rng(12)
+    pymoo.PYMOO_PRNG = np.random.default_rng(12)
     pop_2nn = surv_2nn.do(problem, res.pop, n_survive=70)
     
-    PYMOO_PRNG = np.random.default_rng(12)
+    pymoo.PYMOO_PRNG = np.random.default_rng(12)
     pop_2nn_py = surv_2nn_py.do(problem, res.pop, n_survive=70)
     
     assert np.sum(np.abs(pop_2nn.get("F") - pop_2nn_py.get("F"))) <= 1e-8

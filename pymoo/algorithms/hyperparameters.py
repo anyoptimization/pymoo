@@ -5,7 +5,7 @@ import numpy as np
 from pymoo.core.parameters import get_params, flatten, set_params, hierarchical
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.optimize import minimize
-from pymoo import PYMOO_PRNG
+import pymoo
 
 
 def create(algorithm, params):
@@ -78,7 +78,7 @@ class MultiRun:
             if n_runs is None:
                 raise Exception("Either provide number of runs or seeds directly.")
 
-            seeds = PYMOO_PRNG.integers(1, 1000000, size=n_runs)
+            seeds = pymoo.PYMOO_PRNG.integers(1, 1000000, size=n_runs)
 
         self.seeds = seeds
         self.func_stats = func_stats

@@ -7,7 +7,7 @@ from cma.evolution_strategy import cma_default_options, CMAEvolutionStrategy
 from cma.utilities import utils
 from cma.utilities.math import Mh
 
-from pymoo import PYMOO_PRNG
+import pymoo
 
 all_stoppings = []
 
@@ -89,9 +89,9 @@ def my_fmin(x0,
                     restarts += 1  # A small restart doesn't count in the total
                 runs_with_small += 1  # _Before_ it's used in popsize_lastlarge
 
-                sigma_factor = 0.01 ** PYMOO_PRNG.uniform()  # Local search
+                sigma_factor = 0.01 ** pymoo.PYMOO_PRNG.uniform()  # Local search
                 popsize_multiplier = fmin_options['incpopsize'] ** (irun - runs_with_small)
-                opts['popsize'] = np.floor(popsize0 * popsize_multiplier ** (PYMOO_PRNG.uniform() ** 2))
+                opts['popsize'] = np.floor(popsize0 * popsize_multiplier ** (pymoo.PYMOO_PRNG.uniform() ** 2))
                 opts['maxiter'] = min(maxiter0, 0.5 * sum(large_i) / opts['popsize'])
                 # print('small basemul %s --> %s; maxiter %s' % (popsize_multiplier, opts['popsize'], opts['maxiter']))
 
@@ -199,8 +199,8 @@ def my_fmin(x0,
 
                     if 11 < 3 and opts['vv']:  # inject a solution
                         # use option check_point = [0]
-                        if 0 * PYMOO_PRNG.randn() >= 0:
-                            X[0] = 0 + opts['vv'] * es.sigma ** 0 * PYMOO_PRNG.randn(es.N)
+                        if 0 * pymoo.PYMOO_PRNG.randn() >= 0:
+                            X[0] = 0 + opts['vv'] * es.sigma ** 0 * pymoo.PYMOO_PRNG.randn(es.N)
                             fit[0] = yield X[0]
                             # print fit[0]
                     if es.opts['verbose'] > 4:  # may be undesirable with dynamic fitness (e.g. Augmented Lagrangian)

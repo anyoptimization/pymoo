@@ -36,7 +36,7 @@ def test_kktpm_correctness(str_problem, params):
         np.testing.assert_almost_equal(G, _G, decimal=5)
         np.testing.assert_almost_equal(dG, _dG, decimal=5)
 
-    # indices = PYMOO_PRNG.permutation(X.shape[0])[:100]
+    # indices = pymoo.PYMOO_PRNG.permutation(X.shape[0])[:100]
     n, _ = X.shape
     indices = np.arange(n)
 

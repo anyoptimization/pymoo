@@ -15,7 +15,7 @@ from pymoo.util.function_loader import load_function
 from pymoo.util.misc import intersect, has_feasible
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
-from pymoo import PYMOO_PRNG
+import pymoo
 
 # =========================================================================================================
 # Implementation
@@ -33,7 +33,7 @@ def comp_by_cv_then_random(pop, P, **kwargs):
 
         # both solutions are feasible just set random
         else:
-            S[i] = PYMOO_PRNG.choice([a, b])
+            S[i] = pymoo.PYMOO_PRNG.choice([a, b])
 
     return S[:, None].astype(int)
 
@@ -215,7 +215,7 @@ def niching(pop, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
 
         # all niches with the minimum niche count (truncate if randomly if more niches than remaining individuals)
         next_niches = next_niches_list[np.where(next_niche_count == min_niche_count)[0]]
-        next_niches = next_niches[PYMOO_PRNG.permutation(len(next_niches))[:n_select]]
+        next_niches = next_niches[pymoo.PYMOO_PRNG.permutation(len(next_niches))[:n_select]]
 
         for next_niche in next_niches:
 
@@ -223,7 +223,7 @@ def niching(pop, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
             next_ind = np.where(np.logical_and(niche_of_individuals == next_niche, mask))[0]
 
             # shuffle to break random tie (equal perp. dist) or select randomly
-            PYMOO_PRNG.shuffle(next_ind)
+            pymoo.PYMOO_PRNG.shuffle(next_ind)
 
             if niche_count[next_niche] == 0:
                 next_ind = next_ind[np.argmin(dist_to_niche[next_ind])]

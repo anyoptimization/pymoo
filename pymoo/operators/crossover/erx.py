@@ -1,5 +1,5 @@
 import numpy as np
-from pymoo import PYMOO_PRNG
+import pymoo
 from pymoo.core.crossover import Crossover
 
 
@@ -46,7 +46,7 @@ def erx(a, b):
     H = calc_adjency_matrix(b, H=H)
 
     # randomly select the first node
-    _next = PYMOO_PRNG.choice(list(H.keys()))
+    _next = pymoo.PYMOO_PRNG.choice(list(H.keys()))
 
     y = []
     while True:
@@ -64,7 +64,7 @@ def erx(a, b):
 
         # if the current node does not have any neighbors
         if len(neighbors) == 0:
-            _next = PYMOO_PRNG.choice(list(H.keys()))
+            _next = pymoo.PYMOO_PRNG.choice(list(H.keys()))
 
         # otherwise search in the neighbors for a node with the fewest neighbors
         else:
@@ -74,7 +74,7 @@ def erx(a, b):
             _next = [neighbors[k] for k in range(len(neighbors)) if n_neighbors[k] == min_n_neighbors]
 
             # break the tie if they might have the same number of neighbors
-            _next = PYMOO_PRNG.choice(_next)
+            _next = pymoo.PYMOO_PRNG.choice(_next)
 
     return y
 

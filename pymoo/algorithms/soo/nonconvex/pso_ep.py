@@ -34,7 +34,7 @@ from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.sliding_window import SlidingWindow
 
-from pymoo import PYMOO_PRNG
+import pymoo
 
 # =========================================================================================================
 # Mating
@@ -43,7 +43,7 @@ from pymoo import PYMOO_PRNG
 
 def pso_canonical(V, X, P_X, L_X, w, c1, c2):
     n_particles, n_var = X.shape
-    r1, r2 = PYMOO_PRNG.random((n_particles, n_var)), PYMOO_PRNG.random((n_particles, n_var))
+    r1, r2 = pymoo.PYMOO_PRNG.random((n_particles, n_var)), pymoo.PYMOO_PRNG.random((n_particles, n_var))
     Vp = w * V + c1 * r1 * (P_X - X) + c2 * r2 * (L_X - X)
     return Vp
 
@@ -51,10 +51,10 @@ def pso_canonical(V, X, P_X, L_X, w, c1, c2):
 def pso_rotation_invariant(V, X, P_X, L_X, inertia, c1, c2):
     n_particles, n_var = X.shape
 
-    r1 = PYMOO_PRNG.random((n_particles, n_var))
+    r1 = pymoo.PYMOO_PRNG.random((n_particles, n_var))
     p = X + c1 * r1 * (P_X - X)
 
-    r2 = PYMOO_PRNG.random((n_particles, n_var))
+    r2 = pymoo.PYMOO_PRNG.random((n_particles, n_var))
     l = X + c2 * r2 * (L_X - X)
 
     G = (X + p + l) / 3
@@ -68,10 +68,10 @@ def pso_rotation_invariant(V, X, P_X, L_X, inertia, c1, c2):
 def alea_sphere(G, radius):
     n, m = G.shape
 
-    x = PYMOO_PRNG.normal(size=(n, m))
+    x = pymoo.PYMOO_PRNG.normal(size=(n, m))
     l = np.sqrt(np.sum(x ** 2, axis=1, keepdims=True))
 
-    r = PYMOO_PRNG.random(size=(n, 1))
+    r = pymoo.PYMOO_PRNG.random(size=(n, 1))
     x = r * radius * x / l
     return x + G
 
@@ -169,7 +169,7 @@ def get_neighbors(name, N):
         K = 3
         neighbors = []
         for i in range(N):
-            vals = PYMOO_PRNG.permutation(N)[:K]
+            vals = pymoo.PYMOO_PRNG.permutation(N)[:K]
             neighbors.append([i] + vals.tolist())
         return neighbors
     else:

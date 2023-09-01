@@ -4,11 +4,11 @@ from pymoo.problems import get_problem
 from pymoo.core.evaluator import Evaluator
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population
-from pymoo import PYMOO_PRNG
+import pymoo
 
 problem = get_problem("Rastrigin")
 
-X = PYMOO_PRNG.random((100, problem.n_var))
+X = pymoo.PYMOO_PRNG.random((100, problem.n_var))
 
 F = problem.evaluate(X)
 

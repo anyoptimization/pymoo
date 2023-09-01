@@ -1,5 +1,5 @@
 import numpy as np
-from pymoo import PYMOO_PRNG
+import pymoo
 
 class RouletteWheelSelection:
 
@@ -12,9 +12,9 @@ class RouletteWheelSelection:
 
     def next(self, n=None):
         if n is None:
-            X = PYMOO_PRNG.random((1, 1))
+            X = pymoo.PYMOO_PRNG.random((1, 1))
         else:
-            X = PYMOO_PRNG.random((n, 1))
+            X = pymoo.PYMOO_PRNG.random((n, 1))
             if n > 1:
                 X.repeat(n - 1, axis=1)
 

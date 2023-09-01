@@ -1,7 +1,7 @@
 from pymoo.util.misc import swap
 
 import numpy as np
-from pymoo import PYMOO_PRNG
+import pymoo
 
 def stochastic_ranking(f, phi, pr, I=None):
     _lambda = len(f)
@@ -15,7 +15,7 @@ def stochastic_ranking(f, phi, pr, I=None):
 
         for j in range(_lambda - 1):
 
-            u = PYMOO_PRNG.random()
+            u = pymoo.PYMOO_PRNG.random()
 
             if u < pr or (phi[I[j]] == 0 and phi[I[j + 1]] == 0):
                 if f[I[j]] > f[I[j + 1]]:
