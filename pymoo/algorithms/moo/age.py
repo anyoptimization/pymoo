@@ -96,10 +96,10 @@ class AGEMOEASurvival(Survival):
         fronts = self.nds.do(F, n_stop_if_ranked=N)
 
         # get max int value
-        max_val = np.iinfo(np.int).max
+        max_val = np.iinfo(int).max
 
         # initialize population ranks with max int value
-        front_no = np.full(F.shape[0], max_val, dtype=np.int)
+        front_no = np.full(F.shape[0], max_val, dtype=int)
 
         # assign the rank to each individual
         for i, fr in enumerate(fronts):
