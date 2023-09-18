@@ -4,7 +4,7 @@ import numpy as np
 
 from pymoo.core.operator import Operator
 from pymoo.core.variable import Real, get
-
+import pymoo
 
 class Mutation(Operator):
 
@@ -29,7 +29,7 @@ class Mutation(Operator):
 
         # the likelihood for a mutation on the individuals
         prob = get(self.prob, size=n_mut)
-        mut = np.random.random(size=n_mut) <= prob
+        mut = pymoo.PymooPRNG().random(size=n_mut) <= prob
 
         # store the mutated individual back to the population
         pop[mut].set("X", Xp[mut])

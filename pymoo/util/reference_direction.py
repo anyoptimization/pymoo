@@ -4,7 +4,7 @@ import numpy as np
 from scipy import special
 
 from pymoo.util.misc import find_duplicates, cdist
-
+import pymoo
 
 # =========================================================================================================
 # Model
@@ -40,7 +40,8 @@ class ReferenceDirectionFactory:
 
         # set the random seed if it is provided
         if self.seed is not None:
-            np.random.seed(self.seed)
+            
+            pymoo.PymooPRNG(self.seed)
 
         if self.n_dim == 1:
             return np.array([[1.0]])
@@ -181,10 +182,10 @@ def get_rng(seed = None):
 
 def sample_on_unit_simplex(n_points, n_dim, unit_simplex_mapping="kraemer", seed = None):
     if unit_simplex_mapping == "sum":
-        rnd = map_onto_unit_simplex(get_rng(seed).random((n_points, n_dim)), "sum")
+        rnd = map_onto_unit_simplex(pymoo.PymooPRNG().random((n_points, n_dim)), "sum")
 
     elif unit_simplex_mapping == "kraemer":
-        rnd = map_onto_unit_simplex(get_rng(seed).random((n_points, n_dim)), "kraemer")
+        rnd = map_onto_unit_simplex(pymoo.PymooPRNG().random((n_points, n_dim)), "kraemer")
 
     elif unit_simplex_mapping == "das-dennis":
         n_partitions = get_partition_closest_to_points(n_points, n_dim)
@@ -234,7 +235,7 @@ def select_points_with_maximum_distance(X, n_select, selected=[]):
 
     # if no selection provided pick randomly in the beginning
     if len(selected) == 0:
-        selected = [np.random.randint(len(X))]
+        selected = [pymoo.PymooPRNG().integers(len(X))]
 
     # create variables to store what selected and what not
     not_selected = [i for i in range(n_points) if i not in selected]

@@ -10,7 +10,7 @@ tau : current generation
 # !/bin/python
 
 import numpy as np
-from random import randint
+import pymoo
 from math import floor, fabs, sin, pi, cos, sqrt
 
 ## Parameter configuration ##
@@ -520,7 +520,7 @@ def dMOP3(X, tau, nt, taut, r, rIteration):
     """dMOP3 dynamic benchmark problem
     """
     if tau % taut == 0 and rIteration != tau:
-        r = randint(0, 9)
+        r = pymoo.PymooPRNG().integers(0, 9)
         rIteration = tau
 
     XII = X[:r] + X[r + 1:]

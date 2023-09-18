@@ -1,5 +1,5 @@
 import numpy as np
-
+import pymoo
 from pymoo.core.crossover import Crossover
 from pymoo.core.variable import Real, get
 from pymoo.util.misc import row_at_least_once_true
@@ -7,7 +7,7 @@ from pymoo.util.misc import row_at_least_once_true
 
 def mut_binomial(n, m, prob, at_least_once=True):
     prob = np.ones(n) * prob
-    M = np.random.random((n, m)) < prob[:, None]
+    M = pymoo.PymooPRNG().random((n, m)) < prob[:, None]
 
     if at_least_once:
         M = row_at_least_once_true(M)

@@ -40,7 +40,25 @@ data = dict(
                       'cma==3.2.2',
                       'alive-progress',
                       'dill',
-                      'Deprecated'],
+                      'Deprecated'
+                      ],
+    extras_require={
+        'AGEMOEA': ["numba"],
+        'test': [
+            "numba",
+            "Cython",
+            "pytest",
+            "nbformat",
+            "wheel",
+            "jupyter",
+            "pyrecorder",
+            "optproblems",
+            "pandas",
+            "ipython",
+            "ipykernel",
+            "optuna",
+        ]
+    },
     platforms='any',
     classifiers=[
         'Intended Audience :: Developers',

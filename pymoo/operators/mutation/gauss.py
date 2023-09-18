@@ -1,5 +1,5 @@
 import numpy as np
-
+import pymoo
 from pymoo.core.mutation import Mutation
 from pymoo.core.variable import Real, get
 from pymoo.operators.repair.bounds_repair import repair_random_init
@@ -17,7 +17,7 @@ def mut_gauss(X, xl, xu, sigma, prob):
 
     Xp = np.full(X.shape, np.inf)
 
-    mut = np.random.random(X.shape) < prob[:, None]
+    mut = pymoo.PymooPRNG().random(X.shape) < prob[:, None]
 
     Xp[:, :] = X
 
@@ -25,7 +25,7 @@ def mut_gauss(X, xl, xu, sigma, prob):
     _xu = np.repeat(xu[None, :], X.shape[0], axis=0)[mut]
     sigma = sigma[:, None].repeat(n_var, axis=1)[mut]
 
-    Xp[mut] = np.random.normal(X[mut], sigma * (_xu * _xl))
+    Xp[mut] = pymoo.PymooPRNG().normal(X[mut], sigma * (_xu * _xl))
 
     Xp = repair_random_init(Xp, X, xl, xu)
 

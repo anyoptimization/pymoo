@@ -1,6 +1,6 @@
 import numpy as np
 import numpy as np
-
+import pymoo
 from pymoo.core.problem import Problem
 
 
@@ -34,10 +34,12 @@ class MultiObjectiveKnapsack(Knapsack):
         out["G"] = (np.sum(self.W * x, axis=1) - self.C)
 
 
-def create_random_knapsack_problem(n_items, seed=1, variant="single"):
-    np.random.seed(seed)
-    P = np.random.randint(1, 100, size=n_items)
-    W = np.random.randint(1, 100, size=n_items)
+def create_random_knapsack_problem(n_items, seed=None, variant="single"):
+    if seed is not None:
+        
+        pymoo.PymooPRNG(seed)
+    P = pymoo.PymooPRNG().integers(1, 100, size=n_items)
+    W = pymoo.PymooPRNG().integers(1, 100, size=n_items)
     C = int(np.sum(W) / 10)
 
     if variant == "single":

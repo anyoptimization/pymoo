@@ -13,6 +13,7 @@ from pymoo.util.function_loader import FunctionLoader
 from pymoo.util.misc import termination_from_tuple
 from pymoo.util.optimum import filter_optimum
 
+import pymoo
 
 class Algorithm:
 
@@ -99,6 +100,8 @@ class Algorithm:
         self.start_time = None
 
     def setup(self, problem, **kwargs):
+        # Use the global random number generator
+        
 
         # the problem to be solved by the algorithm
         self.problem = problem
@@ -110,14 +113,12 @@ class Algorithm:
         # if seed is a boolean and true, then randomly set a seed (useful to reproduce runs)
         seed = self.seed
         if isinstance(seed, bool) and seed:
-            seed = np.random.randint(0, 10000000)
+            seed = pymoo.PymooPRNG().integers(0, 10000000)
             self.seed = seed
 
         # if a seed is set, then use it to call the random number generators
         if seed is not None:
-            import random
-            random.seed(seed)
-            np.random.seed(seed)
+            pymoo.PymooPRNG(seed)
 
         # make sure that some type of termination criterion is set
         if self.termination is None:

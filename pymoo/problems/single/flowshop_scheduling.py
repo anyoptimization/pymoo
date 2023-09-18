@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+import pymoo
 from pymoo.core.problem import ElementwiseProblem
 
 
@@ -77,8 +77,9 @@ class FlowshopScheduling(ElementwiseProblem):
 
 def create_random_flowshop_problem(n_machines, n_jobs, seed=None):
     if seed is not None:
-        np.random.seed(seed)
-    T = np.random.random((n_machines, n_jobs)) * 50 + 50
+        
+        pymoo.PymooPRNG(seed)
+    T = pymoo.PymooPRNG().random((n_machines, n_jobs)) * 50 + 50
     return FlowshopScheduling(T)
 
 

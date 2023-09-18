@@ -1,5 +1,5 @@
 import numpy as np
-
+import pymoo
 
 class Variable(object):
 
@@ -49,7 +49,7 @@ class Real(BoundedVariable):
 
     def _sample(self, n):
         low, high = self.bounds
-        return np.random.uniform(low=low, high=high, size=n)
+        return pymoo.PymooPRNG().uniform(low=low, high=high, size=n)
 
 
 class Integer(BoundedVariable):
@@ -57,14 +57,14 @@ class Integer(BoundedVariable):
 
     def _sample(self, n):
         low, high = self.bounds
-        return np.random.randint(low, high=high + 1, size=n)
+        return pymoo.PymooPRNG().integers(low, high=high + 1, size=n)
 
 
 class Binary(BoundedVariable):
     vtype = bool
 
     def _sample(self, n):
-        return np.random.random(size=n) < 0.5
+        return pymoo.PymooPRNG().random(size=n) < 0.5
 
 
 class Choice(Variable):
@@ -79,7 +79,7 @@ class Choice(Variable):
         self.all = all
 
     def _sample(self, n):
-        return np.random.choice(self.options, size=n)
+        return pymoo.PymooPRNG().choice(self.options, size=n)
 
 
 def get(*args, size=None, **kwargs):

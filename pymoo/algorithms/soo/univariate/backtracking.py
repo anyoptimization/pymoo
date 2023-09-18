@@ -4,7 +4,7 @@ from pymoo.core.solution import Solution, SolutionSet
 from pymoo.core.termination import NoTermination
 from pymoo.optimize import minimize
 from pymoo.problems.single import Sphere
-
+import pymoo
 
 class BacktrackingLineSearch(LineSearch):
 
@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     problem = Sphere()
 
-    X = np.array(np.random.random(problem.n_var))
+    X = np.array(pymoo.PymooPRNG().random(problem.n_var))
 
     point = Solution(X=X)
     Evaluator(evaluate_values_of=["F", "dF"]).eval(problem, point)
