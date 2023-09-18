@@ -13,7 +13,7 @@ import pymoo
     (ZDT1WithGradient(), ElementwiseZDT1())],
                          ids=['elementwise_sphere', 'elementwise_zdt1'])
 def test_elementwise_eval_with_gradient(correct, problem):
-    X = pymoo.PYMOO_PRNG.random((100, correct.n_var))
+    X = pymoo.PymooPRNG().random((100, correct.n_var))
 
     autodiff = ElementwiseAutomaticDifferentiation(problem)
 
@@ -27,7 +27,7 @@ def test_elementwise_eval_with_gradient(correct, problem):
 @pytest.mark.parametrize("correct, problem", [(MyConstrainedSphereWithGradient(), MyConstrainedSphere())],
                          ids=['elementwise_constr_sphere'])
 def test_elementwise_constrained_eval_with_gradient(correct, problem):
-    X = pymoo.PYMOO_PRNG.random((100, correct.n_var))
+    X = pymoo.PymooPRNG().random((100, correct.n_var))
 
     autodiff = AutomaticDifferentiation(problem)
 
@@ -44,7 +44,7 @@ def test_elementwise_constrained_eval_with_gradient(correct, problem):
 @pytest.mark.parametrize("correct, problem", [
     (ZDT1WithGradient(), ZDT1())], ids=['vectorized_zdt1'])
 def test_vectorized_eval_with_gradient(correct, problem):
-    X = pymoo.PYMOO_PRNG.random((100, correct.n_var))
+    X = pymoo.PymooPRNG().random((100, correct.n_var))
 
     autodiff = AutomaticDifferentiation(problem)
 
@@ -58,7 +58,7 @@ def test_vectorized_eval_with_gradient(correct, problem):
 @pytest.mark.parametrize("correct, problem", [(ConstrainedZDT1WithGradient(), ConstrainedZDT1())],
                          ids=['vectorized_constr_zdt1'])
 def test_constrained_multi_eval_with_gradient(correct, problem):
-    X = pymoo.PYMOO_PRNG.random((100, correct.n_var))
+    X = pymoo.PymooPRNG().random((100, correct.n_var))
 
     autodiff = AutomaticDifferentiation(problem)
 

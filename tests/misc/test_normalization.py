@@ -10,14 +10,14 @@ n_var = 10
 @pytest.fixture
 def matrix_input():
     xl, xu = np.full(n_var, -5.0), np.full(n_var, 5.0)
-    X = pymoo.PYMOO_PRNG.random((200, n_var)) * (xu - xl) + xl
+    X = pymoo.PymooPRNG().random((200, n_var)) * (xu - xl) + xl
     return X, xl, xu
 
 
 @pytest.fixture
 def vector_input():
     xl, xu = np.full(n_var, -5.0), np.full(n_var, 5.0)
-    X = pymoo.PYMOO_PRNG.random(n_var) * (xu - xl) + xl
+    X = pymoo.PymooPRNG().random(n_var) * (xu - xl) + xl
     return X, xl, xu
 
 

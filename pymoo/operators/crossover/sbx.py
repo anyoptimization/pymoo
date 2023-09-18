@@ -14,7 +14,7 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14):
     n_parents, n_matings, n_var = X.shape
 
     # the probability of a crossover for each of the variables
-    cross = pymoo.PYMOO_PRNG.random((n_matings, n_var)) < prob_var
+    cross = pymoo.PymooPRNG().random((n_matings, n_var)) < prob_var
 
     # when solutions are too close -> do not apply sbx crossover
     too_close = np.abs(X[0] - X[1]) <= eps
@@ -36,7 +36,7 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14):
     prob_bin = prob_bin.repeat(n_var, axis=1)[cross]
 
     # random values for each individual
-    rand = pymoo.PYMOO_PRNG.random(len(eta))
+    rand = pymoo.PymooPRNG().random(len(eta))
 
     def calc_betaq(beta):
         alpha = 2.0 - np.power(beta, -(eta + 1.0))
@@ -61,7 +61,7 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14):
     c2 = 0.5 * ((y1 + y2) + betaq * delta)
 
     # with the given probability either assign the value from the first or second parent
-    b = pymoo.PYMOO_PRNG.random(len(prob_bin)) < prob_bin
+    b = pymoo.PymooPRNG().random(len(prob_bin)) < prob_bin
     tmp = np.copy(c1[b])
     c1[b] = c2[b]
     c2[b] = tmp
@@ -108,13 +108,13 @@ class SimulatedBinaryCrossover(Crossover):
                                                  size=(n_matings, 1))
 
         # set the binomial probability to zero if no exchange between individuals shall happen
-        rand = pymoo.PYMOO_PRNG.random((len(prob_bin), 1))
+        rand = pymoo.PymooPRNG().random((len(prob_bin), 1))
         prob_bin[rand > prob_exch] = 0.0
 
         Q = cross_sbx(X.astype(float), problem.xl, problem.xu, eta, prob_var, prob_bin)
 
         if self.n_offsprings == 1:
-            rand = pymoo.PYMOO_PRNG.random(size=n_matings) < 0.5
+            rand = pymoo.PymooPRNG().random(size=n_matings) < 0.5
             Q[0, rand] = Q[1, rand]
             Q = Q[[0]]
 

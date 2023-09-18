@@ -35,7 +35,7 @@ class InversionMutation(Mutation):
     def _do(self, problem, X, **kwargs):
         Y = X.copy()
         for i, y in enumerate(X):
-            if pymoo.PYMOO_PRNG.random() < self.prob:
+            if pymoo.PymooPRNG().random() < self.prob:
                 seq = random_sequence(len(y))
                 Y[i] = inversion_mutation(y, seq, inplace=True)
 

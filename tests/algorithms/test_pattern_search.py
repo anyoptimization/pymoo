@@ -23,7 +23,7 @@ def test_against_original_implementation(problem, seed, bounds):
     problem = copy(problem)
 
     
-    pymoo.PYMOO_PRNG = np.random.default_rng(seed)
+    pymoo.PymooPRNG(seed)
     x0 = FloatRandomSampling().do(problem, 1)[0].X
 
     if not bounds:

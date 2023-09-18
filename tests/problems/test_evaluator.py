@@ -8,7 +8,7 @@ import pymoo
 
 problem = get_problem("Rastrigin")
 
-X = pymoo.PYMOO_PRNG.random((100, problem.n_var))
+X = pymoo.PymooPRNG().random((100, problem.n_var))
 
 F = problem.evaluate(X)
 

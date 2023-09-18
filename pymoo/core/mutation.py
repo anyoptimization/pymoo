@@ -29,7 +29,7 @@ class Mutation(Operator):
 
         # the likelihood for a mutation on the individuals
         prob = get(self.prob, size=n_mut)
-        mut = pymoo.PYMOO_PRNG.random(size=n_mut) <= prob
+        mut = pymoo.PymooPRNG().random(size=n_mut) <= prob
 
         # store the mutated individual back to the population
         pop[mut].set("X", Xp[mut])

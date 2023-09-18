@@ -105,10 +105,10 @@ def pso_equation(X, P_X, S_X, V, V_max, w, c1, c2, r1=None, r2=None):
     n_particles, n_var = X.shape
 
     if r1 is None:
-        r1 = pymoo.PYMOO_PRNG.random((n_particles, n_var))
+        r1 = pymoo.PymooPRNG().random((n_particles, n_var))
 
     if r2 is None:
-        r2 = pymoo.PYMOO_PRNG.random((n_particles, n_var))
+        r2 = pymoo.PymooPRNG().random((n_particles, n_var))
 
     inerta = w * V
     cognitive = c1 * r1 * (P_X - X)
@@ -213,7 +213,7 @@ class PSO(Algorithm):
         particles = self.pop
 
         if self.initial_velocity == "random":
-            init_V = pymoo.PYMOO_PRNG.random((len(particles), self.problem.n_var)) * self.V_max[None, :]
+            init_V = pymoo.PymooPRNG().random((len(particles), self.problem.n_var)) * self.V_max[None, :]
         elif self.initial_velocity == "zero":
             init_V = np.zeros((len(particles), self.problem.n_var))
         else:
@@ -257,7 +257,7 @@ class PSO(Algorithm):
         # try to improve the current best with a pertubation
         if self.pertube_best:
             k = FitnessSurvival().do(problem, pbest, n_survive=1, return_indices=True)[0]
-            mut = PM(prob=0.9, eta=pymoo.PYMOO_PRNG.uniform(5, 30), at_least_once=False)
+            mut = PM(prob=0.9, eta=pymoo.PymooPRNG().uniform(5, 30), at_least_once=False)
             mutant = mut(problem, Population(Individual(X=pbest[k].X)))[0]
             off[k].set("X", mutant.X)
 
@@ -303,7 +303,7 @@ class PSO(Algorithm):
         S = np.array([S1_exploration(f), S2_exploitation(f), S3_convergence(f), S4_jumping_out(f)])
         strategy = S.argmax() + 1
 
-        delta = 0.05 + (pymoo.PYMOO_PRNG.random() * 0.05)
+        delta = 0.05 + (pymoo.PymooPRNG().random() * 0.05)
 
         if strategy == 1:
             c1 += delta

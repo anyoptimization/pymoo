@@ -34,7 +34,7 @@ def comp_by_rank_and_ref_line_dist(pop, P, **kwargs):
                                    method='smaller_is_better')
 
         if np.isnan(S[i]):
-            S[i] = pymoo.PYMOO_PRNG.choice([a, b])
+            S[i] = pymoo.PymooPRNG().choice([a, b])
 
     return S[:, None].astype(int)
 

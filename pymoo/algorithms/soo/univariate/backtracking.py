@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     problem = Sphere()
 
-    X = np.array(pymoo.PYMOO_PRNG.random(problem.n_var))
+    X = np.array(pymoo.PymooPRNG().random(problem.n_var))
 
     point = Solution(X=X)
     Evaluator(evaluate_values_of=["F", "dF"]).eval(problem, point)

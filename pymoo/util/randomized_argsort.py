@@ -5,7 +5,7 @@ from pymoo.util.misc import swap
 
 def randomized_argsort(A, method="numpy", order='ascending'):
     if method == "numpy":
-        P = pymoo.PYMOO_PRNG.permutation(len(A))
+        P = pymoo.PymooPRNG().permutation(len(A))
         I = np.argsort(A[P], kind='quicksort')
         I = P[I]
 
@@ -32,7 +32,7 @@ def quicksort(A):
 def _quicksort(A, I, left, right):
     if left < right:
 
-        index = pymoo.PYMOO_PRNG.integers(left, right + 1)
+        index = pymoo.PymooPRNG().integers(left, right + 1)
         swap(I, right, index)
 
         pivot = A[I[right]]

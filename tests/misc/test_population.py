@@ -15,7 +15,7 @@ def test_init():
 
 
 def test_copy():
-    a = Population.new(X=pymoo.PYMOO_PRNG.random((100, 2)))
+    a = Population.new(X=pymoo.PymooPRNG().random((100, 2)))
     b = deepcopy(a)
     b[0].X[:] = -1
 

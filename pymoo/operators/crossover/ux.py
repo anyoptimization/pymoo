@@ -11,7 +11,7 @@ class UniformCrossover(Crossover):
 
     def _do(self, _, X, **kwargs):
         _, n_matings, n_var = X.shape
-        M = pymoo.PYMOO_PRNG.random((n_matings, n_var)) < 0.5
+        M = pymoo.PymooPRNG().random((n_matings, n_var)) < 0.5
         _X = crossover_mask(X, M)
         return _X
 

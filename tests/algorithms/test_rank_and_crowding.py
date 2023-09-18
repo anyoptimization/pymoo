@@ -102,18 +102,18 @@ def test_mnn():
     surv_2nn_py = RankAndCrowding(crowding_func=calc_2nn_python)
     
     
-    pymoo.PYMOO_PRNG = np.random.default_rng(12)
+    pymoo.PymooPRNG(12)
     pop_mnn = surv_mnn.do(problem, res.pop, n_survive=80)
     
-    pymoo.PYMOO_PRNG = np.random.default_rng(12)
+    pymoo.PymooPRNG(12)
     pop_mnn_py = surv_mnn_py.do(problem, res.pop, n_survive=80)
     
     assert np.sum(np.abs(pop_mnn.get("F") - pop_mnn_py.get("F"))) <= 1e-8
     
-    pymoo.PYMOO_PRNG = np.random.default_rng(12)
+    pymoo.PymooPRNG(12)
     pop_2nn = surv_2nn.do(problem, res.pop, n_survive=70)
     
-    pymoo.PYMOO_PRNG = np.random.default_rng(12)
+    pymoo.PymooPRNG(12)
     pop_2nn_py = surv_2nn_py.do(problem, res.pop, n_survive=70)
     
     assert np.sum(np.abs(pop_2nn.get("F") - pop_2nn_py.get("F"))) <= 1e-8

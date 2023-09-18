@@ -55,7 +55,7 @@ class WFG(Problem):
         return x[:, -1][:, None] + s * np.column_stack(h)
 
     def _rand_optimal_position(self, n):
-        return pymoo.PYMOO_PRNG.random((n, self.k))
+        return pymoo.PymooPRNG().random((n, self.k))
 
     def _positional_to_optimal(self, K):
         suffix = np.full((len(K), self.l), 0.35)
@@ -142,7 +142,7 @@ class WFG1(WFG):
         out["F"] = self._calculate(y, self.S, h)
 
     def _rand_optimal_position(self, n):
-        return np.power(pymoo.PYMOO_PRNG.random((n, self.k)), 50.0)
+        return np.power(pymoo.PymooPRNG().random((n, self.k)), 50.0)
 
 
 class WFG2(WFG):

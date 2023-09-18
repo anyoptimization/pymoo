@@ -15,7 +15,7 @@ class Truncation:
 class RandomTruncation(Truncation):
 
     def __call__(self, sols, k):
-        return pymoo.PYMOO_PRNG.choice(sols, size=k, replace=False)
+        return pymoo.PymooPRNG().choice(sols, size=k, replace=False)
 
 
 class SurvivalTruncation(Truncation):

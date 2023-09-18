@@ -40,7 +40,7 @@ class Crossover(Operator):
         prob = get(self.prob, size=n_matings)
 
         # a boolean mask when crossover is actually executed
-        cross = pymoo.PYMOO_PRNG.random(n_matings) < prob
+        cross = pymoo.PymooPRNG().random(n_matings) < prob
 
         # the design space from the parents used for the crossover
         if np.any(cross):
@@ -53,13 +53,13 @@ class Crossover(Operator):
         # now set the parents whenever NO crossover has been applied
         for k in np.flatnonzero(~cross):
             if n_offsprings < n_parents:
-                s = pymoo.PYMOO_PRNG.choice(np.arange(self.n_parents), size=n_offsprings, replace=False)
+                s = pymoo.PymooPRNG().choice(np.arange(self.n_parents), size=n_offsprings, replace=False)
             elif n_offsprings == n_parents:
                 s = np.arange(n_parents)
             else:
                 s = []
                 while len(s) < n_offsprings:
-                    s.extend(pymoo.PYMOO_PRNG.permutation(n_parents))
+                    s.extend(pymoo.PymooPRNG().permutation(n_parents))
                 s = s[:n_offsprings]
 
             Xp[:, k] = np.copy(X[s, k])

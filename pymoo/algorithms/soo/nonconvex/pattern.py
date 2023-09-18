@@ -125,7 +125,7 @@ def exploration_move(problem, center, sign, delta, rho, randomize=True):
 
     # the order for the variable iteration
     if randomize:
-        K = pymoo.PYMOO_PRNG.permutation(n_var)
+        K = pymoo.PymooPRNG().permutation(n_var)
     else:
         K = np.arange(n_var)
 

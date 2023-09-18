@@ -61,7 +61,7 @@ def parameter_less_constraints(F, CV, F_max=None):
 def random_permuations(n, l, concat=True):
     P = []
     for i in range(n):
-        P.append(pymoo.PYMOO_PRNG.permutation(l))
+        P.append(pymoo.PymooPRNG().permutation(l))
     if concat:
         P = np.concatenate(P)
     return P
@@ -456,5 +456,5 @@ def crossover_mask(X, M):
 def row_at_least_once_true(M):
     _, d = M.shape
     for k in np.where(~np.any(M, axis=1))[0]:
-        M[k, pymoo.PYMOO_PRNG.integers(d)] = True
+        M[k, pymoo.PymooPRNG().integers(d)] = True
     return M

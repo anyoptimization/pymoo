@@ -59,11 +59,11 @@ def repair_random_init(Xp, X, xl, xu):
 
     i, j = np.where(Xp < XL)
     if len(i) > 0:
-        Xp[i, j] = XL[i, j] + pymoo.PYMOO_PRNG.random(len(i)) * (X[i, j] - XL[i, j])
+        Xp[i, j] = XL[i, j] + pymoo.PymooPRNG().random(len(i)) * (X[i, j] - XL[i, j])
 
     i, j = np.where(Xp > XU)
     if len(i) > 0:
-        Xp[i, j] = XU[i, j] - pymoo.PYMOO_PRNG.random(len(i)) * (XU[i, j] - X[i, j])
+        Xp[i, j] = XU[i, j] - pymoo.PymooPRNG().random(len(i)) * (XU[i, j] - X[i, j])
 
     return Xp
 

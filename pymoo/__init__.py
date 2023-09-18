@@ -1,7 +1,17 @@
 from pymoo.version import __version__
 import numpy as np
+import threading
 
-# Create the global random state
-# NOTE do not use from to import c.f. https://stackoverflow.com/a/15959638/5517459
-# TODO use builtin to define the global prng? 
-PYMOO_PRNG = np.random.default_rng()
+# Create the global random state Singleton
+class PymooPRNG(object):
+   _lock = threading.Lock()
+   _instance = None
+
+   @classmethod
+   def instance(cls, seed=None):
+        if not cls._instance:
+            with cls._lock:
+                if not cls._instance:
+                    cls._instance = np.random.default_rng(seed)
+                    
+        return cls._instance

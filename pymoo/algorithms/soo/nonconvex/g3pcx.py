@@ -78,7 +78,7 @@ class G3PCX(LoopwiseAlgorithm):
 
             pop, family_size = self.pop, get(self.family_size)
 
-            rnd = pymoo.PYMOO_PRNG.choice(np.arange(len(pop)), size=family_size, replace=False)
+            rnd = pymoo.PymooPRNG().choice(np.arange(len(pop)), size=family_size, replace=False)
             family = Population.merge(pop[rnd], off)
             pop[rnd] = FitnessSurvival().do(self.problem, family, n_survive=family_size)
 

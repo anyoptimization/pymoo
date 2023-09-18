@@ -5,10 +5,11 @@ from pymoo.decomposition.perp_dist import PerpendicularDistance
 from pymoo.decomposition.weighted_sum import WeightedSum
 
 import pymoo
-pymoo.PYMOO_PRNG = np.random.default_rng(1)
+
+pymoo.PymooPRNG(1)
 
 def test_one_to_one():
-    F = pymoo.PYMOO_PRNG.random((2, 2))
+    F = pymoo.PymooPRNG().random((2, 2))
     weights = np.array([[0.5, 0.5], [0.25, 0.25]])
     val = WeightedSum().do(F, weights=weights)
 
@@ -17,7 +18,7 @@ def test_one_to_one():
 
 
 def test_one_to_many():
-    F = pymoo.PYMOO_PRNG.random((1, 2))
+    F = pymoo.PymooPRNG().random((1, 2))
     weights = np.array([[0.5, 0.5], [0.25, 0.25]])
     val = WeightedSum().do(F, weights=weights)
 
@@ -26,7 +27,7 @@ def test_one_to_many():
 
 
 def test_many_to_one():
-    F = pymoo.PYMOO_PRNG.random((10, 2))
+    F = pymoo.PymooPRNG().random((10, 2))
     weights = np.array([[0.5, 0.5]])
     val = WeightedSum().do(F, weights=weights)
 
@@ -35,7 +36,7 @@ def test_many_to_one():
 
 
 def test_many_to_many():
-    F = pymoo.PYMOO_PRNG.random((10, 2))
+    F = pymoo.PymooPRNG().random((10, 2))
     weights = np.array([[0.5, 0.5], [0.25, 0.25]])
     val = WeightedSum().do(F, weights=weights)
 
@@ -44,8 +45,8 @@ def test_many_to_many():
 
 
 def test_perp_dist():
-    F = pymoo.PYMOO_PRNG.random((100, 3))
-    weights = pymoo.PYMOO_PRNG.random((10, 3))
+    F = pymoo.PymooPRNG().random((100, 3))
+    weights = pymoo.PymooPRNG().random((10, 3))
 
     correct = Remote.get_instance().load("tests", "perp_dist")
 

@@ -123,7 +123,7 @@ def cv_and_dom_tournament(pop, P, *args, **kwargs):
 
             # if rank or domination relation didn't make a decision compare by crowding
             if np.isnan(S[i]):
-                S[i] = pymoo.PYMOO_PRNG.choice([a, b])
+                S[i] = pymoo.PymooPRNG().choice([a, b])
 
     return S[:, None].astype(int, copy=False)
 

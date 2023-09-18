@@ -49,9 +49,9 @@ class TravelingSalesman(ElementwiseProblem):
 def create_random_tsp_problem(n_cities, grid_width=100.0, grid_height=None, seed=None):
     if seed is not None:
         
-        pymoo.PYMOO_PRNG = np.random.default_rng(seed)
+        pymoo.PymooPRNG(seed)
     grid_height = grid_height if grid_height is not None else grid_width
-    cities = pymoo.PYMOO_PRNG.random((n_cities, 2)) * [grid_width, grid_height]
+    cities = pymoo.PymooPRNG().random((n_cities, 2)) * [grid_width, grid_height]
     return TravelingSalesman(cities)
 
 

@@ -16,7 +16,7 @@ class PointCrossover(Crossover):
         _, n_matings, n_var = X.shape
 
         # start point of crossover
-        r = np.row_stack([pymoo.PYMOO_PRNG.permutation(n_var - 1) + 1 for _ in range(n_matings)])[:, :self.n_points]
+        r = np.row_stack([pymoo.PymooPRNG().permutation(n_var - 1) + 1 for _ in range(n_matings)])[:, :self.n_points]
         r.sort(axis=1)
         r = np.column_stack([r, np.full(n_matings, n_var)])
 

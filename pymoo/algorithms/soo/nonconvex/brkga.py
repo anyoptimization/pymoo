@@ -69,8 +69,8 @@ class EliteBiasedSelection(Selection):
             non_elites = elites
 
         # do the mating selection - always one elite and one non-elites
-        s_elite = pymoo.PYMOO_PRNG.choice(elites, size=n_select)
-        s_non_elite = pymoo.PYMOO_PRNG.choice(non_elites, size=n_select)
+        s_elite = pymoo.PymooPRNG().choice(elites, size=n_select)
+        s_non_elite = pymoo.PymooPRNG().choice(non_elites, size=n_select)
 
         return np.column_stack([s_elite, s_non_elite])
 

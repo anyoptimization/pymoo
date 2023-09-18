@@ -7,7 +7,7 @@ from pymoo.util.archive import SingleObjectiveArchive, MultiObjectiveArchive, Su
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 import pymoo
 
-pymoo.PYMOO_PRNG = np.random.default_rng(1)
+pymoo.PymooPRNG(1)
 
 def test_unconstr_add_to_archive():
     archive = SingleObjectiveArchive()
@@ -103,7 +103,7 @@ def test_multi_objective_archive():
 
 
 def test_multi_objective_archive_multi():
-    X, F = pymoo.PYMOO_PRNG.random(size=(100, 10)), pymoo.PYMOO_PRNG.random(size=(100, 3))
+    X, F = pymoo.PymooPRNG().random(size=(100, 10)), pymoo.PymooPRNG().random(size=(100, 3))
     pop = Population.new(X=X, F=F)
 
     archive = MultiObjectiveArchive().add(pop)

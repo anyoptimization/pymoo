@@ -43,6 +43,6 @@ def test_problems(name, params):
 @pytest.mark.parametrize('name,params', problems)
 def test_autodiff(name, params):
     problem = AutomaticDifferentiation(get_problem(name, *params))
-    X = pymoo.PYMOO_PRNG.random((100, problem.n_var))
+    X = pymoo.PymooPRNG().random((100, problem.n_var))
     problem.evaluate(X)
     assert True

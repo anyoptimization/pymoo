@@ -7,7 +7,7 @@ from pymoo.util.misc import row_at_least_once_true
 
 def mut_binomial(n, m, prob, at_least_once=True):
     prob = np.ones(n) * prob
-    M = pymoo.PYMOO_PRNG.random((n, m)) < prob[:, None]
+    M = pymoo.PymooPRNG().random((n, m)) < prob[:, None]
 
     if at_least_once:
         M = row_at_least_once_true(M)

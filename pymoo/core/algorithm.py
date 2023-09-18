@@ -113,12 +113,12 @@ class Algorithm:
         # if seed is a boolean and true, then randomly set a seed (useful to reproduce runs)
         seed = self.seed
         if isinstance(seed, bool) and seed:
-            seed = pymoo.PYMOO_PRNG.integers(0, 10000000)
+            seed = pymoo.PymooPRNG().integers(0, 10000000)
             self.seed = seed
 
         # if a seed is set, then use it to call the random number generators
         if seed is not None:
-            pymoo.PYMOO_PRNG = np.random.default_rng(seed)
+            pymoo.PymooPRNG(seed)
 
         # make sure that some type of termination criterion is set
         if self.termination is None:

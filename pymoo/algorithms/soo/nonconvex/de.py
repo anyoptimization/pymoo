@@ -55,7 +55,7 @@ def de_differential(X, F, jitter, alpha=0.001):
     for i in range(1, n_parents, 2):
         # create the weight vectors with jitter to give some variation
         _F = F[:, None].repeat(n_var, axis=1)
-        _F[jitter] *= (1 + alpha * (pymoo.PYMOO_PRNG.random((jitter.sum(), n_var)) - 0.5))
+        _F[jitter] *= (1 + alpha * (pymoo.PymooPRNG().random((jitter.sum(), n_var)) - 0.5))
 
         # add the difference to the vector
         delta += _F * (X[i] - X[i + 1])
@@ -130,7 +130,7 @@ class Variant(InfillCriterion):
 
             itself = np.array(targets)[:, None]
 
-            best = lambda: pymoo.PYMOO_PRNG.choice(np.where(pop.get("rank") == 0)[0], replace=True, size=n_matings)
+            best = lambda: pymoo.PymooPRNG().choice(np.where(pop.get("rank") == 0)[0], replace=True, size=n_matings)
 
             if sel_type == "rand":
                 fast_fill_random(P, len(pop), columns=range(n_parents), Xp=itself)
@@ -176,10 +176,10 @@ class Variant(InfillCriterion):
                 _trial = np.copy(_target)
                 _trial[M] = _donor[M]
             elif name == "line":
-                w = pymoo.PYMOO_PRNG.random((len(K), 1)) * _CR[:, None]
+                w = pymoo.PymooPRNG().random((len(K), 1)) * _CR[:, None]
                 _trial = _target + w * (_donor - _target)
             elif name == "hypercube":
-                w = pymoo.PYMOO_PRNG.random((len(K), _target.shape[1])) * _CR[:, None]
+                w = pymoo.PymooPRNG().random((len(K), _target.shape[1])) * _CR[:, None]
                 _trial = _target + w * (_donor - _target)
             else:
                 raise Exception(f"Unknown crossover variant: {name}")
@@ -253,7 +253,7 @@ class DE(GeneticAlgorithm):
 
         # if number of offsprings is set lower than pop_size - randomly select
         if self.n_offsprings < self.pop_size:
-            index = pymoo.PYMOO_PRNG.permutation(len(infills))[:self.n_offsprings]
+            index = pymoo.PymooPRNG().permutation(len(infills))[:self.n_offsprings]
             infills = infills[index]
 
         infills.set("index", index)

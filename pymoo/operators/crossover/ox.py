@@ -4,7 +4,7 @@ from pymoo.core.crossover import Crossover
 
 
 def random_sequence(n):
-    start, end = np.sort(pymoo.PYMOO_PRNG.choice(n, 2, replace=False))
+    start, end = np.sort(pymoo.PymooPRNG().choice(n, 2, replace=False))
     return tuple([start, end])
 
 

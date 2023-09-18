@@ -34,7 +34,7 @@ def mut_pm(X, xl, xu, eta, prob, at_least_once):
 
     mut_pow = 1.0 / (eta + 1.0)
 
-    rand = pymoo.PYMOO_PRNG.random(X.shape)
+    rand = pymoo.PymooPRNG().random(X.shape)
     mask = rand <= 0.5
     mask_not = np.logical_not(mask)
 

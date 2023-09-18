@@ -17,7 +17,7 @@ def mut_gauss(X, xl, xu, sigma, prob):
 
     Xp = np.full(X.shape, np.inf)
 
-    mut = pymoo.PYMOO_PRNG.random(X.shape) < prob[:, None]
+    mut = pymoo.PymooPRNG().random(X.shape) < prob[:, None]
 
     Xp[:, :] = X
 
@@ -25,7 +25,7 @@ def mut_gauss(X, xl, xu, sigma, prob):
     _xu = np.repeat(xu[None, :], X.shape[0], axis=0)[mut]
     sigma = sigma[:, None].repeat(n_var, axis=1)[mut]
 
-    Xp[mut] = pymoo.PYMOO_PRNG.normal(X[mut], sigma * (_xu * _xl))
+    Xp[mut] = pymoo.PymooPRNG().normal(X[mut], sigma * (_xu * _xl))
 
     Xp = repair_random_init(Xp, X, xl, xu)
 

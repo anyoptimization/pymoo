@@ -55,7 +55,7 @@ class ConstructionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
 
     def next(self):
 
-        x = pymoo.PYMOO_PRNG.random((self.n_samples, self.n_dim))
+        x = pymoo.PymooPRNG().random((self.n_samples, self.n_dim))
         x = map_onto_unit_simplex(x, "kraemer")
         x = x[vectorized_cdist(x, self.X).min(axis=1).argmax()]
 

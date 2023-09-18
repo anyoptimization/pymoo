@@ -17,7 +17,7 @@ def test_same_seed_same_result():
     res1 = minimize(problem, algorithm, ('n_gen', 20), seed=1)
 
     # set a new seed for the default global random number generator
-    pymoo.PYMOO_PRNG = np.random.default_rng(200)
+    pymoo.PymooPRNG(200)
 
     # get the result with specifying the same seed
     res2 = minimize(problem, algorithm, ('n_gen', 20), seed=1)

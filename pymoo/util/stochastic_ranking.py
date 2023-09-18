@@ -15,7 +15,7 @@ def stochastic_ranking(f, phi, pr, I=None):
 
         for j in range(_lambda - 1):
 
-            u = pymoo.PYMOO_PRNG.random()
+            u = pymoo.PymooPRNG().random()
 
             if u < pr or (phi[I[j]] == 0 and phi[I[j + 1]] == 0):
                 if f[I[j]] > f[I[j + 1]]:

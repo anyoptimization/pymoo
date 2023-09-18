@@ -12,7 +12,7 @@ def mut_exp(n_matings, n_var, prob, at_least_once=True):
     M = np.full((n_matings, n_var), False)
 
     # start point of crossover
-    s = pymoo.PYMOO_PRNG.integers(0, n_var, size=n_matings)
+    s = pymoo.PymooPRNG().integers(0, n_var, size=n_matings)
 
     # create for each individual the crossover range
     for i in range(n_matings):
@@ -25,7 +25,7 @@ def mut_exp(n_matings, n_var, prob, at_least_once=True):
             current = (start + j) % n_var
 
             # replace only if random value keeps being smaller than CR
-            if pymoo.PYMOO_PRNG.random() <= prob[i]:
+            if pymoo.PymooPRNG().random() <= prob[i]:
                 M[i, current] = True
             else:
                 break

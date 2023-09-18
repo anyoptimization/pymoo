@@ -78,8 +78,8 @@ class FlowshopScheduling(ElementwiseProblem):
 def create_random_flowshop_problem(n_machines, n_jobs, seed=None):
     if seed is not None:
         
-        pymoo.PYMOO_PRNG = np.random.default_rng(seed)
-    T = pymoo.PYMOO_PRNG.random((n_machines, n_jobs)) * 50 + 50
+        pymoo.PymooPRNG(seed)
+    T = pymoo.PymooPRNG().random((n_machines, n_jobs)) * 50 + 50
     return FlowshopScheduling(T)
 
 

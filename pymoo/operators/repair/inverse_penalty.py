@@ -31,7 +31,7 @@ def inverse_penality(x, p, xl, xu, alpha=None):
             alpha = (normv - d) / normv
             alpha += 1e-32
 
-        r = pymoo.PYMOO_PRNG.random()
+        r = pymoo.PymooPRNG().random()
         Y = d * (1.0 + alpha * np.tan(r * np.arctan((D - d) / (alpha * d))))
 
         ret = x + (p - x) * Y / normv
