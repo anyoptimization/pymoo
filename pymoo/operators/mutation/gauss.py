@@ -25,7 +25,7 @@ def mut_gauss(X, xl, xu, sigma, prob):
     _xu = np.repeat(xu[None, :], X.shape[0], axis=0)[mut]
     sigma = sigma[:, None].repeat(n_var, axis=1)[mut]
 
-    Xp[mut] = np.random.normal(X[mut], sigma * (_xu * _xl))
+    Xp[mut] = np.random.normal(X[mut], sigma * (_xu - _xl))
 
     Xp = repair_random_init(Xp, X, xl, xu)
 
