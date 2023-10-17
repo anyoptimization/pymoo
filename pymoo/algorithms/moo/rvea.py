@@ -133,8 +133,9 @@ class APDSurvival(Survival):
         self.gamma = calc_gamma(self.V)
 
     def adapt(self):
-        self.V = calc_V(calc_V(self.ref_dirs) * (self.nadir - self.ideal))
-        self.gamma = calc_gamma(self.V)
+        if self.nadir is not None:
+            self.V = calc_V(calc_V(self.ref_dirs) * (self.nadir - self.ideal))
+            self.gamma = calc_gamma(self.V)
 
     def _do(self, problem, pop, n_survive, algorithm=None, n_gen=None, n_max_gen=None, **kwargs):
 
