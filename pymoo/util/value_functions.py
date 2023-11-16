@@ -58,6 +58,9 @@ class OptimizeVF(Problem):
         # Add the rankings onto our objectives 
         self.P = np.hstack((F, np.array([ranks]).T))
 
+        # Sort P by rankings in the last column
+        self.P = self.P[self.P[:, -1].argsort()]
+
         super().__init__(n_var_vf, n_obj=1, n_ieq_constr=n_ieq_c_vf, n_eq_constr=1, xl=xl_vf, xu=xu_vf)
 
        

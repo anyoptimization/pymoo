@@ -22,16 +22,21 @@ def test_dummy_vf(F, rankings, test_f, expected_value):
 
 
 test_test_prob_const_inputs = [
-    (np.array([[1,2], [2,3]]), [1,2]),
-    (np.array([[2,3], [3,2]]), [2,1])
+    (np.array([[1,2], [2,3], [4,5]]), [1,3,2]),
+    (np.array([[2,3], [3,2], [7,8]]), [5,2,1])
 ]
 @pytest.mark.parametrize('F, rankings', test_test_prob_const_inputs)
 def test_prob_const(F, rankings):
 
-    val_fnc = vf.OptimizeVF(F, rankings)
+    pymoo_prob = vf.OptimizeVF(F, rankings)
 
+    # Test whether the solutions are ranked by 
+    ranks_from_prob = pymoo_prob.P[:, -1]
 
+    rankings.sort()
 
+    assert ranks_from_prob.tolist() == rankings
+    
 
 
     
