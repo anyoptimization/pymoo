@@ -38,12 +38,12 @@ def linear_vf(F, x_vf):
 class OptimizeVF(Problem): 
 
 
-    def __init__(self, F, ranks):
+    def __init__(self, P, ranks, vf):
        
         # One var for each dimension of the object space, plus epsilon 
-        n_var_vf = np.size(F, 0) + 1
+        n_var_vf = np.size(P, 0) + 1
 
-        # it has one inequality constraints per dimension in F, and one equality 
+        # it has one inequality constraints for every solution in P, and one equality 
         n_ieq_c_vf = n_var_vf - 1
        
         xl_vf = [0.0] * n_var_vf 
@@ -56,7 +56,7 @@ class OptimizeVF(Problem):
         # TODO start everything at 0.5
 
         # Add the rankings onto our objectives 
-        self.P = np.hstack((F, np.array([ranks]).T))
+        self.P = np.hstack((P, np.array([ranks]).T))
 
         # Sort P by rankings in the last column
         self.P = self.P[self.P[:, -1].argsort()]
@@ -75,7 +75,12 @@ class OptimizeVF(Problem):
         ## Inequality
         # TODO for now, assuming there are no ties in the ranks
         out["G"] = -99
-        
+
+        # Go through each member of P, seeing if our proposed utility 
+        #  function increases monotonically as rank increases
+
+        #for p in self.P[0:-1, :]: 
+                
             
         ## Equality
         

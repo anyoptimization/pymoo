@@ -38,7 +38,9 @@ test_test_prob_const_in_out = [
 @pytest.mark.parametrize('P, rankings, output', test_test_prob_const_in_out)
 def test_prob_const(P, rankings, output):
 
-    pymoo_prob = vf.OptimizeVF(P, rankings)
+    linear_vf = vf.linear_vf
+
+    pymoo_prob = vf.OptimizeVF(P, rankings, linear_vf)
 
     ## Test whether the solutions are ranked by ranking 
     ranks_from_prob = pymoo_prob.P[:, -1]
@@ -67,7 +69,9 @@ test_obj_in_out = [
 @pytest.mark.parametrize('x, obj', test_obj_in_out)
 def test_obj(x, obj):
 
-    pymoo_prob = vf.OptimizeVF(dummy_inputs[0], dummy_inputs[1])
+    linear_vf = vf.linear_vf
+
+    pymoo_prob = vf.OptimizeVF(dummy_inputs[0], dummy_inputs[1], linear_vf)
 
     out = {}
 
@@ -75,4 +79,35 @@ def test_obj(x, obj):
     
     # Test whether or not the objective function simply negates the epsilon term of x (last element)
     assert np.all(obj == out["F"])
+
+
+## Test the inequality for linear function 
+test_ineq_in_out = [
+    (np.array([[0.5,0.5, 0.5]]), np.array([[1,2], [2,3]]), [1,2], np.array([0.5, 1.2, 0.65, 2.0]).T),
+        ]
+
+
+
+@pytest.mark.parametrize('x, P, ranks, ineq_con', test_ineq_in_out)
+def test_ineq(x, P, ranks, ineq_con):
+
+    linear_vf = vf.linear_vf
+
+    pymoo_prob = vf.OptimizeVF(P, ranks, linear_vf)
+
+    out = {}
+
+    pymoo_prob._evaluate(x, out)
+    
+    # Test whether or not the objective function simply negates the epsilon term of x (last element)
+    #assert np.all(ineq_con == out["G"])
+
+
+
+
+
+
+
+
+
 
