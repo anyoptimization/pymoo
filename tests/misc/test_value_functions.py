@@ -18,10 +18,10 @@ test_dummy_val_fnc_inputs = [
     (np.array([[2,3], [3,2]]), [2,1], np.array([3,2]), 5)
 ]
 
-@pytest.mark.parametrize('F, rankings, test_f, expected_value', test_dummy_val_fnc_inputs)
-def test_dummy_vf(F, rankings, test_f, expected_value):
+@pytest.mark.parametrize('P, rankings, test_f, expected_value', test_dummy_val_fnc_inputs)
+def test_dummy_vf(P, rankings, test_f, expected_value):
 
-    val_fnc = vf.create_linear_vf(F, rankings)
+    val_fnc = vf.create_linear_vf(P, rankings)
 
     assert val_fnc(test_f) == expected_value
 
@@ -35,10 +35,10 @@ test_test_prob_const_in_out = [
     (np.array([[2,3], [3,2], [7,8]]), [5,2,1], np.array([[7,8], [3,2], [2,3]]))
 ]
 
-@pytest.mark.parametrize('F, rankings, output', test_test_prob_const_in_out)
-def test_prob_const(F, rankings, output):
+@pytest.mark.parametrize('P, rankings, output', test_test_prob_const_in_out)
+def test_prob_const(P, rankings, output):
 
-    pymoo_prob = vf.OptimizeVF(F, rankings)
+    pymoo_prob = vf.OptimizeVF(P, rankings)
 
     ## Test whether the solutions are ranked by ranking 
     ranks_from_prob = pymoo_prob.P[:, -1]
@@ -75,8 +75,4 @@ def test_obj(x, obj):
     
     # Test whether or not the objective function simply negates the epsilon term of x (last element)
     assert np.all(obj == out["F"])
-
-
-
-
 
