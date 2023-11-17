@@ -10,7 +10,6 @@ from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.binx import BinomialCrossover
 from pymoo.operators.mutation.nom import NoMutation
 from pymoo.operators.sampling.rnd import FloatRandomSampling
-from pymoo.operators.selection.rnd import RandomSelection
 from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
@@ -60,8 +59,8 @@ class EliteBiasedSelection(Selection):
 
     def _do(self, problem, pop, n_select, n_parents, **kwargs):
         _type = pop.get("type")
-        elites = np.where(_type == "elite")[0]
-        non_elites = np.where(_type == "non_elite")[0]
+        elites = np.where(_type == "elite")[0].astype(int)
+        non_elites = np.where(_type == "non_elite")[0].astype(int)
 
         # if through duplicate elimination no non-elites exist
         if len(non_elites) == 0:
