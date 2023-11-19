@@ -38,20 +38,6 @@ pymoo: Multi-objective Optimization in Python
 ------------------------------------------------------------------------------
 
 
-.. admonition:: Overview
-    :class: myOwnStyle
-
-    The things to check out in **pymoo 0.6.0**.
-
-    - The new version is available pre-compiled for Python 3.7-3.10 for Linux, Mac, and Windows.
-    - The module *pymoo.factory* has been deprecated. Please instantiate the objects directly.
-    - The number of constraints is now defined by n_ieq_constr and n_eq_constr to distinguish between equality and inequality constraints (also the correct amount of objectives and constraints is checked now)
-    - Do not forget to look at the features flagged with *new* for further changes: Mixed Variable Optimization, Hyperparameter Optimization, Updated Constrained Handling Methods, and more.
-
-    Enjoy our new release!
-
-
-
 Our framework offers state of the art single- and multi-objective optimization algorithms and many
 more features related to multi-objective optimization such as visualization and decision making.
 **pymoo** is available on PyPi and can be installed by:

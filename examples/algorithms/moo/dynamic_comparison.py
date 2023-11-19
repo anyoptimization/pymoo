@@ -34,7 +34,7 @@ class DynamicIGD(Callback):
 
 
 problem = DF1(taut=2, n_var=2)
-n_time = 100
+n_time = 10
 
 dnsga2 = DNSGA2(version="A")
 dnsga2_migd = DynamicIGD()
