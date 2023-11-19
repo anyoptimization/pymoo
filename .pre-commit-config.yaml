@@ -8,4 +8,5 @@ repos:
           - --preserve-cell-metadata
           - tags
           - format
+          - raw_mimetype
           - --
