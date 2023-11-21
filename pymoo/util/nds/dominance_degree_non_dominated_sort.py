@@ -19,14 +19,13 @@ def construct_comp_matrix(vec: np.ndarray) -> np.ndarray:
     n = v.shape[-1]
     # a is the sorted vector in ascending order, and b is the index vector satisfying a = w(b)
     b = np.argsort(v, axis=-1, kind="quicksort")
-    a = v[b]
     c = np.zeros(shape=(n, n), dtype=np.int32)
 
     # the elements of the b(0)-th row in C are all set to 1
     c[b[0], :] = 1
 
     for i in range(1, n):
-        if a[i] == a[i - 1]:
+        if v[b[i]] == v[b[i - 1]]:
             # the rows in C corresponding to the same elements in w are identical
             c[b[i]] = c[b[i - 1]]
         else:
@@ -53,7 +52,7 @@ def construct_domination_matrix(f_scores: np.ndarray, **kwargs) -> np.ndarray:
     return d
 
 
-def dda_ns(f_scores: np.ndarray, **kwargs) -> list[set[int]]:
+def dda_ns(f_scores: np.ndarray, **kwargs) -> list[list[int]]:
     """
     dda_ns runs the DDA-NS algorithm.
 
@@ -70,22 +69,25 @@ def dda_ns(f_scores: np.ndarray, **kwargs) -> list[set[int]]:
     """
     d_mx = construct_domination_matrix(f_scores)
 
-    for i in range(f_scores.shape[0]):
-        for j in range(f_scores.shape[0]):
-            if d_mx[i, j] == f_scores.shape[-1] and d_mx[j, i] == f_scores.shape[-1]:
-                # solutions Yi and Yj are with identical objective vectors
-                d_mx[i, j] = d_mx[j, i] = 0
+    # remove dominating solutions (D[i, j] == m && D[j, i] == M)
+    d_mx = np.where(
+        np.logical_and(
+            np.equal(d_mx, f_scores.shape[-1]), np.equal(d_mx.T, f_scores.shape[-1])
+        ),
+        0,
+        d_mx,
+    )
 
     fronts = []
     count = 0
     while count < f_scores.shape[0]:
-        front = set()
+        front = []
         # Max(D) is the row vector containing the maximum elements from each column of D
         max_d = np.max(d_mx, axis=0)
         for i in range(f_scores.shape[0]):
             if 0 <= max_d[i] < f_scores.shape[-1]:
                 # solution Yi belongs to current front
-                front.add(i)
+                front.append(i)
                 count += 1
         for i in front:
             d_mx[i, :] = -1
@@ -95,35 +97,28 @@ def dda_ns(f_scores: np.ndarray, **kwargs) -> list[set[int]]:
     return fronts
 
 
-def dda_ens(f_scores: np.ndarray, **kwargs) -> list[set[int]]:
+def dda_ens(f_scores: np.ndarray, **kwargs) -> list[list[int]]:
     d_mx = construct_domination_matrix(f_scores)
 
-    for i in range(f_scores.shape[0]):
-        for j in range(f_scores.shape[0]):
-            if d_mx[i, j] == f_scores.shape[-1] and d_mx[j, i] == f_scores.shape[-1]:
-                # solutions Yi and Yj are with identical objective vectors
-                d_mx[i, j] = d_mx[j, i] = 0
+    d_mx = np.where(
+        np.logical_and(d_mx == f_scores.shape[-1], d_mx.T == f_scores.shape[-1]),
+        0,
+        d_mx,
+    )
 
-    sorted_indices = np.argsort(f_scores[:, 0])
-
-    fronts: list[set[int]] = []
+    fronts: list[list[int]] = []
     front_count = 0
-    isdominated = False
-    for s in sorted_indices:
+    for s in np.lexsort(f_scores.T):
         isinserted = False
         for k in range(front_count):
-            isdominated = False
-            for sd in fronts[k]:
-                if d_mx[sd, s] == f_scores.shape[1]:
-                    isdominated = True
-                    break
+            isdominated = any(d_mx[sd, s] == f_scores.shape[1] for sd in fronts[k])
             if not isdominated:
-                fronts[k].add(s)
+                fronts[k].append(s)
                 isinserted = True
                 break
         if not isinserted:
             front_count += 1
-            fronts.append({s})
+            fronts.append([s])
     return fronts
 
 
