@@ -559,20 +559,20 @@ cdef int[:, ::1] c_construct_comparison_matrix(double[:]& v, Py_ssize_t n):
     return C
 
 cdef void c_remove_dominators(int[:, ::1]& D, Py_ssize_t n, Py_ssize_t m):
-    cdef long i, j = 0, k = 0
-    # for i in range(n * n):
-    # only scan the upper triangular matrix since we only need to check the lower half
-    # if an element in the upper is m
-    # can reduce the number of checks from n**2 to (n**2)/2
+    cdef long j = 0, k = 0
     while k < n:
         # prefer iteration over columns for C memory layout
-        if D[j, k] == m:
-            if D[k, j] == m:
+        if D[k, j] == m:
+            if D[j, k] == m:
                 D[j, k] = 0
                 D[k, j] = 0
         j += 1
         if j == n:
+            # only scan the upper triangular matrix since we only need to check the lower half
+            # if an element in the upper half is m
+            # can reduce the number of checks from n**2 to (n**2)/2
             k += 1
+            # start searching next row from the diagonal
             j = k
 
 cdef void c_remove_front_members(int[:, ::1]& D, vector[int] front, int n):
