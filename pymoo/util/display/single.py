@@ -60,9 +60,8 @@ class SingleObjectiveOutput(Output):
 
         if opt.feas:
             self.f_min.set(opt.f)
-            if self.best:
+            if self.best is not None:
                 self.f_gap.set(opt.f - self.best)
-
         else:
             self.f_min.set(None)
             self.f_gap.set(None)
