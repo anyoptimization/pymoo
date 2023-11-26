@@ -15,7 +15,7 @@ IPYNBS = [e for e in files_from_folder(DOCS, regex='**/*.ipynb', skip=SKIP) if "
 @pytest.mark.long
 @pytest.mark.parametrize('ipynb', IPYNBS)
 def test_docs(ipynb, pytestconfig):
-    overwrite = pytestconfig.getoption("overwrite", True)
+    overwrite = pytestconfig.getoption("overwrite", False)
     KERNEL = start_new_kernel(kernel_name='python3')
     run_ipynb(KERNEL, ipynb, overwrite=overwrite, remove_trailing_empty_cells=True)
     assert True

@@ -32,8 +32,7 @@ jobs:
       matrix:
         os:
           - windows-latest
-          - macos-12
-          - macos-13
+          - macos-latest
         python-version:
           - "3.7"
           - "3.8"
