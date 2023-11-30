@@ -61,9 +61,23 @@ def test_prob_const(P, rankings, output):
 
 ## Test the objective function     
 test_obj_in_out = [
-    (np.array([[0.2,0.3, 0.1, 12], [0.3,0.2,0.5, 13], [0.7,0.8,0.1, -14]]), np.array([[-12, -13, 14]]).T),
-    (np.array([[0.2,0.3, 0.1, 73], [0.3,0.2,0.5, 22], [0.7,0.8,0.1, -52]]), np.array([[-73, -22, 52]]).T)
-        ]
+    (
+        np.array([
+            [0.3, 0.1,  12], 
+            [0.2, 0.5,  13], 
+            [0.8, 0.1, -14]
+        ]), 
+        np.array([[-12, -13, 14]]).T
+    ),
+    (
+        np.array([
+            [0.3, 0.1,  73], 
+            [0.2, 0.5,  22], 
+            [0.8, 0.1, -52]
+        ]), 
+        np.array([[-73, -22, 52]]).T
+    )
+]
 
 
 @pytest.mark.parametrize('x, obj', test_obj_in_out)
@@ -89,7 +103,7 @@ test_ineq_in_out = [
 
         # Linear function values to optimize (x). This is two individuals
         np.array([
-            [0.5,0.5, 0.5], 
+            [0.5,    0.5, 0.5], 
             [0.3780, 0.6220, 0.2072]
         ]), 
 
