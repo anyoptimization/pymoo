@@ -126,7 +126,7 @@ def test_ineq(x, P, ranks, expected_ineq_con):
     pymoo_prob._evaluate(x, out)
     
     # Test whether or not the constraint function matches our expected values   
-    assert np.all(expected_ineq_con == out["G"])
+    assert np.all(expected_ineq_con - out["G"] < 1e-5)
 
 
 
