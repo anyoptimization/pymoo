@@ -36,14 +36,13 @@ def linear_vf(P, x_vf):
 
 class OptimizeVF(Problem): 
 
-
     def __init__(self, P, ranks, vf):
        
         # One var for each dimension of the object space, plus epsilon 
-        n_var_vf = np.size(P, 0) + 1
+        n_var_vf = np.size(P, 1) + 1
 
-        # it has one inequality constraints for every solution in P, and one equality 
-        n_ieq_c_vf = n_var_vf - 1
+        # it has one inequality constraints for every pair of solutions in P
+        n_ieq_c_vf = np.size(P,0) - 1
        
         xl_vf = [0.0] * n_var_vf 
         xu_vf = [1.0] * n_var_vf

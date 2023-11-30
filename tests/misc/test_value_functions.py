@@ -1,4 +1,6 @@
 import pytest
+from pymoo.algorithms.soo.nonconvex.ga import GA
+from pymoo.optimize import minimize
 
 from pymoo.util import value_functions as vf
 import numpy as np
@@ -40,11 +42,11 @@ def test_prob_const(P, rankings, output):
 
     linear_vf = vf.linear_vf
 
-    pymoo_prob = vf.OptimizeVF(P, rankings, linear_vf)
+    vf_prob = vf.OptimizeVF(P, rankings, linear_vf)
 
     ## Test whether the solutions are ranked by ranking 
-    ranks_from_prob = pymoo_prob.P[:, -1]
-    P_from_prob = pymoo_prob.P[:, 0:-1]
+    ranks_from_prob = vf_prob.P[:, -1]
+    P_from_prob = vf_prob.P[:, 0:-1]
 
     rankings.sort()
 
@@ -85,11 +87,11 @@ def test_obj(x, obj):
 
     linear_vf = vf.linear_vf
 
-    pymoo_prob = vf.OptimizeVF(dummy_inputs[0], dummy_inputs[1], linear_vf)
+    vf_prob = vf.OptimizeVF(dummy_inputs[0], dummy_inputs[1], linear_vf)
 
     out = {}
 
-    pymoo_prob._evaluate(x, out)
+    vf_prob._evaluate(x, out)
     
     # Test whether or not the objective function simply negates the epsilon term of x (last element)
     assert np.all(obj == out["F"])
@@ -133,11 +135,11 @@ def test_ineq(x, P, ranks, expected_ineq_con):
 
     linear_vf = vf.linear_vf
 
-    pymoo_prob = vf.OptimizeVF(P, ranks, linear_vf)
+    vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
 
     out = {}
 
-    pymoo_prob._evaluate(x, out)
+    vf_prob._evaluate(x, out)
     
     # Test whether or not the constraint function matches our expected values   
     assert np.all(np.isclose(expected_ineq_con, out["G"]))
@@ -179,14 +181,65 @@ def test_eq(x, P, ranks, expected_eq_con):
 
     linear_vf = vf.linear_vf
 
-    pymoo_prob = vf.OptimizeVF(P, ranks, linear_vf)
+    vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
 
     out = {}
 
-    pymoo_prob._evaluate(x, out)
+    vf_prob._evaluate(x, out)
     
     # Test whether or not the constraint function matches our expected values   
     assert np.all(np.isclose(expected_eq_con, out["H"]))
+
+
+
+test_optimization_in_out = [
+
+    (
+
+
+        # P, or the solutions to the problem we're trying to create a VF for 
+        np.array([[3.6, 3.9], 
+                  [2.5, 4.1],    
+                  [5.5, 2.5],      
+                  [0.5, 5.2],     
+                  [6.9, 1.8]]), 
+         
+
+        # Ranking of the P values, as per the decision maker 
+        [1, 2, 3, 4, 5],
+
+        # The expected x values after optimization
+        np.array([
+            [0.348571428062270  ], 
+            [0.651428571937730  ], 
+            [-0.0160000393082190]
+        ])   
+
+
+
+
+
+    )
+]
+
+@pytest.mark.parametrize('P, ranks, expected_x', test_optimization_in_out)
+def test_optimization(P, ranks, expected_x): 
+
+    linear_vf = vf.linear_vf
+
+    vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
+
+    algorithm = GA(pop_size=100)
+   
+    res = minimize(vf_prob,
+               algorithm,
+               ('n_gen', 200),
+               seed=1)
+
+    awlefkjawf
+
+
+
 
 
 
