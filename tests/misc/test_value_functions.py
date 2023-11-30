@@ -140,11 +140,53 @@ def test_ineq(x, P, ranks, expected_ineq_con):
     pymoo_prob._evaluate(x, out)
     
     # Test whether or not the constraint function matches our expected values   
-    assert np.all(expected_ineq_con - out["G"] < 1e-5)
+    assert np.all(np.isclose(expected_ineq_con, out["G"]))
 
 
 
+test_eq_in_out = [
 
+    (
+
+        # Linear function values to optimize (x). This is two individuals
+        np.array([
+            [0.5,    0.5, 0.5], 
+            [0.3780, 0.6220, 0.2072]
+        ]), 
+
+        # P, or the solutions to the problem we're trying to create a VF for 
+        np.array([[3.6, 3.9], 
+                  [2.5, 4.1],    
+                  [5.5, 2.5],      
+                  [0.5, 5.2],     
+                  [6.9, 1.8]]), 
+         
+
+        # Ranking of the P values, as per the decision maker 
+        [1, 2, 3, 4, 5],
+
+        # The constraint values, given the x
+        np.array([
+            [0], 
+            [0]
+        ])
+    ),
+]
+
+
+@pytest.mark.parametrize('x, P, ranks, expected_eq_con', test_eq_in_out)
+def test_eq(x, P, ranks, expected_eq_con):
+
+    linear_vf = vf.linear_vf
+
+    pymoo_prob = vf.OptimizeVF(P, ranks, linear_vf)
+
+    out = {}
+
+    pymoo_prob._evaluate(x, out)
+    
+    # Test whether or not the constraint function matches our expected values   
+    assert np.all(np.isclose(expected_eq_con, out["H"]))
 
 
 

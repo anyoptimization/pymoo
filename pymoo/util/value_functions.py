@@ -85,16 +85,13 @@ class OptimizeVF(Problem):
 
         for p in range(np.size(self.P,0) - 1):
 
-            current_P = self.vf(self.P[[p],0:-1], x[:, 0:-1])
-            next_P = self.vf(self.P[[p+1],0:-1], x[:, 0:-1])
+           current_P = self.vf(self.P[[p],0:-1], x[:, 0:-1])
+           next_P = self.vf(self.P[[p+1],0:-1], x[:, 0:-1])
 
-            out["G"][:,[p]] = -(current_P - next_P) + ep
+           out["G"][:,[p]] = -(current_P - next_P) + ep
 
             
         ## Equality
-        
-        out["H"] = -99
-
-
+        out["H"] = np.sum(x[:,0:-1],1, keepdims=True) - 1
 
 
