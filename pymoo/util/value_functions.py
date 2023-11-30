@@ -28,9 +28,8 @@ def create_linear_vf(F, ranks):
     return lambda f_new:  np.sum(f_new)
 
 
-def linear_vf(F, x_vf): 
-
-    return np.multiply(F, x_vf)
+def linear_vf(P, x_vf): 
+    return np.matmul(P, x_vf.T).T
 
 
 #def linear_const(F, x_vf):
@@ -61,6 +60,8 @@ class OptimizeVF(Problem):
         # Sort P by rankings in the last column
         self.P = self.P[self.P[:, -1].argsort()]
 
+        self.vf = vf
+
         super().__init__(n_var_vf, n_obj=1, n_ieq_constr=n_ieq_c_vf, n_eq_constr=1, xl=xl_vf, xu=xu_vf)
 
        
@@ -68,19 +69,27 @@ class OptimizeVF(Problem):
     def _evaluate(self, x, out, *args, **kwargs):
 
         ## Objective function: 
+        ep = np.column_stack([x[:,-1]])
+
+        pop_size = np.size(x,0)
 
         # maximize epsilon, or the minimum distance between each contour 
-        out["F"] = -x[:,-1]
+        out["F"] = -ep
 
         ## Inequality
         # TODO for now, assuming there are no ties in the ranks
-        out["G"] = -99
 
-        # Go through each member of P, seeing if our proposed utility 
+        # Pair-wise compare each ranked member of P, seeing if our proposed utility 
         #  function increases monotonically as rank increases
+        out["G"] = np.ones((pop_size, np.size(self.P,0)-1))*-99
 
-        #for p in self.P[0:-1, :]: 
-                
+        for p in range(np.size(self.P,0) - 1):
+
+            current_P = self.vf(self.P[[p],0:-1], x[:, 0:-1])
+            next_P = self.vf(self.P[[p+1],0:-1], x[:, 0:-1])
+
+            out["G"][:,[p]] = -(current_P - next_P) + ep
+
             
         ## Equality
         
