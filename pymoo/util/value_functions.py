@@ -2,6 +2,8 @@ import numpy as np
 
 from pymoo.core.problem import Problem
 import pymoo.algorithms.soo.nonconvex.ga
+import matplotlib.pyplot as plt
+
 
 # Notes: 
 # I'm using the suffix _vf to denote variables used in the value-function optimization 
@@ -11,28 +13,38 @@ import pymoo.algorithms.soo.nonconvex.ga
 # Input 2: The ranking of the given non-dominated points 
 # Input 3: constraint function for optimizing the value func
 # Input 4: the skeleton utility function that we're trying to optimize
-def create_vf(F, ranks, cFunc, utilFunc): 
+def create_vf(P, ranks, cFunc, utilFunc): 
 
     # Combine rankings and objective functions into one matrix 
     # The first O columns are the objective values, and the O + 1 column is the ranking
 
-    X = np.hstack((F, np.array([ranks]).T))
-
-
-    return lambda f_new:  np.sum(f_new)
-
-
-
-def create_linear_vf(F, ranks): 
+    X = np.hstack((P, np.array([ranks]).T))
 
     return lambda f_new:  np.sum(f_new)
 
 
-def linear_vf(P, x_vf): 
-    return np.matmul(P, x_vf.T).T
+
+def create_linear_vf(P, ranks): 
+
+    return lambda f_new:  np.sum(f_new)
 
 
-#def linear_const(F, x_vf):
+def linear_vf(P, x): 
+    return np.matmul(P, x.T).T
+
+
+def plot_linear_vf(P, x): 
+   
+
+    plt.scatter(P[:,0], P[:,1], marker="*", color="red", s=200 )
+   
+    for i in range(np.size(P,0)):
+        plt.annotate("P%d" % (i+1), (P[i,0], P[i,1]))
+
+
+
+    plt.show()
+
 
 class OptimizeVF(Problem): 
 
