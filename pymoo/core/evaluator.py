@@ -1,116 +1,108 @@
+from collections.abc import Generator
+
 import numpy as np
 
-from pymoo.core.individual import Individual
-from pymoo.core.population import Population
+from pymoo.core.parallelize import Serial, Parallelize
 from pymoo.core.problem import Problem
+from pymoo.core.solution import SolutionSet, Solution
+from pymoo.core.variable import Variable
+
+
+class Evaluation:
+
+    def __init__(self,
+                 sols: SolutionSet,
+                 problem: Problem = None,
+                 rtype=SolutionSet,
+                 parallelize: Parallelize = Serial()):
+        super().__init__()
+        self.sols = sols
+        self.problem = problem
+        self.rtype = rtype
+        self.parallelize = parallelize
+
+    def solution(self) -> Solution:
+        if len(self.sols) > 0:
+            return self.sols.item(0)
+
+    def solutions(self) -> SolutionSet:
+        return self.sols
+
+    def get(self):
+        if self.rtype == SolutionSet:
+            return self.solutions()
+        elif self.rtype == Solution:
+            return self.solution()
+        else:
+            raise Exception("Unknown return type.")
+
+    def run(self):
+        problem = self.problem
+        assert problem is not None, "To run the evaluation a problem needs to be given."
+
+        if problem.parallel:
+            assert False, "Not supported yet."
+
+        else:
+
+            def f(sol):
+                out = problem.evaluate(sol.var)
+                for k, v in out.items():
+                    setattr(sol, k, v)
+
+            self.parallelize(f, self.solutions())
 
 
 class Evaluator:
 
     def __init__(self,
-                 skip_already_evaluated: bool = True,
-                 evaluate_values_of: list = ["F", "G", "H"],
-                 callback=None):
+                 problem: Problem,
+                 parallelize: Parallelize = Serial()
+                 ):
+        super().__init__()
+        self.problem = problem
+        self.parallelize = parallelize
+        self.fevals = 0
 
-        """
-        The evaluator has the purpose to glue the problem with the population/individual objects.
-        Additionally, it serves as a bookkeeper to store determine the number of function evaluations of runs, time,
-        and others.
+    def create(self, obj: np.ndarray | Solution | SolutionSet):
 
+        problem = self.problem
+        vtype = problem.vtype
+        rtype = SolutionSet
 
-        Parameters
-        ----------
-        skip_already_evaluated : bool
-            If individual that are already evaluated shall be skipped.
+        if isinstance(obj, SolutionSet):
+            sols = obj
 
-        evaluate_values_of : list
-            The type of values to be asked the problem to evaluated. By default all objective, ieq. and eq. constraints.
+        elif isinstance(obj, Solution):
+            sols = SolutionSet([obj])
+            rtype = Solution
 
-        """
+        elif isinstance(obj, Variable):
+            sols = SolutionSet([obj.solution()])
+            rtype = Solution
 
-        self.evaluate_values_of = evaluate_values_of
-        self.skip_already_evaluated = skip_already_evaluated
-        self.callback = callback
+        elif isinstance(obj, np.ndarray):
 
-        # current number of function evaluations - initialized to zero
-        self.n_eval = 0
+            if obj.ndim == 1:
+                sols = SolutionSet([vtype.new(obj).solution()])
+                rtype = Solution
+            elif obj.ndim == 2:
+                sols = SolutionSet([vtype.new(row).solution() for row in obj])
+            else:
+                raise Exception("Either provide a 1 or 2 dimensional array.")
 
-    def eval(self,
-             problem: Problem,
-             pop: Population,
-             skip_already_evaluated: bool = None,
-             evaluate_values_of: list = None,
-             count_evals: bool = True,
-             **kwargs):
-
-        # load the default settings from the evaluator object if not already provided
-        evaluate_values_of = self.evaluate_values_of if evaluate_values_of is None else evaluate_values_of
-        skip_already_evaluated = self.skip_already_evaluated if skip_already_evaluated is None else skip_already_evaluated
-
-        # check the type of the input
-        is_individual = isinstance(pop, Individual)
-
-        # make sure the object is a population
-        if is_individual:
-            pop = Population().create(pop)
-
-        # filter the index to have individual where not all attributes have been evaluated
-        if skip_already_evaluated:
-            I = [i for i, ind in enumerate(pop) if not all([e in ind.evaluated for e in evaluate_values_of])]
-
-        # if skipping is deactivated simply make the index being all individuals
         else:
-            I = np.arange(len(pop))
+            sols = SolutionSet([vtype.new(obj).solution()])
+            rtype = Solution
 
-        # evaluate the solutions (if there are any)
-        if len(I) > 0:
+        evaluation = Evaluation(sols, problem=self.problem, rtype=rtype, parallelize=self.parallelize)
 
-            # do the actual evaluation - call the sub-function to set the corresponding values to the population
-            self._eval(problem, pop[I], evaluate_values_of, **kwargs)
+        return evaluation
 
-        # update the function evaluation counter
-        if count_evals:
-            self.n_eval += len(I)
+    def send(self, obj: np.ndarray | Solution | SolutionSet) -> Generator[Evaluation, None, Solution | SolutionSet]:
+        evaluation = self.create(obj)
 
-        # allow to have a callback registered
-        if self.callback:
-            self.callback(pop)
+        self.fevals += len(evaluation.solutions())
 
-        if is_individual:
-            return pop[0]
-        else:
-            return pop
-
-    def _eval(self, problem, pop, evaluate_values_of, **kwargs):
-
-        # get the design space value from the individuals
-        X = pop.get("X")
-
-        # call the problem to evaluate the solutions
-        out = problem.evaluate(X, return_values_of=evaluate_values_of, return_as_dictionary=True, **kwargs)
-
-        # for each of the attributes set it to the problem
-        for key, val in out.items():
-            if val is not None:
-                pop.set(key, val)
-
-        # finally set all the attributes to be evaluated for all individuals
-        pop.apply(lambda ind: ind.evaluated.update(out.keys()))
-
-
-class VoidEvaluator(Evaluator):
-
-    def __init__(self, value=np.inf, **kwargs):
-        super().__init__(**kwargs)
-        self.value = value
-
-    def eval(self, problem, pop, **kwargs):
-        val = self.value
-        if val is not None:
-            for individual in pop:
-                if len(individual.evaluated) == 0:
-                    individual.F = np.full(problem.n_obj, val)
-                    individual.G = np.full(problem.n_ieq_constr, val) if problem.n_ieq_constr > 0 else None
-                    individual.H = np.full(problem.n_eq_constr, val) if problem.n_eq_constr else None
-                    individual.CV = [-np.inf]
-                    individual.feas = [False]
+        yield evaluation
+        return evaluation.get()

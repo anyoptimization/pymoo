@@ -1,105 +1,122 @@
 import numpy as np
 
+from pymoo.core.solution import Solution
+from pymoo.util import is_iterable
 
-class Variable(object):
 
-    def __init__(self, value=None, active=True, flag="default") -> None:
+class VariableType:
+
+    def __init__(self,
+                 dtype: type = object,
+                 size: int = None,
+                 bounds: tuple = None):
         super().__init__()
-        self.value = value
-        self.flag = flag
-        self.active = active
+        self.dtype = dtype
+        self.size = size
 
-    def sample(self, n=None):
-        if n is None:
-            return self._sample(1)[0]
+        if bounds is not None:
+            low, high = bounds
+
+            if self.size is not None:
+                low = np.array(low) if is_iterable(low) else np.full(self.size, low)
+                high = np.array(high) if is_iterable(high) else np.full(self.size, high)
+                bounds = (low, high)
+
+                assert len(low) == size and len(high) == size
+
+        self.bounds = bounds
+
+    @property
+    def low(self):
+        if self.has_bounds():
+            return self.bounds[0]
+
+    @property
+    def high(self):
+        if self.has_bounds():
+            return self.bounds[1]
+
+    def has_bounds(self):
+        return self.bounds is not None
+
+    def norm(self):
+        if self.has_bounds():
+            low, high = self.bounds
+            return high - low
         else:
-            return self._sample(n)
+            return 1.0
 
-    def _sample(self, n):
+    def new(self, value: object) -> 'Variable':
+        return Variable(self, value)
+
+    def random(self):
         pass
+
+    def full(self, v):
+        pass
+
+
+class Float(VariableType):
+
+    def __init__(self, bounds=(0, 1), **kwargs):
+        super().__init__(dtype=float, bounds=bounds, **kwargs)
+
+    def random(self):
+        x = np.random.uniform(size=self.size)
+
+        if self.bounds:
+            low, high = self.bounds
+            x = low + x * (high - low)
+
+        return self.new(x)
+
+    def full(self, v):
+        return self.new(np.full(self.size, v))
+
+
+class Integer(VariableType):
+
+    def __init__(self, bounds=(0, 1), **kwargs):
+        super().__init__(dtype=int, bounds=bounds, **kwargs)
+
+    def random(self):
+        x = np.random.randint(self.low, high=self.high + 1, size=self.size)
+        return self.new(x)
+
+
+class Binary(VariableType):
+
+    def __init__(self, **kwargs):
+        super().__init__(dtype=bool, **kwargs)
+
+    def random(self):
+        x = np.random.uniform(size=self.size) < 0.5
+        return self.new(x)
+
+
+class Mixed(VariableType):
+
+    def __init__(self, vars):
+        super().__init__(dtype=object, size=len(vars), bounds=None)
+        self.vars = vars
+
+    def random(self):
+        x = [var.random().get() for var in self.vars]
+        return self.new(x)
+
+
+class Variable:
+
+    def __init__(self, vtype: VariableType, value: object):
+        super().__init__()
+        self.vtype = vtype
+        self.value = value
+
+    def get(self):
+        return self.value
 
     def set(self, value):
         self.value = value
 
-    def get(self, **kwargs):
-        return self.value
-
-
-class BoundedVariable(Variable):
-
-    def __init__(self, value=None, bounds=(None, None), strict=None, **kwargs) -> None:
-        super().__init__(value=value, **kwargs)
-        self.bounds = bounds
-
-        if strict is None:
-            strict = bounds
-        self.strict = strict
-
-    @property
-    def lb(self):
-        return self.bounds[0]
-
-    @property
-    def ub(self):
-        return self.bounds[1]
-
-
-class Real(BoundedVariable):
-    vtype = float
-
-    def _sample(self, n):
-        low, high = self.bounds
-        return np.random.uniform(low=low, high=high, size=n)
-
-
-class Integer(BoundedVariable):
-    vtype = int
-
-    def _sample(self, n):
-        low, high = self.bounds
-        return np.random.randint(low, high=high + 1, size=n)
-
-
-class Binary(BoundedVariable):
-    vtype = bool
-
-    def _sample(self, n):
-        return np.random.random(size=n) < 0.5
-
-
-class Choice(Variable):
-    vtype = object
-
-    def __init__(self, value=None, options=None, all=None, **kwargs) -> None:
-        super().__init__(value=value, **kwargs)
-        self.options = options
-
-        if all is None:
-            all = options
-        self.all = all
-
-    def _sample(self, n):
-        return np.random.choice(self.options, size=n)
-
-
-def get(*args, size=None, **kwargs):
-    if len(args) == 0:
-        return
-
-    ret = []
-    for arg in args:
-        v = arg.get(**kwargs) if isinstance(arg, Variable) else arg
-
-        if size is not None:
-
-            if isinstance(v, np.ndarray):
-                v = np.reshape(v, size)
-            else:
-                v = np.full(size, v)
-
-        ret.append(v)
-
-    if len(ret) == 1:
-        return ret[0]
-    else:
-        return tuple(ret)
+    def solution(self) -> 'Solution':
+        return Solution(var=self)

@@ -1,178 +1,106 @@
+from typing import Generator
+
 import numpy as np
+from scipy.spatial.distance import cdist
 
-from pymoo.algorithms.base.local import LocalSearch
-from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
-from pymoo.core.individual import Individual
-from pymoo.core.population import Population
-from pymoo.core.population import pop_from_array_or_individual
-from pymoo.core.replacement import is_better
+from pymoo.algorithms.local import LocalSearch
+from pymoo.core.algorithm import Algorithm
+from pymoo.core.evaluator import Evaluation
+from pymoo.core.fitness import sort_by_fitness, is_better
+from pymoo.core.output import SingleObjectiveOutput, Column
+from pymoo.core.problem import Problem
+from pymoo.core.solution import SolutionSet, merge
 from pymoo.core.termination import Termination
-from pymoo.docs import parse_doc_string
-from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
-from pymoo.util.display.single import SingleObjectiveOutput
-from pymoo.util.misc import vectorized_cdist
-from pymoo.util.vectors import max_alpha
+from pymoo.util import y_and_n
 
 
-# =========================================================================================================
-# Implementation
-# =========================================================================================================
+class NelderAndMeadOutput(SingleObjectiveOutput):
+
+    def setup(self, _):
+        super().setup(_)
+        self.columns += [
+            Column(name='status', f_get=lambda a: a.status, width=12),
+            Column(name='x_delta', f_get=lambda a: a.x_delta, width=9),
+            Column(name='f_delta', f_get=lambda a: a.f_delta, width=9),
+            Column(name='is_degenerated', f_get=lambda a: y_and_n(a.is_degenerated), width=9)
+        ]
 
 
 class NelderAndMeadTermination(Termination):
 
     def __init__(self,
-                 x_tol=1e-6,
-                 f_tol=1e-6,
-                 n_max_iter=1e6,
-                 n_max_evals=1e6):
-
+                 x_tol: float = 1e-7,
+                 f_tol: float = 1e-7):
         super().__init__()
         self.x_tol = x_tol
         self.f_tol = f_tol
-        self.n_max_iter = n_max_iter
-        self.n_max_evals = n_max_evals
 
-    def _update(self, algorithm):
-        pop, problem = algorithm.pop, algorithm.problem
+    def update(self, algorithm):
+        sols, problem = algorithm.sols, algorithm.problem
 
-        if len(pop) <= 1:
+        if len(sols) <= 1:
             return 0.0
-
-        X, F = pop.get("X", "F")
-
-        f_delta = np.abs(F[1:] - F[0]).max()
-        f_tol = 1 / (1 + (f_delta - self.f_tol))
-
-        # if the problem has bounds we can normalize the x space to to be more accurate
-        if problem.has_bounds():
-            x_delta = np.abs((X[1:] - X[0]) / (problem.xu - problem.xl)).max()
-        else:
-            x_delta = np.abs(X[1:] - X[0]).max()
-
-        x_tol = 1 / (1 + (x_delta - self.x_tol))
-
-        # degenerated simplex - get all edges and minimum and maximum length
-        D = vectorized_cdist(X, X)
-        val = D[np.triu_indices(len(pop), 1)]
-        min_e, max_e = val.min(), val.max()
-
-        # either if the maximum length is very small or the ratio is degenerated
-        is_degenerated = int(max_e < 1e-16 or min_e / max_e < 1e-16)
-
-        max_iter = algorithm.n_iter / self.n_max_iter
-        max_evals = algorithm.evaluator.n_eval / self.n_max_evals
-
-        return max(f_tol, x_tol, max_iter, max_evals, is_degenerated)
-
-
-def adaptive_params(problem):
-    n = problem.n_var
-    alpha = 1
-    beta = 1 + 2 / n
-    gamma = 0.75 - 1 / (2 * n)
-    delta = 1 - 1 / n
-    return alpha, beta, gamma, delta
-
-
-def default_params(_):
-    alpha = 1
-    beta = 2.0
-    gamma = 0.5
-    delta = 0.05
-    return alpha, beta, gamma, delta
-
-
-def initialize_simplex(problem, x0, scale=0.05):
-    n = len(x0)
-
-    if problem.has_bounds():
-        delta = scale * (problem.xu - problem.xl)
-    else:
-        delta = scale * x0
-        delta[delta == 0] = 0.00025
-
-    # repeat the x0 already and add the values
-    X = x0[None, :].repeat(n, axis=0)
-
-    for k in range(n):
-
-        # if the problem has bounds do the check
-        if problem.has_bounds():
-            if X[k, k] + delta[k] < problem.xu[k]:
-                X[k, k] = X[k, k] + delta[k]
-            else:
-                X[k, k] = X[k, k] - delta[k]
-
-        # otherwise just add the init_simplex_scale
-        else:
-            X[k, k] = X[k, k] + delta[k]
-
-    return X
+        f_tol = 1 / (1 + (algorithm.f_delta - self.f_tol))
+        x_tol = 1 / (1 + (algorithm.x_delta - self.x_tol))
+        is_degenerated = int(algorithm.is_degenerated)
+        self.status = max(f_tol, x_tol, is_degenerated)
 
 
 class NelderMead(LocalSearch):
 
     def __init__(self,
-                 init_simplex_scale=0.05,
-                 func_params=adaptive_params,
-                 output=SingleObjectiveOutput(),
+                 termination=NelderAndMeadTermination(),
+                 output=NelderAndMeadOutput(),
                  **kwargs):
-
-        super().__init__(output=output, **kwargs)
-
-        # the function to return the parameter
-        self.func_params = func_params
-
-        # the attributes for the simplex operations
+        super().__init__(termination=termination, output=output, **kwargs)
         self.alpha = None
         self.beta = None
         self.gamma = None
         self.delta = None
 
-        # whether the simplex has been initialized or not
-        self.is_simplex_initialized = False
+        self.init_simplex = None
+        self.status = None
 
-        # the initial simplex scale used
-        self.init_simplex_scale = init_simplex_scale
+        self.x_delta = None
+        self.f_delta = None
+        self.is_degenerated = None
 
-        # the termination used for nelder and mead if nothing else provided
-        self.termination = NelderAndMeadTermination()
+    def setup(self, problem: Problem, **kwargs) -> Algorithm:
+        super().setup(problem, **kwargs)
+        self.problem = problem
 
-    def _setup(self, problem, **kwargs):
-        self.alpha, self.beta, self.gamma, self.delta = self.func_params(self.problem)
+        vtype = problem.vtype
 
-    def _initialize_simplex(self):
-        simplex = pop_from_array_or_individual(initialize_simplex(self.problem, self.x0.X, scale=0.05))
-        return Population.merge(self.x0, simplex)
+        n = vtype.size
+        self.alpha = 1
+        self.beta = 1 + 2 / n
+        self.gamma = 0.75 - 1 / (2 * n)
+        self.delta = 1 - 1 / n
 
-    def _next(self):
-        if not self.is_simplex_initialized:
-            self.pop = yield self._initialize_simplex()
-            self.is_simplex_initialized = True
-        else:
-            yield from self._step()
+        return self
 
-    def _step(self):
+    def initialize(self) -> Generator[Evaluation, None, SolutionSet]:
+        yield from super().initialize()
 
-        # number of variables increased by one - matches equations in the paper
-        xl, xu = self.problem.bounds()
-        pop, n = self.pop, self.problem.n_var - 1
+        init_sol = self.init_sol
+        init_simplex = create_simplex(init_sol.x, bounds=self.problem.vtype.bounds)
+        sols = yield from self.evaluator.send(init_simplex)
+
+        return merge(init_sol, sols)
+
+    def advance(self) -> Generator[Evaluation, None, SolutionSet]:
+        vtype = self.problem.vtype
+        n = vtype.size - 1
+        pop = self.sols
 
         # calculate the centroid
         centroid = pop[:n + 1].get("X").mean(axis=0)
 
-        # -------------------------------------------------------------------------------------------
-        # REFLECT
-        # -------------------------------------------------------------------------------------------
-
-        # check the maximum alpha until the bounds are hit
-        alphaU = max_alpha(centroid, (centroid - pop[n + 1].X), xl, xu)
+        # REFLECT #
 
         # reflect the point, consider factor if bounds are there, make sure in bounds (floating point) evaluate
-        x_reflect = centroid + min(self.alpha, alphaU) * (centroid - pop[n + 1].X)
-        x_reflect = set_to_bounds_if_outside_by_problem(self.problem, x_reflect)
-        reflect = yield Individual(X=x_reflect)
+        reflect = yield from self.evaluator.send(centroid + self.alpha * (centroid - pop[n + 1].X))
+        self.status = 'REFLECT'
 
         # whether a shrink is necessary or not - decided during this step
         shrink = False
@@ -184,21 +112,13 @@ class NelderMead(LocalSearch):
         # if better than the current best - check for expansion
         if better_than_current_best:
 
-            # -------------------------------------------------------------------------------------------
             # EXPAND
-            # -------------------------------------------------------------------------------------------
-
-            # the maximum expansion until the bounds are hit
-            betaU = max_alpha(centroid, (x_reflect - centroid), xl, xu)
-
-            # expand using the factor, consider bounds, make sure in case of floating point issues
-            x_expand = centroid + min(self.beta, betaU) * (x_reflect - centroid)
-            x_expand = set_to_bounds_if_outside_by_problem(self.problem, x_expand)
-            expand = yield Individual(X=x_expand)
+            expand = yield from self.evaluator.send(centroid + self.beta * (reflect.x - centroid))
 
             # if the expansion further improved take it - otherwise use expansion
             if is_better(expand, reflect):
                 pop[n + 1] = expand
+                self.status = 'EXPAND'
             else:
                 pop[n + 1] = reflect
 
@@ -209,43 +129,78 @@ class NelderMead(LocalSearch):
         # if not worse than the worst - outside contraction
         elif not better_than_second_worst and better_than_worst:
 
-            # -------------------------------------------------------------------------------------------
             # Outside Contraction
-            # -------------------------------------------------------------------------------------------
-
-            x_contract_outside = centroid + self.gamma * (x_reflect - centroid)
-            contract_outside = yield Individual(X=x_contract_outside)
+            contract_outside = yield from self.evaluator.send(centroid + self.gamma * (reflect.x - centroid))
 
             if is_better(contract_outside, reflect):
                 pop[n + 1] = contract_outside
+                self.status = 'CONTRACT_OUT'
             else:
                 shrink = True
 
         # if the reflection was worse than the worst - inside contraction
         else:
-
-            # -------------------------------------------------------------------------------------------
-            # Inside Contraction
-            # -------------------------------------------------------------------------------------------
-
-            x_contract_inside = centroid - self.gamma * (x_reflect - centroid)
-            contract_inside = yield Individual(X=x_contract_inside)
+            # Inside Contraction #
+            contract_inside = yield from self.evaluator.send(centroid - self.gamma * (reflect.x - centroid))
 
             if is_better(contract_inside, pop[n + 1]):
                 pop[n + 1] = contract_inside
+                self.status = 'CONTRACT_IN'
             else:
                 shrink = True
 
-        # -------------------------------------------------------------------------------------------
-        # Shrink (only if necessary)
-        # -------------------------------------------------------------------------------------------
-
+        # Shrink #
         if shrink:
             x_best, x_others = pop[0].X, pop[1:].get("X")
             x_shrink = x_best + self.delta * (x_others - x_best)
-            pop[1:] = yield Population.new(X=x_shrink)
+            pop[1:] = yield from self.evaluator.send(x_shrink)
+            self.status = 'SHRINK'
 
-        self.pop = FitnessSurvival().do(self.problem, pop, n_survive=len(pop))
+        # sort the population by te objective value
+        pop = sort_by_fitness(pop)
+
+        # store information about the current simplex
+        X, F = pop.get("X", "F")
+        norm = self.problem.vtype.norm()
+        self.x_delta = np.abs((X[1:] - X[0]) / norm).max()
+        self.f_delta = np.abs(F[1:] - F[0]).max()
+
+        # degenerated simplex - get all edges and minimum and maximum length
+        D = cdist(X, X)
+        val = D[np.triu_indices(len(X), 1)]
+        min_e, max_e = val.min(), val.max()
+
+        # either if the maximum length is very small or the ratio is degenerated
+        self.is_degenerated = max_e < 1e-16 or min_e / max_e < 1e-16
+
+        return pop
 
 
-parse_doc_string(NelderMead.__init__)
+def create_simplex(init_x, bounds=None, scale=0.05):
+    n = len(init_x)
+
+    if bounds is not None:
+        low, high = bounds
+        delta = scale * (high - low)
+    else:
+        delta = scale * init_x
+        delta[delta == 0] = 0.00025
+
+    # repeat the x0 already and add the values
+    X = init_x[None, :].repeat(n, axis=0)
+
+    for k in range(n):
+
+        # if the problem has bounds do the check
+        if bounds is not None:
+            low, high = bounds
+            if X[k, k] + delta[k] < high[k]:
+                X[k, k] = X[k, k] + delta[k]
+            else:
+                X[k, k] = X[k, k] - delta[k]
+
+        # otherwise just add the init_simplex_scale
+        else:
+            X[k, k] = X[k, k] + delta[k]
+
+    return X

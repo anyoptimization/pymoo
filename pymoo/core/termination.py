@@ -1,70 +1,67 @@
-from abc import abstractmethod
+from pymoo.core.observer import Observer
+from pymoo.core.problem import Problem
 
 
-class Termination:
+class Termination(Observer):
 
-    def __init__(self) -> None:
+    def __init__(self):
         super().__init__()
-
-        # the algorithm can be forced to terminate by setting this attribute to true
-        self.force_termination = False
-
-        # the value indicating how much perc has been made
-        self.perc = 0.0
-
-    def update(self, algorithm):
-        """
-        Provide the termination criterion a current status of the algorithm to update the perc.
-
-        Parameters
-        ----------
-        algorithm : object
-            The algorithm object which is used to determine whether a run has terminated.
-        """
-
-        if self.force_termination:
-            progress = 1.0
-        else:
-            progress = self._update(algorithm)
-            assert progress >= 0.0, "Invalid progress was set by the TerminationCriterion."
-
-        self.perc = progress
-        return self.perc
+        self.algorithm = None
+        self.message = None
+        self.status = 0.0
 
     def has_terminated(self):
-        return self.perc >= 1.0
+        return self.status < 1.0
 
-    def do_continue(self):
-        return not self.has_terminated()
-
-    def terminate(self):
-        self.force_termination = True
-
-    @abstractmethod
-    def _update(self, algorithm):
-        pass
+    def terminate(self, message: str = None):
+        self.status = 1.0
+        self.message = message
 
 
-class NoTermination(Termination):
+class TerminationSet(Termination):
 
-    def _update(self, algorithm):
-        return 0.0
-
-
-class MultipleCriteria(Termination):
-
-    def __init__(self, *args) -> None:
+    def __init__(self, criteria=(), op=max):
         super().__init__()
-        self.criteria = args
+        self.criteria = criteria
+        self.op = op
+
+    def setup(self, problem: Problem):
+        super().setup(problem)
+        [condition.setup(problem) for condition in self.criteria]
+
+    def update(self, algorithm: 'Algorithm'):
+        for condition in self.criteria:
+            condition.update(algorithm)
+            self.status = self.op(self.status, condition.status)
 
 
-class TerminateIfAny(MultipleCriteria):
+class TerminateIfAny(TerminationSet):
 
-    def _update(self, algorithm):
-        return max([termination.update(algorithm) for termination in self.criteria])
+    def __init__(self, criteria=()):
+        super().__init__(criteria, op=max)
 
 
-class TerminateIfAll(MultipleCriteria):
+class TerminateIfAll(TerminationSet):
 
-    def _update(self, algorithm):
-        return min([termination.update(algorithm) for termination in self.criteria])
+    def __init__(self, criteria=()):
+        super().__init__(criteria, op=min)
+
+
+class MaximumIterationTermination(Termination):
+
+    def __init__(self, max_iter: int):
+        super().__init__()
+        self.max_iter = max_iter
+
+    def update(self, algorithm: 'Algorithm'):
+        self.status = algorithm.iter / self.max_iter
+
+
+class MaximumEvaluationTermination(Termination):
+
+    def __init__(self, max_fevals: int):
+        super().__init__()
+        self.max_fevals = max_fevals
+
+    def update(self, algorithm: 'Algorithm'):
+        self.status = algorithm.evaluator.fevals / self.max_fevals
