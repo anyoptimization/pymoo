@@ -27,5 +27,11 @@ res = minimize(vf_prob,
            ('n_gen', 200),
                seed=1)
 
-vf.plot_linear_vf(P, res.X)
+x = np.reshape(res.X[0:-1], (1, -1))
+
+vf.plot_linear_vf(P, x)
+
+print(res.X)
+
+
 

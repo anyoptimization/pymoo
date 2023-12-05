@@ -30,10 +30,11 @@ def create_linear_vf(P, ranks):
 
 
 def linear_vf(P, x): 
+
     return np.matmul(P, x.T).T
 
 
-def plot_linear_vf(P, x): 
+def plot_linear_vf(P, x_vf): 
    
 
     plt.scatter(P[:,0], P[:,1], marker="*", color="red", s=200 )
@@ -41,7 +42,12 @@ def plot_linear_vf(P, x):
     for i in range(np.size(P,0)):
         plt.annotate("P%d" % (i+1), (P[i,0], P[i,1]))
 
+    # TODO pull 0 and 8 from min/max P 
+    x,y = np.meshgrid(np.linspace(0, 8, 1000), np.linspace(0, 8, 1000))
 
+    z = linear_vf(np.stack((x,y), axis=2), x_vf)[0]
+   
+    plt.contour(x,y,z)
 
     plt.show()
 
