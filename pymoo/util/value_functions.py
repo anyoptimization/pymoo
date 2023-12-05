@@ -37,17 +37,26 @@ def linear_vf(P, x):
 def plot_linear_vf(P, x_vf): 
    
 
-    plt.scatter(P[:,0], P[:,1], marker="*", color="red", s=200 )
+    plt.scatter(P[:,0], P[:,1], marker=".", color="red", s=200 )
    
     for i in range(np.size(P,0)):
         plt.annotate("P%d" % (i+1), (P[i,0], P[i,1]))
 
     # TODO pull 0 and 8 from min/max P 
-    x,y = np.meshgrid(np.linspace(0, 8, 1000), np.linspace(0, 8, 1000))
+    x,y = np.meshgrid(np.linspace(0, 8, 1000), np.linspace(0, 8, 1500))
 
-    z = linear_vf(np.stack((x,y), axis=2), x_vf)[0]
-   
-    plt.contour(x,y,z)
+    z = linear_vf(np.stack((x,y), axis=2), x_vf)[0] 
+
+    z = z.T
+
+    values_at_P = []
+    for p in range(np.size(P,0)):
+
+        values_at_P.append(linear_vf(P[p,:], x_vf)[0])
+
+    values_at_P.sort()
+
+    plt.contour(x,y,z, levels=values_at_P)
 
     plt.show()
 
