@@ -94,6 +94,7 @@ class OptimizeVF(Problem):
 
         super().__init__(n_var_vf, n_obj=1, n_ieq_constr=n_ieq_c_vf, n_eq_constr=1, xl=xl_vf, xu=xu_vf)
 
+
        
 
     def _evaluate(self, x, out, *args, **kwargs):
@@ -116,6 +117,14 @@ class OptimizeVF(Problem):
             
         ## Equality constraint that keeps sum of x under 1
         out["H"] = OptimizeVF._eqConst(x)
+
+    def buildConstrFunc(self):
+
+        ineq_constr_func = self._buildIneqFunc();
+
+        return lambda x : np.append(ineq_constr_func(x), self._eqConst(x))
+
+
 
     def _buildIneqFunc(self):
 
@@ -155,9 +164,8 @@ class OptimizeVF(Problem):
     def _ineqFunc1D(x, P, vf):
 
         ep = x[-1]
-        pop_size = len(x)
 
-        G = np.ones((pop_size, np.size(P,0)-1))*-99
+        G = np.ones((1, np.size(P,0)-1))*-99
 
         # Pair-wise compare each ranked member of P, seeing if our proposed utility 
         #  function increases monotonically as rank increases

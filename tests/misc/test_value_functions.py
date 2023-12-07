@@ -1,8 +1,8 @@
 import pytest
 from pymoo.algorithms.soo.nonconvex.es import ES
-from pymoo.algorithms.soo.nonconvex.pattern import PatternSearch
-from pymoo.optimize import minimize
-
+from scipy.optimize import minimize as scimin
+from pymoo.optimize import minimize as moomin
+from scipy.optimize import NonlinearConstraint
 from pymoo.util import value_functions as vf
 import numpy as np
 
@@ -351,9 +351,7 @@ def test_eq_const(x, P, ranks, expected_eq_con):
     assert np.all(np.isclose(expected_eq_con, out["H"]))
 
 ## ----------------------------------------------------
-
-test_optimization_in_out = [
-
+test_ga_in_out = [
     (
 
 
@@ -372,8 +370,8 @@ test_optimization_in_out = [
     )
 ]
 
-@pytest.mark.parametrize('P, ranks', test_optimization_in_out)
-def test_optimization(P, ranks): 
+@pytest.mark.parametrize('P, ranks', test_ga_in_out)
+def test_ga(P, ranks): 
 
     linear_vf = vf.linear_vf
 
@@ -381,17 +379,44 @@ def test_optimization(P, ranks):
 
     algorithm = ES()
    
-    res = minimize(vf_prob,
+    res = moomin(vf_prob,
                algorithm,
                ('n_gen', 200),
                seed=1)
 
+## ----------------------------------------------------
 
 
+test_scipy_in_out = [
+    (
 
 
+        # P, or the solutions to the problem we're trying to create a VF for 
+        np.array([[3.6, 3.9], 
+                  [2.5, 4.1],    
+                  [5.5, 2.5],      
+                  [0.5, 5.2],     
+                  [6.9, 1.8]]), 
+         
+
+        # Ranking of the P values, as per the decision maker 
+        [1, 2, 3, 4, 5]
 
 
+    )
+]
 
+@pytest.mark.parametrize('P, ranks', test_scipy_in_out)
+def test_scipy(P, ranks): 
+
+    linear_vf = vf.linear_vf
+
+    vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
+
+    constr = NonlinearConstraint(vf_prob.buildConstrFunc(), [-np.inf, -np.inf, -np.inf, -np.inf, 0], [0, 0, 0 ,0, 0])
+
+    x0 = [0.5, 0.5, 0.5]
+
+    res = scimin(vf_prob._objFunc, x0, constraints= constr)
 
 
