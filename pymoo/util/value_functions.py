@@ -94,9 +94,6 @@ class OptimizeVF(Problem):
 
         super().__init__(n_var_vf, n_obj=1, n_ieq_constr=n_ieq_c_vf, n_eq_constr=1, xl=xl_vf, xu=xu_vf)
 
-
-       
-
     def _evaluate(self, x, out, *args, **kwargs):
 
         ## Objective function: 
@@ -111,37 +108,37 @@ class OptimizeVF(Problem):
         ## Inequality
         # TODO for now, assuming there are no ties in the ranks
 
-        ineq_func = self._build_ineq_constr()
+        ineq_func = self._build_ineq_constr_linear()
 
         out["G"] = ineq_func(x)
             
         ## Equality constraint that keeps sum of x under 1
-        out["H"] = OptimizeVF._eq_constr(x)
+        out["H"] = OptimizeVF._eq_constr_linear(x)
 
-    def build_constr(self):
+    def _build_constr_linear(self):
 
-        ineq_constr_func = self._build_ineq_constr();
+        ineq_constr_func = self._build_ineq_constr_linear();
 
-        return lambda x : np.append(ineq_constr_func(x), self._eq_constr(x))
+        return lambda x : np.append(ineq_constr_func(x), self._eq_constr_linear(x))
 
 
 
-    def _build_ineq_constr(self):
+    def _build_ineq_constr_linear(self):
 
-        ineq_func = lambda x : OptimizeVF._ineq_constr(x, self.P, self.vf)
+        ineq_func = lambda x : OptimizeVF._ineq_constr_linear(x, self.P, self.vf)
 
         return ineq_func
 
     @staticmethod
-    def _ineq_constr(x, P, vf):
+    def _ineq_constr_linear(x, P, vf):
         if len(x.shape) == 1:
-            return OptimizeVF._ineq_constr_1D(x, P, vf)
+            return OptimizeVF._ineq_constr_1D_linear(x, P, vf)
         else: 
-            return OptimizeVF._ineq_constr_2D(x, P, vf)
+            return OptimizeVF._ineq_constr_2D_linear(x, P, vf)
 
 
     @staticmethod
-    def _ineq_constr_2D(x, P, vf):
+    def _ineq_constr_2D_linear(x, P, vf):
 
         ep = np.column_stack([x[:,-1]]) 
         pop_size = np.size(x,0)
@@ -161,7 +158,7 @@ class OptimizeVF(Problem):
 
 
     @staticmethod
-    def _ineq_constr_1D(x, P, vf):
+    def _ineq_constr_1D_linear(x, P, vf):
 
         ep = x[-1]
 
@@ -192,7 +189,7 @@ class OptimizeVF(Problem):
 
     # Constraint that states that the x values must add up to 1
     @staticmethod
-    def _eq_constr(x): 
+    def _eq_constr_linear(x): 
 
         if len(x.shape) == 1:
             eq_cons = sum(x[0:-1]) - 1

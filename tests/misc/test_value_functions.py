@@ -233,7 +233,7 @@ def test_buildIneqFunc(x, P, ranks, expected_ineq_con):
 
     out = {}
 
-    ineqFunc = vf_prob._build_ineq_constr()
+    ineqFunc = vf_prob._build_ineq_constr_linear()
 
     G = ineqFunc(x)
     
@@ -300,8 +300,8 @@ def test_eqConst(x, P, ranks, expected_eq_constr):
 
     vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
 
-    constr = vf_prob._eq_constr(x)
-    #
+    constr = vf_prob._eq_constr_linear(x)
+
     ## Test whether or not the constraint function matches our expected values   
     assert np.all(np.isclose(expected_eq_constr, constr))
 
@@ -421,7 +421,7 @@ def test_scipy(P, ranks):
     lb.append(0)
     ub.append(0)
 
-    constr = NonlinearConstraint(vf_prob.build_constr(), lb, ub)
+    constr = NonlinearConstraint(vf_prob._build_constr_linear(), lb, ub)
 
     x0 = [0.5, 0.5, 0.5]
 

@@ -65,7 +65,7 @@ ub = [0] * (P.shape[0] - 1)
 lb.append(0)
 ub.append(0)
 
-constr = NonlinearConstraint(vf_prob.build_constr(), lb, ub)
+constr = NonlinearConstraint(vf_prob._build_constr_linear(), lb, ub)
 
 x0 = [0.5, 0.5, 0.5]
 
