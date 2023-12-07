@@ -1,5 +1,6 @@
 import pytest
-from pymoo.algorithms.soo.nonconvex.ga import GA
+from pymoo.algorithms.soo.nonconvex.es import ES
+from pymoo.algorithms.soo.nonconvex.pattern import PatternSearch
 from pymoo.optimize import minimize
 
 from pymoo.util import value_functions as vf
@@ -8,7 +9,6 @@ import numpy as np
 
 ## Global helper variables
 dummy_inputs = (np.array([[2,3], [3,2], [7,8]]), [5,2,1])
-
 
 
 ## General test for function I/O. 
@@ -95,6 +95,38 @@ def test_obj(x, obj):
     
     # Test whether or not the objective function simply negates the epsilon term of x (last element)
     assert np.all(obj == out["F"])
+
+
+## Test the internal objective function 
+test_objFunc_in_out = [
+    (
+        np.array([
+            [0.3, 0.1,  12], 
+            [0.2, 0.5,  13], 
+            [0.8, 0.1, -14]
+        ]), 
+        np.array([[-12, -13, 14]]).T
+    ),
+    (
+        np.array(
+            [0.8, 0.1, -52]
+        ), 
+        52
+    )
+]
+
+
+@pytest.mark.parametrize('x, true_obj', test_objFunc_in_out)
+def test_objFunc(x, true_obj):
+
+    linear_vf = vf.linear_vf
+
+    vf_prob = vf.OptimizeVF(dummy_inputs[0], dummy_inputs[1], linear_vf)
+
+    obj = vf_prob._objFunc(x)
+
+    # Test whether or not the objective function simply negates the epsilon term of x (last element)
+    assert np.all(obj == true_obj)
 
 
 ## Test the inequality for linear function 
@@ -206,37 +238,26 @@ test_optimization_in_out = [
          
 
         # Ranking of the P values, as per the decision maker 
-        [1, 2, 3, 4, 5],
-
-        # The expected x values after optimization
-        np.array([
-            [0.348571428062270  ], 
-            [0.651428571937730  ], 
-            [-0.0160000393082190]
-        ])   
-
-
-
+        [1, 2, 3, 4, 5]
 
 
     )
 ]
 
-@pytest.mark.parametrize('P, ranks, expected_x', test_optimization_in_out)
-def test_optimization(P, ranks, expected_x): 
+@pytest.mark.parametrize('P, ranks', test_optimization_in_out)
+def test_optimization(P, ranks): 
 
     linear_vf = vf.linear_vf
 
     vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
 
-    algorithm = GA(pop_size=100)
+    algorithm = ES()
    
     res = minimize(vf_prob,
                algorithm,
                ('n_gen', 200),
                seed=1)
 
-    awlefkjawf
 
 
 

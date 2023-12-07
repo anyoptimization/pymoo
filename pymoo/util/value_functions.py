@@ -99,12 +99,15 @@ class OptimizeVF(Problem):
     def _evaluate(self, x, out, *args, **kwargs):
 
         ## Objective function: 
-        ep = np.column_stack([x[:,-1]])
+        obj = OptimizeVF._objFunc(x)
+
+        # The objective function above returns a negated version of epsilon 
+        ep = -obj
 
         pop_size = np.size(x,0)
 
         # maximize epsilon, or the minimum distance between each contour 
-        out["F"] = OptimizeVF._objFunc(x)
+        out["F"] = obj
 
         ## Inequality
         # TODO for now, assuming there are no ties in the ranks
@@ -127,8 +130,12 @@ class OptimizeVF(Problem):
     @staticmethod
     def _objFunc(x): 
 
-        ep = np.column_stack([x[:,-1]])
-                 
+        # check if x is a 1D array or a 2D array
+        if len(x.shape) == 1:
+            ep = x[-1]
+        else: 
+            ep = np.column_stack([x[:,-1]])
+
         return -ep
 
 
