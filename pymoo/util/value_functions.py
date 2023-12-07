@@ -104,28 +104,44 @@ class OptimizeVF(Problem):
         # The objective function above returns a negated version of epsilon 
         ep = -obj
 
-        pop_size = np.size(x,0)
-
         # maximize epsilon, or the minimum distance between each contour 
         out["F"] = obj
 
         ## Inequality
         # TODO for now, assuming there are no ties in the ranks
 
-        # Pair-wise compare each ranked member of P, seeing if our proposed utility 
-        #  function increases monotonically as rank increases
-        out["G"] = np.ones((pop_size, np.size(self.P,0)-1))*-99
+        ineq_func = self._buildIneqFunc()
 
-        for p in range(np.size(self.P,0) - 1):
-
-           current_P = self.vf(self.P[[p],0:-1], x[:, 0:-1])
-           next_P = self.vf(self.P[[p+1],0:-1], x[:, 0:-1])
-
-           out["G"][:,[p]] = -(current_P - next_P) + ep
-
+        out["G"] = ineq_func(x)
             
         ## Equality constraint that keeps sum of x under 1
         out["H"] = OptimizeVF._eqConst(x)
+
+    def _buildIneqFunc(self):
+
+        ineq_func = lambda x : OptimizeVF._ineqFunc(x, self.P, self.vf)
+
+        return ineq_func
+
+    @staticmethod
+    def _ineqFunc(x, P, vf):
+
+        ep = np.column_stack([x[:,-1]]) 
+
+        pop_size = np.size(x,0)
+
+        G = np.ones((pop_size, np.size(P,0)-1))*-99
+
+        # Pair-wise compare each ranked member of P, seeing if our proposed utility 
+        #  function increases monotonically as rank increases
+        for p in range(np.size(P,0) - 1):
+
+           current_P = vf(P[[p],0:-1], x[:, 0:-1])
+           next_P = vf(P[[p+1],0:-1], x[:, 0:-1])
+
+           G[:,[p]] = -(current_P - next_P) + ep
+
+        return G
 
     @staticmethod
     def _objFunc(x): 
@@ -150,6 +166,6 @@ class OptimizeVF(Problem):
 
         return eq_cons
 
-        
+     
 
 
