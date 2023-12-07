@@ -99,7 +99,7 @@ def test_obj(x, obj):
 
 ## ----------------------------------------------------
 ## Test the internal objective function 
-test_objFunc_in_out = [
+test_obj_func_in_out = [
     (
         np.array([
             [0.3, 0.1,  12], 
@@ -117,14 +117,14 @@ test_objFunc_in_out = [
 ]
 
 
-@pytest.mark.parametrize('x, true_obj', test_objFunc_in_out)
-def test_objFunc(x, true_obj):
+@pytest.mark.parametrize('x, true_obj', test_obj_func_in_out)
+def test_obj_func(x, true_obj):
 
     linear_vf = vf.linear_vf
 
     vf_prob = vf.OptimizeVF(dummy_inputs[0], dummy_inputs[1], linear_vf)
 
-    obj = vf_prob._objFunc(x)
+    obj = vf_prob._obj_func(x)
 
     # Test whether or not the objective function simply negates the epsilon term of x (last element)
     assert np.all(obj == true_obj)
@@ -177,7 +177,7 @@ def test_ineq(x, P, ranks, expected_ineq_con):
     assert np.all(np.isclose(expected_ineq_con, out["G"]))
 
 ## -------------------------------------------------------------------
-test_buildIneqFunc_in_out = [
+test_build_ineq_constr_in_out = [
 
     (
 
@@ -224,7 +224,7 @@ test_buildIneqFunc_in_out = [
 ]
 
 
-@pytest.mark.parametrize('x, P, ranks, expected_ineq_con', test_buildIneqFunc_in_out)
+@pytest.mark.parametrize('x, P, ranks, expected_ineq_con', test_build_ineq_constr_in_out)
 def test_buildIneqFunc(x, P, ranks, expected_ineq_con):
 
     linear_vf = vf.linear_vf
@@ -233,7 +233,7 @@ def test_buildIneqFunc(x, P, ranks, expected_ineq_con):
 
     out = {}
 
-    ineqFunc = vf_prob._buildIneqFunc()
+    ineqFunc = vf_prob._build_ineq_constr()
 
     G = ineqFunc(x)
     
@@ -242,7 +242,7 @@ def test_buildIneqFunc(x, P, ranks, expected_ineq_con):
 
 
 ## -------------------------------------------------------------------
-test_eqConst_in_out = [
+test_eq_constr_in_out = [
 
     (
 
@@ -289,21 +289,21 @@ test_eqConst_in_out = [
 
         # The constraint values, given the x
         0
-    ),
+    )
 ]
 
 
-@pytest.mark.parametrize('x, P, ranks, expected_eqConst', test_eqConst_in_out)
-def test_eqConst(x, P, ranks, expected_eqConst):
+@pytest.mark.parametrize('x, P, ranks, expected_eq_constr', test_eq_constr_in_out)
+def test_eqConst(x, P, ranks, expected_eq_constr):
 
     linear_vf = vf.linear_vf
 
     vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
 
-    constr = vf_prob._eqConst(x)
+    constr = vf_prob._eq_constr(x)
     #
     ## Test whether or not the constraint function matches our expected values   
-    assert np.all(np.isclose(expected_eqConst, constr))
+    assert np.all(np.isclose(expected_eq_constr, constr))
 
 ## ----------------------------------------------------
 test_eq_const_in_out = [
@@ -413,10 +413,21 @@ def test_scipy(P, ranks):
 
     vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
 
-    constr = NonlinearConstraint(vf_prob.buildConstrFunc(), [-np.inf, -np.inf, -np.inf, -np.inf, 0], [0, 0, 0 ,0, 0])
+    # Inequality constraints
+    lb = [-np.inf] * (P.shape[0] - 1)
+    ub = [0] * (P.shape[0] - 1)
+
+    # Equality constraints
+    lb.append(0)
+    ub.append(0)
+
+    constr = NonlinearConstraint(vf_prob.build_constr(), lb, ub)
 
     x0 = [0.5, 0.5, 0.5]
 
-    res = scimin(vf_prob._objFunc, x0, constraints= constr)
+    res = scimin(vf_prob._obj_func, x0, constraints= constr)
+
+
+
 
 

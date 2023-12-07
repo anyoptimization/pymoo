@@ -10,23 +10,23 @@ from pymoo.optimize import minimize
 from pymoo.util import value_functions as vf
 import numpy as np
 
-P = np.array([[3.6, 3.9], 
-              [2.5, 4.1],    
-              [5.5, 2.5],      
-              [0.5, 5.2],     
-              [6.9, 1.8]])
-
-#ranks = [1,2,3,4,5]
-ranks = [1,4,3,5,2]
-
-
-#P = np.array([[4, 4], 
-#              [4, 3], 
-#              [2, 4], 
-#              [4, 1], 
-#              [1, 3]]);
+#P = np.array([[3.6, 3.9], 
+#              [2.5, 4.1],    
+#              [5.5, 2.5],      
+#              [0.5, 5.2],     
+#              [6.9, 1.8]])
 #
 #ranks = [1,2,3,4,5]
+#ranks = [1,4,3,5,2]
+
+
+P = np.array([[4, 4], 
+              [4, 3], 
+              [2, 4], 
+              [4, 1], 
+              [1, 3]]);
+
+ranks = [1,2,3,4,5]
 
 
 
@@ -57,12 +57,19 @@ vf.plot_linear_vf(P, x)
 
 
 ## Scipy solver methods 
+# Inequality constraints
+lb = [-np.inf] * (P.shape[0] - 1)
+ub = [0] * (P.shape[0] - 1)
 
-constr = NonlinearConstraint(vf_prob.buildConstrFunc(), [-np.inf, -np.inf, -np.inf, -np.inf, 0], [0, 0, 0 ,0, 0])
+# Equality constraints
+lb.append(0)
+ub.append(0)
+
+constr = NonlinearConstraint(vf_prob.build_constr(), lb, ub)
 
 x0 = [0.5, 0.5, 0.5]
 
-res = scimin(vf_prob._objFunc, x0, constraints= constr)
+res = scimin(vf_prob._obj_func, x0, constraints= constr)
 
 print("Variables: %s" % res.x[0:-1])
 print("Epsilon: %s" % res.x[-1])

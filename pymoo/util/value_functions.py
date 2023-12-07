@@ -100,7 +100,7 @@ class OptimizeVF(Problem):
     def _evaluate(self, x, out, *args, **kwargs):
 
         ## Objective function: 
-        obj = OptimizeVF._objFunc(x)
+        obj = OptimizeVF._obj_func(x)
 
         # The objective function above returns a negated version of epsilon 
         ep = -obj
@@ -111,37 +111,37 @@ class OptimizeVF(Problem):
         ## Inequality
         # TODO for now, assuming there are no ties in the ranks
 
-        ineq_func = self._buildIneqFunc()
+        ineq_func = self._build_ineq_constr()
 
         out["G"] = ineq_func(x)
             
         ## Equality constraint that keeps sum of x under 1
-        out["H"] = OptimizeVF._eqConst(x)
+        out["H"] = OptimizeVF._eq_constr(x)
 
-    def buildConstrFunc(self):
+    def build_constr(self):
 
-        ineq_constr_func = self._buildIneqFunc();
+        ineq_constr_func = self._build_ineq_constr();
 
-        return lambda x : np.append(ineq_constr_func(x), self._eqConst(x))
+        return lambda x : np.append(ineq_constr_func(x), self._eq_constr(x))
 
 
 
-    def _buildIneqFunc(self):
+    def _build_ineq_constr(self):
 
-        ineq_func = lambda x : OptimizeVF._ineqFunc(x, self.P, self.vf)
+        ineq_func = lambda x : OptimizeVF._ineq_constr(x, self.P, self.vf)
 
         return ineq_func
 
     @staticmethod
-    def _ineqFunc(x, P, vf):
+    def _ineq_constr(x, P, vf):
         if len(x.shape) == 1:
-            return OptimizeVF._ineqFunc1D(x, P, vf)
+            return OptimizeVF._ineq_constr_1D(x, P, vf)
         else: 
-            return OptimizeVF._ineqFunc2D(x, P, vf)
+            return OptimizeVF._ineq_constr_2D(x, P, vf)
 
 
     @staticmethod
-    def _ineqFunc2D(x, P, vf):
+    def _ineq_constr_2D(x, P, vf):
 
         ep = np.column_stack([x[:,-1]]) 
         pop_size = np.size(x,0)
@@ -161,7 +161,7 @@ class OptimizeVF(Problem):
 
 
     @staticmethod
-    def _ineqFunc1D(x, P, vf):
+    def _ineq_constr_1D(x, P, vf):
 
         ep = x[-1]
 
@@ -179,7 +179,7 @@ class OptimizeVF(Problem):
         return G
 
     @staticmethod
-    def _objFunc(x): 
+    def _obj_func(x): 
 
         # check if x is a 1D array or a 2D array
         if len(x.shape) == 1:
@@ -192,7 +192,7 @@ class OptimizeVF(Problem):
 
     # Constraint that states that the x values must add up to 1
     @staticmethod
-    def _eqConst(x): 
+    def _eq_constr(x): 
 
         if len(x.shape) == 1:
             eq_cons = sum(x[0:-1]) - 1
