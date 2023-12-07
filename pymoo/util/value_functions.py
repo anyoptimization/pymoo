@@ -33,8 +33,12 @@ def linear_vf(P, x):
 
     return np.matmul(P, x.T).T
 
-
 def plot_linear_vf(P, x_vf): 
+
+    plot_vf(P, x_vf, linear_vf)
+
+
+def plot_vf(P, x_vf, vf): 
 
     plt.scatter(P[:,0], P[:,1], marker=".", color="red", s=200 )
    
@@ -44,23 +48,20 @@ def plot_linear_vf(P, x_vf):
     # TODO pull 0 and 8 from min/max P 
     x,y = np.meshgrid(np.linspace(0, 8, 1000), np.linspace(0, 8, 1500))
 
-    z = linear_vf(np.stack((x,y), axis=2), x_vf)[0] 
+    z = vf(np.stack((x,y), axis=2), x_vf)[0] 
 
     z = z.T
 
     values_at_P = []
     for p in range(np.size(P,0)):
 
-        values_at_P.append(linear_vf(P[p,:], x_vf)[0])
+        values_at_P.append(vf(P[p,:], x_vf)[0])
 
     values_at_P.sort()
 
     plt.contour(x,y,z, levels=values_at_P)
 
     plt.show()
-
-
-#def scipyMin(P, ranks): 
 
 
 
