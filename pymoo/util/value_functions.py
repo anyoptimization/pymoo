@@ -124,8 +124,8 @@ class OptimizeVF(Problem):
            out["G"][:,[p]] = -(current_P - next_P) + ep
 
             
-        ## Equality
-        out["H"] = np.sum(x[:,0:-1],1, keepdims=True) - 1
+        ## Equality constraint that keeps sum of x under 1
+        out["H"] = OptimizeVF._eqConst(x)
 
     @staticmethod
     def _objFunc(x): 
@@ -139,6 +139,17 @@ class OptimizeVF(Problem):
         return -ep
 
 
+    # Constraint that states that the x values must add up to 1
+    @staticmethod
+    def _eqConst(x): 
 
+        if len(x.shape) == 1:
+            eq_cons = sum(x[0:-1]) - 1
+        else: 
+            eq_cons = np.sum(x[:,0:-1],1, keepdims=True) - 1
+
+        return eq_cons
+
+        
 
 

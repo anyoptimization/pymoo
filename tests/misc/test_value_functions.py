@@ -177,12 +177,75 @@ def test_ineq(x, P, ranks, expected_ineq_con):
     assert np.all(np.isclose(expected_ineq_con, out["G"]))
 
 
-
-test_eq_in_out = [
+test_eqConst_in_out = [
 
     (
 
-        # Linear function values to optimize (x). This is two individuals
+        # Linear function values to optimize (x). This is two individuals in the population 
+        np.array([
+            [0.5,    0.5, 0.5], 
+            [0.3780, 0.6220, 0.2072]
+        ]), 
+
+        # P, or the solutions to the problem we're trying to create a VF for 
+        np.array([[3.6, 3.9], 
+                  [2.5, 4.1],    
+                  [5.5, 2.5],      
+                  [0.5, 5.2],     
+                  [6.9, 1.8]]), 
+         
+
+        # Ranking of the P values, as per the decision maker 
+        [1, 2, 3, 4, 5],
+
+        # The constraint values, given the x
+        np.array([
+            [0], 
+            [0]
+        ])
+    ),
+    (
+
+        # Linear function values to optimize (x). This is two individuals in the population 
+        np.array(
+            [0.3780, 0.6220, 0.2072]
+        ), 
+
+        # P, or the solutions to the problem we're trying to create a VF for 
+        np.array([[3.6, 3.9], 
+                  [2.5, 4.1],    
+                  [5.5, 2.5],      
+                  [0.5, 5.2],     
+                  [6.9, 1.8]]), 
+         
+
+        # Ranking of the P values, as per the decision maker 
+        [1, 2, 3, 4, 5],
+
+        # The constraint values, given the x
+        0
+    ),
+]
+
+
+@pytest.mark.parametrize('x, P, ranks, expected_eqConst', test_eqConst_in_out)
+def test_eqConst(x, P, ranks, expected_eqConst):
+
+    linear_vf = vf.linear_vf
+
+    vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
+
+    constr = vf_prob._eqConst(x)
+    #
+    ## Test whether or not the constraint function matches our expected values   
+    assert np.all(np.isclose(expected_eqConst, constr))
+
+
+test_eq_const_in_out = [
+
+    (
+
+        # Linear function values to optimize (x). This is two individuals in the population 
         np.array([
             [0.5,    0.5, 0.5], 
             [0.3780, 0.6220, 0.2072]
@@ -208,8 +271,8 @@ test_eq_in_out = [
 ]
 
 
-@pytest.mark.parametrize('x, P, ranks, expected_eq_con', test_eq_in_out)
-def test_eq(x, P, ranks, expected_eq_con):
+@pytest.mark.parametrize('x, P, ranks, expected_eq_con', test_eq_const_in_out)
+def test_eq_const(x, P, ranks, expected_eq_con):
 
     linear_vf = vf.linear_vf
 
@@ -221,6 +284,7 @@ def test_eq(x, P, ranks, expected_eq_con):
     
     # Test whether or not the constraint function matches our expected values   
     assert np.all(np.isclose(expected_eq_con, out["H"]))
+
 
 
 
