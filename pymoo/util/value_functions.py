@@ -125,9 +125,16 @@ class OptimizeVF(Problem):
 
     @staticmethod
     def _ineqFunc(x, P, vf):
+        if len(x.shape) == 1:
+            return OptimizeVF._ineqFunc1D(x, P, vf)
+        else: 
+            return OptimizeVF._ineqFunc2D(x, P, vf)
+
+
+    @staticmethod
+    def _ineqFunc2D(x, P, vf):
 
         ep = np.column_stack([x[:,-1]]) 
-
         pop_size = np.size(x,0)
 
         G = np.ones((pop_size, np.size(P,0)-1))*-99
@@ -138,6 +145,26 @@ class OptimizeVF(Problem):
 
            current_P = vf(P[[p],0:-1], x[:, 0:-1])
            next_P = vf(P[[p+1],0:-1], x[:, 0:-1])
+
+           G[:,[p]] = -(current_P - next_P) + ep
+
+        return G
+
+
+    @staticmethod
+    def _ineqFunc1D(x, P, vf):
+
+        ep = x[-1]
+        pop_size = len(x)
+
+        G = np.ones((pop_size, np.size(P,0)-1))*-99
+
+        # Pair-wise compare each ranked member of P, seeing if our proposed utility 
+        #  function increases monotonically as rank increases
+        for p in range(np.size(P,0) - 1):
+
+           current_P = vf(P[[p],0:-1], x[0:-1])
+           next_P = vf(P[[p+1],0:-1], x[0:-1])
 
            G[:,[p]] = -(current_P - next_P) + ep
 
