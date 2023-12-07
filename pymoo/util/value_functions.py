@@ -35,7 +35,6 @@ def linear_vf(P, x):
 
 
 def plot_linear_vf(P, x_vf): 
-   
 
     plt.scatter(P[:,0], P[:,1], marker=".", color="red", s=200 )
    
@@ -59,6 +58,11 @@ def plot_linear_vf(P, x_vf):
     plt.contour(x,y,z, levels=values_at_P)
 
     plt.show()
+
+
+#def scipyMin(P, ranks): 
+
+
 
 
 class OptimizeVF(Problem): 
@@ -100,7 +104,7 @@ class OptimizeVF(Problem):
         pop_size = np.size(x,0)
 
         # maximize epsilon, or the minimum distance between each contour 
-        out["F"] = -ep
+        out["F"] = OptimizeVF._objFunc(x)
 
         ## Inequality
         # TODO for now, assuming there are no ties in the ranks
@@ -119,5 +123,15 @@ class OptimizeVF(Problem):
             
         ## Equality
         out["H"] = np.sum(x[:,0:-1],1, keepdims=True) - 1
+
+    @staticmethod
+    def _objFunc(x): 
+
+        ep = np.column_stack([x[:,-1]])
+                 
+        return -ep
+
+
+
 
 
