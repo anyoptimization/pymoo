@@ -3,6 +3,8 @@ from pymoo.algorithms.soo.nonconvex.de import DE
 from pymoo.algorithms.soo.nonconvex.es import ES
 from pymoo.algorithms.soo.nonconvex.nelder import NelderMead
 from pymoo.algorithms.soo.nonconvex.pattern import PatternSearch
+from scipy.optimize import NonlinearConstraint
+from scipy.optimize import minimize as scimin
 from pymoo.optimize import minimize
 
 from pymoo.util import value_functions as vf
@@ -32,6 +34,9 @@ linear_vf = vf.linear_vf
 
 vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
 
+
+## Evolutionary approach: 
+
 #algorithm = GA(pop_size=100)
 #algorithm = PatternSearch(pop_size=100)
 #algorithm = DE(pop_size=100)
@@ -49,6 +54,22 @@ x = np.reshape(res.X[0:-1], (1, -1))
 
 vf.plot_linear_vf(P, x)
 
+
+
+## Scipy solver methods 
+
+constr = NonlinearConstraint(vf_prob.buildConstrFunc(), [-np.inf, -np.inf, -np.inf, -np.inf, 0], [0, 0, 0 ,0, 0])
+
+x0 = [0.5, 0.5, 0.5]
+
+res = scimin(vf_prob._objFunc, x0, constraints= constr)
+
+print("Variables: %s" % res.x[0:-1])
+print("Epsilon: %s" % res.x[-1])
+
+x = np.reshape(res.x[0:-1], (1, -1))
+
+vf.plot_linear_vf(P, x)
 
 
 
