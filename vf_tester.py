@@ -10,23 +10,23 @@ from pymoo.optimize import minimize
 from pymoo.util import value_functions as vf
 import numpy as np
 
-#P = np.array([[3.6, 3.9], 
-#              [2.5, 4.1],    
-#              [5.5, 2.5],      
-#              [0.5, 5.2],     
-#              [6.9, 1.8]])
+P = np.array([[3.6, 3.9], 
+              [2.5, 4.1],    
+              [5.5, 2.5],      
+              [0.5, 5.2],     
+              [6.9, 1.8]])
+
+#ranks = [1,2,3,4,5]
+ranks = [1,4,3,5,2]
+
+
+#P = np.array([[4, 4], 
+#              [4, 3], 
+#              [2, 4], 
+#              [4, 1], 
+#              [1, 3]]);
 #
 #ranks = [1,2,3,4,5]
-#ranks = [1,4,3,5,2]
-
-
-P = np.array([[4, 4], 
-              [4, 3], 
-              [2, 4], 
-              [4, 1], 
-              [1, 3]]);
-
-ranks = [1,2,3,4,5]
 
 
 
@@ -65,7 +65,8 @@ ub = [0] * (P.shape[0] - 1)
 lb.append(0)
 ub.append(0)
 
-constr = NonlinearConstraint(vf._build_constr_linear(P, vf.linear_vf), lb, ub)
+P_sorted = vf._sort_P(P, ranks)
+constr = NonlinearConstraint(vf._build_constr_linear(P_sorted, vf.linear_vf), lb, ub)
 
 x0 = [0.5, 0.5, 0.5]
 
@@ -76,7 +77,7 @@ print("Epsilon: %s" % res.x[-1])
 
 x = np.reshape(res.x[0:-1], (1, -1))
 
-vf.plot_linear_vf(P, x)
+vf.plot_linear_vf(P_sorted, x)
 
 
 

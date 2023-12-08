@@ -46,16 +46,11 @@ def test_prob_const(P, rankings, output):
     vf_prob = vf.OptimizeVF(P, rankings, linear_vf)
 
     ## Test whether the solutions are ranked by ranking 
-    ranks_from_prob = vf_prob.P[:, -1]
-    P_from_prob = vf_prob.P[:, 0:-1]
-
-    rankings.sort()
+    P_from_prob = vf_prob.P
 
     # Check the solutions 
     assert np.all(output == P_from_prob)
 
-    # Check the ranks
-    assert ranks_from_prob.tolist() == rankings
    
 
 ## TODO test the constructor with partial ordering 
@@ -234,7 +229,7 @@ def test_build_ineq_constr(x, P, ranks, expected_ineq_con):
     out = {}
 
     ineqFunc = vf._build_ineq_constr_linear(P, vf.linear_vf)
-
+    
     G = ineqFunc(x)
     
     # Test whether or not the constraint function matches our expected values   
@@ -421,11 +416,13 @@ def test_scipy(P, ranks):
     lb.append(0)
     ub.append(0)
 
-    constr = NonlinearConstraint(vf_prob._build_constr_linear(), lb, ub)
+    P_sorted = vf._sort_P(P, ranks)
+
+    constr = NonlinearConstraint(vf._build_constr_linear(P_sorted, vf.linear_vf), lb, ub)
 
     x0 = [0.5, 0.5, 0.5]
 
-    res = scimin(vf_prob._obj_func, x0, constraints= constr)
+    res = scimin(vf._obj_func, x0, constraints= constr)
 
 
 

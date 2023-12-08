@@ -89,10 +89,10 @@ def _ineq_constr_2D_linear(x, P, vf):
     #  function increases monotonically as rank increases
     for p in range(np.size(P,0) - 1):
 
-       current_P = vf(P[[p],0:-1], x[:, 0:-1])
-       next_P = vf(P[[p+1],0:-1], x[:, 0:-1])
+        current_P = vf(P[[p],:], x[:, 0:-1])
+        next_P = vf(P[[p+1],:], x[:, 0:-1])
 
-       G[:,[p]] = -(current_P - next_P) + ep
+        G[:,[p]] = -(current_P - next_P) + ep
 
     return G
 
@@ -107,10 +107,10 @@ def _ineq_constr_1D_linear(x, P, vf):
     #  function increases monotonically as rank increases
     for p in range(np.size(P,0) - 1):
 
-       current_P = vf(P[[p],0:-1], x[0:-1])
-       next_P = vf(P[[p+1],0:-1], x[0:-1])
+        current_P = vf(P[[p],:], x[0:-1])
+        next_P = vf(P[[p+1],:], x[0:-1])
 
-       G[:,[p]] = -(current_P - next_P) + ep
+        G[:,[p]] = -(current_P - next_P) + ep
 
     return G
 
@@ -124,6 +124,13 @@ def _obj_func(x):
 
     return -ep
 
+def _sort_P(P, ranks): 
+    P_with_rank = np.hstack((P, np.array([ranks]).T))
+
+    P_sorted = P[P_with_rank[:, -1].argsort()]
+
+    return P_sorted
+
 
 # Constraint that states that the x values must add up to 1
 def _eq_constr_linear(x): 
@@ -134,9 +141,6 @@ def _eq_constr_linear(x):
         eq_cons = np.sum(x[:,0:-1],1, keepdims=True) - 1
 
     return eq_cons
-
- 
-
 
 
 class OptimizeVF(Problem): 
@@ -158,11 +162,7 @@ class OptimizeVF(Problem):
 
         # TODO start everything at 0.5
 
-        # Add the rankings onto our objectives 
-        self.P = np.hstack((P, np.array([ranks]).T))
-
-        # Sort P by rankings in the last column
-        self.P = self.P[self.P[:, -1].argsort()]
+        self.P = _sort_P(P, ranks)
 
         self.vf = vf
 
