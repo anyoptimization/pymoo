@@ -1,10 +1,11 @@
 import numpy as np
-
+from pymoo.optimize import minimize as moomin
+from scipy.optimize import minimize as scimin
 from pymoo.core.problem import Problem
 import pymoo.algorithms.soo.nonconvex.ga
 import matplotlib.pyplot as plt
-
-
+from scipy.optimize import NonlinearConstraint
+from pymoo.algorithms.soo.nonconvex.es import ES
 # Notes: 
 # I'm using the suffix _vf to denote variables used in the value-function optimization 
 # This is to avoid confuse it with variables being optimized in the main function 
@@ -13,14 +14,62 @@ import matplotlib.pyplot as plt
 # Input 2: The ranking of the given non-dominated points 
 # Input 3: constraint function for optimizing the value func
 # Input 4: the skeleton utility function that we're trying to optimize
-def create_vf(P, ranks, ineq_constr, eq_constr, vf, algorithm="scimin"): 
+def create_vf(P, ranks, ineq_constr, vf="linear", algorithm="scimin"): 
+
+    if vf == "linear":
+        return create_linear_vf(P, ranks, algorithm)
+    else:
+        raise ValueError("Value function '%d' not supported." % vf) 
+    
 
     return lambda f_new:  np.sum(f_new)
 
 
 def create_linear_vf(P, ranks, algorithm="scimin"): 
+    
+    if algorithm == "scimin": 
+        return create_vf_scipy(P, ranks, linear_vf)
+    elif algorithm == "ES": 
+        return create_vf_pymoo(P, ranks, linear_vf)
+    else: 
+        raise ValueError("Algorithm %s not supported" % algorithm) 
 
-    return lambda f_new:  np.sum(f_new)
+
+
+def create_vf_scipy(P, ranks, vf): 
+
+    # Inequality constraints
+    lb = [-np.inf] * (P.shape[0] - 1)
+    ub = [0] * (P.shape[0] - 1)
+
+    # Equality constraints
+    lb.append(0)
+    ub.append(0)
+
+    P_sorted = _sort_P(P, ranks)
+
+    constr = NonlinearConstraint(_build_constr_linear(P_sorted, linear_vf), lb, ub)
+
+    x0 = [0.5, 0.5, 0.5]
+
+    res = scimin(_obj_func, x0, constraints= constr)
+
+    return lambda P_in: vf(P_in, res.x[0:-1])
+        
+
+def create_vf_pymoo(P, ranks, vf): 
+
+    vf_prob = OptimizeVF(P, ranks, linear_vf)
+
+    algorithm = ES()
+
+    res = moomin(vf_prob,
+        algorithm,
+        ('n_gen', 200),
+        seed=1)
+
+    return lambda P_in: vf(P_in, res.X[0:-1])
+
 
 def linear_vf(P, x): 
 

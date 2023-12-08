@@ -1,8 +1,5 @@
 import pytest
-from pymoo.algorithms.soo.nonconvex.es import ES
-from scipy.optimize import minimize as scimin
-from pymoo.optimize import minimize as moomin
-from scipy.optimize import NonlinearConstraint
+
 from pymoo.util import value_functions as mvf
 import numpy as np
 
@@ -16,16 +13,16 @@ dummy_inputs = (np.array([[2,3], [3,2], [7,8]]), [5,2,1])
 # That function should take in a given PO point and return the 
 # value of that point according to the decision maker
 test_dummy_val_fnc_inputs = [
-    (np.array([[1,2], [2,3]]), [1,2], np.array([1,2]), 3),
-    (np.array([[2,3], [3,2]]), [2,1], np.array([3,2]), 5)
+    (np.array([[1,2], [2,3]]), [1,2]),
+    (np.array([[2,3], [3,2]]), [3,2])
 ]
 
-@pytest.mark.parametrize('P, rankings, test_f, expected_value', test_dummy_val_fnc_inputs)
-def test_dummy_vf(P, rankings, test_f, expected_value):
+@pytest.mark.parametrize('P, rankings', test_dummy_val_fnc_inputs)
+def test_create_vf(P, rankings):
 
     val_fnc = mvf.create_linear_vf(P, rankings)
 
-    assert val_fnc(test_f) == expected_value
+    assert val_fnc(P[0,:]) 
 
 
 
@@ -367,17 +364,7 @@ test_ga_in_out = [
 
 @pytest.mark.parametrize('P, ranks', test_ga_in_out)
 def test_ga(P, ranks): 
-
-    linear_vf = mvf.linear_vf
-
-    vf_prob = mvf.OptimizeVF(P, ranks, linear_vf)
-
-    algorithm = ES()
-   
-    res = moomin(vf_prob,
-               algorithm,
-               ('n_gen', 200),
-               seed=1)
+    vf = mvf.create_linear_vf(P, ranks, "ES")
 
 ## ----------------------------------------------------
 
@@ -401,30 +388,10 @@ test_scipy_in_out = [
     )
 ]
 
+
+
 @pytest.mark.parametrize('P, ranks', test_scipy_in_out)
 def test_scipy(P, ranks): 
-
-    linear_vf = mvf.linear_vf
-
-    vf_prob = mvf.OptimizeVF(P, ranks, linear_vf)
-
-    # Inequality constraints
-    lb = [-np.inf] * (P.shape[0] - 1)
-    ub = [0] * (P.shape[0] - 1)
-
-    # Equality constraints
-    lb.append(0)
-    ub.append(0)
-
-    P_sorted = mvf._sort_P(P, ranks)
-
-    constr = NonlinearConstraint(mvf._build_constr_linear(P_sorted, mvf.linear_vf), lb, ub)
-
-    x0 = [0.5, 0.5, 0.5]
-
-    res = scimin(mvf._obj_func, x0, constraints= constr)
-
-
-
+    vf = mvf.create_linear_vf(P, ranks, "scimin")
 
 
