@@ -124,7 +124,7 @@ def test_obj_func(x, true_obj):
 
     vf_prob = vf.OptimizeVF(dummy_inputs[0], dummy_inputs[1], linear_vf)
 
-    obj = vf_prob._obj_func(x)
+    obj = vf._obj_func(x)
 
     # Test whether or not the objective function simply negates the epsilon term of x (last element)
     assert np.all(obj == true_obj)
@@ -225,7 +225,7 @@ test_build_ineq_constr_in_out = [
 
 
 @pytest.mark.parametrize('x, P, ranks, expected_ineq_con', test_build_ineq_constr_in_out)
-def test_buildIneqFunc(x, P, ranks, expected_ineq_con):
+def test_build_ineq_constr(x, P, ranks, expected_ineq_con):
 
     linear_vf = vf.linear_vf
 
@@ -233,7 +233,7 @@ def test_buildIneqFunc(x, P, ranks, expected_ineq_con):
 
     out = {}
 
-    ineqFunc = vf_prob._build_ineq_constr_linear()
+    ineqFunc = vf._build_ineq_constr_linear(P, vf.linear_vf)
 
     G = ineqFunc(x)
     
@@ -294,7 +294,7 @@ test_eq_constr_in_out = [
 
 
 @pytest.mark.parametrize('x, P, ranks, expected_eq_constr', test_eq_constr_in_out)
-def test_eqConst(x, P, ranks, expected_eq_constr):
+def test_eq_const(x, P, ranks, expected_eq_constr):
 
     linear_vf = vf.linear_vf
 

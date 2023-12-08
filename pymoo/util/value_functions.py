@@ -13,21 +13,14 @@ import matplotlib.pyplot as plt
 # Input 2: The ranking of the given non-dominated points 
 # Input 3: constraint function for optimizing the value func
 # Input 4: the skeleton utility function that we're trying to optimize
-def create_vf(P, ranks, cFunc, utilFunc): 
-
-    # Combine rankings and objective functions into one matrix 
-    # The first O columns are the objective values, and the O + 1 column is the ranking
-
-    X = np.hstack((P, np.array([ranks]).T))
+def create_vf(P, ranks, ineq_constr, eq_constr, vf, algorithm="scimin"): 
 
     return lambda f_new:  np.sum(f_new)
 
 
-
-def create_linear_vf(P, ranks): 
+def create_linear_vf(P, ranks, algorithm="scimin"): 
 
     return lambda f_new:  np.sum(f_new)
-
 
 def linear_vf(P, x): 
 
@@ -65,6 +58,86 @@ def plot_vf(P, x_vf, vf):
 
 
 
+def _build_ineq_constr_linear(P, vf):
+
+    ineq_func = lambda x : _ineq_constr_linear(x, P, vf)
+
+    return ineq_func
+
+def _build_constr_linear(P, vf):
+
+    ineq_constr_func = _build_ineq_constr_linear(P, vf);
+
+    return lambda x : np.append(ineq_constr_func(x), _eq_constr_linear(x))
+
+
+def _ineq_constr_linear(x, P, vf):
+    if len(x.shape) == 1:
+        return _ineq_constr_1D_linear(x, P, vf)
+    else: 
+        return _ineq_constr_2D_linear(x, P, vf)
+
+
+def _ineq_constr_2D_linear(x, P, vf):
+
+    ep = np.column_stack([x[:,-1]]) 
+    pop_size = np.size(x,0)
+
+    G = np.ones((pop_size, np.size(P,0)-1))*-99
+
+    # Pair-wise compare each ranked member of P, seeing if our proposed utility 
+    #  function increases monotonically as rank increases
+    for p in range(np.size(P,0) - 1):
+
+       current_P = vf(P[[p],0:-1], x[:, 0:-1])
+       next_P = vf(P[[p+1],0:-1], x[:, 0:-1])
+
+       G[:,[p]] = -(current_P - next_P) + ep
+
+    return G
+
+
+def _ineq_constr_1D_linear(x, P, vf):
+
+    ep = x[-1]
+
+    G = np.ones((1, np.size(P,0)-1))*-99
+
+    # Pair-wise compare each ranked member of P, seeing if our proposed utility 
+    #  function increases monotonically as rank increases
+    for p in range(np.size(P,0) - 1):
+
+       current_P = vf(P[[p],0:-1], x[0:-1])
+       next_P = vf(P[[p+1],0:-1], x[0:-1])
+
+       G[:,[p]] = -(current_P - next_P) + ep
+
+    return G
+
+def _obj_func(x): 
+
+    # check if x is a 1D array or a 2D array
+    if len(x.shape) == 1:
+        ep = x[-1]
+    else: 
+        ep = np.column_stack([x[:,-1]])
+
+    return -ep
+
+
+# Constraint that states that the x values must add up to 1
+def _eq_constr_linear(x): 
+
+    if len(x.shape) == 1:
+        eq_cons = sum(x[0:-1]) - 1
+    else: 
+        eq_cons = np.sum(x[:,0:-1],1, keepdims=True) - 1
+
+    return eq_cons
+
+ 
+
+
 
 class OptimizeVF(Problem): 
 
@@ -98,7 +171,7 @@ class OptimizeVF(Problem):
     def _evaluate(self, x, out, *args, **kwargs):
 
         ## Objective function: 
-        obj = OptimizeVF._obj_func(x)
+        obj = _obj_func(x)
 
         # The objective function above returns a negated version of epsilon 
         ep = -obj
@@ -109,96 +182,15 @@ class OptimizeVF(Problem):
         ## Inequality
         # TODO for now, assuming there are no ties in the ranks
 
-        ineq_func = self._build_ineq_constr_linear()
+        ineq_func = _build_ineq_constr_linear(self.P, self.vf)
 
         out["G"] = ineq_func(x)
             
         ## Equality constraint that keeps sum of x under 1
-        out["H"] = OptimizeVF._eq_constr_linear(x)
-
-    def _build_constr_linear(self):
-
-        ineq_constr_func = self._build_ineq_constr_linear();
-
-        return lambda x : np.append(ineq_constr_func(x), self._eq_constr_linear(x))
+        out["H"] = _eq_constr_linear(x)
 
 
 
-    def _build_ineq_constr_linear(self):
 
-        ineq_func = lambda x : OptimizeVF._ineq_constr_linear(x, self.P, self.vf)
-
-        return ineq_func
-
-    @staticmethod
-    def _ineq_constr_linear(x, P, vf):
-        if len(x.shape) == 1:
-            return OptimizeVF._ineq_constr_1D_linear(x, P, vf)
-        else: 
-            return OptimizeVF._ineq_constr_2D_linear(x, P, vf)
-
-
-    @staticmethod
-    def _ineq_constr_2D_linear(x, P, vf):
-
-        ep = np.column_stack([x[:,-1]]) 
-        pop_size = np.size(x,0)
-
-        G = np.ones((pop_size, np.size(P,0)-1))*-99
-
-        # Pair-wise compare each ranked member of P, seeing if our proposed utility 
-        #  function increases monotonically as rank increases
-        for p in range(np.size(P,0) - 1):
-
-           current_P = vf(P[[p],0:-1], x[:, 0:-1])
-           next_P = vf(P[[p+1],0:-1], x[:, 0:-1])
-
-           G[:,[p]] = -(current_P - next_P) + ep
-
-        return G
-
-
-    @staticmethod
-    def _ineq_constr_1D_linear(x, P, vf):
-
-        ep = x[-1]
-
-        G = np.ones((1, np.size(P,0)-1))*-99
-
-        # Pair-wise compare each ranked member of P, seeing if our proposed utility 
-        #  function increases monotonically as rank increases
-        for p in range(np.size(P,0) - 1):
-
-           current_P = vf(P[[p],0:-1], x[0:-1])
-           next_P = vf(P[[p+1],0:-1], x[0:-1])
-
-           G[:,[p]] = -(current_P - next_P) + ep
-
-        return G
-
-    @staticmethod
-    def _obj_func(x): 
-
-        # check if x is a 1D array or a 2D array
-        if len(x.shape) == 1:
-            ep = x[-1]
-        else: 
-            ep = np.column_stack([x[:,-1]])
-
-        return -ep
-
-
-    # Constraint that states that the x values must add up to 1
-    @staticmethod
-    def _eq_constr_linear(x): 
-
-        if len(x.shape) == 1:
-            eq_cons = sum(x[0:-1]) - 1
-        else: 
-            eq_cons = np.sum(x[:,0:-1],1, keepdims=True) - 1
-
-        return eq_cons
-
-     
 
 

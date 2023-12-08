@@ -65,11 +65,11 @@ ub = [0] * (P.shape[0] - 1)
 lb.append(0)
 ub.append(0)
 
-constr = NonlinearConstraint(vf_prob._build_constr_linear(), lb, ub)
+constr = NonlinearConstraint(vf._build_constr_linear(P, vf.linear_vf), lb, ub)
 
 x0 = [0.5, 0.5, 0.5]
 
-res = scimin(vf_prob._obj_func, x0, constraints= constr)
+res = scimin(vf._obj_func, x0, constraints= constr)
 
 print("Variables: %s" % res.x[0:-1])
 print("Epsilon: %s" % res.x[-1])
