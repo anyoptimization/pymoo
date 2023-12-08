@@ -3,7 +3,7 @@ from pymoo.algorithms.soo.nonconvex.es import ES
 from scipy.optimize import minimize as scimin
 from pymoo.optimize import minimize as moomin
 from scipy.optimize import NonlinearConstraint
-from pymoo.util import value_functions as vf
+from pymoo.util import value_functions as mvf
 import numpy as np
 
 
@@ -23,7 +23,7 @@ test_dummy_val_fnc_inputs = [
 @pytest.mark.parametrize('P, rankings, test_f, expected_value', test_dummy_val_fnc_inputs)
 def test_dummy_vf(P, rankings, test_f, expected_value):
 
-    val_fnc = vf.create_linear_vf(P, rankings)
+    val_fnc = mvf.create_linear_vf(P, rankings)
 
     assert val_fnc(test_f) == expected_value
 
@@ -41,9 +41,9 @@ test_test_prob_const_in_out = [
 @pytest.mark.parametrize('P, rankings, output', test_test_prob_const_in_out)
 def test_prob_const(P, rankings, output):
 
-    linear_vf = vf.linear_vf
+    linear_vf = mvf.linear_vf
 
-    vf_prob = vf.OptimizeVF(P, rankings, linear_vf)
+    vf_prob = mvf.OptimizeVF(P, rankings, linear_vf)
 
     ## Test whether the solutions are ranked by ranking 
     P_from_prob = vf_prob.P
@@ -81,9 +81,9 @@ test_obj_in_out = [
 @pytest.mark.parametrize('x, obj', test_obj_in_out)
 def test_obj(x, obj):
 
-    linear_vf = vf.linear_vf
+    linear_vf = mvf.linear_vf
 
-    vf_prob = vf.OptimizeVF(dummy_inputs[0], dummy_inputs[1], linear_vf)
+    vf_prob = mvf.OptimizeVF(dummy_inputs[0], dummy_inputs[1], linear_vf)
 
     out = {}
 
@@ -115,11 +115,11 @@ test_obj_func_in_out = [
 @pytest.mark.parametrize('x, true_obj', test_obj_func_in_out)
 def test_obj_func(x, true_obj):
 
-    linear_vf = vf.linear_vf
+    linear_vf = mvf.linear_vf
 
-    vf_prob = vf.OptimizeVF(dummy_inputs[0], dummy_inputs[1], linear_vf)
+    vf_prob = mvf.OptimizeVF(dummy_inputs[0], dummy_inputs[1], linear_vf)
 
-    obj = vf._obj_func(x)
+    obj = mvf._obj_func(x)
 
     # Test whether or not the objective function simply negates the epsilon term of x (last element)
     assert np.all(obj == true_obj)
@@ -160,9 +160,9 @@ test_ineq_in_out = [
 @pytest.mark.parametrize('x, P, ranks, expected_ineq_con', test_ineq_in_out)
 def test_ineq(x, P, ranks, expected_ineq_con):
 
-    linear_vf = vf.linear_vf
+    linear_vf = mvf.linear_vf
 
-    vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
+    vf_prob = mvf.OptimizeVF(P, ranks, linear_vf)
 
     out = {}
 
@@ -222,13 +222,13 @@ test_build_ineq_constr_in_out = [
 @pytest.mark.parametrize('x, P, ranks, expected_ineq_con', test_build_ineq_constr_in_out)
 def test_build_ineq_constr(x, P, ranks, expected_ineq_con):
 
-    linear_vf = vf.linear_vf
+    linear_vf = mvf.linear_vf
 
-    vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
+    vf_prob = mvf.OptimizeVF(P, ranks, linear_vf)
 
     out = {}
 
-    ineqFunc = vf._build_ineq_constr_linear(P, vf.linear_vf)
+    ineqFunc = mvf._build_ineq_constr_linear(P, mvf.linear_vf)
     
     G = ineqFunc(x)
     
@@ -291,9 +291,9 @@ test_eq_constr_in_out = [
 @pytest.mark.parametrize('x, P, ranks, expected_eq_constr', test_eq_constr_in_out)
 def test_eq_const(x, P, ranks, expected_eq_constr):
 
-    linear_vf = vf.linear_vf
+    linear_vf = mvf.linear_vf
 
-    vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
+    vf_prob = mvf.OptimizeVF(P, ranks, linear_vf)
 
     constr = vf_prob._eq_constr_linear(x)
 
@@ -334,9 +334,9 @@ test_eq_const_in_out = [
 @pytest.mark.parametrize('x, P, ranks, expected_eq_con', test_eq_const_in_out)
 def test_eq_const(x, P, ranks, expected_eq_con):
 
-    linear_vf = vf.linear_vf
+    linear_vf = mvf.linear_vf
 
-    vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
+    vf_prob = mvf.OptimizeVF(P, ranks, linear_vf)
 
     out = {}
 
@@ -368,9 +368,9 @@ test_ga_in_out = [
 @pytest.mark.parametrize('P, ranks', test_ga_in_out)
 def test_ga(P, ranks): 
 
-    linear_vf = vf.linear_vf
+    linear_vf = mvf.linear_vf
 
-    vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
+    vf_prob = mvf.OptimizeVF(P, ranks, linear_vf)
 
     algorithm = ES()
    
@@ -404,9 +404,9 @@ test_scipy_in_out = [
 @pytest.mark.parametrize('P, ranks', test_scipy_in_out)
 def test_scipy(P, ranks): 
 
-    linear_vf = vf.linear_vf
+    linear_vf = mvf.linear_vf
 
-    vf_prob = vf.OptimizeVF(P, ranks, linear_vf)
+    vf_prob = mvf.OptimizeVF(P, ranks, linear_vf)
 
     # Inequality constraints
     lb = [-np.inf] * (P.shape[0] - 1)
@@ -416,13 +416,13 @@ def test_scipy(P, ranks):
     lb.append(0)
     ub.append(0)
 
-    P_sorted = vf._sort_P(P, ranks)
+    P_sorted = mvf._sort_P(P, ranks)
 
-    constr = NonlinearConstraint(vf._build_constr_linear(P_sorted, vf.linear_vf), lb, ub)
+    constr = NonlinearConstraint(mvf._build_constr_linear(P_sorted, mvf.linear_vf), lb, ub)
 
     x0 = [0.5, 0.5, 0.5]
 
-    res = scimin(vf._obj_func, x0, constraints= constr)
+    res = scimin(mvf._obj_func, x0, constraints= constr)
 
 
 
