@@ -8,12 +8,26 @@ Adapted from https://github.com/rsenwar/Non-Dominated-Sorting-Algorithms/tree/ma
 """
 
 
+from typing import Literal, List
 import numpy as np
 
 
 def construct_comp_matrix(vec: np.ndarray, sorted_idx: np.ndarray) -> np.ndarray:
     """
-    const_comp_mat construct the comparison matrix from a row-vector w.
+    const_comp_mat construct the comparison matrix from a row-vector vec.
+
+    Parameters
+    ----------
+    vec : np.ndarray
+        The vector of scores for the population on a single objective
+    sorted_idx : np.ndarray
+        The indices which would sort `vec`
+
+    Returns
+    -------
+    np.ndarray
+        The comparison matrix indicating whether each member in the population dominates the other member for the
+        objective in `vec`
     """
     n = vec.shape[0]
     c = np.zeros(shape=(n, n), dtype=np.int32)
@@ -53,7 +67,7 @@ def construct_domination_matrix(f_scores: np.ndarray, **kwargs) -> np.ndarray:
     return d
 
 
-def dda_ns(f_scores: np.ndarray, **kwargs) -> list[list[int]]:
+def dda_ns(f_scores: np.ndarray, **kwargs) -> List[List[int]]:
     """
     dda_ns runs the DDA-NS algorithm.
 
@@ -64,7 +78,7 @@ def dda_ns(f_scores: np.ndarray, **kwargs) -> list[list[int]]:
 
     Returns
     -------
-    list[list[int]]
+    List[List[int]]
         A list of members of each Pareto front. The index in the outer most list corresponds to the level in the Pareto front
         while the value in the inner-most list is the id of the member of the population belonging to that front.
     """
@@ -85,10 +99,23 @@ def dda_ns(f_scores: np.ndarray, **kwargs) -> list[list[int]]:
     return fronts
 
 
-def dda_ens(f_scores: np.ndarray, **kwargs) -> list[list[int]]:
+def dda_ens(f_scores: np.ndarray, **kwargs) -> List[List[int]]:
+    """
+    dda_ens runs the DDA-ENS (efficient DDA) algorithm
+
+    Parameters
+    ----------
+    f_scores : np.ndarray
+        The N x M matrix of N (population size) objective function values for M objectives
+
+    Returns
+    -------
+    List[List[int]]
+        an N x M matrix of N (population size) objective function values for M objectives
+    """
     d_mx = construct_domination_matrix(f_scores)
 
-    fronts: list[list[int]] = []
+    fronts: List[List[int]] = []
     for s in np.lexsort(f_scores.T):
         isinserted = False
         for fk in fronts:
@@ -101,7 +128,30 @@ def dda_ens(f_scores: np.ndarray, **kwargs) -> list[list[int]]:
     return fronts
 
 
-def dominance_degree_non_dominated_sort(f_scores: np.ndarray, strategy="efficient"):
+def dominance_degree_non_dominated_sort(
+    f_scores: np.ndarray, strategy: Literal["efficient", "fast"] = "efficient"
+) -> List[List[int]]:
+    """
+    dominance_degree_non_dominated_sort performs the non-dominating sort with the specified algorithm
+
+    Parameters
+    ----------
+    f_scores : np.ndarray
+        The N x M matrix of N (population size) objective function values for M objectives
+    strategy : Literal["efficient", "fast"], optional
+        The dominance degree algorithm to use, by default "efficient"
+
+    Returns
+    -------
+    List[List[int]]
+        A list of members of each Pareto front. The index in the outer most list corresponds to the level in the Pareto front
+        while the value in the inner-most list is the id of the member of the population belonging to that front.
+
+    Raises
+    ------
+    ValueError
+        If an invalid strategy is specified
+    """
     if strategy == "efficient":
         return dda_ens(f_scores)
     if strategy == "fast":

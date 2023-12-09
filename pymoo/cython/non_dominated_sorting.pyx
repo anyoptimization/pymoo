@@ -1,12 +1,11 @@
 # distutils: language = c++
-# cython: language_level=2, boundscheck=False, wraparound=False, cdivision=True, profile=True
+# cython: language_level=2, boundscheck=False, wraparound=False, cdivision=True
 
 
 import numpy as np
 from libcpp cimport bool
 from libcpp.vector cimport vector
-from libcpp.algorithm cimport copy, fill, transform
-from libcpp.iterator cimport back_inserter
+
 
 cdef extern from "math.h":
     cpdef double floor(double x)
@@ -14,15 +13,6 @@ cdef extern from "math.h":
 cdef extern from "limits.h":
     int INT_MAX
 
-cdef extern from "<functional>" namespace "std":
-    cdef cppclass plus[T]:
-        plus() except +
-
-# cdef extern from *:
-#     cppclass plus[T](T& arg1, T& arg2):
-#         plus() except +
-
-#         operator+
 
 # ---------------------------------------------------------------------------------------------------------
 # Interface
@@ -356,11 +346,11 @@ cdef vector[vector[int]] c_fast_best_order_sort(double[:,:] F):
 
 cdef vector[vector[int]] c_dominance_degree_non_dominated_sort(double[:, :] F, str strategy):
     if strategy == "efficient":
+        # return c_dda_ens_get_fronts(c_construct_domination_matrix(F), F.shape[0], np.lexsort(F))
         return c_dda_ens_get_fronts(c_construct_domination_matrix(F), F.shape[1], np.lexsort(F.T))
-        # return dda_ens(F)
     elif strategy == "fast":
+        # return c_dda_ns_get_fronts(c_construct_domination_matrix(F), F.shape[1], F.shape[0])
         return c_dda_ns_get_fronts(c_construct_domination_matrix(F), F.shape[0], F.shape[1])
-        # return dda_ns(F)
 
 
 
@@ -543,65 +533,68 @@ cdef bool c_is_equal(double[:,:] F, int a, int b):
             return False
     return True
 
-cdef vector[vector[int]] c_construct_domination_matrix(double[:, :] F):
+cdef vector[vector[int]] c_construct_domination_matrix(double[:, :]& F):
     cdef:
-        long i, j, k
-        Py_ssize_t n = F.shape[0]
-        Py_ssize_t m = F.shape[1]
+        long i
+        int n = F.shape[0]
+        int m = F.shape[1]
+        long [:, ::1] b = np.apply_over_axes(np.argsort, F.T, axes=1)
 
-        long[:, :] b = np.apply_over_axes(np.argsort, F, axes=0)
-        vector[vector[int]] D = vector[vector[int]](n, vector[int](n, 0))
         vector[vector[int]] C = vector[vector[int]](n, vector[int](n, 0))
+        vector[vector[int]] D = vector[vector[int]](n, vector[int](n, 0))
 
     for i in range(m):
-        c_construct_comparison_matrix(F[:, i], b[:, i], C, n)
+        c_construct_comparison_matrix(F[:, i], b[i], C, D, n)
 
-        # for_
-
-        for j in range(n):
-            # transform(D[j].begin(), D[j].end(), C[j].begin(), D[j].begin(), plus[int]())
-            # fill(C[j].begin(), C[j].end(), 0)
-            for k in range(n):
-                D[j][k] += C[j][k]
-                C[j][k] = 0
     c_remove_dominators(D, n, m)
     return D
 
-cdef void c_construct_comparison_matrix(double[:]& v, long[:]& b, vector[vector[int]]& C, Py_ssize_t n):
+cdef void c_construct_comparison_matrix(double[:]& v, long[:]& b, vector[vector[int]] &C, vector[vector[int]]& D, int n):
     cdef:
-        Py_ssize_t i, j
+        int i, j
 
-    fill(C[b[0]].begin(), C[b[0]].end(), 1)
+    for i in range(n):
+        C[b[0]][i] = 1
     for i in range(1, n):
         if v[b[i]] == v[b[i - 1]]:
-            copy(C[b[i-1]].begin(), C[b[i-1]].end(), C[b[i]].begin())
+            for j in range(n):
+                C[b[i]][j] = C[b[i - 1]][j]
         else:
             for j in range(i, n):
                 C[b[i]][b[j]] = 1
 
-cdef void c_remove_dominators(vector[vector[int]] &D, Py_ssize_t n, Py_ssize_t m):
-    cdef long i, j
+    # increment the DD matrix while also resetting the comparison matrix
+    for i in range(n):
+        for j in range(n):
+            D[i][j] += C[i][j]
+            C[i][j] = 0
+
+cdef void c_remove_dominators(vector[vector[int]] &D, int n, int m):
+    cdef int i, j
     for i in range(n):
         for j in range(i, n):
             if D[i][j] == m:
+                # only perform the row-wise check if the column-wise check fails (C=row major)
                 if D[j][i] == m:
                     D[j][i] = 0
                     D[i][j] = 0
 
-cdef void c_remove_front_members(vector[vector[int]]& D, vector[int]& front, int n):
+cdef void c_remove_front_members(vector[vector[int]] &D, vector[int]& front, int n):
     cdef:
-        long i, j
+        int i, j
 
     for i in front:
         for j in range(n):
-            D[j][i] = -1
+            # set to -1 so not-yet-added members are preferred by max()
             D[i][j] = -1
+            D[j][i] = -1
 
 cdef void c_dda_ns_build_front(vector[int]& max_D, vector[int]& front, int n, int m):
-    cdef long i
-    for i in range(n):
-        if 0 <= max_D[i] < m:
+    cdef int i = 0, md
+    for md in max_D:
+        if 0 <= md < m:
             front.push_back(i)
+        i += 1
 
 cdef void c_max(vector[vector[int]]& D, vector[int]& vec_max, int n):
     cdef int i, j, m
@@ -626,25 +619,23 @@ cdef vector[vector[int]] c_dda_ns_get_fronts(vector[vector[int]]& D, int n, int 
         count += front.size()
     return fronts
 
-cdef vector[vector[int]] c_dda_ens_get_fronts(vector[vector[int]]& D, int m, long[:]& sorted_indices):
+cdef vector[vector[int]] c_dda_ens_get_fronts(vector[vector[int]]& D, int m, long[::1]& sorted_indices):
     cdef:
-        int k, sd, s, n_fronts = 0, n = sorted_indices.shape[0]
+        int k, sd, s, n_fronts = 0
         vector[int] fk
         vector[vector[int]] fronts
+
     for s in range(sorted_indices.shape[0]):
         isinserted = False
-        # for k in range(n_fronts):
         k = 0
         for fk in fronts:
             isdominated = False
-            # for sd in fronts[k]:
             for sd in fk:
                 if D[sd][sorted_indices[s]] == m:
                     isdominated = True
                     break
             if not isdominated:
                 fronts[k].push_back(sorted_indices[s])
-                # fk.push_back(sorted_indices[s])
                 isinserted = True
                 break
             k+= 1
