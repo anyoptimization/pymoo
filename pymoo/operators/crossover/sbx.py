@@ -89,7 +89,7 @@ class SimulatedBinaryCrossover(Crossover):
     def __init__(self,
                  prob_var=0.5,
                  eta=15,
-                 prob_exch=0.5,
+                 prob_exch=1.0,
                  prob_bin=0.5,
                  n_offsprings=2,
                  **kwargs):

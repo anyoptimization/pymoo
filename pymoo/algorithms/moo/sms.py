@@ -137,7 +137,7 @@ class SMSEMOA(GeneticAlgorithm):
                  pop_size=100,
                  sampling=FloatRandomSampling(),
                  selection=TournamentSelection(func_comp=cv_and_dom_tournament),
-                 crossover=SBX(prob_exch=0.5),
+                 crossover=SBX(),
                  mutation=PM(),
                  survival=LeastHypervolumeContributionSurvival(),
                  eliminate_duplicates=True,
