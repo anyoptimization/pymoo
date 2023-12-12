@@ -278,7 +278,6 @@ class HyperplaneNormalization:
         self.extreme_points = None
 
     def update(self, F, nds=None):
-
         # find or usually update the new ideal point - from feasible solutions
         self.ideal_point = np.min(np.vstack((self.ideal_point, F)), axis=0)
         self.worst_point = np.max(np.vstack((self.worst_point, F)), axis=0)
@@ -296,7 +295,7 @@ class HyperplaneNormalization:
         worst_of_front = np.max(F[nds, :], axis=0)
 
         self.nadir_point = get_nadir_point(self.extreme_points, self.ideal_point, self.worst_point,
-                                           worst_of_population, worst_of_front)
+                                           worst_of_front, worst_of_population)
 
 
 def get_extreme_points_c(F, ideal_point, extreme_points=None):
