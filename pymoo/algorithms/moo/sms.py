@@ -184,6 +184,9 @@ class SMSEMOA(GeneticAlgorithm):
         # merge the offsprings with the current population
         if infills is not None:
             pop = Population.merge(self.pop, infills)
+        else:
+            pop = self.pop
+
 
         self.pop = self.survival.do(self.problem, pop, n_survive=self.pop_size, algorithm=self,
                                     ideal=ideal, nadir=nadir, **kwargs)
