@@ -6,6 +6,8 @@ import pymoo.algorithms.soo.nonconvex.ga
 import matplotlib.pyplot as plt
 from scipy.optimize import NonlinearConstraint
 from pymoo.algorithms.soo.nonconvex.es import ES
+import math 
+
 # Notes: 
 # I'm using the suffix _vf to denote variables used in the value-function optimization 
 # This is to avoid confuse it with variables being optimized in the main function 
@@ -74,6 +76,49 @@ def create_vf_pymoo(P, ranks, vf):
 def linear_vf(P, x): 
 
     return np.matmul(P, x.T).T
+
+def poly_vf(P, x): 
+
+    # find out M
+    M = len(P)
+
+    result = [] 
+
+    # Calculate value for each row of x 
+    for xi in range(x.shape[0]):
+
+        running_product = 1
+
+        # Get current x 
+        curr_x = x[xi, :]
+
+        # reshape x into a matrix 
+        curr_x = np.ones((M, M+1))*-99.0
+
+        curr_x[0:M, 0:M] = x[xi,0:M*M].reshape(M,M)
+        
+        curr_x[:, [M]] = x[xi,M*M:(M*M)+M].reshape(M,1)
+
+        # See definition of i and j in the journal article
+        # Product
+        for i in range(M):
+
+            current_sum = 0
+
+            # summation 
+            for j in range(M):
+                 
+                current_sum += curr_x[i,j]*P[j] + curr_x[i, M]
+
+            print(current_sum)
+
+            running_product *= current_sum 
+
+        result.append(running_product)
+
+
+
+    return result
 
 
 def plot_vf(P, vf): 

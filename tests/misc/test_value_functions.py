@@ -342,6 +342,37 @@ def test_eq_const(x, P, ranks, expected_eq_con):
     # Test whether or not the constraint function matches our expected values   
     assert np.all(np.isclose(expected_eq_con, out["H"]))
 
+
+## ----------------------------------------------------
+
+test_poly_vf_in_out = [
+
+    (
+
+        # Polynomial function values to optimize (x). These are five indentical individuals
+        np.array([
+                [0.38,0.51,0.37,0.07,124.98,-284.6],
+                [0.26,0.68,0.69,0.06,380.41,75.26],
+                [0.87,0.06,0.73,0.03,134.89,-393.62],
+                [0.53,0.46,0.85,0.52,-228,-377.7],
+                [0.54,0.85,0.03,0.73,-296.88,200.68]
+        ]), 
+
+
+        # P, or the solutions to the problem we're trying to create a VF for 
+        [3.6, 3.9], 
+
+        # Expected value 
+        [-143781.4626, 117136.3531, -214281.6713, 339364.617, -237939.7818]
+    ),
+]
+
+@pytest.mark.parametrize('x, P, expected_value', test_poly_vf_in_out)
+def test_poly_vf(x, P, expected_value):
+
+    assert np.all(np.isclose(expected_value, mvf.poly_vf(P, x)))
+
+
 ## ----------------------------------------------------
 test_ga_in_out = [
     (
@@ -393,5 +424,8 @@ test_scipy_in_out = [
 @pytest.mark.parametrize('P, ranks', test_scipy_in_out)
 def test_scipy(P, ranks): 
     vf = mvf.create_linear_vf(P, ranks, "scimin")
+
+
+
 
 
