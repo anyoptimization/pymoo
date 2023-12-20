@@ -29,11 +29,9 @@ def create_vf(P, ranks, ineq_constr, vf="linear", algorithm="scimin"):
 def create_poly_vf(P, ranks, algorithm="scimin"):
     
     if algorithm == "scimin": 
-        # TODO update this to poly_vf
-        return create_vf_scipy(P, ranks, linear_vf)
+        return create_vf_scipy(P, ranks, poly_vf)
     elif algorithm == "ES": 
-        # TODO update this to poly_vf
-        return create_vf_pymoo(P, ranks, linear_vf)
+        return create_vf_pymoo(P, ranks, poly_vf)
     else: 
         raise ValueError("Algorithm %s not supported" % algorithm) 
 
@@ -42,15 +40,45 @@ def create_poly_vf(P, ranks, algorithm="scimin"):
 def create_linear_vf(P, ranks, algorithm="scimin"): 
     
     if algorithm == "scimin": 
-        return create_vf_scipy(P, ranks, linear_vf)
+        return create_vf_scipy_linear(P, ranks)
     elif algorithm == "ES": 
-        return create_vf_pymoo(P, ranks, linear_vf)
+        return create_vf_pymoo_linear(P, ranks)
     else: 
         raise ValueError("Algorithm %s not supported" % algorithm) 
 
 
+def create_vf_scipy_poly(P, ranks):
 
-def create_vf_scipy(P, ranks, vf): 
+    # Gathering basic info
+    M = P.shape(1)
+
+    P_count = P.shape[0]
+
+    # Inequality constraints - check VF is monotonically increasing with user preference
+    lb = [-np.inf] * (P_count - 1)
+    ub = [0] * (P_count - 1)
+
+    # Inequality constraints - check that each term of S in our obj is non-negative for each P
+    lb += [-np.inf] * (P_count*M)
+    ub += [0] * (P_count*M)
+
+    # Equality constraints (Make sure all terms in VF add up to 1 per term of product)
+    for m in range(M): 
+        lb.append(0)
+        ub.append(0)
+
+    P_sorted = _sort_P(P, ranks)
+
+    constr = NonlinearConstraint(_build_constr_poly(P_sorted, vf), lb, ub)
+
+    x0 = [0.5, 0.5, 0.5]
+
+    res = scimin(_obj_func, x0, constraints= constr)
+
+    return lambda P_in: vf(P_in, res.x[0:-1])
+
+
+def create_vf_scipy_linear(P, ranks): 
 
     # Inequality constraints
     lb = [-np.inf] * (P.shape[0] - 1)
@@ -62,23 +90,16 @@ def create_vf_scipy(P, ranks, vf):
 
     P_sorted = _sort_P(P, ranks)
 
-    if vf.__name__ == "poly_vf": 
-        # TODO update this to poly vf 
-        constr = NonlinearConstraint(_build_constr_poly(P_sorted, linear_vf), lb, ub)
-    elif vf.__name__ == "linear_vf": 
-        constr = NonlinearConstraint(_build_constr_linear(P_sorted, linear_vf), lb, ub)
-    else: 
-        raise ValueError("Value function %s not supported" % vf.__name) 
-
+    constr = NonlinearConstraint(_build_constr_linear(P_sorted, linear_vf), lb, ub)
 
     x0 = [0.5, 0.5, 0.5]
 
     res = scimin(_obj_func, x0, constraints= constr)
 
-    return lambda P_in: vf(P_in, res.x[0:-1])
+    return lambda P_in: linear_vf(P_in, res.x[0:-1])
         
 
-def create_vf_pymoo(P, ranks, vf): 
+def create_vf_pymoo_linear(P, ranks): 
 
     vf_prob = OptimizeVF(P, ranks, linear_vf)
 
@@ -89,7 +110,7 @@ def create_vf_pymoo(P, ranks, vf):
         ('n_gen', 200),
         seed=1)
 
-    return lambda P_in: vf(P_in, res.X[0:-1])
+    return lambda P_in: linear_vf(P_in, res.X[0:-1])
 
 
 def linear_vf(P, x): 
@@ -162,12 +183,14 @@ def plot_vf(P, vf):
 
     plt.show()
 
+## ---------------- Polynomial VF creation functions ------------------
 
 def _ineq_constr_poly(x, P, vf):
     if len(x.shape) == 1:
-        return _ineq_constr_1D_linear(x, P, vf)
+        return _ineq_constr_1D_poly(x, P, vf)
     else: 
-        return _ineq_constr_2D_linear(x, P, vf)
+        return _ineq_constr_2D_poly(x, P, vf)
+
 
 def _build_ineq_constr_poly(P, vf):
 
@@ -190,6 +213,62 @@ def _build_constr_poly(P, vf):
     ineq_constr_func = _build_ineq_constr_poly(P, vf)
 
     return lambda x : np.append(ineq_constr_func(x), _eq_constr_poly(x))
+
+
+def _ineq_constr_2D_poly(x, P, vf):
+
+    ep = np.column_stack([x[:,-1]]) 
+    pop_size = np.size(x,0)
+
+    G = np.ones((pop_size, np.size(P,0)-1))*-99
+
+    # Pair-wise compare each ranked member of P, seeing if our proposed utility 
+    #  function increases monotonically as rank increases
+    for p in range(np.size(P,0) - 1):
+
+        current_P = vf(P[[p],:], x[:, 0:-1])
+        next_P = vf(P[[p+1],:], x[:, 0:-1])
+
+        G[:,[p]] = -(current_P - next_P) + ep
+
+    return G
+
+
+def _ineq_constr_1D_poly(x, P, vf):
+
+    ep = x[-1]
+
+    P_count = P.shape[0]
+    M = P.shape[1]
+
+    G = np.ones((1, np.size(P,0)-1))*-99
+
+    # Pair-wise compare each ranked member of P, seeing if our proposed utility 
+    #  function increases monotonically as rank increases
+    for p in range(P_count - 1):
+
+        current_P = vf(P[[p],:], x[0:-1])
+        next_P = vf(P[[p+1],:], x[0:-1])
+
+        G[:,[p]] = -(current_P - next_P) + ep
+
+    # Checking to make sure each S term in the polynomial objective function is non-negative
+    current_constr = P_count 
+
+    for p  in range(P_count): 
+
+        for m in range(M):
+
+            G[:, [current_constr]] = "update me!"
+
+
+            current_constr += 1
+        
+            # TODO finish 
+
+    return G
+
+## ---------------- Linear VF creation functions ------------------
 
 def _build_ineq_constr_linear(P, vf):
 

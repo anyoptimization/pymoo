@@ -4,11 +4,7 @@ from pymoo.util import value_functions as mvf
 import numpy as np
 
 
-## Global helper variables
-dummy_inputs = (np.array([[2,3], [3,2], [7,8]]), [5,2,1])
-
-
-## General test for function I/O. 
+## ----------------------- Constructor test ----------------------
 # It should take in a set of PO points, and then return a function. 
 # That function should take in a given PO point and return the 
 # value of that point according to the decision maker
@@ -18,15 +14,12 @@ test_dummy_val_fnc_inputs = [
 ]
 
 @pytest.mark.parametrize('P, rankings', test_dummy_val_fnc_inputs)
-def test_create_vf(P, rankings):
+def test_vf_constructor(P, rankings):
 
     val_fnc = mvf.create_linear_vf(P, rankings)
 
     assert val_fnc(P[0,:]) 
-
-
-
-## ----------------------------------------------------
+## ----------------------- Test Ranking -------------------------
 
 ## Tests whether the constructor is running correctly 
 # Assumes that there is complete ordering (no ties in ranks)
@@ -36,8 +29,7 @@ test_test_prob_const_in_out = [
 ]
 
 @pytest.mark.parametrize('P, rankings, output', test_test_prob_const_in_out)
-def test_prob_const(P, rankings, output):
-
+def test_ranking(P, rankings, output):
     linear_vf = mvf.linear_vf
 
     vf_prob = mvf.OptimizeVF(P, rankings, linear_vf)
@@ -53,7 +45,7 @@ def test_prob_const(P, rankings, output):
 ## TODO test the constructor with partial ordering 
 
 
-## ----------------------------------------------------
+## ------------------------ Objective function -----------------
 ## Test the objective function     
 test_obj_in_out = [
     (
@@ -71,34 +63,6 @@ test_obj_in_out = [
             [0.8, 0.1, -52]
         ]), 
         np.array([[-73, -22, 52]]).T
-    )
-]
-
-
-@pytest.mark.parametrize('x, obj', test_obj_in_out)
-def test_obj(x, obj):
-
-    linear_vf = mvf.linear_vf
-
-    vf_prob = mvf.OptimizeVF(dummy_inputs[0], dummy_inputs[1], linear_vf)
-
-    out = {}
-
-    vf_prob._evaluate(x, out)
-    
-    # Test whether or not the objective function simply negates the epsilon term of x (last element)
-    assert np.all(obj == out["F"])
-
-## ----------------------------------------------------
-## Test the internal objective function 
-test_obj_func_in_out = [
-    (
-        np.array([
-            [0.3, 0.1,  12], 
-            [0.2, 0.5,  13], 
-            [0.8, 0.1, -14]
-        ]), 
-        np.array([[-12, -13, 14]]).T
     ),
     (
         np.array(
@@ -109,67 +73,18 @@ test_obj_func_in_out = [
 ]
 
 
-@pytest.mark.parametrize('x, true_obj', test_obj_func_in_out)
-def test_obj_func(x, true_obj):
+@pytest.mark.parametrize('x, obj', test_obj_in_out)
+def test_obj(x, obj):
 
-    linear_vf = mvf.linear_vf
-
-    vf_prob = mvf.OptimizeVF(dummy_inputs[0], dummy_inputs[1], linear_vf)
-
-    obj = mvf._obj_func(x)
-
+    result = mvf._obj_func(x)
+    
     # Test whether or not the objective function simply negates the epsilon term of x (last element)
-    assert np.all(obj == true_obj)
+    assert np.all(obj == result)
 
 
-## ------------- Test the inequality for linear function ---------------
+## ------------- Test the inequality constraint for linear function ---------------
 #  The expected values are pulled from the debugger of our linear.m file
 test_ineq_in_out = [
-
-    (
-
-        # Linear function values to optimize (x). This is two individuals
-        np.array([
-            [0.5,    0.5, 0.5], 
-            [0.3780, 0.6220, 0.2072]
-        ]), 
-
-        # P, or the solutions to the problem we're trying to create a VF for 
-        np.array([[3.6, 3.9], 
-                  [2.5, 4.1],    
-                  [5.5, 2.5],      
-                  [0.5, 5.2],     
-                  [6.9, 1.8]]), 
-         
-
-        # Ranking of the P values, as per the decision maker 
-        [1, 2, 3, 4, 5],
-        # The constraint values, given the x
-        np.array([
-            [0.05, 1.2, -0.65, 2.0], 
-            [-0.0842, 0.346, -0.0034, 0.5116]
-        ])
-    ),
-]
-
-#    
-
-@pytest.mark.parametrize('x, P, ranks, expected_ineq_con', test_ineq_in_out)
-def test_ineq(x, P, ranks, expected_ineq_con):
-
-    linear_vf = mvf.linear_vf
-
-    vf_prob = mvf.OptimizeVF(P, ranks, linear_vf)
-
-    out = {}
-
-    vf_prob._evaluate(x, out)
-    
-    # Test whether or not the constraint function matches our expected values   
-    assert np.all(np.isclose(expected_ineq_con, out["G"]))
-
-## -------------------------------------------------------------------
-test_build_ineq_constr_in_out = [
 
     (
 
@@ -215,25 +130,18 @@ test_build_ineq_constr_in_out = [
     ),
 ]
 
+@pytest.mark.parametrize('x, P, ranks, expected_ineq_con', test_ineq_in_out)
+def test_ineq_constr_linear(x, P, ranks, expected_ineq_con):
 
-@pytest.mark.parametrize('x, P, ranks, expected_ineq_con', test_build_ineq_constr_in_out)
-def test_build_ineq_constr(x, P, ranks, expected_ineq_con):
+    P_sorted = mvf._sort_P(P, ranks)
 
-    linear_vf = mvf.linear_vf
+    result = mvf._ineq_constr_linear(x, P_sorted, mvf.linear_vf)
 
-    vf_prob = mvf.OptimizeVF(P, ranks, linear_vf)
-
-    out = {}
-
-    ineqFunc = mvf._build_ineq_constr_linear(P, mvf.linear_vf)
-    
-    G = ineqFunc(x)
-    
     # Test whether or not the constraint function matches our expected values   
-    assert np.all(np.isclose(expected_ineq_con, G))
+    assert np.all(np.isclose(expected_ineq_con, result))
 
 
-## -------------------------------------------------------------------
+## --------------- Test the equality constraint for linear function --------------------
 test_eq_constr_in_out = [
 
     (
@@ -286,18 +194,14 @@ test_eq_constr_in_out = [
 
 
 @pytest.mark.parametrize('x, P, ranks, expected_eq_constr', test_eq_constr_in_out)
-def test_eq_const(x, P, ranks, expected_eq_constr):
+def test_eq_const_linear(x, P, ranks, expected_eq_constr):
 
-    linear_vf = mvf.linear_vf
-
-    vf_prob = mvf.OptimizeVF(P, ranks, linear_vf)
-
-    constr = vf_prob._eq_constr_linear(x)
+    constr = mvf._eq_constr_linear(x)
 
     ## Test whether or not the constraint function matches our expected values   
     assert np.all(np.isclose(expected_eq_constr, constr))
 
-## ----------------------------------------------------
+## --------------- Test the polynomial value function ----------------
 
 test_poly_vf_in_out = [
 
@@ -327,7 +231,7 @@ def test_poly_vf(x, P, expected_value):
     assert np.all(np.isclose(expected_value, mvf.poly_vf(P, x)))
 
 
-## ----------------------------------------------------
+## --------------- Smoke test for creating a VF with GA -----------------------
 test_ga_in_out = [
     (
 
@@ -351,7 +255,7 @@ test_ga_in_out = [
 def test_ga(P, ranks): 
     vf = mvf.create_linear_vf(P, ranks, "ES")
 
-## ----------------------------------------------------
+## --------------- Smoke test for creating a VF with scipy ------------------
 
 
 test_scipy_in_out = [
@@ -372,8 +276,6 @@ test_scipy_in_out = [
 
     )
 ]
-
-
 
 @pytest.mark.parametrize('P, ranks', test_scipy_in_out)
 def test_scipy(P, ranks): 
