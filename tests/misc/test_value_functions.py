@@ -298,52 +298,6 @@ def test_eq_const(x, P, ranks, expected_eq_constr):
     assert np.all(np.isclose(expected_eq_constr, constr))
 
 ## ----------------------------------------------------
-test_eq_const_in_out = [
-
-    (
-
-        # Linear function values to optimize (x). This is two individuals in the population 
-        np.array([
-            [0.5,    0.5, 0.5], 
-            [0.3780, 0.6220, 0.2072]
-        ]), 
-
-        # P, or the solutions to the problem we're trying to create a VF for 
-        np.array([[3.6, 3.9], 
-                  [2.5, 4.1],    
-                  [5.5, 2.5],      
-                  [0.5, 5.2],     
-                  [6.9, 1.8]]), 
-         
-
-        # Ranking of the P values, as per the decision maker 
-        [1, 2, 3, 4, 5],
-
-        # The constraint values, given the x
-        np.array([
-            [0], 
-            [0]
-        ])
-    ),
-]
-
-
-@pytest.mark.parametrize('x, P, ranks, expected_eq_con', test_eq_const_in_out)
-def test_eq_const(x, P, ranks, expected_eq_con):
-
-    linear_vf = mvf.linear_vf
-
-    vf_prob = mvf.OptimizeVF(P, ranks, linear_vf)
-
-    out = {}
-
-    vf_prob._evaluate(x, out)
-    
-    # Test whether or not the constraint function matches our expected values   
-    assert np.all(np.isclose(expected_eq_con, out["H"]))
-
-
-## ----------------------------------------------------
 
 test_poly_vf_in_out = [
 
