@@ -26,6 +26,18 @@ def create_vf(P, ranks, ineq_constr, vf="linear", algorithm="scimin"):
 
     return lambda f_new:  np.sum(f_new)
 
+def create_poly_vf(P, ranks, algorithm="scimin"):
+    
+    if algorithm == "scimin": 
+        # TODO update this to poly_vf
+        return create_vf_scipy(P, ranks, linear_vf)
+    elif algorithm == "ES": 
+        # TODO update this to poly_vf
+        return create_vf_pymoo(P, ranks, linear_vf)
+    else: 
+        raise ValueError("Algorithm %s not supported" % algorithm) 
+
+
 
 def create_linear_vf(P, ranks, algorithm="scimin"): 
     
@@ -50,7 +62,14 @@ def create_vf_scipy(P, ranks, vf):
 
     P_sorted = _sort_P(P, ranks)
 
-    constr = NonlinearConstraint(_build_constr_linear(P_sorted, linear_vf), lb, ub)
+    if vf.__name__ == "poly_vf": 
+        # TODO update this to poly vf 
+        constr = NonlinearConstraint(_build_constr_poly(P_sorted, linear_vf), lb, ub)
+    elif vf.__name__ == "linear_vf": 
+        constr = NonlinearConstraint(_build_constr_linear(P_sorted, linear_vf), lb, ub)
+    else: 
+        raise ValueError("Value function %s not supported" % vf.__name) 
+
 
     x0 = [0.5, 0.5, 0.5]
 
@@ -116,8 +135,6 @@ def poly_vf(P, x):
 
         result.append(running_product)
 
-
-
     return result
 
 
@@ -146,6 +163,33 @@ def plot_vf(P, vf):
     plt.show()
 
 
+def _ineq_constr_poly(x, P, vf):
+    if len(x.shape) == 1:
+        return _ineq_constr_1D_linear(x, P, vf)
+    else: 
+        return _ineq_constr_2D_linear(x, P, vf)
+
+def _build_ineq_constr_poly(P, vf):
+
+    ineq_func = lambda x : _ineq_constr_poly(x, P, vf)
+
+    return ineq_func
+
+def _eq_constr_poly(x):
+
+    if len(x.shape) == 1:
+        eq_cons = sum(x[0:-1]) - 1
+    else: 
+        eq_cons = np.sum(x[:,0:-1],1, keepdims=True) - 1
+
+    return eq_cons
+
+
+def _build_constr_poly(P, vf): 
+
+    ineq_constr_func = _build_ineq_constr_poly(P, vf)
+
+    return lambda x : np.append(ineq_constr_func(x), _eq_constr_poly(x))
 
 def _build_ineq_constr_linear(P, vf):
 
