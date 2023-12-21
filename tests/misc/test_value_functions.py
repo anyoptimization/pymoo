@@ -171,8 +171,8 @@ test_poly_ineq_in_out = [
     #),
     (
 
-        # Linear function values to optimize (x). This is one individual 
-        np.array([0.8, 0.22, 0.82, 0.94, 261, -351.91]), 
+        # Linear function values to optimize (x). This is one individual
+        np.array([0.8, 0.22, 0.82, 0.94, 261, -351.91, 0.5]), 
 
         # P, or the solutions to the problem we're trying to create a VF for 
         np.array([[3.6, 3.9], 
@@ -198,9 +198,9 @@ def test_ineq_constr_poly(x, P, ranks, expected_ineq_con):
 
     sorted_P = mvf._sort_P(P, ranks) 
 
-    #constraints = mvf._ineq_constr_poly(x, P, mvf.poly_vf)
+    constraints = mvf._ineq_constr_poly(x, P, mvf.poly_vf)
     
-    assert True #np.all(np.isclose(expected_ineq_con, constraints))
+    assert np.all(np.isclose(expected_ineq_con, constraints))
 
 
 ## --------------- Test calculating S from P and x --------------------------------
@@ -318,6 +318,20 @@ test_poly_vf_in_out = [
 
         # Expected value 
         [-143781.4626, 117136.3531, -214281.6713, 339364.617, -237939.7818]
+    ),
+    (
+
+        # Polynomial function values to optimize (x). These are five indentical individuals
+        np.array(
+                [0.38,0.51,0.37,0.07,124.98,-284.6],
+        ), 
+
+
+        # P, or the solutions to the problem we're trying to create a VF for 
+        np.array([[3.6, 3.9]]), 
+
+        # Expected value 
+        [-143781.4626]
     ),
 ]
 

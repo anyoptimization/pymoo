@@ -126,13 +126,22 @@ def poly_vf(P, x):
 
     result = [] 
 
+    if len(x.shape) == 1:
+        x_len = 1    
+    else:
+        x_len = x.shape[0]
+
+
     # Calculate value for each row of x 
-    for xi in range(x.shape[0]):
+    for xi in range(x_len):
 
         running_product = 1
 
         # Get current x 
-        curr_x = x[xi, :]
+        if x_len == 1:
+            curr_x = x
+        else: 
+            curr_x = x[xi, :]
 
         S = _calc_S(P, curr_x)
 
@@ -140,7 +149,7 @@ def poly_vf(P, x):
 
         result.append(product)
 
-    return result
+    return np.array(result)
 
 
 def plot_vf(P, vf): 
@@ -225,30 +234,28 @@ def _ineq_constr_1D_poly(x, P, vf):
     P_count = P.shape[0]
     M = P.shape[1]
 
-    G = np.ones((1, np.size(P,0)-1))*-99
+    S_constr_len = M * P_count 
+    increasing_len = P_count - 1
+
+    G = np.ones((1, S_constr_len + increasing_len))*-99
 
     # Checking to make sure each S term in the polynomial objective function is non-negative
     current_constr = 0
 
-    for p  in range(P_count): 
+    S = _calc_S(P, x[0:-1])
 
-        S = _calc_S(P,x)
-
-        G[:, [current_constr]] = "update me!"
-
-        current_constr += 1
-    
-        # TODO finish 
+    G[:, 0:S_constr_len] = S.reshape(1, S_constr_len)
 
 
     # Pair-wise compare each ranked member of P, seeing if our proposed utility 
     #  function increases monotonically as rank increases
     for p in range(P_count - 1):
+    
 
         current_P = vf(P[[p],:], x[0:-1])
         next_P = vf(P[[p+1],:], x[0:-1])
 
-        G[:,[p]] = -(current_P - next_P) + ep
+        G[:,[p + S_constr_len]] = -(current_P - next_P) + ep
 
     return G
 
