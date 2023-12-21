@@ -122,7 +122,7 @@ def linear_vf(P, x):
 def poly_vf(P, x): 
 
     # find out M
-    M = len(P)
+    M = P.shape[1]
 
     result = [] 
 
@@ -136,7 +136,7 @@ def poly_vf(P, x):
 
         S = _calc_S(P, curr_x)
 
-        product = reduce(mul, S, 1)        
+        product = reduce(mul, S.tolist()[0],1)
 
         result.append(product)
 
@@ -230,16 +230,15 @@ def _ineq_constr_1D_poly(x, P, vf):
     # Checking to make sure each S term in the polynomial objective function is non-negative
     current_constr = 0
 
-    for m in range(M):
+    for p  in range(P_count): 
 
-        for p  in range(P_count): 
+        S = _calc_S(P,x)
 
-            G[:, [current_constr]] = "update me!"
+        G[:, [current_constr]] = "update me!"
 
-
-            current_constr += 1
-        
-            # TODO finish 
+        current_constr += 1
+    
+        # TODO finish 
 
 
     # Pair-wise compare each ranked member of P, seeing if our proposed utility 
@@ -328,11 +327,16 @@ def _sort_P(P, ranks):
 
     return P_sorted
 
+# Can have several P instances, but assumes one x instance 
 def _calc_S(P, x): 
 
-    M = len(P)
+    if len(P.shape) == 1:
+        M = len(P)
+        S = np.ones((1,M))*-99
+    else: 
+        M = P.shape[1]
+        S = np.ones((P.shape[0],M))*-99
 
-    S = []
 
     # reshape x into a matrix 
     x_mat = np.ones((M, M+1))*-99.0
@@ -349,10 +353,11 @@ def _calc_S(P, x):
 
         # summation 
         for j in range(M):
-             
-            current_sum += x_mat[i,j]*P[j] + x_mat[i, M]
+                
+            current_sum += x_mat[i,j]*P[:,[j]] + x_mat[i, M]
 
-        S.append(current_sum)
+        S[:,[i]] = current_sum
+
 
     return S
 
