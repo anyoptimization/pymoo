@@ -145,30 +145,6 @@ def test_ineq_constr_linear(x, P, ranks, expected_ineq_con):
 
 test_poly_ineq_in_out = [
 
-    #(
-
-    #    # Linear function values to optimize (x). This is two individuals
-    #    np.array([
-    #        [0.5,    0.5, 0.5], 
-    #        [0.3780, 0.6220, 0.2072]
-    #    ]), 
-
-    #    # P, or the solutions to the problem we're trying to create a VF for 
-    #    np.array([[3.6, 3.9], 
-    #              [2.5, 4.1],    
-    #              [5.5, 2.5],      
-    #              [0.5, 5.2],     
-    #              [6.9, 1.8]]), 
-    #     
-
-    #    # Ranking of the P values, as per the decision maker 
-    #    [1, 2, 3, 4, 5],
-    #    # The constraint values, given the x
-    #    np.array([
-    #        [0.05, 1.2, -0.65, 2.0], 
-    #        [-0.0842, 0.346, -0.0034, 0.5116]
-    #    ])
-    #),
     (
 
         # Linear function values to optimize (x). This is one individual
@@ -183,14 +159,47 @@ test_poly_ineq_in_out = [
         # Ranking of the P values, as per the decision maker 
         [1, 2, 3, 4, 5],
         # The constraint values, given the x
-        np.array([
+        np.array([[
             525.738,-697.202,     
             524.902,-697.916,
             526.95,-696.96,
             523.544,-698.522,
             527.916,-696.47,
-            208.580844,-925.067768,1556.570032,-1970.154552])
+            208.580844,-925.067768,1556.570032,-1970.154552]])
     ),
+    (
+
+        # Linear function values to optimize (x). This is one individual
+        np.array([[0.8, 0.22, 0.82, 0.94, 261, -351.91, 0.5], 
+                 [1, 0.34, 0.33, 0.49, -333.48, -360.15, 0.6]]), 
+
+        # P, or the solutions to the problem we're trying to create a VF for 
+        np.array([[3.6, 3.9], 
+                  [2.5, 4.1],    
+                  [5.5, 2.5],      
+                  [0.5, 5.2],     
+                  [6.9, 1.8]]), 
+        # Ranking of the P values, as per the decision maker 
+        [1, 2, 3, 4, 5],
+        # The constraint values, given the x
+        np.array([[
+            525.738,-697.202,     
+            524.902,-697.916,
+            526.95,-696.96,
+            523.544,-698.522,
+            527.916,-696.47,
+            208.580844,-925.067768,1556.570032,-1970.154552], 
+            [
+            -662.034, -717.201, 
+            -663.066, -717.466, 
+            -660.61, -717.26, 
+            -664.692, -717.587, 
+            -659.448, -717.141, 
+            916.463922, -1897.582156, 3145.809604, -4056.540036
+            ]])
+    ),
+
+    
 ]
 
 @pytest.mark.parametrize('x, P, ranks, expected_ineq_con', test_poly_ineq_in_out)

@@ -210,19 +210,19 @@ def _build_constr_poly(P, vf):
 
 def _ineq_constr_2D_poly(x, P, vf):
 
-    ep = np.column_stack([x[:,-1]]) 
     pop_size = np.size(x,0)
 
-    G = np.ones((pop_size, np.size(P,0)-1))*-99
+    P_count = P.shape[0]
+    M = P.shape[1]
 
-    # Pair-wise compare each ranked member of P, seeing if our proposed utility 
-    #  function increases monotonically as rank increases
-    for p in range(np.size(P,0) - 1):
+    S_constr_len = M * P_count 
+    increasing_len = P_count - 1
 
-        current_P = vf(P[[p],:], x[:, 0:-1])
-        next_P = vf(P[[p+1],:], x[:, 0:-1])
-
-        G[:,[p]] = -(current_P - next_P) + ep
+    G = np.ones((pop_size, S_constr_len + increasing_len))*-99
+   
+    for xi in range(pop_size): 
+    
+        G[xi, :] = _ineq_constr_1D_poly(x[xi, :], P, vf)
 
     return G
 
@@ -250,12 +250,11 @@ def _ineq_constr_1D_poly(x, P, vf):
     # Pair-wise compare each ranked member of P, seeing if our proposed utility 
     #  function increases monotonically as rank increases
     for p in range(P_count - 1):
-    
 
-        current_P = vf(P[[p],:], x[0:-1])
-        next_P = vf(P[[p+1],:], x[0:-1])
+        current_P_val = vf(P[[p],:], x[0:-1])
+        next_P_val = vf(P[[p+1],:], x[0:-1])
 
-        G[:,[p + S_constr_len]] = -(current_P - next_P) + ep
+        G[:,[p + S_constr_len]] = -(current_P_val - next_P_val) + ep
 
     return G
 
@@ -292,10 +291,10 @@ def _ineq_constr_2D_linear(x, P, vf):
     #  function increases monotonically as rank increases
     for p in range(np.size(P,0) - 1):
 
-        current_P = vf(P[[p],:], x[:, 0:-1])
+        current_P_val = vf(P[[p],:], x[:, 0:-1])
         next_P = vf(P[[p+1],:], x[:, 0:-1])
 
-        G[:,[p]] = -(current_P - next_P) + ep
+        G[:,[p]] = -(current_P_val - next_P) + ep
 
     return G
 
@@ -310,10 +309,10 @@ def _ineq_constr_1D_linear(x, P, vf):
     #  function increases monotonically as rank increases
     for p in range(np.size(P,0) - 1):
 
-        current_P = vf(P[[p],:], x[0:-1])
+        current_P_val = vf(P[[p],:], x[0:-1])
         next_P = vf(P[[p+1],:], x[0:-1])
 
-        G[:,[p]] = -(current_P - next_P) + ep
+        G[:,[p]] = -(current_P_val - next_P) + ep
 
     return G
 
