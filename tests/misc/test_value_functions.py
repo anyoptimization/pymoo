@@ -39,7 +39,6 @@ def test_ranking(P, rankings, output):
 
     # Check the solutions 
     assert np.all(output == P_from_prob)
-
    
 
 ## TODO test the constructor with partial ordering 
@@ -84,7 +83,7 @@ def test_obj(x, obj):
 
 ## ------------- Test the inequality constraint for linear function ---------------
 #  The expected values are pulled from the debugger of our linear.m file
-test_ineq_in_out = [
+test_linear_ineq_in_out = [
 
     (
 
@@ -130,7 +129,8 @@ test_ineq_in_out = [
     ),
 ]
 
-@pytest.mark.parametrize('x, P, ranks, expected_ineq_con', test_ineq_in_out)
+
+@pytest.mark.parametrize('x, P, ranks, expected_ineq_con', test_linear_ineq_in_out)
 def test_ineq_constr_linear(x, P, ranks, expected_ineq_con):
 
     P_sorted = mvf._sort_P(P, ranks)
@@ -140,6 +140,67 @@ def test_ineq_constr_linear(x, P, ranks, expected_ineq_con):
     # Test whether or not the constraint function matches our expected values   
     assert np.all(np.isclose(expected_ineq_con, result))
 
+
+## ------------- Test the inequality constraints for polynomial VF -------------
+
+test_poly_ineq_in_out = [
+
+    #(
+
+    #    # Linear function values to optimize (x). This is two individuals
+    #    np.array([
+    #        [0.5,    0.5, 0.5], 
+    #        [0.3780, 0.6220, 0.2072]
+    #    ]), 
+
+    #    # P, or the solutions to the problem we're trying to create a VF for 
+    #    np.array([[3.6, 3.9], 
+    #              [2.5, 4.1],    
+    #              [5.5, 2.5],      
+    #              [0.5, 5.2],     
+    #              [6.9, 1.8]]), 
+    #     
+
+    #    # Ranking of the P values, as per the decision maker 
+    #    [1, 2, 3, 4, 5],
+    #    # The constraint values, given the x
+    #    np.array([
+    #        [0.05, 1.2, -0.65, 2.0], 
+    #        [-0.0842, 0.346, -0.0034, 0.5116]
+    #    ])
+    #),
+    (
+
+        # Linear function values to optimize (x). This is one individual 
+        np.array([0.8, 0.22, 0.82, 0.94, 261, -351.91]), 
+
+        # P, or the solutions to the problem we're trying to create a VF for 
+        np.array([[3.6, 3.9], 
+                  [2.5, 4.1],    
+                  [5.5, 2.5],      
+                  [0.5, 5.2],     
+                  [6.9, 1.8]]), 
+        # Ranking of the P values, as per the decision maker 
+        [1, 2, 3, 4, 5],
+        # The constraint values, given the x
+        np.array([
+            525.738,-697.202,     
+            524.902,-697.916,
+            526.95,-696.96,
+            523.544,-698.522,
+            527.916,-696.47,
+            208.580844,-925.067768,1556.570032,-1970.154552])
+    ),
+]
+
+@pytest.mark.parametrize('x, P, ranks, expected_ineq_con', test_poly_ineq_in_out)
+def test_ineq_constr_poly(x, P, ranks, expected_ineq_con):
+
+    sorted_P = mvf._sort_P(P, ranks) 
+
+    constraints = mvf._ineq_constr_poly(x, P, mvf.poly_vf)
+
+    assert np.all(np.isclose(expected_ineq_con, constraints))
 
 ## --------------- Test the equality constraint for linear function --------------------
 test_eq_constr_in_out = [
@@ -191,6 +252,7 @@ test_eq_constr_in_out = [
         0
     )
 ]
+
 
 
 @pytest.mark.parametrize('x, P, ranks, expected_eq_constr', test_eq_constr_in_out)

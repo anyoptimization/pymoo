@@ -243,6 +243,21 @@ def _ineq_constr_1D_poly(x, P, vf):
 
     G = np.ones((1, np.size(P,0)-1))*-99
 
+    # Checking to make sure each S term in the polynomial objective function is non-negative
+    current_constr = 0
+
+    for m in range(M):
+
+        for p  in range(P_count): 
+
+            G[:, [current_constr]] = "update me!"
+
+
+            current_constr += 1
+        
+            # TODO finish 
+
+
     # Pair-wise compare each ranked member of P, seeing if our proposed utility 
     #  function increases monotonically as rank increases
     for p in range(P_count - 1):
@@ -251,20 +266,6 @@ def _ineq_constr_1D_poly(x, P, vf):
         next_P = vf(P[[p+1],:], x[0:-1])
 
         G[:,[p]] = -(current_P - next_P) + ep
-
-    # Checking to make sure each S term in the polynomial objective function is non-negative
-    current_constr = P_count 
-
-    for p  in range(P_count): 
-
-        for m in range(M):
-
-            G[:, [current_constr]] = "update me!"
-
-
-            current_constr += 1
-        
-            # TODO finish 
 
     return G
 
