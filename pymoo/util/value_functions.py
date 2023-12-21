@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from scipy.optimize import NonlinearConstraint
 from pymoo.algorithms.soo.nonconvex.es import ES
 import math 
+from operator import mul
+from functools import reduce
 
 # Notes: 
 # I'm using the suffix _vf to denote variables used in the value-function optimization 
@@ -132,29 +134,11 @@ def poly_vf(P, x):
         # Get current x 
         curr_x = x[xi, :]
 
-        # reshape x into a matrix 
-        curr_x = np.ones((M, M+1))*-99.0
+        S = _calc_S(P, curr_x)
 
-        curr_x[0:M, 0:M] = x[xi,0:M*M].reshape(M,M)
-        
-        curr_x[:, [M]] = x[xi,M*M:(M*M)+M].reshape(M,1)
+        product = reduce(mul, S, 1)        
 
-        # See definition of i and j in the journal article
-        # Product
-        for i in range(M):
-
-            current_sum = 0
-
-            # summation 
-            for j in range(M):
-                 
-                current_sum += curr_x[i,j]*P[j] + curr_x[i, M]
-
-            print(current_sum)
-
-            running_product *= current_sum 
-
-        result.append(running_product)
+        result.append(product)
 
     return result
 
@@ -343,6 +327,34 @@ def _sort_P(P, ranks):
     P_sorted = P[P_with_rank[:, -1].argsort()]
 
     return P_sorted
+
+def _calc_S(P, x): 
+
+    M = len(P)
+
+    S = []
+
+    # reshape x into a matrix 
+    x_mat = np.ones((M, M+1))*-99.0
+
+    x_mat[0:M, 0:M] = x[0:M*M].reshape(M,M)
+    
+    x_mat[:, [M]] = x[M*M:(M*M)+M].reshape(M,1)
+
+    # See definition of i and j in the journal article
+    # Product
+    for i in range(M):
+
+        current_sum = 0
+
+        # summation 
+        for j in range(M):
+             
+            current_sum += x_mat[i,j]*P[j] + x_mat[i, M]
+
+        S.append(current_sum)
+
+    return S
 
 
 # Constraint that states that the x values must add up to 1
