@@ -198,8 +198,6 @@ test_poly_ineq_in_out = [
             916.463922, -1897.582156, 3145.809604, -4056.540036
             ]])
     ),
-
-    
 ]
 
 @pytest.mark.parametrize('x, P, ranks, expected_ineq_con', test_poly_ineq_in_out)
@@ -210,6 +208,32 @@ def test_ineq_constr_poly(x, P, ranks, expected_ineq_con):
     constraints = mvf._ineq_constr_poly(x, P, mvf.poly_vf)
     
     assert np.all(np.isclose(expected_ineq_con, constraints))
+
+
+## --------------- Test equality constraints -----------------------
+test_eq_constr_poly_io = [
+    (
+        # Linear function values to optimize (x). This is one individual
+        np.array([0.8, 0.2, 0.82, 0.94, 261, -351.91, 0.5]), 
+        [0, -(0.82 + 0.94 - 1)]
+    ),
+    #(
+    #    # Linear function values to optimize (x). This is one individual
+    #    np.array([[0.8, 0.22, 0.82, 0.94, 261, -351.91, 0.5], 
+    #             [1, 0.34, 0.33, 0.49, -333.48, -360.15, 0.6]])
+
+    #)
+]
+
+
+@pytest.mark.parametrize('x, expected_eq_con', test_eq_constr_poly_io)
+def test_eq_constr_poly(x, expected_eq_con):
+
+    constraints =  mvf._eq_constr_poly(x)
+
+    assert np.all(np.isclose(expected_eq_con, constraints))
+
+
 
 
 ## --------------- Test calculating S from P and x --------------------------------

@@ -31,9 +31,9 @@ def create_vf(P, ranks, ineq_constr, vf="linear", algorithm="scimin"):
 def create_poly_vf(P, ranks, algorithm="scimin"):
     
     if algorithm == "scimin": 
-        return create_vf_scipy(P, ranks, poly_vf)
+        return create_vf_scipy_poly(P, ranks)
     elif algorithm == "ES": 
-        return create_vf_pymoo(P, ranks, poly_vf)
+        return create_vf_pymoo_poly(P, ranks, poly_vf)
     else: 
         raise ValueError("Algorithm %s not supported" % algorithm) 
 
@@ -56,13 +56,13 @@ def create_vf_scipy_poly(P, ranks):
 
     P_count = P.shape[0]
 
-    # Inequality constraints - check VF is monotonically increasing with user preference
-    lb = [-np.inf] * (P_count - 1)
-    ub = [0] * (P_count - 1)
-
     # Inequality constraints - check that each term of S in our obj is non-negative for each P
     lb += [-np.inf] * (P_count*M)
     ub += [0] * (P_count*M)
+
+    # Inequality constraints - check VF is monotonically increasing with user preference
+    lb = [-np.inf] * (P_count - 1)
+    ub = [0] * (P_count - 1)
 
     # Equality constraints (Make sure all terms in VF add up to 1 per term of product)
     for m in range(M): 
@@ -193,12 +193,18 @@ def _build_ineq_constr_poly(P, vf):
 
 def _eq_constr_poly(x):
 
+    M = math.floor(math.sqrt(6))
+
     if len(x.shape) == 1:
-        eq_cons = sum(x[0:-1]) - 1
+        result = [] 
+        for m in range(M): 
+            print(x[m*M:m*M+M])
+            result.append(-(sum(x[m*M:m*M+M]) - 1))
+
     else: 
         eq_cons = np.sum(x[:,0:-1],1, keepdims=True) - 1
 
-    return eq_cons
+    return result
 
 
 def _build_constr_poly(P, vf): 
