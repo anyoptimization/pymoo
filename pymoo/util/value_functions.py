@@ -52,17 +52,17 @@ def create_linear_vf(P, ranks, algorithm="scimin"):
 def create_vf_scipy_poly(P, ranks):
 
     # Gathering basic info
-    M = P.shape(1)
+    M = P.shape[1]
 
     P_count = P.shape[0]
 
     # Inequality constraints - check that each term of S in our obj is non-negative for each P
-    lb += [-np.inf] * (P_count*M)
-    ub += [0] * (P_count*M)
+    lb = [-np.inf] * (P_count*M)
+    ub = [0] * (P_count*M)
 
     # Inequality constraints - check VF is monotonically increasing with user preference
-    lb = [-np.inf] * (P_count - 1)
-    ub = [0] * (P_count - 1)
+    lb += [-np.inf] * (P_count - 1)
+    ub += [0] * (P_count - 1)
 
     # Equality constraints (Make sure all terms in VF add up to 1 per term of product)
     for m in range(M): 
@@ -71,13 +71,14 @@ def create_vf_scipy_poly(P, ranks):
 
     P_sorted = _sort_P(P, ranks)
 
-    constr = NonlinearConstraint(_build_constr_poly(P_sorted, vf), lb, ub)
-
-    x0 = [0.5, 0.5, 0.5]
+    constr = NonlinearConstraint(_build_constr_poly(P_sorted, poly_vf), lb, ub)
+   
+    # TODO missing bounds on the variables themselves
+    x0 = [1] * (M**2 + M + 1)
 
     res = scimin(_obj_func, x0, constraints= constr)
 
-    return lambda P_in: vf(P_in, res.x[0:-1])
+    return lambda P_in: poly_vf(P_in, res.x[0:-1])
 
 
 def create_vf_scipy_linear(P, ranks): 
