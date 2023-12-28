@@ -24,6 +24,20 @@ def test_das_dennis_not_achievable_points():
     get_reference_directions("das-dennis", 3, n_points=92)
 
 
+def test_incremental():
+    ref_dirs = get_reference_directions("incremental", 3, n_partitions=8)
+    assert len(ref_dirs) == 109
+
+def test_incremental_achievable_points():
+    ref_dirs = get_reference_directions("incremental", 3, n_points=109)
+    assert len(ref_dirs) == 109
+
+
+@pytest.mark.xfail(raises=Exception)
+def test_incremental_not_achievable_points():
+    get_reference_directions("incremental", 3, n_points=110)
+
+
 def test_unit_simplex_sampling():
     n_points = 1000
     n_dim = 3
