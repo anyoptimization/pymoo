@@ -238,6 +238,7 @@ def test_eq_constr_poly(x, expected_eq_con):
 
 ## --------------- Test calculating S from P and x --------------------------------
 test_calc_S = [
+    # K stuffed into an x matrix, one singleP 2-D P value (1D array)
     (
         np.array([0.8, 0.22, 0.82, 0.94, 261, -351.91]), 
 
@@ -246,10 +247,14 @@ test_calc_S = [
         np.array([525.738,-697.202])
         
     ),
+    # K stuffed into an x matrix, a list of Ps (2D array)
     (
         np.array([0.8, 0.22, 0.82, 0.94, 261, -351.91]), 
 
-        np.array([[3.6, 3.9], [2.5, 4.1], [5.5, 2.5]]), 
+        np.array([
+            [3.6, 3.9], 
+            [2.5, 4.1], 
+            [5.5, 2.5]]), 
 
         np.array([  
                   [525.738,-697.202],
@@ -257,7 +262,23 @@ test_calc_S = [
                   [526.95, -696.96]
                   ])
         
-    )
+    ),
+    # K stuffed into an x matrix, a 2 dimensional space of Ps (3D array)
+    (
+        np.array([0.8, 0.22, 0.82, 0.94, 261, -351.91]), 
+        np.array([
+            [[3.6, 3.9], [2.5, 4.1]],
+            [[5.5, 2.5], [0.5, 5.2]]
+        ]),
+        np.array([
+            [[525.738, -697.202], [524.902, -697.916]],
+            [[526.95, -696.96], [523.544, -698.522 ]]
+        ])
+    ) 
+
+
+
+
 
 ]
 

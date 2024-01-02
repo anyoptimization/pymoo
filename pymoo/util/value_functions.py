@@ -343,34 +343,17 @@ def _sort_P(P, ranks):
 # Can have several P instances, but assumes one x instance 
 def _calc_S(P, x): 
 
-    if len(P.shape) == 1:
-        M = len(P)
-        S = np.ones((1,M))*-99
-    else: 
-        M = P.shape[1]
-        S = np.ones((P.shape[0],M))*-99
+    M = P.shape[1]
 
+    # reshape x into a matrix called k
+    k = np.ones((M, M+1))*-99.0
 
-    # reshape x into a matrix 
-    x_mat = np.ones((M, M+1))*-99.0
-
-    x_mat[0:M, 0:M] = x[0:M*M].reshape(M,M)
+    k[0:M, 0:M] = x[0:M*M].reshape(M,M)
     
-    x_mat[:, [M]] = x[M*M:(M*M)+M].reshape(M,1)
+    k[:, [M]] = x[M*M:(M*M)+M].reshape(M,1)
 
-    # See definition of i and j in the journal article
-    # Product
-    for i in range(M):
-
-        current_sum = 0
-
-        # summation 
-        for j in range(M):
-                
-            current_sum += x_mat[i,j]*P[:,[j]] + x_mat[i, M]
-
-        S[:,[i]] = current_sum
-
+    # Calc S for an arbitrary dimensional space of P 
+    S = np.matmul(P, k[:,0:-1].T) + (k[:, -1].T  * 2)
 
     return S
 
