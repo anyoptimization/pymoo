@@ -146,7 +146,8 @@ def poly_vf(P, x):
 
         S = _calc_S(P, curr_x)
 
-        product = reduce(mul, S.tolist()[0],1)
+        # Multiply all of the S terms together along the final axis 
+        product = np.prod(S, axis = len(np.shape(S))-1)
 
         result.append(product)
 
@@ -343,7 +344,7 @@ def _sort_P(P, ranks):
 # Can have several P instances, but assumes one x instance 
 def _calc_S(P, x): 
 
-    M = P.shape[1]
+    M = P.shape[-1]
 
     # reshape x into a matrix called k
     k = np.ones((M, M+1))*-99.0
