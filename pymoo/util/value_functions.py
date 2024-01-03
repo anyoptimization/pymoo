@@ -123,15 +123,14 @@ def linear_vf(P, x):
 def poly_vf(P, x): 
 
     # find out M
-    M = P.shape[1]
+    M = P.shape[-1]
 
-    result = [] 
+    result = []
 
     if len(x.shape) == 1:
         x_len = 1    
     else:
         x_len = x.shape[0]
-
 
     # Calculate value for each row of x 
     for xi in range(x_len):
@@ -151,7 +150,9 @@ def poly_vf(P, x):
 
         result.append(product)
 
-    return np.array(result)
+
+
+    return np.squeeze(np.array(result))
 
 
 def plot_vf(P, vf): 
@@ -356,7 +357,7 @@ def _calc_S(P, x):
     # Calc S for an arbitrary dimensional space of P 
     S = np.matmul(P, k[:,0:-1].T) + (k[:, -1].T  * 2)
 
-    return S
+    return np.squeeze(S)
 
 
 # Constraint that states that the x values must add up to 1

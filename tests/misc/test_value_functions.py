@@ -218,7 +218,7 @@ test_eq_constr_poly_io = [
         [0, -(0.82 + 0.94 - 1)]
     ),
     #(
-    #    # Linear function values to optimize (x). This is one individual
+    #    # Linear function values to optimize (x). This is one individual 
     #    np.array([[0.8, 0.22, 0.82, 0.94, 261, -351.91, 0.5], 
     #             [1, 0.34, 0.33, 0.49, -333.48, -360.15, 0.6]])
 
@@ -274,16 +274,43 @@ test_calc_S = [
             [[525.738, -697.202], [524.902, -697.916]],
             [[526.95, -696.96], [523.544, -698.522 ]]
         ])
+    ),
+    # K stuffed into an x matrix, a 2 dimensional space of Ps (3D array) with rectangular dimensions
+    (
+        np.array([0.8, 0.22, 0.82, 0.94, 261, -351.91]), 
+
+        np.array([
+            [[3.6, 3.9], [2.5, 4.1], [6.9, 1.8]],
+            [[5.5, 2.5], [0.5, 5.2], [3.3, 2.1]]
+        ]),
+        np.array([
+            [[525.738, -697.202], [524.902, -697.916], [527.916,-696.47]],
+            [[526.95, -696.96], [523.544, -698.522 ], [525.102,-699.14]]
+        ])
+    ),
+    # K stuffed into an x matrix, a 2 dimensional space of Ps (3D array) with rectangular dimensions
+    (
+        np.array([0.8, 0.22, 0.82, 0.94, 261, -351.91]), 
+
+        np.array([
+            [[3.6, 3.9], [2.5, 4.1]],
+            [[5.5, 2.5], [0.5, 5.2]],
+            [[6.9, 1.8], [3.3, 2.1]]
+        ]),
+        np.array([
+            [[525.738, -697.202], [524.902, -697.916]],
+            [[526.95, -696.96], [523.544, -698.522 ]],
+            [[527.916,-696.47], [525.102,-699.14]]
+        ])
     ) 
-
-
-
-
 
 ]
 
 @pytest.mark.parametrize('x, P, expected_S', test_calc_S)
 def test_calc_S(x, P, expected_S):
+
+
+    assert np.shape(mvf._calc_S(P, x)) == np.shape(expected_S)
 
     S = mvf._calc_S(P, x)
 
@@ -371,7 +398,7 @@ test_poly_vf_in_out = [
         np.array([[3.6, 3.9]]), 
 
         # Expected value 
-        np.array([[-143781.4626, 117136.3531, -214281.6713, 339364.617, -237939.7818]]).T
+        np.array([-143781.4626, 117136.3531, -214281.6713, 339364.617, -237939.7818])
     ),
     (
 
@@ -385,13 +412,56 @@ test_poly_vf_in_out = [
         np.array([[3.6, 3.9]]), 
 
         # Expected value 
-        np.array([[-143781.4626]]).T
+        np.array(-143781.4626)
     ),
+    (
+        np.array([0.8, 0.22, 0.82, 0.94, 261, -351.91]), 
+        np.array([
+            [[3.6, 3.9], [2.5, 4.1]],
+            [[5.5, 2.5], [0.5, 5.2]]
+        ]),
+        np.array([
+            [-366545.5851, -366337.5042],
+            [-367263.072, -365707.002]
+        ])
+    ) ,
+    # K stuffed into an x matrix, a 2 dimensional space of Ps (3D array) with rectangular dimensions
+    (
+        np.array([0.8, 0.22, 0.82, 0.94, 261, -351.91]), 
+
+        np.array([
+            [[3.6, 3.9], [2.5, 4.1], [6.9, 1.8]],
+            [[5.5, 2.5], [0.5, 5.2], [3.3, 2.1]]
+        ]),
+        np.array([
+            [-366545.5851, -366337.5042, -367677.6565],
+            [-367263.072, -365707.002, -367119.8123]
+        ])
+    ),
+    # K stuffed into an x matrix, a 2 dimensional space of Ps (3D array) with rectangular dimensions
+    (
+        np.array([0.8, 0.22, 0.82, 0.94, 261, -351.91]), 
+
+        np.array([
+            [[3.6, 3.9], [2.5, 4.1]],
+            [[5.5, 2.5], [0.5, 5.2]],
+            [[6.9, 1.8], [3.3, 2.1]]
+        ]),
+        np.array([
+            [-366545.5851, -366337.5042],
+            [-367263.072, -365707.002],
+            [-367677.6565, -367119.8123]
+
+        ])
+    ) 
+
 ]
 
 @pytest.mark.parametrize('x, P, expected_value', test_poly_vf_in_out)
 def test_poly_vf(x, P, expected_value):
-    
+  
+    assert np.shape(mvf.poly_vf(P, x)) == np.shape(expected_value)
+
     assert np.all(np.isclose(expected_value, mvf.poly_vf(P, x)))
 
 
