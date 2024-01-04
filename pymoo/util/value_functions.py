@@ -118,7 +118,7 @@ def create_vf_pymoo_linear(P, ranks):
 
 def linear_vf(P, x): 
 
-    return np.matmul(P, x.T).T
+    return np.matmul(P, x.T)
 
 def poly_vf(P, x): 
 
@@ -166,8 +166,6 @@ def plot_vf(P, vf):
     x,y = np.meshgrid(np.linspace(0, 8, 1000), np.linspace(0, 8, 1500))
 
     z = vf(np.stack((x,y), axis=2))
-
-    z = z.T
 
     values_at_P = []
     for p in range(np.size(P,0)):
@@ -300,10 +298,13 @@ def _ineq_constr_2D_linear(x, P, vf):
     #  function increases monotonically as rank increases
     for p in range(np.size(P,0) - 1):
 
+
         current_P_val = vf(P[[p],:], x[:, 0:-1])
         next_P = vf(P[[p+1],:], x[:, 0:-1])
 
-        G[:,[p]] = -(current_P_val - next_P) + ep
+        # As vf returns, each column is an value of P for a given x in the population
+        # We transpose to make each ROW the value of P
+        G[:,[p]] = -(current_P_val.T - next_P.T) + ep
 
     return G
 

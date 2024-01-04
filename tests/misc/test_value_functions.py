@@ -378,13 +378,89 @@ def test_eq_const_linear(x, P, ranks, expected_eq_constr):
     ## Test whether or not the constraint function matches our expected values   
     assert np.all(np.isclose(expected_eq_constr, constr))
 
+## --------------- Test the linear value function ---------------
+
+test_linear_vf_io = [
+    # Test with a 1D P vector
+    (
+        np.array([0.5, 0.6]),
+        np.array([
+            [3.6, 3.9],
+            [5.5, 2.5],
+            [2.5, 4.1],
+            [0.5, 5.2]
+        ]),
+        np.array([
+          4.14,
+          4.25,
+          3.71,
+          3.37
+        ])
+    ),
+    # Test with a 2x2 2D P vector 
+    (
+        np.array([0.5, 0.6]),
+        np.array([
+            [[3.6, 3.9],[2.5, 4.1]],
+            [[5.5, 2.5],[0.5, 5.2]]
+        ]),
+        np.array([
+            [4.14, 3.71],
+            [4.25, 3.37]
+        ])
+    ),
+    # Test with a 3x2 2D P vector 
+    (
+        np.array([0.5, 0.6]),
+        np.array([
+            [[3.6, 3.9],[2.5, 4.1]],
+            [[5.5, 2.5],[0.5, 5.2]],
+            [[6.9, 1.8],[3.3, 2.1]],
+        ]),
+        np.array([
+            [4.14, 3.71],
+            [4.25, 3.37],
+            [4.53, 2.91]
+        ])
+    ),
+    (
+        np.array([
+            [0.5, 0.6],
+            [0.4, 0.7]
+
+            ]),
+        np.array([
+            [[3.6, 3.9],[2.5, 4.1]],
+            [[5.5, 2.5],[0.5, 5.2]],
+            [[6.9, 1.8],[3.3, 2.1]],
+        ]),
+        np.array([
+            [[4.14, 4.17], [3.71, 3.87]],
+            [[4.25, 3.95], [3.37, 3.84]],
+            [[4.53, 4.02], [2.91, 2.79]]
+        ])
+    ),
+
+]
+
+@pytest.mark.parametrize('x, P, expected_value', test_linear_vf_io)
+def test_linear_vf(x, P, expected_value):
+
+
+    assert np.shape(expected_value) == np.shape(mvf.linear_vf(P, x))
+
+    assert np.all(np.isclose(expected_value, mvf.linear_vf(P, x)))
+
+
+
+
 ## --------------- Test the polynomial value function ----------------
 
 test_poly_vf_in_out = [
 
     (
 
-        # Polynomial function values to optimize (x). These are five indentical individuals
+        # Polynomial function values to optimize (x). These are five individuals
         np.array([
                 [0.38,0.51,0.37,0.07,124.98,-284.6],
                 [0.26,0.68,0.69,0.06,380.41,75.26],
