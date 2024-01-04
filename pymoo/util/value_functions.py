@@ -150,8 +150,6 @@ def poly_vf(P, x):
 
         result.append(product)
 
-
-
     return np.squeeze(np.array(result))
 
 
@@ -349,14 +347,19 @@ def _calc_S(P, x):
     M = P.shape[-1]
 
     # reshape x into a matrix called k
-    k = np.ones((M, M+1))*-99.0
+    k = np.array(x[0:M*M].reshape(M,M), copy=True)
+    k = k.T  
+   
+    # roll each column down to work with equation 5
+    for col in range(1, k.shape[1]):
+        k[:,[col]] = np.roll(k[:,[col]], col)
 
-    k[0:M, 0:M] = x[0:M*M].reshape(M,M)
-    
-    k[:, [M]] = x[M*M:(M*M)+M].reshape(M,1)
+
+    l = x[M*M:(M*M)+M].reshape(M,1)
+    l = l.T
 
     # Calc S for an arbitrary dimensional space of P 
-    S = np.matmul(P, k[:,0:-1].T) + (k[:, -1].T  * 2)
+    S = np.matmul(P, k) + (l  * 2)
 
     return np.squeeze(S)
 
