@@ -247,7 +247,8 @@ def _ineq_constr_1D_poly(x, P, vf):
     # Checking to make sure each S term in the polynomial objective function is non-negative
     current_constr = 0
 
-    S = _calc_S(P, x[0:-1])
+
+    S = _calc_S(P, x[0:-1]) * -1
 
     G[:, 0:S_constr_len] = S.reshape(1, S_constr_len)
 
@@ -260,6 +261,7 @@ def _ineq_constr_1D_poly(x, P, vf):
         next_P_val = vf(P[[p+1],:], x[0:-1])
 
         G[:,[p + S_constr_len]] = -(current_P_val - next_P_val) + ep
+
 
     return G
 
