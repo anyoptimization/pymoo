@@ -10,6 +10,7 @@ from pymoo.algorithms.soo.nonconvex.es import ES
 import math 
 from operator import mul
 from functools import reduce
+from pymoo.termination.default import DefaultSingleObjectiveTermination
 
 # Notes: 
 # I'm using the suffix _vf to denote variables used in the value-function optimization 
@@ -140,7 +141,7 @@ def create_vf_pymoo_poly(P, ranks):
 
     res = moomin(vf_prob,
         algorithm,
-        ('n_gen', 200),
+        ('n_gen', 100),
         seed=1)
 
     return lambda P_in: poly_vf(P_in, res.X[0:-1])

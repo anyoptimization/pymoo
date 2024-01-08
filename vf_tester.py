@@ -38,6 +38,7 @@ ranks = [1,2,3,4,5]
 
 vf = mvf.create_poly_vf(P, ranks, "ES")
 
+print("Resulting polynomial parameters:")
 for p in range(1, P.shape[0]):
 
     print(vf(P[p-1, :]) - vf(P[p, :]))
