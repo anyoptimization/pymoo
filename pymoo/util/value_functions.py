@@ -5,6 +5,7 @@ from pymoo.core.problem import Problem
 import pymoo.algorithms.soo.nonconvex.ga
 import matplotlib.pyplot as plt
 from scipy.optimize import NonlinearConstraint
+from scipy.optimize import Bounds
 from pymoo.algorithms.soo.nonconvex.es import ES
 import math 
 from operator import mul
@@ -33,7 +34,7 @@ def create_poly_vf(P, ranks, algorithm="scimin"):
     if algorithm == "scimin": 
         return create_vf_scipy_poly(P, ranks)
     elif algorithm == "ES": 
-        return create_vf_pymoo_poly(P, ranks, poly_vf)
+        return create_vf_pymoo_poly(P, ranks)
     else: 
         raise ValueError("Algorithm %s not supported" % algorithm) 
 
@@ -57,26 +58,41 @@ def create_vf_scipy_poly(P, ranks):
     P_count = P.shape[0]
 
     # Inequality constraints - check that each term of S in our obj is non-negative for each P
-    lb = [-np.inf] * (P_count*M)
-    ub = [0] * (P_count*M)
+    ineq_lb = [-np.inf] * (P_count*M)
+    ineq_ub = [0] * (P_count*M)
 
     # Inequality constraints - check VF is monotonically increasing with user preference
-    lb += [-np.inf] * (P_count - 1)
-    ub += [0] * (P_count - 1)
+    ineq_lb += [-np.inf] * (P_count - 1)
+    ineq_ub += [0] * (P_count - 1)
 
     # Equality constraints (Make sure all terms in VF add up to 1 per term of product)
     for m in range(M): 
-        lb.append(0)
-        ub.append(0)
+        ineq_lb.append(0)
+        ineq_ub.append(0)
 
     P_sorted = _sort_P(P, ranks)
 
-    constr = NonlinearConstraint(_build_constr_poly(P_sorted, poly_vf), lb, ub)
+    constr = NonlinearConstraint(_build_constr_poly(P_sorted, poly_vf), ineq_lb, ineq_ub)
+  
+    # Bounds on x 
+    x_lb = []
+    x_ub = []
+    for m in range(M**2):
+        x_lb.append(0)
+        x_ub.append(1)
+
+    for m in range(M): 
+        x_lb.append(-1000)
+        x_ub.append(1000)
+
+    x_lb.append(-1000)
+    x_ub.append(1000)
    
-    # TODO missing bounds on the variables themselves
+    bounds = Bounds(x_lb, x_ub)
+
     x0 = [1] * (M**2 + M + 1)
 
-    res = scimin(_obj_func, x0, constraints= constr)
+    res = scimin(_obj_func, x0, constraints= constr, bounds = bounds)
 
     return lambda P_in: poly_vf(P_in, res.x[0:-1])
 
@@ -104,7 +120,7 @@ def create_vf_scipy_linear(P, ranks):
 
 def create_vf_pymoo_linear(P, ranks): 
 
-    vf_prob = OptimizeVF(P, ranks, linear_vf)
+    vf_prob = OptimizeLinearVF(P, ranks, linear_vf)
 
     algorithm = ES()
 
@@ -114,6 +130,20 @@ def create_vf_pymoo_linear(P, ranks):
         seed=1)
 
     return lambda P_in: linear_vf(P_in, res.X[0:-1])
+
+
+def create_vf_pymoo_poly(P, ranks):
+
+    vf_prob = OptimizePolyVF(P, ranks, poly_vf)
+
+    algorithm = ES()
+
+    res = moomin(vf_prob,
+        algorithm,
+        ('n_gen', 200),
+        seed=1)
+
+    return lambda P_in: poly_vf(P_in, res.X[0:-1])
 
 
 def linear_vf(P, x): 
@@ -197,11 +227,25 @@ def _eq_constr_poly(x):
     if len(x.shape) == 1:
         result = [] 
         for m in range(M): 
-            print(x[m*M:m*M+M])
             result.append(-(sum(x[m*M:m*M+M]) - 1))
 
     else: 
-        eq_cons = np.sum(x[:,0:-1],1, keepdims=True) - 1
+
+        pop_size = np.size(x,0)
+
+        result = []
+
+        for xi in range(pop_size): 
+
+            result_for_xi = [] 
+
+            for m in range(M): 
+
+                result_for_xi.append(-(sum(x[xi,m*M:m*M+M]) - 1))
+
+            result.append(result_for_xi)
+
+        result = np.array(result)
 
     return result
 
@@ -247,7 +291,6 @@ def _ineq_constr_1D_poly(x, P, vf):
     # Checking to make sure each S term in the polynomial objective function is non-negative
     current_constr = 0
 
-
     S = _calc_S(P, x[0:-1]) * -1
 
     G[:, 0:S_constr_len] = S.reshape(1, S_constr_len)
@@ -261,7 +304,6 @@ def _ineq_constr_1D_poly(x, P, vf):
         next_P_val = vf(P[[p+1],:], x[0:-1])
 
         G[:,[p + S_constr_len]] = -(current_P_val - next_P_val) + ep
-
 
     return G
 
@@ -377,7 +419,7 @@ def _eq_constr_linear(x):
     return eq_cons
 
 
-class OptimizeVF(Problem): 
+class OptimizeLinearVF(Problem): 
 
     def __init__(self, P, ranks, vf):
        
@@ -422,6 +464,62 @@ class OptimizeVF(Problem):
             
         ## Equality constraint that keeps sum of x under 1
         out["H"] = _eq_constr_linear(x)
+
+
+
+
+class OptimizePolyVF(Problem): 
+
+    def __init__(self, P, ranks, vf):
+      
+        M = P.shape[1]
+
+        P_count = P.shape[0]
+
+
+        # One var for each dimension of the object space, plus epsilon 
+        n_var_vf = (M**2 + M + 1)
+
+        # it has one inequality constraints for every pair of solutions in P
+        n_ieq_c_vf =  (P_count*M) + (P_count - 1)
+       
+        xl_vf = [0.0] * n_var_vf 
+        xu_vf = [1.0] * n_var_vf
+        
+        # upper/lower bound on the epsilon variable is -1000/1000
+        xl_vf[-1] = -1000
+        xu_vf[-1] = 1000
+
+        # TODO start everything at 0.5
+
+        self.P = _sort_P(P, ranks)
+
+        self.vf = vf
+
+        super().__init__(n_var_vf, n_obj=1, n_ieq_constr=n_ieq_c_vf, n_eq_constr=M, xl=xl_vf, xu=xu_vf)
+
+    def _evaluate(self, x, out, *args, **kwargs):
+
+        ## Objective function: 
+        obj = _obj_func(x)
+
+        # The objective function above returns a negated version of epsilon 
+        ep = -obj
+
+        # maximize epsilon, or the minimum distance between each contour 
+        out["F"] = obj
+
+        ## Inequality
+        # TODO for now, assuming there are no ties in the ranks
+
+        ineq_func = _build_ineq_constr_poly(self.P, self.vf)
+
+        out["G"] = ineq_func(x)
+            
+        ## Equality constraint that keeps sum of x under 1
+        out["H"] = _eq_constr_poly(x)
+
+
 
 
 

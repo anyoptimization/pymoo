@@ -32,7 +32,7 @@ test_test_prob_const_in_out = [
 def test_ranking(P, rankings, output):
     linear_vf = mvf.linear_vf
 
-    vf_prob = mvf.OptimizeVF(P, rankings, linear_vf)
+    vf_prob = mvf.OptimizeLinearVF(P, rankings, linear_vf)
 
     ## Test whether the solutions are ranked by ranking 
     P_from_prob = vf_prob.P
