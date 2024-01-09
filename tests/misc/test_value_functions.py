@@ -16,9 +16,9 @@ test_dummy_val_fnc_inputs = [
 @pytest.mark.parametrize('P, rankings', test_dummy_val_fnc_inputs)
 def test_vf_constructor(P, rankings):
 
-    val_fnc = mvf.create_linear_vf(P, rankings)
+    val_res = mvf.create_linear_vf(P, rankings)
 
-    assert val_fnc(P[0,:]) 
+    assert val_res.vf(P[0,:]) 
 ## ----------------------- Test Ranking -------------------------
 
 ## Tests whether the constructor is running correctly 
@@ -545,29 +545,47 @@ def test_poly_vf(x, P, expected_value):
 
 ## --------------- Test vf comparator -----------------------------------------
 
-#test_vf_comparator_io = [
-#    # 
-#    #  To recreate: 
-#    # P = np.array([[1, 5],
-#    #               [2, 3],
-#    #               [3, 2],
-#    #               [4, 1]])
-#    # 
-#    # ranks = [3,4,2,1]
-#
-#    (
-#        "poly"
-#
-#
-#        )
-#
-#]
-#
-#
-#@pytest.mark.parametrize(' P, vf_type expected_value', test_poly_vf_in_out)
-#def test_vf_comparator():
-#    
-#    ugh = "implement me"
+test_vf_comparator_io = [
+    # 
+    #  To recreate these parameters: 
+    # P = np.array([[1, 5],
+    #               [2, 3],
+    #               [3, 2],   <- P2
+    #               [4, 1]])
+    # 
+    # ranks = [3,4,2,1]
+    (
+        "linear", 
+        [0.6250625, 0.3750375], 
+        [3,2], # on V2 exactly
+        0
+    ),
+    (
+        "linear", 
+        [0.6250625, 0.3750375], 
+        [4,1], # greater than V2 
+        1
+    ),
+    (
+        "linear", 
+        [0.6250625, 0.3750375], 
+        [1,5], # less than V2
+        -1 
+    ),
+    (
+        "linear", 
+        [0.6250625, 0.3750375], 
+        [2,3], # less than V2 
+        -1 
+    ),
+
+]
+
+
+@pytest.mark.parametrize('vf_type, vf_params, expected', test_poly_vf_in_out)
+def test_vf_comparator(vf_type, vf_params, expected):
+    
+    ugh = "implement me"
 
 
 ## --------------- Smoke test for creating a VF with GA -----------------------
