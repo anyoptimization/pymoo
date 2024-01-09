@@ -29,25 +29,31 @@ ranks = [3,4,2,1]
 
 
 # ES or scimin
-approach = "scimin"
+approach = "ES"
 
 # Linear or polynomial 
-fnc_type = "poly"
+fnc_type = "linear"
 
 
 if fnc_type == "linear":
 
-    vf = mvf.create_linear_vf(P, ranks, approach)
+    vf_res = mvf.create_linear_vf(P, ranks, approach)
 
 elif fnc_type == "poly": 
 
-    vf = mvf.create_poly_vf(P, ranks, approach)
+    vf_res = mvf.create_poly_vf(P, ranks, approach)
 
 else: 
 
     print("function not supported")
 
-mvf.plot_vf(P, vf)
+print("Final parameters:")
+print(vf_res.params)
+
+print("Final epsilon:")
+print(vf_res.epsilon)
+
+mvf.plot_vf(P, vf_res.vf)
 
 
 

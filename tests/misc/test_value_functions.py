@@ -543,6 +543,32 @@ def test_poly_vf(x, P, expected_value):
 
     assert np.all(np.isclose(expected_value, mvf.poly_vf(P, x)))
 
+## --------------- Test vf comparator -----------------------------------------
+
+#test_vf_comparator_io = [
+#    # 
+#    #  To recreate: 
+#    # P = np.array([[1, 5],
+#    #               [2, 3],
+#    #               [3, 2],
+#    #               [4, 1]])
+#    # 
+#    # ranks = [3,4,2,1]
+#
+#    (
+#        "poly"
+#
+#
+#        )
+#
+#]
+#
+#
+#@pytest.mark.parametrize(' P, vf_type expected_value', test_poly_vf_in_out)
+#def test_vf_comparator():
+#    
+#    ugh = "implement me"
+
 
 ## --------------- Smoke test for creating a VF with GA -----------------------
 test_ga_in_out = [
@@ -564,9 +590,12 @@ test_ga_in_out = [
     )
 ]
 
+
+
+
 @pytest.mark.parametrize('P, ranks', test_ga_in_out)
 def test_ga(P, ranks): 
-    vf = mvf.create_linear_vf(P, ranks, "ES")
+    vf_res = mvf.create_linear_vf(P, ranks, "ES")
 
 ## --------------- Smoke test for creating a VF with scipy ------------------
 
@@ -592,7 +621,7 @@ test_scipy_in_out = [
 
 @pytest.mark.parametrize('P, ranks', test_scipy_in_out)
 def test_scipy(P, ranks): 
-    vf = mvf.create_linear_vf(P, ranks, "scimin")
+    vf_res = mvf.create_linear_vf(P, ranks, "scimin")
 
 
 

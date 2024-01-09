@@ -95,7 +95,12 @@ def create_vf_scipy_poly(P, ranks):
 
     res = scimin(_obj_func, x0, constraints= constr, bounds = bounds)
 
-    return lambda P_in: poly_vf(P_in, res.x[0:-1])
+    # package up results 
+    vf =  lambda P_in: poly_vf(P_in, res.x[0:-1])
+    params = res.x[0:-1]
+    epsilon = res.x[-1]
+
+    return vfResults(vf, params, epsilon)
 
 
 def create_vf_scipy_linear(P, ranks): 
@@ -116,8 +121,12 @@ def create_vf_scipy_linear(P, ranks):
 
     res = scimin(_obj_func, x0, constraints= constr)
 
-    return lambda P_in: linear_vf(P_in, res.x[0:-1])
-        
+    # package up results
+    vf =  lambda P_in: linear_vf(P_in, res.x[0:-1])
+    params = res.x[0:-1]
+    epsilon = res.x[-1]
+
+    return vfResults(vf, params, epsilon)
 
 def create_vf_pymoo_linear(P, ranks): 
 
@@ -130,7 +139,11 @@ def create_vf_pymoo_linear(P, ranks):
         ('n_gen', 200),
         seed=1)
 
-    return lambda P_in: linear_vf(P_in, res.X[0:-1])
+    vf = lambda P_in: linear_vf(P_in, res.X[0:-1])
+    params = res.X[0:-1]
+    epsilon = res.X[-1]
+
+    return vfResults(vf, params, epsilon)
 
 
 def create_vf_pymoo_poly(P, ranks):
@@ -144,7 +157,11 @@ def create_vf_pymoo_poly(P, ranks):
         ('n_gen', 100),
         seed=1)
 
-    return lambda P_in: poly_vf(P_in, res.X[0:-1])
+    vf = lambda P_in: poly_vf(P_in, res.X[0:-1])
+    params = res.X[0:-1]
+    epsilon = res.X[-1]
+
+    return vfResults(vf, params, epsilon)
 
 
 def linear_vf(P, x): 
@@ -205,6 +222,7 @@ def plot_vf(P, vf):
     plt.contour(x,y,z, levels=values_at_P)
 
     plt.show()
+
 
 ## ---------------- Polynomial VF creation functions ------------------
 
@@ -420,6 +438,12 @@ def _eq_constr_linear(x):
     return eq_cons
 
 
+# Makes a comparator for a given value function and the P that is ranked second in the 
+def make_vf_comparator(vf, P_rank_2):
+
+    return -99
+
+
 class OptimizeLinearVF(Problem): 
 
     def __init__(self, P, ranks, vf):
@@ -521,9 +545,13 @@ class OptimizePolyVF(Problem):
         out["H"] = _eq_constr_poly(x)
 
 
+class vfResults(): 
 
+    def __init__(self, vf, params, epsilon): 
 
-
-
+        self.vf = vf
+        self.params = params
+        self.epsilon = epsilon  
+    
 
 
