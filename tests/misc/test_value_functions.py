@@ -135,7 +135,7 @@ def test_ineq_constr_linear(x, P, ranks, expected_ineq_con):
 
     P_sorted = mvf._sort_P(P, ranks)
 
-    result = mvf._ineq_constr_linear(x, P_sorted, mvf.linear_vf)
+    result = mvf._ineq_constr_linear(x, P_sorted, mvf.linear_vf, minimize=False)
 
     # Test whether or not the constraint function matches our expected values   
     assert np.all(np.isclose(expected_ineq_con, result))
@@ -205,7 +205,7 @@ def test_ineq_constr_poly(x, P, ranks, expected_ineq_con):
 
     sorted_P = mvf._sort_P(P, ranks) 
 
-    constraints = mvf._ineq_constr_poly(x, P, mvf.poly_vf)
+    constraints = mvf._ineq_constr_poly(x, P, mvf.poly_vf, minimize=False)
     
     assert np.all(np.isclose(expected_ineq_con, constraints))
 

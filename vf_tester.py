@@ -10,7 +10,10 @@ import numpy as np
 #ranks = [1,2,3,4,5]
 #ranks = [1,4,3,5,2]
 
-## Domination example values 
+# This is a great example. Illustrates the when polynomial versus linear works 
+# when the problem is changed from. 
+# TODO Also doesn't work for scimin minimization. It does that weird thing where
+# multiple lines are drawn on the contour
 P = np.array([[1, 5],
               [2, 3],
               [3, 2],
@@ -31,17 +34,20 @@ ranks = [3,4,2,1]
 # ES or scimin
 approach = "ES"
 
-# Linear or polynomial 
-fnc_type = "linear"
+# linear or poly
+fnc_type = "poly"
+
+# max (False) or min (True)
+minimize = False
 
 
 if fnc_type == "linear":
 
-    vf_res = mvf.create_linear_vf(P, ranks, approach)
+    vf_res = mvf.create_linear_vf(P, ranks, approach, minimize)
 
 elif fnc_type == "poly": 
 
-    vf_res = mvf.create_poly_vf(P, ranks, approach)
+    vf_res = mvf.create_poly_vf(P, ranks, approach, minimize)
 
 else: 
 
