@@ -450,7 +450,18 @@ def _eq_constr_linear(x):
 # Makes a comparator for a given value function and the P that is ranked second in the 
 def make_vf_comparator(vf, P_rank_2):
 
-    return -99
+    return lambda P : vf_comparator(vf, P_rank_2, P)
+
+def vf_comparator(vf, P_rank_2, P):
+
+    reference_value = vf(P_rank_2)
+
+    if reference_value > vf(P):
+        return -1
+    elif reference_value < vf(P): 
+        return 1
+    else: 
+        return 0 
 
 
 class OptimizeLinearVF(Problem): 

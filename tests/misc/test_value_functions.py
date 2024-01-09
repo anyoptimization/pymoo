@@ -547,7 +547,7 @@ def test_poly_vf(x, P, expected_value):
 
 test_vf_comparator_io = [
     # 
-    #  To recreate these parameters: 
+    # To recreate these parameters, run maximization on: 
     # P = np.array([[1, 5],
     #               [2, 3],
     #               [3, 2],   <- P2
@@ -556,25 +556,29 @@ test_vf_comparator_io = [
     # ranks = [3,4,2,1]
     (
         "linear", 
-        [0.6250625, 0.3750375], 
+        np.array([[0.6250625, 0.3750375]]), 
+        [3,2],  
         [3,2], # on V2 exactly
         0
     ),
     (
         "linear", 
-        [0.6250625, 0.3750375], 
+        np.array([[0.6250625, 0.3750375]]), 
+        [3,2],  
         [4,1], # greater than V2 
-        1
+        1 
     ),
     (
         "linear", 
-        [0.6250625, 0.3750375], 
+        np.array([[0.6250625, 0.3750375]]), 
+        [3,2],  
         [1,5], # less than V2
         -1 
     ),
     (
         "linear", 
-        [0.6250625, 0.3750375], 
+        np.array([[0.6250625, 0.3750375]]), 
+        [3,2],  
         [2,3], # less than V2 
         -1 
     ),
@@ -582,10 +586,20 @@ test_vf_comparator_io = [
 ]
 
 
-@pytest.mark.parametrize('vf_type, vf_params, expected', test_poly_vf_in_out)
-def test_vf_comparator(vf_type, vf_params, expected):
-    
-    ugh = "implement me"
+@pytest.mark.parametrize('vf_type, vf_params, P2, P, expected', test_vf_comparator_io)
+def test_vf_comparator(vf_type, vf_params, P2, P, expected):
+
+    if vf_type == "linear": 
+        vf = lambda P_in: mvf.linear_vf(P_in, vf_params)
+    elif vf_type == "poly":
+        vf = lambda P_in: mvf.poly_vf(P_in, vf_params)
+    else: 
+        assert False
+
+
+    comp = mvf.make_vf_comparator(vf, P2)
+
+    assert comp(P) == expected
 
 
 ## --------------- Smoke test for creating a VF with GA -----------------------
