@@ -24,7 +24,7 @@ jobs:
           linux: "python setup.py sdist"
           macos: "python setup.py bdist_wheel"
           windows: "python setup.py bdist_wheel"
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist
@@ -59,7 +59,7 @@ jobs:
           python-versions: "cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311"
       - name: "Remove non-compatible packages"
         run: "sudo rm dist/*linux_x86_64.whl\n"
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist
