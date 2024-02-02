@@ -157,7 +157,8 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
                 X = ReductionBasedReferenceDirectionFactory(self.n_dim,
                                                             self.n_points,
                                                             kmeans=True,
-                                                            lexsort=False) \
+                                                            lexsort=False,
+                                                            seed=self.seed) \
                     .do()
 
             elif self.sampling == "construction":
