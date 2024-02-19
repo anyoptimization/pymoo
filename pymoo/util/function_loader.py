@@ -28,6 +28,10 @@ def get_functions():
             "python": efficient_non_dominated_sort,
             "cython": "pymoo.cython.non_dominated_sorting",
         },
+        "fast_best_order_sort": {
+            "python": None,
+            "cython": "pymoo.cython.non_dominated_sorting",
+        },
         "tree_based_non_dominated_sort": {
             "python": tree_based_non_dominated_sort,
             "cython": "pymoo.cython.non_dominated_sorting",
