@@ -1,6 +1,7 @@
 from pymoo.util.ref_dirs.energy import RieszEnergyReferenceDirectionFactory
 from pymoo.util.ref_dirs.energy_layer import LayerwiseRieszEnergyReferenceDirectionFactory
 from pymoo.util.ref_dirs.reduction import ReductionBasedReferenceDirectionFactory
+from pymoo.util.ref_dirs.incremental import IncrementalReferenceDirectionFactory
 from pymoo.util.reference_direction import MultiLayerReferenceDirectionFactory
 
 
@@ -14,6 +15,7 @@ def get_reference_directions(name, *args, **kwargs):
         "multi-layer": MultiLayerReferenceDirectionFactory,
         "layer-energy": LayerwiseRieszEnergyReferenceDirectionFactory,
         "reduction": ReductionBasedReferenceDirectionFactory,
+        "incremental": IncrementalReferenceDirectionFactory,
     }
 
     if name not in REF:

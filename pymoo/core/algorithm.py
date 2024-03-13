@@ -66,9 +66,6 @@ class Algorithm:
         # the random seed that was used
         self.seed = seed
 
-        # an algorithm can defined the default termination which can be overwritten
-        self.termination = termination
-
         # the function evaluator object (can be used to inject code)
         if evaluator is None:
             evaluator = Evaluator()

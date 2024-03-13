@@ -94,8 +94,11 @@ class MixedVariableMating(InfillCriterion):
             crossover = self.crossover[clazz]
             assert crossover.n_parents == XOVER_N_PARENTS and crossover.n_offsprings == XOVER_N_OFFSPRINGS
 
-            _parents = [[Individual(X=np.array([parent.X[var] for var in list_of_vars])) for parent in parents] for
-                        parents in pop]
+            _parents = [
+                [Individual(X=np.array([parent.X[var] for var in list_of_vars], dtype="O" if clazz is Choice else None)) 
+                  for parent in parents] 
+                for parents in pop
+            ]
 
             _vars = {e: vars[e] for e in list_of_vars}
             _xl = np.array([vars[e].lb if hasattr(vars[e], "lb") else None for e in list_of_vars])
