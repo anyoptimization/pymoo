@@ -253,6 +253,7 @@ class Algorithm:
 
         res.pop = self.pop
         res.archive = self.archive
+        res.data = self.data
 
         # get the optimal solution found
         opt = self.opt

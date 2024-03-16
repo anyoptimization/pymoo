@@ -36,6 +36,9 @@ class Result:
         # the history of the optimization run is they were saved
         self.history = []
 
+        # data stored within the algorithm
+        self.data = None
+
     @property
     def cv(self):
         return self.CV[0]
