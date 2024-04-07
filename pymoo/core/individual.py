@@ -3,7 +3,7 @@ Module containing infrastructure for representing individuals in
 population-based optimization algorithms.
 """
 
-# public API for when using ``from pymoo.core.variable import *``
+# public API for when using ``from pymoo.core.individual import *``
 __all__ = [
     "default_config",
     "Individual",
