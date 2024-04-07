@@ -19,7 +19,7 @@ from warnings import warn
 import numpy as np
 
 
-def default_config():
+def default_config() -> dict:
     """
     Get default constraint violation configuration settings.
 
