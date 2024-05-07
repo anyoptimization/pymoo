@@ -1,9 +1,10 @@
 from pymoo.visualization.Dashboard import Dashboard
-from pymoo.algorithms.moo.nsga2 import NSGA2
+from pymoo.algorithms.moo.pinsga2 import PINSGA2
 from pymoo.optimize import minimize
 from pymoo.problems.multi import ZDT1
 import pymoo.gradient.toolbox as anp
-
+import matplotlib.pyplot as plt
+from pymoo.visualization.scatter import Scatter
 
 class ZDT1_max(ZDT1):
 
@@ -23,14 +24,36 @@ class ZDT1_max(ZDT1):
 
 problem = ZDT1_max()
 
-algorithm = NSGA2(pop_size=100)
+algorithm = PINSGA2(pop_size=100)
+
+def plot_eta_F(context, algorithm):
+
+   
+    # Next highlight the eta selctions
+    if len(algorithm.eta_F) > 0:
+        plot = Scatter().add(algorithm.paused_F)
+        plot.add(algorithm.eta_F)
+
+    else: 
+        F = algorithm.pop.get("F")
+        plot = Scatter().add(F)
+
+
+
+    plot.plot_if_not_done_yet()
+
+    return plot.fig
+ 
 
 res = minimize(problem,
                algorithm,
                ('n_gen', 200),
                seed=1,
-               callback=Dashboard(),
+               callback=Dashboard(plot_eta_F=plot_eta_F),
                verbose=True)
+
+
+
 
 
 

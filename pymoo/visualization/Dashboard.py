@@ -26,8 +26,10 @@ from pymoo.util.ref_dirs import get_reference_directions
 
 class Dashboard(Callback):
 
-    def __init__(self) -> None:
+    def __init__(self, **kwargs) -> None:
+
         super().__init__()
+
         self.data["HV"] = []
 
         self.announcer = self.MessageAnnouncer()    
@@ -35,11 +37,16 @@ class Dashboard(Callback):
         self.flask_thread = threading.Thread(target=self.start_server, daemon=True)
         self.flask_thread.start() 
 
-        self.visualizations = {
+        # Default visualizations + user defined ones
+        self.visualizations = dict({
             "HV": self.plot_hv,
             "Pareto Front Scatter Plot": self.plot_scatter,
             "PCP Plot": self.plot_pcp
-                }
+
+                }, **kwargs)
+
+        # User defined visualizations
+
 
 
         self.overview_fields = ['algorithm', 'problem', 'generation', 'seed', 'pop_size']
@@ -82,7 +89,7 @@ class Dashboard(Callback):
 
             plotter = self.visualizations[v]
 
-            fig = plotter(algorithm)
+            fig = plotter(self, algorithm)
 
             # Set up I/O buffer to save the image 
             buffer = io.BytesIO()
@@ -214,7 +221,8 @@ class Dashboard(Callback):
         return file_content
 
     ## Dashboard plots
-    def plot_scatter(self, algorithm):
+    @staticmethod
+    def plot_scatter(context, algorithm):
 
         # Send PO update to client
         F = algorithm.pop.get("F")
@@ -224,7 +232,8 @@ class Dashboard(Callback):
         return plot.fig
 
 
-    def plot_pcp(self, algorithm):
+    @staticmethod
+    def plot_pcp(context, algorithm):
 
         # Send PO update to client
         F = algorithm.pop.get("F")
@@ -234,10 +243,11 @@ class Dashboard(Callback):
         return plot.fig
 
 
-    def plot_hv(self, algorithm):
+    @staticmethod
+    def plot_hv(context, algorithm):
 
         # Send PO update to client
-        hv_series = self.data["HV"]
+        hv_series = context.data["HV"]
         gen_series = list(range(len(hv_series)))
 
         plt.figure(figsize=(7,7))

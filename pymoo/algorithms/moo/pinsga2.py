@@ -12,6 +12,7 @@ from pymoo.termination.default import DefaultMultiObjectiveTermination
 from pymoo.util.display.multi import MultiObjectiveOutput
 from pymoo.util.dominator import Dominator
 from pymoo.util.misc import has_feasible
+from pymoo.util.reference_direction import select_points_with_maximum_distance
 
 from pymoo.algorithms.moo.nsga2 import binary_tournament
 from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
@@ -47,19 +48,31 @@ class PINSGA2(GeneticAlgorithm):
 
         self.termination = DefaultMultiObjectiveTermination()
         self.tournament_type = 'comp_by_dom_and_crowding'
-        #self.survival=RankAndCrowding()
+
+        self.eta_F = []
 
 
     def _advance(self, infills=None, **kwargs):
 
-        super()._advance(infills=infills, **kwargs)
-      
-        if self.n_gen % 5 == 0:
+        if self.n_gen % 10 == 0:
+
+            F = self.pop.get("F")
+
+            # Eta is the number of solutions displayed to the DM
+            eta_F_indices = select_points_with_maximum_distance(self.pop.get("F"), 6)
+
+            self.eta_F = F[eta_F_indices]
+            self.paused_F = F
 
             print("What's your favorite color?")
             color = input()
 
             print("Neat! %s Is a great color." % color)
+
+        super()._advance(infills=infills, **kwargs)
+      
+
+
 
 
 parse_doc_string(PINSGA2.__init__)
