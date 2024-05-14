@@ -106,7 +106,6 @@ class PINSGA2(GeneticAlgorithm):
 
             self.eta_F = F[eta_F_indices]
             self.eta_F = self.eta_F[self.eta_F[:,0].argsort()]
-            self.eta_F = -1*self.eta_F[self.eta_F[:,0].argsort()]
 
             self.paused_F = F
 
@@ -123,11 +122,11 @@ class PINSGA2(GeneticAlgorithm):
 
             if fnc_type == "linear":
 
-                vf_res = mvf.create_linear_vf(self.eta_F, ranks, approach, minimize)
+                vf_res = mvf.create_linear_vf(self.eta_F * -1, ranks, approach, minimize)
 
             elif fnc_type == "poly":
 
-                vf_res = mvf.create_poly_vf(self.eta_F, ranks, approach, minimize)
+                vf_res = mvf.create_poly_vf(self.eta_F * -1, ranks, approach, minimize)
 
             else:
 

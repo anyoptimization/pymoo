@@ -32,12 +32,13 @@ def plot_eta_F(context, algorithm):
    
     # Next highlight the eta selctions
     if len(algorithm.eta_F) > 0:
-        plot = Scatter().add(algorithm.paused_F)
-        plot.add(algorithm.eta_F)
+        plot = Scatter().add(algorithm.paused_F * -1)
+        plot.add(algorithm.eta_F * -1, s=500, marker='*', facecolors='red')
+        
 
     else: 
         F = algorithm.pop.get("F")
-        plot = Scatter().add(F)
+        plot = Scatter().add(F * -1)
 
 
 
@@ -50,13 +51,13 @@ def plot_vf(context, algorithm):
 
 
     if len(algorithm.eta_F) > 0:
-        plot = mvf.plot_vf(algorithm.eta_F, algorithm.vf_res.vf, show=False)
+        plot = mvf.plot_vf(algorithm.eta_F * -1, algorithm.vf_res.vf, show=False)
         
         return plot.gcf()
     
     else: 
         F = algorithm.pop.get("F")
-        plot = Scatter().add(F)
+        plot = Scatter().add(F * -1)
         plot.plot_if_not_done_yet()
         return plot.fig
 

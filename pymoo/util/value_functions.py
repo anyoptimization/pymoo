@@ -204,12 +204,17 @@ def poly_vf(P, x):
 def plot_vf(P, vf, show=True): 
 
     plt.scatter(P[:,0], P[:,1], marker=".", color="red", s=200 )
-   
+  
+
     for i in range(np.size(P,0)):
         plt.annotate("P%d" % (i+1), (P[i,0], P[i,1]))
 
-    # TODO pull 0 and 8 from min/max P 
-    x,y = np.meshgrid(np.linspace(0, 8, 1000), np.linspace(0, 8, 1500))
+    min_x = min(P[:,0])
+    min_y = min(P[:,1])
+    max_x = max(P[:,0])
+    max_y = max(P[:,1])
+
+    x,y = np.meshgrid(np.linspace(min_x, max_y, 1000), np.linspace(max_x, max_y, 1000))
 
     z = vf(np.stack((x,y), axis=2))
 
