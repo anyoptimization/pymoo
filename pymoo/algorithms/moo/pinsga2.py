@@ -33,6 +33,8 @@ class PINSGA2(GeneticAlgorithm):
                  mutation=PM(eta=20),
                  survival=RankAndCrowding(),
                  output=MultiObjectiveOutput(),
+                 tau=10,
+                 eta=4,
                  **kwargs):
         
         super().__init__(
@@ -49,7 +51,48 @@ class PINSGA2(GeneticAlgorithm):
         self.termination = DefaultMultiObjectiveTermination()
         self.tournament_type = 'comp_by_dom_and_crowding'
 
+        self.tau = tau
+        self.eta = eta
         self.eta_F = []
+
+    @staticmethod
+    def _prompt_for_ranks(F):
+
+        for (e, f) in enumerate(F):
+            print("Solution %d %s" % (e + 1, f))   
+
+        raw_ranks = input("Ranks (e.g., 3, 2, ..., 1): ")
+
+        ranks = [int(raw_rank) for raw_rank in raw_ranks.split()  ] 
+
+        return ranks
+
+    @staticmethod
+    def _get_ranks(F):
+
+        ranks_invalid = True
+
+        print("Rank the given solutions from highest to lowest preference:")
+
+        ranks = PINSGA2._prompt_for_ranks(F)
+
+        while ranks_invalid: 
+
+            fc = F.shape[0]
+
+            if sorted(ranks) == list(range(1,fc+1)):
+
+                ranks_invalid = False 
+
+            else: 
+
+                print("Invalid ranks given. Please try again")
+
+                ranks = PINSGA2._prompt_for_ranks(F)
+                
+
+        return ranks;                         
+    
 
 
     def _advance(self, infills=None, **kwargs):
@@ -59,20 +102,20 @@ class PINSGA2(GeneticAlgorithm):
             F = self.pop.get("F")
 
             # Eta is the number of solutions displayed to the DM
-            eta_F_indices = select_points_with_maximum_distance(self.pop.get("F"), 6)
+            eta_F_indices = select_points_with_maximum_distance(self.pop.get("F"), self.eta)
 
             self.eta_F = F[eta_F_indices]
+            self.eta_F = self.eta_F[self.eta_F[:,0].argsort()]
+            self.eta_F = -1*self.eta_F[self.eta_F[:,0].argsort()]
+
+
             self.paused_F = F
 
-            print("What's your favorite color?")
-            color = input()
+            ranks = PINSGA2._get_ranks(self.eta_F)
 
-            print("Neat! %s Is a great color." % color)
+            print(ranks)
 
         super()._advance(infills=infills, **kwargs)
-      
-
-
 
 
 parse_doc_string(PINSGA2.__init__)
