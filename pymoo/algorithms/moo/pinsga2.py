@@ -55,12 +55,13 @@ class PINSGA2(GeneticAlgorithm):
         self.tau = tau
         self.eta = eta
         self.eta_F = []
+        self.vf_res = None
 
     @staticmethod
     def _prompt_for_ranks(F):
 
         for (e, f) in enumerate(F):
-            print("Solution %d %s" % (e + 1, f))   
+            print("Solution %d %s" % (e + 1, f * -1))   
 
         raw_ranks = input("Ranks (e.g., 3, 2, ..., 1): ")
 
@@ -97,17 +98,19 @@ class PINSGA2(GeneticAlgorithm):
 
     def _advance(self, infills=None, **kwargs):
 
+        super()._advance(infills=infills, **kwargs)
+
+        F = self.pop.get("F")
+
+        # Eta is the number of solutions displayed to the DM
+        eta_F_indices = select_points_with_maximum_distance(self.pop.get("F"), self.eta)
+
+        self.eta_F = F[eta_F_indices]
+        self.eta_F = self.eta_F[self.eta_F[:,0].argsort()]
+
+        self.paused_F = F
+
         if self.n_gen % 10 == 0:
-
-            F = self.pop.get("F")
-
-            # Eta is the number of solutions displayed to the DM
-            eta_F_indices = select_points_with_maximum_distance(self.pop.get("F"), self.eta)
-
-            self.eta_F = F[eta_F_indices]
-            self.eta_F = self.eta_F[self.eta_F[:,0].argsort()]
-
-            self.paused_F = F
 
             ranks = PINSGA2._get_ranks(self.eta_F)
 
@@ -135,8 +138,6 @@ class PINSGA2(GeneticAlgorithm):
             self.vf_res = vf_res
 
 
-
-        super()._advance(infills=infills, **kwargs)
 
 
 parse_doc_string(PINSGA2.__init__)

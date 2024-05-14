@@ -41,7 +41,6 @@ def plot_eta_F(context, algorithm):
         plot = Scatter().add(F * -1)
 
 
-
     plot.plot_if_not_done_yet()
 
     return plot.fig
@@ -50,7 +49,7 @@ def plot_eta_F(context, algorithm):
 def plot_vf(context, algorithm):
 
 
-    if len(algorithm.eta_F) > 0:
+    if len(algorithm.eta_F) > 0 and algorithm.vf_res is not None:
         plot = mvf.plot_vf(algorithm.eta_F * -1, algorithm.vf_res.vf, show=False)
         
         return plot.gcf()
