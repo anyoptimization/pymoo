@@ -5,6 +5,7 @@ from pymoo.problems.multi import ZDT1
 import pymoo.gradient.toolbox as anp
 import matplotlib.pyplot as plt
 from pymoo.visualization.scatter import Scatter
+from pymoo.util import value_functions as mvf
 
 class ZDT1_max(ZDT1):
 
@@ -45,11 +46,26 @@ def plot_eta_F(context, algorithm):
     return plot.fig
  
 
+def plot_vf(context, algorithm):
+
+
+    if len(algorithm.eta_F) > 0:
+        plot = mvf.plot_vf(algorithm.eta_F, algorithm.vf_res.vf, show=False)
+        
+        return plot.gcf()
+    
+    else: 
+        F = algorithm.pop.get("F")
+        plot = Scatter().add(F)
+        plot.plot_if_not_done_yet()
+        return plot.fig
+
+
 res = minimize(problem,
                algorithm,
                ('n_gen', 200),
                seed=1,
-               callback=Dashboard(plot_eta_F=plot_eta_F),
+               callback=Dashboard(plot_eta_F=plot_eta_F, plot_vf=plot_vf),
                verbose=True)
 
 

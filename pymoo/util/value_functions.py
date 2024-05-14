@@ -201,7 +201,7 @@ def poly_vf(P, x):
     return np.squeeze(np.array(result))
 
 
-def plot_vf(P, vf): 
+def plot_vf(P, vf, show=True): 
 
     plt.scatter(P[:,0], P[:,1], marker=".", color="red", s=200 )
    
@@ -221,7 +221,11 @@ def plot_vf(P, vf):
 
     plt.contour(x,y,z, levels=values_at_P)
 
-    plt.show()
+    if show: 
+        plt.show()
+
+    return plt
+
 
 
 ## ---------------- Polynomial VF creation functions ------------------

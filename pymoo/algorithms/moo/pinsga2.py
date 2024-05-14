@@ -13,6 +13,7 @@ from pymoo.util.display.multi import MultiObjectiveOutput
 from pymoo.util.dominator import Dominator
 from pymoo.util.misc import has_feasible
 from pymoo.util.reference_direction import select_points_with_maximum_distance
+from pymoo.util import value_functions as mvf
 
 from pymoo.algorithms.moo.nsga2 import binary_tournament
 from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
@@ -89,7 +90,6 @@ class PINSGA2(GeneticAlgorithm):
                 print("Invalid ranks given. Please try again")
 
                 ranks = PINSGA2._prompt_for_ranks(F)
-                
 
         return ranks;                         
     
@@ -108,12 +108,34 @@ class PINSGA2(GeneticAlgorithm):
             self.eta_F = self.eta_F[self.eta_F[:,0].argsort()]
             self.eta_F = -1*self.eta_F[self.eta_F[:,0].argsort()]
 
-
             self.paused_F = F
 
             ranks = PINSGA2._get_ranks(self.eta_F)
 
-            print(ranks)
+            # ES or scimin
+            approach = "ES"
+
+            # linear or poly
+            fnc_type = "poly"
+
+            # max (False) or min (True)
+            minimize = False
+
+            if fnc_type == "linear":
+
+                vf_res = mvf.create_linear_vf(self.eta_F, ranks, approach, minimize)
+
+            elif fnc_type == "poly":
+
+                vf_res = mvf.create_poly_vf(self.eta_F, ranks, approach, minimize)
+
+            else:
+
+                print("function not supported")
+    
+            self.vf_res = vf_res
+
+
 
         super()._advance(infills=infills, **kwargs)
 
