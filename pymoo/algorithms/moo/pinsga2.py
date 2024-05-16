@@ -56,6 +56,9 @@ class PINSGA2(GeneticAlgorithm):
         self.eta = eta
         self.eta_F = []
         self.vf_res = None
+        self.vf_plot_flag = False
+        self.vf_plot = None
+        self.historical_F = None
 
     @staticmethod
     def _prompt_for_ranks(F):
@@ -102,12 +105,18 @@ class PINSGA2(GeneticAlgorithm):
 
         F = self.pop.get("F")
 
+        if self.historical_F is not None:
+            self.historical_F = np.vstack((self.historical_F, F)) 
+        else: 
+            self.historical_F = F
+
         # Eta is the number of solutions displayed to the DM
         eta_F_indices = select_points_with_maximum_distance(self.pop.get("F"), self.eta)
 
         self.eta_F = F[eta_F_indices]
         self.eta_F = self.eta_F[self.eta_F[:,0].argsort()]
 
+        # A frozen view of the optimization each 10 generations 
         self.paused_F = F
 
         if self.n_gen % 10 == 0:
@@ -136,8 +145,9 @@ class PINSGA2(GeneticAlgorithm):
                 print("function not supported")
     
             self.vf_res = vf_res
-
-
+            self.vf_plot_flag = True
 
 
 parse_doc_string(PINSGA2.__init__)
+
+

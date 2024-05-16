@@ -32,7 +32,14 @@ def plot_eta_F(context, algorithm):
    
     # Next highlight the eta selctions
     if len(algorithm.eta_F) > 0:
-        plot = Scatter().add(algorithm.paused_F * -1)
+
+        # Plot the historical PO fronts
+        plot = Scatter().add(algorithm.historical_F * -1, facecolors= '#f5f5f5', edgecolors='#f5f5f5')
+
+        # The current PO front 
+        plot.add(algorithm.paused_F * -1)
+
+        # Starred items for the DM
         plot.add(algorithm.eta_F * -1, s=500, marker='*', facecolors='red')
         
 
@@ -48,16 +55,25 @@ def plot_eta_F(context, algorithm):
 
 def plot_vf(context, algorithm):
 
+    if not algorithm.vf_plot_flag and algorithm.vf_plot: 
+        return algorithm.vf_plot
 
-    if len(algorithm.eta_F) > 0 and algorithm.vf_res is not None:
+    elif len(algorithm.eta_F) > 0 and (algorithm.vf_res is not None) and algorithm.vf_plot_flag:
         plot = mvf.plot_vf(algorithm.eta_F * -1, algorithm.vf_res.vf, show=False)
         
+        algorithm.vf_plot_flag = False;
+        
+        algorithm.vf_plot = plot.gcf()
+
         return plot.gcf()
     
     else: 
         F = algorithm.pop.get("F")
         plot = Scatter().add(F * -1)
         plot.plot_if_not_done_yet()
+        
+        algorithm.vf_plot = plot.fig
+
         return plot.fig
 
 
