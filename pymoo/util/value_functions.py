@@ -214,7 +214,7 @@ def plot_vf(P, vf, show=True):
     max_x = max(P[:,0])
     max_y = max(P[:,1])
 
-    x,y = np.meshgrid(np.linspace(min_x, max_y, 1000), np.linspace(max_x, max_y, 1000))
+    x,y = np.meshgrid(np.linspace(min_x, max_x, 1000), np.linspace(min_x, max_y, 1000))
 
     z = vf(np.stack((x,y), axis=2))
 
