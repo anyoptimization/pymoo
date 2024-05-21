@@ -1,6 +1,6 @@
 import argparse
 import copy
-import distutils
+import sysconfig
 import os
 import sys
 import traceback
@@ -95,7 +95,7 @@ sys.argv = [e for e in sys.argv if not e.lstrip("-") in args]
 # ============================================================
 
 def is_new_osx():
-    name = distutils.util.get_platform()
+    name = sysconfig.get_platform()
     if sys.platform != "darwin":
         return False
     elif name.startswith("macosx-10"):
