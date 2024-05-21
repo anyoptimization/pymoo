@@ -11,6 +11,7 @@ import math
 from operator import mul
 from functools import reduce
 from pymoo.termination.default import DefaultSingleObjectiveTermination
+import sys
 
 # Notes: 
 # I'm using the suffix _vf to denote variables used in the value-function optimization 
@@ -25,6 +26,7 @@ def create_vf(P, ranks, ineq_constr, vf="linear", algorithm="scimin", minimize=T
     if vf == "linear":
         res = create_linear_vf(P, ranks, algorithm, minimize)
         # TODO validate results 
+        res.fit = _validate_vf(res)
         return res
     else:
         raise ValueError("Value function '%d' not supported." % vf) 
@@ -36,9 +38,11 @@ def create_poly_vf(P, ranks, algorithm="scimin", minimize=True):
     
     if algorithm == "scimin": 
         res = create_vf_scipy_poly(P, ranks, minimize)
+        res.fit = _validate_vf(res)
         return res
     elif algorithm == "ES": 
         res = create_vf_pymoo_poly(P, ranks, minimize)
+        res.fit = _validate_vf(res)
         return res
     else: 
         raise ValueError("Algorithm %s not supported" % algorithm) 
@@ -49,9 +53,11 @@ def create_linear_vf(P, ranks, algorithm="scimin", minimize=True):
     
     if algorithm == "scimin": 
         res = create_vf_scipy_linear(P, ranks, minimize)
+        res.fit = _validate_vf(res)
         return res
     elif algorithm == "ES": 
         res = create_vf_pymoo_linear(P, ranks, minimize)
+        res.fit = _validate_vf(res)
         return res
     else: 
         raise ValueError("Algorithm %s not supported" % algorithm) 
@@ -527,6 +533,13 @@ class OptimizeLinearVF(Problem):
         ## Equality constraint that keeps sum of x under 1
         out["H"] = _eq_constr_linear(x)
 
+def _validate_vf(res):
+    if res.epsilon < 0: 
+        sys.stderr.write("WARNING: Unable to fit value function\n")    
+        return False
+    else:
+        return True
+
 
 
 
@@ -582,7 +595,6 @@ class OptimizePolyVF(Problem):
         ## Equality constraint that keeps sum of x under 1
         out["H"] = _eq_constr_poly(x)
 
-    #def _validate_vf()
 
 class vfResults(): 
 
