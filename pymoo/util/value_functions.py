@@ -23,7 +23,9 @@ from pymoo.termination.default import DefaultSingleObjectiveTermination
 def create_vf(P, ranks, ineq_constr, vf="linear", algorithm="scimin", minimize=True): 
 
     if vf == "linear":
-        return create_linear_vf(P, ranks, algorithm, minimize)
+        res = create_linear_vf(P, ranks, algorithm, minimize)
+        # TODO validate results 
+        return res
     else:
         raise ValueError("Value function '%d' not supported." % vf) 
     
@@ -33,9 +35,11 @@ def create_vf(P, ranks, ineq_constr, vf="linear", algorithm="scimin", minimize=T
 def create_poly_vf(P, ranks, algorithm="scimin", minimize=True):
     
     if algorithm == "scimin": 
-        return create_vf_scipy_poly(P, ranks, minimize)
+        res = create_vf_scipy_poly(P, ranks, minimize)
+        return res
     elif algorithm == "ES": 
-        return create_vf_pymoo_poly(P, ranks, minimize)
+        res = create_vf_pymoo_poly(P, ranks, minimize)
+        return res
     else: 
         raise ValueError("Algorithm %s not supported" % algorithm) 
 
@@ -44,9 +48,11 @@ def create_poly_vf(P, ranks, algorithm="scimin", minimize=True):
 def create_linear_vf(P, ranks, algorithm="scimin", minimize=True): 
     
     if algorithm == "scimin": 
-        return create_vf_scipy_linear(P, ranks, minimize)
+        res = create_vf_scipy_linear(P, ranks, minimize)
+        return res
     elif algorithm == "ES": 
-        return create_vf_pymoo_linear(P, ranks, minimize)
+        res = create_vf_pymoo_linear(P, ranks, minimize)
+        return res
     else: 
         raise ValueError("Algorithm %s not supported" % algorithm) 
 
@@ -214,7 +220,7 @@ def plot_vf(P, vf, show=True):
     max_x = max(P[:,0])
     max_y = max(P[:,1])
 
-    x,y = np.meshgrid(np.linspace(min_x, max_x, 1000), np.linspace(min_x, max_y, 1000))
+    x,y = np.meshgrid(np.linspace(min_x, max_x, 1000), np.linspace(min_y, max_y, 1000))
 
     z = vf(np.stack((x,y), axis=2))
 
@@ -576,6 +582,7 @@ class OptimizePolyVF(Problem):
         ## Equality constraint that keeps sum of x under 1
         out["H"] = _eq_constr_poly(x)
 
+    #def _validate_vf()
 
 class vfResults(): 
 
