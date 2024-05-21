@@ -34,19 +34,20 @@ class PINSGA2(GeneticAlgorithm):
                  selection=TournamentSelection(func_comp=binary_tournament),
                  crossover=SBX(eta=15, prob=0.9),
                  mutation=PM(eta=20),
-                 survival=RankAndCrowding(nds=NonDominatedSorting(dominator=VFDominator())),
                  output=MultiObjectiveOutput(),
                  tau=10,
                  eta=4,
                  **kwargs):
         
+        self.survival = survival=RankAndCrowding(nds=NonDominatedSorting(dominator=VFDominator(self)))
+
         super().__init__(
             pop_size=pop_size,
             sampling=sampling,
             selection=selection,
             crossover=crossover,
             mutation=mutation,
-            survival=survival,
+            survival=self.survival,
             output=output,
             advance_after_initial_infill=True,
             **kwargs)

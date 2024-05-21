@@ -6,6 +6,10 @@ def get_relation(ind_a, ind_b):
 
 class VFDominator:
 
+    def __init__(self, algorithm):
+
+        self.algorithm = algorithm
+
     @staticmethod
     def get_relation(a, b, cva=None, cvb=None):
 
@@ -41,8 +45,10 @@ class VFDominator:
 
         return M
 
-    @staticmethod
-    def calc_domination_matrix(F, _F=None, epsilon=0.0):
+    def calc_domination_matrix(self, F, _F=None, epsilon=0.0):
+
+        if self.algorithm.vf_res is not None: 
+            print(self.algorithm.vf_res.params)
 
         if _F is None:
             _F = F
