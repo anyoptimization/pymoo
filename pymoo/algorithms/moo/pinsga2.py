@@ -59,6 +59,7 @@ class PINSGA2(GeneticAlgorithm):
         self.eta = eta
         self.eta_F = []
         self.vf_res = None
+        self.v2 = None
         self.vf_plot_flag = False
         self.vf_plot = None
         self.historical_F = None
@@ -146,10 +147,11 @@ class PINSGA2(GeneticAlgorithm):
             else:
 
                 print("function not supported")
-    
+
             self.vf_res = vf_res
             self.vf_plot_flag = True
-
+            self.v2 = self.vf_res.vf(self.eta_F[ranks.index(2), :]).item()
+            
 
 parse_doc_string(PINSGA2.__init__)
 

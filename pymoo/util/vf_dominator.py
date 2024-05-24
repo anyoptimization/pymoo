@@ -47,9 +47,6 @@ class VFDominator:
 
     def calc_domination_matrix(self, F, _F=None, epsilon=0.0):
 
-        if self.algorithm.vf_res is not None: 
-            print(self.algorithm.vf_res.params)
-
         if _F is None:
             _F = F
 
@@ -62,12 +59,32 @@ class VFDominator:
 
         smaller = np.reshape(np.any(L + epsilon < R, axis=1), (n, m))
         larger = np.reshape(np.any(L > R + epsilon, axis=1), (n, m))
+    
+        non_dom = np.logical_and(smaller, np.logical_not(larger))
+        dom = np.logical_and(larger, np.logical_not(smaller))
 
-        M = np.logical_and(smaller, np.logical_not(larger)) * 1 \
-            + np.logical_and(larger, np.logical_not(smaller)) * -1
+        if self.algorithm.vf_res is not None: 
 
-        # if cv equal then look at dom
-        # M = constr + (constr == 0) * dom
+            v2 = self.algorithm.v2
+
+            vf = self.algorithm.vf_res.vf
+
+            F_vf = vf(F)[:,np.newaxis]
+            _F_vf = vf(_F)[:,np.newaxis]
+
+            Lv = np.repeat(F_vf, m, axis=0)
+            Rv = np.tile(_F_vf, (n, 1))
+             
+            gtv2 = np.reshape(Lv < v2, (n, m))
+            ltv2 = np.reshape(Rv > v2, (n, m))
+          
+            split_by_v2 = np.logical_and(gtv2, ltv2)
+           
+            dom = np.logical_or(dom, split_by_v2)
+
+        M = non_dom * 1 \
+            + dom * -1
+       
 
         return M
 
