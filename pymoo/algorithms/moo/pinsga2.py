@@ -150,7 +150,7 @@ class PINSGA2(GeneticAlgorithm):
 
             self.vf_res = vf_res
             self.vf_plot_flag = True
-            self.v2 = self.vf_res.vf(self.eta_F[ranks.index(2), :]).item()
+            self.v2 = self.vf_res.vf(self.eta_F[ranks.index(2), :] * -1).item()
             
 
 parse_doc_string(PINSGA2.__init__)
