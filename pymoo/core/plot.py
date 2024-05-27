@@ -74,7 +74,7 @@ class Plot:
 
         # the colormap or the color lists to use
         if isinstance(cmap, str):
-            self.cmap = matplotlib.cm.get_cmap(cmap)
+            self.cmap = matplotlib.pyplot.get_cmap(cmap)
         else:
             self.cmap = cmap
         if isinstance(self.cmap, ListedColormap):
