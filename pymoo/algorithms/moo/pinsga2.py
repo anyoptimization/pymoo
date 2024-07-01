@@ -63,12 +63,13 @@ class PINSGA2(GeneticAlgorithm):
         self.vf_plot_flag = False
         self.vf_plot = None
         self.historical_F = None
+        self.prev_pop = None
 
     @staticmethod
     def _prompt_for_ranks(F):
 
         for (e, f) in enumerate(F):
-            print("Solution %d %s" % (e + 1, f * -1))   
+            print("Solution %d %s" % (e + 1, f))   
 
         raw_ranks = input("Ranks (e.g., 3, 2, ..., 1): ")
 
@@ -99,59 +100,137 @@ class PINSGA2(GeneticAlgorithm):
 
                 ranks = PINSGA2._prompt_for_ranks(F)
 
-        return ranks;                         
+        return np.array(ranks);                         
     
+    def _reset_dm_preference(self):
+
+            print("Back-tracking and removing DM preference from search.")
+
+            self.eta_F = []
+            self.vf_res = None
+            self.v2 = None
+            self.vf_plot_flag = False
+            self.vf_plot = None
+            self.pop = self.prev_pop
 
 
     def _advance(self, infills=None, **kwargs):
 
         super()._advance(infills=infills, **kwargs)
 
-        F = self.pop.get("F")
+        rank, F = self.pop.get("rank", "F")
+
+        F = F[rank == 0]
 
         if self.historical_F is not None:
             self.historical_F = np.vstack((self.historical_F, F)) 
         else: 
             self.historical_F = F
 
+        to_find = self.eta if F.shape[0] >= self.eta else F.shape[0] 
+
         # Eta is the number of solutions displayed to the DM
-        eta_F_indices = select_points_with_maximum_distance(self.pop.get("F"), self.eta)
+        eta_F_indices = select_points_with_maximum_distance(F, to_find)
 
         self.eta_F = F[eta_F_indices]
         self.eta_F = self.eta_F[self.eta_F[:,0].argsort()]
 
+        # Remove duplicate rows
+        self.eta_F = np.unique(self.eta_F, axis=0)
+
         # A frozen view of the optimization each 10 generations 
         self.paused_F = F
 
-        if self.n_gen % 10 == 0:
+        # Record the previous population in case we need to back track 
+        self.prev_pop = self.pop
 
-            ranks = PINSGA2._get_ranks(self.eta_F)
+        dm_time = self.n_gen % 10 == 0
 
-            # ES or scimin
-            approach = "ES"
+        # Check whether we have more than one solution
+        if dm_time and len(self.eta_F) < 2: 
 
-            # linear or poly
-            fnc_type = "poly"
+            print("Population only contains one non-dominated solution. ")
 
-            # max (False) or min (True)
-            minimize = False
+            self._reset_dm_preference()
 
-            if fnc_type == "linear":
 
-                vf_res = mvf.create_linear_vf(self.eta_F * -1, ranks, approach, minimize)
 
-            elif fnc_type == "poly":
 
-                vf_res = mvf.create_poly_vf(self.eta_F * -1, ranks, approach, minimize)
+        elif dm_time:
 
-            else:
+            dm_ranks = PINSGA2._get_ranks(self.eta_F)
 
-                print("function not supported")
+            if len(set(rank)) == 0: 
 
-            self.vf_res = vf_res
-            self.vf_plot_flag = True
-            self.v2 = self.vf_res.vf(self.eta_F[ranks.index(2), :] * -1).item()
-            
+                print("No preference between any two points provided.")
+
+                self._reset_dm_preference()
+
+                return 
+
+            eta_F = self.eta_F
+
+            while eta_F.shape[0] > 1:
+
+                # ES or scimin
+                approach = "ES"
+
+                # linear or poly
+                fnc_type = "poly"
+
+                # max (False) or min (True)
+                minimize = False
+
+                if fnc_type == "linear":
+
+                    vf_res = mvf.create_linear_vf(eta_F * -1, dm_ranks.tolist(), approach, minimize)
+
+                elif fnc_type == "poly":
+
+                    vf_res = mvf.create_poly_vf(eta_F * -1, dm_ranks.tolist(), approach, minimize)
+
+                else:
+
+                    print("function not supported")
+
+                # check if we were able to model the VF
+                if vf_res.fit:
+
+                    self.vf_res = vf_res
+                    self.vf_plot_flag = True
+                    self.v2 = self.vf_res.vf(eta_F[dm_ranks[1] - 1] * -1).item()
+                    break
+
+                else:
+
+                    # If we didn't the model, try to remove the least preferred point and try to refit
+                    print("Could not fit a function to the DM preference")
+
+                    if eta_F.shape[0] == 2:
+
+                        # If not, reset and use normal domination
+                        print("Removing DM preference")
+                        self._reset_dm_preference()
+
+                    else:
+
+                        print("Removing the second best preferred solution from the fit.")
+
+                        # ranks start at 1, not zero
+                        rank_to_remove = dm_ranks[1] 
+                        eta_F = np.delete(eta_F, rank_to_remove - 1, axis=0)
+
+                        dm_ranks = np.concatenate(([dm_ranks[0]], dm_ranks[2:]))
+                        
+                        # update the ranks, since we just removed one
+                        dm_ranks[dm_ranks > rank_to_remove] = dm_ranks[dm_ranks > rank_to_remove] - 1 
+
+
+
+
+
+
+
 
 parse_doc_string(PINSGA2.__init__)
 
