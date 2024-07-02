@@ -2,6 +2,7 @@ from pymoo.visualization.Dashboard import Dashboard
 from pymoo.algorithms.moo.pinsga2 import PINSGA2
 from pymoo.optimize import minimize
 from pymoo.problems.multi import ZDT1
+from pymoo.problems.multi import ZDT3
 import pymoo.gradient.toolbox as anp
 import matplotlib.pyplot as plt
 from pymoo.visualization.scatter import Scatter
@@ -24,8 +25,9 @@ class ZDT1_max(ZDT1):
 
 
 problem = ZDT1_max()
+problem = ZDT3()
 
-algorithm = PINSGA2(pop_size=100)
+algorithm = PINSGA2(pop_size=30)
 
 def plot_eta_F(context, algorithm):
 
@@ -55,9 +57,11 @@ def plot_eta_F(context, algorithm):
 
 def plot_vf(context, algorithm):
 
+    # This option prevents us from plotting vf every single 
     if not algorithm.vf_plot_flag and algorithm.vf_plot: 
         return algorithm.vf_plot
 
+    # This option is if a vf has been calculated and we want to plot it
     elif len(algorithm.eta_F) > 0 and (algorithm.vf_res is not None) and algorithm.vf_plot_flag:
         plot = mvf.plot_vf(algorithm.eta_F * -1, algorithm.vf_res.vf, show=False)
         
@@ -66,15 +70,58 @@ def plot_vf(context, algorithm):
         algorithm.vf_plot = plot.gcf()
 
         return plot.gcf()
-    
+   
+    # This option is if we have not calculated a vf and we just want to show the PF
     else: 
         F = algorithm.pop.get("F")
-        plot = Scatter().add(F * -1)
-        plot.plot_if_not_done_yet()
-        
-        algorithm.vf_plot = plot.fig
 
-        return plot.fig
+        plt.scatter(F[:, 0], F[:, 1], color='blue')
+        
+        algorithm.vf_plot = plt.gcf()
+
+        return algorithm.vf_plot
+
+
+def plot_dom(context, algorithm):
+
+    F = algorithm.pop.get("F")
+
+    fronts = algorithm.fronts
+
+    
+    if len(algorithm.eta_F) > 0 and (algorithm.vf_res is not None):
+        plot = mvf.plot_vf(algorithm.eta_F * -1, algorithm.vf_res.vf, show=False)
+    else:
+        plot = plt
+    
+
+
+    if len(fronts) == 0: 
+        plot.scatter(-1*F[:, 0], -1*F[:, 1], color="blue")
+
+    else: 
+
+        # TODO make this more automatic
+        colors = ['red', 'blue', 'yellow', 'green', 'purple', 'orange', 'black', 'pink', 'brown', 'gray']
+
+        # Plot each of the fronts
+        for f in range(0, max(fronts)):
+            plot.scatter(-1*F[fronts == f, 0], -1*F[fronts == f, 1], 
+                        color=colors[f], 
+                        label="Front %d" % (f + 1))
+
+         
+
+        plot.legend()
+
+    ax = plot.gca()
+
+    ax.set_xlim([min(-1*F[:, 0]) * 0.9, max(-1*F[:, 0]) * 1.1])
+    ax.set_ylim([min(-1*F[:, 1]) * 0.9, max(-1*F[:, 1]) * 1.1])
+
+    return plot.gcf() 
+
+
 
 
 res = minimize(problem,
