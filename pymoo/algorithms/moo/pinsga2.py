@@ -39,7 +39,7 @@ class PINSGA2(GeneticAlgorithm):
                  eta=4,
                  **kwargs):
         
-        self.survival = survival=RankAndCrowding(nds=NonDominatedSorting(dominator=VFDominator(self)))
+        self.survival = RankAndCrowding(nds=NonDominatedSorting(dominator=VFDominator(self)))
 
         super().__init__(
             pop_size=pop_size,
@@ -64,6 +64,7 @@ class PINSGA2(GeneticAlgorithm):
         self.vf_plot = None
         self.historical_F = None
         self.prev_pop = None
+        self.fronts = []
 
     @staticmethod
     def _prompt_for_ranks(F):
@@ -119,6 +120,8 @@ class PINSGA2(GeneticAlgorithm):
         super()._advance(infills=infills, **kwargs)
 
         rank, F = self.pop.get("rank", "F")
+
+        self.fronts = rank
 
         F = F[rank == 0]
 
