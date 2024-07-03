@@ -37,6 +37,7 @@ class PINSGA2(GeneticAlgorithm):
                  output=MultiObjectiveOutput(),
                  tau=10,
                  eta=4,
+                 ranking='absolute',
                  **kwargs):
         
         self.survival = survival=RankAndCrowding(nds=NonDominatedSorting(dominator=VFDominator(self)))
@@ -54,6 +55,8 @@ class PINSGA2(GeneticAlgorithm):
 
         self.termination = DefaultMultiObjectiveTermination()
         self.tournament_type = 'comp_by_dom_and_crowding'
+        
+        self.ranking = ranking
 
         self.tau = tau
         self.eta = eta
@@ -66,25 +69,77 @@ class PINSGA2(GeneticAlgorithm):
         self.prev_pop = None
 
     @staticmethod
-    def _prompt_for_ranks(F):
+    def _prompt_for_ranks(self, F):
+        
+        if self.ranking == 'absolute':
 
-        for (e, f) in enumerate(F):
-            print("Solution %d %s" % (e + 1, f))   
+            for (e, f) in enumerate(F):
+                print("Solution %d %s" % (e + 1, f))   
 
-        raw_ranks = input("Ranks (e.g., 3, 2, ..., 1): ")
+            raw_ranks = input("Ranks (e.g., 3, 2, ..., 1): ")
 
-        ranks = [int(raw_rank) for raw_rank in raw_ranks.split()  ] 
+            ranks = [int(raw_rank) for raw_rank in raw_ranks.split()  ] 
 
-        return ranks
+            return ranks
+        
+        elif self.ranking == 'pairwise':
+            
+            # initialize empty ranking
+            ranks = []
+            for i, f in enumerate( F ):
+                
+                # handle empty case, put first element in first place
+                if not ranks:
+                    ranks.append( [i] )
+                    
+                else:
+                    inserted = False
+                    
+                    # for each remaining elements, compare to all currently ranked elements
+                    for j, group in enumerate( ranks ):
+
+                        # get pairwise preference from user
+                        while True:
+                            preference = input( f"\nWhich solution do you like best?\n[a] {f}\n[b] {F[ group[0] ]}\n[c] These solutions are equivalent.\n--> " ).strip().lower()
+                            if preference in ['a', 'b', 'c']:
+                                break
+                            print("Invalid input. Please enter 'a', 'b', or 'c'.")
+                        
+                        # if better than currenly ranked element place before that element
+                        if preference == 'a':
+                            ranks.insert( j, [i] )
+                            inserted = True
+                            break
+                        
+                        # if equal to currently ranked element place with that element
+                        elif preference == 'c':
+                            group.append( i )
+                            inserted = True
+                            break
+                        
+                    # if found to be worse than all place at the end
+                    if not inserted:
+                        ranks.append( [i] )
+            
+            # flatten and number 
+            f_ranks = []
+            for i, group in enumerate( ranks ):
+                f_ranks.extend( [ i+1 ] * len( group ) )
+            
+            return f_ranks
+        
+        else:
+            print("Unsuported ranking method, please set ranking to 'absolute', or 'pairwise'.")
+            
 
     @staticmethod
-    def _get_ranks(F):
+    def _get_ranks(self, F):
 
         ranks_invalid = True
 
         print("Rank the given solutions from highest to lowest preference:")
 
-        ranks = PINSGA2._prompt_for_ranks(F)
+        ranks = PINSGA2._prompt_for_ranks(self, F)
 
         while ranks_invalid: 
 
@@ -158,7 +213,7 @@ class PINSGA2(GeneticAlgorithm):
 
         elif dm_time:
 
-            dm_ranks = PINSGA2._get_ranks(self.eta_F)
+            dm_ranks = PINSGA2._get_ranks(self, self.eta_F)
 
             if len(set(rank)) == 0: 
 
