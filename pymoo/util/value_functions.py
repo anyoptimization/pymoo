@@ -2,11 +2,11 @@ import numpy as np
 from pymoo.optimize import minimize as moomin
 from scipy.optimize import minimize as scimin
 from pymoo.core.problem import Problem
-import pymoo.algorithms.soo.nonconvex.ga
 import matplotlib.pyplot as plt
 from scipy.optimize import NonlinearConstraint
 from scipy.optimize import Bounds
 from pymoo.algorithms.soo.nonconvex.es import ES
+from pymoo.algorithms.soo.nonconvex.ga import GA
 import math 
 from operator import mul
 from functools import reduce
@@ -21,49 +21,47 @@ import sys
 # Input 2: The ranking of the given non-dominated points 
 # Input 3: constraint function for optimizing the value func
 # Input 4: the skeleton utility function that we're trying to optimize
-def create_vf(P, ranks, ineq_constr, vf="linear", algorithm="scimin", minimize=True): 
+def create_vf(P, ranks, ineq_constr, vf="linear", method="trust-constr", minimize=True): 
 
     if vf == "linear":
-        res = create_linear_vf(P, ranks, algorithm, minimize)
-        # TODO validate results 
+        res = create_linear_vf(P, ranks, method, minimize)
         res.fit = _validate_vf(res)
         return res
     else:
         raise ValueError("Value function '%d' not supported." % vf) 
-    
 
     return lambda f_new:  np.sum(f_new)
 
-def create_poly_vf(P, ranks, algorithm="scimin", minimize=True):
+def create_poly_vf(P, ranks, method="trust-constr", minimize=True):
     
-    if algorithm == "scimin": 
-        res = create_vf_scipy_poly(P, ranks, minimize)
+    if method == "trust-constr" or method == "SLSQP": 
+        res = create_vf_scipy_poly(P, ranks, minimize, method=method)
         res.fit = _validate_vf(res)
         return res
-    elif algorithm == "ES": 
-        res = create_vf_pymoo_poly(P, ranks, minimize)
+    elif method == "ES": 
+        res = create_vf_pymoo_poly(P, ranks, minimize, method=method)
         res.fit = _validate_vf(res)
         return res
     else: 
-        raise ValueError("Algorithm %s not supported" % algorithm) 
+        raise ValueError("Optimization method %s not supported" % method) 
 
 
 
-def create_linear_vf(P, ranks, algorithm="scimin", minimize=True): 
+def create_linear_vf(P, ranks, method="trust-constr", minimize=True): 
     
-    if algorithm == "scimin": 
-        res = create_vf_scipy_linear(P, ranks, minimize)
+    if method == "trust-constr" or method == "SLSQP": 
+        res = create_vf_scipy_linear(P, ranks, minimize, method)
         res.fit = _validate_vf(res)
         return res
-    elif algorithm == "ES": 
-        res = create_vf_pymoo_linear(P, ranks, minimize)
+    elif method == "ES": 
+        res = create_vf_pymoo_linear(P, ranks, minimize, method)
         res.fit = _validate_vf(res)
         return res
     else: 
-        raise ValueError("Algorithm %s not supported" % algorithm) 
+        raise ValueError("Optimization method %s not supported" % method) 
 
 
-def create_vf_scipy_poly(P, ranks, minimize=True):
+def create_vf_scipy_poly(P, ranks, minimize=True, method="trust-constr"):
 
     # Gathering basic info
     M = P.shape[1]
@@ -105,7 +103,12 @@ def create_vf_scipy_poly(P, ranks, minimize=True):
 
     x0 = [1] * (M**2 + M + 1)
 
-    res = scimin(_obj_func, x0, constraints= constr, bounds = bounds)
+    #if method == 'trust-constr':
+    #    hess = lambda x: numpy.zeros((M, M))
+    #else: 
+    #    hess = None
+
+    res = scimin(_obj_func, x0, constraints=constr, bounds=bounds, method=method)
 
     # package up results 
     vf =  lambda P_in: poly_vf(P_in, res.x[0:-1])
@@ -115,7 +118,7 @@ def create_vf_scipy_poly(P, ranks, minimize=True):
     return vfResults(vf, params, epsilon)
 
 
-def create_vf_scipy_linear(P, ranks, minimize=True): 
+def create_vf_scipy_linear(P, ranks, minimize=True, method="trust-constr"): 
 
     # Inequality constraints
     lb = [-np.inf] * (P.shape[0] - 1)
@@ -140,11 +143,16 @@ def create_vf_scipy_linear(P, ranks, minimize=True):
 
     return vfResults(vf, params, epsilon)
 
-def create_vf_pymoo_linear(P, ranks, minimize=True): 
+def create_vf_pymoo_linear(P, ranks, minimize=True, method="ES"): 
 
     vf_prob = OptimizeLinearVF(P, ranks, linear_vf, minimize)
 
-    algorithm = ES()
+    if method == "ES":
+        algorithm = ES()
+    elif method == "GA": 
+        algorithm = GA()
+    else: 
+        raise ValueError("Optimization method %s not supported" % method) 
 
     res = moomin(vf_prob,
         algorithm,
@@ -164,11 +172,16 @@ def create_vf_pymoo_linear(P, ranks, minimize=True):
     return vfResults(vf, params, epsilon)
 
 
-def create_vf_pymoo_poly(P, ranks, minimize=True):
+def create_vf_pymoo_poly(P, ranks, minimize=True, method="trust-constr"):
 
     vf_prob = OptimizePolyVF(P, ranks, poly_vf, minimize)
 
-    algorithm = ES()
+    if method == "ES":
+        algorithm = ES()
+    elif method == "GA": 
+        algorithm = GA()
+    else: 
+        raise ValueError("Optimization method %s not supported" % method) 
 
     res = moomin(vf_prob,
         algorithm,

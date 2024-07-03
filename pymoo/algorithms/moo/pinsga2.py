@@ -37,6 +37,8 @@ class PINSGA2(GeneticAlgorithm):
                  output=MultiObjectiveOutput(),
                  tau=10,
                  eta=4,
+                 opt_method="trust-constr",
+                 vf_type="poly",
                  **kwargs):
         
         self.survival = RankAndCrowding(nds=NonDominatedSorting(dominator=VFDominator(self)))
@@ -55,6 +57,8 @@ class PINSGA2(GeneticAlgorithm):
         self.termination = DefaultMultiObjectiveTermination()
         self.tournament_type = 'comp_by_dom_and_crowding'
 
+        self.vf_type = vf_type
+        self.opt_method = opt_method
         self.tau = tau
         self.eta = eta
         self.eta_F = []
@@ -175,26 +179,17 @@ class PINSGA2(GeneticAlgorithm):
 
             while eta_F.shape[0] > 1:
 
-                # ES or scimin
-                approach = "ES"
+                if self.vf_type == "linear":
 
-                # linear or poly
-                fnc_type = "poly"
+                    vf_res = mvf.create_linear_vf(eta_F * -1, dm_ranks.tolist(), self.opt_method)
 
-                # max (False) or min (True)
-                minimize = False
+                elif self.vf_type == "poly":
 
-                if fnc_type == "linear":
-
-                    vf_res = mvf.create_linear_vf(eta_F * -1, dm_ranks.tolist(), approach, minimize)
-
-                elif fnc_type == "poly":
-
-                    vf_res = mvf.create_poly_vf(eta_F * -1, dm_ranks.tolist(), approach, minimize)
+                    vf_res = mvf.create_poly_vf(eta_F * -1, dm_ranks.tolist(), self.opt_method)
 
                 else:
-
-                    print("function not supported")
+                    
+                    raise ValueError("Value function %s not supported" % self.vf_type)
 
                 # check if we were able to model the VF
                 if vf_res.fit:

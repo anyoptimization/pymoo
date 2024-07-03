@@ -8,12 +8,13 @@ import matplotlib.pyplot as plt
 from pymoo.visualization.scatter import Scatter
 from pymoo.util import value_functions as mvf
 
+
+# Example from original PI-EMO-VF literature
 class ZDT1_max(ZDT1):
 
     def _evaluate(self, x, out, *args, **kwargs): 
         f1 = x[:, 0]
         g = 1 + 9.0 / (self.n_var - 1) * anp.sum(x[:, 1:], axis=1)
-        #f2 = g * (1 - anp.power((f1 / g), 0.5))
         f2 = (10 - anp.power((f1 * g), 0.5)) / g
 
         f1 = -1 * f1;
@@ -22,12 +23,6 @@ class ZDT1_max(ZDT1):
         out["F"] = anp.column_stack([f1, f2])
 
 
-
-
-problem = ZDT1_max()
-problem = ZDT3()
-
-algorithm = PINSGA2(pop_size=30)
 
 def plot_eta_F(context, algorithm):
 
@@ -122,6 +117,11 @@ def plot_dom(context, algorithm):
     return plot.gcf() 
 
 
+problem = ZDT3()
+
+# opt_method can be trust-constr, SLSQP, ES, or GA
+# vf_type can be linear or poly
+algorithm = PINSGA2(pop_size=30, opt_method="trust-constr", vf_type="poly")
 
 
 res = minimize(problem,
