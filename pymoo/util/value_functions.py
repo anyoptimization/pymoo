@@ -103,12 +103,18 @@ def create_vf_scipy_poly(P, ranks, minimize=False, method="trust-constr"):
 
     x0 = [1] * (M**2 + M + 1)
 
-    #if method == 'trust-constr':
-    #    hess = lambda x: numpy.zeros((M, M))
-    #else: 
-    #    hess = None
+    if method == 'trust-constr':
+        # The trust-constr method always finds the decision space linear
+        hess = lambda x: np.zeros((len(x0), len(x0)))
+    else: 
+        hess = None
 
-    res = scimin(_obj_func, x0, constraints=constr, bounds=bounds, method=method)
+    res = scimin(_obj_func, 
+                 x0, 
+                 constraints=constr, 
+                 bounds=bounds, 
+                 method=method, 
+                 hess=hess)
 
     # package up results 
     vf =  lambda P_in: poly_vf(P_in, res.x[0:-1])
