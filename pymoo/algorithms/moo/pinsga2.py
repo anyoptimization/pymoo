@@ -87,6 +87,7 @@ class PINSGA2(GeneticAlgorithm):
 
         # initialize empty ranking
         ranks = []
+        offset = 0
         for i, f in enumerate( F ):
             
             # handle empty case, put first element in first place
@@ -108,26 +109,24 @@ class PINSGA2(GeneticAlgorithm):
                     
                     # if better than currenly ranked element place before that element
                     if preference == 'a':
-                        ranks.insert( j, [i] )
+                        ranks.insert( j, [ i - offset ] )
                         inserted = True
                         break
                     
                     # if equal to currently ranked element place with that element
                     elif preference == 'c':
-                        group.append( i )
+                        group.append( i - 1 - offset )
+                        offset += 1
                         inserted = True
                         break
                     
                 # if found to be worse than all place at the end
                 if not inserted:
-                    ranks.append( [i] )
+                    ranks.append( [ i - offset ] )
         
-        # flatten and number 
-        f_ranks = []
-        for i, group in enumerate( ranks ):
-            f_ranks.extend( [ i+1 ] * len( group ) )
+        ranks = [ rank for group in ranks for rank in group ]
         
-        return np.array(f_ranks)
+        return np.array(ranks)
 
 
     @staticmethod
