@@ -9,7 +9,7 @@ from pymoo.visualization.scatter import Scatter
 from pymoo.util import value_functions as mvf
 
 
-# Example from original PI-EMO-VF literature
+# Additional example from original PI-EMO-VF literature
 class ZDT1_max(ZDT1):
 
     def _evaluate(self, x, out, *args, **kwargs): 
@@ -77,52 +77,11 @@ def plot_vf(context, algorithm):
         return algorithm.vf_plot
 
 
-def plot_dom(context, algorithm):
-
-    F = algorithm.pop.get("F")
-
-    fronts = algorithm.fronts
-
-    
-    if len(algorithm.eta_F) > 0 and (algorithm.vf_res is not None):
-        plot = mvf.plot_vf(algorithm.eta_F * -1, algorithm.vf_res.vf, show=False)
-    else:
-        plot = plt
-    
-
-
-    if len(fronts) == 0: 
-        plot.scatter(-1*F[:, 0], -1*F[:, 1], color="blue")
-
-    else: 
-
-        # TODO make this more automatic
-        colors = ['red', 'blue', 'yellow', 'green', 'purple', 'orange', 'black', 'pink', 'brown', 'gray']
-
-        # Plot each of the fronts
-        for f in range(0, max(fronts)):
-            plot.scatter(-1*F[fronts == f, 0], -1*F[fronts == f, 1], 
-                        color=colors[f], 
-                        label="Front %d" % (f + 1))
-
-         
-
-        plot.legend()
-
-    ax = plot.gca()
-
-    ax.set_xlim([min(-1*F[:, 0]) * 0.9, max(-1*F[:, 0]) * 1.1])
-    ax.set_ylim([min(-1*F[:, 1]) * 0.9, max(-1*F[:, 1]) * 1.1])
-
-    return plot.gcf() 
-
-
 problem = ZDT3()
 
 # opt_method can be trust-constr, SLSQP, ES, or GA
 # vf_type can be linear or poly
 algorithm = PINSGA2(pop_size=30, opt_method="trust-constr", vf_type="poly")
-
 
 res = minimize(problem,
                algorithm,
@@ -130,10 +89,4 @@ res = minimize(problem,
                seed=1,
                callback=Dashboard(plot_eta_F=plot_eta_F, plot_vf=plot_vf),
                verbose=True)
-
-
-
-
-
-
 
