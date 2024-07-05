@@ -154,7 +154,7 @@ def create_vf_scipy_linear(P, ranks, delta, method="trust-constr"):
 
 def create_vf_pymoo_linear(P, ranks, delta, method="ES"): 
 
-    vf_prob = OptimizeLinearVF(P, ranks, linear_vf)
+    vf_prob = OptimizeLinearVF(P, ranks, delta, linear_vf)
 
     if method == "ES":
         algorithm = ES()
@@ -181,9 +181,9 @@ def create_vf_pymoo_linear(P, ranks, delta, method="ES"):
     return vfResults(vf, params, epsilon)
 
 
-def create_vf_pymoo_poly(P, ranks, method="trust-constr"):
+def create_vf_pymoo_poly(P, ranks, delta, method="trust-constr"):
 
-    vf_prob = OptimizePolyVF(P, ranks, poly_vf)
+    vf_prob = OptimizePolyVF(P, ranks, delta, poly_vf)
 
     if method == "ES":
         algorithm = ES()
@@ -378,7 +378,15 @@ def _ineq_constr_1D_poly(x, P, vf, ranks, delta):
         current_P_val = vf(P[[p],:], x[0:-1])
         next_P_val = vf(P[[p+1],:], x[0:-1])
 
-        G[:,[p + S_constr_len]] = -(current_P_val - next_P_val) + ep
+        current_rank = ranks[p]
+        next_rank = ranks[p+1]
+
+        if current_rank == next_rank: 
+            # Handle ties
+            G[:,[p + S_constr_len]] = np.abs(current_P_val - next_P_val) - delta*ep
+        else: 
+            G[:,[p + S_constr_len]] = -(current_P_val - next_P_val) + ep
+
 
     return G
 
@@ -422,11 +430,15 @@ def _ineq_constr_2D_linear(x, P, vf, ranks, delta):
         current_rank = ranks[p]
         next_rank = ranks[p+1]
 
-        # As vf returns, each column is an value of P for a given x in the population
-        # We transpose to make each ROW the value of P
         
-        # TODO Handle ties 
-        G[:,[p]] = -(current_P_val.T - next_P.T) + ep
+        if current_rank == next_rank: 
+            # Handle ties 
+            G[:,[p]] = np.abs(current_P_val.T - next_P.T) - delta*ep
+        else: 
+            # As vf returns, each column is an value of P for a given x in the population
+            # We transpose to make each ROW the value of P
+            G[:,[p]] = -(current_P_val.T - next_P.T) + ep
+
 
     return G
 
@@ -447,13 +459,12 @@ def _ineq_constr_1D_linear(x, P, vf, ranks, delta):
         current_rank = ranks[p]
         next_rank = ranks[p+1]
 
-        # Handle ties 
-        #if current_rank == next_rank: 
-        #    G[:,[p]] = np.abs(current_P_val - next_P) - delta*ep
-        #    #c(i) = abs((utilfunc(obj(i,:),x))-(utilfunc(obj(i+1,:),x))) - delta*x(end);
-        #else: 
-        #    G[:,[p]] = -(current_P_val - next_P) + ep
-        G[:,[p]] = -(current_P_val - next_P) + ep
+        if current_rank == next_rank: 
+            # Handle ties 
+            G[:,[p]] = np.abs(current_P_val - next_P) - delta*ep
+        else: 
+            G[:,[p]] = -(current_P_val - next_P) + ep
+        
 
 
     return G
@@ -570,7 +581,7 @@ class OptimizeLinearVF(Problem):
 
         ## Inequality
 
-        ineq_func = _build_ineq_constr_linear(self.P, self.vf, self.ranks)
+        ineq_func = _build_ineq_constr_linear(self.P, self.vf, self.ranks, self.delta)
 
         out["G"] = ineq_func(x)
             
@@ -634,9 +645,7 @@ class OptimizePolyVF(Problem):
         out["F"] = obj
 
         ## Inequality
-        # TODO for now, assuming there are no ties in the ranks
-
-        ineq_func = _build_ineq_constr_poly(self.P, self.vf, self.ranks, delta)
+        ineq_func = _build_ineq_constr_poly(self.P, self.vf, self.ranks, self.delta)
 
         out["G"] = ineq_func(x)
             

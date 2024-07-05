@@ -7,7 +7,7 @@ P = np.array([[3.6, 3.9],
               [5.5, 2.5],      
               [0.5, 5.2],     
               [6.9, 1.8]])
-ranks = [1,2,3,4,5]
+ranks = [1,2,2,3,4]
 #ranks = [1,4,3,5,2]
 
 # This is a great example. Illustrates the when polynomial versus linear works 
@@ -31,6 +31,11 @@ ranks = [1,2,3,4,5]
 #ranks = [1,2,3,4,5]
 
 
+# Partial ordering example
+P = np.array([[3.6, 3.9], [2.5, 4.1], [5.5, 2.5], [0.5, 5.2], [6.9, 1.8]])
+
+ranks = [1, 2, 3, 3, 4]
+
 # opt_method can be trust-constr, SLSQP, ES, or GA
 opt_method = "trust-constr"
 
@@ -40,23 +45,25 @@ fnc_type = "poly"
 
 if fnc_type == "linear":
 
-    vf_res = mvf.create_linear_vf(P, ranks, opt_method)
+    vf_res = mvf.create_linear_vf(P, ranks, method=opt_method)
 
 elif fnc_type == "poly": 
 
-    vf_res = mvf.create_poly_vf(P, ranks, opt_method)
+    vf_res = mvf.create_poly_vf(P, ranks, method=opt_method)
 
 else: 
 
     print("function not supported")
 
-print("Final parameters:")
-print(vf_res.params)
+if vf_res.fit:
 
-print("Final epsilon:")
-print(vf_res.epsilon)
+    print("Final parameters:")
+    print(vf_res.params)
 
-mvf.plot_vf(P, vf_res.vf)
+    print("Final epsilon:")
+    print(vf_res.epsilon)
+
+    mvf.plot_vf(P, vf_res.vf)
 
 
 
