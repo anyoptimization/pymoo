@@ -1,6 +1,7 @@
 import numpy as np
 import warnings
 
+from abc import ABC, abstractmethod
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.sbx import SBX
@@ -26,6 +27,13 @@ from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
 # =========================================================================================================
 
 
+class AutomatedDM(ABC): 
+
+    @abstractmethod
+    def makeDecision(self, F):
+        pass
+
+
 class PINSGA2(GeneticAlgorithm):
 
     def __init__(self,
@@ -39,6 +47,7 @@ class PINSGA2(GeneticAlgorithm):
                  eta=4,
                  opt_method="trust-constr",
                  vf_type="poly",
+                 automated_dm=None,
                  **kwargs):
         
         self.survival = RankAndCrowding(nds=NonDominatedSorting(dominator=VFDominator(self)))
@@ -69,6 +78,8 @@ class PINSGA2(GeneticAlgorithm):
         self.historical_F = None
         self.prev_pop = None
         self.fronts = []
+
+        self.automated_dm=None
 
     @staticmethod
     def _prompt_for_ranks(F):
@@ -160,12 +171,14 @@ class PINSGA2(GeneticAlgorithm):
 
             self._reset_dm_preference()
 
-
-
-
         elif dm_time:
+        
+            if automated_dm == None: 
+                dm_ranks = PINSGA2._get_ranks(self.eta_F)
+            else:
+                dm_ranks = automated_dm.makeDecision(self.eta_F)
 
-            dm_ranks = PINSGA2._get_ranks(self.eta_F)
+            
 
             if len(set(rank)) == 0: 
 
