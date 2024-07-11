@@ -79,7 +79,7 @@ class PINSGA2(GeneticAlgorithm):
         self.prev_pop = None
         self.fronts = []
 
-        self.automated_dm=None
+        self.automated_dm=automated_dm
 
     @staticmethod
     def _prompt_for_ranks(F):
@@ -173,10 +173,10 @@ class PINSGA2(GeneticAlgorithm):
 
         elif dm_time:
         
-            if automated_dm == None: 
+            if self.automated_dm == None: 
                 dm_ranks = PINSGA2._get_ranks(self.eta_F)
             else:
-                dm_ranks = automated_dm.makeDecision(self.eta_F)
+                dm_ranks = self.automated_dm.makeDecision(self.eta_F)
 
             
 

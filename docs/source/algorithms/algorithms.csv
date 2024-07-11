@@ -9,6 +9,7 @@
    :ref:`Improved Stochastic Ranking Evolutionary Strategy <nb_isres>`, ISRES, single, x, An improved version of SRES being able to deal dependent variables efficiently.
    :ref:`NSGA-II <nb_nsga2>`, NSGA2, multi, x, Well-known multi-objective optimization algorithm based on non-dominated sorting and crowding.
    :ref:`R-NSGA-II <nb_rnsga2>`, RNSGA2, multi, x, An extension of NSGA-II where reference/aspiration points can be provided by the user.
+   :ref:`PI-NSGA-II <nb_pinsga2>`, PINSGA2, multi, x, An interactive version of NSGA-II that uses user preference to guide the optimization towards desired solutions.
    :ref:`NSGA-III <nb_nsga3>`, NSGA3, many, x, An improvement of NSGA-II developed for multi-objective optimization problems with more than two objectives.
    :ref:`U-NSGA-III <nb_unsga3>`, UNSGA3, many, x, A generalization of NSGA-III to be more efficient for single and bi-objective optimization problems.
    :ref:`R-NSGA-III <nb_rnsga3>`, RNSGA3, many, x, Allows defining aspiration points for NSGA-III to incorporate the user's preference.
