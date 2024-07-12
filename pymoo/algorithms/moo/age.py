@@ -284,7 +284,7 @@ def normalize(front, extreme):
 
     try:
         hyperplane = np.linalg.solve(front[extreme], np.ones(n))
-        if any(np.isnan(hyperplane)) or any(np.isinf(hyperplane)) or any(hyperplane < 0):
+        if any(np.isnan(hyperplane)) or any(np.isinf(hyperplane)) or any(hyperplane <= 0):
             normalization = np.max(front, axis=0)
         else:
             normalization = 1. / hyperplane
@@ -299,5 +299,6 @@ def normalize(front, extreme):
     front = front / normalization
 
     return front, normalization
+
 
 parse_doc_string(AGEMOEA.__init__)
