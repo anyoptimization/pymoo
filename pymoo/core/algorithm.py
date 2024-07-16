@@ -135,6 +135,8 @@ class Algorithm:
 
     def run(self):
         while self.has_next():
+            if 'reconstruct_objs_func' in self.__dict__:
+                self.problem.objs = self.reconstruct_objs_func(algo=self)
             self.next()
         return self.result()
 
