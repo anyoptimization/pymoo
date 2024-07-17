@@ -124,9 +124,15 @@ class PINSGA2(GeneticAlgorithm):
                 if not inserted:
                     ranks.append( [ i - offset ] )
         
-        ranks = [ rank for group in ranks for rank in group ]
+        _ranks = [ rank for group in ranks for rank in group ]
         
-        return np.array(ranks)
+        # reorder ranks
+        ranks = np.zeros ( len( _ranks ), dtype=int ) 
+
+        for index, rank in enumerate( _ranks) :
+            ranks[rank] = index
+        
+        return np.array( ranks )
 
 
     @staticmethod
