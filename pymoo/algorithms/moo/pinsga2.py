@@ -83,22 +83,21 @@ class PINSGA2(GeneticAlgorithm):
 
 
     @staticmethod
-    def _get_pairwise_ranks(F):
+    def _get_pairwise_ranks( F ):
 
         # initialize empty ranking
-        ranks = []
-        offset = 0
+        _ranks = []
         for i, f in enumerate( F ):
             
             # handle empty case, put first element in first place
-            if not ranks:
-                ranks.append( [i] )
+            if not _ranks:
+                _ranks.append( [i] )
                 
             else:
                 inserted = False
                 
                 # for each remaining elements, compare to all currently ranked elements
-                for j, group in enumerate( ranks ):
+                for j, group in enumerate( _ranks ):
 
                     # get pairwise preference from user
                     while True:
@@ -109,29 +108,26 @@ class PINSGA2(GeneticAlgorithm):
                     
                     # if better than currenly ranked element place before that element
                     if preference == 'a':
-                        ranks.insert( j, [ i - offset ] )
+                        _ranks.insert( j, [i] )
                         inserted = True
                         break
                     
                     # if equal to currently ranked element place with that element
                     elif preference == 'c':
-                        group.append( i - 1 - offset )
-                        offset += 1
+                        group.append( i )
                         inserted = True
                         break
                     
                 # if found to be worse than all place at the end
                 if not inserted:
-                    ranks.append( [ i - offset ] )
-        
-        _ranks = [ rank for group in ranks for rank in group ]
-        
-        # reorder ranks
-        ranks = np.zeros ( len( _ranks ), dtype=int ) 
+                    _ranks.append( [i] )
 
-        for index, rank in enumerate( _ranks) :
-            ranks[rank] = index
-        
+        ranks = np.zeros ( len( F ), dtype=int ) 
+
+        for rank, group in enumerate( _ranks ):
+            for index in group:
+                ranks[index] = rank
+
         return np.array( ranks )
 
 
