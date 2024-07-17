@@ -39,6 +39,7 @@ class PINSGA2(GeneticAlgorithm):
                  eta=4,
                  opt_method="trust-constr",
                  vf_type="poly",
+                 eps_max=1000,
                  **kwargs):
         
         self.survival = RankAndCrowding(nds=NonDominatedSorting(dominator=VFDominator(self)))
@@ -69,6 +70,7 @@ class PINSGA2(GeneticAlgorithm):
         self.historical_F = None
         self.prev_pop = None
         self.fronts = []
+        self.eps_max = eps_max
 
     @staticmethod
     def _prompt_for_ranks(F):
@@ -76,9 +78,14 @@ class PINSGA2(GeneticAlgorithm):
         for (e, f) in enumerate(F):
             print("Solution %d %s" % (e + 1, f))   
 
-        raw_ranks = input("Ranks (e.g., 3, 2, ..., 1): ")
+        dim = F.shape[0]                                                                                 
 
-        ranks = [int(raw_rank) for raw_rank in raw_ranks.split()  ] 
+        raw_ranks = input(f"Ranks (e.g., \"3, {dim}, ..., 1\" for 3rd best, {dim}th best, ..., 1st best): ")
+
+        if raw_ranks == "":
+            ranks = []
+        else:
+            ranks = [int(raw_rank) for raw_rank in raw_ranks.split()  ] 
 
         return ranks
 
@@ -87,7 +94,9 @@ class PINSGA2(GeneticAlgorithm):
 
         ranks_invalid = True
 
-        print("Rank the given solutions from highest to lowest preference:")
+        dim = F.shape[0]                                                                                 
+                                                                                                          
+        print(f"Give each solution a ranking, with 1 being the highest score, and {dim} being the lowest score:")        
 
         ranks = PINSGA2._prompt_for_ranks(F)
 
@@ -95,7 +104,7 @@ class PINSGA2(GeneticAlgorithm):
 
             fc = F.shape[0]
 
-            if sorted(ranks) == list(range(1,fc+1)):
+            if len(ranks) > 0 and max(ranks) <= fc and min(ranks) >= 1:
 
                 ranks_invalid = False 
 
@@ -161,8 +170,6 @@ class PINSGA2(GeneticAlgorithm):
             self._reset_dm_preference()
 
 
-
-
         elif dm_time:
 
             dm_ranks = PINSGA2._get_ranks(self.eta_F)
@@ -181,12 +188,18 @@ class PINSGA2(GeneticAlgorithm):
 
                 if self.vf_type == "linear":
 
-                    vf_res = mvf.create_linear_vf(eta_F * -1, dm_ranks.tolist(), self.opt_method)
+                    vf_res = mvf.create_linear_vf(eta_F * -1, 
+                                                  dm_ranks.tolist(), 
+                                                  eps_max=self.eps_max, 
+                                                  method=self.opt_method)
 
                 elif self.vf_type == "poly":
 
-                    vf_res = mvf.create_poly_vf(eta_F * -1, dm_ranks.tolist(), self.opt_method)
-
+                    vf_res = mvf.create_poly_vf(eta_F * -1, 
+                                                dm_ranks.tolist(), 
+                                                eps_max=self.eps_max, 
+                                                method=self.opt_method)
+    
                 else:
                     
                     raise ValueError("Value function %s not supported" % self.vf_type)

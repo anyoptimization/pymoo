@@ -1,4 +1,6 @@
 import numpy as np
+import pymoo
+import scipy
 from pymoo.optimize import minimize as moomin
 from scipy.optimize import minimize as scimin
 from pymoo.core.problem import Problem
@@ -13,56 +15,45 @@ from functools import reduce
 from pymoo.termination.default import DefaultSingleObjectiveTermination
 import sys
 
-# _ineq_constr_1D_linear
-# _ineq_constr_2D_linear
-# _ineq_constr_1D_poly
-# _ineq_constr_2D_poly
 
 # Input 1: A list of non-dominated points 
 # Input 2: The ranking of the given non-dominated points 
 # Input 3: constraint function for optimizing the value func
 # Input 4: the skeleton utility function that we're trying to optimize
-def create_vf(P, ranks, ineq_constr, vf="linear", delta=0.1, method="trust-constr"): 
+def create_vf(P, ranks, ineq_constr, vf="linear", delta=0.1, eps_max=1000, method="trust-constr"): 
 
     if vf == "linear":
-        res = create_linear_vf(P, ranks, delta, method)
-        res.fit = _validate_vf(res)
-        return res
+        return create_linear_vf(P, ranks, delta, eps_max, method)
+    elif vf == "poly":
+        return create_poly_vf(P, ranks, delta, eps_max, method)
+
     else:
         raise ValueError("Value function '%d' not supported." % vf) 
 
     return lambda f_new:  np.sum(f_new)
 
-def create_poly_vf(P, ranks, delta=0.1, method="trust-constr"):
-    
+def create_poly_vf(P, ranks, delta=0.1, eps_max=1000, method="trust-constr"):
+
     if method == "trust-constr" or method == "SLSQP": 
-        res = create_vf_scipy_poly(P, ranks, delta, method=method)
-        res.fit = _validate_vf(res)
-        return res
+        return create_vf_scipy_poly(P, ranks, delta, eps_max, method=method)
     elif method == "ES": 
-        res = create_vf_pymoo_poly(P, ranks, delta, method=method)
-        res.fit = _validate_vf(res)
-        return res
+        return create_vf_pymoo_poly(P, ranks, delta, eps_max, method=method)
     else: 
         raise ValueError("Optimization method %s not supported" % method) 
 
 
 
-def create_linear_vf(P, ranks, delta=0.1, method="trust-constr"): 
+def create_linear_vf(P, ranks, delta=0.1, eps_max=1000, method="trust-constr"): 
     
     if method == "trust-constr" or method == "SLSQP": 
-        res = create_vf_scipy_linear(P, ranks, delta, method)
-        res.fit = _validate_vf(res)
-        return res
+        return create_vf_scipy_linear(P, ranks, delta, eps_max, method)
     elif method == "ES": 
-        res = create_vf_pymoo_linear(P, ranks, delta, method)
-        res.fit = _validate_vf(res)
-        return res
+        return create_vf_pymoo_linear(P, ranks, delta, eps_max, method)
     else: 
         raise ValueError("Optimization method %s not supported" % method) 
 
 
-def create_vf_scipy_poly(P, ranks, delta,  method="trust-constr"):
+def create_vf_scipy_poly(P, ranks, delta, eps_max, method="trust-constr"):
 
     # Gathering basic info
     M = P.shape[1]
@@ -99,10 +90,11 @@ def create_vf_scipy_poly(P, ranks, delta,  method="trust-constr"):
         x_ub.append(1000)
 
     x_lb.append(-1000)
-    x_ub.append(1000)
+    x_ub.append(eps_max)
    
     bounds = Bounds(x_lb, x_ub)
 
+    # Initial position
     x0 = [1] * (M**2 + M + 1)
 
     if method == 'trust-constr':
@@ -123,10 +115,16 @@ def create_vf_scipy_poly(P, ranks, delta,  method="trust-constr"):
     params = res.x[0:-1]
     epsilon = res.x[-1]
 
-    return vfResults(vf, params, epsilon)
+    fit = _validate_vf(res)
+
+    return vfResults(vf, params, epsilon, fit)
 
 
-def create_vf_scipy_linear(P, ranks, delta, method="trust-constr"): 
+def create_vf_scipy_linear(P, ranks, delta, eps_max, method="trust-constr"): 
+
+    # Sort P
+    P_sorted = _sort_P(P, ranks)
+    ranks.sort()
 
     # Inequality constraints
     lb = [-np.inf] * (P.shape[0] - 1)
@@ -136,25 +134,48 @@ def create_vf_scipy_linear(P, ranks, delta, method="trust-constr"):
     lb.append(0)
     ub.append(0)
 
-    P_sorted = _sort_P(P, ranks)
-    ranks.sort()
-
     constr = NonlinearConstraint(_build_constr_linear(P_sorted, linear_vf, ranks, delta), lb, ub)
 
-    x0 = [0.5, 0.5, 0.5]
+    # Bounds on x
+    x_lb = []
+    x_ub = []
 
-    res = scimin(_obj_func, x0, constraints= constr)
+    for m in range(M): 
+        x_lb.append(0)
+        x_ub.append(1)
+
+    x_lb.append(-1000)
+    x_ub.append(eps_max)
+   
+    bounds = Bounds(x_lb, x_ub)
+
+    # Initial position
+    x0 = [0.5] * (M+1)
+
+    if method == 'trust-constr':
+        # The trust-constr method always finds the decision space linear
+        hess = lambda x: np.zeros((len(x0), len(x0)))
+    else: 
+        hess = None
+
+    res = scimin(_obj_func, 
+                 x0, 
+                 constraints= constr,
+                 bounds=bounds, 
+                 method=method, 
+                 hess=hess)
 
     # package up results
     vf =  lambda P_in: linear_vf(P_in, res.x[0:-1])
     params = res.x[0:-1]
     epsilon = res.x[-1]
+    fit = _validate_vf(res)
 
-    return vfResults(vf, params, epsilon)
+    return vfResults(vf, params, epsilon, fit)
 
-def create_vf_pymoo_linear(P, ranks, delta, method="ES"): 
+def create_vf_pymoo_linear(P, ranks, delta, eps_max, method="ES"): 
 
-    vf_prob = OptimizeLinearVF(P, ranks, delta, linear_vf)
+    vf_prob = OptimizeLinearVF(P, ranks, delta, eps_max, linear_vf)
 
     if method == "ES":
         algorithm = ES()
@@ -177,13 +198,14 @@ def create_vf_pymoo_linear(P, ranks, delta, method="ES"):
         params = None
         epsilon = -1000
 
+    fit = _validate_vf(res)
 
-    return vfResults(vf, params, epsilon)
+    return vfResults(vf, params, epsilon, fit)
 
 
-def create_vf_pymoo_poly(P, ranks, delta, method="trust-constr"):
+def create_vf_pymoo_poly(P, ranks, delta, eps_max, method="trust-constr"):
 
-    vf_prob = OptimizePolyVF(P, ranks, delta, poly_vf)
+    vf_prob = OptimizePolyVF(P, ranks, delta, eps_max, poly_vf)
 
     if method == "ES":
         algorithm = ES()
@@ -206,7 +228,9 @@ def create_vf_pymoo_poly(P, ranks, delta, method="trust-constr"):
         params = None
         epsilon = -1000
 
-    return vfResults(vf, params, epsilon)
+    fit = _validate_vf(res)
+
+    return vfResults(vf, params, epsilon, fit)
 
 
 def linear_vf(P, x): 
@@ -539,7 +563,7 @@ def vf_comparator(vf, P_rank_2, P):
 
 class OptimizeLinearVF(Problem): 
 
-    def __init__(self, P, ranks, delta, vf):
+    def __init__(self, P, ranks, delta, eps_max, vf):
        
         # One var for each dimension of the object space, plus epsilon 
         n_var_vf = np.size(P, 1) + 1
@@ -552,7 +576,7 @@ class OptimizeLinearVF(Problem):
         
         # upper/lower bound on the epsilon variable is -1000/1000
         xl_vf[-1] = -1000
-        xu_vf[-1] = 1000
+        xu_vf[-1] = eps_max
 
         # TODO start everything at 0.5
 
@@ -589,18 +613,36 @@ class OptimizeLinearVF(Problem):
         out["H"] = _eq_constr_linear(x)
 
 def _validate_vf(res):
-    if res.epsilon < 0: 
+
+    message = "" 
+
+    if isinstance(res, pymoo.core.result.Result):
+        success = np.all(res.G <= 0)
+        epsilon = res.X[-1]
+        if not success: 
+            message = "Constraints not met\n"
+        if epsilon < 0:
+            message = message + "Epsilon negative\n"
+
+
+    elif isinstance(res, scipy.optimize.optimize.OptimizeResult):
+        success = res.success
+        epsilon = res.x[-1]
+        message = res.message
+    else: 
+        ValueError("Internal error: bad result objective given for validation")
+
+    if epsilon < 0 or not success: 
         sys.stderr.write("WARNING: Unable to fit value function\n")    
+        sys.stderr.write(message + "\n")    
         return False
     else:
         return True
 
 
-
-
 class OptimizePolyVF(Problem): 
 
-    def __init__(self, P, ranks, delta, vf):
+    def __init__(self, P, ranks, delta, eps_max, vf):
       
         M = P.shape[1]
 
@@ -618,7 +660,7 @@ class OptimizePolyVF(Problem):
         
         # upper/lower bound on the epsilon variable is -1000/1000
         xl_vf[-1] = -1000
-        xu_vf[-1] = 1000
+        xu_vf[-1] = eps_max 
 
         # TODO start everything at 0.5
 
@@ -655,11 +697,11 @@ class OptimizePolyVF(Problem):
 
 class vfResults(): 
 
-    def __init__(self, vf, params, epsilon): 
+    def __init__(self, vf, params, epsilon, fit): 
 
         self.vf = vf
         self.params = params
         self.epsilon = epsilon  
-    
+        self.fit = fit 
 
 
