@@ -38,6 +38,7 @@ class PINSGA2(GeneticAlgorithm):
                  tau=10,
                  eta=4,
                  ranking_type='pairwise',
+                 presi_signs=None,
                  **kwargs):
         
         self.survival = survival=RankAndCrowding(nds=NonDominatedSorting(dominator=VFDominator(self)))
@@ -56,7 +57,8 @@ class PINSGA2(GeneticAlgorithm):
         self.termination = DefaultMultiObjectiveTermination()
         self.tournament_type = 'comp_by_dom_and_crowding'
         
-        self.ranking_type = ranking_type
+        self.ranking_type=ranking_type
+        self.presi_signs=presi_signs
 
         self.tau = tau
         self.eta = eta
@@ -69,10 +71,10 @@ class PINSGA2(GeneticAlgorithm):
         self.prev_pop = None
 
     @staticmethod
-    def _prompt_for_ranks(F):
+    def _prompt_for_ranks(F, presi_signs):
 
         for (e, f) in enumerate(F):
-            print("Solution %d %s" % (e + 1, f))   
+            print("Solution %d %s" % (e + 1, f * presi_signs))   
 
         raw_ranks = input("Ranks (e.g., 3, 2, ..., 1): ")
 
@@ -81,16 +83,17 @@ class PINSGA2(GeneticAlgorithm):
         return ranks
        
     @staticmethod
-    def _present_ranks(F, dm_ranks):
+    def _present_ranks(F, dm_ranks, presi_signs):
 
         print("Solutions are ranked as:")
 
         for (e, f) in enumerate(F):
-            print("Solution %d %s: Rank %d" % (e + 1, f, dm_ranks[e]))   
+            print("Solution %d %s: Rank %d" % (e + 1, f * presi_signs, dm_ranks[e]))   
 
 
     @staticmethod
-    def _get_pairwise_ranks( F ):
+    def _get_pairwise_ranks(F, presi_signs):
+
 
         # initialize empty ranking
         _ranks = []
@@ -108,7 +111,16 @@ class PINSGA2(GeneticAlgorithm):
 
                     # get pairwise preference from user
                     while True:
-                        preference = input( f"\nWhich solution do you like best?\n[a] {f}\n[b] {F[ group[0] ]}\n[c] These solutions are equivalent.\n--> " ).strip().lower()
+
+                        prompt =  "\nWhich solution do you like best?\n" + \
+                                   f"[a] {f*presi_signs}\n" +  \
+                                   f"[b] {F[ group[0] ]*presi_signs}\n" + \
+                                    "[c] These solutions are equivalent.\n--> " 
+
+                        preference_raw = input(prompt)
+
+                        preference = preference_raw.strip().lower()
+
                         if preference in ['a', 'b', 'c']:
                             break
                         print("Invalid input. Please enter 'a', 'b', or 'c'.")
@@ -139,13 +151,13 @@ class PINSGA2(GeneticAlgorithm):
 
 
     @staticmethod
-    def _get_ranks(F):
+    def _get_ranks(F, presi_signs):
 
         ranks_invalid = True
 
         print("Rank the given solutions from highest to lowest preference:")
 
-        ranks = PINSGA2._prompt_for_ranks( F)
+        ranks = PINSGA2._prompt_for_ranks(F, presi_signs)
 
         while ranks_invalid: 
 
@@ -159,7 +171,7 @@ class PINSGA2(GeneticAlgorithm):
 
                 print("Invalid ranks given. Please try again")
 
-                ranks = PINSGA2._prompt_for_ranks(F)
+                ranks = PINSGA2._prompt_for_ranks(F, presi_signs)
 
         return np.array(ranks);                         
 
@@ -191,6 +203,9 @@ class PINSGA2(GeneticAlgorithm):
 
         to_find = self.eta if F.shape[0] >= self.eta else F.shape[0] 
 
+        if self.presi_signs is None: 
+            self.presi_signs = np.ones(F.shape[1])
+
         # Eta is the number of solutions displayed to the DM
         eta_F_indices = select_points_with_maximum_distance(F, to_find)
 
@@ -218,10 +233,10 @@ class PINSGA2(GeneticAlgorithm):
         elif dm_time:
 
             if self.ranking_type == "absolute": 
-                dm_ranks = PINSGA2._get_ranks(self.eta_F)
+                dm_ranks = PINSGA2._get_ranks(self.eta_F, self.presi_signs)
             elif self.ranking_type == "pairwise": 
-                dm_ranks = PINSGA2._get_pairwise_ranks(self.eta_F)
-                PINSGA2._present_ranks(self.eta_F, dm_ranks) 
+                dm_ranks = PINSGA2._get_pairwise_ranks(self.eta_F, self.presi_signs)
+                PINSGA2._present_ranks(self.eta_F, dm_ranks, self.presi_signs) 
             else: 
                 raise ValueError("Invalid ranking type [%s] given." % self.ranking_type)
 

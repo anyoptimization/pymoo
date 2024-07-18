@@ -25,7 +25,7 @@ class ZDT1_max(ZDT1):
 
 problem = ZDT1_max()
 
-algorithm = PINSGA2(pop_size=100, ranking_type='absolute')
+algorithm = PINSGA2(pop_size=100, ranking_type='pairwise', presi_signs=[-1, -1])
 
 def plot_eta_F(context, algorithm):
 
