@@ -31,18 +31,18 @@ def plot_eta_F(context, algorithm):
     if len(algorithm.eta_F) > 0:
 
         # Plot the historical PO fronts
-        plot = Scatter().add(algorithm.historical_F * -1, facecolors= '#f5f5f5', edgecolors='#f5f5f5')
+        plot = Scatter().add(algorithm.historical_F, facecolors= '#f5f5f5', edgecolors='#f5f5f5')
 
         # The current PO front 
-        plot.add(algorithm.paused_F * -1)
+        plot.add(algorithm.paused_F)
 
         # Starred items for the DM
-        plot.add(algorithm.eta_F * -1, s=500, marker='*', facecolors='red')
+        plot.add(algorithm.eta_F, s=500, marker='*', facecolors='red')
         
 
     else: 
         F = algorithm.pop.get("F")
-        plot = Scatter().add(F * -1)
+        plot = Scatter().add(F)
 
 
     plot.plot_if_not_done_yet()
