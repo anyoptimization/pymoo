@@ -79,7 +79,14 @@ class PINSGA2(GeneticAlgorithm):
         ranks = [int(raw_rank) for raw_rank in raw_ranks.split()  ] 
 
         return ranks
-        
+       
+    @staticmethod
+    def _present_ranks(F, dm_ranks):
+
+        print("Solutions are ranked as:")
+
+        for (e, f) in enumerate(F):
+            print("Solution %d %s: Rank %d" % (e + 1, f, dm_ranks[e]))   
 
 
     @staticmethod
@@ -128,7 +135,7 @@ class PINSGA2(GeneticAlgorithm):
             for index in group:
                 ranks[index] = rank
 
-        return np.array( ranks )
+        return np.array( ranks ) + 1
 
 
     @staticmethod
@@ -214,7 +221,7 @@ class PINSGA2(GeneticAlgorithm):
                 dm_ranks = PINSGA2._get_ranks(self.eta_F)
             elif self.ranking_type == "pairwise": 
                 dm_ranks = PINSGA2._get_pairwise_ranks(self.eta_F)
-                print(dm_ranks)
+                PINSGA2._present_ranks(self.eta_F, dm_ranks) 
             else: 
                 raise ValueError("Invalid ranking type [%s] given." % self.ranking_type)
 
