@@ -1,6 +1,7 @@
 import numpy as np
 import warnings
 
+from abc import ABC, abstractmethod
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.sbx import SBX
@@ -26,6 +27,13 @@ from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
 # =========================================================================================================
 
 
+class AutomatedDM(ABC): 
+
+    @abstractmethod
+    def makeDecision(self, F):
+        pass
+
+
 class PINSGA2(GeneticAlgorithm):
 
     def __init__(self,
@@ -42,6 +50,7 @@ class PINSGA2(GeneticAlgorithm):
                  eps_max=1000,
                  ranking_type='pairwise',
                  presi_signs=None,
+                 automated_dm=None,
                  **kwargs):
         
         self.survival = RankAndCrowding(nds=NonDominatedSorting(dominator=VFDominator(self)))
@@ -76,6 +85,8 @@ class PINSGA2(GeneticAlgorithm):
         self.prev_pop = None
         self.fronts = []
         self.eps_max = eps_max
+
+        self.automated_dm=automated_dm
 
     @staticmethod
     def _prompt_for_ranks(F, presi_signs):
@@ -247,14 +258,22 @@ class PINSGA2(GeneticAlgorithm):
             self._reset_dm_preference()
 
         elif dm_time:
+       
+            # Check if the DM is a machine or a human
+            if self.automated_dm is None: 
 
-            if self.ranking_type == "absolute": 
-                dm_ranks = PINSGA2._get_ranks(self.eta_F, self.presi_signs)
-            elif self.ranking_type == "pairwise": 
-                dm_ranks = PINSGA2._get_pairwise_ranks(self.eta_F, self.presi_signs)
-                PINSGA2._present_ranks(self.eta_F, dm_ranks, self.presi_signs) 
-            else: 
-                raise ValueError("Invalid ranking type [%s] given." % self.ranking_type)
+                # Human DM
+                if self.ranking_type == "absolute": 
+                    dm_ranks = PINSGA2._get_ranks(self.eta_F, self.presi_signs)
+                elif self.ranking_type == "pairwise": 
+                    dm_ranks = PINSGA2._get_pairwise_ranks(self.eta_F, self.presi_signs)
+                    PINSGA2._present_ranks(self.eta_F, dm_ranks, self.presi_signs) 
+                else: 
+                    raise ValueError("Invalid ranking type [%s] given." % self.ranking_type)
+            else:
+
+                # Automated DM
+                dm_ranks = self.automated_dm.makeDecision(self.eta_F)
 
             
 
@@ -319,12 +338,6 @@ class PINSGA2(GeneticAlgorithm):
                         
                         # update the ranks, since we just removed one
                         dm_ranks[dm_ranks > rank_to_remove] = dm_ranks[dm_ranks > rank_to_remove] - 1 
-
-
-
-
-
-
 
 
 parse_doc_string(PINSGA2.__init__)
