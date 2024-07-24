@@ -28,10 +28,21 @@ from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
 
 
 class AutomatedDM(ABC): 
+    
+    def __init__(self, get_pairwise_ranks_func=None):
+        self.get_pairwise_ranks_func = get_pairwise_ranks_func
 
     @abstractmethod
     def makeDecision(self, F):
         pass
+    
+    def makePairwiseDecision(self, F):
+        
+        dm = lambda F: self.makeDecision(F)
+        ranks = self.get_pairwise_ranks_func(F, 1, dm=dm)
+        
+        return ranks
+        
 
 
 class PINSGA2(GeneticAlgorithm):
@@ -86,7 +97,9 @@ class PINSGA2(GeneticAlgorithm):
         self.fronts = []
         self.eps_max = eps_max
 
-        self.automated_dm=automated_dm
+        if automated_dm is not None:
+            automated_dm.get_pairwise_ranks_func = self._get_pairwise_ranks
+        self.automated_dm = automated_dm
 
     @staticmethod
     def _prompt_for_ranks(F, presi_signs):
@@ -115,8 +128,14 @@ class PINSGA2(GeneticAlgorithm):
 
 
     @staticmethod
-    def _get_pairwise_ranks(F, presi_signs):
+    def _get_pairwise_ranks(F, presi_signs, dm=None):
 
+        if not dm:
+                                  
+            dm = lambda F: input("\nWhich solution do you like best?\n" + \
+                                    f"[a] {F[0]}\n" +  \
+                                    f"[b] {F[1]}\n" + \
+                                     "[c] These solutions are equivalent.\n--> " )
 
         # initialize empty ranking
         _ranks = []
@@ -135,12 +154,8 @@ class PINSGA2(GeneticAlgorithm):
                     # get pairwise preference from user
                     while True:
 
-                        prompt =  "\nWhich solution do you like best?\n" + \
-                                   f"[a] {f*presi_signs}\n" +  \
-                                   f"[b] {F[ group[0] ]*presi_signs}\n" + \
-                                    "[c] These solutions are equivalent.\n--> " 
-
-                        preference_raw = input(prompt)
+                        points_to_compare = np.array( [f*presi_signs, F[ group[0] ]*presi_signs] )
+                        preference_raw = dm( points_to_compare )
 
                         preference = preference_raw.strip().lower()
 
@@ -273,7 +288,12 @@ class PINSGA2(GeneticAlgorithm):
             else:
 
                 # Automated DM
-                dm_ranks = self.automated_dm.makeDecision(self.eta_F)
+                if self.ranking_type == "absolute": 
+                    dm_ranks = self.automated_dm.makeDecision(self.eta_F)
+                elif self.ranking_type == "pairwise": 
+                    dm_ranks = self.automated_dm.makePairwiseDecision(self.eta_F)
+                else: 
+                    raise ValueError("Invalid ranking type [%s] given." % self.ranking_type)
 
             
 
