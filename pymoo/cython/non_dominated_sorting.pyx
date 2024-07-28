@@ -14,8 +14,6 @@ cdef extern from "limits.h":
     int INT_MAX
 
 
-
-
 # ---------------------------------------------------------------------------------------------------------
 # Interface
 # ---------------------------------------------------------------------------------------------------------
@@ -38,6 +36,10 @@ def efficient_non_dominated_sort(double[:,:] F, strategy="sequential"):
     assert (strategy in ["sequential", 'binary']), "Invalid search strategy"
     return c_efficient_non_dominated_sort(F, strategy)
 
+def dominance_degree_non_dominated_sort(double[:, :] F, strategy="efficient"):
+    if strategy not in ["fast", "efficient"]:
+        raise ValueError("Invalid search strategy")
+    return c_dominance_degree_non_dominated_sort(F, strategy)
 
 
 
@@ -337,6 +339,22 @@ cdef vector[vector[int]] c_fast_best_order_sort(double[:,:] F):
 
 
 
+
+# ---------------------------------------------------------------------------------------------------------
+# Dominance Degree Approach Non-dominated Sort
+# ---------------------------------------------------------------------------------------------------------
+
+cdef vector[vector[int]] c_dominance_degree_non_dominated_sort(double[:, :] F, str strategy):
+    if strategy == "efficient":
+        # return c_dda_ens_get_fronts(c_construct_domination_matrix(F), F.shape[0], np.lexsort(F))
+        return c_dda_ens_get_fronts(c_construct_domination_matrix(F), F.shape[1], np.lexsort(F.T))
+    elif strategy == "fast":
+        # return c_dda_ns_get_fronts(c_construct_domination_matrix(F), F.shape[1], F.shape[0])
+        return c_dda_ns_get_fronts(c_construct_domination_matrix(F), F.shape[0], F.shape[1])
+
+
+
+
 # ---------------------------------------------------------------------------------------------------------
 # Efficient Non-dominated Sort
 # ---------------------------------------------------------------------------------------------------------
@@ -344,7 +362,7 @@ cdef vector[vector[int]] c_fast_best_order_sort(double[:,:] F):
 
 cdef vector[vector[int]] c_efficient_non_dominated_sort(double[:,:] F, str strategy):
     cdef:
-        int i, j, k, n, val
+        long unsigned int i, j, k, n, val
         vector[int] empty, e
         vector[vector[int]] fronts, ret
 
@@ -500,10 +518,8 @@ cdef int c_get_relation(double[:,:] F, int a, int b, double epsilon = 0.0):
 
     return val
 
-
-
 cdef bool c_is_dominating_or_equal(double[:,:] F, int a, int b, vector[vector[int]]& C, int k):
-    cdef int i, j
+    cdef unsigned int i, j
     for i in range(k, C[0].size()):
         j = C[b][i]
         if F[b, j] < F[a, j]:
@@ -511,9 +527,119 @@ cdef bool c_is_dominating_or_equal(double[:,:] F, int a, int b, vector[vector[in
     return True
 
 cdef bool c_is_equal(double[:,:] F, int a, int b):
-    cdef int i
-    cdef int n_obj = F.shape[1]
+    cdef int i, n_obj = F.shape[1]
     for i in range(n_obj):
         if F[a, i] != F[b, i]:
             return False
     return True
+
+cdef vector[vector[int]] c_construct_domination_matrix(double[:, :]& F):
+    cdef:
+        long i
+        int n = F.shape[0]
+        int m = F.shape[1]
+        long [:, ::1] b = np.apply_over_axes(np.argsort, F.T, axes=1)
+
+        vector[vector[int]] C = vector[vector[int]](n, vector[int](n, 0))
+        vector[vector[int]] D = vector[vector[int]](n, vector[int](n, 0))
+
+    for i in range(m):
+        c_construct_comparison_matrix(F[:, i], b[i], C, D, n)
+
+    c_remove_dominators(D, n, m)
+    return D
+
+cdef void c_construct_comparison_matrix(double[:]& v, long[:]& b, vector[vector[int]] &C, vector[vector[int]]& D, int n):
+    cdef:
+        int i, j
+
+    for i in range(n):
+        C[b[0]][i] = 1
+    for i in range(1, n):
+        if v[b[i]] == v[b[i - 1]]:
+            for j in range(n):
+                C[b[i]][j] = C[b[i - 1]][j]
+        else:
+            for j in range(i, n):
+                C[b[i]][b[j]] = 1
+
+    # increment the DD matrix while also resetting the comparison matrix
+    for i in range(n):
+        for j in range(n):
+            D[i][j] += C[i][j]
+            C[i][j] = 0
+
+cdef void c_remove_dominators(vector[vector[int]] &D, int n, int m):
+    cdef int i, j
+    for i in range(n):
+        for j in range(i, n):
+            if D[i][j] == m:
+                # only perform the row-wise check if the column-wise check fails (C=row major)
+                if D[j][i] == m:
+                    D[j][i] = 0
+                    D[i][j] = 0
+
+cdef void c_remove_front_members(vector[vector[int]] &D, vector[int]& front, int n):
+    cdef:
+        int i, j
+
+    for i in front:
+        for j in range(n):
+            # set to -1 so not-yet-added members are preferred by max()
+            D[i][j] = -1
+            D[j][i] = -1
+
+cdef void c_dda_ns_build_front(vector[int]& max_D, vector[int]& front, int n, int m):
+    cdef int i = 0, md
+    for md in max_D:
+        if 0 <= md < m:
+            front.push_back(i)
+        i += 1
+
+cdef void c_max(vector[vector[int]]& D, vector[int]& vec_max, int n):
+    cdef int i, j, m
+    for i in range(n):
+        m = -1
+        for j in range(n):
+            m = max(m, D[j][i])
+        vec_max[i] = m
+
+cdef vector[vector[int]] c_dda_ns_get_fronts(vector[vector[int]]& D, int n, int m):
+    cdef:
+        vector[vector[int]] fronts = vector[vector[int]]()
+        vector[int] vec_max = vector[int](n)
+        long count = 0
+
+    while count < n:
+        front = vector[int]()
+        c_max(D, vec_max, n)
+        c_dda_ns_build_front(vec_max, front, n, m)
+        c_remove_front_members(D, front, n)
+        fronts.push_back(front)
+        count += front.size()
+    return fronts
+
+cdef vector[vector[int]] c_dda_ens_get_fronts(vector[vector[int]]& D, int m, long[::1]& sorted_indices):
+    cdef:
+        int k, sd, s, n_fronts = 0
+        vector[int] fk
+        vector[vector[int]] fronts
+
+    for s in range(sorted_indices.shape[0]):
+        isinserted = False
+        k = 0
+        for fk in fronts:
+            isdominated = False
+            for sd in fk:
+                if D[sd][sorted_indices[s]] == m:
+                    isdominated = True
+                    break
+            if not isdominated:
+                fronts[k].push_back(sorted_indices[s])
+                isinserted = True
+                break
+            k+= 1
+        if not isinserted:
+            n_fronts += 1
+            fronts.push_back(vector[int](1, sorted_indices[s]))
+    return fronts

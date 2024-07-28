@@ -6,6 +6,11 @@ import pymoo.gradient.toolbox as anp
 from pymoo.util.cache import Cache
 from pymoo.util.misc import at_least_2d_array
 
+try:
+    import ray
+except ImportError:
+    ray = None
+
 
 class ElementwiseEvaluationFunction:
 
@@ -54,7 +59,61 @@ class DaskParallelization:
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        state.pop("client")
+        state.pop("client", None)
+        return state
+
+
+class JoblibParallelization:
+
+    def __init__(self, aJoblibParallel,  aJoblibDelayed, *args, **kwargs) -> None:
+        super().__init__()
+        self.parallel = aJoblibParallel 
+        self.delayed =  aJoblibDelayed 
+
+    def __call__(self, f, X):
+        return self.parallel(self.delayed(f)(x) for x in X)
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state.pop("parallel", None)
+        state.pop("delayed", None)
+        return state
+
+
+class RayParallelization:
+    """Use Ray as backend to parallelize problem evaluation.
+    
+    Ray is an open-source unified framework for scaling AI and Python applicaitons.
+    Read more here: https://docs.ray.io.
+    
+    You will need to install Ray to use this.
+    """
+    def __init__(self, job_resources: dict = {'num_cpus': 1}) -> None:
+        """
+        Parameters
+        ----------
+        job_resources: A resource in Ray is a key-value pair where the key denotes a 
+            resource name and the value is a float quantity. Ray has native support for CPU,
+            GPU, and memory resource types; `'num_cpus'`, `'num_gpus'`, and `'memory'`.
+            Read more here: 
+            https://docs.ray.io/en/latest/ray-core/scheduling/resources.html.
+        """
+        assert ray is not None, (
+            "Ray must be installed! "
+            "You can install Ray with the command: "
+            '`pip install -U "ray[default]"`'
+        )
+        super().__init__()
+        self.job_resources = job_resources
+
+    def __call__(self, f, X):
+        runnable = ray.remote(f.__call__.__func__)
+        runnable = runnable.options(**self.job_resources)
+        futures = [runnable.remote(f, x) for x in X]
+        return ray.get(futures)
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
         return state
 
 
@@ -71,6 +130,7 @@ class Problem:
                  elementwise=False,
                  elementwise_func=ElementwiseEvaluationFunction,
                  elementwise_runner=LoopedElementwiseEvaluation(),
+                 requires_kwargs=False,
                  replace_nan_values_by=None,
                  exclude_from_serialization=None,
                  callback=None,
@@ -129,8 +189,11 @@ class Problem:
         if vars is not None:
             self.vars = vars
             self.n_var = len(vars)
-            self.xl = {name: var.lb if hasattr(var, "lb") else None for name, var in vars.items()}
-            self.xu = {name: var.ub if hasattr(var, "ub") else None for name, var in vars.items()}
+
+            if self.xl is None:
+                self.xl = {name: var.lb if hasattr(var, "lb") else None for name, var in vars.items()}
+            if self.xu is None:
+                self.xu = {name: var.ub if hasattr(var, "ub") else None for name, var in vars.items()}
 
         # the variable type (only as a type hint at this point)
         self.vtype = vtype
@@ -139,6 +202,9 @@ class Problem:
         self.elementwise = elementwise
         self.elementwise_func = elementwise_func
         self.elementwise_runner = elementwise_runner
+
+        # whether evaluation requires kwargs (passing them can cause overhead in parallelization)
+        self.requires_kwargs = requires_kwargs
 
         # whether the shapes are checked strictly
         self.strict = strict
@@ -168,6 +234,10 @@ class Problem:
                  return_values_of=None,
                  return_as_dictionary=False,
                  **kwargs):
+
+        # if the problem does not require any kwargs they are re-initialized
+        if not self.requires_kwargs:
+            kwargs = dict()
 
         if return_values_of is None:
             return_values_of = ["F"]
@@ -203,7 +273,7 @@ class Problem:
             try:
                 out[k] = v.astype(np.float64)
             except:
-                pass
+                out[k] = v
 
         if self.callback is not None:
             self.callback(X, out)

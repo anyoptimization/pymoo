@@ -1,4 +1,5 @@
 import math
+from copy import deepcopy
 
 import numpy as np
 
@@ -10,7 +11,7 @@ from pymoo.core.infill import InfillCriterion
 from pymoo.core.population import Population
 from pymoo.core.problem import Problem
 from pymoo.core.sampling import Sampling
-from pymoo.core.variable import Choice, Real, Integer, Binary
+from pymoo.core.variable import Choice, Real, Integer, Binary, BoundedVariable
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.crossover.ux import UX
 from pymoo.operators.mutation.bitflip import BFM
@@ -93,15 +94,15 @@ class MixedVariableMating(InfillCriterion):
             crossover = self.crossover[clazz]
             assert crossover.n_parents == XOVER_N_PARENTS and crossover.n_offsprings == XOVER_N_OFFSPRINGS
 
-            _parents = [[Individual(X=np.array([parent.X[var] for var in list_of_vars])) for parent in parents] for
-                        parents in pop]
+            _parents = [
+                [Individual(X=np.array([parent.X[var] for var in list_of_vars], dtype="O" if clazz is Choice else None)) 
+                  for parent in parents] 
+                for parents in pop
+            ]
 
-            _vars = [vars[e] for e in list_of_vars]
-            _xl, _xu = None, None
-
-            if clazz in [Real, Integer]:
-                _xl, _xu = np.array([v.bounds for v in _vars]).T
-
+            _vars = {e: vars[e] for e in list_of_vars}
+            _xl = np.array([vars[e].lb if hasattr(vars[e], "lb") else None for e in list_of_vars])
+            _xu = np.array([vars[e].ub if hasattr(vars[e], "ub") else None for e in list_of_vars])
             _problem = Problem(vars=_vars, xl=_xl, xu=_xu)
 
             _off = crossover(_problem, _parents, **kwargs)

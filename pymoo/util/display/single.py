@@ -42,7 +42,7 @@ class SingleObjectiveOutput(Output):
         self.columns += [self.f_avg, self.f_min]
 
         pf = pareto_front_if_possible(problem)
-        if pf:
+        if pf is not None:
             self.best = pf.flatten()[0]
             self.columns += [self.f_gap]
 
@@ -60,9 +60,8 @@ class SingleObjectiveOutput(Output):
 
         if opt.feas:
             self.f_min.set(opt.f)
-            if self.best:
+            if self.best is not None:
                 self.f_gap.set(opt.f - self.best)
-
         else:
             self.f_min.set(None)
             self.f_gap.set(None)

@@ -28,8 +28,9 @@ class BinomialCrossover(Crossover):
         M = mut_binomial(n_matings, n_var, bias, at_least_once=True)
 
         if self.n_offsprings == 1:
-            Xp = X[0].copy(X)
+            Xp = X[0].copy()
             Xp[~M] = X[1][~M]
+            Xp = Xp[None, ...]
         elif self.n_offsprings == 2:
             Xp = np.copy(X)
             Xp[0][~M] = X[1][~M]

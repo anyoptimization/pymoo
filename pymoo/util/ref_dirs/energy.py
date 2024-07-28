@@ -1,7 +1,6 @@
 import numpy as np
-import pymoo.gradient.toolbox as anp
 
-
+from pymoo.gradient.grad_autograd import triu_indices, sqrt, log
 from pymoo.util.ref_dirs.construction import ConstructionBasedReferenceDirectionFactory
 from pymoo.util.ref_dirs.misc import project_onto_sum_equals_zero_plane, project_onto_unit_simplex_recursive
 from pymoo.util.ref_dirs.optimizer import Adam
@@ -280,9 +279,9 @@ def squared_dist(A, B):
 
 
 def calc_potential_energy(A, d):
-    i, j = anp.triu_indices(len(A), 1)
-    D = anp.sqrt(squared_dist(A, A)[i, j])
-    energy = anp.log((1 / D ** d).mean())
+    i, j = triu_indices(len(A), 1)
+    D = sqrt(squared_dist(A, A)[i, j])
+    energy = log((1 / D ** d).mean())
     return energy
 
 

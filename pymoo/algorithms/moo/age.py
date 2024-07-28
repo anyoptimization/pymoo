@@ -96,10 +96,10 @@ class AGEMOEASurvival(Survival):
         fronts = self.nds.do(F, n_stop_if_ranked=N)
 
         # get max int value
-        max_val = np.iinfo(np.int).max
+        max_val = np.iinfo(int).max
 
         # initialize population ranks with max int value
-        front_no = np.full(F.shape[0], max_val, dtype=np.int)
+        front_no = np.full(F.shape[0], max_val, dtype=int)
 
         # assign the rank to each individual
         for i, fr in enumerate(fronts):
@@ -167,7 +167,7 @@ class AGEMOEASurvival(Survival):
         p = self.compute_geometry(front, extreme, n)
 
         nn = np.linalg.norm(front, p, axis=1)
-        distances = self.pairwise_distances(front, p) / nn[:, None]
+        distances = self.pairwise_distances(front, p) / (nn[:, None])
 
         neighbors = 2
         remaining = np.arange(m)
@@ -284,7 +284,7 @@ def normalize(front, extreme):
 
     try:
         hyperplane = np.linalg.solve(front[extreme], np.ones(n))
-        if any(np.isnan(hyperplane)) or any(np.isinf(hyperplane)) or any(hyperplane < 0):
+        if any(np.isnan(hyperplane)) or any(np.isinf(hyperplane)) or any(hyperplane <= 0):
             normalization = np.max(front, axis=0)
         else:
             normalization = 1. / hyperplane
@@ -299,5 +299,6 @@ def normalize(front, extreme):
     front = front / normalization
 
     return front, normalization
+
 
 parse_doc_string(AGEMOEA.__init__)

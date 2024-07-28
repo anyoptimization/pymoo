@@ -5,17 +5,21 @@ from pymoo.termination.delta import DeltaToleranceTermination
 from pymoo.util.normalization import normalize
 
 
+
 class DesignSpaceTermination(DeltaToleranceTermination):
 
     def __init__(self, tol=0.005, **kwargs):
+        """
+        Check the distance in the design-space and terminate based on tolerance.
+        (only works if variables can be converted to float)
+        """
         super().__init__(tol, **kwargs)
 
     def _delta(self, prev, current):
-
-        if prev.dtype == float and current.dtype == float:
-            return IGD(current).do(prev)
-        else:
-            return np.mean([np.sum(e != prev, axis=1).max() / len(e) for e in current])
+        try:
+            return IGD(current.astype(float)).do(prev.astype(float))
+        except:
+            return np.inf
 
     def _data(self, algorithm):
 

@@ -10,7 +10,7 @@ class AdaptiveEpsilonConstraintHandling(AdaptiveConstraintHandling):
         self.perc_eps_until = perc_eps_until
         self.max_cv = None
 
-    def _adapt(self, config, **kwargs):
+    def _adapt_constraint_handling(self, config, **kwargs):
         t = self.termination.perc
         alpha = np.maximum(0.0, 1 - 1 / self.perc_eps_until * t)
         eps = alpha * self.max_cv

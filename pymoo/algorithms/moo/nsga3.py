@@ -112,7 +112,8 @@ class NSGA3(GeneticAlgorithm):
         if not has_feasible(self.pop):
             self.opt = self.pop[[np.argmin(self.pop.get("CV"))]]
         else:
-            self.opt = self.survival.opt
+            if len(self.survival.opt):
+                self.opt = self.survival.opt
 
 
 # =========================================================================================================
@@ -166,6 +167,8 @@ class ReferenceDirectionSurvival(Survival):
         # set the optimum, first front and closest to all reference directions
         closest = np.unique(dist_matrix[:, np.unique(niche_of_individuals)].argmin(axis=0))
         self.opt = pop[intersect(fronts[0], closest)]
+        if len(self.opt) == 0:
+            self.opt = pop[fronts[0]]
 
         # if we need to select individuals to survive
         if len(pop) > n_survive:
@@ -275,7 +278,6 @@ class HyperplaneNormalization:
         self.extreme_points = None
 
     def update(self, F, nds=None):
-
         # find or usually update the new ideal point - from feasible solutions
         self.ideal_point = np.min(np.vstack((self.ideal_point, F)), axis=0)
         self.worst_point = np.max(np.vstack((self.worst_point, F)), axis=0)
@@ -293,7 +295,7 @@ class HyperplaneNormalization:
         worst_of_front = np.max(F[nds, :], axis=0)
 
         self.nadir_point = get_nadir_point(self.extreme_points, self.ideal_point, self.worst_point,
-                                           worst_of_population, worst_of_front)
+                                           worst_of_front, worst_of_population)
 
 
 def get_extreme_points_c(F, ideal_point, extreme_points=None):

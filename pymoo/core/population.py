@@ -42,6 +42,11 @@ class Population(np.ndarray):
 
             for i in range(len(self)):
                 val = values[i] if is_iterable else values
+
+                # check for view and make copy to prevent memory leakage (#455)
+                if isinstance(val, np.ndarray) and not val.flags["OWNDATA"]:
+                    val = val.copy()
+
                 self[i].set(key, val)
 
         return self

@@ -31,22 +31,27 @@ class RunningMetric(Callback):
         F = algorithm.opt.get("F")
         c_F, c_ideal, c_nadir = F, F.min(axis=0), F.max(axis=0)
 
+        # find the normalization constant to divide by
+        norm = c_nadir - c_ideal
+
+        # make sure all dimensions in ideal are strictly lower than in nadir
+        c_nadir[c_ideal == c_nadir] += 1e-16
+        norm[c_ideal == c_nadir] = 1.0
+
         # append the current optimum to the history
         history.append(dict(F=F, ideal=c_ideal, nadir=c_nadir))
 
-        # the current norm that should be used for normalization
-        norm = c_nadir - c_ideal
-        norm[norm < 1e-32] = 1.0
-
-        # normalize the current objective space values
+        # normalize the current objective space values (use the utopian if equal)
         c_N = normalize(c_F, c_ideal, c_nadir)
 
         # normalize all previous generations with respect to current ideal and nadir
         N = [normalize(e["F"], c_ideal, c_nadir) for e in history]
 
         # calculate the delta difference for each previous ideal and nadir point to current
-        delta_ideal = [calc_delta_norm(history[k]["ideal"], history[k-1]["ideal"], norm) for k in range(1, len(history))] + [0.0]
-        delta_nadir = [calc_delta_norm(history[k]["nadir"], history[k-1]["nadir"], norm) for k in range(1, len(history))] + [0.0]
+        delta_ideal = [calc_delta_norm(history[k]["ideal"], history[k - 1]["ideal"], norm) for k in
+                       range(1, len(history))] + [0.0]
+        delta_nadir = [calc_delta_norm(history[k]["nadir"], history[k - 1]["nadir"], norm) for k in
+                       range(1, len(history))] + [0.0]
 
         # now calculate the indicator from each previous one to the current
         if self.indicator == "igd":
@@ -121,4 +126,3 @@ class RunningMetricAnimation(AnimationCallback):
                 plt.draw()
                 plt.waitforbuttonpress()
                 plt.close('all')
-

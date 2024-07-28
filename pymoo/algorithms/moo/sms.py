@@ -137,7 +137,7 @@ class SMSEMOA(GeneticAlgorithm):
                  pop_size=100,
                  sampling=FloatRandomSampling(),
                  selection=TournamentSelection(func_comp=cv_and_dom_tournament),
-                 crossover=SBX(prob_exch=0.5),
+                 crossover=SBX(),
                  mutation=PM(),
                  survival=LeastHypervolumeContributionSurvival(),
                  eliminate_duplicates=True,
@@ -184,6 +184,9 @@ class SMSEMOA(GeneticAlgorithm):
         # merge the offsprings with the current population
         if infills is not None:
             pop = Population.merge(self.pop, infills)
+        else:
+            pop = self.pop
+
 
         self.pop = self.survival.do(self.problem, pop, n_survive=self.pop_size, algorithm=self,
                                     ideal=ideal, nadir=nadir, **kwargs)

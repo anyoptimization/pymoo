@@ -80,7 +80,7 @@ class PatternSearch(LocalSearch):
     def _next(self):
 
         # whether the last iteration has resulted in a new optimum or not
-        has_improved = is_better(self._explr, self._center, eps=0.0)
+        has_improved = is_better(self._explr, self._center)
 
         # that means that the exploration did not find any new point and was thus unsuccessful
         if not has_improved:

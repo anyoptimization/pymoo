@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 import pytest
 
-from pymoo.algorithms.moo.nsga2 import calc_crowding_distance
+from pymoo.operators.survival.rank_and_crowding.metrics import calc_crowding_distance
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from tests.test_util import load_to_test_resource
 

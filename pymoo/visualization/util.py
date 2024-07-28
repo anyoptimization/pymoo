@@ -49,7 +49,7 @@ def plot_axes_lines(ax, X, extend_factor=1.0, **kwargs):
 
 
 def plot_polygon(ax, x, **kwargs):
-    ax.add_collection(PatchCollection([patches.Polygon(x, True)], **kwargs))
+    ax.add_collection(PatchCollection([patches.Polygon(x, closed=True)], **kwargs))
 
 
 def plot_axis_labels(ax, endpoints, labels, margin=0.035, size='small', **kwargs):

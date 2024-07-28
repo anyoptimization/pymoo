@@ -178,7 +178,7 @@ class CADASurvival:
                             np.random.shuffle(min_d_i)
                             closest = crowdest[min_d_i]
                             niche_worst = closest[np.argmax(FV[closest])]
-                        if FV[niche_worst] > worst_fit:
+                        if (FV[niche_worst] > worst_fit).all():
                             worst_fit = FV[niche_worst]
                             worst_idx = niche_worst
                             worst_niche = crowdest_niche

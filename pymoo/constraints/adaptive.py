@@ -40,7 +40,7 @@ class AdaptiveConstraintHandling(Meta, Algorithm):
     def _setup(self, _, **kwargs):
         self.evaluator = AttachConfigEvaluator(self.evaluator, self.config)
 
-    def _adapt(self, config, infills=None, **kwargs):
+    def _adapt_constraint_handling(self, config, infills=None, **kwargs):
         pass
 
     def _initialize_advance(self, infills=None, **kwargs):
@@ -53,7 +53,7 @@ class AdaptiveConstraintHandling(Meta, Algorithm):
         super()._advance(infills=infills, **kwargs)
         copy_to_dict(self.default_config, self.config)
 
-        self._adapt(self.adapted_config, infills=infills, **kwargs)
+        self._adapt_constraint_handling(self.adapted_config, infills=infills, **kwargs)
 
     def _infill(self):
         copy_to_dict(self.adapted_config, self.config)
