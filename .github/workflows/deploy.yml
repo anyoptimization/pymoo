@@ -28,6 +28,7 @@ jobs:
         with:
           name: dist
           path: dist
+          overwrite: true
     strategy:
       matrix:
         os:
