@@ -3,7 +3,7 @@ import importlib
 
 GRADIENT_MODULE = "pymoo.gradient.toolbox"
 
-TOOLBOX = "autograd.numpy"
+TOOLBOX = "numpy"
 
 
 def activate(name):
@@ -17,3 +17,5 @@ def activate(name):
 
 def deactivate():
     activate("numpy")
+
+
