@@ -23,7 +23,7 @@ data = dict(
     version=__version__,
     author=__author__,
     url=__url__,
-    python_requires='>=3.7',
+    python_requires='>=3.9',
     author_email="blankjul@msu.edu",
     description="Multi-Objective Optimization in Python",
     license='Apache License 2.0',
