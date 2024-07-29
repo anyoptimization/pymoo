@@ -3,7 +3,6 @@ import numpy as np
 
 try:
     import autograd.numpy as anp
-    from autograd import value_and_grad
     from autograd.core import VJPNode, backward_pass
     from autograd.tracer import new_box, isbox
 except:
@@ -11,7 +10,8 @@ except:
 
 
 def value_and_grad(*args, **kwargs):
-    return value_and_grad(*args, **kwargs)
+    from autograd import value_and_grad as vag
+    return vag(*args, **kwargs)
 
 
 def log(*args, **kwargs):
