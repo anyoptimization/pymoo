@@ -59,8 +59,8 @@ class ImprovementReplacement(ReplacementSurvival):
 
         ret = np.full((len(pop), 1), False)
 
-        pop_F, pop_CV, pop_feas = pop.get("F", "CV", "feasible")
-        off_F, off_CV, off_feas = off.get("F", "CV", "feasible")
+        pop_F, pop_CV, pop_feas = pop.get("F", "CV", "FEAS")
+        off_F, off_CV, off_feas = off.get("F", "CV", "FEAS")
 
         if problem.has_constraints() > 0:
 

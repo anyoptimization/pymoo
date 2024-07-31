@@ -86,7 +86,7 @@ class ToReplacement(Survival):
 
 
 def split_by_feasibility(pop, sort_infeas_by_cv=True, sort_feas_by_obj=False, return_pop=False):
-    F, CV, b = pop.get("F", "CV", "feasible")
+    F, CV, b = pop.get("F", "CV", "FEAS")
 
     feasible = np.where(b)[0]
     infeasible = np.where(~b)[0]

@@ -360,7 +360,7 @@ def intersect(a, b):
 
 
 def has_feasible(pop):
-    return np.any(pop.get("feasible"))
+    return np.any(pop.get("FEAS"))
 
 
 def to_numpy(a):
