@@ -68,6 +68,7 @@ def create_vf_scipy_poly(P, ranks, delta, eps_max, method="trust-constr"):
     ineq_lb += [-np.inf] * (P_count - 1)
     ineq_ub += [0] * (P_count - 1)
 
+
     # Equality constraints (Make sure all terms in VF add up to 1 per term of product)
     for m in range(M): 
         ineq_lb.append(0)
@@ -388,8 +389,6 @@ def _ineq_constr_1D_poly(x, P, vf, ranks, delta):
     G = np.ones((1, S_constr_len + increasing_len))*-99
 
     # Checking to make sure each S term in the polynomial objective function is non-negative
-    current_constr = 0
-
     S = _calc_S(P, x[0:-1]) * -1
 
     G[:, 0:S_constr_len] = S.reshape(1, S_constr_len)
@@ -626,9 +625,13 @@ def _validate_vf(res):
 
 
     elif isinstance(res, scipy.optimize.optimize.OptimizeResult):
-        success = res.success
+        success = res.success and res.constr_violation <= 0
         epsilon = res.x[-1]
-        message = res.message
+
+        if not (res.constr_violation <= 0): 
+            message = "Constraints not met."
+        else:
+            message = res.message
     else: 
         ValueError("Internal error: bad result objective given for validation")
 
