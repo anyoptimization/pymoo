@@ -32,7 +32,7 @@ test_test_prob_const_in_out = [
 def test_ranking(P, rankings, output):
     linear_vf = mvf.linear_vf
 
-    vf_prob = mvf.OptimizeLinearVF(P, rankings, linear_vf)
+    vf_prob = mvf.OptimizeLinearVF(P, rankings, 0.1, 1000, linear_vf)
 
     ## Test whether the solutions are ranked by ranking 
     P_from_prob = vf_prob.P
@@ -135,7 +135,7 @@ def test_ineq_constr_linear(x, P, ranks, expected_ineq_con):
 
     P_sorted = mvf._sort_P(P, ranks)
 
-    result = mvf._ineq_constr_linear(x, P_sorted, mvf.linear_vf, minimize=False)
+    result = mvf._ineq_constr_linear(x, P_sorted, mvf.linear_vf, ranks, 0.1)
 
     # Test whether or not the constraint function matches our expected values   
     assert np.all(np.isclose(expected_ineq_con, result))
@@ -205,7 +205,7 @@ def test_ineq_constr_poly(x, P, ranks, expected_ineq_con):
 
     sorted_P = mvf._sort_P(P, ranks) 
 
-    constraints = mvf._ineq_constr_poly(x, P, mvf.poly_vf, minimize=False)
+    constraints = mvf._ineq_constr_poly(x, P, mvf.poly_vf, ranks, 0.1)
     
     assert np.all(np.isclose(expected_ineq_con, constraints))
 
@@ -627,7 +627,7 @@ test_ga_in_out = [
 
 @pytest.mark.parametrize('P, ranks', test_ga_in_out)
 def test_ga(P, ranks): 
-    vf_res = mvf.create_linear_vf(P, ranks, "ES")
+    vf_res = mvf.create_linear_vf(P, ranks, method="ES")
 
 ## --------------- Smoke test for creating a VF with scipy ------------------
 
