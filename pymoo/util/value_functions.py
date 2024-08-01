@@ -122,6 +122,9 @@ def create_vf_scipy_poly(P, ranks, delta, eps_max, method="trust-constr"):
 
 def create_vf_scipy_linear(P, ranks, delta, eps_max, method="trust-constr"): 
 
+    # Gathering basic info
+    M = P.shape[1]
+    
     # Sort P
     P_sorted = _sort_P(P, ranks)
     ranks.sort()
