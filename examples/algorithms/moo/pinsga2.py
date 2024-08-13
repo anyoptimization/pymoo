@@ -1,4 +1,3 @@
-from pymoo.visualization.Dashboard import Dashboard
 from pymoo.algorithms.moo.pinsga2 import PINSGA2
 from pymoo.optimize import minimize
 from pymoo.problems.multi import ZDT1
@@ -87,6 +86,5 @@ res = minimize(problem,
                algorithm,
                ('n_gen', 200),
                seed=1,
-               callback=Dashboard(plot_eta_F=plot_eta_F, plot_vf=plot_vf),
                verbose=True)
 

@@ -1,5 +1,5 @@
 import numpy as np
-import warnings
+import sys
 
 from abc import ABC, abstractmethod
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
