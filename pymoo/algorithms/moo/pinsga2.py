@@ -62,8 +62,9 @@ class PINSGA2(GeneticAlgorithm):
                  ranking_type='pairwise',
                  presi_signs=None,
                  automated_dm=None,
+                 verbose=False, 
                  **kwargs):
-        
+       
         self.survival = RankAndCrowding(nds=NonDominatedSorting(dominator=VFDominator(self)))
 
         super().__init__(
@@ -97,9 +98,15 @@ class PINSGA2(GeneticAlgorithm):
         self.fronts = []
         self.eps_max = eps_max
 
+        self.verbose = verbose
+
         if automated_dm is not None:
             automated_dm.get_pairwise_ranks_func = self._get_pairwise_ranks
         self.automated_dm = automated_dm
+
+    def _warn(self, msg):
+        if self.verbose: 
+            sys.stderr.write(msg)
 
     @staticmethod
     def _prompt_for_ranks(F, presi_signs):
@@ -218,7 +225,7 @@ class PINSGA2(GeneticAlgorithm):
 
     def _reset_dm_preference(self):
 
-            print("Back-tracking and removing DM preference from search.")
+            self._warn("Back-tracking and removing DM preference from search.")
 
             self.eta_F = []
             self.vf_res = None
@@ -268,7 +275,7 @@ class PINSGA2(GeneticAlgorithm):
         # Check whether we have more than one solution
         if dm_time and len(self.eta_F) < 2: 
 
-            print("Population only contains one non-dominated solution. ")
+            self._warn("Population only contains one non-dominated solution. ")
 
             self._reset_dm_preference()
 
@@ -299,7 +306,7 @@ class PINSGA2(GeneticAlgorithm):
 
             if len(set(rank)) == 0: 
 
-                print("No preference between any two points provided.")
+                self._warn("No preference between any two points provided.")
 
                 self._reset_dm_preference()
 
@@ -338,18 +345,18 @@ class PINSGA2(GeneticAlgorithm):
                 else:
 
                     # If we didn't the model, try to remove the least preferred point and try to refit
-                    print("Could not fit a function to the DM preference")
+                    self._warn("Could not fit a function to the DM preference")
 
                     if eta_F.shape[0] == 2:
 
                         # If not, reset and use normal domination
-                        print("Removing DM preference")
+                        self._warn("Removing DM preference")
                         self._reset_dm_preference()
                         break
 
                     else:
 
-                        print("Removing the second best preferred solution from the fit.")
+                        self._warn("Removing the second best preferred solution from the fit.")
 
                         # ranks start at 1, not zero
                         rank_to_remove = dm_ranks[1] 

@@ -626,8 +626,9 @@ test_ga_in_out = [
 
 
 @pytest.mark.parametrize('P, ranks', test_ga_in_out)
-def test_ga(P, ranks): 
+def test_pymoo(P, ranks): 
     vf_res = mvf.create_linear_vf(P, ranks, method="ES")
+    vf_res = mvf.create_poly_vf(P, ranks, method="ES")
 
 ## --------------- Smoke test for creating a VF with scipy ------------------
 
@@ -654,6 +655,7 @@ test_scipy_in_out = [
 @pytest.mark.parametrize('P, ranks', test_scipy_in_out)
 def test_scipy(P, ranks): 
     vf_res = mvf.create_linear_vf(P, ranks, "scimin")
+    vf_res = mvf.create_poly_vf(P, ranks, "scimin")
 
 
 
