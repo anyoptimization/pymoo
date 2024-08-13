@@ -345,6 +345,7 @@ class PINSGA2(GeneticAlgorithm):
                         # If not, reset and use normal domination
                         print("Removing DM preference")
                         self._reset_dm_preference()
+                        break
 
                     else:
 
