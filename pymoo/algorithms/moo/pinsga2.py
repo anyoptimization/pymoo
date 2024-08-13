@@ -264,13 +264,13 @@ class PINSGA2(GeneticAlgorithm):
         # Remove duplicate rows
         self.eta_F = np.unique(self.eta_F, axis=0)
 
-        # A frozen view of the optimization each 10 generations 
+        # A frozen view of the optimization each tau generations 
         self.paused_F = F
 
         # Record the previous population in case we need to back track 
         self.prev_pop = self.pop
 
-        dm_time = self.n_gen % 10 == 0
+        dm_time = self.n_gen % self.tau == 0
 
         # Check whether we have more than one solution
         if dm_time and len(self.eta_F) < 2: 
