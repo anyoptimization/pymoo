@@ -81,7 +81,11 @@ def find_zero(point, n, precision):
         f = 0.0
         for obj_index in range(0, n):
             if point[obj_index] > 0:
-                f += np.power(point[obj_index] + epsilon, x)
+                log_value = x * np.log(point[obj_index] + epsilon)
+                if log_value < np.log(np.finfo(np.float64).max):
+                    f += np.exp(log_value)
+                else:
+                    return 1  # Handle overflow by returning a fallback value
 
         f = np.log(f) if f > 0 else 0  # Avoid log of non-positive numbers
 
@@ -90,22 +94,26 @@ def find_zero(point, n, precision):
         denominator = 0
         for obj_index in range(0, n):
             if point[obj_index] > 0:
-                power_value = np.power(point[obj_index] + epsilon, x)
-                numerator += power_value * np.log(point[obj_index] + epsilon)
-                denominator += power_value
+                log_value = x * np.log(point[obj_index] + epsilon)
+                if log_value < np.log(np.finfo(np.float64).max):
+                    power_value = np.exp(log_value)
+                    numerator += power_value * np.log(point[obj_index] + epsilon)
+                    denominator += power_value
+                else:
+                    return 1  # Handle overflow by returning a fallback value
 
         if denominator == 0 or np.isnan(denominator) or np.isinf(denominator):
             return 1  # Handle division by zero or NaN
 
         if np.isnan(numerator) or np.isinf(numerator):
-            return 1  # Handle division with Nan or Inf
+            return 1  # Handle invalid numerator
 
         ff = numerator / denominator
 
-        if ff == 0:  # Check for zero denominator before division
+        if ff == 0:  # Check for zero before division
             return 1  # Handle by returning a fallback value
 
-        # Zero of function
+        # Update x using Newton's method
         x = x - f / ff
 
         if abs(x - past_value) <= precision:
