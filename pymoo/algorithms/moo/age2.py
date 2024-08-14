@@ -72,40 +72,45 @@ def project_on_manifold(point, p):
 
 def find_zero(point, n, precision):
     x = 1
-
+    epsilon = 1e-10  # Small constant for regularization
     past_value = x
+
     for i in range(0, 100):
 
-        # Original function
+        # Original function with regularization
         f = 0.0
         for obj_index in range(0, n):
             if point[obj_index] > 0:
-                f += np.power(point[obj_index], x)
+                f += np.power(point[obj_index] + epsilon, x)
 
-        f = np.log(f)
+        f = np.log(f) if f > 0 else 0  # Avoid log of non-positive numbers
 
-        # Derivative
+        # Derivative with regularization
         numerator = 0
         denominator = 0
         for obj_index in range(0, n):
             if point[obj_index] > 0:
-                numerator = numerator + np.power(point[obj_index], x) * np.log(point[obj_index])
-                denominator = denominator + np.power(point[obj_index], x)
+                power_value = np.power(point[obj_index] + epsilon, x)
+                numerator += power_value * np.log(point[obj_index] + epsilon)
+                denominator += power_value
 
         if denominator == 0:
-            return 1
+            return 1  # Handle division by zero
 
         ff = numerator / denominator
 
-        # zero of function
+        if ff == 0:  # Check for zero denominator before division
+            return 1  # Handle by returning a fallback value
+
+        # Zero of function
         x = x - f / ff
 
         if abs(x - past_value) <= precision:
             break
         else:
-            paste_value = x  # update current point
+            past_value = x  # Update current point
 
-    if isinstance(x, complex):
+    if isinstance(x, complex) or np.isinf(x) or np.isnan(x):
         return 1
     else:
         return x
