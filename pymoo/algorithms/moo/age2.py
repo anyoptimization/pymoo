@@ -64,7 +64,7 @@ class AGEMOEA2(GeneticAlgorithm):
         self.tournament_type = 'comp_by_rank_and_crowding'
 
 
-@jit(fastmath=True)
+@jit(nopython=True, fastmath=True)
 def project_on_manifold(point, p):
     dist = sum(point[point > 0] ** p) ** (1/p)
     return np.multiply(point, 1 / dist)
@@ -140,7 +140,7 @@ class AGEMOEA2Survival(AGEMOEASurvival):
         return p
 
     @staticmethod
-    @jit(fastmath=True)
+    @jit(nopython=True, fastmath=True)
     def pairwise_distances(front, p):
         m, n = front.shape
         projected_front = front.copy()

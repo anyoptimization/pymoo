@@ -209,7 +209,7 @@ class AGEMOEASurvival(Survival):
         return p
 
     @staticmethod
-    @jit(fastmath=True)
+    @jit(nopython=True, fastmath=True)
     def pairwise_distances(front, p):
         m = np.shape(front)[0]
         distances = np.zeros((m, m))
@@ -219,7 +219,7 @@ class AGEMOEASurvival(Survival):
         return distances
 
     @staticmethod
-    @jit(fastmath=True)
+    @jit(nopython=True, fastmath=True)
     def minkowski_distances(A, B, p):
         m1 = np.shape(A)[0]
         m2 = np.shape(B)[0]
@@ -254,7 +254,7 @@ def find_corner_solutions(front):
     return indexes
 
 
-@jit(fastmath=True)
+@jit(nopython=True, fastmath=True)
 def point_2_line_distance(P, A, B):
     d = np.zeros(P.shape[0])
 
