@@ -94,8 +94,11 @@ def find_zero(point, n, precision):
                 numerator += power_value * np.log(point[obj_index] + epsilon)
                 denominator += power_value
 
-        if denominator == 0:
-            return 1  # Handle division by zero
+        if denominator == 0 or np.isnan(denominator) or np.isinf(denominator):
+            return 1  # Handle division by zero or NaN
+
+        if np.isnan(numerator) or np.isinf(numerator):
+            return 1  # Handle division with Nan or Inf
 
         ff = numerator / denominator
 
