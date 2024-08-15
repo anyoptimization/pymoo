@@ -70,10 +70,15 @@ def project_on_manifold(point, p):
     return np.multiply(point, 1 / dist)
 
 
+import numpy as np
+
+
 def find_zero(point, n, precision):
     x = 1
     epsilon = 1e-10  # Small constant for regularization
     past_value = x
+    max_float = np.finfo(np.float64).max  # Maximum representable float value
+    log_max_float = np.log(max_float)  # Logarithm of the maximum float
 
     for i in range(0, 100):
 
@@ -82,7 +87,7 @@ def find_zero(point, n, precision):
         for obj_index in range(0, n):
             if point[obj_index] > 0:
                 log_value = x * np.log(point[obj_index] + epsilon)
-                if log_value < np.log(np.finfo(np.float64).max):
+                if log_value < log_max_float:
                     f += np.exp(log_value)
                 else:
                     return 1  # Handle overflow by returning a fallback value
@@ -95,10 +100,19 @@ def find_zero(point, n, precision):
         for obj_index in range(0, n):
             if point[obj_index] > 0:
                 log_value = x * np.log(point[obj_index] + epsilon)
-                if log_value < np.log(np.finfo(np.float64).max):
+                if log_value < log_max_float:
                     power_value = np.exp(log_value)
-                    numerator += power_value * np.log(point[obj_index] + epsilon)
-                    denominator += power_value
+                    log_term = np.log(point[obj_index] + epsilon)
+
+                    # Use logarithmic comparison to avoid overflow
+                    if log_value + np.log(abs(log_term) + epsilon) < log_max_float:
+                        result = power_value * log_term
+                        numerator += result
+                        denominator += power_value
+                    else:
+                        # Handle extreme cases by capping the result
+                        numerator += max_float
+                        denominator += power_value
                 else:
                     return 1  # Handle overflow by returning a fallback value
 
