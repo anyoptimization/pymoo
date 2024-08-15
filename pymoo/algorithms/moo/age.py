@@ -167,7 +167,13 @@ class AGEMOEASurvival(Survival):
         p = self.compute_geometry(front, extreme, n)
 
         nn = np.linalg.norm(front, p, axis=1)
-        distances = self.pairwise_distances(front, p) / (nn[:, None])
+        # Replace very small norms with 1 to prevent division by zero
+        nn[nn < 1e-8] = 1
+
+        distances = self.pairwise_distances(front, p)
+        distances[distances < 1e-8] = 1e-8  # Replace very small entries to prevent division by zero
+
+        distances = distances / (nn[:, None])
 
         neighbors = 2
         remaining = np.arange(m)
@@ -209,7 +215,7 @@ class AGEMOEASurvival(Survival):
         return p
 
     @staticmethod
-    @jit(nopython=True, fastmath=True)
+    #@jit(nopython=True, fastmath=True)
     def pairwise_distances(front, p):
         m = np.shape(front)[0]
         distances = np.zeros((m, m))
