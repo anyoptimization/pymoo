@@ -156,12 +156,14 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
                 X = ReductionBasedReferenceDirectionFactory(self.n_dim,
                                                             self.n_points,
                                                             kmeans=True,
-                                                            lexsort=False) \
+                                                            lexsort=False,
+                                                            seed=self.seed) \
                     .do()
 
             elif self.sampling == "construction":
                 X = ConstructionBasedReferenceDirectionFactory(self.n_dim,
-                                                               self.n_points) \
+                                                               self.n_points,
+                                                               seed=self.seed) \
                     .do()
             else:
                 raise Exception("Unknown sampling method. Either reduction or construction.")
