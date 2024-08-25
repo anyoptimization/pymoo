@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
@@ -43,9 +44,9 @@ class ES(GeneticAlgorithm):
         """
 
         if pop_size is None and n_offsprings is not None:
-            pop_size = int(np.math.ceil(n_offsprings * rule))
+            pop_size = int(math.ceil(n_offsprings * rule))
         elif n_offsprings is None and pop_size is not None:
-            n_offsprings = int(np.math.floor(pop_size / rule))
+            n_offsprings = int(math.floor(pop_size / rule))
 
         assert pop_size is not None and n_offsprings is not None, "You have to at least provivde pop_size of n_offsprings."
         assert n_offsprings >= 2 * pop_size, "The number of offsprings should be at least double the population size."

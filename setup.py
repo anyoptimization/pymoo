@@ -37,7 +37,7 @@ data = dict(
                       'scipy>=1.1',
                       'matplotlib>=3',
                       'autograd>=1.4',
-                      'cma==3.2.2',
+                      'cma>=3.2.2',
                       'alive-progress',
                       'dill',
                       'Deprecated'],
