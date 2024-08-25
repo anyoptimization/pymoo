@@ -6,10 +6,11 @@ from pymoo.util.function_loader import load_function
 
 class NonDominatedSorting:
 
-    def __init__(self, epsilon=None, method="fast_non_dominated_sort") -> None:
+    def __init__(self, epsilon=None, method="fast_non_dominated_sort", dominator=Dominator()) -> None:
         super().__init__()
         self.epsilon = epsilon
         self.method = method
+        self.dominator = dominator
 
     def do(self, F, return_rank=False, only_non_dominated_front=False, n_stop_if_ranked=None, **kwargs):
         F = F.astype(float)
@@ -23,7 +24,7 @@ class NonDominatedSorting:
         if self.epsilon is not None:
             kwargs["epsilon"] = float(self.epsilon)
 
-        fronts = func(F, **kwargs)
+        fronts = func(F, **dict(kwargs, dominator=self.dominator))
 
         # convert to numpy array for each front and filter by n_stop_if_ranked if desired
         _fronts = []
