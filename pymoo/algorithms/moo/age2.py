@@ -64,48 +64,78 @@ class AGEMOEA2(GeneticAlgorithm):
         self.tournament_type = 'comp_by_rank_and_crowding'
 
 
-@jit(fastmath=True)
+@jit(nopython=True, fastmath=True)
 def project_on_manifold(point, p):
     dist = sum(point[point > 0] ** p) ** (1/p)
     return np.multiply(point, 1 / dist)
 
 
+import numpy as np
+
+
 def find_zero(point, n, precision):
     x = 1
-
+    epsilon = 1e-10  # Small constant for regularization
     past_value = x
+    max_float = np.finfo(np.float64).max  # Maximum representable float value
+    log_max_float = np.log(max_float)  # Logarithm of the maximum float
+
     for i in range(0, 100):
 
-        # Original function
+        # Original function with regularization
         f = 0.0
         for obj_index in range(0, n):
             if point[obj_index] > 0:
-                f += np.power(point[obj_index], x)
+                log_value = x * np.log(point[obj_index] + epsilon)
+                if log_value < log_max_float:
+                    f += np.exp(log_value)
+                else:
+                    return 1  # Handle overflow by returning a fallback value
 
-        f = np.log(f)
+        f = np.log(f) if f > 0 else 0  # Avoid log of non-positive numbers
 
-        # Derivative
+        # Derivative with regularization
         numerator = 0
         denominator = 0
         for obj_index in range(0, n):
             if point[obj_index] > 0:
-                numerator = numerator + np.power(point[obj_index], x) * np.log(point[obj_index])
-                denominator = denominator + np.power(point[obj_index], x)
+                log_value = x * np.log(point[obj_index] + epsilon)
+                if log_value < log_max_float:
+                    power_value = np.exp(log_value)
+                    log_term = np.log(point[obj_index] + epsilon)
 
-        if denominator == 0:
-            return 1
+                    # Use logarithmic comparison to avoid overflow
+                    if log_value + np.log(abs(log_term) + epsilon) < log_max_float:
+                        result = power_value * log_term
+                        numerator += result
+                        denominator += power_value
+                    else:
+                        # Handle extreme cases by capping the result
+                        numerator += max_float
+                        denominator += power_value
+                else:
+                    return 1  # Handle overflow by returning a fallback value
+
+        if denominator == 0 or np.isnan(denominator) or np.isinf(denominator):
+            return 1  # Handle division by zero or NaN
+
+        if np.isnan(numerator) or np.isinf(numerator):
+            return 1  # Handle invalid numerator
 
         ff = numerator / denominator
 
-        # zero of function
+        if ff == 0:  # Check for zero before division
+            return 1  # Handle by returning a fallback value
+
+        # Update x using Newton's method
         x = x - f / ff
 
         if abs(x - past_value) <= precision:
             break
         else:
-            paste_value = x  # update current point
+            past_value = x  # Update current point
 
-    if isinstance(x, complex):
+    if isinstance(x, complex) or np.isinf(x) or np.isnan(x):
         return 1
     else:
         return x
@@ -135,7 +165,7 @@ class AGEMOEA2Survival(AGEMOEASurvival):
         return p
 
     @staticmethod
-    @jit(fastmath=True)
+    @jit(nopython=True, fastmath=True)
     def pairwise_distances(front, p):
         m, n = front.shape
         projected_front = front.copy()
