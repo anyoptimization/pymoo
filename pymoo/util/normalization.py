@@ -305,7 +305,7 @@ class ObjectiveSpaceNormalization:
         self._worst = None
 
     def update(self, pop):
-        F, feas = pop.get("F", "feasible")
+        F, feas = pop.get("F", "FEAS")
         self._infeas_ideal = find_ideal(F, current=self._infeas_ideal)
 
         if np.any(feas):

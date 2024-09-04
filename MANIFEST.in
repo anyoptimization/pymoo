@@ -1,4 +1,4 @@
 prune .
 recursive-include pymoo *.py *.pyx *.pxd
-recursive-include pymoo/cython/vendor *.cpp *.h
-include LICENSE Makefile
+recursive-include pymoo/cython/vendor *.cpp *.h *.py
+include LICENSE Makefile pyproject.toml

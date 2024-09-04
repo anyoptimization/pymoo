@@ -1,6 +1,6 @@
 import argparse
 import copy
-import distutils
+import sysconfig
 import os
 import sys
 import traceback
@@ -23,7 +23,7 @@ data = dict(
     version=__version__,
     author=__author__,
     url=__url__,
-    python_requires='>=3.7',
+    python_requires='>=3.9',
     author_email="blankjul@msu.edu",
     description="Multi-Objective Optimization in Python",
     license='Apache License 2.0',
@@ -37,7 +37,7 @@ data = dict(
                       'scipy>=1.1',
                       'matplotlib>=3',
                       'autograd>=1.4',
-                      'cma==3.2.2',
+                      'cma>=3.2.2',
                       'alive-progress',
                       'dill',
                       'Deprecated'],
@@ -49,11 +49,10 @@ data = dict(
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'Topic :: Scientific/Engineering :: Mathematics'
@@ -95,7 +94,7 @@ sys.argv = [e for e in sys.argv if not e.lstrip("-") in args]
 # ============================================================
 
 def is_new_osx():
-    name = distutils.util.get_platform()
+    name = sysconfig.get_platform()
     if sys.platform != "darwin":
         return False
     elif name.startswith("macosx-10"):

@@ -253,6 +253,7 @@ class Algorithm:
 
         res.pop = self.pop
         res.archive = self.archive
+        res.data = self.data
 
         # get the optimal solution found
         opt = self.opt
@@ -260,7 +261,7 @@ class Algorithm:
             opt = None
 
         # if no feasible solution has been found
-        elif not np.any(opt.get("feasible")):
+        elif not np.any(opt.get("FEAS")):
             if self.return_least_infeasible:
                 opt = filter_optimum(opt, least_infeasible=True)
             else:

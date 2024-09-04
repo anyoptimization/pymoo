@@ -13,7 +13,7 @@ Heatmap().add(F).show()
 # START heatmap_custom
 plot = Heatmap(title=("Optimization", {'pad': 15}),
                cmap="Oranges_r",
-               y_labels=["Solution A", "Solution B", "Solution C", "Solution D"],
+               solution_labels=["Solution A", "Solution B", "Solution C", "Solution D"],
                labels=["profit", "cost", "sustainability", "environment", "satisfaction", "time"])
 plot.add(F)
 plot.show()
@@ -26,7 +26,7 @@ plot = Heatmap(figsize=(10,30),
                bound=[0,1],
                order_by_objectives=0,
                y_labels=None,
-               labels=["profit", "cost", "sustainability", "environment", "satisfaction", "time"],
+               solution_labels=["profit", "cost", "sustainability", "environment", "satisfaction", "time"],
                cmap="Greens_r")
 
 plot.add(F, aspect=0.2)

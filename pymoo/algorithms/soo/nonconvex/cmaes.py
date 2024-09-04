@@ -402,7 +402,7 @@ class CMAES(LocalSearch):
             self.norm = NoNormalization()
             self.options['bounds'] = [xl, xu]
 
-        self.options['seed'] = self.seed
+        self.options['seed'] = kwargs.get('seed', self.seed)
 
         if isinstance(self.termination, MaximumGenerationTermination):
             self.options['maxiter'] = self.termination.n_max_gen

@@ -1,9 +1,33 @@
 import warnings
-
-import autograd.numpy as anp
 import numpy as np
-from autograd.core import VJPNode, vspace, backward_pass
-from autograd.tracer import new_box, isbox
+
+try:
+    import autograd.numpy as anp
+    from autograd.core import VJPNode, backward_pass
+    from autograd.tracer import new_box, isbox
+except:
+    print("autograd only supports numpy < 2.0.0 versions.")
+
+
+def value_and_grad(*args, **kwargs):
+    from autograd import value_and_grad as vag
+    return vag(*args, **kwargs)
+
+
+def log(*args, **kwargs):
+    return anp.log(*args, **kwargs)
+
+
+def sqrt(*args, **kwargs):
+    return anp.sqrt(*args, **kwargs)
+
+
+def row_stack(*args, **kwargs):
+    return anp.row_stack(*args, **kwargs)
+
+
+def triu_indices(*args, **kwargs):
+    return anp.triu_indices(*args, **kwargs)
 
 
 def run_and_trace(f, x):

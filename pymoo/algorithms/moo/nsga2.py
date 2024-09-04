@@ -70,10 +70,6 @@ def binary_tournament(pop, P, algorithm, **kwargs):
 class RankAndCrowdingSurvival(RankAndCrowding):
     
     def __init__(self, nds=None, crowding_func="cd"):
-        warnings.warn(
-                "RankAndCrowdingSurvival is deprecated and will be removed in version 0.8.*; use RankAndCrowding operator instead, which supports several and custom crowding diversity metrics.",
-                DeprecationWarning, 2
-            )
         super().__init__(nds, crowding_func)
 
 # =========================================================================================================

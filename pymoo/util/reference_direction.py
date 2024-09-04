@@ -174,12 +174,13 @@ class MultiLayerReferenceDirectionFactory:
 # Util
 # =========================================================================================================
 
-def get_rng(seed = None):
+def get_rng(seed=None):
     if seed is None or type(seed) == int:
         rng = np.random.default_rng(seed)
     return rng
 
-def sample_on_unit_simplex(n_points, n_dim, unit_simplex_mapping="kraemer", seed = None):
+
+def sample_on_unit_simplex(n_points, n_dim, unit_simplex_mapping="kraemer", seed=None):
     if unit_simplex_mapping == "sum":
         rnd = map_onto_unit_simplex(get_rng(seed).random((n_points, n_dim)), "sum")
 

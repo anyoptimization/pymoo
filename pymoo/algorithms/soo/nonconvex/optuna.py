@@ -1,12 +1,9 @@
-import logging
-
-from optuna.logging import get_logger
-
 from pymoo.util.optimum import filter_optimum
 
 try:
     import optuna
     from optuna.samplers import TPESampler
+    from optuna.logging import get_logger
 except:
     raise Exception("Please install optuna: pip install optuna")
 

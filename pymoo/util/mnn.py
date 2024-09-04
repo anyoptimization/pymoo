@@ -40,7 +40,7 @@ def calc_mnn_base(X, n_remove=0, twonn=False):
     
     D = squareform(pdist(X, metric="sqeuclidean"))
     Dnn = np.partition(D, range(1, M+1), axis=1)[:, 1:M+1]
-    d = np.product(Dnn, axis=1)
+    d = np.prod(Dnn, axis=1)
     d[extremes] = np.inf
     
     n_removed = 0
@@ -63,7 +63,7 @@ def calc_mnn_base(X, n_remove=0, twonn=False):
 
             D[:, k] = np.inf
             Dnn[H] = np.partition(D[H], range(1, M+1), axis=1)[:, 1:M+1]
-            d[H] = np.product(Dnn[H], axis=1)
+            d[H] = np.prod(Dnn[H], axis=1)
             d[extremes] = np.inf
     
     return d

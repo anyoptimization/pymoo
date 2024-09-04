@@ -62,7 +62,7 @@ class ReductionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
         self.n_points = n_points
 
     def _do(self):
-        rnd = sample_on_unit_simplex(self.n_sample_points, self.n_dim, unit_simplex_mapping=self.sampling)
+        rnd = sample_on_unit_simplex(self.n_sample_points, self.n_dim, seed=self.seed, unit_simplex_mapping=self.sampling)
 
         def h(n):
             return get_partition_closest_to_points(n, self.n_dim)
