@@ -11,15 +11,11 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import compare, TournamentSelection
 from pymoo.termination.default import DefaultMultiObjectiveTermination
 from pymoo.util.display.multi import MultiObjectiveOutput
-from pymoo.util.dominator import Dominator
-from pymoo.util.vf_dominator import VFDominator
-from pymoo.util.misc import has_feasible
 from pymoo.util.reference_direction import select_points_with_maximum_distance
 from pymoo.util import value_functions as mvf
-from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.vf_survival import VFSurvival, VFDominator
 
 from pymoo.algorithms.moo.nsga2 import binary_tournament
-from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
 
 
 # =========================================================================================================
@@ -65,7 +61,8 @@ class PINSGA2(GeneticAlgorithm):
                  verbose=False, 
                  **kwargs):
        
-        self.survival = RankAndCrowding(nds=NonDominatedSorting(dominator=VFDominator(self)))
+        dominator = VFDominator( self )
+        self.survival = VFSurvival( dominator )
 
         super().__init__(
             pop_size=pop_size,
