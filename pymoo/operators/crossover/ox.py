@@ -36,7 +36,7 @@ def ox(receiver, donor, seq=None, shift=False):
     assert len(donor) == len(receiver)
 
     # the sequence which shall be use for the crossover
-    seq = seq if not None else random_sequence(len(receiver))
+    seq = seq if seq is not None else random_sequence(len(receiver))
     start, end = seq
 
     # the donation and a set of it to allow a quick lookup
