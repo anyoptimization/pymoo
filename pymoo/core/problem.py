@@ -12,9 +12,12 @@ from pymoo.util.misc import at_least_2d_array
 
 try:
     import ray
-    import joblib
 except ImportError:
     ray = None
+
+try:
+    import joblib
+except ImportError:
     joblib = None
 
 
@@ -74,7 +77,7 @@ class JoblibParallelization:
     
     Note
     ----
-    You will need to install joblib to use this.
+    You will need to install `joblib` (and optionally `psutil`) to use this.
     """
 
     def __init__(
