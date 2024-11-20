@@ -66,7 +66,7 @@ class AGEMOEA2(GeneticAlgorithm):
 
 @jit(nopython=True, fastmath=True)
 def project_on_manifold(point, p):
-    dist = sum(point[point > 0] ** p) ** (1/p)
+    dist = np.sum(point[point > 0] ** p) ** (1/p)
     return np.multiply(point, 1 / dist)
 
 
@@ -178,7 +178,7 @@ class AGEMOEA2Survival(AGEMOEASurvival):
         if 0.95 < p < 1.05:
             for row in range(0, m - 1):
                 for column in range(row + 1, m):
-                    distances[row][column] = sum(np.abs(projected_front[row] - projected_front[column]) ** 2) ** 0.5
+                    distances[row][column] = np.sum(np.abs(projected_front[row] - projected_front[column]) ** 2) ** 0.5
 
         else:
             for row in range(0, m-1):
@@ -186,8 +186,8 @@ class AGEMOEA2Survival(AGEMOEASurvival):
                     mid_point = projected_front[row] * 0.5 + projected_front[column] * 0.5
                     mid_point = project_on_manifold(mid_point, p)
 
-                    distances[row][column] = sum(np.abs(projected_front[row] - mid_point) ** 2) ** 0.5 + \
-                                            sum(np.abs(projected_front[column] - mid_point) ** 2) ** 0.5
+                    distances[row][column] = np.sum(np.abs(projected_front[row] - mid_point) ** 2) ** 0.5 + \
+                                            np.sum(np.abs(projected_front[column] - mid_point) ** 2) ** 0.5
 
         return distances + distances.T
 
