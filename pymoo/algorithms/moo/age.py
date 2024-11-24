@@ -232,7 +232,7 @@ class AGEMOEASurvival(Survival):
         distances = np.zeros((m1, m2))
         for i in range(m1):
             for j in range(m2):
-                distances[i][j] = sum(np.abs(A[i] - B[j]) ** p) ** (1 / p)
+                distances[i][j] = np.sum(np.abs(A[i] - B[j]) ** p) ** (1 / p)
 
         return distances
 
@@ -262,13 +262,13 @@ def find_corner_solutions(front):
 
 @jit(nopython=True, fastmath=True)
 def point_2_line_distance(P, A, B):
-    d = np.zeros(P.shape[0])
+    d = np.zeros(P.shape[0], dtype=numba.float64)
 
     for i in range(P.shape[0]):
         pa = P[i] - A
         ba = B - A
         t = np.dot(pa, ba) / np.dot(ba, ba)
-        d[i] = sum((pa - t * ba) ** 2)
+        d[i] = np.sum((pa - t * ba) ** 2)
 
     return d
 
