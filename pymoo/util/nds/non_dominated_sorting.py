@@ -1,5 +1,5 @@
 import numpy as np
-
+import sys
 from pymoo.util.dominator import Dominator
 from pymoo.util.function_loader import load_function
 
@@ -53,7 +53,7 @@ class NonDominatedSorting:
 
 def rank_from_fronts(fronts, n):
     # create the rank array and set values
-    rank = np.full(n, 1e16, dtype=int)
+    rank = np.full(n, sys.maxsize, dtype=int)
     for i, front in enumerate(fronts):
         rank[front] = i
 
