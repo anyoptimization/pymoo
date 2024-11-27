@@ -1,3 +1,5 @@
+# mypy: disable-error-code="return-value"
+
 """
 Module containing infrastructure for representing individuals in 
 population-based optimization algorithms.
@@ -12,7 +14,7 @@ __all__ = [
 ]
 
 import copy
-from typing import Optional
+from typing import Optional, Callable, Any
 from typing import Tuple
 from typing import Union
 from warnings import warn
@@ -63,36 +65,36 @@ class Individual:
             in the ``Individual``.
         """
         # set decision variable vector to None
-        self._X = None
+        self._X: np.ndarray | None = None
 
         # set values objective(s), inequality constraint(s), equality 
         # contstraint(s) to None
-        self._F = None
-        self._G = None
-        self._H = None
+        self._F: np.ndarray | None = None
+        self._G: np.ndarray | None = None
+        self._H: np.ndarray | None = None
         
         # set first derivatives of objective(s), inequality constraint(s), 
         # equality contstraint(s) to None
-        self._dF = None
-        self._dG = None
-        self._dH = None
+        self._dF: np.ndarray | None = None
+        self._dG: np.ndarray | None = None
+        self._dH: np.ndarray | None = None
         
         # set second derivatives of objective(s), inequality constraint(s), 
         # equality contstraint(s) to None
-        self._ddF = None
-        self._ddG = None
-        self._ddH = None
+        self._ddF: np.ndarray | None = None
+        self._ddG: np.ndarray | None = None
+        self._ddH: np.ndarray | None = None
 
         # set constraint violation value to None
-        self._CV = None
+        self._CV: np.ndarray | None = None
 
-        self.evaluated = None
+        self.evaluated: set[Any] | None = None
 
         # initialize all the local variables
         self.reset()
 
         # a local storage for data
-        self.data = {}
+        self.data: dict[Any, Any] = {}
 
         # the config for this individual
         if config is None:
@@ -594,8 +596,8 @@ class Individual:
 
     def get(
             self, 
-            *keys: Tuple[str,...],
-        ) -> Union[tuple,object]:
+            *keys: Tuple[str, ...],
+        ) -> Union[tuple, object]:
         """
         Get the values for one or more keys for an individual.
 
@@ -614,7 +616,7 @@ class Individual:
 
         for key in keys:
             if hasattr(self, key):
-                v = getattr(self, key)
+                v = getattr(self, key)  # type: ignore
             elif key in self.data:
                 v = self.data[key]
             else:
@@ -731,14 +733,14 @@ def calc_cv(
     elif G.ndim == 1:
         ieq_cv = constr_to_cv(G, **config["cv_ieq"])
     else:
-        ieq_cv = [constr_to_cv(g, **config["cv_ieq"]) for g in G]
+        ieq_cv = [constr_to_cv(g, **config["cv_ieq"]) for g in G]  # type: ignore
 
     if H is None:
         eq_cv = [0.0]
     elif H.ndim == 1:
         eq_cv = constr_to_cv(np.abs(H), **config["cv_eq"])
     else:
-        eq_cv = [constr_to_cv(np.abs(h), **config["cv_eq"]) for h in H]
+        eq_cv = [constr_to_cv(np.abs(h), **config["cv_eq"]) for h in H]  # type: ignore
 
     return np.array(ieq_cv) + np.array(eq_cv)
 
@@ -748,7 +750,7 @@ def constr_to_cv(
         eps: float = 0.0, 
         scale: Optional[float] = None, 
         pow: Optional[float] = None, 
-        func: object = np.mean,
+        func: Callable = np.mean,
     ) -> float:
     """
     Convert a constraint to a constraint violation.

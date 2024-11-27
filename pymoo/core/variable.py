@@ -137,7 +137,7 @@ class BoundedVariable(Variable):
     def __init__(
             self, 
             value: Optional[object] = None, 
-            bounds: Tuple[Optional[object],Optional[object]] = (None, None), 
+            bounds: Tuple[Optional[int | float], Optional[int | float]] = (None, None),
             strict: Optional[Tuple[Optional[object],Optional[object]]] = None, 
             **kwargs: dict,
         ) -> None:
@@ -255,6 +255,7 @@ class Integer(BoundedVariable):
             decision variables.
         """
         low, high = self.bounds
+        assert high is not None, "The upper bound must be specified"
         return np.random.randint(low, high=high + 1, size=n)
 
 
@@ -355,10 +356,10 @@ class Choice(Variable):
 
 
 def get(
-        *args: Tuple[Union[Variable,object],...], 
-        size: Optional[Union[tuple,int]] = None, 
+        *args: Tuple[Union[Variable, object], ...],
+        size: Optional[Union[tuple, int]] = None,
         **kwargs: dict
-    ) -> Union[tuple,object,None]:
+    ) -> Union[tuple, object, None]:
     """
     Get decision variable values from a tuple of ``Variable`` objects.
 
@@ -378,7 +379,7 @@ def get(
         Decision variable value(s).
     """
     if len(args) == 0:
-        return
+        return None
 
     ret = []
     for arg in args:
