@@ -66,7 +66,7 @@ class ZeroToOneNormalization(Normalization):
         # now create all the masks that are necessary
         self.xl_only, self.xu_only = np.logical_and(~xl_nan, xu_nan), np.logical_and(xl_nan, ~xu_nan)
         self.both_nan = np.logical_and(np.isnan(xl), np.isnan(xu))
-        self.neither_nan = ~self.both_nan
+        self.neither_nan = np.logical_and(~np.isnan(xl), ~np.isnan(xu))
 
         # if neither is nan than xu must be greater or equal than xl
         any_nan = np.logical_or(np.isnan(xl), np.isnan(xu))
@@ -76,18 +76,15 @@ class ZeroToOneNormalization(Normalization):
         if X is None or (self.xl is None and self.xu is None):
             return X
 
-        xl, xu, xl_only, xu_only = self.xl, self.xu, self.xl_only, self.xu_only
-        both_nan, neither_nan = self.both_nan, self.neither_nan
-
         # simple copy the input
         N = np.copy(X)
 
         # normalize between zero and one if neither of them is nan
-        N[..., neither_nan] = (X[..., neither_nan] - xl[neither_nan]) / (xu[neither_nan] - xl[neither_nan])
+        N[...,  self.neither_nan] = (X[...,  self.neither_nan] - self.xl[self.neither_nan]) / (self.xu[self.neither_nan] - self.xl[self.neither_nan])
 
-        N[..., xl_only] = X[..., xl_only] - xl[xl_only]
+        N[..., self.xl_only] = X[..., self.xl_only] - self.xl[self.xl_only]
 
-        N[..., xu_only] = 1.0 - (xu[xu_only] - X[..., xu_only])
+        N[..., self.xu_only] = 1.0 - (self.xu[self.xu_only] - X[..., self.xu_only])
 
         return N
 
