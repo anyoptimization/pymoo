@@ -1,25 +1,22 @@
-import numpy as np
 import sys
-
 from abc import ABC, abstractmethod
+
+import numpy as np
+
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
+from pymoo.algorithms.moo.nsga2 import binary_tournament
 from pymoo.docs import parse_doc_string
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
-from pymoo.operators.survival.rank_and_crowding import RankAndCrowding
 from pymoo.operators.sampling.rnd import FloatRandomSampling
-from pymoo.operators.selection.tournament import compare, TournamentSelection
+from pymoo.operators.selection.tournament import TournamentSelection
+from pymoo.operators.survival.rank_and_crowding import RankAndCrowding
 from pymoo.termination.default import DefaultMultiObjectiveTermination
-from pymoo.util.display.multi import MultiObjectiveOutput
-from pymoo.util.dominator import Dominator
-from pymoo.util.vf_dominator import VFDominator
-from pymoo.util.misc import has_feasible
-from pymoo.util.reference_direction import select_points_with_maximum_distance
 from pymoo.util import value_functions as mvf
+from pymoo.util.display.multi import MultiObjectiveOutput
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-
-from pymoo.algorithms.moo.nsga2 import binary_tournament
-from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
+from pymoo.util.reference_direction import select_points_with_maximum_distance
+from pymoo.util.vf_dominator import VFDominator
 
 
 # =========================================================================================================

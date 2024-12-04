@@ -58,7 +58,7 @@ def parameter_less_constraints(F, CV, F_max=None):
     return F
 
 
-def random_permuations(n, l, concat=True):
+def random_permutations(n, l, concat=True):
     P = []
     for i in range(n):
         P.append(np.random.permutation(l))

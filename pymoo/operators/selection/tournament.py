@@ -3,7 +3,7 @@ import math
 import numpy as np
 
 from pymoo.core.selection import Selection
-from pymoo.util.misc import random_permuations
+from pymoo.util.misc import random_permutations
 
 
 class TournamentSelection(Selection):
@@ -42,7 +42,7 @@ class TournamentSelection(Selection):
         n_perms = math.ceil(n_random / len(pop))
 
         # get random permutations and reshape them
-        P = random_permuations(n_perms, len(pop))[:n_random]
+        P = random_permutations(n_perms, len(pop))[:n_random]
         P = np.reshape(P, (n_select * n_parents, self.pressure))
 
         # compare using tournament function
