@@ -167,7 +167,7 @@ class PINSGA2(GeneticAlgorithm):
                             break
                         print("Invalid input. Please enter 'a', 'b', or 'c'.")
                     
-                    # if better than currenly ranked element place before that element
+                    # if better than currently ranked element place before that element
                     if preference == 'a':
                         _ranks.insert( j, [i] )
                         inserted = True
