@@ -14,7 +14,7 @@ class TravelingSalesman(ElementwiseProblem):
         Parameters
         ----------
         cities : numpy.array
-            The cities with 2-dimensional coordinates provided by a matrix where where city is represented by a row.
+            The cities with 2-dimensional coordinates provided by a matrix where city is represented by a row.
 
         """
         n_cities, _ = cities.shape

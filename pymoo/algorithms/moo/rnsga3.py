@@ -176,7 +176,7 @@ def get_ref_dirs_from_points(ref_point, ref_dirs, mu=0.1):
     Das-Dennis points around the projection of user points on the Das-Dennis hyperplane
     :param ref_point: List of user specified reference points
     :param n_obj: Number of objectives to consider
-    :param mu: Shrinkage factor (0-1), Smaller = tigher convergence, Larger= larger convergence
+    :param mu: Shrinkage factor (0-1), Smaller = tighter convergence, Larger= larger convergence
     :return: Set of reference points
     """
 
@@ -232,7 +232,7 @@ def line_plane_intersection(l0, l1, p0, p_no, epsilon=1e-6):
         # if 'fac' is between (0 - 1) the point intersects with the segment.
         # otherwise:
         #  < 0.0: behind p0.
-        #  > 1.0: infront of p1.
+        #  > 1.0: in front of p1.
         w = p0 - l0
         d = np.dot(w, p_no) / dot
         l = l * d

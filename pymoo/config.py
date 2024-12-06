@@ -22,7 +22,7 @@ class Config:
     # whether when import a file the doc should be parsed - only activate when creating doc files
     parse_custom_docs = False
 
-    # a method defining the endpoint to load data remotely - default from github repo
+    # a method defining the endpoint to load data remotely - default from GitHub repo
     @classmethod
     def data(cls):
         return f"https://raw.githubusercontent.com/anyoptimization/pymoo-data/main/"

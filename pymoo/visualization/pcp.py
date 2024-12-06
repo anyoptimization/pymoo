@@ -36,7 +36,7 @@ class PCP(Plot):
             Whether the value of the boundaries are shown in the plot or not.
 
         normalize_each_axis : bool
-            Whether the values should be normalized either by bounds or implictly.
+            Whether the values should be normalized either by bounds or implicitly.
 
         Other Parameters
         ----------------

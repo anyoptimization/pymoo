@@ -87,7 +87,7 @@ algorithms = {
 
 visualization = {
     "figsize": """tuple
-                The figure size. Default (figsize=(8, 6)). For some plots changing the size might have side-effects for position.
+                The figure size. Default (figsize=(8, 6)). For some plots changing the size might have side effects for position.
                 """,
 
     "title": """str or tuple

@@ -21,7 +21,7 @@ class Radar(Plot):
         Parameters
         ----------------
         normalize_each_objective : bool
-            Whether each objective is normalized. Otherwise the inner and outer bound is plotted.
+            Whether each objective is normalized. Otherwise, the inner and outer bound is plotted.
         point_style : dict
             The style being used to visualize the points
         n_partitions : int
