@@ -24,13 +24,13 @@ class KGB(NSGA2):
         c_size=13,
         eps=0.0,
         ps={},
-        pertub_dev=0.1,
+        perturb_dev=0.1,
         save_ps=False,
         **kwargs,
     ):
 
         super().__init__(**kwargs)
-        self.PERTUB_DEV = pertub_dev
+        self.PERTURB_DEV = perturb_dev
         self.PERC_DIVERSITY = perc_diversity
         self.PERC_DETECT_CHANGE = perc_detect_change
         self.EPS = eps
@@ -258,11 +258,11 @@ class KGB(NSGA2):
         :param pop: Population to check and fix boundaries
         :return: Population with corrected boundaries
         """
-        # check wether numpy array or pymoo population is given
+        # check whether numpy array or pymoo population is given
         if isinstance(pop, Population):
             pop = pop.get("X")
 
-        # check if any solution is outside of the bounds
+        # check if any solution is outside the bounds
         for individual in pop:
             for i in range(len(individual)):
                 if individual[i] > self.problem.xu[i]:
@@ -281,7 +281,7 @@ class KGB(NSGA2):
         # TODO: Check boundaries
         random_pop = np.random.random((N_r, self.problem.n_var))
 
-        # check if any solution is outside of the bounds
+        # check if any solution is outside the bounds
         for individual in random_pop:
             for i in range(len(individual)):
                 if individual[i] > self.problem.xu[i]:
@@ -341,16 +341,16 @@ class KGB(NSGA2):
             X_test = self.random_strategy(self.nr_rand_solutions)
 
             # introduce noise to vary previously useful solutions
-            noise = np.random.normal(0, self.PERTUB_DEV, self.problem.n_var)
+            noise = np.random.normal(0, self.PERTURB_DEV, self.problem.n_var)
             noisy_useful_history = np.asarray(pop_useful) + noise
 
-            # check wether solutions are within bounds
+            # check whether solutions are within bounds
             noisy_useful_history = self.check_boundaries(noisy_useful_history)
 
             # add noisy useful history to randomly generated solutions
             X_test = np.vstack((X_test, noisy_useful_history))
 
-            # predict wether random solutions are useful or useless
+            # predict whether random solutions are useful or useless
             Y_test = model.predict(X_test)
 
             # create list of useful predicted solutions
@@ -391,7 +391,7 @@ class KGB(NSGA2):
             # if there are still not enough solutions in init_pop randomly sample previously useful solutions directly without noise to init_pop
             if len(init_pop) < self.pop_size:
 
-                # fill up init_pop with randomly sampled solutions from pop_usefull
+                # fill up init_pop with randomly sampled solutions from pop_useful
                 if len(pop_useful) >= self.pop_size - len(init_pop):
 
                     nr_sampled_pop_useful = self.pop_size - len(init_pop)

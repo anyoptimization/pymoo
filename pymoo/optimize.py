@@ -8,7 +8,7 @@ def minimize(problem, algorithm, termination=None, copy_algorithm=True, copy_ter
 
     This is used as a convenience function to execute several algorithms with default settings which turned
     out to work for a test single. However, evolutionary computations utilizes the idea of customizing a
-    meta-algorithm. Customizing the algorithm using the object oriented interface is recommended to improve the
+    meta-algorithm. Customizing the algorithm using the object-oriented interface is recommended to improve the
     convergence.
 
     Parameters
@@ -48,7 +48,7 @@ def minimize(problem, algorithm, termination=None, copy_algorithm=True, copy_ter
 
     """
 
-    # create a copy of the algorithm object to ensure no side-effects
+    # create a copy of the algorithm object to ensure no side effects
     if copy_algorithm:
         algorithm = copy.deepcopy(algorithm)
 
