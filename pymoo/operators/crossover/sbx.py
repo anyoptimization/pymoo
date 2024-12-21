@@ -26,8 +26,8 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14):
     cross[:, xl == xu] = False
 
     # assign y1 the smaller and y2 the larger value
-    y1 = np.min(X, axis=0)[cross]
-    y2 = np.max(X, axis=0)[cross]
+    p1_low = X[0] < X[1]
+    y1, y2 = np.where(p1_low[None, ...], X, X[::-1])[:, cross]
 
     # mask all the values that should be crossovered
     _xl = np.repeat(xl[None, :], n_matings, axis=0)[cross]
@@ -61,10 +61,8 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14):
     c2 = 0.5 * ((y1 + y2) + betaq * delta)
 
     # with the given probability either assign the value from the first or second parent
-    b = np.random.random(len(prob_bin)) < prob_bin
-    tmp = np.copy(c1[b])
-    c1[b] = c2[b]
-    c2[b] = tmp
+    b = (np.random.random(len(prob_bin)) < prob_bin) == p1_low[cross]
+    c1, c2 = np.where(b[None, ...], [c1, c2], [c2, c1])
 
     # first copy the unmodified parents
     Q = np.copy(X)
