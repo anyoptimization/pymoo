@@ -7,12 +7,12 @@ from pymoo.core.survival import Survival
 
 
 def is_better(_new, _old, eps=0.0):
-    both_infeasible = not _old.feasible[0] and not _new.feasible[0]
-    both_feasible = _old.feasible[0] and _new.feasible[0]
+    both_infeasible = not _old.feas and not _new.feas
+    both_feasible = _old.feas and _new.feas
 
     if both_infeasible and _old.CV[0] - _new.CV[0] > eps:
         return True
-    elif not _old.feasible and _new.feasible:
+    elif not _old.FEAS and _new.FEAS:
         return True
     elif both_feasible and _old.F[0] - _new.F[0] > eps:
         return True
