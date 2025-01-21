@@ -212,7 +212,7 @@ def niching(pop, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
         # the minimum niche count
         min_niche_count = next_niche_count.min()
 
-        # all niches with the minimum niche count (truncate if randomly if more niches than remaining individuals)
+        # all niches with the minimum niche count (truncate randomly if there are more niches than remaining individuals)
         next_niches = next_niches_list[np.where(next_niche_count == min_niche_count)[0]]
         next_niches = next_niches[np.random.permutation(len(next_niches))[:n_select]]
 
@@ -303,7 +303,7 @@ def get_extreme_points_c(F, ideal_point, extreme_points=None):
     weights = np.eye(F.shape[1])
     weights[weights == 0] = 1e6
 
-    # add the old extreme points to never loose them for normalization
+    # add the old extreme points to never lose them for normalization
     _F = F
     if extreme_points is not None:
         _F = np.concatenate([extreme_points, _F], axis=0)

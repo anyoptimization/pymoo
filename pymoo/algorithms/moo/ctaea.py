@@ -14,7 +14,7 @@ from pymoo.operators.selection.tournament import TournamentSelection
 from pymoo.util.display.multi import MultiObjectiveOutput
 from pymoo.util.dominator import Dominator
 from pymoo.util.function_loader import load_function
-from pymoo.util.misc import has_feasible, random_permuations
+from pymoo.util.misc import has_feasible, random_permutations
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
 
@@ -63,7 +63,7 @@ class RestrictedMating(TournamentSelection):
         n_random = n_select * n_parents * self.pressure
         n_perms = math.ceil(n_random / n_pop)
         # get random permutations and reshape them
-        P = random_permuations(n_perms, n_pop)[:n_random]
+        P = random_permutations(n_perms, n_pop)[:n_random]
         P = np.reshape(P, (n_select * n_parents, self.pressure))
         if Pc <= Pd:
             # Choose from DA

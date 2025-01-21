@@ -32,7 +32,7 @@ class Heatmap(Plot):
             If true large values are white and small values the corresponding color. Otherwise, the other way around.
 
         solution_labels : bool or list
-            If False no labels are plotted in the y axis. If true just the corresponding index. Otherwise the label provided.
+            If False no labels are plotted in the y axis. If true just the corresponding index. Otherwise, the label provided.
 
         bounds : {bounds}
 
@@ -97,11 +97,11 @@ class Heatmap(Plot):
         if self.solution_labels is None:
             pass
 
-        # in case just true just use a number for each solution
+        # if true, just use a number for each solution
         elif isinstance(self.solution_labels, bool) and self.solution_labels:
             self.solution_labels = np.arange(len(F)) + 1
 
-        # otherwise use directly the label provided
+        # otherwise, use directly the label provided
         else:
             if len(self.solution_labels) != len(F):
                 raise Exception(

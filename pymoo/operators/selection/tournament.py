@@ -3,12 +3,12 @@ import math
 import numpy as np
 
 from pymoo.core.selection import Selection
-from pymoo.util.misc import random_permuations
+from pymoo.util.misc import random_permutations
 
 
 class TournamentSelection(Selection):
     """
-      The Tournament selection is used to simulated a tournament between individuals. The pressure balances
+      The Tournament selection is used to simulate a tournament between individuals. The pressure balances
       greedy the genetic algorithm will be.
     """
 
@@ -19,7 +19,7 @@ class TournamentSelection(Selection):
         ----------
         func_comp: func
             The function to compare two individuals. It has the shape: comp(pop, indices) and returns the winner.
-            If the function is None it is assumed the population is sorted by a criterium and only indices are compared.
+            If the function is None it is assumed the population is sorted by a criterion and only indices are compared.
 
         pressure: int
             The selection pressure to bie applied. Default it is a binary tournament.
@@ -42,7 +42,7 @@ class TournamentSelection(Selection):
         n_perms = math.ceil(n_random / len(pop))
 
         # get random permutations and reshape them
-        P = random_permuations(n_perms, len(pop))[:n_random]
+        P = random_permutations(n_perms, len(pop))[:n_random]
         P = np.reshape(P, (n_select * n_parents, self.pressure))
 
         # compare using tournament function

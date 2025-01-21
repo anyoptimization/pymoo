@@ -100,7 +100,7 @@ cdef vector[vector[int]] c_fast_non_dominated_sort(double[:,:] F, double epsilon
     # append the first front to the current front
     fronts.push_back(current_front)
 
-    # while not all solutions are assigned to a pareto front or we can stop early because of stop criterium
+    # while not all solutions are assigned to a pareto front or we can stop early because of stop criterion
     while (n_ranked < n_points) and (n_ranked < n_stop_if_ranked):
 
         next_front = vector[int]()
