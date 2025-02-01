@@ -312,8 +312,11 @@ def get_extreme_points_c(F, ideal_point, extreme_points=None):
     __F = _F - ideal_point
     __F[__F < 1e-3] = 0
 
+    # normalize __F
+    __F_norm = (__F - np.min(__F, axis=0)) / (np.max(__F, axis=0) - np.min(__F, axis=0))
+
     # update the extreme points for the normalization having the highest asf value each
-    F_asf = np.max(__F * weights[:, None, :], axis=2)
+    F_asf = np.max(__F_norm * weights[:, None, :], axis=2)
 
     I = np.argmin(F_asf, axis=1)
     extreme_points = _F[I, :]
