@@ -318,10 +318,10 @@ class DF11(DF):
         y1 = np.pi * G / 6 + (np.pi / 2 - np.pi * G / 3) * x1
         y2 = np.pi * G / 6 + (np.pi / 2 - np.pi * G / 3) * x2
 
-        f1 = np.sin(y1)
-        f2 = np.dot(np.multiply(1, np.sin(y2)), np.cos(y1))
-        f3 = np.dot(np.multiply(1, np.cos(y2)), np.cos(y1))
-
+        f1 = (1 + G) * np.sin(y1)
+        f2 = (1 + G) * np.sin(y2) * np.cos(y1)  # Correct element-wise multiplication
+        f3 = (1 + G) * np.cos(y2) * np.cos(y1)  # Correct element-wise multiplication
+        
         return get_PF(np.array([f1, f2, f3]), False)
 
 
