@@ -25,7 +25,8 @@ class SurvivalTruncation(Truncation):
 
         if problem is None:
             from pymoo.core.problem import Problem
-            problem = Problem()
+            # TODO: this line is probably never evaluated. It would raise as Problem is ABC
+            problem = Problem()  # type: ignore
 
         self.problem = problem
 
