@@ -13,7 +13,7 @@ __all__ = [
     "get",
 ]
 
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 from typing import Union
 import numpy as np
 from numpy.typing import ArrayLike
@@ -111,14 +111,14 @@ class Variable(object):
 
     def get(
             self, 
-            **kwargs: dict
+            **kwargs: Any
         ) -> object:
         """
         Get the value of a decision variable.
 
         Parameters
         ----------
-        kwargs : dict
+        kwargs : Any
             Additional keyword arguments.
         
         Returns
@@ -139,7 +139,7 @@ class BoundedVariable(Variable):
             value: Optional[object] = None, 
             bounds: Tuple[Optional[object],Optional[object]] = (None, None), 
             strict: Optional[Tuple[Optional[object],Optional[object]]] = None, 
-            **kwargs: dict,
+            **kwargs: Any,
         ) -> None:
         """
         Constructor for the ``BoundedVariable`` class.
@@ -154,7 +154,7 @@ class BoundedVariable(Variable):
         strict : tuple, None
             Strict boundaries for the decision variable.
             If ``None``, the value of ``bounds`` is copied to ``strict``.
-        kwargs : dict
+        kwargs : Any
             Additional keyword arguments for ``active`` and ``flag``.
         """
         # call the Variable constructor 
@@ -302,7 +302,7 @@ class Choice(Variable):
             value: Optional[object] = None, 
             options: Optional[ArrayLike] = None, 
             all: Optional[ArrayLike] = None, 
-            **kwargs: dict,
+            **kwargs: Any,
         ) -> None:
         """
         Constructor for the ``Choice`` class.
@@ -316,7 +316,7 @@ class Choice(Variable):
         all : ArrayLike, None
             A strict list of decision variable options from which to choose.
             If ``None``, the value of ``options`` is copied to ``all``.
-        kwargs : dict
+        kwargs : Any
             Additional keyword arguments for ``active`` and ``flag``.
         """
         # all super constructor
@@ -357,7 +357,7 @@ class Choice(Variable):
 def get(
         *args: Tuple[Union[Variable,object],...], 
         size: Optional[Union[tuple,int]] = None, 
-        **kwargs: dict
+        **kwargs: Any
     ) -> Union[tuple,object,None]:
     """
     Get decision variable values from a tuple of ``Variable`` objects.
@@ -368,7 +368,7 @@ def get(
         A tuple of ``Variable`` or ``object``s.
     size : tuple, int, None
         Size to reshape decision variables.
-    kwargs : dict
+    kwargs : Any
         Additional keyword arguments to pass to the ``get`` method of the 
         ``Variable`` class when getting decision variable values.
     
