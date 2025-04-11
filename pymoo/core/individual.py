@@ -595,15 +595,15 @@ class Individual:
 
     def get(
             self, 
-            *keys: Tuple[str,...],
+            *keys: str,
         ) -> Union[tuple,object]:
         """
         Get the values for one or more keys for an individual.
 
         Parameters
         ----------
-        keys : tuple
-            A tuple of keys for which to get values.
+        keys : str
+            Keys for which to get values.
 
         Returns
         -------
