@@ -62,7 +62,6 @@ jobs:
             - uses: astral-sh/setup-uv@v5
             - uses: pypa/cibuildwheel@v2.23
               env:
-                CIBW_ENABLE: cpython-freethreading
                 CIBW_BUILD_FRONTEND: "build[uv]"
                 CIBW_BUILD: "${{ matrix.build }}${{ matrix.python }}*"
                 CIBW_ARCHS: ${{ matrix.arch }}
