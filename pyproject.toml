@@ -41,3 +41,21 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]
 version = { attr = "pymoo.version.__version__" }
+
+[dependency-groups]
+dev = [
+    "numba",
+    "pytest",
+    "pytest-xdist",
+    "nbformat",
+    "jupyter",
+    "pyrecorder",
+    "optproblems",
+    "pandas",
+    "ipython",
+    "ipykernel",
+]
+
+[tool.pytest.ini_options]
+addopts = "--tb=short --strict-markers --strict-config --maxfail 1"
+testpaths = ["tests"]
