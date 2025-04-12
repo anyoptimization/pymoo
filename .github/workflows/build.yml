@@ -13,29 +13,6 @@ concurrency:
 
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                python: [39, 310, 311, 312, 313]
-
-        steps:
-            - uses: actions/checkout@v4
-
-            - uses: astral-sh/setup-uv@v5
-              with:
-                python-version: ${{ matrix.python }}
-
-            - name: Check Compilation
-              run: |
-                uv run python -c "import sys; from pymoo.util.function_loader import is_compiled; sys.exit(0 if is_compiled() else 1) "
-            - name: Test
-              # FIXME: fast test just for sanity checks
-              # run: |
-              #   uv run pytest -v --maxfail 1 --no-header -m "not long"
-              run: |
-                uv run pytest tests/algorithms/test_nsga2.py
-
     build_wheels:
         name: Build wheel for ${{ matrix.os }}-${{ matrix.build }}${{ matrix.python }}-${{ matrix.arch }}
         runs-on: ${{ matrix.os }}
@@ -80,29 +57,13 @@ jobs:
                   name: artifact-source
                   path: dist/*.tar.gz
 
-    pass:
-      needs: [test, build_wheels, build_sdist]
+    merge:
+      name: Merge sdist and wheel artifacts
+      needs: [build_wheels, build_sdist]
       runs-on: ubuntu-latest
       steps:
-        - run: echo "All jobs passed"
-
-    upload_pypi:
-        needs: [pass]
-        runs-on: ubuntu-latest
-        environment: pypi # TODO: this must match setting on pypi
-        permissions:
-            # Required for trusted publishing; see https://docs.pypi.org/trusted-publishers/using-a-publisher/
-            id-token: write
-        # upload to PyPI on every tag starting with 'v'
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
-        steps:
-            - uses: actions/download-artifact@v4
-              with:
-                  path: dist
-                  merge-multiple: true
-
-            - uses: astral-sh/setup-uv@v5
-
-            - name: Publish
-              run: uv publish --trusted-publishing always -v
+        - uses: actions/upload-artifact/merge@v4
+          with:
+            name: pymoo
+            delete-merged: true
 
