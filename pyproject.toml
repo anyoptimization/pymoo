@@ -56,5 +56,5 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--tb=short --strict-markers --strict-config --maxfail 1"
+addopts = "--tb=short --strict-markers --strict-config"
 testpaths = ["tests"]
