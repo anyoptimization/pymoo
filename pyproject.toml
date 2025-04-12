@@ -3,12 +3,11 @@ name = "pymoo"
 description = "Multi-Objective Optimization in Python"
 authors = [{ name = "Julian Blank", email = "blankjul@msu.edu" }]
 readme = "README.rst"
-license = { file = "LICENSE" }
+license = "Apache-2.0"
 classifiers = [
     'Intended Audience :: Developers',
     'Intended Audience :: Science/Research',
     'Operating System :: OS Independent',
-    'License :: OSI Approved :: Apache Software License',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.9',
