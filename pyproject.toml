@@ -35,11 +35,8 @@ dependencies = [
     "Deprecated",
 ]
 
-[dependency-groups]
-dev = ["pyright>=1.1.399", "ruff>=0.11.5"]
-
 [build-system]
-requires = ["setuptools", "wheel", "numpy>=1.15", "Cython>=0.29"]
+requires = ["setuptools>=61.0", "numpy>=1.15", "Cython>=0.29"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]
