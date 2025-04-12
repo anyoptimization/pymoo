@@ -17,7 +17,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                python: [39, 310, 311, 312]
+                python: [39, 310, 311, 312, 313]
 
         steps:
             - uses: actions/checkout@v4
@@ -48,7 +48,7 @@ jobs:
             fail-fast: false
             matrix:
                 os: [windows-latest, ubuntu-latest, macos-latest]
-                python: [39, 310, 311, 312]
+                python: [39, 310, 311, 312, 313]
                 arch: [auto64, auto32, universal2]
                 build: ["cp"]
                 exclude:
