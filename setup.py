@@ -1,7 +1,10 @@
-from setuptools import setup
-from Cython.Build import cythonize
+import setuptools
+import setuptools.command.build_ext
+import Cython.Build
+
 import numpy
 
-setup(
-    ext_modules=cythonize("src/pymoo/cython/*.pyx"), include_dirs=[numpy.get_include()]
+setuptools.setup(
+    ext_modules=Cython.Build.cythonize("src/pymoo/cython/*.pyx"),
+    include_dirs=[numpy.get_include()],
 )
