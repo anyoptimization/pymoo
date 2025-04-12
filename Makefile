@@ -6,10 +6,10 @@ clean: clean-ext clean-pyc
 
 .PHONY: clean-ext
 clean-ext:
-	rm -f src/pymoo/cython/*.c
-	rm -f src/pymoo/cython/*.so
-	rm -f src/pymoo/cython/*.cpp
-	rm -f src/pymoo/cython/*.html
+	rm -f pymoo/cython/*.c
+	rm -f pymoo/cython/*.so
+	rm -f pymoo/cython/*.cpp
+	rm -f pymoo/cython/*.html
 	find . -name '*.so' -delete
 
 .PHONY: clean-pyc
