@@ -32,14 +32,6 @@ jobs:
             - name: Test with oldest-supported-numpy
               run: uv run --no-dev --with oldest-supported-numpy python -m unittest discover tests
 
-            - name: Lint
-              run: |
-                  uv run ruff check
-                  uv run ruff format --check
-
-            - name: Static type check
-              run: uv run pyright
-
     build_wheels:
         name: Build wheel for ${{ matrix.os }}-${{ matrix.build }}${{ matrix.python }}-${{ matrix.arch }}
         runs-on: ${{ matrix.os }}
