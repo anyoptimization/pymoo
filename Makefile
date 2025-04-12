@@ -18,15 +18,9 @@ clean-pyc:
 	find . -name '*.pyo' -delete
 	find . -name '__pycache__' -exec rm -rf {} +
 
-.PHONY: compile
-compile:
-	python setup.py build_ext --inplace
-
-.PHONY: dist
-dist:
-	python setup.py sdist
-
-.PHONY: install
-install:
-	python setup.py install
+.PHONY: build
+build:
+	# Build a source distribution, and a wheel for the current platform.
+	# See: https://docs.astral.sh/uv/concepts/projects/build/
+	uv build
 
