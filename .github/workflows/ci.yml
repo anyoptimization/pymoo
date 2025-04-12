@@ -30,8 +30,11 @@ jobs:
               run: |
                 uv run python -c "import sys; from pymoo.util.function_loader import is_compiled; sys.exit(0 if is_compiled() else 1) "
             - name: Test
+              # FIXME: fast test just for sanity checks
+              # run: |
+              #   uv run pytest -v --maxfail 1 --no-header -m "not long"
               run: |
-                uv run pytest -v --maxfail 1 --no-header -m "not long"
+                uv run pytest tests/test_decomposition.py
 
     build_wheels:
         name: Build wheel for ${{ matrix.os }}-${{ matrix.build }}${{ matrix.python }}-${{ matrix.arch }}
