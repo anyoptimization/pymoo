@@ -1,2 +1,46 @@
+[project]
+name = "pymoo"
+description = "Multi-Objective Optimization in Python"
+authors = [{ name = "Julian Blank", email = "blankjul@msu.edu" }]
+readme = "README.rst"
+license = { file = "LICENSE" }
+classifiers = [
+    'Intended Audience :: Developers',
+    'Intended Audience :: Science/Research',
+    'Operating System :: OS Independent',
+    'License :: OSI Approved :: Apache Software License',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
+    'Topic :: Scientific/Engineering',
+    'Topic :: Scientific/Engineering :: Artificial Intelligence',
+    'Topic :: Scientific/Engineering :: Mathematics',
+]
+keywords = ["optimization"]
+dynamic = ["version"]
+urls = { homepage = "https://pymoo.org" }
+requires-python = ">= 3.9"
+dependencies = [
+    "numpy>=1.15",
+    "scipy>=1.1",
+    "matplotlib>=3",
+    "autograd>=1.4",
+    "cma>=3.2.2",
+    "alive-progress",
+    "dill",
+    "Deprecated",
+]
+
+[dependency-groups]
+dev = ["pyright>=1.1.399", "ruff>=0.11.5"]
+
 [build-system]
 requires = ["setuptools", "wheel", "numpy>=1.15", "Cython>=0.29"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = { attr = "pymoo.version.__version__" }
