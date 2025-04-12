@@ -2,9 +2,7 @@ name: Testing
 on:
   push:
     branches:
-      - develop
-      - release
-      - master
+      - DEPRECATED
   pull_request:
   workflow_dispatch:
   schedule:
