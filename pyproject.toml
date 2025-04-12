@@ -24,7 +24,7 @@ dynamic = ["version"]
 urls = { homepage = "https://pymoo.org" }
 requires-python = ">= 3.9"
 dependencies = [
-    "numpy>=1.15",
+    "numpy>=1.19.3",
     "scipy>=1.1",
     "matplotlib>=3",
     "autograd>=1.4",
@@ -35,7 +35,7 @@ dependencies = [
 ]
 
 [build-system]
-requires = ["setuptools>=61.0", "numpy>=1.15", "Cython>=0.29"]
+requires = ["setuptools>=61.0", "numpy", "Cython>=0.29"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]
