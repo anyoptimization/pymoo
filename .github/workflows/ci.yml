@@ -34,7 +34,7 @@ jobs:
               # run: |
               #   uv run pytest -v --maxfail 1 --no-header -m "not long"
               run: |
-                uv run pytest tests/test_decomposition.py
+                uv run pytest tests/algorithms/test_nsga2.py
 
     build_wheels:
         name: Build wheel for ${{ matrix.os }}-${{ matrix.build }}${{ matrix.python }}-${{ matrix.arch }}
