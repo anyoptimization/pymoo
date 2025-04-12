@@ -89,28 +89,6 @@ args, _ = parser.parse_known_args()
 sys.argv = [e for e in sys.argv if not e.lstrip("-") in args]
 
 
-# ============================================================
-# MacOSX FIX for compiling modules
-# ============================================================
-
-def is_new_osx():
-    name = sysconfig.get_platform()
-    if sys.platform != "darwin":
-        return False
-    elif name.startswith("macosx-10"):
-        minor_version = int(name.split("-")[1].split(".")[1])
-        if minor_version >= 7:
-            return True
-        else:
-            return False
-    else:
-        return False
-
-
-# fix compiling for new macosx!
-if is_new_osx():
-    os.environ['CFLAGS'] = '-stdlib=libc++'
-
 
 # ============================================================
 # Module for Compilation - Throws an Exception if Failing
