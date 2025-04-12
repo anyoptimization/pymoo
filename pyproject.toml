@@ -38,9 +38,6 @@ dependencies = [
 requires = ["setuptools>=61.0", "numpy", "Cython>=0.29"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["pymoo"]
-
 [tool.setuptools.dynamic]
 version = { attr = "pymoo.version.__version__" }
 
@@ -48,7 +45,6 @@ version = { attr = "pymoo.version.__version__" }
 dev = [
     "numba",
     "pytest",
-    "pytest-xdist",
     "nbformat",
     "jupyter",
     "pyrecorder",
@@ -57,10 +53,6 @@ dev = [
     "ipython",
     "ipykernel",
 ]
-
-[tool.pytest.ini_options]
-addopts = "--tb=short --strict-markers --strict-config"
-testpaths = ["tests"]
 
 [tool.uv]
 required-version = ">=0.6.9"

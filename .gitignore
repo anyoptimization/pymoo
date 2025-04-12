@@ -4,7 +4,7 @@
 **/*.npy
 **/*.png
 **/*.gif
-pymoo/cython/*.cpp
+src/pymoo/cython/*.cpp
 **/nohup.out
 benchmark
 wheelhouse
@@ -32,11 +32,11 @@ tests/scratch*
 tests/!archive_tests/*
 tests/!experimental/*
 
-pymoo/cache/
-pymoo/cache/*
-pymoo/data
-pymoo/docs/build
-pymoo/docs/nbconvert
+src/pymoo/cache/
+src/pymoo/cache/*
+src/pymoo/data
+src/pymoo/docs/build
+src/pymoo/docs/nbconvert
 
 
 benchmark/runs/*
