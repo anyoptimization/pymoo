@@ -1,2 +1,15 @@
 [build-system]
-requires = ["setuptools", "wheel", "numpy>=1.15", "Cython>=0.29"]
+requires = ["setuptools<72.2", "wheel", "numpy>=1.15", "Cython>=0.29"]
+
+[tool.cibuildwheel]
+build-verbosity = 1
+before-all = "uname -a"
+
+[tool.cibuildwheel.linux]
+archs = ["x86_64"]
+
+[tool.cibuildwheel.windows]
+archs = ["x86", "AMD64"]
+
+[tool.cibuildwheel.macos]
+archs = ["arm64"]

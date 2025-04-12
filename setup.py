@@ -23,8 +23,8 @@ data = dict(
     version=__version__,
     author=__author__,
     url=__url__,
-    python_requires='>=3.9',
-    author_email="blankjul@msu.edu",
+    python_requires='>=3.10',
+    author_email="blankjul@outlook.com",
     description="Multi-Objective Optimization in Python",
     license='Apache License 2.0',
     keywords="optimization",
@@ -49,10 +49,10 @@ data = dict(
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'Topic :: Scientific/Engineering :: Mathematics'
@@ -80,37 +80,12 @@ data['long_description_content_type'] = 'text/x-rst'
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--nopyx', dest='nopyx', action='store_true',
-                    help='Whether the pyx files shall be considered at all.')
+parser.add_argument('--nopyx', dest='nopyx', action='store_true', help='Whether the pyx files shall be considered at all.')
 parser.add_argument('--nocython', dest='nocython', action='store_true', help='Whether pyx files shall be cythonized.')
 parser.add_argument('--nolibs', dest='nolibs', action='store_true', help='Whether the libraries should be compiled.')
 args, _ = parser.parse_known_args()
 
 sys.argv = [e for e in sys.argv if not e.lstrip("-") in args]
-
-
-# ============================================================
-# MacOSX FIX for compiling modules
-# ============================================================
-
-def is_new_osx():
-    name = sysconfig.get_platform()
-    if sys.platform != "darwin":
-        return False
-    elif name.startswith("macosx-10"):
-        minor_version = int(name.split("-")[1].split(".")[1])
-        if minor_version >= 7:
-            return True
-        else:
-            return False
-    else:
-        return False
-
-
-# fix compiling for new macosx!
-if is_new_osx():
-    os.environ['CFLAGS'] = '-stdlib=libc++'
-
 
 # ============================================================
 # Module for Compilation - Throws an Exception if Failing
