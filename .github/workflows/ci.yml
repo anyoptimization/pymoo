@@ -1,0 +1,120 @@
+name: Build
+
+on:
+    pull_request:
+    push:
+        branches: [main]
+        tags: ["*"]
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python: [39, 310, 311, 312]
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: astral-sh/setup-uv@v5
+              with:
+                python-version: ${{ matrix.python }}
+
+            - name: Test
+              run: uv run --no-dev python -m unittest discover tests
+
+            - name: Test with oldest-supported-numpy
+              run: uv run --no-dev --with oldest-supported-numpy python -m unittest discover tests
+
+            - name: Lint
+              run: |
+                  uv run ruff check
+                  uv run ruff format --check
+
+            - name: Static type check
+              run: uv run pyright
+
+    build_wheels:
+        name: Build wheel for ${{ matrix.os }}-${{ matrix.build }}${{ matrix.python }}-${{ matrix.arch }}
+        runs-on: ${{ matrix.os }}
+        strategy:
+            # Ensure that a wheel builder finishes even if another fails
+            fail-fast: false
+            matrix:
+                os: [windows-latest, ubuntu-latest, macos-latest]
+                python: [39, 310, 311, 312]
+                arch: [auto64, auto32, universal2]
+                build: ["cp"]
+                exclude:
+                    - os: ubuntu-latest
+                      arch: universal2
+                    - os: windows-latest
+                      arch: universal2
+                    - os: macos-latest
+                      arch: auto32
+                    - os: ubuntu-latest
+                      python: 313
+                      arch: auto32
+                    - os: ubuntu-latest
+                      python: 313t
+                      arch: auto32
+        steps:
+            - uses: actions/checkout@v4
+            - uses: astral-sh/setup-uv@v5
+            - uses: pypa/cibuildwheel@v2.23
+              env:
+                CIBW_ENABLE: cpython-freethreading
+                CIBW_BUILD_FRONTEND: "build[uv]"
+                CIBW_BUILD: "${{ matrix.build }}${{ matrix.python }}*"
+                CIBW_ARCHS: ${{ matrix.arch }}
+                CIBW_TEST_COMMAND: python -m unittest discover -t {project} -s {project}/tests
+
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: "artifact-${{ matrix.os }}-${{ matrix.build }}-${{ matrix.python }}-${{ matrix.arch }}"
+                  path: ./wheelhouse/*.whl
+
+    build_sdist:
+        name: Build source distribution
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: astral-sh/setup-uv@v5
+            - run: uv build --sdist
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: artifact-source
+                  path: dist/*.tar.gz
+
+    pass:
+      needs: [test, build_wheels, build_sdist]
+      runs-on: ubuntu-latest
+      steps:
+        - run: echo "All jobs passed"
+
+    upload_pypi:
+        needs: [pass]
+        runs-on: ubuntu-latest
+        environment: moopypi
+        permissions:
+            # Required for trusted publishing; see https://docs.pypi.org/trusted-publishers/using-a-publisher/
+            id-token: write
+        # upload to PyPI on every tag starting with 'v'
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
+        steps:
+            - uses: actions/download-artifact@v4
+              with:
+                  path: dist
+                  merge-multiple: true
+
+            - uses: astral-sh/setup-uv@v5
+
+            - name: Publish
+              run: uv publish --trusted-publishing always -v
+
