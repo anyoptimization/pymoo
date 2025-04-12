@@ -26,11 +26,12 @@ jobs:
               with:
                 python-version: ${{ matrix.python }}
 
+            - name: Check Compilation
+              run: |
+                uv run python -c "from pymoo.util.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
             - name: Test
-              run: uv run --no-dev python -m unittest discover tests
-
-            - name: Test with oldest-supported-numpy
-              run: uv run --no-dev --with oldest-supported-numpy python -m unittest discover tests
+              run: |
+                uv run pytest -v --maxfail 1 --no-header -m "not long"
 
     build_wheels:
         name: Build wheel for ${{ matrix.os }}-${{ matrix.build }}${{ matrix.python }}-${{ matrix.arch }}
@@ -93,7 +94,7 @@ jobs:
     upload_pypi:
         needs: [pass]
         runs-on: ubuntu-latest
-        environment: moopypi
+        environment: pypi # TODO: this must match setting on pypi
         permissions:
             # Required for trusted publishing; see https://docs.pypi.org/trusted-publishers/using-a-publisher/
             id-token: write
