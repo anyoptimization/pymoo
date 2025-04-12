@@ -1,5 +1,3 @@
-exclude docs/*
-exclude examples/*
 exclude tests/*
 include pymoo/cython/*.pyx
 include pymoo/cython/*.pxd
