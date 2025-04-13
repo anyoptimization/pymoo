@@ -1,3 +1,5 @@
+import typing
+
 from collections import OrderedDict
 from datetime import datetime
 from itertools import combinations
@@ -7,6 +9,9 @@ import numpy as np
 
 from pymoo.core.population import Population
 from pymoo.core.sampling import Sampling
+
+if typing.TYPE_CHECKING:
+    from pymoo.core.termination import Termination
 
 
 
@@ -367,7 +372,7 @@ def to_numpy(a):
     return np.array(a)
 
 
-def termination_from_tuple(termination):
+def termination_from_tuple(termination: typing.Union["Termination", str, tuple[str, ...]]) -> "Termination":
     from pymoo.core.termination import Termination
 
     # get the termination if provided as a tuple - create an object

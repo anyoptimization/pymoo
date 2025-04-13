@@ -1,13 +1,16 @@
 import copy
 import time
+from typing import Any
 
 import numpy as np
 
 from pymoo.core.callback import Callback
 from pymoo.core.evaluator import Evaluator
 from pymoo.core.population import Population
+from pymoo.core.problem import Problem
 from pymoo.core.result import Result
-from pymoo.termination.default import DefaultMultiObjectiveTermination, DefaultSingleObjectiveTermination
+from pymoo.termination.default import DefaultMultiObjectiveTermination, DefaultSingleObjectiveTermination, Termination
+from pymoo.util.archive import Archive
 from pymoo.util.display.display import Display
 from pymoo.util.function_loader import FunctionLoader
 from pymoo.util.misc import termination_from_tuple
@@ -17,16 +20,16 @@ from pymoo.util.optimum import filter_optimum
 class Algorithm:
 
     def __init__(self,
-                 termination=None,
-                 output=None,
-                 display=None,
-                 callback=None,
-                 archive=None,
-                 return_least_infeasible=False,
-                 save_history=False,
-                 verbose=False,
-                 seed=None,
-                 evaluator=None,
+                 termination: Termination | str | tuple[str, ...] | None = None,
+                 output: str | None = None,
+                 display: Display | None = None,
+                 callback: Callback | None = None,
+                 archive: Archive | None = None,
+                 return_least_infeasible: bool = False,
+                 save_history: bool = False,
+                 verbose: bool = False,
+                 seed: int | None = None,
+                 evaluator: Evaluator | None = None,
                  **kwargs):
 
         super().__init__()
@@ -35,7 +38,7 @@ class Algorithm:
         FunctionLoader.get_instance()
 
         # the problem to be solved (will be set later on)
-        self.problem = None
+        self.problem: Problem | None = None
 
         # the termination criterion to be used by the algorithm - might be specific for an algorithm
         self.termination = termination
@@ -72,30 +75,30 @@ class Algorithm:
         self.evaluator = evaluator
 
         # the history object which contains the list
-        self.history = list()
+        self.history: list[Algorithm] = []
 
         # the current solutions stored - here considered as population
-        self.pop = None
+        self.pop: Population | None = None
 
         # a placeholder object for implementation to store solutions in each iteration
-        self.off = None
+        self.off: Population | None = None
 
         # the optimum found by the algorithm
-        self.opt = None
+        self.opt: Population | None = None
 
         # the current number of generation or iteration
-        self.n_iter = None
+        self.n_iter: int | None = None
 
         # can be used to store additional data in submodules
-        self.data = {}
+        self.data: dict[Any, Any] = {}
 
         # if the initialized method has been called before or not
         self.is_initialized = False
 
         # the time when the algorithm has been setup for the first time
-        self.start_time = None
+        self.start_time: float | None = None
 
-    def setup(self, problem, **kwargs):
+    def setup(self, problem: Problem, **kwargs) -> "Algorithm":
 
         # the problem to be solved by the algorithm
         self.problem = problem
@@ -133,13 +136,14 @@ class Algorithm:
 
         return self
 
-    def run(self):
+    def run(self) -> Result:
         while self.has_next():
             self.next()
         return self.result()
 
-    def has_next(self):
-        return not self.termination.has_terminated()
+    def has_next(self) -> bool:
+        assert self.termination is not None, "Algorithm has no termination"
+        return not self.termination.has_terminated()  # type: ignore
 
     def finalize(self):
 
@@ -148,7 +152,7 @@ class Algorithm:
 
         return self._finalize()
 
-    def next(self):
+    def next(self) -> None:
 
         # get the infill solutions
         infills = self.infill()
@@ -162,7 +166,7 @@ class Algorithm:
         else:
             self.advance()
 
-    def _initialize(self):
+    def _initialize(self) -> None:
 
         # the time starts whenever this method is called
         self.start_time = time.time()
@@ -172,7 +176,7 @@ class Algorithm:
         self.pop = Population.empty()
         self.opt = None
 
-    def infill(self):
+    def infill(self) -> Population | None:
         if self.problem is None:
             raise Exception("Please call `setup(problem)` before calling next().")
 
@@ -196,7 +200,7 @@ class Algorithm:
 
         return infills
 
-    def advance(self, infills=None, **kwargs):
+    def advance(self, infills: Population | None = None, **kwargs) -> Population | Result:
 
         # if infills have been provided set them as offsprings and feed them into advance
         self.off = infills
@@ -229,13 +233,13 @@ class Algorithm:
                 self._post_advance()
 
         # if the algorithm has terminated, then do the finalization steps and return the result
-        if self.termination.has_terminated():
+        if self.termination.has_terminated():  # type: ignore
             self.finalize()
             ret = self.result()
 
         # otherwise just increase the iteration counter for the next step and return the current optimum
         else:
-            ret = self.opt
+            ret = self.opt  # type: ignore
 
         # add the infill solutions to an archive
         if self.archive is not None and infills is not None:
@@ -243,13 +247,13 @@ class Algorithm:
 
         return ret
 
-    def result(self):
+    def result(self) -> Result:
         res = Result()
 
         # store the time when the algorithm as finished
         res.start_time = self.start_time
         res.end_time = time.time()
-        res.exec_time = res.end_time - res.start_time
+        res.exec_time = res.end_time - res.start_time  # type: ignore
 
         res.pop = self.pop
         res.archive = self.archive
@@ -257,7 +261,7 @@ class Algorithm:
 
         # get the optimal solution found
         opt = self.opt
-        if opt is None or len(opt) == 0:
+        if opt is None or len(opt) == 0:  # type: ignore
             opt = None
 
         # if no feasible solution has been found
@@ -274,10 +278,10 @@ class Algorithm:
 
         # otherwise get the values from the population
         else:
-            X, F, CV, G, H = self.opt.get("X", "F", "CV", "G", "H")
+            X, F, CV, G, H = self.opt.get("X", "F", "CV", "G", "H")  # type: ignore
 
             # if single-objective problem and only one solution was found - create a 1d array
-            if self.problem.n_obj == 1 and len(X) == 1:
+            if self.problem.n_obj == 1 and len(X) == 1:  # type: ignore
                 X, F, CV, G, H = X[0], F[0], CV[0], G[0], H[0]
 
         # set all the individual values
@@ -289,22 +293,22 @@ class Algorithm:
 
         return res
 
-    def ask(self):
+    def ask(self) -> Population | None:
         return self.infill()
 
-    def tell(self, *args, **kwargs):
+    def tell(self, *args, **kwargs) -> Population | Result:
         return self.advance(*args, **kwargs)
 
-    def _set_optimum(self):
+    def _set_optimum(self) -> None:
         self.opt = filter_optimum(self.pop, least_infeasible=True)
 
-    def _post_advance(self):
+    def _post_advance(self) -> None:
 
         # update the current optimum of the algorithm
         self._set_optimum()
 
         # update the current termination condition of the algorithm
-        self.termination.update(self)
+        self.termination.update(self)  # type: ignore
 
         # display the output if defined by the algorithm
         self.display(self)
@@ -315,32 +319,32 @@ class Algorithm:
         if self.save_history:
             _hist, _callback, _display = self.history, self.callback, self.display
 
-            self.history, self.callback, self.display = None, None, None
+            self.history, self.callback, self.display = None, None, None  # type: ignore
             obj = copy.deepcopy(self)
 
             self.history, self.callback, self.display = _hist, _callback, _display
             self.history.append(obj)
 
-        self.n_iter += 1
+        self.n_iter += 1  # type: ignore
 
     # =========================================================================================================
     # TO BE OVERWRITTEN
     # =========================================================================================================
 
-    def _setup(self, problem, **kwargs):
+    def _setup(self, problem, **kwargs) -> None:
         pass
 
-    def _initialize_infill(self):
+    def _initialize_infill(self) -> Population:
         pass
 
-    def _initialize_advance(self, infills=None, **kwargs):
+    def _initialize_advance(self, infills=None, **kwargs) -> None:
         pass
 
-    def _infill(self):
+    def _infill(self) -> Population:
         pass
 
-    def _advance(self, infills=None, **kwargs):
-        pass
+    def _advance(self, infills=None, **kwargs) -> Any:
+        raise NotImplementedError()
 
     def _finalize(self):
         pass
@@ -386,7 +390,7 @@ class LoopwiseAlgorithm(Algorithm):
         return False
 
 
-def default_termination(problem):
+def default_termination(problem: Problem) -> Termination:
     if problem.n_obj > 1:
         termination = DefaultMultiObjectiveTermination()
     else:

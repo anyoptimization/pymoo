@@ -141,3 +141,7 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# pixi environments
+.pixi
+*.egg-info
