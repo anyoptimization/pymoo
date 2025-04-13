@@ -12,6 +12,7 @@ __all__ = [
 ]
 
 import copy
+from typing import Any
 from typing import Optional
 from typing import Tuple
 from typing import Union
@@ -48,7 +49,7 @@ class Individual:
     def __init__(
             self, 
             config: Optional[dict] = None, 
-            **kwargs: dict,
+            **kwargs: Any,
         ) -> None:
         """
         Constructor for the ``Invididual`` class.
@@ -58,7 +59,7 @@ class Individual:
         config : dict, None
             A dictionary of configuration metadata.
             If ``None``, use a class-dependent default configuration.
-        kwargs : dict
+        kwargs : Any
             Additional keyword arguments containing data which is to be stored 
             in the ``Individual``.
         """
@@ -553,14 +554,14 @@ class Individual:
 
     def set_by_dict(
             self, 
-            **kwargs: dict
+            **kwargs: Any
         ) -> None:
         """
         Set an individual's data or metadata using values in a dictionary.
 
         Parameters
         ----------
-        kwargs : dict
+        kwargs : Any
             Keyword arguments defining the data to set.
         """
         for k, v in kwargs.items():
@@ -594,15 +595,15 @@ class Individual:
 
     def get(
             self, 
-            *keys: Tuple[str,...],
+            *keys: str,
         ) -> Union[tuple,object]:
         """
         Get the values for one or more keys for an individual.
 
         Parameters
         ----------
-        keys : tuple
-            A tuple of keys for which to get values.
+        keys : str
+            Keys for which to get values.
 
         Returns
         -------
