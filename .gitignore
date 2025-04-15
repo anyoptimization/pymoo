@@ -141,3 +141,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# Package manager lock files
+uv.lock
