@@ -43,7 +43,7 @@ version = { attr = "pymoo.version.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["pymoo"]
+include = ["pymoo*"]
 
 [dependency-groups]
 dev = [
