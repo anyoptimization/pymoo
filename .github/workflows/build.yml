@@ -40,7 +40,7 @@ jobs:
                 CIBW_TEST_COMMAND: |
                   uv run python -c "
                     import sys 
-                    sys.path = [p for p in sys.path if p != \"\"]
+                    sys.path = [p for p in sys.path if p != '']
 
                     import pymoo print(pymoo)
                     from pymoo.util.function_loader import is_compiled
