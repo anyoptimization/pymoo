@@ -38,11 +38,12 @@ dependencies = [
 requires = ["setuptools>=61.0", "numpy", "Cython>=0.29"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["pymoo"]
-
 [tool.setuptools.dynamic]
 version = { attr = "pymoo.version.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pymoo"]
 
 [dependency-groups]
 dev = [
