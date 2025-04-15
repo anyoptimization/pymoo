@@ -1,6 +1,6 @@
 exclude tests/*
-include src/pymoo/cython/*.pyx
-include src/pymoo/cython/*.pxd
-include src/pymoo/cython/vendor/*.cpp
-include src/pymoo/cython/vendor/*.h
+include pymoo/cython/*.pyx
+include pymoo/cython/*.pxd
+include pymoo/cython/vendor/*.cpp
+include pymoo/cython/vendor/*.h
 include Makefile
