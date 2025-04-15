@@ -39,15 +39,15 @@ jobs:
                 CIBW_ARCHS: ${{ matrix.arch }}
                 CIBW_TEST_COMMAND: >
                   uv run python -c "
-import sys;
-sys.path = [p for p in sys.path if p != ''];
-print(sys.path);
-
-import pymoo;
-print(pymoo);
-from pymoo.util.function_loader import is_compiled;
-sys.exit(0 if is_compiled() else 1)
-"
+                import sys;
+                sys.path = [p for p in sys.path if p != ''];
+                print(sys.path);
+                
+                import pymoo;
+                print(pymoo);
+                from pymoo.util.function_loader import is_compiled;
+                sys.exit(0 if is_compiled() else 1)
+                "
 
             - uses: actions/upload-artifact@v4
               with:
