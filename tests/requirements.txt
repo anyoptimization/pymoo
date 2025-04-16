@@ -1,3 +1,4 @@
+setuptools>=61.0  # Required for building
 numpy
 numba
 Cython
