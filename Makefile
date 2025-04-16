@@ -1,8 +1,6 @@
 .PHONY: clean
 clean:
-	rm -rf build/
-	rm -rf dist/
-	find . -name '*.egg-info' -exec rm -rf {} +
+	rm -rf build dist pymoo.egg-info
 
 .PHONY: clean-ext
 clean-ext:
