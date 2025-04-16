@@ -1,0 +1,69 @@
+name: Build
+
+on:
+    pull_request:
+    push:
+        branches: [main]
+        tags: ["*"]
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+
+jobs:
+    build_wheels:
+        name: Build wheel for ${{ matrix.os }}-${{ matrix.build }}${{ matrix.python }}-${{ matrix.arch }}
+        runs-on: ${{ matrix.os }}
+        strategy:
+            # Ensure that a wheel builder finishes even if another fails
+            fail-fast: false
+            matrix:
+                os: [windows-latest, ubuntu-latest, macos-latest]
+                python: [39, 310, 311, 312, 313]
+                arch: [auto64, universal2]
+                build: ["cp"]
+                exclude:
+                    - os: ubuntu-latest
+                      arch: universal2
+                    - os: windows-latest
+                      arch: universal2
+        steps:
+            - uses: actions/checkout@v4
+            - uses: astral-sh/setup-uv@v5
+            - uses: pypa/cibuildwheel@v2.23
+              env:
+                CIBW_BUILD_FRONTEND: "build[uv]"
+                CIBW_BUILD: "${{ matrix.build }}${{ matrix.python }}*"
+                CIBW_ARCHS: ${{ matrix.arch }}
+                CIBW_TEST_COMMAND: >
+                  uv run python -c "import sys; import pymoo; print(pymoo); from pymoo.util.function_loader import is_compiled; sys.exit(0 if is_compiled() else 42)"
+
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: "artifact-${{ matrix.os }}-${{ matrix.build }}-${{ matrix.python }}-${{ matrix.arch }}"
+                  path: ./wheelhouse/*.whl
+
+    build_sdist:
+        name: Build source distribution
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: astral-sh/setup-uv@v5
+            - run: uv build --sdist
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: artifact-source
+                  path: dist/*.tar.gz
+
+    merge:
+      name: Merge sdist and wheel artifacts
+      needs: [build_wheels, build_sdist]
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/upload-artifact/merge@v4
+          with:
+            name: pymoo
+            delete-merged: true
+

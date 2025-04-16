@@ -4,7 +4,7 @@
 **/*.npy
 **/*.png
 **/*.gif
-**/*.cpp
+pymoo/cython/*.cpp
 **/nohup.out
 benchmark
 wheelhouse
@@ -141,3 +141,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# Package manager lock files
+uv.lock

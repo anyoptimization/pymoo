@@ -19,6 +19,7 @@ jobs:
           python-version: '3.10'
       - name: Install Dependencies
         run: |
+          pip install --no-cache-dir --upgrade setuptools>=77.0 
           pip install numpy Cython scipy
           pip install -r tests/requirements.txt
       - name: Install pymoo (DEBUG)

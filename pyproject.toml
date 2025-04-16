@@ -1,15 +1,59 @@
+[project]
+name = "pymoo"
+description = "Multi-Objective Optimization in Python"
+authors = [{ name = "Julian Blank", email = "blankjul@outlook.com" }]
+readme = "README.rst"
+license = "Apache-2.0"
+classifiers = [
+    'Intended Audience :: Developers',
+    'Intended Audience :: Science/Research',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
+    'Topic :: Scientific/Engineering',
+    'Topic :: Scientific/Engineering :: Artificial Intelligence',
+    'Topic :: Scientific/Engineering :: Mathematics',
+]
+keywords = ["optimization"]
+dynamic = ["version"]
+urls = { homepage = "https://pymoo.org" }
+requires-python = ">= 3.9"
+dependencies = [
+    "numpy>=1.19.3",
+    "scipy>=1.1",
+    "matplotlib>=3",
+    "autograd>=1.4",
+    "cma>=3.2.2",
+    "alive-progress",
+    "dill",
+    "Deprecated",
+]
+
 [build-system]
-requires = ["setuptools<72.2", "wheel", "numpy>=1.15", "Cython>=0.29"]
+requires = ["setuptools>=77", "numpy", "Cython>=0.29"]
+build-backend = "setuptools.build_meta"
 
-[tool.cibuildwheel]
-build-verbosity = 1
-before-all = "uname -a"
+[tool.setuptools.dynamic]
+version = { attr = "pymoo.version.__version__" }
 
-[tool.cibuildwheel.linux]
-archs = ["x86_64"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pymoo*"]
 
-[tool.cibuildwheel.windows]
-archs = ["x86", "AMD64"]
-
-[tool.cibuildwheel.macos]
-archs = ["arm64"]
+[dependency-groups]
+dev = [
+    "numba",
+    "pytest",
+    "nbformat",
+    "jupyter",
+    "pyrecorder",
+    "optproblems",
+    "pandas",
+    "ipython",
+    "ipykernel",
+]
