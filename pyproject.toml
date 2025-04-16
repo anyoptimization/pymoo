@@ -57,6 +57,3 @@ dev = [
     "ipython",
     "ipykernel",
 ]
-
-[tool.uv]
-required-version = ">=0.6.9"
