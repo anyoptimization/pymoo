@@ -1,4 +1,5 @@
 exclude tests/*
+exclude pymoo/cython/*.cpp
 recursive-include pymoo *.pyx *.pxd
-recursive-include pymoo/cython/vendor *.cpp *.h
+recursive-include pymoo/cython/vendor *.h
 include Makefile
