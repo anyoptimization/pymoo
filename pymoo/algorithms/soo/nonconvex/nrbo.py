@@ -1,6 +1,6 @@
 """
 
-Engineering Applications of Artificial Intelligence (NRBO)
+Newton-Raphson-based optimizer (NRBO)
 
 -------------------------------- Description -------------------------------
 
@@ -8,9 +8,8 @@ Engineering Applications of Artificial Intelligence (NRBO)
 
 -------------------------------- References --------------------------------
 
-[1] R. Sowmya, M. Premkumar和P. Jangir, 《Newton-Raphson-based optimizer:
-A new population-based metaheuristic algorithm for continuous optimization problems》,
-Engineering Applications of Artificial Intelligence, 卷 128, 页 107532, 2月 2024, doi: 10.1016/j.engappai.2023.107532.
+[1]. Sowmya, R., Premkumar, M. & Jangir, P. Newton-Raphson-based optimizer: A new population-based metaheuristic algorithm for continuous optimization problems. Engineering Applications of Artificial Intelligence 128, 107532 (2024).
+
 
 
 -------------------------------- License -----------------------------------
