@@ -79,7 +79,7 @@ class NRBO(Algorithm):
         deciding_factor=0.6,
         sampling=LHS(),
         max_iteration=100,
-        repair=NoRepair,
+        repair=NoRepair(),
         output=None,
         display=None,
         callback=None,
@@ -89,7 +89,7 @@ class NRBO(Algorithm):
         verbose=False,
         seed=None,
         evaluator=None,
-        **kwargs
+        **kwargs,
     ):
         self.max_iteration = max_iteration
         termination = ("n_gen", self.max_iteration)
@@ -97,7 +97,7 @@ class NRBO(Algorithm):
         self.deciding_factor = deciding_factor
         self.repair = repair
         self.survial = FitnessSurvival()
-        self.initialization = Initialization(sampling)
+        self.initialization = Initialization(sampling, self.repair)
         super().__init__(
             termination,
             output,
@@ -109,7 +109,7 @@ class NRBO(Algorithm):
             verbose,
             seed,
             evaluator,
-            **kwargs
+            **kwargs,
         )
 
     def _setup(self, problem, **kwargs):
@@ -176,6 +176,8 @@ class NRBO(Algorithm):
             off = repair_random_init(off, X, *self.problem.bounds())
 
         off = Population.new(X=off)
+
+        off = self.repair.do(self.problem, off)
         return off
 
     def _advance(self, infills=None, **kwargs):
@@ -289,4 +291,6 @@ if __name__ == "__main__":
     ax.plot(F_hist_pso, label="pso")
     ax.plot(F_hist_eppso, label="eppso")
     ax.legend()
+    ax.set_title("Ackley with 50 dim")
     plt.show()
+    # fig.savefig("result.png",dpi=300)
