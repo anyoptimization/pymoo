@@ -22,7 +22,7 @@ class TournamentSelection(Selection):
             If the function is None it is assumed the population is sorted by a criterion and only indices are compared.
 
         pressure: int
-            The selection pressure to bie applied. Default it is a binary tournament.
+            The selection pressure to be applied. Default it is a binary tournament.
         """
 
         super().__init__(**kwargs)
