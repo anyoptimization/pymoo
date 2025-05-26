@@ -77,8 +77,6 @@ class GA(GeneticAlgorithm):
                          output=output,
                          **kwargs)
 
-        self.termination = DefaultSingleObjectiveTermination()
-
 
 class BGA(GA):
 
