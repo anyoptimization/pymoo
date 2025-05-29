@@ -4,7 +4,7 @@
    :ref:`Nelder Mead <nb_nelder_mead>`, NelderMead, single, x, A point-by-point based algorithm which keeps track of a simplex with is either extended  reflected or shrunk.
    :ref:`Pattern Search <nb_pattern_search>`, PatternSearch, single, x, Iterative approach where the search direction is estimated by forming a specific exploration pattern around the current best solution.
    :ref:`CMAES <nb_cmaes>`, CMAES, single, , Well-known model-based algorithm sampling from a dynamically updated normal distribution in each iteration.
-   :ref:`Evolutionary Strategy <nb_es>`, ES, single, , The evolutionary strategy algorithm proposed for real-valued optimization problems.
+   :ref:`Evolutionary Strategy <nb_es>`, ES, single, x, The evolutionary strategy algorithm proposed for real-valued optimization problems.
    :ref:`Stochastic Ranking Evolutionary Strategy <nb_sres>`, SRES, single, x, An evolutionary strategy with constrained handling using stochastic ranking.
    :ref:`Improved Stochastic Ranking Evolutionary Strategy <nb_isres>`, ISRES, single, x, An improved version of SRES being able to deal dependent variables efficiently.
    :ref:`NSGA-II <nb_nsga2>`, NSGA2, multi, x, Well-known multi-objective optimization algorithm based on non-dominated sorting and crowding.
