@@ -6,7 +6,11 @@ from pymoo.util.misc import crossover_mask, row_at_least_once_true
 
 
 def mut_exp(n_matings, n_var, prob, at_least_once=True):
-    assert len(prob) == n_matings
+    
+    if isinstance(np.float64(prob), float) or isinstance(np.float64(prob), int):
+        prob = np.ones(n_matings) * prob
+    else:
+        assert len(prob) == n_matings
 
     # the mask do to the crossover
     M = np.full((n_matings, n_var), False)
