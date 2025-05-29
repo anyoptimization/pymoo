@@ -22,7 +22,6 @@ They aim at replacing the CTP test suite by proposing more complex problems with
 ```{code-cell} ipython3
 from pymoo.problems import get_problem
 from pymoo.util.plotting import plot
-from pymoo.problems import get_problem
 from pymoo.util.ref_dirs import get_reference_directions
 from pymoo.visualization.scatter import Scatter
 ```

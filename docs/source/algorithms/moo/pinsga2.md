@@ -20,7 +20,7 @@ vscode:
 ```
 
 .. meta::
-    :description:  An implementation of a progressivly interactive NSGA-II algorithm that uses user preference to guide the solving of multi-objective optimization problems. Value function optimization is used to take user generated ranking of key points to model user's preferences.
+    :description:  An implementation of a progressively interactive NSGA-II algorithm that uses user preference to guide the solving of multi-objective optimization problems. Value function optimization is used to take user generated ranking of key points to model user's preferences.
 
 +++
 
@@ -29,7 +29,7 @@ vscode:
 
 +++
 
-# PI-NSGA-II: Progressivly Interactive NSGA-II
+# PI-NSGA-II: Progressively Interactive NSGA-II
 
 +++
 
@@ -45,7 +45,7 @@ The user-provided rankings are then used to fit a value function that models the
 
 +++
 
-This is a simple example with a custom automatedDM. This example uses ZDT3, since its disconnected Pareto-optimal front illustrates how the algorithm guides the optimization through the objective space. The decision maker is set to rank four points ($\eta$) every ten generations ($\tau$) based on their distance from the center of the second region of the solution. In this case imagine the decision maker only wants one or more solutions in this area of the search space, and the other solutions are undisireable.
+This is a simple example with a custom automatedDM. This example uses ZDT3, since its disconnected Pareto-optimal front illustrates how the algorithm guides the optimization through the objective space. The decision maker is set to rank four points ($\eta$) every ten generations ($\tau$) based on their distance from the center of the second region of the solution. In this case imagine the decision maker only wants one or more solutions in this area of the search space, and the other solutions are undesirable.
 
 ```{code-cell} ipython3
 from pymoo.algorithms.moo.pinsga2 import PINSGA2, AutomatedDM

@@ -40,7 +40,7 @@ Heatmap().add(F).show()
 ```
 
 ```{raw-cell}
-By default, larger values are represented with wight and smaller values with the corresponding color:
+By default, larger values are represented with white and smaller values with the corresponding color:
 ```
 
 ```{code-cell} ipython3
@@ -70,7 +70,7 @@ Moreover, the values can be sorted lexicographically by objective(s) - and by de
 F = np.random.random((30, 6))
 
 plot = Heatmap(figsize=(10,30),
-               bound=[0,1],
+               bounds=[0,1],
                order_by_objectives=0,
                solution_labels=None,
                labels=["profit", "cost", "sustainability", "environment", "satisfaction", "time"],

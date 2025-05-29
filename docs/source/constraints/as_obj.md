@@ -33,7 +33,7 @@ from pymoo.visualization.scatter import Scatter
 
 problem = G1()
 
-problem = ConstrainedProblem()
+problem = G1()
 
 algorithm = NSGA2(pop_size=100)
 

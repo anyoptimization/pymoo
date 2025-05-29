@@ -24,7 +24,7 @@ raw_mimetype: text/restructuredtext
 
 +++ {"pycharm": {"name": "#%% md\n"}}
 
-Images are fantastic, but since optimization happens over time, videos can capture the optimization process itself often in a better way.
+Images are fantastic, but since optimization happens over time, videos can often capture the optimization process itself in a better way.
 In `pymoo` we offer a wrapper around `matplotlib` to combine complex plots and put them together in a video (a different way than the animation package does it). This is, however, more computationally expensive, but makes recording very simple.
 
 +++ {"pycharm": {"name": "#%% md\n"}}
@@ -35,7 +35,7 @@ To enable video support, you have to install `pyrecorder` by
 pip install -U pyrecorder
 ```
 
-Because our recording tool has some dependencies, not every regular `pymoo` user would be interested in, we have decided to outsource the recording to another third-party library.
+Because our recording tool has some dependencies that not every regular `pymoo` user would be interested in, we have decided to outsource the recording to another third-party library.
 
 +++ {"pycharm": {"name": "#%% md\n"}}
 

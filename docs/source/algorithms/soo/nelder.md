@@ -16,7 +16,7 @@ jupytext:
 # Nelder Mead
 
 
-This algorithm is implemented based on <cite data-cite="NelderMead65"></cite>. In addition to other implementations, a boundary check is included. This ensures that the search considers the box constraints of the given optimization problem. If no boundaries are provided the algorithm falls back to a search without any constraints. 
+This algorithm is implemented based on <cite data-cite="NelderMead65"></cite>. In addition to other implementations, a boundary check is included. This ensures that the search considers the box constraints of the given optimization problem. If no boundaries are provided, the algorithm falls back to a search without any constraints. 
 
 ```{code-cell} ipython3
 from pymoo.algorithms.soo.nonconvex.nelder import NelderMead

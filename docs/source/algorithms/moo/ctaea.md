@@ -16,7 +16,7 @@ jupytext:
 # C-TAEA
 
 
-This algorithm is implemented based on <cite data-cite="ctaea"></cite> and the authors' [implementation](https://web.archive.org/web/20200916105021/https://cola-laboratory.github.io/docs/publications). The algorithm is based on [Reference Directions](../../misc/reference_directions.ipynb) which need to be provided when initializing the algorithm object.
+This algorithm is implemented based on <cite data-cite="ctaea"></cite> and the authors' [implementation](https://web.archive.org/web/20200916105021/https://cola-laboratory.github.io/docs/publications). The algorithm is based on [Reference Directions](../../misc/reference_directions.ipynb), which need to be provided when initializing the algorithm object.
 
 C-TAEA follows a two archive approach to balance convergence (Convergence Archive CA) and diversity (Diversity Archive DA).
 

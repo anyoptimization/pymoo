@@ -19,7 +19,7 @@ jupytext:
 
 +++
 
-One way of customizing an algorithm is a biased initial population. This can be very helpful if expert knowledge already exists, and known solutions should be improved. In the following, two different ways of initialization are provided: **a)** just providing the design space of the variables and **b)** a `Population` object where the objectives and constraints are provided and are not needed to be calculated again.
+One way of customizing an algorithm is a biased initial population. This can be very helpful if expert knowledge already exists, and known solutions should be improved. In the following, two different ways of initialization are provided: **a)** just providing the design space of the variables and **b)** a `Population` object where the objectives and constraints are provided and do not need to be calculated again.
 
 **NOTE:** This works with all **population-based** algorithms in *pymoo*. Technically speaking, all algorithms which inherit from `GeneticAlgorithm`. For **local-search** based algorithm, the initial solution can be provided by setting `x0` instead of `sampling`.
 

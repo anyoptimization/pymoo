@@ -24,7 +24,7 @@ jupytext:
 # Part II: Find a Solution Set using Multi-objective Optimization
 
 ```{raw-cell}
-The constrained bi-objective problem from Part I was defined by
+The constrained bi-objective problem from Part I is defined by
 ```
 
 \begin{align} 
@@ -54,7 +54,7 @@ To implement the problem in **pymoo** some more work has to be done.
 
 Thus, we need to multiply an objective that is supposed to be maximized by $-1$ and minimize it. This results in minimizing $-f_2(x)$ instead of maximizing $f_2(x)$. 
 
-Moreover, the inequality constraints need to be formulated as **less than zero**  ($\leq 0$) constraint. 
+Moreover, the inequality constraints need to be formulated as **less than zero**  ($\leq 0$) constraints. 
 For this reason, $g_2(x)$ is multiplied by $-1$ in order to flip inequality relation. 
 Also, we recommend the normalization of constraints to make them operating on the same scale and giving them equal importance. For $g_1(x)$, the coefficient results in $2 \cdot (-0.1) \cdot (-0.9) = 0.18$ and for $g_2(x)$ in $20 \cdot (-0.4) \cdot (-0.6) = 4.8$, respectively. We achieve normalization of constraints by dividing $g_1(x)$ and $g_2(x)$ by its corresponding coefficient.
 
@@ -184,8 +184,12 @@ from pymoo.termination import get_termination
 termination = get_termination("n_gen", 40)
 ```
 
+```{raw-cell}
+:raw_mimetype: text/restructuredtext
+
 .. tip::
     A convergence analysis will show how much progress an algorithm has made at what time. Always keep in mind that having the most suitable algorithm but running it not long enough might prevent from finding the global optimum. However, continuing with optimization of an algorithm that got stuck or has already found the optimum will not improve the best found solution and unnecessarily increase the number of function evaluations.
+```
 
 +++
 
@@ -213,7 +217,7 @@ X = res.X
 F = res.F
 ```
 
-If the `verbose=True`, some printouts during the algorithm's execution are provided. This can very from algorithm to algorithm. Here, we execute `NSGA2` on a problem where *pymoo* has no knowledge about the optimum. Each line represents one iteration. The first two columns are the current generation counter and the number of evaluations so far. For constrained problems, the next two columns show the minimum constraint violation (*cv (min)*) and the average constraint violation (*cv (avg)*) in the current population. This is followed by the number of non-dominated solutions (*n_nds*) and two more metrics which represents the movement in the objective space. 
+If the `verbose=True`, some printouts during the algorithm's execution are provided. This can vary from algorithm to algorithm. Here, we execute `NSGA2` on a problem where *pymoo* has no knowledge about the optimum. Each line represents one iteration. The first two columns are the current generation counter and the number of evaluations so far. For constrained problems, the next two columns show the minimum constraint violation (*cv (min)*) and the average constraint violation (*cv (avg)*) in the current population. This is followed by the number of non-dominated solutions (*n_nds*) and two more metrics which represents the movement in the objective space. 
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext

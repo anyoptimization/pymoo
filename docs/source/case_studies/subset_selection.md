@@ -59,7 +59,7 @@ n_max = 10
 problem = SubsetProblem(L, n_max)
 ```
 
-The customization requires writing custom operators in order to solve this problem efficiently. We recommend considering the feasibility directly in the evolutionary operators because otherwise, most of the time, infeasible solutions will be processed.
+The customization requires writing custom operators in order to solve this problem efficiently. We recommend considering the feasibility directly in the evolutionary operators because, otherwise, most of the time, infeasible solutions will be processed.
 The sampling creates a random solution where the subset constraint will always be satisfied. 
 The mutation randomly removes a number and chooses another one. The crossover takes the values of both parents and then randomly picks either the one from the first or from the second parent until enough numbers are picked.
 

@@ -31,7 +31,7 @@ $$
 +++
 
 
-So far, most studies have used the Das and Dennis's structured approach <cite data-cite="das_dennis"></cite> for generating  well-spaced reference points. 
+So far, most studies have used the Das and Dennis's structured approach <cite data-cite="das_dennis"></cite> for generating well-spaced reference points. 
 A reference direction is constructed by a vector originating from the origin and connected to each of them. The number of points on the unit simplex is determined by a parameter $p$ (we call it `n_partitions` in our implementation), which indicates the number of gaps between two consecutive points along an objective axis. It turns out that the total number of points ($n$) on the unit simplex is
 
 +++
@@ -41,7 +41,7 @@ n = C_{p}^{\, M+p-1}
 $$
 
 For example, if $p=10$ is chosen for a three-objective problem ($M=3$), then the total number of points on the unit simplex is $C_{10}^{\, 3+10-1}=\binom{12}{10}$ or 66. These 66 points are well-spaced with an identical distance to their nearest neighbor on the unit simplex.
-Due to the highly structured nature of the procedure, this method cannot produce an arbitrary number of points desired in an EMaO application. Moreover, in higher dimensional space, most points to not lie in the interior but on the boundaries. Both are demonstrated in the figure below.
+Due to the highly structured nature of the procedure, this method cannot produce an arbitrary number of points desired in an EMaO application. Moreover, in higher dimensional space, most points do not lie in the interior but on the boundaries. Both are demonstrated in the figure below.
 
 <div style="text-align: center;">
     <img src="https://github.com/anyoptimization/pymoo-data/blob/main/docs/images/ref_dir_interior.png?raw=true" width="450">
@@ -137,7 +137,7 @@ Scatter().add(ref_dirs).show()
 
 As mentioned in the introduction, the Das-Dennis method can be used to create reference directions in a very structured way. 
 However, the method relies on a partition number `n_partitions` which determines how many points will be sampled.
-Points can be uniformly create on the unit simplex using the Das-Dennis method proposed in <cite data-cite="das_dennis"></cite>.
+Points can be uniformly created on the unit simplex using the Das-Dennis method proposed in <cite data-cite="das_dennis"></cite>.
 
 ```{code-cell} ipython3
 ref_dirs = get_reference_directions("uniform", 3, n_partitions=12)
@@ -234,7 +234,7 @@ Scatter().add(ref_dirs).show()
 
 Incremental method can be used to create reference directions in increments. 
 However, the method relies on a partition number `n_partitions` which determines how many points will be sampled.
-Points can be uniformly create on the unit hyperplane using the Incremental method proposed in <cite data-cite="incremental_Lattice"></cite>.
+Points can be uniformly created on the unit hyperplane using the Incremental method proposed in <cite data-cite="incremental_Lattice"></cite>.
 
 ```{code-cell} ipython3
 ref_dirs = get_reference_directions("incremental", 3, n_partitions=8)

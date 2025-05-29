@@ -26,9 +26,9 @@ jupytext:
 # NSGA-III
 
 
-The algorithm is implemented in base of <cite data-cite="nsga3-part1"></cite> <cite data-cite="nsga3-part2"></cite>. Implementation details of this algorithm can be found in <cite data-cite="nsga3-norm"></cite>. NSGA-III is based on [Reference Directions](../../misc/reference_directions.ipynb) which need to be provided when the algorithm is initialized. 
+The algorithm is implemented based on <cite data-cite="nsga3-part1"></cite> <cite data-cite="nsga3-part2"></cite>. Implementation details of this algorithm can be found in <cite data-cite="nsga3-norm"></cite>. NSGA-III is based on [Reference Directions](../../misc/reference_directions.ipynb) which need to be provided when the algorithm is initialized. 
 
-The survival, first, the non-dominated sorting is done as in NSGA-II. 
+First, the non-dominated sorting is done as in NSGA-II for survival. 
 
 +++
 

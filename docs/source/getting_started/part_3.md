@@ -30,7 +30,7 @@ jupytext:
 
 +++
 
-Having now obtained a set of non-dominated solutions, one can ask how a decision-maker can nail down the set to only a few or even a single solution. This decision-making process for multi-objective problems is also known as Multi-Criteria Decision Making (MCDM). You should know that the main focus of *pymoo* lies in the optimization, not the MCDM part. However, the framework offers some rudimentary tools to find an appropriate solution.  
+Having now obtained a set of non-dominated solutions, one can ask how a decision-maker can narrow down the set to only a few or even a single solution. This decision-making process for multi-objective problems is also known as Multi-Criteria Decision Making (MCDM). You should know that the main focus of *pymoo* lies in the optimization, not the MCDM part. However, the framework offers some rudimentary tools to find an appropriate solution.  
 
 +++
 
@@ -146,7 +146,7 @@ plt.show()
 
 +++
 
-A simple way to chose a solution out of a solution set in the context of multi-objective optimization is the pseudo-weight vector approach proposed in <cite data-cite="multi_objective_book"></cite>. Respectively, the pseudo weight $w_i$ for the i-ith objective function can be calculated by:
+A simple way to choose a solution out of a solution set in the context of multi-objective optimization is the pseudo-weight vector approach proposed in <cite data-cite="multi_objective_book"></cite>. Respectively, the pseudo weight $w_i$ for the i-ith objective function can be calculated by:
 
 \begin{equation}
 w_i = \frac{(f_i^{max} - f_i {(x)}) \, /\,  (f_i^{max} - f_i^{min})}{\sum_{m=1}^M (f_m^{max} - f_m (x)) \, /\,  (f_m^{max} - f_m^{min})}  

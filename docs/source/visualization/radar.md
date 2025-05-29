@@ -18,7 +18,7 @@ jupytext:
 
 +++
 
-Let us start generating some data:
+Let us start by generating some data:
 
 ```{code-cell} ipython3
 import numpy as np

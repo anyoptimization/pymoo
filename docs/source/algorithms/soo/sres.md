@@ -27,7 +27,7 @@ jupytext:
 
 +++
 
-Many different constrained handling methods have been proposed in the past. One way of addressing constraints in evolutionary strategy is to change the selection operator and give infeasible solutions a chance to survive. 
+Many different constraint handling methods have been proposed in the past. One way of addressing constraints in evolutionary strategy is to change the selection operator and give infeasible solutions a chance to survive. 
 The survival is based on stochastic ranking, and thus the method is known as Stochastic Ranking Evolutionary Strategy <cite data-cite="sres"></cite>. 
 
 The stochastic ranking is proposed as follows:
@@ -40,7 +40,7 @@ The stochastic ranking is proposed as follows:
 
 +++
 
-Together will the effective evolutionary strategy search algorithm, this provides a powerful method to optimize constrained problems. 
+Together with the effective evolutionary strategy search algorithm, this provides a powerful method to optimize constrained problems. 
 
 ```{code-cell} ipython3
 from pymoo.algorithms.soo.nonconvex.sres import SRES

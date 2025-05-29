@@ -17,7 +17,7 @@ jupytext:
 
 +++
 
-Permutations are a very particular type where each integer value occurs only once. Your algorithm to solve your optimization problem efficiently might need some customization regarding the evolutionary operators. 
+Permutations are a very particular type of solution where each integer value occurs only once. Your algorithm to solve your optimization problem efficiently might need some customization regarding the evolutionary operators. 
 
 In the following, two examples of permutation problems shall be provided.
 
@@ -28,7 +28,7 @@ In the following, two examples of permutation problems shall be provided.
 +++
 
 The traditional traveling salesman problem aims to minimize the time to travel to visit each city exactly once. 
-Since a permutation can start with an arbitrary number, it is advisable to avoid oranges with apples and to repair each individual to start with the index `0`. Therefore, let us define a `Repair` operator as follows: 
+Since a permutation can start with an arbitrary number, it is advisable to avoid mixing oranges with apples and to repair each individual to start with the index `0`. Therefore, let us define a `Repair` operator as follows: 
 
 ```{code-cell} ipython3
 import numpy as np

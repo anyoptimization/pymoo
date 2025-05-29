@@ -24,7 +24,7 @@ jupytext:
     Hyperparameter optimization is a new feature available since version **0.6.0**. In general, this is quite a challenging and computationally expensive topic, and only a few basics are presented in this guide. If you are interested in contributing or collaborating, please let us know to enrich this module with more robust and better features.
 ```
 
-Most algoriths have **hyperparameters**. For some optimization methods the parameters are already defined and can directly be optimized. For instance, for Differential Evolution (DE) the parameters can be found by:
+Most algorithms have **hyperparameters**. For some optimization methods the parameters are already defined and can directly be optimized. For instance, for Differential Evolution (DE) the parameters can be found by:
 
 ```{code-cell} ipython3
 import json

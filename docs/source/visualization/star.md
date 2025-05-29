@@ -17,7 +17,7 @@ jupytext:
 
 +++
 
-Star Coordinate Plot maps a higher dimensional space with a non-linear function to two dimensions. Compared to Radviz, points can be outside of the circle.
+A Star Coordinate Plot maps a higher dimensional space with a non-linear function to two dimensions. Compared to Radviz, points can be outside of the circle.
 
 Let us visualize some test data:
 
@@ -29,7 +29,7 @@ ref_dirs = get_reference_directions("uniform", 6, n_partitions=5)
 F = get_problem("dtlz1").pareto_front(ref_dirs)
 ```
 
-A simple Star Coordinate Plot plot with points can be created by:
+A simple Star Coordinate Plot with points can be created by:
 
 ```{code-cell} ipython3
 from pymoo.visualization.star_coordinate import StarCoordinate

@@ -60,14 +60,14 @@ The problem definition above defines a problem with just one variable. This vari
 
 +++
 
-To solve the optimization problem, evolutionary operators sampling, crossover, mutation, and duplication, check needs to be implemented.
+To solve the optimization problem, evolutionary operators sampling, crossover, mutation, and duplication check needs to be implemented.
 Each of the modules will be shown in the following.
 
 +++
 
 ### Sampling
 
-Our sampling method just generates a random string, which is equivalent to choosing a random letter from the alphabet (only lower case).
+Our sampling method just generates a random string, which is equivalent to choosing a random letter from the alphabet (only lowercase).
 Because of the implementation of having only one variable, we return a matrix with the shape (n,1).
 
 ```{code-cell} ipython3
@@ -88,7 +88,7 @@ class MySampling(Sampling):
 
 +++
 
-The crossover operator combines parents to create offsprings. In our framework, the crossover operator retrieves the input already with predefined matings. 
+The crossover operator combines parents to create offspring. In our framework, the crossover operator retrieves the input already with predefined matings. 
 Our crossover randomly picks a character from the first or the second parent.
 
 ```{code-cell} ipython3
@@ -105,8 +105,8 @@ class MyCrossover(Crossover):
         # The input of has the following shape (n_parents, n_matings, n_var)
         _, n_matings, n_var = X.shape
         
-        # The output owith the shape (n_offsprings, n_matings, n_var)
-        # Because there the number of parents and offsprings are equal it keeps the shape of X
+        # The output with the shape (n_offsprings, n_matings, n_var)
+        # Because the number of parents and offspring are equal it keeps the shape of X
         Y = np.full_like(X, None, dtype=object)
 
         # for each mating provided
@@ -153,12 +153,12 @@ class MyMutation(Mutation):
             
             r = np.random.random()
             
-            # with a probabilty of 40% - change the order of characters
+            # with a probability of 40% - change the order of characters
             if r < 0.4:
                 perm = np.random.permutation(problem.n_characters)
                 X[i, 0] = "".join(np.array([e for e in X[i, 0]])[perm])
                 
-            # also with a probabilty of 40% - change a character randomly
+            # also with a probability of 40% - change a character randomly
             elif r < 0.8:
                 prob = 1 / problem.n_characters
                 mut = [c if np.random.random() > prob 

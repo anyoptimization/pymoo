@@ -25,9 +25,9 @@ The Ackley function is widely used for testing optimization algorithms. In its t
 
 \begin{align}
 \begin{split}
-f(x) &=& \,-a \exp{ \Bigg[ -b \, \sqrt{ \frac{1}{n} \sum_{i=1}^{n}{x_i}^2 } \Bigg]} - \exp{ \Bigg[ \frac{1}{n}\sum_{i=1}^{n}{cos(c x_i)} \Bigg] } + a + e, \\[2mm]
+f(x) &= \,-a \exp{ \Bigg[ -b \, \sqrt{ \frac{1}{n} \sum_{i=1}^{n}{x_i}^2 } \Bigg]} - \exp{ \Bigg[ \frac{1}{n}\sum_{i=1}^{n}{cos(c x_i)} \Bigg] } + a + e, \\[2mm]
 && a = \;20, \quad b = \; \frac{1}{5}, \quad c = \;2 \pi \\[2mm]
-&&-32.768 \leq x_i \leq 32.768, \quad i=1 \ldots,n \\[4mm]
+&&-32.768 \leq x_i \leq 32.768, \quad i=1, \ldots,n \\[4mm]
 \end{split}
 \end{align}
 

@@ -41,7 +41,7 @@ PCP().add(F).show()
 ```
 
 This gives an idea of the overall result set. 
-Let us assume we identified solution 50 and 75 to more of interest and like to highlight them in our plot:
+Let us assume we identified solution 50 and 75 to be more of interest and would like to highlight them in our plot:
 
 ```{code-cell} ipython3
 plot = PCP()
@@ -72,12 +72,12 @@ plot.add(F[75], linewidth=5, color="blue", label="Solution B")
 plot.show()
 ```
 
-Moreover, if the boundaries should be set manually, this can be achieved by turning the default normalization of and providing them. Either directly as a NumPy array or just an integer to be set for all axes.
+Moreover, if the boundaries should be set manually, this can be achieved by turning the default normalization off and providing them. Either directly as a NumPy array or just an integer to be set for all axes.
 
 ```{code-cell} ipython3
 plot.reset()
 plot.normalize_each_axis = False
-plot.bounds=[[1,1,1,2,2,5],[32,32,32,32,32,32]]
+plot.bounds = [[1,1,1,2,2,5],[32,32,32,32,32,32]]
 plot.show()
 ```
 

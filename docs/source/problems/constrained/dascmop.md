@@ -24,7 +24,7 @@ raw_mimetype: text/restructuredtext
 
 DAS-CMOP is a constrained multi-objective test suite with tunable constraints <cite data-cite="dascmop"></cite>. The constraints are tuned using a difficulty triplet: $(\eta, \zeta, \gamma)$, with $\eta, \zeta, \gamma \in [0, 1]$. The triplet allows to adjust the diversity, the feasibility and the convergence hardness respectively.
 
-There are 6 biobjective problems DAS-CMOP1-6 (11 constraints) and 3 three-objective problems DAS-CMOP7-9 (7 constraints). Each of these can be initialized with a custom difficulty triplet or the authors proposed a set of 16 triplets:
+There are 6 bi-objective problems DAS-CMOP1-6 (11 constraints) and 3 three-objective problems DAS-CMOP7-9 (7 constraints). Each of these can be initialized with a custom difficulty triplet or the authors proposed a set of 16 triplets:
 
 |No. | Difficulty     | No. | Difficulty     | No | Difficulty     | No | Difficulty
 |---|---|---|---|---|---|---|---

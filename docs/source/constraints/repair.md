@@ -26,7 +26,7 @@ A simple approach is to handle constraints through a repair function. This is on
 
 +++
 
-Let us define a `Repair` operator that always satisfies the equality constraint (the inequality constraint is simply ignored and will be figured out by the algorithm)
+Let us define a `Repair` operator that always satisfies the equality constraint (the inequality constraint is simply ignored and will be figured out by the algorithm).
 
 ```{code-cell} ipython3
 from pymoo.core.repair import Repair

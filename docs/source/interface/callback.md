@@ -21,7 +21,7 @@ A `Callback` class can be used to receive a notification of the algorithm object
 This can be useful to track metrics, do additional calculations, or even modify the algorithm object during the run.
 The latter is only recommended for experienced users.
 
-The example below implements a less memory-intense version of keeping track of the convergence. A posteriori analysis can one the one hand, be done by using the `save_history=True` option. This, however, stores a deep copy of the `Algorithm` object in each iteration. This might be more information than necessary, and thus, the `Callback` allows to select only the information necessary to be analyzed when the run has terminated. Another good use case can be to visualize data in each iteration in real-time.
+The example below implements a less memory-intense version of keeping track of the convergence. A posteriori analysis can on the one hand, be done by using the `save_history=True` option. This, however, stores a deep copy of the `Algorithm` object in each iteration. This might be more information than necessary, and thus, the `Callback` allows to select only the information necessary to be analyzed when the run has terminated. Another good use case can be to visualize data in each iteration in real-time.
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
@@ -69,7 +69,7 @@ plt.show()
 
 ```
 
-**Note** that the `Callback` object from the `Result` object needs to be accessed `res.algorithm.callback` because the original object keeps unmodified to ensure reproducibility.
+**Note** that the `Callback` object from the `Result` object needs to be accessed via `res.algorithm.callback` because the original object keeps unmodified to ensure reproducibility.
 
 +++
 

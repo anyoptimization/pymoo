@@ -18,7 +18,7 @@ jupytext:
 
 +++
 
-There exist a couple of different ways for defining an optimization problem in *pymoo*. In contrast to other optimization frameworks in Python, the preferred way is to define an **object**. However, a problem can also be defined by functions as shown [here](../problems/index.ipynb). Most algorithms in *pymoo* are population-based, which implies in each generation, not a single but multiple solutions are evaluated. Thus, the problem implementation retrieves the set of solutions to provide the most flexibility to the end-user. This flexibility allows you to implement a custom parallelization and thus to use your hardware most efficiently. Three different ways of defining a problem are shown below:
+There exist a couple of different ways for defining an optimization problem in *pymoo*. In contrast to other optimization frameworks in Python, the preferred way is to define an **object**. However, a problem can also be defined by functions as shown [here](../problems/index.ipynb). Most algorithms in *pymoo* are population-based, which implies that in each generation, not a single but multiple solutions are evaluated. Thus, the problem implementation retrieves the set of solutions to provide the most flexibility to the end-user. This flexibility allows you to implement a custom parallelization and thus to use your hardware most efficiently. Three different ways of defining a problem are shown below:
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
@@ -31,7 +31,7 @@ There exist a couple of different ways for defining an optimization problem in *
     - `FunctionalProblem <../problems/index.ipynb>`_: Define a problem :code:`FunctionalProblem` by using a **function** for each objective and constraint.
 ```
 
-Next, we define an **unconstrained** optimization problem with two variables and two objectives. Because the lower and upper bounds are identical for both variables, only a float value is passed to the `Problem` constructor. Assuming the `Algorithm` has a population size N, the input variable `x` is a two-dimensional matrix with the dimensions (N,2). The input has two columns because the optimization problem has `n_var=2`. Thus, to evaluated the problem makes use of the vectorized calculations `[:, 0]` and `[:, 1]` to select the first and second variables for each row in the input matrix `x`.
+Next, we define an **unconstrained** optimization problem with two variables and two objectives. Because the lower and upper bounds are identical for both variables, only a float value is passed to the `Problem` constructor. Assuming the `Algorithm` has a population size N, the input variable `x` is a two-dimensional matrix with the dimensions (N,2). The input has two columns because the optimization problem has `n_var=2`. Thus, to evaluate the problem makes use of the vectorized calculations `[:, 0]` and `[:, 1]` to select the first and second variables for each row in the input matrix `x`.
 
 ```{code-cell} ipython3
 import numpy as np
@@ -52,7 +52,7 @@ class MyProblem(Problem):
  
 ```
 
-Below we define a **constrained** optimization problem with two variables and two objectives. Here, the problem is defined **element-wise**. The lower and upper bounds, `xl` and `xu`, are defined using a vector with a length equal to the number of variables. The input `x` is a **one-dimensional** array of length two and is called N times in each iteration for the algorithm discussed above.
+Below, we define a **constrained** optimization problem with two variables and two objectives. Here, the problem is defined **element-wise**. The lower and upper bounds, `xl` and `xu`, are defined using a vector with a length equal to the number of variables. The input `x` is a **one-dimensional** array of length two and is called N times in each iteration for the algorithm discussed above.
 
 ```{code-cell} ipython3
 import numpy as np

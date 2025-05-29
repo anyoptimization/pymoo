@@ -17,7 +17,7 @@ jupytext:
 
 +++
 
-It is fundamental for any algorithm to measure the performance. In a multi-objective scenario, we can not calculate the distance to the true global optimum but must consider a set of solutions. Moreover, sometimes the optimum is not even known, and other techniques must be used. 
+It is fundamental for any algorithm to measure its performance. In a multi-objective scenario, we can not calculate the distance to the true global optimum but must consider a set of solutions. Moreover, sometimes the optimum is not even known, and other techniques must be used. 
 
 First, let us consider a scenario where the Pareto-front is known:
 
@@ -44,7 +44,7 @@ Scatter(legend=True).add(pf, label="Pareto-front").add(A, label="Result").show()
 
 ### Generational Distance (GD)
 
-The GD performance indicator <cite data-cite="gd"></cite> measure the distance from solution to the Pareto-front. Let us assume the points found by our algorithm are the objective vector set $A=\{a_1, a_2, \ldots, a_{|A|}\}$ and the reference points set (Pareto-front) is $Z=\{z_1, z_2, \ldots, z_{|Z|}\}$. Then, 
+The GD performance indicator <cite data-cite="gd"></cite> measures the distance from solution to the Pareto-front. Let us assume the points found by our algorithm are the objective vector set $A=\{a_1, a_2, \ldots, a_{|A|}\}$ and the reference points set (Pareto-front) is $Z=\{z_1, z_2, \ldots, z_{|Z|}\}$. Then, 
 
 \begin{align}
 \begin{split}
@@ -69,7 +69,7 @@ print("GD", ind(A))
 
 ### Generational Distance Plus (GD+)
 
-Ishibushi et. al. proposed in <cite data-cite="igd_plus"></cite> GD+:
+Ishibushi et al. proposed in <cite data-cite="igd_plus"></cite> GD+:
 
 \begin{align}
 \begin{split}
@@ -77,7 +77,7 @@ Ishibushi et. al. proposed in <cite data-cite="igd_plus"></cite> GD+:
 \end{split}
 \end{align}
 
-where for minimization $d_i^{+} = max \{ a_i - z_i, 0\}$ represents the modified distance from $a_i$ to its nearest reference point in $Z$ with the corresponding value $z_i$.
+where for minimization $d_i^{+} = \max \{ a_i - z_i, 0\}$ represents the modified distance from $a_i$ to its nearest reference point in $Z$ with the corresponding value $z_i$.
 
 ```{code-cell} ipython3
 from pymoo.indicators.gd_plus import GDPlus
@@ -119,7 +119,7 @@ print("IGD", ind(A))
 
 ### Inverted Generational Distance Plus (IGD+)
 
-In <cite data-cite="igd_plus"></cite> Ishibushi et. al. proposed IGD+ which is weakly Pareto compliant wheres the original IGD is not.
+In <cite data-cite="igd_plus"></cite> Ishibushi et al. proposed IGD+ which is weakly Pareto compliant whereas the original IGD is not.
 
 \begin{align}
 \begin{split}
@@ -127,7 +127,7 @@ In <cite data-cite="igd_plus"></cite> Ishibushi et. al. proposed IGD+ which is w
 \end{split}
 \end{align}
 
-where for minimization $d_i^{+} = max \{ a_i - z_i, 0\}$ represents the modified distance from $z_i$ to the closest solution in $A$ with the corresponding value $a_i$.
+where for minimization $d_i^{+} = \max \{ a_i - z_i, 0\}$ represents the modified distance from $z_i$ to the closest solution in $A$ with the corresponding value $a_i$.
 
 ```{code-cell} ipython3
 from pymoo.indicators.igd_plus import IGDPlus
@@ -146,7 +146,7 @@ print("IGD+", ind(A))
 
 +++
 
-For all performance indicators showed so far, a target set needs to be known. For Hypervolume only a reference point needs to be provided. First, I would like to mention that we are using the Hypervolume implementation from [DEAP](https://deap.readthedocs.io/en/master/). It calculates the area/volume, which is dominated by the provided set of solutions with respect to a reference point.
+For all performance indicators shown so far, a target set needs to be known. For Hypervolume only a reference point needs to be provided. First, I would like to mention that we are using the Hypervolume implementation from [DEAP](https://deap.readthedocs.io/en/master/). It calculates the area/volume, which is dominated by the provided set of solutions with respect to a reference point.
 
 +++
 

@@ -41,7 +41,7 @@ The functional interface of *pymoo* is based on a method called `minimize`, whic
 .. admonition:: Overview
     :class: myOwnStyle
 
-    - `minimize <minimize.ipynb>`_: This is the functional interface to optimized any kind of problem. The function itself two positional parameters, problem and algorithm, and a few more optional parameters.
+    - `minimize <minimize.ipynb>`_: This is the functional interface to optimize any kind of problem. The function itself has two positional parameters, problem and algorithm, and a few more optional parameters.
     - `Problem <problem.ipynb>`_: A problem object defining what to be optimized. 
     - `Algorithm <algorithm.ipynb>`_: The algorithm which shall be used for optimization. Make sure to choose a suitable algorithm for your optimization problem to ensure efficient convergence. 
     - `Termination Criterion <termination.ipynb>`_: When the algorithm should be considered as terminated. The termination can be simply based on the algorithm's number of iterations, an upper bound of function evaluations, or more sophisticated procedures.

@@ -24,7 +24,7 @@ The ZDT <cite data-cite="zdt"></cite> problem suite is based on the construction
 \end{split}
 \end{align}
 
-where two objective have to be minimized. The function $g(x)$ can be considered as the function for convergenece  and usually $g(x) = 1$ holds for pareto-optimal solutions (except for ZDT5).
+where two objective have to be minimized. The function $g(x)$ can be considered as the function for convergence and usually $g(x) = 1$ holds for pareto-optimal solutions (except for ZDT5).
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
@@ -228,7 +228,7 @@ plot(problem.pareto_front(), no_fill=True)
 
 ### ZDT5
 
-In ZDT5 in variables are decodec by bitsrings. At all 11 discrete variables are used, where $x_1$ is represented by 30 bits and the rest $x_2$ to $x_{11}$ by 5 bits each. The function $u(x)$ does nothing else than count the number of $1$ of the corresponding variable. Also, note that the objective function is deceptive, because the values of $v(u(x_i))$ are decreasing with the number of 1's, but has its minimum when all variables are indeed 1.
+In ZDT5 the variables are decoded by bitstrings. At all 11 discrete variables are used, where $x_1$ is represented by 30 bits and the rest $x_2$ to $x_{11}$ by 5 bits each. The function $u(x)$ does nothing else than count the number of $1$ of the corresponding variable. Also, note that the objective function is deceptive, because the values of $v(u(x_i))$ are decreasing with the number of 1's, but have their minimum when all variables are indeed 1.
 
 +++
 
@@ -269,7 +269,7 @@ problem = get_problem("zdt5", normalize=False)
 plot(problem.pareto_front(), no_fill=True)
 ```
 
-Please note that by default here the Pareto-front is not normalized. However, this can be easily achived normalizing $f_1$ in the range of $(1,31)$ and $f_2$ in $(10/31, 10)$ which are the known bounds of the Pareto-set. By default the normalized problem is used.
+Please note that by default here the Pareto-front is not normalized. However, this can be easily achieved by normalizing $f_1$ in the range of $(1,31)$ and $f_2$ in $(10/31, 10)$ which are the known bounds of the Pareto-set. By default the normalized problem is used.
 
 ```{code-cell} ipython3
 from pymoo.problems import get_problem

@@ -51,7 +51,7 @@ kernelspec:
    dynamic/df.ipynb
 ```
 
-In the future, we are planning to provide a comprehensive overview of the problems. So far, we have managed to describe a view of them and plot the functions. Please note that we have used for some problems the descriptions from [here](https://www.sfu.ca/~ssurjano/).
+In the future, we are planning to provide a comprehensive overview of the problems. So far, we have managed to describe a few of them and plot the functions. Please note that we have used for some problems the descriptions from [here](https://www.sfu.ca/~ssurjano/).
 
 We want to keep the function definitions as error-free as possible and matching with the implementation. If you find any deviation, please let us know.
 
@@ -187,7 +187,7 @@ p = get_problem("dtlz1^-1", n_var=20, n_obj=5)
 
 **Global Optimization** 
 
-Implementations are taken from (SciPy)[https://github.com/scipy/scipy/tree/master/benchmarks/benchmarks/go_benchmark_functions] where a variety of global optimization benchmark problems are provided. Pymoo uses a wrapper class to make all those functions available. 
+Implementations are taken from [SciPy](https://github.com/scipy/scipy/tree/master/benchmarks/benchmarks/go_benchmark_functions) where a variety of global optimization benchmark problems are provided. Pymoo uses a wrapper class to make all those functions available. 
 
 +++
 

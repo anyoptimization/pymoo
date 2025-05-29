@@ -15,7 +15,7 @@ jupytext:
 
 ## Selection
 
-This module defines the mating selection during the execution of a genetic algorithm. At the beginning of the mating, process parents need to be selected to be mated using the crossover operation.
+This module defines the mating selection during the execution of a genetic algorithm. At the beginning of the mating process, parents need to be selected to be mated using the crossover operation.
 
 
 +++

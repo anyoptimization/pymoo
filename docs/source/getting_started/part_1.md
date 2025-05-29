@@ -46,7 +46,7 @@ As already discussed in the Preface, let an optimization problem be defined by:
 
 +++
 
-The the example problem to be solved in this getting started guide is given by:
+The example problem to be solved in this getting started guide is given by:
 
 +++
 

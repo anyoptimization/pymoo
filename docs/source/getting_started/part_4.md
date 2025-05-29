@@ -103,7 +103,7 @@ For such an analysis, intermediate steps of the algorithm need to be considered.
 - Enabling the `save_history` flag when calling the minimize method to store a deep copy of the algorithm's objective each iteration.
 
 We provide some more details about each variant in our [convergence](../misc/convergence.ipynb) tutorial.
-As you might have already seen, we have set `save_history=True` when calling the `minmize` method in this getting started guide and, thus, will you the `history` for our analysis. Moreover, we need to decide what metric should be used to measure the performance of our algorithm. In this tutorial, we are going to use `Hypervolume` and `IGD`. Feel free to look at our [performance indicators](../misc/indicators.ipynb) to find more information about metrics to measure the performance of multi-objective algorithms.
+As you might have already seen, we have set `save_history=True` when calling the `minimize` method in this getting started guide and, thus, will use the `history` for our analysis. Moreover, we need to decide what metric should be used to measure the performance of our algorithm. In this tutorial, we are going to use `Hypervolume` and `IGD`. Feel free to look at our [performance indicators](../misc/indicators.ipynb) to find more information about metrics to measure the performance of multi-objective algorithms.
 
 ```{code-cell} ipython3
 from pymoo.optimize import minimize
@@ -124,7 +124,7 @@ print(len(hist))
 From the `history` it is relatively easy to extract the information we need for an analysis. 
 
 ```{code-cell} ipython3
-n_evals = []             # corresponding number of function evaluations\
+n_evals = []             # corresponding number of function evaluations
 hist_F = []              # the objective space values in each generation
 hist_cv = []             # constraint violation in each generation
 hist_cv_avg = []         # average constraint violation in the whole population
@@ -185,12 +185,12 @@ If the Pareto-front is not known, we can not know if the algorithm has converged
 
 +++
 
-In multi-objective optimization **normalization** the very important. For that reason, you see below that the Hypervolume is based on a normalized set normalized by the bounds (idea)
+In multi-objective optimization **normalization** is very important. For that reason, you see below that the Hypervolume is based on a normalized set normalized by the bounds (idea)
 More details about it will be shown in Part IV. 
 
 +++
 
-### Hypvervolume (HV)
+### Hypervolume (HV)
 
 +++
 

@@ -17,7 +17,7 @@ jupytext:
 
 +++
 
-After an algorithm has been executed a result object is returned. In the following, single- and multi-objective runs with and without constraints are shown and the corresponding `Result` object is explained:
+After an algorithm has been executed, a result object is returned. In the following, single- and multi-objective runs with and without constraints are shown, and the corresponding `Result` object is explained:
 
 ```{code-cell} ipython3
 from pymoo.algorithms.soo.nonconvex.ga import GA
@@ -72,7 +72,7 @@ res.algorithm
 pop = res.pop
 ```
 
-The values from the final population can be extracted by using the `get` method. The population object is used internally and store information for each individual. The `get` method allows returning vectors or matrices based on the provided properties.
+The values from the final population can be extracted by using the `get` method. The population object is used internally and stores information for each individual. The `get` method allows returning vectors or matrices based on the provided properties.
 
 ```{code-cell} ipython3
 pop.get("X")
@@ -121,7 +121,7 @@ res.X, res.F, res.G, res.CV
 ```
 
 We have made this design decision, because an infeasible solution can often not be considered as a solution
-of the optimization problem. Therefore, having a solution equals to `None` indicates the fact no feasible solution has been found.
+of the optimization problem. Therefore, having a solution equals to `None` indicates the fact that no feasible solution has been found.
 
 +++
 

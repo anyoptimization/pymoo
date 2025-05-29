@@ -36,7 +36,7 @@ slideshow:
     Not supported in the current version anymore. Gradient calculation needs to be reworked.
 ```
 
-If the problem is implemented using autograd then the gradients through automatic differentiation are available out of the box. Let us consider the following problem definition for a simple quadratic function without any constraints:
+If the problem is implemented using autograd, then the gradients through automatic differentiation are available out of the box. Let us consider the following problem definition for a simple quadratic function without any constraints:
 
 ```{code-cell} ipython3
 import numpy as np

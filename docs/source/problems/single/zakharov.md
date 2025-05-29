@@ -25,8 +25,8 @@ The Zakharov function has no local minima except the global one. It is shown her
 
 \begin{align}
 \begin{split}
-f(x) &=& \sum\limits_{i=1}^n {x_i^2} + \bigg( \frac{1}{2} \sum\limits_{i=1}^n {ix_i} \bigg)^2 + \bigg( \frac{1}{2} \sum\limits_{i=1}^n {ix_i} \bigg)^4, \\[2mm]
-&& -10 \leq x_i \leq 10 \quad i=1,\ldots,n
+f(x) &= \sum\limits_{i=1}^n {x_i^2} + \bigg( \frac{1}{2} \sum\limits_{i=1}^n {ix_i} \bigg)^2 + \bigg( \frac{1}{2} \sum\limits_{i=1}^n {ix_i} \bigg)^4, \\[2mm]
+&-10 \leq x_i \leq 10 \quad i=1,\ldots,n
 \end{split}
 \end{align}
 
@@ -54,5 +54,5 @@ FitnessLandscape(problem, angle=(45, 45), _type="surface").show()
 ```
 
 ```{code-cell} ipython3
-FitnessLandscape(problem, _type="contour", contour_levels = 200, colorbar=True).show()
+FitnessLandscape(problem, _type="contour", contour_levels=200, colorbar=True).show()
 ```

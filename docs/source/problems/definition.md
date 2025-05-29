@@ -18,8 +18,8 @@ jupytext:
 +++
 
 Problems have to be defined, and some information has to be provided.
-In contrast to other frameworks, we do not share the opinion of just defining a problem by a function is the most convenient one.
-In `pymoo` the problem is defined by an **object** that contains some metadata, for instance the number of objectives, constraints, lower and upper bounds in the design space. These attributes are supposed to be defined in the constructor and thus by overriding the `__init__` method.
+In contrast to other frameworks, we do not share the opinion that just defining a problem by a function is the most convenient one.
+In `pymoo` the problem is defined by an **object** that contains some metadata, for instance the number of objectives, constraints, lower and upper bounds in the design space. These attributes are supposed to be defined in the constructor by overriding the `__init__` method.
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
@@ -36,7 +36,7 @@ In `pymoo` the problem is defined by an **object** that contains some metadata, 
    :code:`vtype`, "(optional) A type hint for the user what variable should be optimized."
 ```
 
-Moreover, in *pymoo* there exists three different ways for defining a problem:
+Moreover, in *pymoo* there exist three different ways for defining a problem:
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
@@ -132,7 +132,7 @@ Moreover, note that the problem above uses a vector definition for the lower and
 
 +++
 
-Another way of defining a problem is through functions. One the one hand, many function calls need to be performed to evaluate a set of solutions, but on the other hand, it is a very intuitive way of defining a problem.
+Another way of defining a problem is through functions. On the one hand, many function calls need to be performed to evaluate a set of solutions, but on the other hand, it is a very intuitive way of defining a problem.
 
 ```{code-cell} ipython3
 import numpy as np

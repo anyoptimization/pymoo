@@ -16,7 +16,7 @@ jupytext:
 # MOEA/D
 
 
-This algorithm is implemented based on <cite data-cite="moead"></cite>. The algorithm is based on [Reference Directions](../../misc/reference_directions.ipynb) which need to be provided when initializing the algorithm object.
+This algorithm is implemented based on <cite data-cite="moead"></cite>. The algorithm is based on [Reference Directions](../../misc/reference_directions.ipynb) which needs to be provided when initializing the algorithm object.
 
 ```{code-cell} ipython3
 from pymoo.algorithms.moo.moead import MOEAD

@@ -25,8 +25,8 @@ The Rastrigin function has several local minima. It is highly multimodal, but lo
 
 \begin{align}
 \begin{split}
-f(x) &=& 10n + \sum\limits_{i=1}^n {[x_i^2 - 10 \cos{(2 \pi x_i)}]} \\[2mm]
-&& -5.12 \leq x_i \leq 5.12 \quad i=1,\ldots,n
+f(x) &= 10n + \sum\limits_{i=1}^n {[x_i^2 - 10 \cos{(2 \pi x_i)}]} \\[2mm]
+&-5.12 \leq x_i \leq 5.12 \quad i=1,\ldots,n
 \end{split}
 \end{align}
 

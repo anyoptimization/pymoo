@@ -38,7 +38,7 @@ The algorithm follows the general NSGA-III procedure with a modified survival se
 
 +++
 
-Second, from the splitting front (final front), some solutions need to be selected. Solutions are associated with reference directions based on perpendicular distance, then solutions with smaller ASF values are preferred by selecting solutions from the underrepresented reference direction first. For this reason, when this algorithm converges, each reference line seeks to find a good representative non-dominated solution.
+Second, from the splitting front (final front), some solutions need to be selected. Solutions are associated with reference directions based on perpendicular distance, then solutions with smaller ASF values are preferred by selecting solutions from the underrepresented reference directions first. For this reason, when this algorithm converges, each reference line seeks to find a good representative non-dominated solution.
 
 +++
 

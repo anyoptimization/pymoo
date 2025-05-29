@@ -41,7 +41,7 @@ Without any loss of generality an optimization problem can be defined by:
 
 +++
 
-where $x_i$ represents the $i$-th variable to be optimized, $x_i^{L}$ and $x_i^{U}$ its lower and upper bound, $f_m$ the $m$-th objective function, $g_j$ the $j-th$ inequality constraint and $h_k$ the $k$-th equality constraint.  
+where $x_i$ represents the $i$-th variable to be optimized, $x_i^{L}$ and $x_i^{U}$ its lower and upper bound, $f_m$ the $m$-th objective function, $g_j$ the $j$-th inequality constraint and $h_k$ the $k$-th equality constraint.  
 The objective function(s) $f$ are supposed to be minimized by satisfying all equality and inequality constraints. If a specific objective function is maximized ($\max f_i$), one can redefine the problem to minimize its negative value ($\min -f_i$).
 
 Instead of starting coding your problem immediately, it is recommendable to first think about the mathematical problem formulation. Doing so makes you being aware of the complete optimization problem. This also helps you to identify the challenging facets of your optimization problem and, thus, to select a suitable algorithm. In this guide, we will demonstrate an example of a multi-objective problem, use `pymoo` to obtain a solution set, and theoretically derive the optimum for verification purposes.
@@ -53,15 +53,15 @@ Instead of starting coding your problem immediately, it is recommendable to firs
     If you are new to multi-objective optimization and are not familiar with essential concepts, a look into "Multi-Objective Optimization Using Evolutionary Algorithms " by Kalyanmoy Deb might be a good starting point.
 ```
 
-If you have some experience solving optimization problems, the following might already be apparent to you. However, if you are new to optimization, thinking about your problem's characteristics is vital. In the following a few common facts and challenges to consider when intending to solve a (real-world) optimization problem are discussed:
+If you have some experience solving optimization problems, the following might already be apparent to you. However, if you are new to optimization, thinking about your problem's characteristics is vital. In the following, a few common facts and challenges to consider when intending to solve a (real-world) optimization problem are discussed:
 
 +++
 
-**Variable Types.** The variables span the search space $\Omega$ of your optimization problem. Thus, the type of variables is an essential aspect of the problem to be paid attention to. Different variables types, such as continuous, discrete/integer, binary, or permutation, define the characteristics of the search space. In some cases, the variable types might be even mixed, which increases the complexity further. 
+**Variable Types.** The variables span the search space $\Omega$ of your optimization problem. Thus, the type of variables is an essential aspect of the problem to be paid attention to. Different variables types, such as continuous, discrete/integer, binary, or permutation, define the characteristics of the search space. In some cases, the variable types might even be mixed, which increases the complexity further. 
 
 +++
 
-**Number of Variables.** Not only the type but also the number of variables ($N$) is essential. For either a very small or large number, different algorithms are known to work more efficiently. You can imagine that solving a problem with only ten variables is fundamentally different from solving one with a couple of thousand. For large-scale optimization problems, even the second-order derivate becomes computationally very expensive, and efficiently handling the memory plays a more important role.
+**Number of Variables.** Not only the type but also the number of variables ($N$) is essential. For either a very small or large number, different algorithms are known to work more efficiently. You can imagine that solving a problem with only ten variables is fundamentally different from solving one with a couple of thousand. For large-scale optimization problems, even the second-order derivative becomes computationally very expensive, and efficiently handling the memory plays a more important role.
 
 +++
 

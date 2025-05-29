@@ -65,7 +65,7 @@ from pymoo.visualization.scatter import Scatter
 plot = Scatter()
 ```
 
-The advantages of the convenience function is that just by changing the string a different visualization 
+The advantage of the convenience function is that just by changing the string a different visualization 
 can be chosen (without changing any other import). Moreover, we desire to keep the global interface in the factory the same, whereas the implementation details, such as class names might change. 
 
 +++
@@ -85,7 +85,7 @@ plot.add(B, color="red", marker="*")
 plot.show()
 ```
 
-This holds for all our visualizations. However, depending on the visualization the matplotlib function that is used and the corresponding keyword arguments might change. For example, in for the PetalWidth Plot polygons are drawn which has different keywords than the plot of matplotlib. 
+This holds for all our visualizations. However, depending on the visualization the matplotlib function that is used and the corresponding keyword arguments might change. For example, in the PetalWidth Plot polygons are drawn which have different keywords than the plot of matplotlib. 
 
 +++
 

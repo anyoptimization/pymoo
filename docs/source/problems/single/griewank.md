@@ -25,8 +25,8 @@ The Griewank function has many widespread local minima, which are regularly dist
 
 \begin{align}
 \begin{split}
-f(x) & = & \; \sum_{n=1}^n \; \frac{x_i^2}{4000} - \prod_{n=1}^n \cos \Bigg( \frac{x_i}{\sqrt{i}} \Bigg) + 1 \\[4mm]
-&&-600 \leq x_i \leq 600 \quad i=1 \ldots,n \\[4mm]
+f(x) & = & \; \sum_{i=1}^n \; \frac{x_i^2}{4000} - \prod_{i=1}^n \cos \Bigg( \frac{x_i}{\sqrt{i}} \Bigg) + 1 \\[4mm]
+&&-600 \leq x_i \leq 600 \quad i=1, \ldots, n \\[4mm]
 \end{split}
 \end{align}
 

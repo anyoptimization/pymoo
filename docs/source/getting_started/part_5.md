@@ -34,7 +34,7 @@ This getting started guide has covered the most common steps of a multi-objectiv
     :class: myOwnStyle
 
     - `Interface <../interface/index.ipynb>`_: An overview over the most important parameters of the interface.
-    - `Problems <../problems/index.ipynb>`_: A guide how to implement your own custom problem and how to use test problems alrady being implemented.
+    - `Problems <../problems/index.ipynb>`_: A guide how to implement your own custom problem and how to use test problems already being implemented.
     - `Algorithms <../algorithms/index.ipynb>`_: Information about all algorithms and how to use them for optimization.
     - `Operators <../operators/index.ipynb>`_: An overview of evolutionary operators.
     - `Customization <../customization/index.ipynb>`_: How to design your custom evolutionary operators to develop an efficient genetic algorithm for your specific optimization problem.

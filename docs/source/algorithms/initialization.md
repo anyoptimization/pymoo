@@ -21,7 +21,7 @@ Algorithms are directly initialized using the corresponding constructor.
 
 +++
 
-Directly initializing the object keeps the code clean and if you use an idea lets you quickly jump to the definition of the algorithm and find hyperparameters to modify.
+Directly initializing the object keeps the code clean and if you use an IDE lets you quickly jump to the definition of the algorithm and find hyperparameters to modify.
 
 ```{code-cell} ipython3
 from pymoo.algorithms.moo.nsga2 import NSGA2

@@ -22,7 +22,7 @@ jupytext:
 
 +++
 
-Another well-known way of handling constraints is removing the constraint and adding it as a penalty to objective(s). One easy way of achieving that is redefining the problem, as shown below using the `ConstraintsAsPenalty` class. Nevertheless, whenever two numbers are added, normalization can become an issue. Thus, commonly a penalty coefficient (here `penalty`) needs to be defined. It can be helpful to play with this parameter if the results are not satisfying.
+Another well-known way of handling constraints is removing the constraint and adding it as a penalty to the objective(s). One easy way of achieving that is redefining the problem, as shown below using the `ConstraintsAsPenalty` class. Nevertheless, whenever two numbers are added, normalization can become an issue. Thus, commonly a penalty coefficient (here `penalty`) needs to be defined. It can be helpful to play with this parameter if the results are not satisfying.
 
 ```{code-cell} ipython3
 from pymoo.algorithms.soo.nonconvex.de import DE

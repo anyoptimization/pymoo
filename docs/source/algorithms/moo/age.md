@@ -14,7 +14,7 @@ jupytext:
 ```
 
 .. meta::
-   :description: An implementation of AGE-MOEA algorithm to solve many-objective optimization problems without using on reference directions. The algorithm estimates the shape of the Pareto front to provide a better way to compute proximity to ideal point and crowding distance.
+   :description: An implementation of AGE-MOEA algorithm to solve many-objective optimization problems without using reference directions. The algorithm estimates the shape of the Pareto front to provide a better way to compute proximity to ideal point and crowding distance.
 
 +++
 
@@ -89,7 +89,7 @@ res = minimize(problem,
 Scatter().add(res.F, facecolor="none", edgecolor="red").show()
 ```
 
-This algorithm is based on <cite data-cite="agemoea"></cite> and its Matlab implementation of the PlatEMO library. This Python version has been implemented by [BenCrulis](https://github.com/BenCrulis)  
+This algorithm is based on <cite data-cite="agemoea"></cite> and its Matlab implementation in the PlatEMO library. This Python version has been implemented by [BenCrulis](https://github.com/BenCrulis)  
 
 +++
 

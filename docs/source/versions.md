@@ -51,8 +51,8 @@ kernelspec:
 
 #### 0.6.1 [[Documentation](http://archive.pymoo.org/0.6.1/)]
 
-- Minor changes and bigfixes that have been reported
-- Added KGB  for dynamic optimization
+- Minor changes and bugfixes that have been reported
+- Added KGB for dynamic optimization
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext

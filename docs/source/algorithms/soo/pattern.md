@@ -17,7 +17,7 @@ jupytext:
 
 +++
 
-An implementation of well-known Hooke and Jeeves Pattern Search <cite data-cite="pattern_search"></cite> for single-objective optimization which makes use of *exploration* and *pattern* moves in an alternating manner. 
+An implementation of the well-known Hooke and Jeeves Pattern Search <cite data-cite="pattern_search"></cite> for single-objective optimization which makes use of *exploration* and *pattern* moves in an alternating manner. 
 For now, we like to refer to [Wikipedia](https://en.wikipedia.org/wiki/Pattern_search_(optimization)) for more information such as pseudo code and visualizations in the search space.
 
 ```{code-cell} ipython3

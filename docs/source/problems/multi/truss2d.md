@@ -15,7 +15,7 @@ jupytext:
 
 # Truss2D
 
-The problem was proposed in <cite data-cite="truss2d"></cite> for the purpose of investigating rules on Pareto-front.
+The problem was proposed in <cite data-cite="truss2d"></cite> for the purpose of investigating rules on the Pareto-front.
 
 ```{code-cell} ipython3
 from pymoo.problems import get_problem

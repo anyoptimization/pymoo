@@ -17,7 +17,7 @@ jupytext:
 
 +++
 
-Also, it might be interesting to compare one solution with another. Here, a visual a single solution regarding its trade-offs.
+Also, it might be interesting to compare one solution with another. Here, a visual of a single solution regarding its trade-offs.
 
 Let us visualize some test data:
 
@@ -53,7 +53,7 @@ plot.show()
 ```
 
 Each add will plot solutions in a row. Each entry represents a column.
-Easily, different solutions can be compared.
+Different solutions can be easily compared.
 
 ```{code-cell} ipython3
 F = np.random.random((6, 6))

@@ -27,7 +27,7 @@ jupytext:
 
 +++
 
-Particle Swarm Optimization was proposed in 1995 by Kennedy and Eberhart <cite data-cite="pso"></cite> based on the simulating of social behavior. The algorithm uses a *swarm* of particles to guide its search. Each particle has a velocity and is influenced by locally and globally best-found solutions. Many different implementations have been proposed in the past and, therefore, it is quite difficult to refer to THE correct implementation of PSO. However, the general concepts shall be explained in the following.
+Particle Swarm Optimization was proposed in 1995 by Kennedy and Eberhart <cite data-cite="pso"></cite> based on the simulation of social behavior. The algorithm uses a *swarm* of particles to guide its search. Each particle has a velocity and is influenced by locally and globally best-found solutions. Many different implementations have been proposed in the past and, therefore, it is quite difficult to refer to THE correct implementation of PSO. However, the general concepts shall be explained in the following.
 
 Given the following variables:
 
@@ -37,7 +37,7 @@ Given the following variables:
 - $P_{d}^{(i)}$ d-th coordinate of i-th particle's *personal* best 
 - $G_{d}^{(i)}$ d-th coordinate of the globally (sometimes also only locally) best solution found
 - $c_1$ and $c_2$ Two weight values to balance exploiting the particle's best $P_{d}^{(i)}$ and swarm's best $G_{d}^{(i)}$ 
-- $r_1$ and $r_2$ Two random values being create for the velocity update
+- $r_1$ and $r_2$ Two random values being created for the velocity update
 
 The velocity update is given by:
 

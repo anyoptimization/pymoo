@@ -17,7 +17,7 @@ jupytext:
 
 +++
 
-The algorithm is implemented based on <cite data-cite="sms"></cite>. The hypervolume measure (or s-metric) is a frequently applied quality measure for comparing the results of evolutionary multiobjective optimization algorithms (EMOA). 
+The algorithm is implemented based on <cite data-cite="sms"></cite>. The hypervolume measure (or s-metric) is a frequently applied quality measure for comparing the results of evolutionary multiobjective optimization algorithms (EMOAs). 
 
 +++
 

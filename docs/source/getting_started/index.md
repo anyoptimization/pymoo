@@ -40,7 +40,7 @@ jupytext:
    
 ```
 
-Learning a new framework, in general, can be rather challenging. Thus, this getting started guide aims to make the first steps with pymoo as simple as possible by demonstrating its capabilities on an example. This guide covers the essential steps when starting with multi-objective optimization and shall be helpful to solve your own optimization problems. Some basic understanding of optimization and knowledge of Python and NumPy are expected to follow.
+Learning a new framework, in general, can be rather challenging. Thus, this getting started guide aims to make the first steps with pymoo as simple as possible by demonstrating its capabilities on an example. This guide covers the essential steps when starting with multi-objective optimization and should be helpful to solve your own optimization problems. Some basic understanding of optimization and knowledge of Python and NumPy are expected to follow.
 
 
 This guide is structured as follows:

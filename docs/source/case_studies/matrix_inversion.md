@@ -26,9 +26,9 @@ slideshow:
 
 ## Matrix Inversion
 
-In this case study, the optimization of a matrix shall be illustrated. Of course, we all know that there are very efficient algorithms for calculating an inverse of a matrix. However, for the sake of illustration, a small example shall show that pymoo can also be used to optimize matrices or even tensors.
+In this case study, the optimization of a matrix will be illustrated. Of course, we all know that there are very efficient algorithms for calculating an inverse of a matrix. However, for the sake of illustration, a small example will show that pymoo can also be used to optimize matrices or even tensors.
 
-Assuming matrix `A` has a size of `n x n`, the problem can be defined by optimizing a vector consisting of `n**2` variables. During evaluation the vector `x`, is reshaped to inversion of the matrix to be found (and also stored as the attribute `A_inv` to be retrieved later).
+Assuming matrix `A` has a size of `n x n`, the problem can be defined by optimizing a vector consisting of `n**2` variables. During evaluation the vector `x` is reshaped to inversion of the matrix to be found (and also stored as the attribute `A_inv` to be retrieved later).
 
 ```{code-cell} ipython3
 from pymoo.core.problem import ElementwiseProblem
@@ -102,4 +102,4 @@ opt.get("A_inv")
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-This small example shall have illustrated how a matrix can be optimized. In fact, this is implemented by optimizing a vector of variables that are reshaped during evaluation.
+This small example illustrates how a matrix can be optimized. In fact, this is implemented by optimizing a vector of variables that are reshaped during evaluation.

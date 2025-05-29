@@ -81,9 +81,9 @@ print('Threads:', res.exec_time)
 
 In general, **pymoo** allows passing a `starmap` object to be used for parallelization. 
 The `starmap` interface is defined in the Python standard library `multiprocessing.Pool.starmap` [function](https://docs.python.org/3/library/multiprocessing.html?highlight=multiprocessing#multiprocessing.pool.Pool.starmap).
-This allows excellent and flexible parallelization opportunities. 
+This allows for excellent and flexible parallelization opportunities. 
 
-**IMPORTANT:** Please note that the problem needs to have set `elementwise_evaluation=True`, which implicates one call of `_evaluate` only takes care of a single solution.
+**IMPORTANT:** Please note that the problem needs to have set `elementwise_evaluation=True`, which indicates one call of `_evaluate` only takes care of a single solution.
 
 
 ```{code-cell}
@@ -175,7 +175,7 @@ pool.close()
 
 +++ {"pycharm": {"name": "#%% md\n"}}
 
-**Note:** Here clearly the overhead of serializing and transfer the data are visible.
+**Note:** Here clearly the overhead of serializing and transferring the data are visible.
 
 +++ {"pycharm": {"name": "#%% md\n"}}
 

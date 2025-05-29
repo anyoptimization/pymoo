@@ -78,7 +78,7 @@ plot_contour(X, dm(X, weights=weights))
 .. _nb_tchebyshev:
 ```
 
-### Tchebysheff
+### Tchebycheff
 
 ```{code-cell} ipython3
 from pymoo.decomposition.tchebicheff import Tchebicheff

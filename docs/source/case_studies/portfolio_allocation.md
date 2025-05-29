@@ -18,11 +18,11 @@ jupytext:
 
 +++
 
-In this quick tutorial, the portfolio allocation problem shall be investigated. Of course, this is not financial advice in any way but should illustrate how multi-objective optimization can be applied to a quite interesting problem.
+In this quick tutorial, the portfolio allocation problem will be investigated. Of course, this is not financial advice in any way but should illustrate how multi-objective optimization can be applied to a quite interesting problem.
 
 +++
 
-Let us start by loading some data for illustration purposes. Feel free to use your own.
+Let's start by loading some data for illustration purposes. Feel free to use your own.
 
 ```{code-cell} ipython3
 import pandas as pd
@@ -95,7 +95,7 @@ class PortfolioProblem(ElementwiseProblem):
 
 Now, we should consider one more fact. The variable `x` defines what percentage we will invest in what product. Thus, it can not be more than 100\% in total. Moreover, an investment of a very small fraction does not really make sense. Thus we also incorporate each weight to be at least `1e-3` of the overall investment.
 
-To ensure both, we can use a `Repair` operator (also see [here](../constraints/repair.ipynb)) which will directly be used by the optimization method.
+To ensure both, we can use a `Repair` operator (also see [here](../constraints/repair.ipynb)) which will be directly used by the optimization method.
 
 ```{code-cell} ipython3
 from pymoo.core.repair import Repair
@@ -108,7 +108,7 @@ class PortfolioRepair(Repair):
     
 ```
 
-Now let us see what solutions are found to be optimal:
+Now let's see what solutions are found to be optimal:
 
 ```{code-cell} ipython3
 from pymoo.algorithms.moo.sms import SMSEMOA
@@ -140,7 +140,7 @@ plt.ylabel("expected return")
 plt.show()
 ```
 
-A common way for the decision making is looking at the sharpe ratio shown below:
+A common way for decision making is looking at the sharpe ratio shown below:
 
 ```{code-cell} ipython3
 import operator

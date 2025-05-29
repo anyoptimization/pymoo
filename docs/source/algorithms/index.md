@@ -56,7 +56,7 @@ kernelspec:
    moo/kgb
 ```
 
-Algorithms are probably the reason why you got to know *pymoo*. You can find a variety of unconstrained and constrained single-, multi-, and many-objective optimization algorithms. Besides the availability of an algorithm, also its usage is of importance. The following tutorial pages show the different ways of initialization and running algorithms (functional, next, ask-and-tell) and all algorithms available in pymoo.
+Algorithms are probably the reason why you got to know *pymoo*. You can find a variety of unconstrained and constrained single-, multi-, and many-objective optimization algorithms. Besides the availability of an algorithm, its usage is also of importance. The following tutorial pages show the different ways of initialization and running algorithms (functional, next, ask-and-tell) and all algorithms available in pymoo.
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext

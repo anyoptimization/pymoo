@@ -41,7 +41,7 @@ The ``ConstrRankAndCrowding`` class has the constraint handling approach propose
 
 +++
 
-In the following examples the code for plotting was ommited although it is available at the [end of the page](#plots).
+In the following examples the code for plotting was omitted although it is available at the [end of the page](#plots).
 
 ```{code-cell} ipython3
 from pymoo.algorithms.moo.nsga2 import NSGA2

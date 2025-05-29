@@ -95,7 +95,7 @@ show(30)
 
 ### Bitflip Mutation (BM)
 
-The bitlip mutation randomly flips a bit.
+The bitflip mutation randomly flips a bit.
 
 ```{code-cell} ipython3
 import matplotlib.pyplot as plt

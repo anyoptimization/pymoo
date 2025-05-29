@@ -28,7 +28,7 @@ jupytext:
 +++
 
 The classical single-objective
-differential evolution algorithm <cite data-cite="de"></cite> where different crossover variations
+differential evolution algorithm <cite data-cite="de"></cite> is where different crossover variations
 and methods can be defined. It is known for its good results for
 global optimization.
 
@@ -38,7 +38,7 @@ $$
 v = x_{\pi_1} + F \cdot (x_{\pi_2} - x_{\pi_3})
 $$
 
-where $\pi$ is a random permutation with with 3 entries. The difference is taken between individual 2 and 3 and added to the first one. This is shown below:
+where $\pi$ is a random permutation with 3 entries. The difference is taken between individual 2 and 3 and added to the first one. This is shown below:
 
 
 <div style="text-align: center;">

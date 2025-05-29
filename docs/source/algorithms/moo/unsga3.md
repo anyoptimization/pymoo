@@ -18,7 +18,7 @@ jupytext:
 
 The algorithm is implemented based on <cite data-cite="unsga3"></cite>. NSGA-III selects parents randomly for mating. It has been shown that tournament selection performs better than random selection. The *U* stands for *unified* and increases NSGA-III's performance by introducing tournament pressure. 
 
-The mating selections works as follows:
+The mating selection works as follows:
 
 +++
 

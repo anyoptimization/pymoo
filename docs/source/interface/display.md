@@ -75,5 +75,5 @@ res = minimize(problem,
                verbose=True)
 ```
 
-You have to inherit your custom display `MyDisplay` from the `Display` class for your own printout logic.
+You have to inherit your custom display `MyOutput` from the `Output` class for your own printout logic.
 The `_do` function will be called in each iteration, and the `Problem`, `Evaluator` and `Algorithm` are provided to you. For each column, you can add an entry to `self.output`, which will be formatted and then printed.

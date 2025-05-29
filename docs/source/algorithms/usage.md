@@ -36,7 +36,7 @@ jupytext:
 
 +++
 
-As you might be used to executing algorithms from other frameworks, pymoo offers a functional interface. It requires to pass the problem to be solved, the algorithm to be used, and optionally (but for most algorithms recommend) a termination condition. Other important arguments are discussed in the [Interface](../interface/index.ipynb) tutorial. For executing custom code in between iterations the [Callback](../interface/callback.ipynb) object can be useful. Moreover, it is worth noting that the algorithm object is cloned before being modified. Thus, two calls with the same algorithm object and random seed lead to the same result.
+As you might be used to executing algorithms from other frameworks, pymoo offers a functional interface. It requires to pass the problem to be solved, the algorithm to be used, and optionally (but for most algorithms recommended) a termination condition. Other important arguments are discussed in the [Interface](../interface/index.ipynb) tutorial. For executing custom code in between iterations the [Callback](../interface/callback.ipynb) object can be useful. Moreover, it is worth noting that the algorithm object is cloned before being modified. Thus, two calls with the same algorithm object and random seed lead to the same result.
 
 ```{code-cell} ipython3
 from pymoo.algorithms.moo.nsga2 import NSGA2
@@ -67,7 +67,7 @@ print("hash", res.F.sum())
 
 +++
 
-Instead of passing the algorithm to the `minimize` function, it can be used directly for optimization. The first way using the `next` function is available for all algorithms in pymoo. The second way provides a convenient **Ask and Tell** interface, available for most evolutionary algorithms. The reason to use one or the other interface is to have more control during an algorithm execution or even modify the algorithm object while injecting new solutions.
+Instead of passing the algorithm to the `minimize` function, it can be used directly for optimization. The first way using the `next` function is available for all algorithms in pymoo. The second way provides a convenient **Ask and Tell** interface, available for most evolutionary algorithms. The reason to use one or the other interface is to have more control during an algorithm's execution or even modify the algorithm object while injecting new solutions.
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
@@ -198,7 +198,7 @@ for n_gen in range(10):
     # get the design space values of the algorithm
     X = pop.get("X")
 
-    # implement your evluation. here ZDT1
+    # implement your evaluation. here ZDT1
     f1 = X[:, 0]
     v = 1 + 9.0 / (problem.n_var - 1) * np.sum(X[:, 1:], axis=1)
     f2 = v * (1 - np.power((f1 / v), 0.5))

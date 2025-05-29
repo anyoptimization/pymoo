@@ -46,7 +46,7 @@ jupytext:
 
 +++
 
-In this tutorial, we are going to have a look at the following constrained single-objective optimization problem:
+In this tutorial, we are going to look at the following constrained single-objective optimization problem:
 
 +++
 
@@ -72,7 +72,7 @@ class ConstrainedProblem(ElementwiseProblem):
         out["G"] = 1.0 - (x[0] + x[1])
 ```
 
-For the problem defined above, the inequality constraint ensures that $1.0 - (x_1 + x_2) \leq 0.0$ or in other words $x_1 + x_2 \geq 1.0$. The objective functions wants to minimize the sum of both variables squared and thus the contour plot looks as follows:
+For the problem defined above, the inequality constraint ensures that $1.0 - (x_1 + x_2) \leq 0.0$ or in other words $x_1 + x_2 \geq 1.0$. The objective function wants to minimize the sum of both variables squared and thus the contour plot looks as follows:
 
 ```{code-cell} ipython3
 import numpy as np
@@ -115,7 +115,7 @@ Now let us introduce another constraint, this time an equality constraint.
 :raw_mimetype: text/restructuredtext
 
 .. note::
-   Next, most algorithms in *pymoo* will not handle equality constraints efficiently. One reason is the strictness of equality constraints with makes it especially challenging to handle them when solving black-box optimization problems. 
+   Next, most algorithms in *pymoo* will not handle equality constraints efficiently. One reason is the strictness of equality constraints which makes it especially challenging to handle them when solving black-box optimization problems. 
 ```
 
 \begin{align} 
@@ -160,7 +160,7 @@ X = np.linspace(0, 1, 500)
 plt.plot(X, 1-X, linewidth=2.0, color="green", linestyle='dotted', label="g(x)")
 plt.plot(X, 3*X, linewidth=2.0, color="blue", linestyle='dotted', label="h(x)")
 
-plt.scatter([0.25], [0.75], marker="*", color="red", s=200, label="Optimum (0.5, 0.5)")
+plt.scatter([0.25], [0.75], marker="*", color="red", s=200, label="Optimum (0.25, 0.75)")
 
 plt.xlim(0, 2)
 plt.ylim(0, 2)

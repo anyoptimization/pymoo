@@ -53,7 +53,7 @@ test problem:
 The Pareto-optimal region is a concatenation of
 five regions. Every region lies on some of the constraints. However, for the
 entire Pareto-optimal region, $x_4^{\ast} = x_6^{\ast} = 0$. 
-In table below shows the other variable values in each of the five
+The table below shows the other variable values in each of the five
 regions and the constraints that are active in each region.
 
 

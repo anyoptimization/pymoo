@@ -33,7 +33,7 @@ kernelspec:
 
 The algorithm is implemented based on <cite data-cite="nsga2"></cite>.
 The algorithm follows the general outline of a genetic algorithm with a modified mating and survival selection. In NSGA-II, first, individuals
-are selected frontwise. By doing so, there will be the situation where a front needs to be split because not all individuals are allowed to survive. In this splitting front, solutions are selected based on crowding distance. 
+are selected frontwise. By doing so, there will be a situation where a front needs to be split because not all individuals are allowed to survive. In this splitting front, solutions are selected based on crowding distance. 
 
 +++
 
@@ -44,7 +44,7 @@ are selected frontwise. By doing so, there will be the situation where a front n
 +++
 
 
-The crowding distance is the Manhatten Distance in the objective space. However, the extreme points are desired to be kept every generation and, therefore, get assigned a crowding distance of infinity.
+The crowding distance is the Manhattan Distance in the objective space. However, the extreme points are desired to be kept every generation and, therefore, get assigned a crowding distance of infinity.
 
 +++
 

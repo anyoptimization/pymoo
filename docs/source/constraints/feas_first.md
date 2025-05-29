@@ -22,7 +22,7 @@ jupytext:
 
 +++
 
-Most algorithms follow the so-called feasibility first (also known as a parameter-less approach). There, the constraint violation measure is chosen from a practical standpoint. In order to evaluate a solution, any designer will first check if the solution is feasible. Suppose the solution is infeasible (that is, at least one constraint is violated). In that case, the designer will never bother to compute its objective function value (such as the cost of the design). It does not make sense to compute the objective function value of an infeasible solution because the solution simply cannot be implemented in practice. Motivated by this argument, we devise the following penalty term where infeasible solutions are compared based on only their constraint violation values:
+Most algorithms follow the so-called feasibility first approach (also known as a parameter-less approach). There, the constraint violation measure is chosen from a practical standpoint. In order to evaluate a solution, any designer will first check if the solution is feasible. Suppose the solution is infeasible (that is, at least one constraint is violated). In that case, the designer will never bother to compute its objective function value (such as the cost of the design). It does not make sense to compute the objective function value of an infeasible solution because the solution simply cannot be implemented in practice. Motivated by this argument, we devise the following penalty term where infeasible solutions are compared based on only their constraint violation values:
 
 <div style="text-align: center;">
     <img src="https://github.com/anyoptimization/pymoo-data/blob/main/docs/images/parameter_less.png?raw=true" width="350">

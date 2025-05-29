@@ -18,7 +18,7 @@ jupytext:
 
 +++
 
-An excellent and very informative presentation about BRKGAs can be found [here](http://mauricio.resende.info/talks/2012-09-CLAIO2012-brkga-tutorial-both-days.pdf). BRKGAs are known to perform well-known on combinatorial problems.
+An excellent and very informative presentation about BRKGAs can be found [here](http://mauricio.resende.info/talks/2012-09-CLAIO2012-brkga-tutorial-both-days.pdf). BRKGAs are known to perform well on combinatorial problems.
 
 +++
 

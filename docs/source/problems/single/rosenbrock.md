@@ -15,7 +15,7 @@ jupytext:
 
 ## Rosenbrock
 
-The definition ca be found in <cite data-cite="rosenbrock"></cite>. It is a non-convex function, introduced by Howard H. Rosenbrock in 1960 and also known as Rosenbrock's valley or Rosenbrock's banana function. 
+The definition can be found in <cite data-cite="rosenbrock"></cite>. It is a non-convex function, introduced by Howard H. Rosenbrock in 1960 and also known as Rosenbrock's valley or Rosenbrock's banana function. 
 
 +++
 
@@ -25,8 +25,8 @@ The definition ca be found in <cite data-cite="rosenbrock"></cite>. It is a non-
 
 \begin{align}
 \begin{split}
-f(x) &=& \sum_{i=1}^{n-1} \bigg[100 (x_{i+1}-x_i^2)^2+(x_i - 1)^2 \bigg] \\
-&&-2.048 \leq x_i \leq 2.048 \quad i=1,\ldots,n
+f(x) &= \sum_{i=1}^{n-1} \bigg[100 (x_{i+1}-x_i^2)^2+(x_i - 1)^2 \bigg] \\
+&-2.048 \leq x_i \leq 2.048 \quad i=1,\ldots,n
 \end{split}
 \end{align}
 

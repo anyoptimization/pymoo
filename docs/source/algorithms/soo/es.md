@@ -14,7 +14,7 @@ jupytext:
 ```
 
 .. meta::
-   :description: Evolutionary Strategy is a well-known algorithm in evolutionary computation consisting of selection and mutation. The standard version has been proposed for real-valued optimization where a gaussian mutation is applied, and the selection is based on each individual's fitness value.
+   :description: Evolutionary Strategy is a well-known algorithm in evolutionary computation consisting of selection and mutation. The standard version has been proposed for real-valued optimization where a Gaussian mutation is applied, and the selection is based on each individual's fitness value.
 
 +++
 
@@ -29,7 +29,7 @@ jupytext:
 
 Evolutionary Strategy is a well-known algorithm in evolutionary computation consisting of selection and mutation. The standard version has been proposed for **real-valued** optimization where a gaussian mutation is applied, and the selection is based on each individual's fitness value.
 
-In this implementation the 1/7 rule creates seven times more offspring than individuals in the current population. The $sigma$ values for the mutation are based on a meta-evolution of surviving individuals.
+In this implementation, the 1/7 rule creates seven times more offspring than individuals in the current population. The $sigma$ values for the mutation are based on a meta-evolution of surviving individuals.
 
 ```{code-cell} ipython3
 from pymoo.algorithms.soo.nonconvex.es import ES

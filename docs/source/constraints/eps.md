@@ -33,7 +33,7 @@ Instead of directly redefining the problem, one can also redefine an algorithm t
     This constraint handling method has been added recently and is still experimental. Please let us know if it has or has not worked for your problem.
 ```
 
-Such a method can be especially useful for equality constraints which are difficult to satisfy. See the example below:
+Such a method can be especially useful for equality constraints which are difficult to satisfy. See the example below.
 
 ```{code-cell} ipython3
 from pymoo.algorithms.soo.nonconvex.de import DE

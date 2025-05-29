@@ -22,7 +22,7 @@ raw_mimetype: text/restructuredtext
 
 # MODAct
 
-MODAct (multi-objective design of actuators) is a real-world benchmark test-suite <cite data-cite="modact"></cite> for constrained multi-objective optimization. The optimization problems aim at finding small electro-actuators given some objectives and constraints. Currently, there are 20 problems with up to 5 objectives and 10 inequaltiy constraints, summarized in the table below.
+MODAct (multi-objective design of actuators) is a real-world benchmark test-suite <cite data-cite="modact"></cite> for constrained multi-objective optimization. The optimization problems aim at finding small electro-actuators given some objectives and constraints. Currently, there are 20 problems with up to 5 objectives and 10 inequality constraints, summarized in the table below.
 
 In order to solve these problems, you will need to have the [modact](https://github.com/epfl-lamd/modact) package and its dependencies installed (Docker image available). A single solution evaluation takes about 20 ms. Therefore, the use of parallel schemes is advised. 
 

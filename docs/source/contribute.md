@@ -17,7 +17,7 @@ kernelspec:
 
 +++
 
-Our framework is from the community to the community of multi-objective optimization. We would be more than glad if some collaborations and contributions would be happening shortly. 
+Our framework is from the community to the community of multi-objective optimization. We would be more than glad if some collaborations and contributions were to happen soon. 
 
 Some topics that are, in our opinion, interesting to incorporate in the future:
 

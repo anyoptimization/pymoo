@@ -18,7 +18,7 @@ jupytext:
 +++
 
 Whenever an algorithm is executed, it needs to be decided in each iteration whether the optimization run shall be continued or not.
-Many different ways exist of how to determine when a run of an algorithm should be terminated. Next, termination criteria specifically developed for single or multi-objective optimization as well as more generalized, for instance, limiting the number of iterations of an algorithm, are described 
+Many different ways exist of how to determine when a run of an algorithm should be terminated. Next, termination criteria specifically developed for single or multi-objective optimization as well as more generalized, for instance, limiting the number of iterations of an algorithm, are described. 
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
@@ -33,7 +33,7 @@ Many different ways exist of how to determine when a run of an algorithm should 
 
 +++
 
-We have added recently developed a termination criterion set if no termination is supplied to the `minimize()` method:
+We have recently developed a termination criterion set if no termination is supplied to the `minimize()` method:
 
 ```{code-cell} ipython3
 from pymoo.algorithms.moo.nsga2 import NSGA2
@@ -50,11 +50,11 @@ res = minimize(problem,
 print(res.algorithm.n_gen)
 ```
 
-This allows you to terminated based on a couple of criteria also explained later on this page. 
+This allows you to terminate based on a couple of criteria also explained later on this page. 
 Commonly used are the movement in the design space `f_tol` and the convergence in the constraint `cv_tol` and objective space `f_tol`.
 To provide an upper bound for the algorithm, we recommend supplying a maximum number of generations `n_max_gen` or function evaluations `n_max_evals`.
 
-Moreover, it is worth mentioning that tolerance termination is based on a sliding window. Not only the last, but a sequence of the `period` generations are used to calculate compare the tolerances with an bound defined by the user.
+Moreover, it is worth mentioning that tolerance termination is based on a sliding window. Not only the last, but a sequence of the `period` generations are used to calculate and compare the tolerances with a bound defined by the user.
 
 +++
 
@@ -73,7 +73,7 @@ termination = DefaultMultiObjectiveTermination(
 )
 ```
 
-And for single-optimization to
+And for single-objective optimization to
 
 ```{code-cell} ipython3
 from pymoo.termination.default import DefaultSingleObjectiveTermination

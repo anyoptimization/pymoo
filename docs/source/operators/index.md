@@ -31,7 +31,7 @@ jupytext:
 
 
 
-Operators are the key to customize genetic algorithms. In the following the different type of operators are listed. For details about each operator we refer to our corresponding documentation.
+Operators are the key to customize genetic algorithms. In the following, the different types of operators are listed. For details about each operator, we refer to our corresponding documentation.
 
 +++
 

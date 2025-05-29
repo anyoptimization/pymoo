@@ -31,7 +31,7 @@ kernelspec:
 
 +++
 
-If you have not really worked with Python before, we recommend using [miniconda](https://docs.conda.io/en/latest/miniconda.html) or [anaconda](https://www.anaconda.com). Please follow the installation guides to set up a Python environment. For convenience we also provide a quick guide [below](#Conda).
+If you have not really worked with Python before, we recommend using [miniconda](https://docs.conda.io/en/latest/miniconda.html) or [anaconda](https://www.anaconda.com). Please follow the installation guides to set up a Python environment. For convenience, we also provide a quick guide [below](#Conda).
 
 +++
 
@@ -39,7 +39,7 @@ If you have not really worked with Python before, we recommend using [miniconda]
 
 +++
 
-To install the most recent stable release of *pymoo* please use **PiPy**
+To install the most recent stable release of *pymoo* please use **PyPI**
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
@@ -49,7 +49,7 @@ To install the most recent stable release of *pymoo* please use **PiPy**
     pip install -U pymoo
 ```
 
-For MacOSX and Windows **compiled** packages are available.  For Linux the package will be compiled during installation (make sure that **NumPy** is installed before executing the **pip** command). If you encounter any difficulties during compilation or you prefer to compile the package by yourself please the our guide [below](#Compilation).
+For MacOSX and Windows **compiled** packages are available.  For Linux the package will be compiled during installation (make sure that **NumPy** is installed before executing the **pip** command). If you encounter any difficulties during compilation or you prefer to compile the package by yourself please see our guide [below](#Compilation).
 
 +++
 
@@ -101,7 +101,7 @@ If you intend to use not the latest development, select the branch you intend to
 +++
 
 The *pymoo* framework can be run with and without compiled modules. Some computationally more
-expensive function has been implemented using [Cython](https://github.com/cython/cython) for speedup. 
+expensive functions have been implemented using [Cython](https://github.com/cython/cython) for speedup. 
 
 The compilation requires *NumPy* to be installed because its header files are needed. 
 You can use the make command below directly:

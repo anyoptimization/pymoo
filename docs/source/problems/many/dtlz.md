@@ -25,7 +25,7 @@ jupytext:
 ### DTLZ1
 
 The only difficulty provided by this problem is the convergence to the 
-Pareto-optimal hyper-plane.The search space contains $(11^k-1)$ local Pareto-optimal fronts,
+Pareto-optimal hyper-plane. The search space contains $(11^k-1)$ local Pareto-optimal fronts,
 where an MOEA can get attracted before reaching the global Pareto-optimal
 front.
 
@@ -50,7 +50,7 @@ front.
 +++
 
 The last $k=(n-M+1)$ variables are represented as $\boldx_M$.
-The functional $g(\boldx_M)$ requires $|\boldx_M|=k$ variables and must take any function
+The function $g(\boldx_M)$ requires $|\boldx_M|=k$ variables and must take any function
 with $g\geq 0$. 
 
 We suggest the following:

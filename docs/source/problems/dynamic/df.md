@@ -279,7 +279,7 @@ import matplotlib.pyplot as plt
 for t in [0.0, 0.2, 0.5, 1.0]:
     
     plot = Scatter()
-    problem = DF13(time=t)
+    problem = DF14(time=t)
     plot.add(problem.pareto_front() + 2*t, color="black", alpha=0.7)
     plot.do()
     plt.show()

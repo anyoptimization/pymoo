@@ -17,7 +17,7 @@ jupytext:
 
 +++
 
-Radviz maps a higher dimensional space with a non-linear function to two dimensions.
+Radviz maps a higher-dimensional space with a non-linear function to two dimensions.
 Let us visualize some test data:
 
 ```{code-cell} ipython3

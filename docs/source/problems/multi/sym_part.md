@@ -42,7 +42,7 @@ Scatter(title="Pareto front").add(pf).show()
 
 ## 2. SYM-PART Rotated
 ### Pareto subsets
-The pareto subsets can be rotated.
+The Pareto subsets can be rotated.
 
 ```{code-cell} ipython3
 from numpy import pi

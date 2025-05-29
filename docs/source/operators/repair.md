@@ -15,7 +15,7 @@ jupytext:
 
 # Repair
 
-The repair operator is mostly problem-dependent. Most commonly, it is used to make sure the algorithm is only searching in the feasible space. It is applied after the offsprings have been reproduced. In the following, we are using the knapsack problem to demonstrate the repair operator in *pymoo*.
+The repair operator is mostly problem-dependent. Most commonly, it is used to make sure the algorithm is only searching in the feasible space. It is applied after the offspring have been reproduced. In the following, we are using the knapsack problem to demonstrate the repair operator in *pymoo*.
 
 +++
 
@@ -29,7 +29,7 @@ g(z) & = & \sum_{j=1}^{m}  z_j \, b_j \\[2mm] \notag
 \end{eqnarray}
 
 
-A simple GA will have some infeasible evaluations in the beginning and then concentrate on the infeasible space.
+A simple GA will have some infeasible evaluations in the beginning and then concentrate on the feasible space.
 
 ```{code-cell} ipython3
 from pymoo.operators.crossover.hux import HUX
@@ -56,7 +56,7 @@ res = minimize(problem,
 ```
 
 
-Because the constraint $\sum_{j=1}^m z_j \, w_j \leq Q$ is fairly easy to satisfy. Therefore, we can make sure that this constraint is not violated by repairing the individual before evaluating the objective function.
+Because the constraint $\sum_{j=1}^m z_j \, w_j \leq Q$ is fairly easy to satisfy, we can make sure that this constraint is not violated by repairing the individual before evaluating the objective function.
 A repair class has to be defined, and the population is given as input. The repaired population has to be returned.
 
 ```{code-cell} ipython3
@@ -80,7 +80,7 @@ class ConsiderMaximumWeightRepair(Repair):
             # the packing plan for i
             z = Z[i]
             
-            # while the maximum capacity violation holds
+            # while the maximum capacity violation exists
             while weights[i] > Q:
                 
                 # randomly select an item currently picked

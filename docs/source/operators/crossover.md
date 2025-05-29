@@ -23,7 +23,7 @@ jupytext:
 
 ### Simulated Binary Crossover (SBX)
 
-Details about the crossover can be found in <cite data-cite="sbx"></cite>. Real values can be represented by a binary notation and then a the point crossovers can be performed. SBX simulated this operation by using a probability distribution *simulating* the binary crossover.
+Details about the crossover can be found in <cite data-cite="sbx"></cite>. Real values can be represented by a binary notation and then the point crossovers can be performed. SBX simulates this operation by using a probability distribution *simulating* the binary crossover.
 
 A crossover object can be created by 
 
@@ -37,7 +37,7 @@ As arguments, the probability of a crossover and the *eta* parameter can be prov
 
 In the example below, we demonstrate a crossover in an optimization problem with only one variable. A crossover is performed between two points, *0.2* and *0.8*, and the resulting exponential distribution is visualized. Depending on the *eta*, the exponential distribution can be fine-tuned.
 
-The probability of SBX follows an exponential distribution. Please note for demonstration purposes, we have set *prob_var=1.0*, which means every variable participates in the crossover (necessary because there exists only one variable). However, it is suggested to perform a crossover of two variables forms each parent with a probability of *0.5*, which is defined by default if not defined otherwise.
+The probability of SBX follows an exponential distribution. Please note for demonstration purposes, we have set *prob_var=1.0*, which means every variable participates in the crossover (necessary because there exists only one variable). However, it is suggested to perform a crossover of two variables from each parent with a probability of *0.5*, which is defined by default if not defined otherwise.
 
 ```{code-cell} ipython3
 import matplotlib.pyplot as plt

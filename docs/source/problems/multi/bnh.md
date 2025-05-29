@@ -43,9 +43,7 @@ Binh and Korn defined the following test problem in <cite data-cite="bnh"></cite
 
 The Pareto-optimal solutions are constituted by solutions 
 $x_1^{\ast}=x_2^{\ast} \in [0,3]$ and $x_1^{\ast} \in [3,5]$,
-$x_2^{\ast}=3$. These solutions are marked by using bold 
-continuous
-curves.  The addition of both constraints in the problem does not make any solution
+$x_2^{\ast}=3$. These solutions are marked by using bold continuous curves.  The addition of both constraints in the problem does not make any solution
 in the unconstrained Pareto-optimal front infeasible. 
 Thus, constraints may not introduce any additional difficulty
 in solving this problem.

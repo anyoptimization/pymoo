@@ -45,7 +45,7 @@ In a single objective problem, the metric shows how close a point is from being 
 
 +++
 
-Let us now see how to use pymoo to calculate the KKTPM for point:
+Let us now see how to use pymoo to calculate the KKTPM for a point:
 
 ```{code-cell} ipython3
 from pymoo.constraints.from_bounds import ConstraintsFromBounds
@@ -55,7 +55,7 @@ from pymoo.problems import get_problem
 problem = AutomaticDifferentiation(ConstraintsFromBounds(get_problem("zdt1", n_var=30)))
 ```
 
-For instance, the code below calculates the KKTPM metric for randomly sampled points for the given an example;
+For instance, the code below calculates the KKTPM metric for randomly sampled points for the given example:
 
 ```{code-cell} ipython3
 from pymoo.indicators.kktpm import KKTPM

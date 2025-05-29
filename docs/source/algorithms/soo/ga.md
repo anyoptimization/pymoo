@@ -17,7 +17,7 @@ jupytext:
 
 This class represents a basic ($\mu+\lambda$) genetic algorithm for single-objective problems. The figure below shows the flow of a genetic algorithm in general. In the following, it is explained how *pymoo* can be customized.
 
-1) **Initial Population:**: A starting population is sampled in the beginning. In this framework, this can be either a [Sampling](../../operators/sampling.ipynb) object, which defines different initial sampling strategies, or `Population` where the `X` and `F` values are set, or a simple NumPy array (pop_size x n_var).
+1) **Initial Population:** A starting population is sampled in the beginning. In this framework, this can be either a [Sampling](../../operators/sampling.ipynb) object, which defines different initial sampling strategies, or `Population` where the `X` and `F` values are set, or a simple NumPy array (pop_size x n_var).
 
 
 

@@ -17,7 +17,7 @@ jupytext:
 
 +++
 
-In the beginning, initial points need to be sampled. *pymoo* offers different sampling methods depending on the variable type.
+In the beginning, initial points need to be sampled. *pymoo* offers different sampling methods depending on the variable types.
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext

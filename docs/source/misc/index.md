@@ -17,7 +17,7 @@ jupytext:
 
 +++
 
-Topics which did not directly fit into on of our main categories:
+Topics which did not directly fit into one of our main categories:
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext

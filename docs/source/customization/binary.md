@@ -15,11 +15,11 @@ jupytext:
 
 ## Binary Variable Problem
 
-Mostly, *pymoo* was made for continuous problems, but of course, other variable types can be used as well. The genetic algorithm is a modular class. By modifying the sampling, crossover, and mutation (in some cases also repair), different kinds of variable types can be used (also more complicated ones such as tree, graph, ...)
+Mostly, *pymoo* was made for continuous problems, but of course, other variable types can be used as well. The genetic algorithm is a modular class. By modifying the sampling, crossover, and mutation (in some cases also repair), different kinds of variable types can be used (also more complicated ones such as trees, graphs, ...)
 
 +++
 
-In the following the classical knapsack problem is considered. A single-objective genetic algorithm with a random initial population, half uniform binary crossover and a bitflip mutation is initialized.
+In the following, the classical knapsack problem is considered. A single-objective genetic algorithm with a random initial population, half uniform binary crossover and a bitflip mutation is initialized.
 
 ```{code-cell} ipython3
 from pymoo.algorithms.soo.nonconvex.ga import GA
