@@ -309,9 +309,6 @@ class Algorithm:
         # display the output if defined by the algorithm
         self.display(self)
 
-        # if a callback function is provided it is called after each iteration
-        self.callback(self)
-
         if self.save_history:
             _hist, _callback, _display = self.history, self.callback, self.display
 
@@ -320,6 +317,9 @@ class Algorithm:
 
             self.history, self.callback, self.display = _hist, _callback, _display
             self.history.append(obj)
+
+        # if a callback function is provided it is called after each iteration
+        self.callback(self)
 
         self.n_iter += 1
 
