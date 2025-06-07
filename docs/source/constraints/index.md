@@ -52,7 +52,7 @@ In this tutorial, we are going to look at the following constrained single-objec
 
 \begin{align} 
 \begin{split}
-\max \;\; & f(x) = x_1^2 + x_2^2 \\[1mm]
+\min \;\; & f(x) = x_1^2 + x_2^2 \\[1mm]
 \text{s.t.} \;\; & g(x) : x_1 + x_2 \geq 1 \\[2mm]
 & 0 \leq x_1 \leq 2 \\
 & 0 \leq x_2 \leq 2 
@@ -120,7 +120,7 @@ Now let us introduce another constraint, this time an equality constraint.
 
 \begin{align} 
 \begin{split}
-\max \;\; & f(x) = x_1^2 + x_2^2 \\[1mm]
+\min \;\; & f(x) = x_1^2 + x_2^2 \\[1mm]
 \text{s.t.} \;\; & g(x) : x_1 + x_2 \geq 1 \\[2mm]
 \;\; & h(x): 3 x_1 - x_2 = 0 \\[2mm]
 & 0 \leq x_1 \leq 2 \\
