@@ -4,6 +4,7 @@
 **/*.npy
 **/*.png
 **/*.gif
+**/*.ipynb
 pymoo/cython/*.cpp
 **/nohup.out
 benchmark
