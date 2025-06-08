@@ -28,6 +28,7 @@ kernelspec:
    vectorized.ipynb
    starmap.ipynb
    joblib.ipynb
+   gpu.ipynb
    custom.ipynb
 ```
 
@@ -46,5 +47,6 @@ This section covers various parallelization strategies available in *pymoo*:
     - `Vectorized Operations <vectorized.ipynb>`_: Using NumPy matrix operations for efficient parallel computation
     - `Starmap Interface <starmap.ipynb>`_: Using Python's multiprocessing starmap for threads and processes
     - `Joblib <joblib.ipynb>`_: Advanced parallelization with joblib's flexible backend system
+    - `GPU Acceleration <gpu.ipynb>`_: High-performance computing using CUDA and PyTorch
     - `Custom Parallelization <custom.ipynb>`_: Implementing your own parallelization strategy
 ```
