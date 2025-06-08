@@ -5,6 +5,10 @@ jupytext:
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.17.1
+kernelspec:
+  name: default
+  display_name: default
+  language: python
 ---
 
 ```{raw-cell}
@@ -18,7 +22,7 @@ jupytext:
 +++
 
 Whenever an algorithm is executed, it needs to be decided in each iteration whether the optimization run shall be continued or not.
-Many different ways exist of how to determine when a run of an algorithm should be terminated. Next, termination criteria specifically developed for single or multi-objective optimization as well as more generalized, for instance, limiting the number of iterations of an algorithm, are described. 
+Many different ways exist of how to determine when a run of an algorithm should be terminated. Next, termination criteria specifically developed for single or multi-objective optimization as well as more generalized, for instance, limiting the number of iterations of an algorithm, are described.
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
@@ -51,10 +55,12 @@ print(res.algorithm.n_gen)
 ```
 
 This allows you to terminate based on a couple of criteria also explained later on this page. 
-Commonly used are the movement in the design space `f_tol` and the convergence in the constraint `cv_tol` and objective space `f_tol`.
+Commonly used are the movement in the design space `xtol` and the convergence in the constraint space `cvtol` and objective space `ftol`.
 To provide an upper bound for the algorithm, we recommend supplying a maximum number of generations `n_max_gen` or function evaluations `n_max_evals`.
 
-Moreover, it is worth mentioning that tolerance termination is based on a sliding window. Not only the last, but a sequence of the `period` generations are used to calculate and compare the tolerances with a bound defined by the user.
+Moreover, it is worth mentioning that tolerance termination is based on a sliding window. Not only the last generation, but a sequence of the last `period` generations are used to calculate and compare the tolerances with a bound defined by the user.
+
+**Parameter Naming Note**: PyMoo uses consistent parameter naming - `xtol` (design space tolerance), `ftol` (objective space tolerance), `cvtol` (constraint violation tolerance), `period` (number of generations in sliding window), and `n_max_gen` (maximum generations).
 
 +++
 
@@ -88,7 +94,75 @@ termination = DefaultSingleObjectiveTermination(
 )
 ```
 
+### Customizing Termination Criteria
+
++++
+
+You can customize termination by creating your own termination object or by modifying the default ones. Here are common scenarios:
+
+**Removing specific criteria**: Set unwanted parameters to very large values to effectively disable them:
+
+```{code-cell} ipython3
+from pymoo.termination.default import DefaultMultiObjectiveTermination
+
+# Create termination with effectively disabled ftol (objective space tolerance)
+termination = DefaultMultiObjectiveTermination(
+    xtol=1e-8, 
+    cvtol=1e-6, 
+    ftol=1.0,  # Very large value effectively disables this criterion
+    period=30,
+    n_max_gen=100,  # Rely mainly on generation limit
+    n_max_evals=10000
+)
+```
+
+**Combining multiple criteria**: You can combine different termination conditions:
+
+```{code-cell} ipython3
+from pymoo.termination.collection import TerminationCollection
+from pymoo.termination import get_termination
+
+# Terminate when ANY condition is met
+termination = TerminationCollection(
+    get_termination("n_gen", 200),      # Max 200 generations
+    get_termination("time", "00:05:00") # Max 5 minutes
+)
+```
+
+**Single termination criterion**: Use only one specific criterion:
+
+```{code-cell} ipython3
+# Only use generation-based termination
+termination = get_termination("n_gen", 100)
+
+# Only use evaluation-based termination  
+termination = get_termination("n_eval", 5000)
+
+# Only use time-based termination
+termination = get_termination("time", "00:10:00")
+```
+
+### Parameter Reference
+
++++
+
+For clarity, here's a reference of all termination parameters and their consistent naming:
+
+| Parameter | Description | Type | Example |
+|-----------|-------------|------|---------|
+| `xtol` | Design space tolerance - stops when decision variables change less than this value | float | `1e-8` |
+| `ftol` | Objective space tolerance - stops when objective values change less than this value | float | `1e-6` |
+| `cvtol` | Constraint violation tolerance - stops when constraint violations are below this value | float | `1e-6` |
+| `period` | Number of generations to consider in sliding window for tolerance calculations | int | `30` |
+| `n_max_gen` | Maximum number of generations before forced termination | int | `1000` |
+| `n_max_evals` | Maximum number of function evaluations before forced termination | int | `100000` |
+| `n_skip` | Calculate termination criterion every n_skip generations (for performance) | int | `5` |
+
+**Note**: All tolerance parameters (`xtol`, `ftol`, `cvtol`) can be set to large values (e.g., `1.0`) to effectively disable that specific termination criterion.
+
 ```{raw-cell}
+:raw_mimetype: text/restructuredtext
+
 .. _nb_n_eval:
 ```
 
@@ -117,6 +191,8 @@ res = minimize(problem,
 ```
 
 ```{raw-cell}
+:raw_mimetype: text/restructuredtext
+
 .. _nb_n_gen:
 ```
 
@@ -124,7 +200,7 @@ res = minimize(problem,
 
 +++
 
-Moreover, the number of generations / iterations can be limited as well. 
+Moreover, the number of generations / iterations can be limited as well.
 
 ```{code-cell} ipython3
 from pymoo.algorithms.moo.nsga2 import NSGA2
@@ -145,6 +221,8 @@ res = minimize(problem,
 ```
 
 ```{raw-cell}
+:raw_mimetype: text/restructuredtext
+
 .. _nb_time:
 ```
 
@@ -175,6 +253,8 @@ print(res.algorithm.n_gen)
 ```
 
 ```{raw-cell}
+:raw_mimetype: text/restructuredtext
+
 .. _nb_xtol:
 ```
 
@@ -206,6 +286,8 @@ print(res.algorithm.n_gen)
 ```
 
 ```{raw-cell}
+:raw_mimetype: text/restructuredtext
+
 .. _nb_ftol:
 ```
 
@@ -217,11 +299,11 @@ The parameters of our implementation are:
 
 **tol**: What is the tolerance in the objective space on average. If the value is below this bound, we terminate.
 
-**n_last**: To make the criterion more robust, we consider the last $n$ generations and take the maximum. This considers the worst case in a window.
+**period**: To make the criterion more robust, we consider the last `period` generations and take the maximum. This considers the worst case in a sliding window.
 
 **n_max_gen**: As a fallback, the generation number can be used. For some problems, the termination criterion might not be reached; however, an upper bound for generations can be defined to stop in that case.
 
-**nth_gen**: Defines whenever the termination criterion is calculated by default, every 10th generation.
+**n_skip**: Defines how often the termination criterion is calculated (by default, every n_skip generations to reduce computational overhead).
 
 ```{code-cell} ipython3
 from pymoo.algorithms.moo.nsga2 import NSGA2
