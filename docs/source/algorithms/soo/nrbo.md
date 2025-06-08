@@ -5,6 +5,10 @@ jupytext:
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.17.1
+kernelspec:
+  name: default
+  display_name: default
+  language: python
 ---
 
 ```{raw-cell}
