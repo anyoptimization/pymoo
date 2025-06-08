@@ -1,3 +1,6 @@
+# Function package for pymoo
+# Contains both compiled (Cython) and standard (Python) implementations
+
 import importlib
 
 from pymoo.config import Config

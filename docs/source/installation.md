@@ -60,7 +60,7 @@ To quickly check if the compilation was successful you can use the following com
 
 .. code:: bash
 
-    python -c "from pymoo.util.function_loader import is_compiled;print('Compiled Extensions: ', is_compiled())"
+    python -c "from pymoo.functions import is_compiled;print('Compiled Extensions: ', is_compiled())"
 ```
 
 ## Release Candidate

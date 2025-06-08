@@ -10,7 +10,7 @@
 
 import numpy as np
 
-from pymoo.cython.utils cimport c_get_drop, c_get_argmin, c_get_argmax, c_normalize_array
+from pymoo.functions.compiled.utils cimport c_get_drop, c_get_argmin, c_get_argmax, c_normalize_array
 
 from libcpp cimport bool
 from libcpp.vector cimport vector

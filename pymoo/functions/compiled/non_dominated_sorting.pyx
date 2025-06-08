@@ -20,8 +20,11 @@ cdef extern from "limits.h":
 
 
 
-def fast_non_dominated_sort(double[:,:] F, double epsilon = 0.0, int n_stop_if_ranked=INT_MAX):
-    return c_fast_non_dominated_sort(F, epsilon, n_stop_if_ranked)
+def fast_non_dominated_sort(double[:,:] F, double epsilon = 0.0, int n_stop_if_ranked=INT_MAX, int n_fronts=INT_MAX):
+    return c_fast_non_dominated_sort(F, epsilon, n_stop_if_ranked, n_fronts)
+
+def find_non_dominated(double[:,:] F, double epsilon = 0.0):
+    return c_find_non_dominated(F, epsilon)
 
 def best_order_sort(double[:,:] F):
     return c_best_order_sort(F)
@@ -50,7 +53,7 @@ def dominance_degree_non_dominated_sort(double[:, :] F, strategy="efficient"):
 
 
 
-cdef vector[vector[int]] c_fast_non_dominated_sort(double[:,:] F, double epsilon = 0.0, int n_stop_if_ranked=INT_MAX):
+cdef vector[vector[int]] c_fast_non_dominated_sort(double[:,:] F, double epsilon = 0.0, int n_stop_if_ranked=INT_MAX, int n_fronts=INT_MAX):
 
     cdef:
         int n_points, i, j, rel, n_ranked
@@ -101,7 +104,7 @@ cdef vector[vector[int]] c_fast_non_dominated_sort(double[:,:] F, double epsilon
     fronts.push_back(current_front)
 
     # while not all solutions are assigned to a pareto front or we can stop early because of stop criterion
-    while (n_ranked < n_points) and (n_ranked < n_stop_if_ranked):
+    while (n_ranked < n_points) and (n_ranked < n_stop_if_ranked) and (fronts.size() < n_fronts):
 
         next_front = vector[int]()
 
@@ -120,6 +123,44 @@ cdef vector[vector[int]] c_fast_non_dominated_sort(double[:,:] F, double epsilon
         current_front = next_front
 
     return fronts
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Optimized Find Non-Dominated
+# ---------------------------------------------------------------------------------------------------------
+
+cdef vector[int] c_find_non_dominated(double[:,:] F, double epsilon = 0.0):
+    """
+    Simple and efficient function to find only non-dominated points.
+    Uses the existing optimized c_get_relation function.
+    """
+    cdef:
+        int n_points = F.shape[0]
+        int i, j
+        bool is_dominated
+        vector[int] non_dominated_indices
+    
+    if n_points == 0:
+        return non_dominated_indices
+    
+    # Check each point to see if it's non-dominated
+    for i in range(n_points):
+        is_dominated = False
+        
+        # Check if point i is dominated by any other point j
+        for j in range(n_points):
+            if i != j:
+                # Use the existing optimized c_get_relation function
+                # c_get_relation returns 1 if j dominates i, -1 if i dominates j, 0 if neither
+                if c_get_relation(F, j, i, epsilon) == 1:
+                    is_dominated = True
+                    break  # Early termination - no need to check other points
+        
+        # If point i is not dominated by any other point, it's non-dominated
+        if not is_dominated:
+            non_dominated_indices.push_back(i)
+    
+    return non_dominated_indices
 
 
 cdef vector[vector[int]] c_best_order_sort(double[:,:] F):

@@ -4,10 +4,10 @@ clean:
 
 .PHONY: clean-ext
 clean-ext:
-	rm -f pymoo/cython/*.c
-	rm -f pymoo/cython/*.so
-	rm -f pymoo/cython/*.cpp
-	rm -f pymoo/cython/*.html
+	rm -f pymoo/functions/compiled/*.c
+	rm -f pymoo/functions/compiled/*.so
+	rm -f pymoo/functions/compiled/*.cpp
+	rm -f pymoo/functions/compiled/*.html
 
 .PHONY: compile
 compile:
