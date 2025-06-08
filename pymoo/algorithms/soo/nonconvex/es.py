@@ -57,6 +57,7 @@ class ES(GeneticAlgorithm):
                          survival=survival,
                          output=output,
                          advance_after_initial_infill=True,
+                         eliminate_duplicates=False,
                          **kwargs)
 
         self.termination = DefaultSingleObjectiveTermination()
