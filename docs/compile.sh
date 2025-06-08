@@ -45,7 +45,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --help|-h)
-            echo "Usage: $0 [options] [file1.md] [file2.md] ..."
+            echo "Usage: $0 [options] [file1.md] [file2.md] [pattern] ..."
             echo ""
             echo "Options:"
             echo "  --force       Process all files, not just missing notebooks"
@@ -57,8 +57,11 @@ while [[ $# -gt 0 ]]; do
             echo "  $0                                    # Process missing notebooks only"
             echo "  $0 --force                           # Process all files"
             echo "  $0 file1.md file2.md                # Process specific files"
+            echo "  $0 'algorithms/*.md'                 # Process all .md files in algorithms/"
+            echo "  $0 'algorithms/moo/*.md'             # Process all .md files in algorithms/moo/"
             echo "  $0 --no-execute file.md             # Convert but don't execute"
             echo ""
+            echo "Note: Use quotes around glob patterns to prevent shell expansion"
             echo "Use --usage for more detailed examples."
             exit 0
             ;;
@@ -109,6 +112,19 @@ while [[ $# -gt 0 ]]; do
             echo "    → Forces regeneration of specific file without execution"
             echo "    → Useful when you know the file exists but want to update it"
             echo ""
+            echo "Pattern/Glob Processing:"
+            echo "  $0 'algorithms/*.md'"
+            echo "    → Process all .md files in algorithms directory"
+            echo "    → Only processes files where notebook is missing"
+            echo ""
+            echo "  $0 --force 'algorithms/moo/*.md'"
+            echo "    → Force regeneration of all .md files in algorithms/moo/"
+            echo "    → Overwrites existing notebooks"
+            echo ""
+            echo "  $0 'algorithms/**/*.md'"
+            echo "    → Process all .md files recursively in algorithms/"
+            echo "    → Note: Requires bash with globstar enabled"
+            echo ""
             echo "Directory Processing:"
             echo "  cd docs/source/algorithms/moo && $0 *.md"
             echo "    → Process all .md files in current directory"
@@ -134,7 +150,24 @@ while [[ $# -gt 0 ]]; do
             exit 1
             ;;
         *)
-            if [[ -f "$1" ]]; then
+            # Check if the argument contains wildcards or is a glob pattern
+            if [[ "$1" == *"*"* ]] || [[ "$1" == *"?"* ]] || [[ "$1" == *"["* ]]; then
+                # Expand the glob pattern
+                shopt -s nullglob  # If no matches, expand to nothing
+                GLOB_MATCHES=($1)
+                shopt -u nullglob
+                
+                if [[ ${#GLOB_MATCHES[@]} -eq 0 ]]; then
+                    echo "Warning: No files matching pattern '$1'"
+                else
+                    # Add all matching .md files
+                    for match in "${GLOB_MATCHES[@]}"; do
+                        if [[ "$match" == *.md ]] && [[ -f "$match" ]]; then
+                            SPECIFIC_FILES+=("$match")
+                        fi
+                    done
+                fi
+            elif [[ -f "$1" ]]; then
                 SPECIFIC_FILES+=("$1")
             else
                 echo "Error: File '$1' not found"
@@ -216,8 +249,9 @@ if [[ ${#SPECIFIC_FILES[@]} -gt 0 ]]; then
         fi
     done
 else
-    # First, collect all markdown files to get total count
-    ALL_MD_FILES=($(find "$SOURCE_DIR" -name '*.md' -not -path "*/\\_*/*"))
+    # First, collect all markdown files to get total count (sorted alphabetically)
+    log_output "Finding and sorting all markdown files alphabetically..."
+    ALL_MD_FILES=($(find "$SOURCE_DIR" -name '*.md' -not -path "*/\\_*/*" -not -path "*/.ipynb_checkpoints/*" | sort))
     total_files=${#ALL_MD_FILES[@]}
     current_index=0
     

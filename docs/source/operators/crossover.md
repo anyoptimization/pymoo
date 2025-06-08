@@ -228,9 +228,6 @@ print("Crossover Rate: ", diff_a_to_off / diff_a_to_b)
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
 
-.. autofunction:: pymoo.factory.get_crossover
-    :noindex:
-
 .. autofunction:: pymoo.core.crossover.Crossover
     :noindex:
 ```

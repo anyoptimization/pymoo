@@ -234,7 +234,7 @@ Scatter().add(ref_dirs).show()
 
 Incremental method can be used to create reference directions in increments. 
 However, the method relies on a partition number `n_partitions` which determines how many points will be sampled.
-Points can be uniformly created on the unit hyperplane using the Incremental method proposed in <cite data-cite="incremental_Lattice"></cite>.
+Points can be uniformly created on the unit hyperplane using the Incremental method proposed in <cite data-cite="incremental_lattice"></cite>.
 
 ```{code-cell} ipython3
 ref_dirs = get_reference_directions("incremental", 3, n_partitions=8)

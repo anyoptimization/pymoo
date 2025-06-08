@@ -124,7 +124,7 @@ If you use **pymoo** as a researcher trying to improve existing algorithms, you 
 
 [Optimization Test Problems](../problems/index.ipynb) | 
 [Define a Custom Problem](../problems/definition.ipynb) | 
-[Parallelization](../problems/parallelization.ipynb) |
+[Parallelization](../parallelization/index.ipynb) |
 [Callback](../interface/callback.ipynb) |
 [Constraint Handling](../constraints/index.ipynb)
 

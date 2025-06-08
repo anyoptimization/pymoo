@@ -125,9 +125,6 @@ plt.show()
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
 
-.. autofunction:: pymoo.factory.get_mutation
-    :noindex:
-
 .. autofunction:: pymoo.core.mutation.Mutation
     :noindex:
 ```

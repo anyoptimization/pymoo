@@ -21,16 +21,6 @@ kernelspec:
 
 
 
-```{raw-cell}
----
-editable: true
-raw_mimetype: text/restructuredtext
-slideshow:
-  slide_type: ''
----
-.. warning::
-    Not supported in the current version anymore. Gradient calculation needs to be reworked.
-```
 
 In 2016, Deb and Abouhawwash proposed Karush Kuhn Tucker Proximity Measure (KKTPM) <cite data-cite="kktpm1"></cite>, a metric that can measure how close a point is from being “an optimum”. The smaller the metric, the closer the point. This does not require the Pareto front to be known, but the gradient information needs to be approximated.
 Their metric applies to both single objective and multi-objective optimization problems. 
@@ -48,6 +38,11 @@ In a single objective problem, the metric shows how close a point is from being 
 Let us now see how to use pymoo to calculate the KKTPM for a point:
 
 ```{code-cell} ipython3
+import pymoo.gradient
+
+# Activate autograd toolbox for gradient calculations
+pymoo.gradient.activate("autograd.numpy")
+
 from pymoo.constraints.from_bounds import ConstraintsFromBounds
 from pymoo.gradient.automatic import AutomaticDifferentiation
 from pymoo.problems import get_problem
@@ -90,27 +85,48 @@ res = minimize(problem,
 ```
 
 ```{code-cell} ipython3
+import pandas as pd
 import numpy as np
-gen, _min, _median, _max = [], [], [], []
 
+# Collect KKTPM data for each generation
+data = []
 for algorithm in res.history:
     if algorithm.n_gen % 5 == 0:
         X = algorithm.pop.get("X")
         kktpm = KKTPM().calc(X, problem)
+        
+        # Add each individual's KKTPM value with generation info
+        for i, value in enumerate(kktpm):
+            data.append({
+                'generation': algorithm.n_gen,
+                'individual': i,
+                'kktpm': value
+            })
 
-        gen.append(algorithm.n_gen)
-        _min.append(kktpm.min())
-        _median.append(np.median(kktpm))
-        _max.append(kktpm.max())
+# Create DataFrame
+df = pd.DataFrame(data)
+df
+```
+
+```{code-cell} ipython3
+# Get summary statistics for each generation
+stats_by_gen = df.groupby('generation')['kktpm'].describe()
+stats_by_gen
 ```
 
 ```{code-cell} ipython3
 import matplotlib.pyplot as plt
 
-plt.plot(gen, _min, label="Min")
-plt.plot(gen, _median, label="Median")
-plt.plot(gen, _max, label="Max")
+# Plot the quartiles and median over generations
+generations = stats_by_gen.index
+plt.plot(generations, stats_by_gen['25%'], label="Q1 (25th percentile)")
+plt.plot(generations, stats_by_gen['50%'], label="Median")
+plt.plot(generations, stats_by_gen['75%'], label="Q3 (75th percentile)")
 plt.yscale("log")
+plt.xlabel("Generation")
+plt.ylabel("KKTPM")
+plt.title("KKTPM Statistics Over Generations")
 plt.legend()
+plt.grid(True, alpha=0.3)
 plt.show()
 ```

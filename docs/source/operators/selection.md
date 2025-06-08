@@ -109,9 +109,6 @@ print(res.X)
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
 
-.. autofunction:: pymoo.factory.get_selection
-    :noindex:
-    
 .. autofunction:: pymoo.core.selection.Selection
     :noindex:
 ```

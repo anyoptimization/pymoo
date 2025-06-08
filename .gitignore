@@ -5,7 +5,7 @@
 **/*.png
 **/*.gif
 **/*.ipynb
-pymoo/functions/compiled/*.cpp
+**/*.cpp
 **/nohup.out
 benchmark
 wheelhouse

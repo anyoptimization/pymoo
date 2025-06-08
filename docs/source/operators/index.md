@@ -22,11 +22,12 @@ jupytext:
    :maxdepth: 1
    :hidden:
 
-   sampling.ipynb
-   selection.ipynb
-   crossover.ipynb
-   mutation.ipynb
-   repair.ipynb
+   sampling
+   selection
+   crossover
+   mutation
+   repair
+   survival
 ```
 
 

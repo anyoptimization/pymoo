@@ -62,9 +62,6 @@ plotting.plot(X, no_fill=True)
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
 
-.. autofunction:: pymoo.factory.get_sampling
-    :noindex:
-
 .. autofunction:: pymoo.core.sampling.Sampling
     :noindex:
 ```

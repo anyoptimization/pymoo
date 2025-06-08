@@ -23,8 +23,9 @@ jupytext:
    :maxdepth: 1
    :hidden:
    
-   subset_selection.ipynb
-   portfolio_allocation.ipynb
+   subset_selection
+   portfolio_allocation
+   matrix_inversion
 
    
 ```
@@ -38,4 +39,6 @@ jupytext:
     - `Subset Selection <subset_selection.ipynb>`_: 
 
     - `Portfolio Allocation <portfolio_allocation.ipynb>`_:
+    
+    - `Matrix Inversion <matrix_inversion.ipynb>`_:
 ```
