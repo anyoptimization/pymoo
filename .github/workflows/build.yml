@@ -2,9 +2,11 @@ name: Build
 
 on:
     pull_request:
+        types: [opened, synchronize, reopened, labeled]
     push:
-        branches: [main]
+        branches: [deploy]
         tags: ["*"]
+    workflow_dispatch:
 
 
 concurrency:
@@ -13,9 +15,36 @@ concurrency:
 
 
 jobs:
+    check_approval:
+        runs-on: ubuntu-latest
+        outputs:
+            should_build: ${{ steps.check.outputs.should_build }}
+        steps:
+            - name: Check if build should run
+              id: check
+              run: |
+                  if [[ "${{ github.event_name }}" == "push" ]]; then
+                      # Always build on push to deploy branch or tags
+                      echo "should_build=true" >> $GITHUB_OUTPUT
+                  elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+                      # Always build on manual trigger
+                      echo "should_build=true" >> $GITHUB_OUTPUT
+                  elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+                      # Check for approval label on PRs
+                      if [[ "${{ contains(github.event.pull_request.labels.*.name, 'build-approved') }}" == "true" ]]; then
+                          echo "should_build=true" >> $GITHUB_OUTPUT
+                      else
+                          echo "should_build=false" >> $GITHUB_OUTPUT
+                      fi
+                  else
+                      echo "should_build=false" >> $GITHUB_OUTPUT
+                  fi
+
     build_wheels:
         name: Build wheel for ${{ matrix.os }}-${{ matrix.build }}${{ matrix.python }}-${{ matrix.arch }}
         runs-on: ${{ matrix.os }}
+        needs: check_approval
+        if: needs.check_approval.outputs.should_build == 'true'
         strategy:
             # Ensure that a wheel builder finishes even if another fails
             fail-fast: false
@@ -48,6 +77,8 @@ jobs:
     build_sdist:
         name: Build source distribution
         runs-on: ubuntu-latest
+        needs: check_approval
+        if: needs.check_approval.outputs.should_build == 'true'
         steps:
             - uses: actions/checkout@v4
             - uses: astral-sh/setup-uv@v5
