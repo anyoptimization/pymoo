@@ -150,15 +150,47 @@ For clarity, here's a reference of all termination parameters and their consiste
 
 | Parameter | Description | Type | Example |
 |-----------|-------------|------|---------|
-| `xtol` | Design space tolerance - stops when decision variables change less than this value | float | `1e-8` |
-| `ftol` | Objective space tolerance - stops when objective values change less than this value | float | `1e-6` |
-| `cvtol` | Constraint violation tolerance - stops when constraint violations are below this value | float | `1e-6` |
+| `xtol` | Design space tolerance - stops when decision variables change less than this value (absolute) | float | `1e-8` |
+| `ftol` | Objective space tolerance - stops when objective values change less than this value (relative for MOO, absolute for SOO) | float | `1e-6` |
+| `cvtol` | Constraint violation tolerance - stops when constraint violations are below this value (absolute) | float | `1e-6` |
 | `period` | Number of generations to consider in sliding window for tolerance calculations | int | `30` |
 | `n_max_gen` | Maximum number of generations before forced termination | int | `1000` |
 | `n_max_evals` | Maximum number of function evaluations before forced termination | int | `100000` |
 | `n_skip` | Calculate termination criterion every n_skip generations (for performance) | int | `5` |
 
 **Note**: All tolerance parameters (`xtol`, `ftol`, `cvtol`) can be set to large values (e.g., `1.0`) to effectively disable that specific termination criterion.
+
+### How Termination Criteria Work Together
+
++++
+
+**Multiple Criteria Logic**: When multiple termination criteria are specified (e.g., `xtol`, `ftol`, `n_max_gen`), the algorithm terminates when **ANY** of the criteria is satisfied (OR logic). This means:
+
+- If `xtol=1e-8` AND `n_max_gen=100` are both specified, the algorithm stops when either the design space changes become smaller than `1e-8` OR when 100 generations are reached, whichever happens first.
+- This ensures the algorithm doesn't run indefinitely if tolerance criteria are never met, and also allows early stopping when convergence is detected.
+
+**Absolute vs Relative Tolerances**: 
+
+- **`xtol` (Design Space Tolerance)**: Uses **absolute** tolerance. It measures the absolute change in decision variables between generations. For example, `xtol=1e-8` means the algorithm stops when the maximum absolute change in any decision variable is less than 1e-8.
+
+- **`ftol` (Objective Space Tolerance)**: Uses **relative** tolerance for multi-objective problems and **absolute** tolerance for single-objective problems. For multi-objective optimization, it considers the relative change in the hypervolume or other convergence metrics.
+
+- **`cvtol` (Constraint Violation Tolerance)**: Uses **absolute** tolerance, measuring the absolute constraint violation values.
+
+**Example of Combined Criteria**:
+
+```{code-cell} ipython3
+from pymoo.termination.default import DefaultMultiObjectiveTermination
+
+# Algorithm will stop when ANY of these conditions is met:
+termination = DefaultMultiObjectiveTermination(
+    xtol=1e-8,        # Stop if design variables change < 1e-8 (absolute)
+    ftol=0.0025,      # Stop if objective improvement < 0.0025 (relative)
+    cvtol=1e-6,       # Stop if constraint violations < 1e-6 (absolute)
+    n_max_gen=1000,   # Stop after 1000 generations maximum
+    n_max_evals=100000 # Stop after 100000 function evaluations maximum
+)
+```
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
