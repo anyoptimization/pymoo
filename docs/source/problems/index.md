@@ -4,7 +4,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.17.1
+    jupytext_version: 1.17.2
 ---
 
 ```{raw-cell}
@@ -24,11 +24,10 @@ jupytext:
    
    definition.ipynb
    test_problems.ipynb
-   parallelization.ipynb
 ```
 
 This part of the documentation describes everything related to defining and making use of optimization problems.
-Besides an intuitive way of defining your optimization problem, *pymoo* also provides an implementation of many well-known single-, multi- and many-objective optimization problems for benchmarking. 
+Besides an intuitive way of defining your optimization problem, *pymoo* also provides an implementation of many well-known single-, multi- and many-objective optimization problems for benchmarking.
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
@@ -38,5 +37,4 @@ Besides an intuitive way of defining your optimization problem, *pymoo* also pro
 
     - `Definition <definition.ipynb>`_: How to define an optimization problem
     - `Test Problems <test_problems.ipynb>`_: Single, Multi and Many-objective Test Problems available in *pymoo*
-    - `Parallelization <parallelization.ipynb>`_: How to parallelize function evaluations
 ```

@@ -180,6 +180,7 @@ Content
    getting_started/index.ipynb
    interface/index.ipynb
    problems/index.ipynb
+   parallelization/index.ipynb
    algorithms/index.ipynb
    constraints/index.ipynb
    gradients/index.ipynb

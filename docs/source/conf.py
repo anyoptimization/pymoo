@@ -85,10 +85,10 @@ templates_path = ['_templates']
 # sphinx.ext.intersphinx - Mappings to other projects
 # =========================================================================================================
 
-intersphinx_mapping = {'python': ('http://docs.python.org/2', None),
-                       'numpy': ('http://docs.scipy.org/doc/numpy', "http://docs.scipy.org/doc/numpy/objects.inv"),
-                       'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
-                       'matplotlib': ('http://matplotlib.sourceforge.net', None)}
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
+                       'numpy': ('https://numpy.org/doc/stable', None),
+                       'scipy': ('https://docs.scipy.org/doc/scipy', None),
+                       'matplotlib': ('https://matplotlib.org/stable', None)}
 
 # ===========================================================================
 # nbsphinx

@@ -39,12 +39,25 @@ docs/run.sh
 
 # Force convert all notebooks (use sparingly)
 docs/run.sh --force
+
+# Compile specific file (recommended for single files)
+docs/compile.sh path/to/file.md
+
+# For detailed usage examples and options
+docs/compile.sh --help     # Quick help
+docs/compile.sh --usage    # Comprehensive examples
 ```
 
 ### Managing Jupyter Dependencies
 ```bash
 # Install jupytext if missing
 pip install jupytext
+
+# Sync specific markdown file to notebook
+jupytext --sync path/to/file.md
+
+# Sync specific notebook back to markdown
+jupytext --sync path/to/file.ipynb
 ```
 
 ## Critical Workflow Rules
@@ -57,11 +70,18 @@ pip install jupytext
 ### 2. When to Regenerate Notebooks
 After editing any .md file:
 ```bash
-# Remove the corresponding .ipynb file
-rm docs/source/path/to/file.ipynb
+# Method 1: Use compile.sh for specific file (recommended)
+docs/compile.sh docs/source/path/to/file.md
 
-# Regenerate it
+# Method 2: Remove and regenerate with run.sh
+rm docs/source/path/to/file.ipynb
 docs/run.sh
+
+# Method 3: Use jupytext directly
+jupytext --sync docs/source/path/to/file.md
+
+# See all compile.sh options and examples
+docs/compile.sh --usage
 ```
 
 ### 3. Factory References (REMOVED)
@@ -111,6 +131,7 @@ Parameters
 Parameters
 ----------
 ```
+
 
 ## Citation Management
 
@@ -190,6 +211,17 @@ The script automatically:
 - **Cause**: Incompatible pandoc version
 - **Fix**: Pin version in requirements.txt: `pandoc<3.0.0,>=1.12.1`
 
+### 6. "Reference to Nonexisting Document" Warnings
+- **Cause**: Toctree references pointing to missing files
+- **Fix**: Either create the missing file or remove the reference from toctree
+- **Example**: Remove invalid parallelization reference from problems index if file doesn't exist
+
+### 7. Jupytext Sync Issues
+- **Cause**: .md and .ipynb files out of sync
+- **Fix**: Use `jupytext --sync` to synchronize files in both directions
+- **Note**: Always edit .md files as source of truth, then sync to .ipynb
+
+
 ## Testing Changes
 
 ### Before Submitting Changes
@@ -242,17 +274,47 @@ case_studies/
 ```bash
 # Full workflow for editing documentation
 vim docs/source/path/to/file.md           # Edit markdown
-rm docs/source/path/to/file.ipynb         # Remove old notebook
-docs/run.sh                               # Regenerate notebook
+docs/compile.sh docs/source/path/to/file.md # Compile specific file (recommended)
+# OR alternatively:
+# jupytext --sync docs/source/path/to/file.md
 # Commit both .md and .ipynb files
 
 # Emergency reset of specific notebook
 rm docs/source/path/to/file.ipynb
 docs/run.sh
 
+# Sync all files in a directory
+cd docs/source/parallelization && jupytext --sync *.md
+
+# Get help with compile.sh
+docs/compile.sh --help      # Quick reference
+docs/compile.sh --usage     # Detailed examples
+
 # Check for broken references
 grep -r "factory\.get_" docs/source/ --include="*.md"
 grep -r "incremental_Lattice" docs/source/ --include="*.md"
+
+```
+
+## Git Commit Guidelines
+
+### Commit Message Format
+- **NEVER include "Claude" or AI-related attribution in commit messages**
+- Keep messages clean and professional
+- Focus on what was changed and why, not who/what made the change
+- Use conventional commit format when appropriate
+- **When working on a GitHub issue, reference it with (#XXX) at the end**
+
+### Examples:
+```bash
+# GOOD - General commit
+git commit -m "Add copy buttons to documentation and fix numpydoc formatting warnings"
+
+# GOOD - Issue reference
+git commit -m "Fix ES algorithm to respect rule parameter when both pop_size and rule are provided (#715)"
+
+# BAD - AI attribution
+git commit -m "Add copy buttons to documentation 🤖 Generated with Claude"
 ```
 
 This guide should help maintain consistency and avoid common pitfalls when working with the PyMoo documentation system.
