@@ -14,7 +14,7 @@ from pymoo.util.optimum import filter_optimum
 class ES(GeneticAlgorithm):
 
     def __init__(self,
-                 n_offsprings=200,
+                 n_offsprings=None,
                  pop_size=None,
                  rule=1.0 / 7.0,
                  phi=1.0,
@@ -43,7 +43,10 @@ class ES(GeneticAlgorithm):
             The sampling method for creating the initial population.
         """
 
-        if pop_size is None and n_offsprings is not None:
+        if n_offsprings is None and pop_size is None:
+            n_offsprings = 200
+            pop_size = int(math.ceil(n_offsprings * rule))
+        elif n_offsprings is not None and pop_size is None:
             pop_size = int(math.ceil(n_offsprings * rule))
         elif n_offsprings is None and pop_size is not None:
             n_offsprings = int(math.floor(pop_size / rule))
