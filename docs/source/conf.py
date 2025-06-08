@@ -55,6 +55,7 @@ extensions = [
     'sphinx.ext.coverage',
     'matplotlib.sphinxext.plot_directive',
     'sphinxcontrib.bibtex',
+    'sphinx_copybutton',
 ]
 
 bibtex_bibfiles = ['references.bib']
@@ -191,4 +192,15 @@ numpydoc_use_blockquotes = False
 
 # Deprecated since version edit: your HTML template instead. Whether to insert an edit link after docstrings.
 numpydoc_edit_link = False
+
+# ===========================================================================
+# sphinx-copybutton
+# ===========================================================================
+
+# Configure copy button behavior
+copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
+copybutton_prompt_is_regexp = True
+copybutton_only_copy_prompt_lines = True
+copybutton_remove_prompts = True
+copybutton_copy_empty_lines = False
 

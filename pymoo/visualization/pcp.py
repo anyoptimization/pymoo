@@ -21,7 +21,7 @@ class PCP(Plot):
 
 
         Parameters
-        ----------------
+        ----------
 
         bounds : {bounds}
 
