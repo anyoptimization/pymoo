@@ -12,8 +12,12 @@ kernelspec:
 ---
 
 ```{raw-cell}
-:raw_mimetype: text/restructuredtext
-
+---
+raw_mimetype: text/restructuredtext
+editable: true
+slideshow:
+  slide_type: ''
+---
 .. _nb_nrbo:
 ```
 
@@ -153,21 +157,33 @@ for name, res in results.items():
 ### API
 
 ```{raw-cell}
-:raw_mimetype: text/restructuredtext
-
+---
+raw_mimetype: text/restructuredtext
+editable: true
+slideshow:
+  slide_type: ''
+---
 .. autofunction:: pymoo.algorithms.soo.nonconvex.nrbo.NRBO
     :noindex:
 ```
 
++++ {"editable": true, "slideshow": {"slide_type": ""}}
+
 ### References
 
-The Newton-Raphson-based Optimizer (NRBO) was proposed in {cite}`Sowmya2024`.
+The Newton-Raphson-based Optimizer (NRBO) was proposed in <cite data-cite="Sowmya2024"></cite>.
+
++++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 ### Acknowledgments
 
 ```{raw-cell}
-:raw_mimetype: text/restructuredtext
-
+---
+raw_mimetype: text/restructuredtext
+editable: true
+slideshow:
+  slide_type: ''
+---
 .. note::
    We would like to thank `@Zcaic <https://github.com/Zcaic>`_ for contributing the NRBO implementation to pymoo.
 ```

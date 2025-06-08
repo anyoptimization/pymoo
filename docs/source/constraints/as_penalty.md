@@ -30,6 +30,16 @@ from pymoo.constraints.as_penalty import ConstraintsAsPenalty
 from pymoo.optimize import minimize
 from pymoo.core.evaluator import Evaluator
 from pymoo.core.individual import Individual
+from pymoo.core.problem import ElementwiseProblem
+
+class ConstrainedProblem(ElementwiseProblem):
+
+    def __init__(self, **kwargs):
+        super().__init__(n_var=2, n_obj=1, n_ieq_constr=1, n_eq_constr=0, xl=0, xu=2, **kwargs)
+
+    def _evaluate(self, x, out, *args, **kwargs):
+        out["F"] = x[0] ** 2 + x[1] ** 2
+        out["G"] = 1.0 - (x[0] + x[1])
 
 problem = ConstrainedProblem()
 
@@ -58,12 +68,6 @@ print("Best solution found: \nX = %s\nF = %s\nCV = %s" % (res.X, res.F, res.CV))
 Please note that this approach might not always find a feasible solution (because the algorithm does not know anything about whether a solution is feasible or not). For instance, see the example below:
 
 ```{code-cell} ipython3
-from pymoo.algorithms.soo.nonconvex.de import DE
-from pymoo.constraints.as_penalty import ConstraintsAsPenalty
-from pymoo.optimize import minimize
-from pymoo.core.evaluator import Evaluator
-from pymoo.core.individual import Individual
-
 res = minimize(ConstraintsAsPenalty(problem, penalty=2.0),
                algorithm,
                seed=1,

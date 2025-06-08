@@ -5,11 +5,18 @@ jupytext:
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.17.1
+kernelspec:
+  name: ''
+  display_name: ''
 ---
 
 ```{raw-cell}
-:raw_mimetype: text/restructuredtext
-
+---
+raw_mimetype: text/restructuredtext
+editable: true
+slideshow:
+  slide_type: ''
+---
 .. _nb_isres:
 ```
 
@@ -25,7 +32,7 @@ jupytext:
 
 # ISRES: Improved Stochastic Ranking Evolutionary Strategy
 
-+++
++++ {"editable": true, "slideshow": {"slide_type": ""}}
 
 Improved Stochastic Ranking Evolutionary Strategy <cite data-cite="isres"></cite>.
 
