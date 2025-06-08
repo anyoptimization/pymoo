@@ -162,3 +162,12 @@ for name, res in results.items():
 
 .. [Sowmya2024] Sowmya, R., Premkumar, M. & Jangir, P. Newton-Raphson-based optimizer: A new population-based metaheuristic algorithm for continuous optimization problems. Engineering Applications of Artificial Intelligence 128, 107532 (2024).
 ```
+
+### Acknowledgments
+
+```{raw-cell}
+:raw_mimetype: text/restructuredtext
+
+.. note::
+   We would like to thank `@Zcaic <https://github.com/Zcaic>`_ for contributing the NRBO implementation to pymoo.
+```
