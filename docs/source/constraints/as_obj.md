@@ -44,7 +44,8 @@ res = minimize(ConstraintsAsObjective(problem),
                verbose=False)
 
 plot = Scatter()
-plot.add(problem.pareto_front(), marker="*", color="black", alpha=0.7, s=100)
+# Note: We only plot the results since the original problem's pareto front 
+# has different dimensions than the transformed 2-objective problem
 plot.add(res.F, facecolor="none", edgecolor="red")
 plot.show()
 ```

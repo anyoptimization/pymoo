@@ -7,13 +7,22 @@ export PYDEVD_DISABLE_FILE_VALIDATION=1
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_DIR="$SCRIPT_DIR/source"
 PYMOO_ROOT="$(dirname "$SCRIPT_DIR")"
+LOG_FILE="$SCRIPT_DIR/compile.log"
 
 # Add pymoo to Python path
 export PYTHONPATH="$PYMOO_ROOT:$PYTHONPATH"
 
+# Create a new log file from scratch
+> "$LOG_FILE"
+
+# Function to log both to console and file
+log_output() {
+    echo "$@" | tee -a "$LOG_FILE"
+}
+
 # Set conda environment (default to "default" if not specified)
 CONDA_ENV="${CONDA_ENV:-default}"
-echo "Using conda environment: $CONDA_ENV"
+log_output "Using conda environment: $CONDA_ENV"
 
 # Activate conda environment
 source "$(conda info --base)/etc/profile.d/conda.sh"
@@ -138,48 +147,54 @@ done
 
 # Display processing mode
 if [[ ${#SPECIFIC_FILES[@]} -gt 0 ]]; then
-    echo "Processing specific files: ${SPECIFIC_FILES[*]}"
+    log_output "Processing specific files: ${SPECIFIC_FILES[*]}"
 elif [[ "$FORCE" == true ]]; then
-    echo "Force mode enabled - processing all files"
+    log_output "Force mode enabled - processing all files"
 else
-    echo "Processing only missing notebook files (use --force to process all, or specify file paths)"
+    log_output "Processing only missing notebook files (use --force to process all, or specify file paths)"
 fi
 
 if [[ "$EXECUTE" == true ]]; then
-    echo "Notebook execution: enabled"
+    log_output "Notebook execution: enabled"
 else
-    echo "Notebook execution: disabled"
+    log_output "Notebook execution: disabled"
 fi
 
-echo "Processing markdown files..."
+log_output "Processing markdown files..."
 
 # Function to process a single markdown file
 process_file() {
     local md_file="$1"
+    local current_index="$2"
+    local total_files="$3"
     local nb_file="${md_file%.md}.ipynb"
     
-    echo "Processing $md_file..."
+    log_output "[$current_index/$total_files] Processing $md_file..."
     
     # Sync the markdown file to create/update the corresponding notebook
-    jupytext --to ipynb --sync "$md_file" 2>/dev/null
+    jupytext --to ipynb --sync "$md_file" 2>&1 | tee -a "$LOG_FILE"
     
     # Execute the notebook if it exists and execution is enabled
     if [ -f "$nb_file" ]; then
         if [[ "$EXECUTE" == true ]]; then
-            echo "Executing $nb_file..."
-            jupyter nbconvert --execute --to notebook --inplace "$nb_file" --log-level=ERROR 2>/dev/null
+            log_output "Executing $nb_file..."
+            jupyter nbconvert --execute --to notebook --inplace "$nb_file" --log-level=ERROR 2>&1 | tee -a "$LOG_FILE"
         else
-            echo "Skipping execution of $nb_file (--no-execute specified)"
+            log_output "Skipping execution of $nb_file (--no-execute specified)"
         fi
     else
-        echo "Warning: $nb_file not found after sync"
+        log_output "Warning: $nb_file not found after sync"
     fi
 }
 
 # Process files based on mode
 if [[ ${#SPECIFIC_FILES[@]} -gt 0 ]]; then
     # Process specific files with force logic if applicable
+    total_files=${#SPECIFIC_FILES[@]}
+    current_index=0
+    
     for md_file in "${SPECIFIC_FILES[@]}"; do
+        ((current_index++))
         nb_file="${md_file%.md}.ipynb"
         
         # Check if we should process this file (apply force logic for specific files too)
@@ -187,23 +202,29 @@ if [[ ${#SPECIFIC_FILES[@]} -gt 0 ]]; then
         
         if [ "$FORCE" = true ]; then
             should_process=true
-            echo "Processing $md_file (force mode)..."
+            log_output "[$current_index/$total_files] Processing $md_file (force mode)..."
         elif [ ! -f "$nb_file" ]; then
             should_process=true
-            echo "Processing $md_file (notebook missing)..."
+            log_output "[$current_index/$total_files] Processing $md_file (notebook missing)..."
         else
-            echo "Skipping $md_file (notebook exists, use --force to override)"
+            log_output "[$current_index/$total_files] Skipping $md_file (notebook exists, use --force to override)"
         fi
         
         # Process the file if needed
         if [ "$should_process" = true ]; then
-            process_file "$md_file"
+            process_file "$md_file" "$current_index" "$total_files"
         fi
     done
 else
+    # First, collect all markdown files to get total count
+    ALL_MD_FILES=($(find "$SOURCE_DIR" -name '*.md' -not -path "*/\\_*/*"))
+    total_files=${#ALL_MD_FILES[@]}
+    current_index=0
+    
     # Loop over each markdown file (excluding folders starting with _)
-    for md_file in $(find "$SOURCE_DIR" -name '*.md' -not -path "*/\\_*/*");
+    for md_file in "${ALL_MD_FILES[@]}";
     do
+        ((current_index++))
         # Get the corresponding notebook file path
         nb_file="${md_file%.md}.ipynb"
         
@@ -212,19 +233,19 @@ else
         
         if [ "$FORCE" = true ]; then
             should_process=true
-            echo "Processing $md_file (force mode)..."
+            log_output "[$current_index/$total_files] Processing $md_file (force mode)..."
         elif [ ! -f "$nb_file" ]; then
             should_process=true
-            echo "Processing $md_file (notebook missing)..."
+            log_output "[$current_index/$total_files] Processing $md_file (notebook missing)..."
         else
-            echo "Skipping $md_file (notebook exists, use --force to override)"
+            log_output "[$current_index/$total_files] Skipping $md_file (notebook exists, use --force to override)"
         fi
         
         # Process the file if needed
         if [ "$should_process" = true ]; then
-            process_file "$md_file"
+            process_file "$md_file" "$current_index" "$total_files"
         fi
     done
 fi
 
-echo "Documentation build complete!"
+log_output "Documentation build complete!"

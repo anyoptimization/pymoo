@@ -1,5 +1,5 @@
 from pymoo.core.decomposition import Decomposition
-from pymoo.util.function_loader import load_function
+from pymoo.functions import load_function
 
 
 class PBI(Decomposition):

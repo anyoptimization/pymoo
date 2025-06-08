@@ -4,7 +4,7 @@ from pymoo.algorithms.soo.nonconvex.es import ES
 from pymoo.core.population import Population, calc_cv
 from pymoo.core.survival import Survival
 from pymoo.docs import parse_doc_string
-from pymoo.util.function_loader import load_function
+from pymoo.functions import load_function
 
 
 class StochasticRankingSurvival(Survival):

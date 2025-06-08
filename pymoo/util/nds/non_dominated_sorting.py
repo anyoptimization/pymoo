@@ -6,10 +6,11 @@ from pymoo.functions import load_function
 
 class NonDominatedSorting:
 
-    def __init__(self, epsilon=None, method="fast_non_dominated_sort") -> None:
+    def __init__(self, epsilon=None, method="fast_non_dominated_sort", dominator=None) -> None:
         super().__init__()
         self.epsilon = epsilon
         self.method = method
+        self.dominator = dominator
 
     def do(self, F, return_rank=False, only_non_dominated_front=False, n_stop_if_ranked=None, n_fronts=None, **kwargs):
         F = F.astype(float)
@@ -24,17 +25,24 @@ class NonDominatedSorting:
         elif n_fronts is None:
             n_fronts = int(1e8)
 
-        func = load_function(self.method)
+        # if a custom dominator is provided, use the custom dominator and run fast_non_dominated_sort
+        if self.dominator is not None:
+            # Use the custom dominator directly
+            from pymoo.util.nds.fast_non_dominated_sort import fast_non_dominated_sort
+            fronts = fast_non_dominated_sort(F, dominator=self.dominator, **kwargs)
+        else:
+            # Use the standard function loader approach
+            func = load_function(self.method)
 
-        # set the epsilon if it should be set
-        if self.epsilon is not None:
-            kwargs["epsilon"] = float(self.epsilon)
+            # set the epsilon if it should be set
+            if self.epsilon is not None:
+                kwargs["epsilon"] = float(self.epsilon)
 
-        # add n_fronts parameter if the method supports it
-        if self.method == "fast_non_dominated_sort":
-            kwargs["n_fronts"] = n_fronts
+            # add n_fronts parameter if the method supports it
+            if self.method == "fast_non_dominated_sort":
+                kwargs["n_fronts"] = n_fronts
 
-        fronts = func(F, n_stop_if_ranked=n_stop_if_ranked, **kwargs)
+            fronts = func(F, n_stop_if_ranked=n_stop_if_ranked, **kwargs)
 
         # convert to numpy array for each front and filter by n_stop_if_ranked if desired
         _fronts = []
@@ -46,7 +54,7 @@ class NonDominatedSorting:
             # increment the n_ranked solution counter
             n_ranked += len(front)
 
-            # stop if more than this solutions are n_ranked
+            # stop if more solutions than n_ranked are ranked
             if n_ranked >= n_stop_if_ranked:
                 break
 

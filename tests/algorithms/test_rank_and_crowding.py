@@ -7,14 +7,16 @@ from pymoo.indicators.igd import IGD
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.operators.survival.rank_and_crowding import RankAndCrowding, ConstrRankAndCrowding
 from pymoo.operators.survival.rank_and_crowding.metrics import calc_crowding_distance
-from pymoo.util.function_loader import load_function
-from pymoo.util.mnn import calc_mnn as calc_mnn_python
-from pymoo.util.mnn import calc_2nn as calc_2nn_python
+from pymoo.functions import load_function
 
 
 calc_mnn = load_function("calc_mnn")
 calc_2nn = load_function("calc_2nn")
 calc_pcd = load_function("calc_pcd")
+
+# Get Python fallback versions for testing
+calc_mnn_python = load_function("calc_mnn", _type="python")
+calc_2nn_python = load_function("calc_2nn", _type="python")
 
 
 @pytest.mark.parametrize('crowding_func', ["mnn", "2nn", "cd", "pcd", "ce"])
