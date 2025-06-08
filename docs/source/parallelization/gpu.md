@@ -59,12 +59,11 @@ JAX as accelerated numpy and it provides a numpy-inspired interface for convenie
 import jax.numpy as jnp
 import numpy as np
 import jax
-from jax.config import config
 from functools import partial
 from pymoo.core.problem import Problem
 
-config.update("jax_enable_x64", True) # default is float32 
-config.update('jax_disable_jit', False) # for debugging
+jax.config.update("jax_enable_x64", True) # default is float32 
+jax.config.update('jax_disable_jit', False) # for debugging
 
 class MyProblem(Problem):
 

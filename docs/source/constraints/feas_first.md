@@ -14,8 +14,16 @@ jupytext:
 ```
 
 ```{code-cell} ipython3
-%%capture
-%run ./index.ipynb
+from pymoo.core.problem import ElementwiseProblem
+
+class ConstrainedProblem(ElementwiseProblem):
+
+    def __init__(self, **kwargs):
+        super().__init__(n_var=2, n_obj=1, n_ieq_constr=1, n_eq_constr=0, xl=0, xu=2, **kwargs)
+
+    def _evaluate(self, x, out, *args, **kwargs):
+        out["F"] = x[0] ** 2 + x[1] ** 2
+        out["G"] = 1.0 - (x[0] + x[1])
 ```
 
 ### Feasibility First (Parameter-less Approach)

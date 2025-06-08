@@ -92,27 +92,4 @@ plot(problem.pareto_front(), no_fill=True)
 
 +++ {"pycharm": {"name": "#%% md\n"}}
 
-### CTS4
-
-```{code-cell}
----
-pycharm:
-  name: '#%%
-
-    '
----
-import numpy as np
-
-from pymoo.problems.multi import MODAct
-from pymoo.visualization.scatter import Scatter
-
-pf = np.loadtxt("modact-cts3.pf")
-
-problem = MODAct("cts4", pf=pf)
-pf = problem.pareto_front()
-Scatter(angle=(45,45)).add(pf, color="red").show()
-```
-
-+++ {"pycharm": {"name": "#%% md\n"}}
-
 <sub>Implementation by [the author (cyrilpic)](https://github.com/cyrilpic).

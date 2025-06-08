@@ -14,8 +14,17 @@ jupytext:
 ```
 
 ```{code-cell} ipython3
-%%capture
-%run ./index.ipynb
+from pymoo.core.problem import ElementwiseProblem
+
+class ConstrainedProblemWithEquality(ElementwiseProblem):
+
+    def __init__(self, **kwargs):
+        super().__init__(n_var=2, n_obj=1, n_ieq_constr=1, n_eq_constr=1, xl=0, xu=1, **kwargs)
+
+    def _evaluate(self, x, out, *args, **kwargs):
+        out["F"] = x[0] + x[1]
+        out["G"] = 1.0 - (x[0] + x[1])
+        out["H"] = 3 * x[0] - x[1]
 ```
 
 ### $\epsilon$-Constraint Handling
