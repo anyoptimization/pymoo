@@ -6,15 +6,15 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.17.1
 kernelspec:
-  name: default
   display_name: default
   language: python
+  name: default
 ---
 
 ```{raw-cell}
 ---
-raw_mimetype: text/restructuredtext
 editable: true
+raw_mimetype: text/restructuredtext
 slideshow:
   slide_type: ''
 ---
@@ -100,7 +100,7 @@ print("Constraint violation: %s" % res.CV)
 
 ### Performance Comparison
 
-Here's an example comparing NRBO with other single-objective algorithms:
+Here's an example comparing NRBO with other single-objective algorithms including G3PCX:
 
 ```{code-cell} ipython3
 import numpy as np
@@ -108,6 +108,7 @@ import matplotlib.pyplot as plt
 from pymoo.algorithms.soo.nonconvex.nrbo import NRBO
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.algorithms.soo.nonconvex.pso import PSO
+from pymoo.algorithms.soo.nonconvex.g3pcx import G3PCX
 from pymoo.problems import get_problem
 from pymoo.optimize import minimize
 
@@ -118,7 +119,8 @@ problem = get_problem("rastrigin", n_var=10)
 algorithms = [
     ("NRBO", NRBO(pop_size=50)),
     ("GA", GA(pop_size=50)),
-    ("PSO", PSO(pop_size=50))
+    ("PSO", PSO(pop_size=50)),
+    ("G3PCX", G3PCX(pop_size=50))
 ]
 
 # Run optimizations and collect results
