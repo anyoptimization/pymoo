@@ -57,3 +57,15 @@ dev = [
     "ipython",
     "ipykernel",
 ]
+visualization = [
+    "matplotlib>=3.0",
+]
+parallelization = [
+    "joblib",
+    "dask[distributed]",
+    "ray[default]",
+]
+full = [
+    {include-group = "visualization"},
+    {include-group = "parallelization"},
+]

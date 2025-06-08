@@ -53,6 +53,33 @@ For MacOSX and Windows **compiled** packages are available.  For Linux the packa
 
 +++
 
+## Optional Dependencies
+
++++
+
+*pymoo* provides optional dependency groups for additional functionality:
+
+```{raw-cell}
+:raw_mimetype: text/restructuredtext
+
+.. code:: bash
+
+    # For visualization features (matplotlib-based plotting)
+    pip install -U pymoo[visualization]
+    
+    # For parallelization features (joblib, dask, ray)
+    pip install -U pymoo[parallelization]
+    
+    # For all optional features
+    pip install -U pymoo[full]
+```
+
+**Visualization**: Includes matplotlib for creating plots, animations, and interactive visualizations of optimization results.
+
+**Parallelization**: Includes joblib, dask, and ray for distributed and parallel evaluation of objective functions across multiple cores or machines.
+
++++
+
 To quickly check if the compilation was successful you can use the following command:
 
 ```{raw-cell}
