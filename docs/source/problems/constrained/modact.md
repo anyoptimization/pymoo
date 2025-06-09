@@ -67,7 +67,7 @@ pycharm:
     '
 ---
 from pymoo.problems.multi import MODAct
-from pymoo.util.plotting import plot
+from pymoo.visualization.util import plot
 
 problem = MODAct("cs3")
 plot(problem.pareto_front(), no_fill=True)
@@ -84,7 +84,7 @@ pycharm:
 
     '
 ---
-from pymoo.util.plotting import plot
+from pymoo.visualization.util import plot
 
 problem = MODAct("ct1")
 plot(problem.pareto_front(), no_fill=True)

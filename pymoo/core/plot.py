@@ -1,9 +1,7 @@
 import importlib
 
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.colors import ListedColormap
+from pymoo.visualization.matplotlib import matplotlib, plt, colors, ListedColormap
 
 from pymoo.util.misc import set_if_none
 from pymoo.visualization.util import default_number_to_text, in_notebook

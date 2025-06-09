@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.problems import get_problem
-from pymoo.util.plotting import plot_problem_surface, plot
+from pymoo.visualization.util import plot, plot_problem_surface
 from pymoo.visualization.scatter import Scatter
 
 # --------------------------------------------------------------------------------------------

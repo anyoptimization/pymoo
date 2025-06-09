@@ -58,7 +58,7 @@ pycharm:
     '
 ---
 from pymoo.problems import get_problem
-from pymoo.util.plotting import plot
+from pymoo.visualization.util import plot
 
 problem = get_problem("dascmop1", 1)
 plot(problem.pareto_front(), no_fill=True)

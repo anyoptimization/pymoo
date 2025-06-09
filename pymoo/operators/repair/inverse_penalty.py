@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     c = np.array([-0.1, 1.0])
 
-    import matplotlib.pyplot as plt
+    from pymoo.visualization.matplotlib import plt
 
     plt.scatter(p[0], p[1], color="green", label="Parent")
     plt.scatter(c[0], c[1], color="orange", label="Offspring")

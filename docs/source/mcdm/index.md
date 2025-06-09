@@ -68,11 +68,13 @@ print("Best regarding decomposition: Point %s - %s" % (I, F[I]))
 Visualize it:
 
 ```{code-cell} ipython3
+import numpy as np
 from pymoo.visualization.scatter import Scatter
 
+F = np.array(F)
 plot = Scatter()
 plot.add(F, color="blue", alpha=0.2, s=10)
-plot.add(F[I], color="red", s=30)
+plot.add(np.array([F[I]]), color="red", s=30)
 plot.do()
 plot.apply(lambda ax: ax.arrow(0, 0, *weights, color='black', 
                                head_width=0.01, head_length=0.01, alpha=0.4))
@@ -104,6 +106,7 @@ from pymoo.visualization.petal import Petal
 
 ref_dirs = get_reference_directions("das-dennis", 4, n_partitions=12)
 F = get_problem("dtlz1").pareto_front(ref_dirs)
+F = np.array(F)
 
 weights = np.array([0.25, 0.25, 0.25, 0.25])
 a, pseudo_weights = PseudoWeights(weights).do(F, return_pseudo_weights=True)

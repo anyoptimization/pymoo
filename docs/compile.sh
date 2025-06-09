@@ -202,21 +202,80 @@ process_file() {
     local total_files="$3"
     local nb_file="${md_file%.md}.ipynb"
     
-    log_output "[$current_index/$total_files] Processing $md_file..."
+    # Check if notebook exists before conversion
+    nb_existed_before=$([ -f "$nb_file" ] && echo "true" || echo "false")
     
-    # Sync the markdown file to create/update the corresponding notebook
-    jupytext --to ipynb --sync "$md_file" 2>&1 | tee -a "$LOG_FILE"
+    # Determine the reason for processing
+    local reason=""
+    if [ "$FORCE" = true ]; then
+        if [ "$nb_existed_before" = "false" ]; then
+            reason="(force mode, notebook missing)"
+        else
+            reason="(force mode)"
+        fi
+    elif [ "$nb_existed_before" = "false" ]; then
+        reason="(notebook missing)"
+    fi
+    
+    # Get relative path from source directory
+    relative_path=$(echo "$md_file" | sed "s|$SOURCE_DIR/||")
+    
+    # Build initial status line
+    status_line="[$current_index/$total_files] $relative_path -> "
+    
+    # Show initial status
+    printf "%s" "$status_line"
+    printf "%s" "$status_line" >> "$LOG_FILE"
+    
+    # Converting step (jupytext)
+    printf "converting... "
+    printf "converting... " >> "$LOG_FILE"
+    jupytext --to ipynb --sync "$md_file" >/dev/null 2>&1
     
     # Execute the notebook if it exists and execution is enabled
     if [ -f "$nb_file" ]; then
         if [[ "$EXECUTE" == true ]]; then
-            log_output "Executing $nb_file..."
-            jupyter nbconvert --execute --to notebook --inplace "$nb_file" --log-level=ERROR 2>&1 | tee -a "$LOG_FILE"
+            printf "executing... "
+            printf "executing... " >> "$LOG_FILE"
+            error_output=$(jupyter nbconvert --execute --to notebook --inplace "$nb_file" --log-level=ERROR 2>&1)
+            if [ $? -eq 0 ]; then
+                echo "SUCCESS"
+                echo "SUCCESS" >> "$LOG_FILE"
+            else
+                # Look for the main error type first
+                error_type=$(echo "$error_output" | grep -o -E "(ImportError|ModuleNotFoundError|NameError|ValueError|TypeError|AttributeError|KeyError|IndexError|FileNotFoundError)" | head -1)
+                
+                # Get the error message that follows the error type
+                if [ -n "$error_type" ]; then
+                    error_msg=$(echo "$error_output" | grep -A 3 "$error_type" | tail -1 | sed 's/^[[:space:]]*//' | cut -c1-120)
+                    if [ -n "$error_msg" ] && [ "$error_msg" != "$error_type" ]; then
+                        final_error="$error_type: $error_msg"
+                    else
+                        final_error="$error_type"
+                    fi
+                else
+                    # Fall back to looking for any error line
+                    final_error=$(echo "$error_output" | grep -E "(Error|Exception):" | head -1 | sed 's/^[[:space:]]*//' | cut -c1-120)
+                    if [ -z "$final_error" ]; then
+                        final_error="execution failed"
+                    fi
+                fi
+                
+                echo "ERROR: $final_error"
+                echo "ERROR: $final_error" >> "$LOG_FILE"
+                # Also log full error to file for debugging
+                echo "FULL ERROR OUTPUT:" >> "$LOG_FILE"
+                echo "$error_output" >> "$LOG_FILE"
+                echo "---" >> "$LOG_FILE"
+                rm -f "$nb_file"
+            fi
         else
-            log_output "Skipping execution of $nb_file (--no-execute specified)"
+            echo "SKIPPED (--no-execute)"
+            echo "SKIPPED (--no-execute)" >> "$LOG_FILE"
         fi
     else
-        log_output "Warning: $nb_file not found after sync"
+        echo "ERROR: notebook not found after sync"
+        echo "ERROR: notebook not found after sync" >> "$LOG_FILE"
     fi
 }
 
@@ -235,12 +294,11 @@ if [[ ${#SPECIFIC_FILES[@]} -gt 0 ]]; then
         
         if [ "$FORCE" = true ]; then
             should_process=true
-            log_output "[$current_index/$total_files] Processing $md_file (force mode)..."
         elif [ ! -f "$nb_file" ]; then
             should_process=true
-            log_output "[$current_index/$total_files] Processing $md_file (notebook missing)..."
         else
-            log_output "[$current_index/$total_files] Skipping $md_file (notebook exists, use --force to override)"
+            relative_path=$(echo "$md_file" | sed "s|$SOURCE_DIR/||")
+            log_output "[$current_index/$total_files] $relative_path -> skipping (notebook exists, use --force to override)"
         fi
         
         # Process the file if needed
@@ -252,33 +310,45 @@ else
     # First, collect all markdown files to get total count (sorted alphabetically)
     log_output "Finding and sorting all markdown files alphabetically..."
     ALL_MD_FILES=($(find "$SOURCE_DIR" -name '*.md' -not -path "*/\\_*/*" -not -path "*/.ipynb_checkpoints/*" | sort))
-    total_files=${#ALL_MD_FILES[@]}
-    current_index=0
     
-    # Loop over each markdown file (excluding folders starting with _)
-    for md_file in "${ALL_MD_FILES[@]}";
-    do
-        ((current_index++))
-        # Get the corresponding notebook file path
+    # Pre-filter files to determine what will be processed vs skipped
+    FILES_TO_PROCESS=()
+    FILES_TO_SKIP=()
+    
+    for md_file in "${ALL_MD_FILES[@]}"; do
         nb_file="${md_file%.md}.ipynb"
         
-        # Check if we should process this file
-        should_process=false
-        
         if [ "$FORCE" = true ]; then
-            should_process=true
-            log_output "[$current_index/$total_files] Processing $md_file (force mode)..."
+            FILES_TO_PROCESS+=("$md_file")
         elif [ ! -f "$nb_file" ]; then
-            should_process=true
-            log_output "[$current_index/$total_files] Processing $md_file (notebook missing)..."
+            FILES_TO_PROCESS+=("$md_file")
         else
-            log_output "[$current_index/$total_files] Skipping $md_file (notebook exists, use --force to override)"
+            FILES_TO_SKIP+=("$md_file")
         fi
-        
-        # Process the file if needed
-        if [ "$should_process" = true ]; then
-            process_file "$md_file" "$current_index" "$total_files"
-        fi
+    done
+    
+    # Report counts
+    total_files=${#ALL_MD_FILES[@]}
+    process_count=${#FILES_TO_PROCESS[@]}
+    skip_count=${#FILES_TO_SKIP[@]}
+    
+    if [ $skip_count -gt 0 ]; then
+        log_output "Skipped files: $skip_count (use --force to process all)"
+    fi
+    
+    if [ $process_count -eq 0 ]; then
+        log_output "No files to process."
+        exit 0
+    fi
+    
+    log_output "Processing $process_count files..."
+    
+    current_index=0
+    
+    # Loop over files to process
+    for md_file in "${FILES_TO_PROCESS[@]}"; do
+        ((current_index++))
+        process_file "$md_file" "$current_index" "$process_count"
     done
 fi
 

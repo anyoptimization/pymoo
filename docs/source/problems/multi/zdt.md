@@ -67,7 +67,7 @@ $$0 \leq x_1^* \leq 1  \quad \text{and} \quad x_i^*=0 \; \text{for} \; i=2,\ldot
 
 ```{code-cell} ipython3
 from pymoo.problems import get_problem
-from pymoo.util.plotting import plot
+from pymoo.visualization.util import plot
 
 problem = get_problem("zdt1")
 plot(problem.pareto_front(), no_fill=True)
@@ -114,7 +114,7 @@ $$0 \leq x_1^* \leq 1  \quad \text{and} \quad x_i^*=0 \; \text{for} \; i=2,\ldot
 
 ```{code-cell} ipython3
 from pymoo.problems import get_problem
-from pymoo.util.plotting import plot
+from pymoo.visualization.util import plot
 
 problem = get_problem("zdt2")
 plot(problem.pareto_front(), no_fill=True)
@@ -166,7 +166,7 @@ x_i^*=0 \; \text{for} \; i=2,\ldots,n$$
 
 ```{code-cell} ipython3
 from pymoo.problems import get_problem
-from pymoo.util.plotting import plot
+from pymoo.visualization.util import plot
 
 problem = get_problem("zdt3")
 plot(problem.pareto_front(), no_fill=True)
@@ -214,7 +214,7 @@ $$0 \leq x_1^* \leq 1  \quad \text{and} \quad x_i^*=0 \; \text{for} \; i=2,\ldot
 
 ```{code-cell} ipython3
 from pymoo.problems import get_problem
-from pymoo.util.plotting import plot
+from pymoo.visualization.util import plot
 
 problem = get_problem("zdt4")
 plot(problem.pareto_front(), no_fill=True)
@@ -263,7 +263,7 @@ $$0 \leq u(x_1^*) \leq 30  \quad \text{and} \quad u(x_i^*)=5 \; \text{for} \; i=
 
 ```{code-cell} ipython3
 from pymoo.problems import get_problem
-from pymoo.util.plotting import plot
+from pymoo.visualization.util import plot
 
 problem = get_problem("zdt5", normalize=False)
 plot(problem.pareto_front(), no_fill=True)
@@ -273,7 +273,7 @@ Please note that by default here the Pareto-front is not normalized. However, th
 
 ```{code-cell} ipython3
 from pymoo.problems import get_problem
-from pymoo.util.plotting import plot
+from pymoo.visualization.util import plot
 
 problem = get_problem("zdt5", normalize=False)
 plot(problem.pareto_front(), no_fill=True)
@@ -320,7 +320,7 @@ $$0 \leq x_1^* \leq 1  \quad \text{and} \quad x_i^*=0 \; \text{for} \; i=2,\ldot
 
 ```{code-cell} ipython3
 from pymoo.problems import get_problem
-from pymoo.util.plotting import plot
+from pymoo.visualization.util import plot
 
 problem = get_problem("zdt6")
 plot(problem.pareto_front(), no_fill=True)

@@ -54,7 +54,7 @@ in solving this problem.
 
 ```{code-cell} ipython3
 from pymoo.problems import get_problem
-from pymoo.util.plotting import plot
+from pymoo.visualization.util import plot
 
 problem = get_problem("bnh")
 plot(problem.pareto_front(), no_fill=True)

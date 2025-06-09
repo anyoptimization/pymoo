@@ -1,5 +1,6 @@
 import numpy as np
 
+import pymoo.visualization.util
 from pymoo.docs import parse_doc_string
 from pymoo.core.plot import Plot
 from pymoo.util.misc import all_combinations
@@ -74,7 +75,7 @@ class FitnessLandscape(Plot):
 
             X = np.linspace(problem.xl[0], problem.xu[0], num=n_samples)[:, None]
             Z = problem.evaluate(X, return_values_of=["F"])
-            self.ax.plot(X, Z)
+            pymoo.visualization.util.plot(X, Z)
             self.ax.set_xlabel("x")
             self.ax.set_ylabel("f(x)")
 

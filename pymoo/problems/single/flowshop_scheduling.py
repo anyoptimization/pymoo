@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+
 import numpy as np
 
 from pymoo.core.problem import ElementwiseProblem
@@ -83,6 +83,7 @@ def create_random_flowshop_problem(n_machines, n_jobs, seed=None):
 
 
 def visualize(problem, x, path=None, label=True):
+    from pymoo.visualization.matplotlib import plt
     with plt.style.context('ggplot'):
         n_machines, n_jobs = problem.records.shape
         machine_times = problem.get_machine_times(x)

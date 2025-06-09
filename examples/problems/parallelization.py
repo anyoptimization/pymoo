@@ -2,8 +2,9 @@ from multiprocessing.pool import ThreadPool
 from time import sleep
 
 from pymoo.algorithms.soo.nonconvex.pso import PSO
-from pymoo.core.problem import ElementwiseProblem, StarmapParallelization
+from pymoo.core.problem import ElementwiseProblem
 from pymoo.optimize import minimize
+from pymoo.parallelization import StarmapParallelization
 
 
 class MyProblem(ElementwiseProblem):

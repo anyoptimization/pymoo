@@ -73,7 +73,7 @@ The Pareto-optimal solution corresponds to $x_i=0.5$ (for all $x_i\in \boldx_M$)
 
 ```{code-cell} ipython3
 from pymoo.problems import get_problem
-from pymoo.util.plotting import plot
+from pymoo.visualization.util import plot
 from pymoo.util.ref_dirs import get_reference_directions
 from pymoo.visualization.scatter import Scatter
 

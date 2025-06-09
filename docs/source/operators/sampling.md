@@ -30,14 +30,14 @@ In the beginning, initial points need to be sampled. *pymoo* offers different sa
 ```{code-cell} ipython3
 from pymoo.core.problem import Problem
 from pymoo.operators.sampling.rnd import FloatRandomSampling
-from pymoo.util import plotting
+from pymoo.visualization.util import plot
 
 problem = Problem(n_var=2, xl=0, xu=1)
 
 sampling = FloatRandomSampling()
 
 X = sampling(problem, 200).get("X")
-plotting.plot(X, no_fill=True)
+plot(X, no_fill=True)
 ```
 
 ```{raw-cell}
@@ -54,7 +54,7 @@ from pymoo.operators.sampling.lhs import LHS
 sampling = LHS()
 
 X = sampling(problem, 200).get("X")
-plotting.plot(X, no_fill=True)
+plot(X, no_fill=True)
 ```
 
 ### API

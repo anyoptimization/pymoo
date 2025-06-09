@@ -199,7 +199,7 @@ if __name__ == "__main__":
     from pymoo.algorithms.soo.nonconvex.pso import PSO
     from pymoo.algorithms.soo.nonconvex.pso_ep import EPPSO
     from pymoo.operators.sampling.lhs import LHS
-    import matplotlib.pyplot as plt
+    from pymoo.visualization.matplotlib import plt
 
     prob = Ackley(n_var=50)
     # prob=G9()
