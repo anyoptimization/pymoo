@@ -33,7 +33,7 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14):
     sm = p1 < p2
     y1 = np.where(sm, p1, p2)
     y2 = np.where(sm, p2, p1)
-
+    
     # mask all the values that should be crossovered
     _xl = np.repeat(xl[None, :], n_matings, axis=0)[cross]
     _xu = np.repeat(xu[None, :], n_matings, axis=0)[cross]
