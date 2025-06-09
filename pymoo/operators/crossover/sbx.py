@@ -25,9 +25,14 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14):
     # disable crossover when lower and upper bound are identical
     cross[:, xl == xu] = False
 
-    # assign y1 the smaller and y2 the larger value
-    y1 = np.min(X, axis=0)[cross]
-    y2 = np.max(X, axis=0)[cross]
+    # preserve parent identity while getting values for SBX calculation
+    p1 = X[0][cross]
+    p2 = X[1][cross]
+    
+    # assign y1 the smaller and y2 the larger value for SBX calculation
+    mask = p1 < p2
+    y1 = np.where(mask, p1, p2)
+    y2 = np.where(mask, p2, p1)
 
     # mask all the values that should be crossovered
     _xl = np.repeat(xl[None, :], n_matings, axis=0)[cross]
@@ -60,18 +65,20 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14):
     betaq = calc_betaq(beta)
     c2 = 0.5 * ((y1 + y2) + betaq * delta)
 
-    # with the given probability either assign the value from the first or second parent
+    # assign children based on parent position, then apply exchange probability
+    child1 = np.where(mask, c1, c2)  # child for parent 1
+    child2 = np.where(mask, c2, c1)  # child for parent 2
+    
+    # exchange children with given probability
     b = np.random.random(len(prob_bin)) < prob_bin
-    tmp = np.copy(c1[b])
-    c1[b] = c2[b]
-    c2[b] = tmp
+    child1, child2 = np.where(b, (child2, child1), (child1, child2))
 
     # first copy the unmodified parents
     Q = np.copy(X)
 
     # copy the positions where the crossover was done
-    Q[0, cross] = c1
-    Q[1, cross] = c2
+    Q[0, cross] = child1
+    Q[1, cross] = child2
 
     Q[0] = repair_clamp(Q[0], xl, xu)
     Q[1] = repair_clamp(Q[1], xl, xu)
