@@ -9,6 +9,7 @@
 **/nohup.out
 benchmark
 wheelhouse
+.pytest_cache
 
 
 **/dask-worker-space/**

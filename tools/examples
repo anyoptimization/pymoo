@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+
+# PyMoo Examples Test Runner
+# This script runs the examples tests using pytest
+
+# Function to display usage information
+usage() {
+    cat << EOF
+Usage: $(basename "$0") [OPTIONS]
+
+Run PyMoo examples tests using pytest.
+
+Options:
+  -h, --help   Show this help message and exit
+  -v           Extra verbose output (passed to pytest)
+  -q, --quiet  Quiet output (disable default verbose mode)
+  -k EXPR      Only run tests matching the expression (passed to pytest)
+  -x           Stop on first failure (passed to pytest)
+  --lf         Only run tests that failed in the last run (saves time)
+  --ff         Run failed tests first, then the rest (for quick feedback)
+  --no-header  Skip the header output
+
+Examples:
+  $(basename "$0")                      # Run all examples tests
+  $(basename "$0") -v                   # Run with extra verbose output
+  $(basename "$0") --lf                 # Run only previously failed tests (faster debugging)
+  $(basename "$0") --ff                 # Run failed tests first, then successful ones
+  $(basename "$0") -k "nsga2"           # Run examples matching "nsga2"
+  $(basename "$0") -x                   # Stop on first failure
+
+Note: Failed test information is automatically tracked by pytest in .pytest_cache/
+Use --lf after a test run to quickly re-run only the tests that failed.
+
+EOF
+}
+
+# Default values
+PYTEST_ARGS=()
+SHOW_HEADER=true
+QUIET_MODE=false
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --no-header)
+            SHOW_HEADER=false
+            shift
+            ;;
+        -v|-k|-x|--tb|--maxfail|--lf|--ff|-q|--quiet)
+            # Pass these arguments directly to pytest
+            if [[ "$1" == "-k" || "$1" == "--maxfail" || "$1" == "--tb" ]]; then
+                PYTEST_ARGS+=("$1" "$2")
+                shift 2
+            elif [[ "$1" == "-q" || "$1" == "--quiet" ]]; then
+                QUIET_MODE=true
+                shift
+            else
+                PYTEST_ARGS+=("$1")
+                shift
+            fi
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Run '$(basename "$0") --help' for usage information."
+            exit 1
+            ;;
+    esac
+done
+
+# Change to the project root directory
+cd "$(dirname "$0")/.." || exit 1
+
+# Show header if enabled
+if [ "$SHOW_HEADER" = true ]; then
+    echo "Running PyMoo examples tests..."
+    echo "Test file: tests/test_examples.py"
+    if [ ${#PYTEST_ARGS[@]} -gt 0 ]; then
+        echo "Additional pytest args: ${PYTEST_ARGS[*]}"
+    fi
+    echo "=========================="
+fi
+
+# Run pytest on the examples test file
+if [ "$QUIET_MODE" = true ]; then
+    python -m pytest tests/test_examples.py "${PYTEST_ARGS[@]}"
+else
+    python -m pytest -v tests/test_examples.py "${PYTEST_ARGS[@]}"
+fi
+
+# Capture the exit code
+exit_code=$?
+
+# Print summary if header was shown
+if [ "$SHOW_HEADER" = true ]; then
+    echo "=========================="
+    if [ $exit_code -eq 0 ]; then
+        echo "All examples tests passed!"
+    else
+        echo "Some examples tests failed. Exit code: $exit_code"
+    fi
+fi
+
+exit $exit_code

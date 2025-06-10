@@ -1,0 +1,411 @@
+#!/usr/bin/env python
+"""
+PyMoo Documentation Tools
+
+This module provides commands for building and compiling PyMoo documentation.
+Commands:
+    compile - Convert markdown files to Jupyter notebooks and execute them
+    build   - Build the HTML documentation using Sphinx
+"""
+
+import argparse
+import os
+import sys
+import subprocess
+import glob
+from pathlib import Path
+from typing import List, Tuple, Optional
+import shutil
+import time
+
+
+class DocsManager:
+    def __init__(self):
+        # Get paths
+        self.script_dir = Path(__file__).parent.absolute()
+        self.pymoo_root = self.script_dir.parent
+        self.docs_dir = self.pymoo_root / "docs"
+        self.source_dir = self.docs_dir / "source"
+        self.build_dir = self.docs_dir / "build"
+        # No log file needed
+        
+        # Load environment from .env
+        self.env_vars = self._load_env()
+        self.conda_env = self.env_vars.get('CONDA_ENV', 'default')
+        self.docs_env = self.env_vars.get('DOCS_ENV', 'pymoo-doc')
+        
+    def _load_env(self) -> dict:
+        """Load environment variables from .env file"""
+        env_vars = {}
+        env_file = self.script_dir / ".env"
+        if env_file.exists():
+            with open(env_file, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#'):
+                        key, value = line.split('=', 1)
+                        env_vars[key.strip()] = value.strip()
+        return env_vars
+    
+    def _run_command(self, cmd: List[str], cwd: Optional[Path] = None, use_docs_env: bool = False) -> Tuple[int, str, str]:
+        """Run a command using the python wrapper script in the same folder"""
+        # Use the python script in the same folder
+        python_script = self.script_dir / "python"
+        
+        # For commands that need Python, prepend our python wrapper
+        if cmd[0] in ['jupytext', 'jupyter']:
+            # Check if python script exists, if not use system python
+            if python_script.exists():
+                cmd = [str(python_script)] + ['-m'] + cmd
+            else:
+                cmd = ['python', '-m'] + cmd
+        
+        # For build command, we need to use the docs environment
+        if use_docs_env:
+            # Temporarily modify environment for this command
+            env = os.environ.copy()
+            env['CONDA_ENV'] = self.docs_env
+            process = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=cwd or self.pymoo_root,
+                env=env
+            )
+        else:
+            # Use normal environment
+            process = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=cwd or self.pymoo_root
+            )
+        
+        stdout, stderr = process.communicate()
+        return process.returncode, stdout.decode(), stderr.decode()
+    
+    def _log(self, message: str):
+        """Log message to console"""
+        print(message)
+    
+    def compile(self, args):
+        """Compile markdown files to Jupyter notebooks and execute them"""
+        self._log(f"Using conda environment: {self.conda_env}")
+        self._log(f"Processing markdown files in: {self.source_dir}")
+        
+        # Determine files to process
+        files_to_process = self._get_files_to_process(args)
+        
+        if not files_to_process:
+            self._log("No files to process.")
+            return 0
+        
+        self._log(f"Processing {len(files_to_process)} files...")
+        
+        # Process each file
+        errors = 0
+        for i, md_file in enumerate(files_to_process, 1):
+            success = self._process_markdown_file(md_file, i, len(files_to_process), args)
+            if not success:
+                errors += 1
+        
+        self._log("Documentation build complete!")
+        return errors
+    
+    def _get_files_to_process(self, args) -> List[Path]:
+        """Determine which files to process based on arguments"""
+        files_to_process = []
+        
+        if args.files:
+            # Process specific files
+            for file_pattern in args.files:
+                # Handle glob patterns
+                if '*' in file_pattern or '?' in file_pattern or '[' in file_pattern:
+                    matches = glob.glob(file_pattern)
+                    for match in matches:
+                        if match.endswith('.md') and os.path.isfile(match):
+                            files_to_process.append(Path(match).absolute())
+                else:
+                    file_path = Path(file_pattern).absolute()
+                    if file_path.exists() and file_path.suffix == '.md':
+                        files_to_process.append(file_path)
+                    else:
+                        self._log(f"Warning: File '{file_pattern}' not found or not a .md file")
+        else:
+            # Find all markdown files, excluding directories starting with underscore
+            all_md_files = []
+            for md_file in self.source_dir.rglob('*.md'):
+                # Check if any parent directory starts with underscore
+                skip = False
+                for parent in md_file.relative_to(self.source_dir).parents:
+                    if str(parent).startswith('_'):
+                        skip = True
+                        break
+                # Also check the immediate parent directory
+                if md_file.parent.name.startswith('_'):
+                    skip = True
+                # Skip .ipynb_checkpoints directories
+                if '.ipynb_checkpoints' in str(md_file):
+                    skip = True
+                    
+                if not skip:
+                    all_md_files.append(md_file)
+            
+            all_md_files.sort()
+            
+            # Track skipped files
+            skipped_files = []
+            
+            # Filter based on force flag
+            for md_file in all_md_files:
+                nb_file = md_file.with_suffix('.ipynb')
+                if args.force or not nb_file.exists():
+                    files_to_process.append(md_file)
+                else:
+                    skipped_files.append(md_file)
+            
+            # Report skipped files if any
+            if skipped_files and not args.force:
+                self._log(f"Skipped {len(skipped_files)} files (notebooks already exist, use --force to regenerate)")
+        
+        return files_to_process
+    
+    def _process_markdown_file(self, md_file: Path, index: int, total: int, args) -> bool:
+        """Process a single markdown file"""
+        nb_file = md_file.with_suffix('.ipynb')
+        # Try to get relative path, but handle cases where file is outside source_dir
+        try:
+            relative_path = md_file.relative_to(self.source_dir)
+        except ValueError:
+            # File is outside source_dir, just use the filename
+            relative_path = md_file.name
+        
+        # Build status line
+        status = f"[{index}/{total}] {relative_path} -> "
+        print(status, end='', flush=True)
+        
+        # Convert with jupytext
+        print("converting... ", end='', flush=True)
+        cmd = ['jupytext', '--to', 'ipynb', '--sync', str(md_file)]
+        returncode, stdout, stderr = self._run_command(cmd)
+        
+        if returncode != 0:
+            print("ERROR: conversion failed")
+            print(f"Error details: {stderr}")
+            return False
+        
+        # Execute if requested
+        if nb_file.exists() and not args.no_execute:
+            print("executing... ", end='', flush=True)
+            cmd = [
+                'jupyter', 'nbconvert',
+                '--execute',
+                '--to', 'notebook',
+                '--inplace',
+                str(nb_file),
+                '--log-level=ERROR'
+            ]
+            
+            # Track execution time
+            start_time = time.time()
+            returncode, stdout, stderr = self._run_command(cmd)
+            execution_time = time.time() - start_time
+            
+            if returncode == 0:
+                print(f"SUCCESS [{execution_time:.2f}s]")
+                return True
+            else:
+                # Parse error message
+                error_msg = self._parse_error(stderr)
+                print(f"ERROR: {error_msg}")
+                
+                # Remove failed notebook
+                if nb_file.exists():
+                    nb_file.unlink()
+                return False
+        else:
+            if args.no_execute:
+                print("SKIPPED (--no-execute)")
+            else:
+                print("ERROR: notebook not found after sync")
+                return False
+        
+        return True
+    
+    def _parse_error(self, error_output: str) -> str:
+        """Parse error output to extract meaningful error message"""
+        # Look for common error types
+        error_types = [
+            'ImportError', 'ModuleNotFoundError', 'NameError', 'ValueError',
+            'TypeError', 'AttributeError', 'KeyError', 'IndexError', 'FileNotFoundError'
+        ]
+        
+        for error_type in error_types:
+            if error_type in error_output:
+                # Find the line with the error
+                lines = error_output.split('\n')
+                for i, line in enumerate(lines):
+                    if error_type in line:
+                        # Get the error message
+                        msg = line.strip()
+                        if i + 1 < len(lines) and lines[i + 1].strip():
+                            msg += ': ' + lines[i + 1].strip()
+                        return msg[:120]  # Limit length
+        
+        # Fallback to generic error
+        return "execution failed"
+    
+    def clean(self, args):
+        """Remove all .ipynb files from docs/source folder"""
+        self._log(f"Cleaning notebook files from: {self.source_dir}")
+        
+        # Find all .ipynb files in source directory
+        ipynb_files = list(self.source_dir.rglob('*.ipynb'))
+        
+        if not ipynb_files:
+            self._log("No notebook files found to clean.")
+            return 0
+        
+        # Confirm with user if not forced
+        if not args.force:
+            self._log(f"Found {len(ipynb_files)} notebook files to remove:")
+            for nb_file in ipynb_files[:10]:  # Show first 10
+                relative_path = nb_file.relative_to(self.source_dir)
+                self._log(f"  - {relative_path}")
+            if len(ipynb_files) > 10:
+                self._log(f"  ... and {len(ipynb_files) - 10} more files")
+            
+            response = input("\nProceed with deletion? [y/N]: ")
+            if response.lower() != 'y':
+                self._log("Clean operation cancelled.")
+                return 1
+        
+        # Remove the files
+        removed = 0
+        errors = 0
+        for nb_file in ipynb_files:
+            # Double-check that file is within source_dir (safety check)
+            try:
+                nb_file.relative_to(self.source_dir)
+                nb_file.unlink()
+                removed += 1
+            except (ValueError, OSError) as e:
+                try:
+                    relative_path = nb_file.relative_to(self.source_dir)
+                except ValueError:
+                    relative_path = nb_file
+                self._log(f"Error removing {relative_path}: {e}")
+                errors += 1
+        
+        self._log(f"Removed {removed} notebook files{f' ({errors} errors)' if errors else ''}.")
+        return errors
+    
+    def build(self, args):
+        """Build HTML documentation using Sphinx"""
+        self._log(f"Building documentation in conda environment: {self.docs_env}")
+        
+        # Run make html
+        self._log("Running: make html")
+        # For build, we use make directly but with the docs environment
+        env = os.environ.copy()
+        env['CONDA_ENV'] = self.docs_env
+        
+        # Activate conda and run make
+        conda_base = subprocess.check_output(['conda', 'info', '--base']).decode().strip()
+        if sys.platform == "win32":
+            activate_cmd = f"call {conda_base}\\Scripts\\activate {self.docs_env}"
+            cmd = f"{activate_cmd} && make html"
+            shell_cmd = ["cmd", "/c", cmd]
+        else:
+            activate_cmd = f"source {conda_base}/etc/profile.d/conda.sh && conda activate {self.docs_env}"
+            cmd = f"{activate_cmd} && make html"
+            shell_cmd = ["bash", "-c", cmd]
+            
+        process = subprocess.Popen(
+            shell_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=self.docs_dir,
+            env=env
+        )
+        stdout, stderr = process.communicate()
+        returncode = process.returncode
+        
+        if returncode == 0:
+            self._log("Documentation build completed successfully!")
+            self._log(f"Output available in: {self.build_dir}/html/index.html")
+            return 0
+        else:
+            self._log("Documentation build failed!")
+            self._log(f"Error: {stderr.decode() if isinstance(stderr, bytes) else stderr}")
+            return 1
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='PyMoo Documentation Tools',
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+    
+    # Compile command
+    compile_parser = subparsers.add_parser(
+        'compile',
+        help='Convert markdown files to Jupyter notebooks and execute them'
+    )
+    compile_parser.add_argument(
+        '--force',
+        action='store_true',
+        help='Process all files, not just missing notebooks'
+    )
+    compile_parser.add_argument(
+        '--no-execute',
+        action='store_true',
+        help='Convert markdown to notebooks but don\'t execute them'
+    )
+    compile_parser.add_argument(
+        'files',
+        nargs='*',
+        help='Specific files or patterns to process (e.g., file.md, "algorithms/*.md")'
+    )
+    
+    # Build command
+    build_parser = subparsers.add_parser(
+        'build',
+        help='Build HTML documentation using Sphinx'
+    )
+    
+    # Clean command
+    clean_parser = subparsers.add_parser(
+        'clean',
+        help='Remove all .ipynb files from docs/source folder'
+    )
+    clean_parser.add_argument(
+        '--force',
+        action='store_true',
+        help='Remove files without confirmation'
+    )
+    
+    # Parse arguments
+    args = parser.parse_args()
+    
+    if not args.command:
+        parser.print_help()
+        return 1
+    
+    # Execute command
+    docs_manager = DocsManager()
+    
+    if args.command == 'compile':
+        return docs_manager.compile(args)
+    elif args.command == 'build':
+        return docs_manager.build(args)
+    elif args.command == 'clean':
+        return docs_manager.clean(args)
+    
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

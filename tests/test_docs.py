@@ -3,13 +3,7 @@ from jupyter_client.manager import start_new_kernel
 
 from tests.test_util import files_from_folder, run_ipynb, DOCS
 
-SKIP = ["parallelization.ipynb",
-        "video.ipynb",
-        "modact.ipynb",
-        "dascmop.ipynb",
-        "constraints.ipynb"]
-
-IPYNBS = [e for e in files_from_folder(DOCS, regex='**/*.ipynb', skip=SKIP) if ".ipynb_checkpoints" not in e]
+IPYNBS = [e for e in files_from_folder(DOCS, regex='**/*.ipynb') if ".ipynb_checkpoints" not in e]
 
 
 @pytest.mark.long
