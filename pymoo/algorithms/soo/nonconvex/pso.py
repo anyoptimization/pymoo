@@ -8,9 +8,8 @@ from pymoo.core.population import Population
 from pymoo.core.repair import NoRepair
 from pymoo.core.replacement import ImprovementReplacement
 from pymoo.docs import parse_doc_string
-from pymoo.operators.crossover.dex import repair_random_init
 from pymoo.operators.mutation.pm import PM
-from pymoo.operators.repair.bounds_repair import is_out_of_bounds_by_problem
+from pymoo.operators.repair.bounds_repair import is_out_of_bounds_by_problem, repair_random_init
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside
 from pymoo.operators.sampling.lhs import LHS
 from pymoo.util.display.column import Column
