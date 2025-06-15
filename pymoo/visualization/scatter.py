@@ -90,7 +90,7 @@ class Scatter(Plot):
         Scatter Plot
 
         Parameters
-        ----------------
+        ----------
 
         axis_style : {axis_style}
         labels : {labels}

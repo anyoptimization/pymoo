@@ -13,7 +13,7 @@ class Radviz(Plot):
         Radviz Plot
 
         Parameters
-        ----------------
+        ----------
 
         axis_style : {axis_style}
         endpoint_style : dict

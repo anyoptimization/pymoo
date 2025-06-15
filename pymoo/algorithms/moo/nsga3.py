@@ -11,7 +11,7 @@ from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import TournamentSelection, compare
 from pymoo.util.display.multi import MultiObjectiveOutput
-from pymoo.util.function_loader import load_function
+from pymoo.functions import load_function
 from pymoo.util.misc import intersect, has_feasible
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 

@@ -10,6 +10,7 @@ except ImportError:
 
 from bs4 import BeautifulSoup as bs
 from docutils.parsers.rst import directives
+from docutils.parsers.rst.directives import body
 from docutils import nodes
 from sphinx.application import Sphinx
 from sphinx.locale import get_translation

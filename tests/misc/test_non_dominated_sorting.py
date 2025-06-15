@@ -5,7 +5,7 @@ from pymoo.algorithms.moo.nsga3 import NSGA3
 from pymoo.core.callback import Callback
 from pymoo.optimize import minimize
 from pymoo.problems.many import DTLZ2
-from pymoo.util.function_loader import load_function
+from pymoo.functions import load_function
 from pymoo.util.ref_dirs import get_reference_directions
 
 

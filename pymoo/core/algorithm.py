@@ -9,7 +9,7 @@ from pymoo.core.population import Population
 from pymoo.core.result import Result
 from pymoo.termination.default import DefaultMultiObjectiveTermination, DefaultSingleObjectiveTermination
 from pymoo.util.display.display import Display
-from pymoo.util.function_loader import FunctionLoader
+from pymoo.functions import FunctionLoader
 from pymoo.util.misc import termination_from_tuple
 from pymoo.util.optimum import filter_optimum
 
@@ -99,6 +99,10 @@ class Algorithm:
 
         # the problem to be solved by the algorithm
         self.problem = problem
+
+        # clone the output object if it exists to avoid state pollution between runs
+        if self.output is not None:
+            self.output = copy.deepcopy(self.output)
 
         # set all the provided options to this method
         for key, value in kwargs.items():

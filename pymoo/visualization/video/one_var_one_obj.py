@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+from pymoo.visualization.matplotlib import plt
 import numpy as np
 
 from pymoo.visualization.video.callback_video import AnimationCallback

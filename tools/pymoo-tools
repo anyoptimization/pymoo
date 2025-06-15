@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Global PyMoo tools launcher
+# This script can be symlinked to /usr/local/bin or added to PATH
+
+# Find the pymoo root directory
+# This script should be in pymoo/tools/, so we need to go up one level
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PYMOO_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Execute the run script with all arguments
+exec "$SCRIPT_DIR/run" "$@"

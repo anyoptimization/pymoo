@@ -55,6 +55,7 @@ extensions = [
     'sphinx.ext.coverage',
     'matplotlib.sphinxext.plot_directive',
     'sphinxcontrib.bibtex',
+    'sphinx_copybutton',
 ]
 
 bibtex_bibfiles = ['references.bib']
@@ -84,10 +85,10 @@ templates_path = ['_templates']
 # sphinx.ext.intersphinx - Mappings to other projects
 # =========================================================================================================
 
-intersphinx_mapping = {'python': ('http://docs.python.org/2', None),
-                       'numpy': ('http://docs.scipy.org/doc/numpy', "http://docs.scipy.org/doc/numpy/objects.inv"),
-                       'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
-                       'matplotlib': ('http://matplotlib.sourceforge.net', None)}
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
+                       'numpy': ('https://numpy.org/doc/stable', None),
+                       'scipy': ('https://docs.scipy.org/doc/scipy', None),
+                       'matplotlib': ('https://matplotlib.org/stable', None)}
 
 # ===========================================================================
 # nbsphinx
@@ -191,4 +192,15 @@ numpydoc_use_blockquotes = False
 
 # Deprecated since version edit: your HTML template instead. Whether to insert an edit link after docstrings.
 numpydoc_edit_link = False
+
+# ===========================================================================
+# sphinx-copybutton
+# ===========================================================================
+
+# Configure copy button behavior
+copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
+copybutton_prompt_is_regexp = True
+copybutton_only_copy_prompt_lines = True
+copybutton_remove_prompts = True
+copybutton_copy_empty_lines = False
 

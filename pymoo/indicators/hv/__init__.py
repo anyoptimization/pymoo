@@ -1,6 +1,7 @@
 import numpy as np
 
 from pymoo.core.indicator import Indicator
+from pymoo.functions import FunctionLoader, load_function
 from pymoo.indicators.distance_indicator import derive_ideal_and_nadir_from_pf
 from pymoo.util.misc import at_least_2d_array
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
@@ -35,7 +36,7 @@ class Hypervolume(Indicator):
 
     def _do(self, F):
         if self.nds:
-            non_dom = NonDominatedSorting().do(F, only_non_dominated_front=True)
+            non_dom = load_function('find_non_dominated')(F)
             F = np.copy(F[non_dom, :])
 
         # calculate the hypervolume using a vendor library

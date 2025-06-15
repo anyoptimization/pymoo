@@ -3,7 +3,7 @@ name = "pymoo"
 description = "Multi-Objective Optimization in Python"
 authors = [{ name = "Julian Blank", email = "blankjul@outlook.com" }]
 readme = "README.rst"
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
 classifiers = [
     'Intended Audience :: Developers',
     'Intended Audience :: Science/Research',
@@ -29,8 +29,6 @@ dependencies = [
     "matplotlib>=3",
     "autograd>=1.4",
     "cma>=3.2.2",
-    "alive-progress",
-    "dill",
     "Deprecated",
 ]
 
@@ -56,4 +54,16 @@ dev = [
     "pandas",
     "ipython",
     "ipykernel",
+]
+visualization = [
+    "matplotlib>=3.0",
+]
+parallelization = [
+    "joblib",
+    "dask[distributed]",
+    "ray[default]",
+]
+full = [
+    {include-group = "visualization"},
+    {include-group = "parallelization"},
 ]

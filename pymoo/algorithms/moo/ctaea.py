@@ -7,13 +7,14 @@ from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.core.population import Population
 from pymoo.decomposition.asf import ASF
 from pymoo.docs import parse_doc_string
+from pymoo.functions import load_function
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import TournamentSelection
 from pymoo.util.display.multi import MultiObjectiveOutput
 from pymoo.util.dominator import Dominator
-from pymoo.util.function_loader import load_function
+
 from pymoo.util.misc import has_feasible, random_permutations
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 

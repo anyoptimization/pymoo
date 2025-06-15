@@ -1,7 +1,7 @@
 import numpy as np
 
 from pymoo.indicators.hv import hvc_looped
-from pymoo.util.function_loader import load_function
+from pymoo.functions import load_function
 
 
 def hv_exact(ref_point, F):

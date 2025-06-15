@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
 from pymoo.util.misc import find_duplicates
-from pymoo.util.function_loader import load_function
+from pymoo.functions import load_function
 
 
 def get_crowding_function(label):

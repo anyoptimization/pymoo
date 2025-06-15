@@ -4,10 +4,12 @@
 **/*.npy
 **/*.png
 **/*.gif
-pymoo/cython/*.cpp
+**/*.ipynb
+**/*.cpp
 **/nohup.out
 benchmark
 wheelhouse
+.pytest_cache
 
 
 **/dask-worker-space/**

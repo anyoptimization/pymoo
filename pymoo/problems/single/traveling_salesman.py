@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.distance import cdist
 
@@ -55,6 +54,7 @@ def create_random_tsp_problem(n_cities, grid_width=100.0, grid_height=None, seed
 
 
 def visualize(problem, x, fig=None, ax=None, show=True, label=True):
+    from pymoo.visualization.matplotlib import plt
     with plt.style.context('ggplot'):
 
         if fig is None or ax is None:

@@ -16,7 +16,7 @@ class StarCoordinate(Plot):
         Star Coordinate Plot
 
         Parameters
-        ----------------
+        ----------
 
         axis_style : {axis_style}
         labels : {labels}

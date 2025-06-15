@@ -18,7 +18,7 @@ class Petal(Plot):
 
 
         Parameters
-        ----------------
+        ----------
         bounds : tuple
             The boundaries for each objective. Necessary to be provided for this plot!
         axis_style : {axis_style}

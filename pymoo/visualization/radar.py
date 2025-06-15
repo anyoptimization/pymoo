@@ -19,7 +19,7 @@ class Radar(Plot):
         Radar Plot
 
         Parameters
-        ----------------
+        ----------
         normalize_each_objective : bool
             Whether each objective is normalized. Otherwise, the inner and outer bound is plotted.
         point_style : dict

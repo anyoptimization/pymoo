@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+from pymoo.visualization.matplotlib import plt
 
 from pymoo.core.callback import Callback
 from pymoo.visualization.scatter import Scatter

@@ -180,6 +180,7 @@ Content
    getting_started/index.ipynb
    interface/index.ipynb
    problems/index.ipynb
+   parallelization/index.ipynb
    algorithms/index.ipynb
    constraints/index.ipynb
    gradients/index.ipynb
@@ -205,8 +206,6 @@ Content
 Contact
 ********************************************************************************
 
-| `Julian Blank <http://julianblank.com>`_  (blankjul [at] msu.edu)
-| Michigan State University
-| Computational Optimization and Innovation Laboratory (COIN)
-| East Lansing, MI 48824, USA
+| `Julian Blank <http://julianblank.com>`_  
+| (blankjul [at] outlook.com)
 

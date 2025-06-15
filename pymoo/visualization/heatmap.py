@@ -19,7 +19,7 @@ class Heatmap(Plot):
         Heatmap
 
         Parameters
-        ----------------
+        ----------
 
         cmap : str
             The color map to be used.
