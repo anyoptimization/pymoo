@@ -66,6 +66,10 @@ class MultiObjectiveOutput(Output):
 
             if self.pf is not None:
 
+                problem = algorithm.problem
+                if hasattr(problem, "time"):
+                    self.pf = pareto_front_if_possible(problem)
+
                 if feas.sum() > 0:
                     self.igd.set(IGD(self.pf, zero_to_one=True).do(F))
                     self.gd.set(GD(self.pf, zero_to_one=True).do(F))
