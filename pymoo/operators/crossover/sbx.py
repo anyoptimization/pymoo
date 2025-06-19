@@ -61,7 +61,10 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14):
     c2 = 0.5 * ((y1 + y2) + betaq * delta)
 
     # with the given probability either assign the value from the first or second parent
-    b = np.random.random(len(prob_bin)) < prob_bin
+    b = np.bitwise_xor(
+        np.random.random(len(prob_bin)) < prob_bin,
+        X[0, cross] > X[1, cross]
+    )
     tmp = np.copy(c1[b])
     c1[b] = c2[b]
     c2[b] = tmp
