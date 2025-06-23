@@ -14,7 +14,7 @@ calc_mnn = load_function("calc_mnn")
 calc_2nn = load_function("calc_2nn")
 calc_pcd = load_function("calc_pcd")
 
-# Get Python fallback versions for testing
+# Get Python fallback versions for pytest
 calc_mnn_python = load_function("calc_mnn", _type="python")
 calc_2nn_python = load_function("calc_2nn", _type="python")
 

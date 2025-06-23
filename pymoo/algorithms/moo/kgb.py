@@ -4,11 +4,7 @@ import json
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.core.population import Population
-try:
-    from sklearn.naive_bayes import GaussianNB
-except:
-    raise "Please install sklearn for KGB: pip install scikit-learn"
-
+from sklearn.naive_bayes import GaussianNB
 
 def euclidean_distance(a, b):
     a = np.array(a)

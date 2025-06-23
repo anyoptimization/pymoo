@@ -74,7 +74,7 @@ class WFG(Problem):
     def _calc_pareto_set(self, n_points=500, *args, **kwargs):
         extremes = self._calc_pareto_set_extremes()
         interior = self._calc_pareto_set_interior(n_points - len(extremes))
-        return np.row_stack([extremes, interior])
+        return np.vstack([extremes, interior])
 
     def _calc_pareto_front(self, ref_dirs=None, n_iterations=200, points_each_iteration=200, *args, **kwargs):
         pf = self.evaluate(self._calc_pareto_set_extremes(), return_values_of=["F"])
@@ -84,7 +84,7 @@ class WFG(Problem):
 
         for k in range(n_iterations):
             _pf = self.evaluate(self._calc_pareto_set_interior(points_each_iteration), return_values_of=["F"])
-            pf = np.row_stack([pf, _pf])
+            pf = np.vstack([pf, _pf])
 
             ideal, nadir = pf.min(axis=0), pf.max(axis=0)
 

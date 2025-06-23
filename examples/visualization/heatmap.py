@@ -25,8 +25,8 @@ F = np.random.random((30, 6))
 plot = Heatmap(figsize=(10,30),
                bound=[0,1],
                order_by_objectives=0,
-               y_labels=None,
-               solution_labels=["profit", "cost", "sustainability", "environment", "satisfaction", "time"],
+               solution_labels=None,
+               labels=["profit", "cost", "sustainability", "environment", "satisfaction", "time"],
                cmap="Greens_r")
 
 plot.add(F, aspect=0.2)

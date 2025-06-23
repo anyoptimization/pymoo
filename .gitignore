@@ -28,7 +28,7 @@ __pycache__/
  **/*.ipynb_checkpoints/
 
 
-# files which are in tests
+# files which are in pytest
 tests/!archive/*
 tests/scratch*
 tests/!archive_tests/*

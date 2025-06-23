@@ -95,7 +95,7 @@ class RankAndModifiedCrowdingSurvival(Survival):
             self.nadir_point = np.ones(self.n_obj)
 
         if self.extreme_points_as_reference_points:
-            self.ref_points = np.row_stack([self.ref_points, get_extreme_points_c(F, self.ideal_point)])
+            self.ref_points = np.vstack([self.ref_points, get_extreme_points_c(F, self.ideal_point)])
 
         # calculate the distance matrix from ever solution to all reference point
         dist_to_ref_points = calc_norm_pref_distance(F, self.ref_points, self.weights, self.ideal_point,

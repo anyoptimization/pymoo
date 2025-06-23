@@ -251,7 +251,7 @@ def stack(*args, flatten=True):
     if not flatten:
         ps = np.concatenate([e[None, ...] for e in args])
     else:
-        ps = np.row_stack(args)
+        ps = np.vstack(args)
     return ps
 
 

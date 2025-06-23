@@ -45,7 +45,7 @@ class ConstructionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
 
         while len(self.X) < self.n_points:
             x = self.next()
-            self.X = np.row_stack([self.X, x])
+            self.X = np.vstack([self.X, x])
 
             if self.verbose:
                 print(len(self.X), "x", x)

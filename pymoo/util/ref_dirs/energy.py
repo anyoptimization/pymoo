@@ -98,7 +98,7 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
 
         # if additional points to be frozen are provided - add them to the X and mark them as frozen
         if F is not None:
-            X = np.row_stack([X, F])
+            X = np.vstack([X, F])
             freeze = np.concatenate([freeze, np.full(len(F), True)])
 
         # if all points are frozen - simply return it
@@ -176,7 +176,7 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
             if self.return_as_tuple:
                 return X, R
             else:
-                return np.row_stack([X, R])
+                return np.vstack([X, R])
 
         return X
 
@@ -200,7 +200,7 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
                     scale = volume ** (self.n_dim - 1)
 
             # retrieve all points to consider
-            _X = np.row_stack([X] + R)
+            _X = np.vstack([X] + R)
 
             # translate X to make the simplex to fill the unit
             v = centroid - ref_point
@@ -223,7 +223,7 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
             _R = scale_reference_directions(_R, 0.9)
 
             # optimize just the edges
-            _R[outer] = self._solve(_R[outer], F=np.row_stack([X_t[I], _R[inner]]), freeze_edges=False)
+            _R[outer] = self._solve(_R[outer], F=np.vstack([X_t[I], _R[inner]]), freeze_edges=False)
 
             # no set the reference point and freeze it
             # closest_to_centroid = cdist(centroid, _R).argmin()
@@ -232,7 +232,7 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
             # _R[closest_to_centroid] = centroid
 
             # now when translated the reference point becomes the centroid - fix that point to be included
-            _R[inner] = self._solve(_R[inner], F=np.row_stack([X_t[I], _R[outer]]), freeze_edges=False)
+            _R[inner] = self._solve(_R[inner], F=np.vstack([X_t[I], _R[outer]]), freeze_edges=False)
 
             # rescale and translate them back
             _R_t = scale_reference_directions(_R, scale)
@@ -266,7 +266,7 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
             # filter out points from to be removed from the original array
             X = X[[i for i in I if i < len(X)]]
 
-        R = np.row_stack(R)
+        R = np.vstack(R)
 
         return X, R
 

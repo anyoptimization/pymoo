@@ -4,17 +4,17 @@ This file contains essential knowledge for working with pymoo, including CLI too
 
 ## CLI Tools Overview
 
-pymoo provides a unified CLI toolset in the `tools/` directory for managing development workflows. All tools are accessed through the `./tools/run` wrapper which handles conda environment setup and Python path configuration.
+pymoo provides a unified CLI toolset in the `tools/` directory for managing development workflows. All tools are accessed through the `./tools/python` wrapper which handles conda environment setup and Python path configuration.
 
 ### Core Tools
 
-#### **Python Execution - `./tools/run`**
+#### **Python Execution - `./tools/python`**
 **CRITICAL**: This is the ONLY way to execute Python code in pymoo. Never use `python` directly.
 
 ```bash
 # Execute Python scripts with proper environment setup
-./tools/run script.py
-./tools/run path/to/script.py
+./tools/python script.py
+./tools/python path/to/script.py
 ```
 
 Features:
@@ -23,28 +23,28 @@ Features:
 - Ensures consistent environment across all operations
 - Configurable via `tools/.env` file
 
-#### **Documentation Management - `./tools/run docs`**
+#### **Documentation Management - `./tools/python docs`**
 Comprehensive documentation compilation and building system.
 
 ```bash
 # Clean all generated notebooks
-./tools/run docs clean
+./tools/python docs clean
 
 # Compile missing .md files to .ipynb and execute them
-./tools/run docs compile
+./tools/python docs compile
 
 # Force compile all files (regenerate existing notebooks)
-./tools/run docs compile --force
+./tools/python docs compile --force
 
 # Compile specific files or patterns
-./tools/run docs compile file1.md file2.md
-./tools/run docs compile "algorithms/*.md"
+./tools/python docs compile file1.md file2.md
+./tools/python docs compile "algorithms/*.md"
 
 # Convert without executing (syntax check)
-./tools/run docs compile --no-execute
+./tools/python docs compile --no-execute
 
 # Build HTML documentation
-./tools/run docs build
+./tools/python docs build
 ```
 
 Features:
@@ -58,7 +58,7 @@ Features:
 Pytest-based runner for all example files in the `examples/` directory.
 
 ```bash
-# Run all examples (excludes long-running tests by default)
+# Run all examples (excludes long-running pytest by default)
 ./tools/examples
 
 # Include long-running examples
@@ -92,27 +92,27 @@ Features:
 Pytest-based runner for the test suite in the `tests/` directory.
 
 ```bash
-# Run all tests (excludes long-running tests by default)
-./tools/tests
+# Run all pytest (excludes long-running pytest by default)
+./tools/pytest
 
-# Include long-running tests
-./tools/tests --all
+# Include long-running pytest
+./tools/pytest --all
 
-# Run only previously failed tests
-./tools/tests --lf
+# Run only previously failed pytest
+./tools/pytest --lf
 
 # Run specific test files or directories
-./tools/tests tests/algorithms/
-./tools/tests tests/algorithms/test_nsga2.py
+./tools/pytest pytest/algorithms/
+./tools/pytest pytest/algorithms/test_nsga2.py
 
-# Run tests matching a pattern
-./tools/tests -k "nsga2"
+# Run pytest matching a pattern
+./tools/pytest -k "nsga2"
 
 # Stop on first failure
-./tools/tests -x
+./tools/pytest -x
 
 # Verbose output
-./tools/tests -v
+./tools/pytest -v
 ```
 
 Features:
@@ -165,10 +165,12 @@ pymoo uses a hybrid documentation system:
 ## Development Best Practices
 
 ### Python Execution
-- **ALWAYS** use `./tools/run` for any Python execution
+- **ALWAYS** use `./tools/python` for any Python execution
 - **NEVER** use `python` directly - it won't have proper environment setup
-- Use `./tools/run script.py` for running scripts
-- Use `./tools/run -m module` for running modules
+- **NEVER** use `python -c` - always use `./tools/python -c` instead
+- Use `./tools/python script.py` for running scripts
+- Use `./tools/python -m module` for running modules
+- Use `./tools/python -c "import numpy; print(numpy.__version__)"` for quick Python commands
 
 ### Testing Strategy
 - Use `./tools/examples` for validating example code
@@ -177,10 +179,10 @@ pymoo uses a hybrid documentation system:
 - Exclude long-running tests during development (`--all` for complete testing)
 
 ### Documentation Workflow
-- Start with `./tools/run docs clean` for fresh compilation
-- Use `./tools/run docs compile` iteratively until all files process
+- Start with `./tools/python docs clean` for fresh compilation
+- Use `./tools/python docs compile` iteratively until all files process
 - Check `docs/compile.log` for detailed error information
-- Use `./tools/run docs build` for final HTML generation
+- Use `./tools/python docs build` for final HTML generation
 
 ### Code Conventions
 - Use numpy docstring format throughout the codebase

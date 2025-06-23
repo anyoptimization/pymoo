@@ -76,7 +76,7 @@ class Truss2D(Problem):
         f2 = calc_S(f1)
         part_b = np.column_stack([f1, f2])
 
-        pf = np.row_stack([part_a, part_b])
+        pf = np.vstack([part_a, part_b])
 
         return pf
 

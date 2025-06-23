@@ -76,7 +76,7 @@ class Radar(Plot):
         if self.bounds is None:
             raise Exception("The boundaries must be provided.")
 
-        _F = np.row_stack([e[0] for e in self.to_plot])
+        _F = np.vstack([e[0] for e in self.to_plot])
         if np.any(_F < self.bounds[0]) or np.any(_F > self.bounds[1]):
             raise Exception(
                 "Points out of the boundaries exist! Please make sure the boundaries are indeed boundaries.")

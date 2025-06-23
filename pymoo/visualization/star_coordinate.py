@@ -55,7 +55,7 @@ class StarCoordinate(Plot):
         no_ticks(self.ax)
 
         # determine the overall scale of points
-        _F = np.row_stack([e[0] for e in self.to_plot])
+        _F = np.vstack([e[0] for e in self.to_plot])
         _min, _max = _F.min(axis=0), _F.max(axis=0)
 
         V = get_uniform_points_around_circle(self.n_dim)

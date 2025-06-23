@@ -94,7 +94,7 @@ def calc_crowding_distance(F, **kwargs):
     F = F[I, np.arange(n_obj)]
 
     # calculate the distance from each point to the last and next
-    dist = np.row_stack([F, np.full(n_obj, np.inf)]) - np.row_stack([np.full(n_obj, -np.inf), F])
+    dist = np.vstack([F, np.full(n_obj, np.inf)]) - np.vstack([np.full(n_obj, -np.inf), F])
 
     # calculate the norm for each objective - set to NaN if all values are equal
     norm = np.max(F, axis=0) - np.min(F, axis=0)
@@ -139,7 +139,7 @@ def calc_crowding_entropy(F, **kwargs):
     F = F[I, np.arange(n_obj)]
 
     # calculate the distance from each point to the last and next
-    dist = np.row_stack([F, np.full(n_obj, np.inf)]) - np.row_stack([np.full(n_obj, -np.inf), F])
+    dist = np.vstack([F, np.full(n_obj, np.inf)]) - np.vstack([np.full(n_obj, -np.inf), F])
 
     # calculate the norm for each objective - set to NaN if all values are equal
     norm = np.max(F, axis=0) - np.min(F, axis=0)
@@ -161,9 +161,9 @@ def calc_crowding_entropy(F, **kwargs):
     pu = (du[1:-1] / cd[1:-1])
 
     # Entropy
-    entropy = np.row_stack([np.full(n_obj, np.inf),
-                            -(pl * np.log2(pl) + pu * np.log2(pu)),
-                            np.full(n_obj, np.inf)])
+    entropy = np.vstack([np.full(n_obj, np.inf),
+                         -(pl * np.log2(pl) + pu * np.log2(pu)),
+                         np.full(n_obj, np.inf)])
 
     # Crowding entropy
     J = np.argsort(I, axis=0)

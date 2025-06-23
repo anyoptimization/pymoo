@@ -1,198 +1,262 @@
 # Fix Tests Command
 
-A systematic workflow for debugging and fixing failing PyMoo unit tests.
+Find and fix failing tests in the **#$ARGUMENTS** test suite. Use systematic stop-early strategy to efficiently identify and resolve all failures.
 
-## Purpose
+**Strategy: Use efficient iteration with stop-early to fix failures, then run complete suite for final verification to ensure no regressions.**
 
-This command provides a structured approach to fix failing tests by:
-1. Running all unit tests to identify failures
-2. Iteratively fixing only the failed tests
-3. Using pytest's cache to save time by re-running only failed tests
-4. Final verification that all tests pass
+## Arguments
+
+Fix the test suite called **#$ARGUMENTS**. The tool for this test suite is located at:
+```bash
+./tools/testing #$ARGUMENTS
+```
+
+**⏰ Timeout Note for Claude**: When running any test commands with the Bash tool, always use `timeout: 600000` (10 minutes) to prevent long-running operations from blocking progress.
 
 ## Workflow
 
-### Step 1: Initial Assessment
-Run all tests (excluding long-running ones) to see the current state and identify failing tests:
+### Step 1: Find First Failure
+
+Start by finding the first failing test without running everything:
 
 ```bash
-./tools/tests
+./tools/testing #$ARGUMENTS -x
 ```
 
-This will show you:
-- Total number of tests run
-- Which specific tests are failing
-- Error messages for each failure
-- Test duration and performance summary
+**⚠️ Note: This stops at the first failure, saving significant time!** No need to wait for all tests to run initially.
 
-### Step 2: Note the Failures
-Pay attention to the output and note:
-- Which test files/functions are failing
-- The specific error messages and stack traces
-- Any patterns in the failures (e.g., import errors, API changes, etc.)
-- Whether failures are in algorithms, operators, problems, or utilities
+**⏰ Important for Claude**: When using the Bash tool to run any command, set `timeout: 600000` (10 minutes).
 
-### Step 3: Fix the Issues
-For each failing test:
-1. Open the failing test file (located in `tests/` directory)
-2. Analyze the error message and stack trace
-3. **Prioritize test fixes by category**:
-   - **Unit test bugs**: Fix test logic that's incorrect
-   - **API changes**: Update tests to match current PyMoo API
-   - **Import errors**: Fix import paths or missing dependencies
-   - **Tolerance issues**: Adjust numerical tolerances for floating-point comparisons
-   - **Core functionality bugs**: Fix genuine bugs in PyMoo core code
-4. Common test fixes include:
-   - Import errors (update import paths)
-   - Deprecated function calls (use newer API)
-   - Parameter name changes (update to current API)
-   - Tolerance adjustments for numerical tests
-   - Test data file path issues
-   - Missing test dependencies
+**🔍 Check Results**: If all tests pass (exit code 0), **STOP HERE** - no fixes needed! Only proceed with the remaining steps if at least one test is failing.
 
-### Step 4: Test Only Failed Tests
-After making fixes, run only the previously failed tests to save time:
+### Step 2: Analyze and Fix the First Issue
+
+For the failing test:
+
+1. **Note the exact failing item** from the output (test name, file path, or specific test case)
+
+2. **Open the failing file** - examine the test output to identify the specific file and location of the failure
+
+3. **THINK HARD before implementing any fix**:
+   - Understand the root cause of the failure
+   - Consider the broader implications of your fix
+   - Evaluate whether this affects other tests in the suite
+   - Determine if this is a symptom of a larger issue
+   - **Check the historical context using Git/GitHub**:
+     - `git log --oneline path/to/failing_file` - See recent changes
+     - `git blame path/to/failing_file` - See who changed what and when
+     - `gh search issues "failing_item_name"` - Search for related GitHub issues
+     - `gh search prs "failing_item_name"` - Search for related pull requests
+     - Check if recent commits to core files might have broken this
+     - Look for patterns: multiple items failing due to the same underlying change
+
+4. **Analyze the error message thoroughly** - understand exactly what's failing and why
+
+5. **Apply systematic fixing strategies**:
+   - Fix test logic that's incorrect or outdated
+   - Update code to match current API expectations
+   - Fix import paths or missing dependencies
+   - Adjust numerical tolerances for floating-point comparisons
+   - Fix file path issues and missing resources
+   - Update deprecated function calls and parameter usage
+   - Fix genuine bugs in the underlying code if the test reveals a real issue
+
+### Step 3: Verify Your Fix
+
+Test only the specific item you just fixed:
 
 ```bash
-./tools/tests --lf
+./tools/testing #$ARGUMENTS -k "specific_test_name"
 ```
 
-This uses pytest's cache to run only tests that failed in the last run.
+Use the exact test name, file name, or pattern from the failure output to target just the item you fixed.
 
-### Step 5: Iterate
-Repeat steps 3-4 until all previously failed tests pass:
-- Fix remaining issues
-- Run `./tools/tests --lf` again
-- Continue until no failures remain
+**⏰ Important for Claude**: Use `timeout: 600000` (10 minutes) in the Bash tool call.
 
-### Step 6: Final Verification
-Once all previously failed tests pass, run the complete test suite to ensure:
-- All tests still pass
-- No regressions were introduced
-- The fixes didn't break other tests
+### Step 4: Continue from Where You Left Off
+
+Once your fix is verified, continue finding the next failure:
 
 ```bash
-./tools/tests
+./tools/testing #$ARGUMENTS --lf -x
 ```
 
-## Useful Commands
+**⏰ Important for Claude**: Use `timeout: 600000` (10 minutes) in the Bash tool call.
 
-- `./tools/tests` - Run all tests (excluding long-running ones)
-- `./tools/tests --all` - Run all tests including long-running ones
-- `./tools/tests --lf` - Run only previously failed tests
-- `./tools/tests --ff` - Run failed tests first, then successful ones
-- `./tools/tests -x` - Stop on first failure (useful for debugging one issue at a time)
-- `./tools/tests -k "keyword"` - Run only tests matching a keyword
-- `./tools/tests -k "specific_test_name"` - Run only a specific test by name
-- `./tools/tests -v` - Extra verbose output for debugging
-- `./tools/tests -m "marker"` - Run tests with specific markers
+This will:
+- Skip the item you just fixed (since it now passes)
+- Continue from where the previous run left off  
+- Stop at the next failure
 
-### Running Specific Tests
+### Step 5: Repeat the Fix-and-Continue Cycle
 
-To run only specific tests (useful when fixing individual test failures):
+Repeat steps 2-4 for each failure:
+1. Fix the failing item
+2. Test the specific fix (Step 3 commands with 10-minute timeout)
+3. Continue to next failure (Step 4 commands with 10-minute timeout)
+4. Repeat until no more failures are found
+
+### Step 6: Final Comprehensive Verification
+
+Once no more failures are found with `-x`, run the complete test suite to ensure:
+- All tests pass
+- No regressions were introduced by your fixes
+- Fixing one test didn't break another test
 
 ```bash
-# Run only tests with "nsga2" in the name
-./tools/tests -k "nsga2"
-
-# Run only algorithm tests
-./tools/tests tests/algorithms/
-
-# Run only a specific test file
-./tools/tests tests/algorithms/test_nsga2.py
-
-# Run only tests from the operators directory
-./tools/tests tests/operators/
-
-# Run only gradient tests
-./tools/tests tests/gradients/
-
-# Run multiple test categories
-./tools/tests -k "nsga2 or de or ga"
+./tools/testing #$ARGUMENTS
 ```
 
-The `-k` flag uses pytest's keyword matching, so you can use:
-- Exact test names: `-k "test_nsga2_binary"`
-- Partial names: `-k "nsga"`
-- Directory names: `-k "algorithms"` or `-k "operators"`
-- Class names: `-k "TestNSGA2"`
-- Multiple keywords: `-k "nsga2 or algorithm"`
+**This final run is CRITICAL** - it verifies that your fixes didn't introduce new failures elsewhere in the codebase. Even though you've been fixing tests iteratively, changes to shared code or dependencies could have broken other tests.
 
-### Test Categories
+**⏰ Important for Claude**: Use `timeout: 600000` (10 minutes) in the Bash tool call for final verification too.
 
-PyMoo tests are organized into these main categories:
+## Test Suite Commands Reference
 
-- **algorithms/**: Algorithm implementation tests
-  - `test_algorithms.py` - General algorithm tests
-  - `test_nsga2.py`, `test_rvea.py`, etc. - Specific algorithm tests
-  - `test_single_objective.py` - Single-objective algorithm tests
-- **operators/**: Genetic operator tests
-  - `test_crossover.py` - Crossover operator tests
-  - `test_mutation.py` - Mutation operator tests
-- **problems/**: Test problem tests
-  - `test_correctness.py` - Problem correctness validation
-  - `test_problems_*.py` - Specific problem suite tests
-- **indicators/**: Performance indicator tests
-- **gradients/**: Gradient computation tests
-- **misc/**: Utility and miscellaneous tests
+### Core Commands
+```bash
+./tools/testing #$ARGUMENTS                     # Run all tests in the suite
+./tools/testing #$ARGUMENTS --lf                # Run only previously failed tests  
+./tools/testing #$ARGUMENTS --ff                # Run failed tests first, then successful
+./tools/testing #$ARGUMENTS -x                  # Stop on first failure
+./tools/testing #$ARGUMENTS -k "keyword"        # Run tests matching keyword
+./tools/testing #$ARGUMENTS -v                  # Verbose output
+./tools/testing #$ARGUMENTS --all               # Include long-running tests (if applicable)
+```
 
-## Tips
+### Selective Execution
+```bash
+./tools/testing #$ARGUMENTS path/to/directory/   # Run tests in specific directory
+./tools/testing #$ARGUMENTS path/to/file.py      # Run specific test file
+./tools/testing #$ARGUMENTS -k "exact_name"      # Run tests with exact name match
+./tools/testing #$ARGUMENTS -k "partial"         # Run tests with partial name match
+```
 
-1. **Fix tests, then code**: Try to fix the test first. Only modify PyMoo core code if there's a genuine bug
-2. **Start with import errors**: These are often the easiest to fix and may resolve multiple test failures
-3. **Use -x flag**: When debugging, use `./tools/tests --lf -x` to stop on the first failure and focus on one issue at a time
-4. **Test specific categories**: Use directory paths to run tests by category (algorithms, operators, etc.)
-5. **Check for API changes**: Many test failures are due to API changes in PyMoo
-6. **Look for patterns**: If many tests fail similarly, there might be a common underlying issue
-7. **Test incrementally**: Use `--lf` to avoid re-running long tests that already pass
-8. **Use verbose output**: Add `-v` for detailed test output when debugging
-9. **Check numerical tolerances**: Floating-point comparison tests may need tolerance adjustments
-10. **Review test markers**: Some tests are marked as "long" - exclude them for faster iteration
+## Advanced Usage Patterns
+
+### Pattern Matching with `-k`
+
+The `-k` flag uses powerful keyword matching to target specific tests:
+
+- **Exact names**: `-k "test_specific_function"`
+- **Partial names**: `-k "keyword"`  
+- **Directory/module names**: `-k "algorithms"` or `-k "operators"`
+- **Class names**: `-k "TestClassName"`
+- **Multiple keywords**: `-k "keyword1 or keyword2"`
+- **Complex patterns**: `-k "keyword1 and not keyword2"`
+
+### Selective Testing by Category
+
+```bash
+./tools/testing #$ARGUMENTS path/to/category/        # Tests in specific category
+./tools/testing #$ARGUMENTS -k "category"            # Tests matching category keyword
+./tools/testing #$ARGUMENTS -k "slow"                # Tests marked as slow
+./tools/testing #$ARGUMENTS -k "integration"         # Integration tests
+./tools/testing #$ARGUMENTS -k "unit"                # Unit tests
+```
 
 ## Common Issues and Solutions
 
-- **Import errors**: Check if modules have been moved or renamed in PyMoo
-- **API changes**: Update test calls to match current PyMoo API
-- **Numerical precision**: Adjust tolerances in `assert_allclose` or similar assertions
-- **Missing test data**: Ensure test data files exist and paths are correct
-- **Deprecated warnings**: Update tests to use newer API calls
-- **Parameter changes**: Check if function signatures have changed
-- **Environment issues**: Verify all required test packages are installed
+### Import Errors
+- **Issue**: `ImportError` or `ModuleNotFoundError`
+- **Solution**: Update import statements to match current module structure
+- **Example**: Fix import paths when modules have been moved or renamed
 
-## Test-Specific Considerations
+### API Changes
+- **Issue**: `AttributeError` or `TypeError` when calling functions
+- **Solution**: Check current API and update function calls
+- **Example**: Update deprecated parameter names or function signatures
 
-### Algorithm Tests
-- May fail due to random seed changes or numerical precision
-- Check for parameter name changes in algorithm constructors
-- Verify termination criteria and convergence tolerances
+### Numerical Precision Issues
+- **Issue**: Floating-point comparison failures in tests
+- **Solution**: Adjust tolerances in `assert_allclose` or similar assertions
+- **Example**: Increase `atol` or `rtol` parameters for numerical comparisons
 
-### Operator Tests
-- Often fail due to API changes in operator interfaces
-- Check input/output shapes and types
-- Verify parameter passing to operators
+### Missing Dependencies
+- **Issue**: Code execution fails due to missing packages or modules
+- **Solution**: Add required imports or ensure dependencies are available
+- **Example**: Add missing import statements or check package availability
 
-### Problem Tests
-- May fail due to changes in problem definitions
-- Check objective function implementations
-- Verify constraint handling
+### File Path Issues
+- **Issue**: `FileNotFoundError` when loading test data or resource files
+- **Solution**: Fix relative paths or ensure resource files exist
+- **Example**: Update paths to test data files or ensure test fixtures are available
 
-### Gradient Tests
-- Sensitive to numerical precision
-- May require adjustment of finite difference tolerances
-- Check automatic differentiation backends
+### Environment Issues
+- **Issue**: Tests fail due to environment-specific problems
+- **Solution**: Check environment setup and dependencies
+- **Example**: Ensure proper Python path, virtual environment, or system dependencies
+
+## Git and GitHub Investigation Strategies
+
+### Git History Analysis
+```bash
+# See recent changes to core codebase
+git log --since="1 month ago" --oneline src/
+
+# See recent changes to specific file
+git log --oneline path/to/failing_file
+
+# See detailed changes in a specific commit  
+git show <commit-hash>
+
+# Compare recent changes in a directory
+git diff HEAD~5..HEAD src/main_module/
+
+# See who changed what and when
+git blame path/to/failing_file
+```
+
+### GitHub Search Techniques
+```bash
+# Search for related issues using specific error messages
+gh search issues "ImportError specific_module"
+gh search issues "test failure error_message"
+gh search issues "failing_test_name"
+
+# Search for related pull requests
+gh search prs "fix failing_test"
+gh search prs "update test_suite"
+gh search prs "path/to/failing_file"
+
+# Search by file paths or test patterns
+gh search prs "tests/specific_area/"
+gh search issues "test_pattern"
+
+# Look for API migration guides
+gh search issues "API breaking change"
+gh search prs "deprecate" 
+```
 
 ## Success Criteria
 
 The fix-tests process is complete when:
-1. `./tools/tests` shows 0 failures
-2. All unit tests run without errors
-3. No critical warnings (deprecation warnings are acceptable if noted)
-4. The output shows "All tests passed!"
-5. Core PyMoo functionality is verified through test coverage
 
-## Notes
+1. `./tools/testing #$ARGUMENTS` shows 0 failures
+2. All tests in the suite run without errors
+3. Core functionality is verified through test coverage
+4. No regressions were introduced by the fixes
 
-- Long-running tests are excluded by default. Use `--all` to include them if needed
-- Some tests may be environment-specific (e.g., requiring specific dependencies)
-- Focus on non-long-running tests for faster iteration during development
-- Document any tests that need to be skipped due to environment constraints
+## Tips for Efficient Debugging
+
+1. **Fix systematically**: Fix test logic first, then underlying code if there's a genuine bug
+
+2. **Use efficient iteration with comprehensive verification**: This workflow uses stop-early iteration to fix issues efficiently, then runs complete suite to catch any regressions
+
+3. **Always verify individual fixes**: Test each fix with `-k "item_name"` before moving on
+
+4. **Leverage test caching**: `--lf` and `--ff` flags are incredibly powerful for iteration
+
+5. **Look for patterns**: If similar tests fail, apply the same fix to multiple files
+
+6. **Start with import errors**: These are often easiest to fix and may resolve multiple failures
+
+7. **Check for recent changes**: Use Git history to understand what might have broken
+
+8. **Use exact names**: Copy exact test names from failure output for `-k` flag
+
+9. **Document your progress**: Keep notes on what you've fixed to identify patterns
+
+10. **Consider environment factors**: Some failures may be environment-specific
+
+This approach provides consistent, efficient debugging for any test suite using a single, parameterized testing tool.

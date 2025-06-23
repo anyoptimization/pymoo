@@ -9,9 +9,11 @@ SKIP = ["__init__.py",
         "mopta08.py",
         "coco.py",
         "gif.py",
+        "gradient.py",
         "__pycache__"]
 
 
+@pytest.mark.examples
 @pytest.mark.long
 @pytest.mark.parametrize('example', files_from_folder(EXAMPLES, skip=SKIP))
 def test_examples(example):

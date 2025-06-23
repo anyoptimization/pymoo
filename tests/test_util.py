@@ -15,8 +15,6 @@ TESTS = join(ROOT, "tests")
 
 EXAMPLES = join(ROOT, "examples")
 
-TESTS = join(ROOT, "tests")
-
 DOCS = join(ROOT, "docs", "source")
 
 NO_INIT = ["__init__.py"]
@@ -68,6 +66,8 @@ def run_file(f):
 
     print("RUNNING:", fname)
 
+    vars = dict(globals())
+
     with open(f) as f:
         s = f.read()
 
@@ -77,7 +77,7 @@ def run_file(f):
 
         s = no_plots + s + "\nplt.close()\n"
 
-        exec(s, globals())
+        exec(s, vars)
 
 
 def remove_trailing_empty_cells(ipynb):

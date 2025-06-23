@@ -73,7 +73,7 @@ class ReductionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
         E = E[np.any(E == 0, axis=1)]
 
         # add the edge coordinates
-        X = np.row_stack([E, rnd])
+        X = np.vstack([E, rnd])
 
         I = select_points_with_maximum_distance(X, self.n_points, selected=list(range((len(E)))))
         centroids = X[I].copy()
