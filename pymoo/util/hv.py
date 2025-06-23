@@ -1,12 +1,10 @@
 import numpy as np
 
-from pymoo.vendor.hv import HyperVolume
+from moocore import hypervolume as _hypervolume
 
 
 def hv(ref_point, F):
-    hv = HyperVolume(ref_point)
-    return hv.compute(F)
-
+    return _hypervolume(F, ref = ref_point)
 
 def calc_hvc_looped(ref_point, F, func=hv):
     hv = func(F, ref_point)
