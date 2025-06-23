@@ -63,6 +63,10 @@ class MultiObjectiveOutput(Output):
         F = F[feas]
 
         if len(F) > 0:
+            
+            problem = algorithm.problem
+            if hasattr(problem, "time"):
+                self.pf = pareto_front_if_possible(problem)
 
             if self.pf is not None:
 
