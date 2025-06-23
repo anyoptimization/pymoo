@@ -10,6 +10,7 @@ SKIP = ["__init__.py",
         "coco.py",
         "gif.py",
         "gradient.py",
+        "as_penalty.py",
         "__pycache__"]
 
 

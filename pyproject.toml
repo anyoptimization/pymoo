@@ -68,4 +68,5 @@ parallelization = [
 full = [
     {include-group = "visualization"},
     {include-group = "parallelization"},
+    "optuna"
 ]

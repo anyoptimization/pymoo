@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# PyMoo Testing Tool
+# Simple pytest wrapper with marker support
+
+# Get the directory where this script is located
+TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Change to the project root directory
+cd "$(dirname "$0")/.." || exit 1
+
+# Check if markers were specified
+if [[ "$*" =~ -m ]]; then
+    # User specified markers, run exactly what they asked for
+    "$TOOLS_DIR/python" -m pytest -v tests/ "$@"
+else
+    # Default: run all pytest except long ones (include examples and docs in default)
+    "$TOOLS_DIR/python" -m pytest -v tests/ -m "not long" "$@"
+fi
+
+exit $?

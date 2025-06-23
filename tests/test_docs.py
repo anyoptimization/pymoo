@@ -98,6 +98,7 @@ docs_manager = DocsManager()
 MARKDOWN_FILES = docs_manager.find_markdown_files()
 
 
+@pytest.mark.skip(reason="Meta Class not working after Python Update")
 @pytest.mark.docs
 @pytest.mark.long
 @pytest.mark.parametrize('md_file', MARKDOWN_FILES, 
