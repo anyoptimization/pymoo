@@ -1,6 +1,5 @@
-from pymoo.vendor.hv import HyperVolume
+from moocore import hypervolume as _hypervolume
 
 
 def hv(ref_point, F):
-    hv_calc = HyperVolume(ref_point)
-    return hv_calc.compute(F)
+    return _hypervolume(F, ref = ref_point)

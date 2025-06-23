@@ -5,7 +5,7 @@ from pymoo.functions import FunctionLoader, load_function
 from pymoo.indicators.distance_indicator import derive_ideal_and_nadir_from_pf
 from pymoo.util.misc import at_least_2d_array
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-from pymoo.vendor.hv import HyperVolume as _HyperVolume
+from moocore import hypervolume as _hypervolume
 
 
 class Hypervolume(Indicator):
@@ -18,7 +18,7 @@ class Hypervolume(Indicator):
         super().__init__(ideal=ideal, nadir=nadir, **kwargs)
         # self.normalization = ZeroToOneNormalization(ideal, nadir)
 
-        # whether the input should be checked for domination or not
+        # whether the input should be checked for domination or not (deprecated)
         self.nds = nds
 
         # the reference point that shall be used - either derived from pf or provided
@@ -35,13 +35,8 @@ class Hypervolume(Indicator):
         assert self.ref_point is not None, "For Hypervolume a reference point needs to be provided!"
 
     def _do(self, F):
-        if self.nds:
-            non_dom = load_function('find_non_dominated')(F)
-            F = np.copy(F[non_dom, :])
-
-        # calculate the hypervolume using a vendor library
-        hv = _HyperVolume(self.ref_point)
-        val = hv.compute(F)
+        # calculate the hypervolume using moocore
+        val = _hypervolume(F, ref = self.ref_point)
         return val
 
 
