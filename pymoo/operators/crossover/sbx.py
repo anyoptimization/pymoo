@@ -70,7 +70,10 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14):
     child2 = np.where(sm, c2, c1)  # child for parent 2
     
     # exchange children with given probability
-    b = np.random.random(len(prob_bin)) < prob_bin
+    b = np.bitwise_xor(
+        np.random.random(len(prob_bin)) < prob_bin,
+        X[0, cross] > X[1, cross]
+    )
     child1, child2 = np.where(b, (child2, child1), (child1, child2))
 
     # first copy the unmodified parents
