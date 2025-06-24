@@ -65,7 +65,7 @@ class PCP(Plot):
 
         # if no normalization of each axis the bounds are based on the overall min and max
         if not self.normalize_each_axis and self.bounds is None:
-            _F = np.row_stack([e[0] for e in self.to_plot])
+            _F = np.vstack([e[0] for e in self.to_plot])
             self.bounds = [_F.min(), _F.max()]
 
         # normalize the input

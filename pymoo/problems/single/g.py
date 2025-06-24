@@ -388,7 +388,7 @@ class G13(G):
               np.array([opt[0], opt[1], -opt[2], +opt[3], -opt[4]]),
               np.array([opt[0], opt[1], -opt[2], -opt[3], +opt[4]])
               ]
-        return np.row_stack(ps)
+        return np.vstack(ps)
 
 
 class G14(G):

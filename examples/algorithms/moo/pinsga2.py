@@ -1,4 +1,4 @@
-from pymoo.algorithms.moo.pinsga2 import PINSGA2
+from pymoo.algorithms.moo.pinsga2 import PINSGA2, AutomatedDM
 from pymoo.optimize import minimize
 from pymoo.problems.multi import ZDT1
 from pymoo.problems.multi import ZDT3
@@ -6,6 +6,21 @@ import pymoo.gradient.toolbox as anp
 import matplotlib.pyplot as plt
 from pymoo.visualization.scatter import Scatter
 from pymoo.util import value_functions as mvf
+import numpy as np
+
+
+# Simple automated decision maker for example purposes
+class SimpleDM(AutomatedDM):
+    def makeDecision(self, F):
+        # Simple decision rule: prefer solution with smaller first objective
+        if len(F) == 2:
+            if F[0][0] < F[1][0]:
+                return "a"  # Choose first solution
+            elif F[0][0] > F[1][0]:
+                return "b"  # Choose second solution
+            else:
+                return "c"  # Solutions are equivalent
+        return "a"  # Default choice
 
 
 # Additional example from original PI-EMO-VF literature
@@ -78,9 +93,12 @@ def plot_vf(context, algorithm):
 
 problem = ZDT3()
 
+# Create automated decision maker to avoid interactive input
+dm = SimpleDM()
+
 # opt_method can be trust-constr, SLSQP, ES, or GA
 # vf_type can be linear or poly
-algorithm = PINSGA2(pop_size=30, opt_method="trust-constr", vf_type="poly")
+algorithm = PINSGA2(pop_size=30, opt_method="trust-constr", vf_type="poly", automated_dm=dm)
 
 res = minimize(problem,
                algorithm,

@@ -37,7 +37,7 @@ def calc_pcd(X, n_remove=0):
     _X = X[I, np.arange(M)]
 
     # calculate the distance from each point to the last and next
-    dist = np.row_stack([_X, np.full(M, np.inf)]) - np.row_stack([np.full(M, -np.inf), _X])
+    dist = np.vstack([_X, np.full(M, np.inf)]) - np.vstack([np.full(M, -np.inf), _X])
 
     # prepare the distance to last and next vectors
     dist_to_last, dist_to_next = dist, np.copy(dist)
@@ -74,7 +74,7 @@ def calc_pcd(X, n_remove=0):
         _X = X[H].copy()[I, np.arange(M)]
 
         # calculate the distance from each point to the last and next
-        dist = np.row_stack([_X, np.full(M, np.inf)]) - np.row_stack([np.full(M, -np.inf), _X])
+        dist = np.vstack([_X, np.full(M, np.inf)]) - np.vstack([np.full(M, -np.inf), _X])
 
         # prepare the distance to last and next vectors
         dist_to_last, dist_to_next = dist, np.copy(dist)

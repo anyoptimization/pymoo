@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+# PyMoo Testing Tool with Type Parameter
+# Usage: ./tools/testing [examples|docs|default] [pytest-args...]
+
+# Get the directory where this script is located
+TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Change to the project root directory
+cd "$(dirname "$0")/.." || exit 1
+
+# Check if first argument is a test type
+if [[ "$1" == "examples" ]]; then
+    # Run examples tests
+    shift  # Remove 'examples' from arguments
+    "$TOOLS_DIR/pytest" -m examples "$@"
+elif [[ "$1" == "docs" ]]; then
+    # Run documentation tests
+    shift  # Remove 'docs' from arguments
+    "$TOOLS_DIR/pytest" -m docs "$@"
+elif [[ "$1" == "default" ]]; then
+    # Run default tests (no examples, no docs, no long)
+    shift  # Remove 'default' from arguments
+    "$TOOLS_DIR/pytest" -m "not examples and not docs and not long" "$@"
+else
+    # No test type specified or unrecognized type - run default tests
+    # Don't shift since first arg might be a pytest flag
+    "$TOOLS_DIR/pytest" -m "not examples and not docs and not long" "$@"
+fi
+
+exit $?

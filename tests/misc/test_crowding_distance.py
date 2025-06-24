@@ -10,7 +10,7 @@ crowding_func = FunctionalDiversity(calc_crowding_distance, filter_out_duplicate
 
 @pytest.mark.skip(reason="check if this is supposed to work or not at all")
 def test_crowding_distance():
-    D = np.loadtxt(os.path.join(get_pymoo(), "tests", "resources", "test_crowding.dat"))
+    D = np.loadtxt(os.path.join(get_pymoo(), "pytest", "resources", "test_crowding.dat"))
     F, cd = D[:, :-1], D[:, -1]
     assert np.all(np.abs(cd - crowding_func.do(F)) < 0.001)
 

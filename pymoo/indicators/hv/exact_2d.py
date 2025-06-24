@@ -8,7 +8,7 @@ def hvc_2d_slow(ref_point, F):
 
     I = np.lexsort((-F[:, 1], F[:, 0]))
 
-    V = np.row_stack([ref_point, F[I], ref_point])
+    V = np.vstack([ref_point, F[I], ref_point])
 
     hvi = np.zeros(n)
 
@@ -28,7 +28,7 @@ def hvc_2d_fast(ref_point, F_sorted, left=None, right=None):
     if right is None:
         right = [ref_point[0], F_sorted[-1, 1]]
 
-    V = np.row_stack([left, F_sorted, right])
+    V = np.vstack([left, F_sorted, right])
     height = (V[:-1, 1] - V[1:, 1])[:-1]
     width = (V[1:, 0] - V[:-1, 0])[1:]
 
@@ -37,7 +37,7 @@ def hvc_2d_fast(ref_point, F_sorted, left=None, right=None):
 
 
 def hv_2d_fast(ref_point, F_sorted):
-    V = np.row_stack([ref_point, F_sorted])
+    V = np.vstack([ref_point, F_sorted])
     height = (V[:-1, 1] - V[1:, 1])
     width = ref_point[0] - V[1:, 0]
     return (height * width).sum()

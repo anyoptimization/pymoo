@@ -35,7 +35,7 @@ class DynamicHypervolume:
     def add(self, F):
         assert len(F.shape) == 2, "The points to add must be a two-dimensional array."
         assert F.shape[1] == self.n_dim, "The dimensions of the ref_point and points to add must be equal"
-        self.F = np.row_stack([self.F, F])
+        self.F = np.vstack([self.F, F])
         self.hv, self.hvc = self.calc()
         return self
 

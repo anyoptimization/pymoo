@@ -20,5 +20,5 @@ class RandomSamplingAndMap(ReferenceDirectionFactory):
 
         x = sampling(problem, self.n_points - self.n_dim, to_numpy=True)
         x = map_onto_unit_simplex(x, "kraemer")
-        x = np.row_stack([x, np.eye(self.n_dim)])
+        x = np.vstack([x, np.eye(self.n_dim)])
         return x

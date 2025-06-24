@@ -59,6 +59,6 @@ def test_against_scipy():
 
     problem.callback = callback
     minimize(problem, NelderMead(x0=x0), termination=("n_eval", len(hist_scipy)))
-    hist = np.row_stack(hist)[:len(hist_scipy)]
+    hist = np.vstack(hist)[:len(hist_scipy)]
 
     np.testing.assert_allclose(hist, hist_scipy, rtol=1e-04)

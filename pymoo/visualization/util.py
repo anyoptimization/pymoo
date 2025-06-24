@@ -33,7 +33,7 @@ def plot_circle(ax, center=0, radius=1, **kwargs):
 
 
 def plot_radar_line(ax, x, **kwargs):
-    x = np.row_stack([x, x[0]])
+    x = np.vstack([x, x[0]])
     plot(x[:, 0], x[:, 1], **kwargs)
 
 
@@ -87,7 +87,7 @@ def no_ticks(ax):
 def normalize(data, bounds, reverse=False, return_bounds=False):
     from pymoo.util.normalization import normalize as _normalize
 
-    _F = np.row_stack([e[0] for e in data])
+    _F = np.vstack([e[0] for e in data])
     if bounds is None:
         bounds = (_F.min(axis=0), _F.max(axis=0))
 

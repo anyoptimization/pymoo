@@ -60,7 +60,7 @@ class ZDT3(ZDT):
         if not flatten:
             pf = np.concatenate([pf[None,...] for pf in pf])
         else:
-            pf = np.row_stack(pf)
+            pf = np.vstack(pf)
 
         return pf
 

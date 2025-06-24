@@ -29,6 +29,8 @@ dependencies = [
     "matplotlib>=3",
     "autograd>=1.4",
     "cma>=3.2.2",
+    "moocore>=0.1.7",
+    "alive_progress",
     "Deprecated",
 ]
 
@@ -66,4 +68,5 @@ parallelization = [
 full = [
     {include-group = "visualization"},
     {include-group = "parallelization"},
+    "optuna"
 ]

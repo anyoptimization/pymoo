@@ -3,6 +3,7 @@ import pymoo
 import scipy
 from pymoo.optimize import minimize as moomin
 from scipy.optimize import minimize as scimin
+from scipy.optimize import OptimizeResult
 from pymoo.core.problem import Problem
 import matplotlib.pyplot as plt
 from scipy.optimize import NonlinearConstraint
@@ -629,7 +630,7 @@ def _validate_vf(res, verbose):
             message = message + "Epsilon negative\n"
 
 
-    elif isinstance(res, scipy.optimize.optimize.OptimizeResult):
+    elif isinstance(res, OptimizeResult):
         success = res.success and res.constr_violation <= 0
         epsilon = res.x[-1]
 

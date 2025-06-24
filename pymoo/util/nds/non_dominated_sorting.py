@@ -1,7 +1,9 @@
-import numpy as np
 import sys
-from pymoo.util.dominator import Dominator
+
+import numpy as np
+
 from pymoo.functions import load_function
+from pymoo.util.dominator import Dominator
 
 
 class NonDominatedSorting:
@@ -41,10 +43,11 @@ class NonDominatedSorting:
             # add n_fronts parameter if the method supports it
             if self.method == "fast_non_dominated_sort":
                 kwargs["n_fronts"] = n_fronts
+                kwargs["n_stop_if_ranked"] = n_stop_if_ranked
 
-            fronts = func(F, n_stop_if_ranked=n_stop_if_ranked, **kwargs)
+            fronts = func(F, **kwargs)
 
-        # convert to numpy array for each front and filter by n_stop_if_ranked if desired
+        # convert to numpy array for each front and filter by n_stop_if_ranked
         _fronts = []
         n_ranked = 0
         for front in fronts:

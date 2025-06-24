@@ -22,7 +22,7 @@ def average_distance_to_other_points(ref_dirs):
 def closest_point_variance(z):
     for row in np.eye(z.shape[1]):
         if not np.any(np.all(row == z, axis=1)):
-            z = np.row_stack([z, row])
+            z = np.vstack([z, row])
 
     D = vectorized_cdist(z, z)
     np.fill_diagonal(D, 1)
@@ -35,7 +35,7 @@ def closest_point_variance_mod(z):
 
     for row in np.eye(z.shape[1]):
         if not np.any(np.all(row == z, axis=1)):
-            z = np.row_stack([z, row])
+            z = np.vstack([z, row])
 
     D = vectorized_cdist(z, z)
     np.fill_diagonal(D, np.inf)
@@ -49,7 +49,7 @@ def closest_point_variance_mod(z):
 def geometric_mean_var(z):
     for row in np.eye(z.shape[1]):
         if not np.any(np.all(row == z, axis=1)):
-            z = np.row_stack([z, row])
+            z = np.vstack([z, row])
     n_points, n_dim = z.shape
 
     D = vectorized_cdist(z, z)
@@ -68,7 +68,7 @@ def geometric_mean_var(z):
 def mean_mean(z):
     for row in np.eye(z.shape[1]):
         if not np.any(np.all(row == z, axis=1)):
-            z = np.row_stack([z, row])
+            z = np.vstack([z, row])
     n_points, n_dim = z.shape
 
     D = vectorized_cdist(z, z)
