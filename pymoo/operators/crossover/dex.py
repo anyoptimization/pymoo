@@ -1,122 +1,334 @@
 import numpy as np
-
 from pymoo.core.crossover import Crossover
 from pymoo.core.population import Population
 from pymoo.operators.crossover.binx import mut_binomial
 from pymoo.operators.crossover.expx import mut_exp
-from pymoo.operators.repair.bounds_repair import is_out_of_bounds_by_problem, repair_random_init
 
 
-def de_differential(X, F, dither=None, jitter=True, gamma=0.0001, return_differentials=False):
-    n_parents, n_matings, n_var = X.shape
-    assert n_parents % 2 == 1, "For the differential an odd number of values need to be provided"
+# =========================================================================================================
+# Implementation
+# =========================================================================================================
 
-    # make sure F is a one-dimensional vector
-    F = np.ones(n_matings) * F
+class DEM(Crossover):
 
-    # build the pairs for the differentials
-    pairs = (np.arange(n_parents - 1) + 1).reshape(-1, 2)
+    def __init__(self,
+                 F=None,
+                 gamma=1e-4,
+                 de_repair="bounce-back",
+                 n_diffs=1,
+                 **kwargs):
 
-    # the differentials from each pair subtraction
-    diffs = np.zeros((n_matings, n_var))
+        # Default value for F
+        if F is None:
+            F = (0.0, 1.0)
 
-    # for each difference
-    for i, j in pairs:
+        # Define which method will be used to generate F values
+        if hasattr(F, "__iter__"):
+            self.scale_factor = self._randomize_scale_factor
+        else:
+            self.scale_factor = self._scalar_scale_factor
 
-        if dither == "vector":
-            F = (F + np.random.random(n_matings) * (1 - F))
-        elif dither == "scalar":
-            F = F + np.random.random() * (1 - F)
+        # Define which method will be used to generate F values
+        if not hasattr(de_repair, "__call__"):
+            try:
+                de_repair = REPAIRS[de_repair]
+            except:
+                raise KeyError("Repair must be either callable or in " + str(list(REPAIRS.keys())))
 
-        # http://www.cs.ndsu.nodak.edu/~siludwig/Publish/papers/SSCI20141.pdf
-        if jitter:
-            F = (F * (1 + gamma * (np.random.random(n_matings) - 0.5)))
+        # Define which strategy of rotation will be used
+        if gamma is None:
+            self.get_diff = self._diff_simple
+        else:
+            self.get_diff = self._diff_jitter
 
-        # an add the difference to the first vector
-        diffs += F[:, None] * (X[i] - X[j])
+        self.F = F
+        self.gamma = gamma
+        self.de_repair = de_repair
 
-    # now add the differentials to the first parent
-    Xp = X[0] + diffs
+        super().__init__(1 + 2 * n_diffs, 1,  prob=1.0, **kwargs)
 
-    if return_differentials:
-        return Xp, diffs
-    else:
-        return Xp
+    def do(self, problem, pop, parents=None, **kwargs):
+
+        # Convert pop if parents is not None
+        if not parents is None:
+            pop = pop[parents]
+
+        # Get all X values for mutation parents
+        Xr = np.swapaxes(pop, 0, 1).get("X")
+
+        # Create mutation vectors
+        V, diffs = self.de_mutation(Xr, return_differentials=True)
+
+        # If the problem has boundaries to be considered
+        if problem.has_bounds():
+
+            # Do repair
+            V = self.de_repair(V, Xr[0], *problem.bounds())
+
+        return Population.new("X", V)
+
+    def de_mutation(self, Xr, return_differentials=True):
+
+        n_parents, n_matings, n_var = Xr.shape
+        assert n_parents % 2 == 1, "For the differential an odd number of values need to be provided"
+
+        # Build the pairs for the differentials
+        pairs = (np.arange(n_parents - 1) + 1).reshape(-1, 2)
+
+        # The differentials from each pair subtraction
+        diffs = self.get_diffs(Xr, pairs, n_matings, n_var)
+
+        # Add the difference vectors to the base vector
+        V = Xr[0] + diffs
+
+        if return_differentials:
+            return V, diffs
+        else:
+            return V
+
+    def _randomize_scale_factor(self, n_matings):
+        return (self.F[0] + np.random.random(n_matings) * (self.F[1] - self.F[0]))
+
+    def _scalar_scale_factor(self, n_matings):
+        return np.full(n_matings, self.F)
+
+    def _diff_jitter(self, F, Xi, Xj, n_matings, n_var):
+        F = F[:, None] * (1 + self.gamma * (np.random.random((n_matings, n_var)) - 0.5))
+        return F * (Xi - Xj)
+
+    def _diff_simple(self, F, Xi, Xj, n_matings, n_var):
+        return F[:, None] * (Xi - Xj)
+
+    def get_diffs(self, Xr, pairs, n_matings, n_var):
+
+        # The differentials from each pair subtraction
+        diffs = np.zeros((n_matings, n_var))
+
+        # For each difference
+        for i, j in pairs:
+
+            # Obtain F randomized in range
+            F = self.scale_factor(n_matings)
+
+            # New difference vector
+            diff = self.get_diff(F, Xr[i], Xr[j], n_matings, n_var)
+
+            # Add the difference to the first vector
+            diffs = diffs + diff
+
+        return diffs
 
 
 class DEX(Crossover):
 
     def __init__(self,
-                 F=None,
-                 CR=0.7,
                  variant="bin",
-                 dither=None,
-                 jitter=False,
+                 CR=0.7,
+                 F=None,
+                 gamma=1e-4,
                  n_diffs=1,
-                 n_iter=1,
                  at_least_once=True,
+                 de_repair="bounce-back",
                  **kwargs):
 
-        super().__init__(1 + 2 * n_diffs, 1, **kwargs)
-        self.n_diffs = n_diffs
-        self.F = F
+        # Default value for F
+        if F is None:
+            F = (0.0, 1.0)
+
+        # Create instace for mutation
+        self.dem = DEM(F=F,
+                       gamma=gamma,
+                       de_repair=de_repair,
+                       n_diffs=n_diffs)
+
         self.CR = CR
         self.variant = variant
         self.at_least_once = at_least_once
-        self.dither = dither
-        self.jitter = jitter
-        self.n_iter = n_iter
+
+        super().__init__(2 + 2 * n_diffs, 1,  prob=1.0, **kwargs)
 
     def do(self, problem, pop, parents=None, **kwargs):
 
-        # if a parents with array with mating indices is provided -> transform the input first
-        if parents is not None:
-            pop = [pop[mating] for mating in parents]
+        # Convert pop if parents is not None
+        if not parents is None:
+            pop = pop[parents]
 
-        # get the actual values from each of the parents
-        X = np.swapaxes(np.array([[parent.get("X") for parent in mating] for mating in pop]), 0, 1).copy()
+        # Get all X values for mutation parents
+        X = pop[:, 0].get("X")
 
-        n_parents, n_matings, n_var = X.shape
+        # About Xi
+        n_matings, n_var = X.shape
 
-        # a mask over matings that need to be repeated
-        m = np.arange(n_matings)
+        # Obtain mutants
+        mutants = self.dem.do(problem, pop[:, 1:], **kwargs)
 
-        # if the user provides directly an F value to use
-        F = self.F if self.F is not None else rnd_F(m)
+        # Obtain V
+        V = mutants.get("X")
 
-        # prepare the out to be set
-        Xp = de_differential(X[:, m], F)
-
-        # if the problem has boundaries to be considered
-        if problem.has_bounds():
-
-            for k in range(self.n_iter):
-                # find the individuals which are still infeasible
-                m = is_out_of_bounds_by_problem(problem, Xp)
-
-                F = rnd_F(m)
-
-                # actually execute the differential equation
-                Xp[m] = de_differential(X[:, m], F)
-
-            # if still infeasible do a random initialization
-            Xp = repair_random_init(Xp, X[0], *problem.bounds())
-
+        # Binomial crossover
         if self.variant == "bin":
             M = mut_binomial(n_matings, n_var, self.CR, at_least_once=self.at_least_once)
+        # Exponential crossover
         elif self.variant == "exp":
             M = mut_exp(n_matings, n_var, self.CR, at_least_once=self.at_least_once)
         else:
             raise Exception(f"Unknown variant: {self.variant}")
 
-        # take the first parents (this is already a copy)
-        X = X[0]
+        # Add mutated elements in corresponding main parent
+        X[M] = V[M]
 
-        # set the corresponding values from the donor vector
-        X[M] = Xp[M]
+        off = Population.new("X", X)
 
-        return Population.new("X", X)
+        return off
 
 
-def rnd_F(m):
-    return 0.5 * (1 + np.random.uniform(size=len(m)))
+def bounce_back(X, Xb, xl, xu):
+    """Repair strategy
+
+    Args:
+        X (2d array like): Mutated vectors including violations.
+        Xb (2d array like): Reference vectors for repair in feasible space.
+        xl (1d array like): Lower-bounds.
+        xu (1d array like): Upper-bounds.
+
+    Returns:
+        2d array like: Repaired vectors.
+    """
+
+    XL = xl[None, :].repeat(len(X), axis=0)
+    XU = xu[None, :].repeat(len(X), axis=0)
+
+    i, j = np.where(X < XL)
+    if len(i) > 0:
+        X[i, j] = XL[i, j] + np.random.random(len(i)) * (Xb[i, j] - XL[i, j])
+
+    i, j = np.where(X > XU)
+    if len(i) > 0:
+        X[i, j] = XU[i, j] - np.random.random(len(i)) * (XU[i, j] - Xb[i, j])
+
+    return X
+
+
+def midway(X, Xb, xl, xu):
+    """Repair strategy
+
+    Args:
+        X (2d array like): Mutated vectors including violations.
+        Xb (2d array like): Reference vectors for repair in feasible space.
+        xl (1d array like): Lower-bounds.
+        xu (1d array like): Upper-bounds.
+
+    Returns:
+        2d array like: Repaired vectors.
+    """
+
+    XL = xl[None, :].repeat(len(X), axis=0)
+    XU = xu[None, :].repeat(len(X), axis=0)
+
+    i, j = np.where(X < XL)
+    if len(i) > 0:
+        X[i, j] = XL[i, j] + (Xb[i, j] - XL[i, j]) / 2
+
+    i, j = np.where(X > XU)
+    if len(i) > 0:
+        X[i, j] = XU[i, j] - (XU[i, j] - Xb[i, j]) / 2
+
+    return X
+
+
+def to_bounds(X, Xb, xl, xu):
+    """Repair strategy
+
+    Args:
+        X (2d array like): Mutated vectors including violations.
+        Xb (2d array like): Reference vectors for repair in feasible space.
+        xl (1d array like): Lower-bounds.
+        xu (1d array like): Upper-bounds.
+
+    Returns:
+        2d array like: Repaired vectors.
+    """
+
+    XL = xl[None, :].repeat(len(X), axis=0)
+    XU = xu[None, :].repeat(len(X), axis=0)
+
+    i, j = np.where(X < XL)
+    if len(i) > 0:
+        X[i, j] = XL[i, j]
+
+    i, j = np.where(X > XU)
+    if len(i) > 0:
+        X[i, j] = XU[i, j]
+
+    return X
+
+
+def rand_init(X, Xb, xl, xu):
+    """Repair strategy
+
+    Args:
+        X (2d array like): Mutated vectors including violations.
+        Xb (2d array like): Reference vectors for repair in feasible space.
+        xl (1d array like): Lower-bounds.
+        xu (1d array like): Upper-bounds.
+
+    Returns:
+        2d array like: Repaired vectors.
+    """
+
+    XL = xl[None, :].repeat(len(X), axis=0)
+    XU = xu[None, :].repeat(len(X), axis=0)
+
+    i, j = np.where(X < XL)
+    if len(i) > 0:
+        X[i, j] = XL[i, j] + np.random.random(len(i)) * (XU[i, j] - XL[i, j])
+
+    i, j = np.where(X > XU)
+    if len(i) > 0:
+        X[i, j] = XU[i, j] - np.random.random(len(i)) * (XU[i, j] - XL[i, j])
+
+    return X
+
+
+def squared_bounce_back(X, Xb, xl, xu):
+    """Repair strategy
+
+    Args:
+        X (2d array like): Mutated vectors including violations.
+        Xb (2d array like): Reference vectors for repair in feasible space.
+        xl (1d array like): Lower-bounds.
+        xu (1d array like): Upper-bounds.
+
+    Returns:
+        2d array like: Repaired vectors.
+    """
+
+    XL = xl[None, :].repeat(len(X), axis=0)
+    XU = xu[None, :].repeat(len(X), axis=0)
+
+    i, j = np.where(X < XL)
+    if len(i) > 0:
+        X[i, j] = XL[i, j] + np.square(np.random.random(len(i))) * (Xb[i, j] - XL[i, j])
+
+    i, j = np.where(X > XU)
+    if len(i) > 0:
+        X[i, j] = XU[i, j] - np.square(np.random.random(len(i))) * (XU[i, j] - Xb[i, j])
+
+    return X
+
+
+def normalize_fun(fun):
+
+    fmin = fun.min(axis=0)
+    fmax = fun.max(axis=0)
+    den = fmax - fmin
+
+    den[den <= 1e-16] = 1.0
+
+    return (fun - fmin)/den
+
+
+REPAIRS = {"bounce-back": bounce_back,
+           "midway": midway,
+           "rand-init": rand_init,
+           "to-bounds": to_bounds}

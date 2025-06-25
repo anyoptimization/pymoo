@@ -5,12 +5,11 @@ from pymoo.operators.crossover.hux import HUX
 from pymoo.operators.crossover.ox import OrderCrossover
 from pymoo.operators.crossover.spx import SPX
 
-from pymoo.operators.crossover.dex import DEX
-
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.operators.crossover.pntx import TwoPointCrossover
 from pymoo.operators.crossover.sbx import SBX
+from pymoo.operators.crossover.dex import DEM, DEX
 from pymoo.operators.crossover.ux import UX
 from pymoo.operators.mutation.inversion import InversionMutation
 from pymoo.operators.sampling.rnd import PermutationRandomSampling
@@ -19,7 +18,7 @@ from pymoo.problems import get_problem
 from pymoo.problems.single.traveling_salesman import create_random_tsp_problem
 
 
-@pytest.mark.parametrize('crossover', [DEX(), SBX()])
+@pytest.mark.parametrize('crossover', [DEX(), DEM(), SBX()])
 def test_crossover_real(crossover):
     method = GA(pop_size=20, crossover=crossover)
     minimize(get_problem("sphere"), method, ("n_gen", 20))
