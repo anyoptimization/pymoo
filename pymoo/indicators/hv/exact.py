@@ -1,13 +1,11 @@
 import numpy as np
+from moocore import hypervolume as _hypervolume
 
 from pymoo.indicators.hv import hvc_looped
-from pymoo.functions import load_function
 
 
 def hv_exact(ref_point, F):
-    func = load_function("hv")
-    hv = func(ref_point, F)
-    return hv
+    return _hypervolume(F, ref = ref_point)
 
 
 def hvc_exact_loopwise(ref_point, F):
