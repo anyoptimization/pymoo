@@ -1,6 +1,7 @@
-import pymoo.gradient.toolbox as anp
+
 import numpy as np
 
+import pymoo.gradient.toolbox as anp
 from pymoo.core.problem import ElementwiseProblem, Problem
 from pymoo.problems.multi.zdt import ZDT1
 
