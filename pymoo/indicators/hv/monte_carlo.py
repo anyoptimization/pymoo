@@ -34,9 +34,10 @@ def hvc_monte_carlo(dom, V, n_dom=None, k=1):
 
 class ApproximateMonteCarloHypervolume(DynamicHypervolume):
 
-    def __init__(self, ref_point, n_samples=10000, n_exclusive=1, **kwargs) -> None:
+    def __init__(self, ref_point, n_samples=10000, n_exclusive=1, random_state=None, **kwargs) -> None:
         self.n_samples = n_samples
         self.n_exclusive = n_exclusive
+        self.random_state = random_state if random_state is not None else np.random.RandomState(1)
 
         self.V = None
         self.dom = None
@@ -49,7 +50,7 @@ class ApproximateMonteCarloHypervolume(DynamicHypervolume):
         ideal = F.min(axis=0)
         V = np.prod(ref_point - ideal)
 
-        S = np.random.uniform(low=ideal, high=ref_point, size=(self.n_samples, M))
+        S = self.random_state.uniform(low=ideal, high=ref_point, size=(self.n_samples, M))
 
         dom = np.array([np.all(F[i] <= S, axis=1) for i in range(N)])
 

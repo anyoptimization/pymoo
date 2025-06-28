@@ -59,8 +59,8 @@ def test_hvc_2d():
 
 
 @pytest.mark.parametrize('case', [case_2d(), case_3d()])
-@pytest.mark.skip(reason='fails since HV moocore updated. need to be checked.')
 def test_hvc_monte_carlo(case):
+    random_state = np.random.RandomState(1)
     ref_point, F = case
 
     exact = ExactHypervolume(ref_point).add(F)
@@ -70,7 +70,7 @@ def test_hvc_monte_carlo(case):
     np.testing.assert_allclose(exact.hvc, mc.hvc, rtol=0, atol=1e-1)
 
     for i in range(len(F)):
-        k = np.random.randint(low=0, high=len(F) - i)
+        k = random_state.randint(low=0, high=len(F) - i)
 
         exact.delete(k)
         mc.delete(k)
