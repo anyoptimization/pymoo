@@ -1,4 +1,5 @@
 import numpy as np
+# from moocore import hv_approx, hv_contributions
 
 from pymoo.indicators.hv.exact import DynamicHypervolume
 
@@ -32,7 +33,7 @@ def hvc_monte_carlo(dom, V, n_dom=None, k=1):
     return hvc
 
 
-class ApproximateMonteCarloHypervolume(DynamicHypervolume):
+class ApproximateHypervolume(DynamicHypervolume):
 
     def __init__(self, ref_point, n_samples=10000, n_exclusive=1, random_state=None, **kwargs) -> None:
         self.n_samples = n_samples
@@ -63,6 +64,18 @@ class ApproximateMonteCarloHypervolume(DynamicHypervolume):
 
         return hv, hvc
 
+        # MOOCORE VERSION (commented out for comparison)
+        # if len(F) == 0:
+        #     return 0.0, np.zeros(0)
+        # 
+        # # Use moocore for approximate hypervolume calculation
+        # hv = hv_approx(F, ref=ref_point, nsamples=self.n_samples, seed=self.random_state.randint(0, 2**32-1))
+        # 
+        # # Use moocore for exact hypervolume contributions (no approximate version available)
+        # hvc = hv_contributions(F, ref=ref_point)
+        # 
+        # return hv, hvc
+
     def delete(self, k):
         self.F = np.delete(self.F, k, axis=0)
         self.dom = np.delete(self.dom, k, axis=0)
@@ -72,4 +85,16 @@ class ApproximateMonteCarloHypervolume(DynamicHypervolume):
         V, dom = self.V, self.dom
         n_dom = dom.sum(axis=0)
         self.hvc = hvc_monte_carlo(dom, V, n_dom=n_dom, k=self.n_exclusive)
+
+        # MOOCORE VERSION (commented out for comparison)
+        # # Handle empty array case
+        # if len(self.F) == 0:
+        #     self.hv = 0.0
+        #     self.hvc = np.zeros(0)
+        # else:
+        #     # Use moocore for updated hypervolume and contributions
+        #     self.hv = hv_approx(self.F, ref=self.ref_point, nsamples=self.n_samples, seed=self.random_state.randint(0, 2**32-1))
+        #     self.hvc = hv_contributions(self.F, ref=self.ref_point)
+        # 
+        # return self
 

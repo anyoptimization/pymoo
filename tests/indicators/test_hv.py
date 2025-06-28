@@ -3,7 +3,7 @@ import pytest
 
 from pymoo.indicators.hv.exact import ExactHypervolume
 from pymoo.indicators.hv.exact_2d import ExactHypervolume2D
-from pymoo.indicators.hv.monte_carlo import ApproximateMonteCarloHypervolume
+from pymoo.indicators.hv.approximate import ApproximateHypervolume
 from pymoo.problems.many import DTLZ1
 from pymoo.problems.multi import ZDT1
 
@@ -64,7 +64,7 @@ def test_hvc_monte_carlo(case):
     ref_point, F = case
 
     exact = ExactHypervolume(ref_point).add(F)
-    mc = ApproximateMonteCarloHypervolume(ref_point, F=F, n_samples=50000)
+    mc = ApproximateHypervolume(ref_point, F=F, n_samples=20_000)
 
     assert np.allclose(exact.hv, mc.hv, rtol=0, atol=1e-2)
     np.testing.assert_allclose(exact.hvc, mc.hvc, rtol=0, atol=1e-1)

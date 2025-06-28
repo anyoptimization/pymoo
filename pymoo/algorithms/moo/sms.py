@@ -6,7 +6,7 @@ from pymoo.core.survival import Survival
 from pymoo.docs import parse_doc_string
 from pymoo.indicators.hv.exact import ExactHypervolume
 from pymoo.indicators.hv.exact_2d import ExactHypervolume2D
-from pymoo.indicators.hv.monte_carlo import ApproximateMonteCarloHypervolume
+from pymoo.indicators.hv.approximate import ApproximateHypervolume
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
@@ -70,7 +70,7 @@ class LeastHypervolumeContributionSurvival(Survival):
                 if n_obj == 2:
                     clazz = ExactHypervolume2D
                 elif n_obj > 3:
-                    clazz = ApproximateMonteCarloHypervolume
+                    clazz = ApproximateHypervolume
 
                 # finally do the computation
                 hv = clazz(ref_point).add(F)
