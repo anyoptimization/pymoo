@@ -1,9 +1,9 @@
 from pymoo.algorithms.soo.nonconvex.de import DE
 from pymoo.constraints.as_penalty import ConstraintsAsPenalty
 from pymoo.optimize import minimize
-from pymoo.problems.single import G4
+from pymoo.problems.single import G1
 
-problem = G4()
+problem = G1()
 
 problem = ConstraintsAsPenalty(problem, penalty=100.0)
 
@@ -15,4 +15,6 @@ res = minimize(problem,
                seed=1,
                verbose=True)
 
-print("Best solution found: \nX = %s\nF = %s\nCV = %s" % (res.X, res.F, res.CV))
+opt = res.opt
+
+print("Best solution found: \nX = %s\nF = %s\nCV = %s" % (opt.get('X'), opt.get('__F__'), opt.get('__CV__')))

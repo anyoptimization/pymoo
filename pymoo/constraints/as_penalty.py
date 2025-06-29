@@ -1,17 +1,30 @@
 from pymoo.core.individual import calc_cv
-from pymoo.core.meta import Meta
 from pymoo.core.problem import Problem
 from pymoo.util.misc import from_dict
 
 import numpy as np
 
 
-class ConstraintsAsPenalty(Meta, Problem):
+class ConstraintsAsPenalty(Problem):
 
     def __init__(self,
                  problem,
                  penalty: float = 0.1):
-        super().__init__(problem)
+        super().__init__()
+        
+        # Store the wrapped problem
+        self.problem = problem
+        
+        # Copy relevant attributes from the wrapped problem
+        self.n_var = problem.n_var
+        self.n_obj = problem.n_obj
+        self.xl = getattr(problem, 'xl', None)
+        self.xu = getattr(problem, 'xu', None)
+        
+        # Copy other important attributes
+        for attr in ['elementwise', 'parallelization', 'replace_nan_values_by']:
+            if hasattr(problem, attr):
+                setattr(self, attr, getattr(problem, attr))
 
         # the amount of penalty to add for this type
         self.penalty = penalty
@@ -21,7 +34,7 @@ class ConstraintsAsPenalty(Meta, Problem):
         self.n_eq_constr = 0
 
     def do(self, X, return_values_of, *args, **kwargs):
-        out = self.__object__.do(X, return_values_of, *args, **kwargs)
+        out = self.problem.do(X, return_values_of, *args, **kwargs)
 
         # get at the values from the output
         F, G, H = from_dict(out, "F", "G", "H")
@@ -31,6 +44,7 @@ class ConstraintsAsPenalty(Meta, Problem):
 
         # calculate the total constraint violation (here normalization shall be already included)
         CV = calc_cv(G=G, H=H)
+        out["__CV__"] = CV
 
         # set the penalized objective values
         out["F"] = F + self.penalty * np.reshape(CV, F.shape)

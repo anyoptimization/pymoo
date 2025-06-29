@@ -20,7 +20,15 @@ class AdaptiveEpsilonConstraintHandling(AdaptiveConstraintHandling):
     def _initialize_advance(self, infills=None, **kwargs):
 
         # get the average constraint violation in the current generation
-        cv = infills.get("cv")
-        self.max_cv = np.mean(cv)
+        if infills is not None and infills.has("cv"):
+            cv = infills.get("cv")
+            self.max_cv = np.mean(cv)
+        elif self.pop is not None and self.pop.has("cv"):
+            # Use current population if available
+            cv = self.pop.get("cv")
+            self.max_cv = np.mean(cv)
+        else:
+            # Default value during initialization
+            self.max_cv = 1.0
 
         return super()._initialize_advance(infills, **kwargs)

@@ -30,11 +30,6 @@ If the problem is implemented using autograd, then the gradients through automat
 
 ```{code-cell} ipython3
 import numpy as np
-import pymoo.gradient
-
-# Activate autograd toolbox for gradient calculations
-pymoo.gradient.activate("autograd.numpy")
-
 import pymoo.gradient.toolbox as anp
 from pymoo.core.problem import Problem
 from pymoo.gradient.automatic import AutomaticDifferentiation
