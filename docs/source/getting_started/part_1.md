@@ -96,11 +96,12 @@ plt.rc('font', family='serif')
 
 levels = np.array([0.02, 0.1, 0.25, 0.5, 0.8])
 plt.figure(figsize=(7, 5))
-CS = plt.contour(X1, X2, F1, 10 * levels, colors='black', alpha=0.5)
-CS.collections[0].set_label("$f_1(x)$")
+CS1 = plt.contour(X1, X2, F1, 10 * levels, colors='black', alpha=0.5)
+CS2 = plt.contour(X1, X2, F2, levels, linestyles="dashed", colors='black', alpha=0.5)
 
-CS = plt.contour(X1, X2, F2, levels, linestyles="dashed", colors='black', alpha=0.5)
-CS.collections[0].set_label("$f_2(x)$")
+# Add dummy lines for legend (since contour collections don't work in new matplotlib)
+plt.plot([], [], color='black', alpha=0.5, label="$f_1(x)$")
+plt.plot([], [], color='black', alpha=0.5, linestyle='dashed', label="$f_2(x)$")
 
 plt.plot(X1[0], G1, linewidth=2.0, color="green", linestyle='dotted')
 plt.plot(X1[0][G1<0], G1[G1<0], label="$g_1(x)$", linewidth=2.0, color="green")

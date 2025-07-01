@@ -20,4 +20,5 @@ bs4
 pandoc
 ipykernel
 sphinx-copybutton
+torch
 

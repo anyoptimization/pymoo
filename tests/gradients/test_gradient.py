@@ -6,14 +6,13 @@ from pymoo.problems.multi.zdt import ZDT1
 from tests.gradients.problems_with_gradients import MySphereWithGradient, MySphere, ZDT1WithGradient, ElementwiseZDT1, \
     MyConstrainedSphereWithGradient, MyConstrainedSphere, ConstrainedZDT1WithGradient, ConstrainedZDT1
 
-# Skip all gradient tests due to autograd compatibility issues
-pytestmark = pytest.mark.skip(reason="Autograd compatibility issues with numpy 2.x")
+# Mark all gradient tests with gradient marker
+pytestmark = pytest.mark.gradient
 
 
 @pytest.mark.parametrize("correct, problem", [
     (MySphereWithGradient(), MySphere()),
-    pytest.param(ZDT1WithGradient(), ElementwiseZDT1(), marks=pytest.mark.skip(reason="Autograd compatibility issue with numpy arrays"))],
-                         ids=['elementwise_sphere', 'elementwise_zdt1'])
+    pytest.param(ZDT1WithGradient(), ElementwiseZDT1())], ids=['elementwise_sphere', 'elementwise_zdt1'])
 def test_elementwise_eval_with_gradient(correct, problem):
     X = np.random.random((100, correct.n_var))
 
@@ -28,7 +27,7 @@ def test_elementwise_eval_with_gradient(correct, problem):
 
 @pytest.mark.parametrize("correct, problem", [(MyConstrainedSphereWithGradient(), MyConstrainedSphere())],
                          ids=['elementwise_constr_sphere'])
-def test_elementwise_constrained_eval_with_gradient(correct, problem):
+def test_vectorized_constrained_eval_with_gradient(correct, problem):
     X = np.random.random((100, correct.n_var))
 
     autodiff = AutomaticDifferentiation(problem)
@@ -72,3 +71,7 @@ def test_constrained_multi_eval_with_gradient(correct, problem):
 
     np.testing.assert_allclose(_G, G, rtol=1e-5, atol=0)
     np.testing.assert_allclose(_dG, dG, rtol=1e-5, atol=0)
+
+
+
+

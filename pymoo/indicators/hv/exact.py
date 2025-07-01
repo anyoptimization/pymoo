@@ -1,17 +1,14 @@
 import numpy as np
-
-from pymoo.indicators.hv import hvc_looped
-from pymoo.functions import load_function
+from moocore import hypervolume as hv
+from moocore import hv_contributions as hvc
 
 
 def hv_exact(ref_point, F):
-    func = load_function("hv")
-    hv = func(ref_point, F)
-    return hv
+    return hv(F, ref=ref_point)
 
 
-def hvc_exact_loopwise(ref_point, F):
-    return hvc_looped(ref_point, F, hv_exact)
+def hvc_exact(ref_point, F):
+    return hvc(F, ref=ref_point)
 
 
 class DynamicHypervolume:
@@ -67,5 +64,5 @@ class DynamicHypervolume:
 
 class ExactHypervolume(DynamicHypervolume):
 
-    def __init__(self, ref_point, func_hv=hv_exact, func_hvc=hvc_exact_loopwise, **kwargs) -> None:
+    def __init__(self, ref_point, func_hv=hv_exact, func_hvc=hvc_exact, **kwargs) -> None:
         super().__init__(ref_point, func_hv=func_hv, func_hvc=func_hvc, **kwargs)

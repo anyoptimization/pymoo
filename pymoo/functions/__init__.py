@@ -59,7 +59,6 @@ def get_functions():
             "python": stochastic_ranking,
             "cython": "pymoo.functions.compiled.stochastic_ranking",
         },
-        "hv": {"python": hv, "cython": "pymoo.functions.compiled.hv"},
         "calc_mnn": {"python": calc_mnn, "cython": "pymoo.functions.compiled.mnn"},
         "calc_2nn": {"python": calc_2nn, "cython": "pymoo.functions.compiled.mnn"},
         "calc_pcd": {"python": calc_pcd, "cython": "pymoo.functions.compiled.pruning_cd"},

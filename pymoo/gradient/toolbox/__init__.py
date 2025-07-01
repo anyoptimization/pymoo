@@ -1,6 +1,19 @@
-import importlib
 import sys
+import importlib
 
-from pymoo.gradient import TOOLBOX
+class LazyBackend:
+    """Lazy backend that always uses the current active backend"""
+    
+    def __getattr__(self, name):
+        from pymoo.gradient import active_backend, BACKENDS
+        backend_module = importlib.import_module(BACKENDS[active_backend])
+        return getattr(backend_module, name)
+    
+    def __dir__(self):
+        """Support for tab completion and introspection"""
+        from pymoo.gradient import active_backend, BACKENDS
+        backend_module = importlib.import_module(BACKENDS[active_backend])
+        return dir(backend_module)
 
-sys.modules[__name__] = importlib.import_module(TOOLBOX)
+# Replace this module with the lazy backend
+sys.modules[__name__] = LazyBackend()

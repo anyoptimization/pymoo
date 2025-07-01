@@ -46,7 +46,8 @@ pycharm:
     '
 ---
 import os
-from pymoo.core.problem import ElementwiseProblem, JoblibParallelization
+from pymoo.core.problem import ElementwiseProblem
+from pymoo.parallelization.joblib import JoblibParallelization
 from pymoo.optimize import minimize
 from pymoo.algorithms.soo.nonconvex.ga import GA
 

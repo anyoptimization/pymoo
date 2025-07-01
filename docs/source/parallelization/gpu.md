@@ -42,7 +42,9 @@ class MyProblem(Problem):
         super().__init__(n_var=10, n_obj=1, n_ieq_constr=0, xl=-5, xu=5, **kwargs)
 
     def _evaluate(self, x, out, *args, **kwargs):
-         x = torch.from_numpy(x).cuda()
+         x = torch.from_numpy(x)
+         if torch.cuda.is_available():
+             x = x.cuda()
          f = torch.sum(torch.pow(x, 2), dim=1)
          out["F"] = f.detach().cpu().clone().numpy()
 

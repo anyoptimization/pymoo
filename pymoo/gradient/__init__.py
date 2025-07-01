@@ -1,18 +1,21 @@
 import sys
-import importlib
 
-GRADIENT_MODULE = "pymoo.gradient.toolbox"
 
-TOOLBOX = "numpy"
+BACKENDS = {
+    "numpy": "numpy",
+    "autograd": "autograd.numpy", 
+    "jax": "jax.numpy"
+}
 
+# Current active backend
+active_backend = "numpy"
 
 def activate(name):
-    global TOOLBOX
-    TOOLBOX = name
-
-    if GRADIENT_MODULE in sys.modules:
-        del sys.modules[GRADIENT_MODULE]
-    importlib.import_module(GRADIENT_MODULE)
+    global active_backend
+    if name not in BACKENDS:
+        raise ValueError(f"Unknown backend: {name}. Choose from: {list(BACKENDS.keys())}")
+    active_backend = name
+    # No need to delete module - LazyBackend handles dynamic switching
 
 
 def deactivate():

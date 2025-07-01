@@ -98,15 +98,21 @@ docs_manager = DocsManager()
 MARKDOWN_FILES = docs_manager.find_markdown_files()
 
 
-@pytest.mark.skip(reason="Meta Class not working after Python Update")
 @pytest.mark.docs
 @pytest.mark.long
-@pytest.mark.parametrize('md_file', MARKDOWN_FILES, 
-                         ids=lambda f: str(f.relative_to(docs_manager.docs_source)))
+@pytest.mark.parametrize('md_file', MARKDOWN_FILES, ids=lambda f: str(f.relative_to(docs_manager.docs_source)))
 def test_documentation_file(md_file: Path):
     """Test that a documentation file converts to notebook and executes successfully."""
     nb_file = md_file.with_suffix('.ipynb')
     relative_path = md_file.relative_to(docs_manager.docs_source)
+    
+    # Skip all constraint docs due to Meta class implementation issues
+    if str(relative_path).startswith('constraints/'):
+        pytest.skip(f"Meta class implementation issues in constraints documentation")
+    
+    # Skip kktpm due to Meta class implementation issues
+    if str(relative_path) == 'misc/kktpm.md':
+        pytest.skip(f"Meta class implementation issues in kktpm documentation")
     
     # Convert markdown to notebook if needed
     if not nb_file.exists():

@@ -1,15 +1,15 @@
 from functools import partial
 
-from jax.config import config
-
-config.update("jax_enable_x64", True)
-
-import pymoo.gradient.toolbox as anp
-import numpy as np
+import jax
+jax.config.update("jax_enable_x64", True)
 from jax import vjp
 from jax import vmap
 from jax._src.api import _jacrev_unravel, _std_basis
 from jax.tree_util import (tree_map)
+
+
+import pymoo.gradient.toolbox as anp
+import numpy as np
 
 
 def jax_elementwise_value_and_grad(f, x):

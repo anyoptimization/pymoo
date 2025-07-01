@@ -10,15 +10,22 @@ from pymoo.core.population import Population
 from pymoo.core.problem import Problem
 
 
-class AttachConfigEvaluator(Meta, Evaluator):
+class AttachConfigEvaluator(Evaluator):
 
     def __init__(self, wrapped, config):
-        super().__init__(wrapped)
+        super().__init__()
+        self.wrapped = wrapped
         self.config = config
+        
+        # Copy all attributes from wrapped evaluator
+        for attr_name in ['evaluate_values_of', 'skip_already_evaluated', 'callback', 'n_eval']:
+            if hasattr(wrapped, attr_name):
+                setattr(self, attr_name, getattr(wrapped, attr_name))
 
     def eval(self, problem: Problem, pop: Population, **kwargs):
-        pop = super().eval(problem, pop, **kwargs)
+        pop = self.wrapped.eval(problem, pop, **kwargs)
         pop.apply(lambda ind: ind.set("config", self.config))
+        return pop
 
 
 def copy_to_dict(src, dest):
