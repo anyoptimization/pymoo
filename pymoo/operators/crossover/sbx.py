@@ -110,6 +110,7 @@ class SimulatedBinaryCrossover(Crossover):
         self.prob_exch = Real(prob_exch, bounds=(0.0, 1.0), strict=(0.0, 1.0))
         self.prob_bin = Real(prob_bin, bounds=(0.0, 1.0), strict=(0.0, 1.0))
 
+    @Crossover.safe_bounds_do
     def _do(self, problem, X, **kwargs):
         _, n_matings, _ = X.shape
 
