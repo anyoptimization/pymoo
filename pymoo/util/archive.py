@@ -2,6 +2,7 @@ import numpy as np
 
 from pymoo.core.duplicate import DefaultDuplicateElimination
 from pymoo.core.population import Population, merge
+from pymoo.util import default_random_state
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
 
@@ -13,8 +14,9 @@ class Truncation:
 
 class RandomTruncation(Truncation):
 
-    def __call__(self, sols, k):
-        return np.random.choice(sols, size=k, replace=False)
+    @default_random_state
+    def __call__(self, sols, k, random_state=None):
+        return random_state.choice(sols, size=k, replace=False)
 
 
 class SurvivalTruncation(Truncation):

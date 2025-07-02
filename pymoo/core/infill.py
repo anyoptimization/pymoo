@@ -16,11 +16,12 @@ class InfillCriterion:
         self.eliminate_duplicates = eliminate_duplicates if eliminate_duplicates is not None else NoDuplicateElimination()
         self.repair = repair if repair is not None else NoRepair()
 
-    def __call__(self, problem, pop, n_offsprings, **kwargs):
-        return self.do(problem, pop, n_offsprings, **kwargs)
+    def __call__(self, problem, pop, n_offsprings, random_state=None, **kwargs):
+        return self.do(problem, pop, n_offsprings, random_state=random_state, **kwargs)
 
-    def do(self, problem, pop, n_offsprings, **kwargs):
-        n_max_iterations = kwargs.get("n_max_iterations", self.n_max_iterations)
+    def do(self, problem, pop, n_offsprings, random_state=None, n_max_iterations=None, **kwargs):
+        if n_max_iterations is None:
+            n_max_iterations = self.n_max_iterations
 
         # the population object to be used
         off = Population.create()
@@ -35,10 +36,10 @@ class InfillCriterion:
             n_remaining = n_offsprings - len(off)
 
             # do the mating
-            _off = self._do(problem, pop, n_remaining, **kwargs)
+            _off = self._do(problem, pop, n_remaining, random_state=random_state, **kwargs)
 
             # repair the individuals if necessary - disabled if repair is NoRepair
-            _off = self.repair(problem, _off, **kwargs)
+            _off = self.repair(problem, _off, random_state=random_state, **kwargs)
 
             # eliminate the duplicates
             _off = self.eliminate_duplicates.do(_off, pop, off)
@@ -60,5 +61,5 @@ class InfillCriterion:
 
         return off
 
-    def _do(self, problem, pop, n_offsprings, **kwargs):
+    def _do(self, problem, pop, n_offsprings, random_state=None, **kwargs):
         pass

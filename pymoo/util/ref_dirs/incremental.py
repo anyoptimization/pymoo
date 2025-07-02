@@ -2,6 +2,7 @@ import numpy as np
 
 from pymoo.util.reference_direction import ReferenceDirectionFactory
 
+
 def check_n_points(n_points, n_dim):
     """
     Returns n_partitions or a numeric value associated with the exception message.
@@ -64,5 +65,5 @@ class IncrementalReferenceDirectionFactory(ReferenceDirectionFactory):
         else:
             raise Exception("Either provide number of partitions or number of points.")
 
-    def _do(self):
+    def _do(self, **kwargs):
         return incremental_lattice(self.n_partitions, self.n_dim)

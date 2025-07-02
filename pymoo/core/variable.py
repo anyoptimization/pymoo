@@ -17,6 +17,7 @@ from typing import Any, Optional, Tuple
 from typing import Union
 import numpy as np
 from numpy.typing import ArrayLike
+from pymoo.util import default_random_state
 
 
 class Variable(object):
@@ -47,9 +48,11 @@ class Variable(object):
         self.flag = flag
         self.active = active
 
+    @default_random_state
     def sample(
             self, 
             n: Optional[int] = None,
+            random_state=None,
         ) -> Union[object,np.ndarray]:
         """
         Randomly sample ``n`` instances of a decision variable.
@@ -70,13 +73,14 @@ class Variable(object):
             variable.
         """
         if n is None:
-            return self._sample(1)[0]
+            return self._sample(1, random_state=random_state)[0]
         else:
-            return self._sample(n)
+            return self._sample(n, random_state=random_state)
 
     def _sample(
             self, 
             n: int,
+            random_state=None,
         ) -> np.ndarray:
         """
         Randomly sample ``n`` instances of a decision variable.
@@ -202,6 +206,7 @@ class Real(BoundedVariable):
     def _sample(
             self, 
             n: int,
+            random_state=None,
         ) -> np.ndarray:
         """
         Randomly sample ``n`` instances of a real, bounded decision variable.
@@ -214,6 +219,8 @@ class Real(BoundedVariable):
         ----------
         n : int
             Number of decision variable samples which to draw.
+        random_state
+            Random state for sampling.
 
         Returns
         -------
@@ -222,7 +229,7 @@ class Real(BoundedVariable):
             decision variables.
         """
         low, high = self.bounds
-        return np.random.uniform(low=low, high=high, size=n)
+        return random_state.uniform(low=low, high=high, size=n)
 
 
 class Integer(BoundedVariable):
@@ -235,6 +242,7 @@ class Integer(BoundedVariable):
     def _sample(
             self, 
             n: int,
+            random_state=None,
         ) -> np.ndarray:
         """
         Randomly sample ``n`` instances of a bounded, integer decision variable.
@@ -247,6 +255,8 @@ class Integer(BoundedVariable):
         ----------
         n : int
             Number of decision variable samples which to draw.
+        random_state
+            Random state for sampling.
 
         Returns
         -------
@@ -255,7 +265,7 @@ class Integer(BoundedVariable):
             decision variables.
         """
         low, high = self.bounds
-        return np.random.randint(low, high=high + 1, size=n)
+        return random_state.integers(low, high + 1, size=n)
 
 
 class Binary(BoundedVariable):
@@ -268,6 +278,7 @@ class Binary(BoundedVariable):
     def _sample(
             self, 
             n: int,
+            random_state=None,
         ) -> np.ndarray:
         """
         Randomly sample ``n`` instances of a bounded, binary decision variable.
@@ -280,6 +291,8 @@ class Binary(BoundedVariable):
         ----------
         n : int
             Number of decision variable samples which to draw.
+        random_state
+            Random state for sampling.
 
         Returns
         -------
@@ -287,7 +300,7 @@ class Binary(BoundedVariable):
             An array of shape ``(n,)`` containing sampled bounded, binary 
             decision variables.
         """
-        return np.random.random(size=n) < 0.5
+        return random_state.random(size=n) < 0.5
 
 
 class Choice(Variable):
@@ -331,6 +344,7 @@ class Choice(Variable):
     def _sample(
             self, 
             n: int,
+            random_state=None,
         ) -> np.ndarray:
         """
         Randomly sample ``n`` instances of a discrete, subset decision variable.
@@ -344,6 +358,8 @@ class Choice(Variable):
         ----------
         n : int
             Number of decision variable samples which to draw.
+        random_state
+            Random state for sampling.
 
         Returns
         -------
@@ -351,7 +367,7 @@ class Choice(Variable):
             An array of shape ``(n,)`` containing sampled bounded, integer 
             decision variables.
         """
-        return np.random.choice(self.options, size=n)
+        return random_state.choice(self.options, size=n)
 
 
 def get(

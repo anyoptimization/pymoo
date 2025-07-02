@@ -1,30 +1,17 @@
-from pymoo.core.individual import calc_cv
-from pymoo.core.problem import Problem
-from pymoo.util.misc import from_dict
-
 import numpy as np
 
+from pymoo.core.individual import calc_cv
+from pymoo.core.problem import MetaProblem
+from pymoo.util.misc import from_dict
 
-class ConstraintsAsPenalty(Problem):
+
+class ConstraintsAsPenalty(MetaProblem):
 
     def __init__(self,
                  problem,
                  penalty: float = 0.1):
-        super().__init__()
-        
-        # Store the wrapped problem
-        self.problem = problem
-        
-        # Copy relevant attributes from the wrapped problem
-        self.n_var = problem.n_var
-        self.n_obj = problem.n_obj
-        self.xl = getattr(problem, 'xl', None)
-        self.xu = getattr(problem, 'xu', None)
-        
-        # Copy other important attributes
-        for attr in ['elementwise', 'parallelization', 'replace_nan_values_by']:
-            if hasattr(problem, attr):
-                setattr(self, attr, getattr(problem, attr))
+        # Initialize MetaProblem with the wrapped problem
+        super().__init__(problem)
 
         # the amount of penalty to add for this type
         self.penalty = penalty
@@ -33,11 +20,17 @@ class ConstraintsAsPenalty(Problem):
         self.n_ieq_constr = 0
         self.n_eq_constr = 0
 
-    def do(self, X, return_values_of, *args, **kwargs):
-        out = self.problem.do(X, return_values_of, *args, **kwargs)
 
-        # get at the values from the output
-        F, G, H = from_dict(out, "F", "G", "H")
+
+    def _evaluate(self, X, out, *args, **kwargs):
+        """
+        Implement _evaluate by calling the wrapped problem and processing constraints.
+        """
+        # Call the wrapped problem's evaluate method to get properly formatted output
+        wrapped_out = self.__wrapped__.evaluate(X, return_as_dictionary=True, *args, **kwargs)
+        
+        # get at the values from the wrapped output
+        F, G, H = from_dict(wrapped_out, "F", "G", "H")
 
         # store a backup of the values in out
         out["__F__"], out["__G__"], out["__H__"] = F, G, H
@@ -49,7 +42,3 @@ class ConstraintsAsPenalty(Problem):
         # set the penalized objective values
         out["F"] = F + self.penalty * np.reshape(CV, F.shape)
 
-        del out["G"]
-        del out["H"]
-
-        return out

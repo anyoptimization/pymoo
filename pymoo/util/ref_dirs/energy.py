@@ -147,7 +147,7 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
 
         return ret[:n_points]
 
-    def _do(self):
+    def _do(self, random_state=None):
         X = self.X
 
         # if no initial points are provided by the user
@@ -156,15 +156,13 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
                 X = ReductionBasedReferenceDirectionFactory(self.n_dim,
                                                             self.n_points,
                                                             kmeans=True,
-                                                            lexsort=False,
-                                                            seed=self.seed) \
-                    .do()
+                                                            lexsort=False) \
+                    .do(random_state=random_state)
 
             elif self.sampling == "construction":
                 X = ConstructionBasedReferenceDirectionFactory(self.n_dim,
-                                                               self.n_points,
-                                                               seed=self.seed) \
-                    .do()
+                                                               self.n_points) \
+                    .do(random_state=random_state)
             else:
                 raise Exception("Unknown sampling method. Either reduction or construction.")
 

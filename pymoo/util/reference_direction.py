@@ -4,6 +4,7 @@ import numpy as np
 from scipy import special
 
 from pymoo.util.misc import find_duplicates, cdist
+from pymoo.util import default_random_state
 
 
 # =========================================================================================================
@@ -25,28 +26,24 @@ def default_ref_dirs(m):
 
 class ReferenceDirectionFactory:
 
-    def __init__(self, n_dim, scaling=None, lexsort=True, verbose=False, seed=None, **kwargs) -> None:
+    def __init__(self, n_dim, scaling=None, lexsort=True, verbose=False, **kwargs) -> None:
         super().__init__()
         self.n_dim = n_dim
         self.scaling = scaling
         self.lexsort = lexsort
         self.verbose = verbose
-        self.seed = seed
 
     def __call__(self):
         return self.do()
 
-    def do(self):
-
-        # set the random seed if it is provided
-        if self.seed is not None:
-            np.random.seed(self.seed)
+    @default_random_state(seed=1)
+    def do(self, random_state=None):
 
         if self.n_dim == 1:
             return np.array([[1.0]])
         else:
 
-            val = self._do()
+            val = self._do(random_state=random_state)
             if isinstance(val, tuple):
                 ref_dirs, other = val[0], val[1:]
             else:
@@ -62,7 +59,7 @@ class ReferenceDirectionFactory:
 
             return ref_dirs
 
-    def _do(self):
+    def _do(self, random_state=None):
         return None
 
 
@@ -140,7 +137,7 @@ class UniformReferenceDirectionFactory(ReferenceDirectionFactory):
         else:
             raise Exception("Either provide number of partitions or number of points.")
 
-    def _do(self):
+    def _do(self, random_state=None):
         return das_dennis(self.n_partitions, self.n_dim)
 
 
@@ -174,18 +171,18 @@ class MultiLayerReferenceDirectionFactory:
 # Util
 # =========================================================================================================
 
-def get_rng(seed=None):
-    if seed is None or type(seed) == int:
-        rng = np.random.default_rng(seed)
-    return rng
+@default_random_state
+def get_rng(random_state=None, **kwargs):
+    return random_state
 
 
-def sample_on_unit_simplex(n_points, n_dim, unit_simplex_mapping="kraemer", seed=None):
+@default_random_state
+def sample_on_unit_simplex(n_points, n_dim, unit_simplex_mapping="kraemer", random_state=None, **kwargs):
     if unit_simplex_mapping == "sum":
-        rnd = map_onto_unit_simplex(get_rng(seed).random((n_points, n_dim)), "sum")
+        rnd = map_onto_unit_simplex(random_state.random((n_points, n_dim)), "sum")
 
     elif unit_simplex_mapping == "kraemer":
-        rnd = map_onto_unit_simplex(get_rng(seed).random((n_points, n_dim)), "kraemer")
+        rnd = map_onto_unit_simplex(random_state.random((n_points, n_dim)), "kraemer")
 
     elif unit_simplex_mapping == "das-dennis":
         n_partitions = get_partition_closest_to_points(n_points, n_dim)
@@ -227,7 +224,7 @@ def scale_reference_directions(ref_dirs, scaling):
     return ref_dirs * scaling + ((1 - scaling) / ref_dirs.shape[1])
 
 
-def select_points_with_maximum_distance(X, n_select, selected=[]):
+def select_points_with_maximum_distance(X, n_select, selected=[], random_state=None):
     n_points, n_dim = X.shape
 
     # calculate the distance matrix
@@ -235,7 +232,8 @@ def select_points_with_maximum_distance(X, n_select, selected=[]):
 
     # if no selection provided pick randomly in the beginning
     if len(selected) == 0:
-        selected = [np.random.randint(len(X))]
+        # random_state should be provided by caller
+        selected = [random_state.integers(len(X))]
 
     # create variables to store what selected and what not
     not_selected = [i for i in range(n_points) if i not in selected]

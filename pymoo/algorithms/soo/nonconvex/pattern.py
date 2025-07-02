@@ -8,6 +8,7 @@ from pymoo.docs import parse_doc_string
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside_by_problem
 from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.optimum import filter_optimum
+from pymoo.util import default_random_state
 
 
 # =========================================================================================================
@@ -119,12 +120,13 @@ class PatternSearch(LocalSearch):
         self.opt = filter_optimum(pop, least_infeasible=True)
 
 
-def exploration_move(problem, center, sign, delta, rho, randomize=True):
+@default_random_state
+def exploration_move(problem, center, sign, delta, rho, randomize=True, random_state=None):
     n_var = problem.n_var
 
     # the order for the variable iteration
     if randomize:
-        K = np.random.permutation(n_var)
+        K = random_state.permutation(n_var)
     else:
         K = np.arange(n_var)
 

@@ -102,18 +102,18 @@ def test_mnn():
     surv_mnn_py = RankAndCrowding(crowding_func=calc_mnn_python)
     surv_2nn_py = RankAndCrowding(crowding_func=calc_2nn_python)
     
-    np.random.seed(12)
-    pop_mnn = surv_mnn.do(problem, res.pop, n_survive=80)
+    random_state_1 = np.random.default_rng(12)
+    pop_mnn = surv_mnn.do(problem, res.pop, n_survive=80, random_state=random_state_1)
     
-    np.random.seed(12)
-    pop_mnn_py = surv_mnn_py.do(problem, res.pop, n_survive=80)
+    random_state_2 = np.random.default_rng(12)
+    pop_mnn_py = surv_mnn_py.do(problem, res.pop, n_survive=80, random_state=random_state_2)
     
     assert np.sum(np.abs(pop_mnn.get("F") - pop_mnn_py.get("F"))) <= 1e-8
     
-    np.random.seed(12)
-    pop_2nn = surv_2nn.do(problem, res.pop, n_survive=70)
+    random_state_3 = np.random.default_rng(12)
+    pop_2nn = surv_2nn.do(problem, res.pop, n_survive=70, random_state=random_state_3)
     
-    np.random.seed(12)
-    pop_2nn_py = surv_2nn_py.do(problem, res.pop, n_survive=70)
+    random_state_4 = np.random.default_rng(12)
+    pop_2nn_py = surv_2nn_py.do(problem, res.pop, n_survive=70, random_state=random_state_4)
     
     assert np.sum(np.abs(pop_2nn.get("F") - pop_2nn_py.get("F"))) <= 1e-8

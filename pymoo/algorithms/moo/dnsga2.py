@@ -32,7 +32,7 @@ class DNSGA2(NSGA2):
         n_samples = int(np.ceil(len(pop) * self.perc_detect_change))
 
         # choose randomly some individuals of the current population to test if there was a change
-        I = np.random.choice(np.arange(len(pop)), size=n_samples)
+        I = self.random_state.choice(np.arange(len(pop)), size=n_samples)
         samples = self.evaluator.eval(self.problem, Population.new(X=X[I]))
 
         # calculate the differences between the old and newly evaluated pop
@@ -47,11 +47,11 @@ class DNSGA2(NSGA2):
             pop = Population.new(X=X)
 
             # find indices to be replaced (introduce diversity)
-            I = np.where(np.random.random(len(pop)) < self.perc_diversity)[0]
+            I = np.where(self.random_state.random(len(pop)) < self.perc_diversity)[0]
 
             # replace with randomly sampled individuals
             if self.version == "A":
-                pop[I] = self.initialization.sampling(self.problem, len(I))
+                pop[I] = self.initialization.sampling(self.problem, len(I), random_state=self.random_state)
 
             # replace by mutations of existing solutions (this occurs inplace)
             elif self.version == "B":
@@ -63,14 +63,14 @@ class DNSGA2(NSGA2):
             self.evaluator.eval(self.problem, pop)
 
             # do a survival to recreate rank and crowding of all individuals
-            pop = self.survival.do(self.problem, pop, n_survive=len(pop))
+            pop = self.survival.do(self.problem, pop, n_survive=len(pop), random_state=self.random_state)
 
         # create the offsprings from the current population
-        off = self.mating.do(self.problem, pop, self.n_offsprings, algorithm=self)
+        off = self.mating.do(self.problem, pop, self.n_offsprings, algorithm=self, random_state=self.random_state)
         self.evaluator.eval(self.problem, off)
 
         # merge the parent population and offsprings
         pop = Population.merge(pop, off)
 
         # execute the survival to find the fittest solutions
-        self.pop = self.survival.do(self.problem, pop, n_survive=self.pop_size, algorithm=self)
+        self.pop = self.survival.do(self.problem, pop, n_survive=self.pop_size, algorithm=self, random_state=self.random_state)

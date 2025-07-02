@@ -253,7 +253,7 @@ class PINSGA2(GeneticAlgorithm):
             self.presi_signs = np.ones(F.shape[1])
 
         # Eta is the number of solutions displayed to the DM
-        eta_F_indices = select_points_with_maximum_distance(F, to_find)
+        eta_F_indices = select_points_with_maximum_distance(F, to_find, random_state=self.random_state)
 
         self.eta_F = F[eta_F_indices]
         self.eta_F = self.eta_F[self.eta_F[:,0].argsort()]

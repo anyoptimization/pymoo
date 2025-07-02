@@ -95,7 +95,7 @@ class AspirationPointSurvival(Survival):
         self.ideal_point = np.full(ref_points.shape[1], np.inf)
         self.worst_point = np.full(ref_points.shape[1], -np.inf)
 
-    def _do(self, problem, pop, n_survive, D=None, **kwargs):
+    def _do(self, problem, pop, n_survive, D=None, random_state=None, **kwargs):
 
         # attributes to be set after the survival
         F = pop.get("F")
@@ -162,7 +162,7 @@ class AspirationPointSurvival(Survival):
                 n_remaining = n_survive - len(until_last_front)
 
             S = niching(pop[last_front], n_remaining, niche_count, niche_of_individuals[last_front],
-                        dist_to_niche[last_front])
+                        dist_to_niche[last_front], random_state=random_state)
 
             survivors = np.concatenate((until_last_front, last_front[S].tolist()))
             pop = pop[survivors]

@@ -38,11 +38,6 @@ In a single objective problem, the metric shows how close a point is from being 
 Let us now see how to use pymoo to calculate the KKTPM for a point:
 
 ```{code-cell} ipython3
-import pymoo.gradient
-
-# Activate autograd toolbox for gradient calculations
-pymoo.gradient.activate("autograd.numpy")
-
 from pymoo.constraints.from_bounds import ConstraintsFromBounds
 from pymoo.gradient.automatic import AutomaticDifferentiation
 from pymoo.problems import get_problem

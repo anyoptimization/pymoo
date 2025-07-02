@@ -4,6 +4,7 @@ import numpy as np
 
 from pymoo.core.population import Population
 from pymoo.core.repair import Repair
+from pymoo.util import default_random_state
 
 
 def is_in_bounds(X, xl, xu):
@@ -54,16 +55,17 @@ def repair_periodic(Xp, xl, xu):
     return Xp
 
 
-def repair_random_init(Xp, X, xl, xu):
+@default_random_state
+def repair_random_init(Xp, X, xl, xu, random_state=None):
     XL, XU = repeat_bounds(xl, xu, len(Xp))
 
     i, j = np.where(Xp < XL)
     if len(i) > 0:
-        Xp[i, j] = XL[i, j] + np.random.random(len(i)) * (X[i, j] - XL[i, j])
+        Xp[i, j] = XL[i, j] + random_state.random(len(i)) * (X[i, j] - XL[i, j])
 
     i, j = np.where(Xp > XU)
     if len(i) > 0:
-        Xp[i, j] = XU[i, j] - np.random.random(len(i)) * (XU[i, j] - X[i, j])
+        Xp[i, j] = XU[i, j] - random_state.random(len(i)) * (XU[i, j] - X[i, j])
 
     return Xp
 

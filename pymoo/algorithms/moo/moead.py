@@ -21,17 +21,17 @@ class NeighborhoodSelection(Selection):
         super().__init__()
         self.prob = Real(prob, bounds=(0.0, 1.0))
 
-    def _do(self, problem, pop, n_select, n_parents, neighbors=None, **kwargs):
+    def _do(self, problem, pop, n_select, n_parents, neighbors=None, random_state=None, **kwargs):
         assert n_select == len(neighbors)
         P = np.full((n_select, n_parents), -1)
 
         prob = get(self.prob, size=n_select)
 
         for k in range(n_select):
-            if np.random.random() < prob[k]:
-                P[k] = np.random.choice(neighbors[k], n_parents, replace=False)
+            if random_state.random() < prob[k]:
+                P[k] = random_state.choice(neighbors[k], n_parents, replace=False)
             else:
-                P[k] = np.random.permutation(len(pop))[:n_parents]
+                P[k] = random_state.permutation(len(pop))[:n_parents]
 
         return P
 
@@ -98,12 +98,12 @@ class MOEAD(LoopwiseAlgorithm, GeneticAlgorithm):
         pop = self.pop
 
         # iterate for each member of the population in random order
-        for k in np.random.permutation(len(pop)):
+        for k in self.random_state.permutation(len(pop)):
             # get the parents using the neighborhood selection
-            P = self.selection.do(self.problem, pop, 1, self.mating.crossover.n_parents, neighbors=[self.neighbors[k]])
+            P = self.selection.do(self.problem, pop, 1, self.mating.crossover.n_parents, neighbors=[self.neighbors[k]], random_state=self.random_state)
 
             # perform a mating using the default operators - if more than one offspring just pick the first
-            off = np.random.choice(self.mating.do(self.problem, pop, 1, parents=P, n_max_iterations=1))
+            off = self.random_state.choice(self.mating.do(self.problem, pop, 1, parents=P, n_max_iterations=1, random_state=self.random_state))
 
             # evaluate the offspring
             off = yield off
@@ -143,17 +143,17 @@ class ParallelMOEAD(MOEAD):
         pop_size, cross_parents, cross_off = self.pop_size, self.mating.crossover.n_parents, self.mating.crossover.n_offsprings
 
         # do the mating in a random order
-        indices = np.random.permutation(len(self.pop))[:self.n_offsprings]
+        indices = self.random_state.permutation(len(self.pop))[:self.n_offsprings]
 
         # get the parents using the neighborhood selection
         P = self.selection.do(self.problem, self.pop, self.n_offsprings, cross_parents,
-                              neighbors=self.neighbors[indices])
+                              neighbors=self.neighbors[indices], random_state=self.random_state)
 
         # do not any duplicates elimination - thus this results in exactly pop_size * n_offsprings offsprings
-        off = self.mating.do(self.problem, self.pop, 1e12, n_max_iterations=1, parents=P)
+        off = self.mating.do(self.problem, self.pop, 1e12, n_max_iterations=1, parents=P, random_state=self.random_state)
 
         # select a random offspring from each mating
-        off = Population.create(*[np.random.choice(pool) for pool in np.reshape(off, (self.n_offsprings, -1))])
+        off = Population.create(*[self.random_state.choice(pool) for pool in np.reshape(off, (self.n_offsprings, -1))])
 
         # store the indices because of the neighborhood matching in advance
         self.indices = indices

@@ -1,11 +1,13 @@
 import numpy as np
 
 from pymoo.util.misc import swap
+from pymoo.util import default_random_state
 
 
-def randomized_argsort(A, method="numpy", order='ascending'):
+@default_random_state
+def randomized_argsort(A, method="numpy", order='ascending', random_state=None):
     if method == "numpy":
-        P = np.random.permutation(len(A))
+        P = random_state.permutation(len(A))
         I = np.argsort(A[P], kind='quicksort')
         I = P[I]
 
@@ -23,16 +25,17 @@ def randomized_argsort(A, method="numpy", order='ascending'):
         raise Exception("Unknown sorting order: ascending or descending.")
 
 
-def quicksort(A):
+@default_random_state
+def quicksort(A, random_state=None):
     I = np.arange(len(A))
-    _quicksort(A, I, 0, len(A) - 1)
+    _quicksort(A, I, 0, len(A) - 1, random_state=random_state)
     return I
 
 
-def _quicksort(A, I, left, right):
+def _quicksort(A, I, left, right, random_state):
     if left < right:
 
-        index = np.random.randint(left, right + 1)
+        index = random_state.integers(left, right + 1)
         swap(I, right, index)
 
         pivot = A[I[right]]
@@ -48,8 +51,8 @@ def _quicksort(A, I, left, right):
         index = i + 1
         swap(I, right, index)
 
-        _quicksort(A, I, left, index - 1)
-        _quicksort(A, I, index + 1, right)
+        _quicksort(A, I, left, index - 1, random_state)
+        _quicksort(A, I, index + 1, right, random_state)
 
 
 if __name__ == '__main__':

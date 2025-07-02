@@ -3,6 +3,7 @@ from abc import abstractmethod
 import numpy as np
 
 from pymoo.core.operator import Operator
+from pymoo.util import default_random_state
 
 
 class Selection(Operator):
@@ -14,7 +15,8 @@ class Selection(Operator):
         """
         super().__init__(**kwargs)
 
-    def do(self, problem, pop, n_select, n_parents, to_pop=True, **kwargs):
+    @default_random_state
+    def do(self, problem, pop, n_select, n_parents, to_pop=True, *args, random_state=None, **kwargs):
         """
         Choose from the population new individuals to be selected.
 
@@ -46,7 +48,7 @@ class Selection(Operator):
 
         """
 
-        ret = self._do(problem, pop, n_select, n_parents, **kwargs)
+        ret = self._do(problem, pop, n_select, n_parents, *args, random_state=random_state, **kwargs)
 
         # if some selections return indices they are used to create the individual list
         if to_pop and isinstance(ret, np.ndarray) and np.issubdtype(ret.dtype, np.integer):
@@ -55,7 +57,5 @@ class Selection(Operator):
         return ret
 
     @abstractmethod
-    def _do(self, problem, pop, n_select, n_parents, **kwargs):
+    def _do(self, problem, pop, n_select, n_parents, *args, random_state=None, **kwargs):
         pass
-
-

@@ -282,7 +282,7 @@ class CMAES(LocalSearch):
         popsize : 4+int(3*np.log(N))
             Population size, AKA lambda, number of new solution per iteration
 
-        randn : np.random.randn
+        randn
             Randn(lam, N) must return an np.array of shape (lam, N), see also cma.utilities.math.randhss
 
         signals_filename : None
@@ -402,7 +402,8 @@ class CMAES(LocalSearch):
             self.norm = NoNormalization()
             self.options['bounds'] = [xl, xu]
 
-        self.options['seed'] = kwargs.get('seed', self.seed)
+        seed = kwargs.get('seed', self.seed)
+        self.options['seed'] = seed
 
         if isinstance(self.termination, MaximumGenerationTermination):
             self.options['maxiter'] = self.termination.n_max_gen
@@ -422,7 +423,8 @@ class CMAES(LocalSearch):
             noise_handler=self.noise_handler,
             noise_change_sigma_exponent=self.noise_change_sigma_exponent,
             noise_kappa_exponent=self.noise_kappa_exponent,
-            bipop=self.bipop)
+            bipop=self.bipop,
+            random_state=self.random_state)
 
         x0 = self.norm.forward(self.x0.X)
         self.es = my_fmin(x0, self.sigma, **kwargs)

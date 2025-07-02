@@ -32,11 +32,11 @@ class InversionMutation(Mutation):
         super().__init__()
         self.prob = prob
 
-    def _do(self, problem, X, **kwargs):
+    def _do(self, problem, X, random_state=None, **kwargs):
         Y = X.copy()
         for i, y in enumerate(X):
-            if np.random.random() < self.prob:
-                seq = random_sequence(len(y))
+            if random_state.random() < self.prob:
+                seq = random_sequence(len(y), random_state=random_state)
                 Y[i] = inversion_mutation(y, seq, inplace=True)
 
         return Y

@@ -1,4 +1,5 @@
 import numpy as np
+from pymoo.util import default_random_state
 
 
 class RouletteWheelSelection:
@@ -10,11 +11,12 @@ class RouletteWheelSelection:
         _sum = val.sum()
         self.cumulative = np.array([val[:k].sum() / _sum for k in range(1, len(val))])
 
-    def next(self, n=None):
+    @default_random_state
+    def next(self, n=None, random_state=None):
         if n is None:
-            X = np.random.random((1, 1))
+            X = random_state.random((1, 1))
         else:
-            X = np.random.random((n, 1))
+            X = random_state.random((n, 1))
             if n > 1:
                 X.repeat(n - 1, axis=1)
 

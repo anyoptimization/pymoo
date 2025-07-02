@@ -72,17 +72,18 @@ class GeneticAlgorithm(Algorithm):
         self.off = None
 
     def _initialize_infill(self):
-        pop = self.initialization.do(self.problem, self.pop_size, algorithm=self)
+        pop = self.initialization.do(self.problem, self.pop_size, algorithm=self, random_state=self.random_state)
         return pop
 
     def _initialize_advance(self, infills=None, **kwargs):
         if self.advance_after_initial_infill:
-            self.pop = self.survival.do(self.problem, infills, n_survive=len(infills), algorithm=self, **kwargs)
+            self.pop = self.survival.do(self.problem, infills, n_survive=len(infills),
+                                        random_state=self.random_state, algorithm=self, **kwargs)
 
     def _infill(self):
 
         # do the mating using the current population
-        off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
+        off = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self, random_state=self.random_state)
 
         # if the mating could not generate any new offspring (duplicate elimination might make that happen)
         if len(off) == 0:
@@ -106,4 +107,4 @@ class GeneticAlgorithm(Algorithm):
             pop = Population.merge(self.pop, infills)
 
         # execute the survival to find the fittest solutions
-        self.pop = self.survival.do(self.problem, pop, n_survive=self.pop_size, algorithm=self, **kwargs)
+        self.pop = self.survival.do(self.problem, pop, n_survive=self.pop_size, algorithm=self, random_state=self.random_state, **kwargs)

@@ -1,5 +1,6 @@
-import numpy as np
 import math
+
+import numpy as np
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
@@ -7,6 +8,7 @@ from pymoo.core.population import Population
 from pymoo.docs import parse_doc_string
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.termination.default import DefaultSingleObjectiveTermination
+from pymoo.util import default_random_state
 from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.optimum import filter_optimum
 
@@ -95,13 +97,13 @@ class ES(GeneticAlgorithm):
         X, sigma = X[I], sigma[I]
 
         # get the sigma only of the elites to be used
-        sigmap = es_intermediate_recomb(sigma)
+        sigmap = es_intermediate_recomb(sigma, random_state=self.random_state)
 
         # calculate the new sigma based on tau and tau prime
-        sigmap = np.minimum(self.sigma_max, es_sigma(sigmap, self.tau, self.taup))
+        sigmap = np.minimum(self.sigma_max, es_sigma(sigmap, self.tau, self.taup, random_state=self.random_state))
 
         # execute the evolutionary strategy to calculate the offspring solutions
-        Xp = X + sigmap * np.random.normal(size=sigmap.shape)
+        Xp = X + sigmap * self.random_state.normal(size=sigmap.shape)
 
         # if gamma is not none do the differential variation overwrite Xp and sigmap for the first mu-1 individuals
         if self.gamma is not None:
@@ -110,7 +112,7 @@ class ES(GeneticAlgorithm):
 
         # if we have bounds to consider -> repair the individuals which are out of bounds
         if self.problem.has_bounds():
-            Xp = es_mut_repair(Xp, X, sigmap, xl, xu, 10)
+            Xp = es_mut_repair(Xp, X, sigmap, xl, xu, 10, random_state=self.random_state)
 
         # create the population to proceed further
         off = Population.new(X=Xp, sigma=sigmap)
@@ -130,24 +132,27 @@ class ES(GeneticAlgorithm):
         self.opt = filter_optimum(pop, least_infeasible=True)
 
 
-def es_sigma(sigma, tau, taup):
+@default_random_state
+def es_sigma(sigma, tau, taup, random_state=None):
     _lambda, _n = sigma.shape
-    return sigma * np.exp(taup * np.random.normal(size=(_lambda, 1)) + tau * np.random.normal(size=(_lambda, _n)))
+    return sigma * np.exp(taup * random_state.normal(size=(_lambda, 1)) + tau * random_state.normal(size=(_lambda, _n)))
 
 
-def es_intermediate_recomb(sigma):
+@default_random_state
+def es_intermediate_recomb(sigma, random_state=None):
     _lambda, _n = sigma.shape
     sigma_hat = np.zeros_like(sigma)
 
     for i in range(_lambda):
         for j in range(_n):
-            k = np.random.randint(_lambda)
+            k = random_state.integers(_lambda)
             sigma_hat[i, j] = (sigma[i, j] + sigma[k, j]) / 2.0
 
     return sigma_hat
 
 
-def es_mut_repair(Xp, X, sigma, xl, xu, n_trials):
+@default_random_state
+def es_mut_repair(Xp, X, sigma, xl, xu, n_trials, random_state=None):
     # reshape xl and xu to be the same shape as the input
     XL = xl[None, :].repeat(len(Xp), axis=0)
     XU = xu[None, :].repeat(len(Xp), axis=0)
@@ -165,7 +170,7 @@ def es_mut_repair(Xp, X, sigma, xl, xu, n_trials):
             break
         else:
             # do the mutation again vectored for all values not in bound
-            Xp[i, j] = X[i, j] + sigma[i, j] * np.random.normal(size=len(i))
+            Xp[i, j] = X[i, j] + sigma[i, j] * random_state.normal(size=len(i))
 
     # if there are still solutions which boundaries are violated, set them to the original X
     if not all_in_bounds:
@@ -175,7 +180,8 @@ def es_mut_repair(Xp, X, sigma, xl, xu, n_trials):
     return Xp
 
 
-def es_mut_loop(X, sigmap, xl, xu, n_trials=10):
+@default_random_state
+def es_mut_loop(X, sigmap, xl, xu, n_trials=10, random_state=None):
     _lambda, _n = sigmap.shape
 
     # X prime which will be returned by the algorithm (set the default value to the same as parent)
@@ -194,7 +200,7 @@ def es_mut_loop(X, sigmap, xl, xu, n_trials=10):
             for _ in range(n_trials):
 
                 # calculate the mutated value
-                x = X[i, j] + sigmap[i, j] * np.random.normal()
+                x = X[i, j] + sigmap[i, j] * random_state.normal()
 
                 # if it is inside the bounds accept it - otherwise try again
                 if xl[j] <= x <= xu[j]:

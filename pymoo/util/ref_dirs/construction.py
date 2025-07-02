@@ -39,8 +39,9 @@ class ConstructionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
         self.verbose = verbose
         self.X = None
 
-    def _do(self):
+    def _do(self, random_state=None, **kwargs):
 
+        self.random_state = random_state
         self.X = np.eye(self.n_dim)
 
         while len(self.X) < self.n_points:
@@ -54,7 +55,7 @@ class ConstructionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
 
     def next(self):
 
-        x = np.random.random((self.n_samples, self.n_dim))
+        x = self.random_state.random((self.n_samples, self.n_dim))
         x = map_onto_unit_simplex(x, "kraemer")
         x = x[vectorized_cdist(x, self.X).min(axis=1).argmax()]
 

@@ -86,7 +86,10 @@ plt.rc('font', family='serif')
 levels = 5 * np.linspace(0, 1, 10)
 plt.figure(figsize=(7, 5))
 CS = plt.contour(X1, X2, F, levels, colors='black', alpha=0.5)
-CS.collections[0].set_label("$f(x)$")
+if hasattr(CS, 'collections'):
+    CS.collections[0].set_label("$f(x)$")
+else:
+    CS.legend_elements()[0][0].set_label("$f(x)$")
 
 X = np.linspace(0, 1, 500)
 plt.plot(X, 1-X, linewidth=2.0, color="green", linestyle='dotted', label="g(x)")
@@ -154,7 +157,10 @@ plt.rc('font', family='serif')
 levels = 5 * np.linspace(0, 1, 10)
 plt.figure(figsize=(7, 5))
 CS = plt.contour(X1, X2, F, levels, colors='black', alpha=0.5)
-CS.collections[0].set_label("$f(x)$")
+if hasattr(CS, 'collections'):
+    CS.collections[0].set_label("$f(x)$")
+else:
+    CS.legend_elements()[0][0].set_label("$f(x)$")
 
 X = np.linspace(0, 1, 500)
 plt.plot(X, 1-X, linewidth=2.0, color="green", linestyle='dotted', label="g(x)")

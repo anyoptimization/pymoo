@@ -3,9 +3,11 @@ import numpy as np
 from pymoo.core.crossover import Crossover
 from pymoo.core.variable import Real, get
 from pymoo.operators.repair.bounds_repair import repair_random_init
+from pymoo.util import default_random_state
 
 
-def pcx(X, eta, zeta, index):
+@default_random_state
+def pcx(X, eta, zeta, index, random_state=None):
     eps = 1e-32
 
     # the number of parents to be considered
@@ -40,13 +42,13 @@ def pcx(X, eta, zeta, index):
 
     # generating zero-mean normally distributed variables
     sigma = D_not[:, None] * eta.repeat(n_var, axis=1)
-    rnd = np.random.normal(loc=0.0, scale=sigma)
+    rnd = random_state.normal(loc=0.0, scale=sigma)
 
     # implemented just like the c code - generate_new.h file
     inner_prod = np.sum(rnd * diff_to_centroid, axis=-1, keepdims=True)
     noise = rnd - (inner_prod * diff_to_centroid) / dist_to_centroid[:, None] ** 2
 
-    bias_to_centroid = np.random.normal(0.0, zeta) * diff_to_centroid
+    bias_to_centroid = random_state.normal(0.0, zeta) * diff_to_centroid
 
     # the array which is finally returned
     Xp = X[index] + noise + bias_to_centroid
@@ -64,16 +66,16 @@ class ParentCentricCrossover(Crossover):
         self.eta = Real(eta, bounds=(0.01, 0.3))
         self.zeta = Real(zeta, bounds=(0.01, 0.3))
 
-    def _do(self, problem, X, params=None, **kwargs):
+    def _do(self, problem, X, params=None, random_state=None, **kwargs):
         n_parents, n_matings, n_var = X.shape
         zeta, eta = get(self.zeta, self.eta, size=(n_matings, 1))
 
         index = 0
 
-        Xp = pcx(X, eta, zeta, index=index)
+        Xp = pcx(X, eta, zeta, index=index, random_state=random_state)
 
         if problem.has_bounds():
-            Xp = repair_random_init(Xp, X[index], *problem.bounds())
+            Xp = repair_random_init(Xp, X[index], *problem.bounds(), random_state=random_state)
 
         return Xp[None, :]
 

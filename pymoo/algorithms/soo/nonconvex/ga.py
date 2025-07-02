@@ -11,6 +11,7 @@ from pymoo.operators.sampling.rnd import BinaryRandomSampling
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import compare, TournamentSelection
 from pymoo.termination.default import DefaultSingleObjectiveTermination
+from pymoo.util import default_random_state
 from pymoo.util.display.single import SingleObjectiveOutput
 
 
@@ -36,7 +37,8 @@ class FitnessSurvival(Survival):
 # =========================================================================================================
 
 
-def comp_by_cv_and_fitness(pop, P, **kwargs):
+@default_random_state
+def comp_by_cv_and_fitness(pop, P, random_state=None, **kwargs):
     S = np.full(P.shape[0], np.nan)
 
     for i in range(P.shape[0]):
@@ -44,11 +46,11 @@ def comp_by_cv_and_fitness(pop, P, **kwargs):
 
         # if at least one solution is infeasible
         if pop[a].CV > 0.0 or pop[b].CV > 0.0:
-            S[i] = compare(a, pop[a].CV, b, pop[b].CV, method='smaller_is_better', return_random_if_equal=True)
+            S[i] = compare(a, pop[a].CV, b, pop[b].CV, method='smaller_is_better', return_random_if_equal=True, random_state=random_state)
 
         # both solutions are feasible just set random
         else:
-            S[i] = compare(a, pop[a].F, b, pop[b].F, method='smaller_is_better', return_random_if_equal=True)
+            S[i] = compare(a, pop[a].F, b, pop[b].F, method='smaller_is_better', return_random_if_equal=True, random_state=random_state)
 
     return S[:, None].astype(int)
 

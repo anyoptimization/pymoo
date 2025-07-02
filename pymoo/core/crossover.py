@@ -3,6 +3,7 @@ import numpy as np
 from pymoo.core.operator import Operator
 from pymoo.core.population import Population
 from pymoo.core.variable import Real, get
+from pymoo.util import default_random_state
 
 
 class Crossover(Operator):
@@ -17,7 +18,8 @@ class Crossover(Operator):
         self.n_offsprings = n_offsprings
         self.prob = Real(prob, bounds=(0.5, 1.0), strict=(0.0, 1.0))
 
-    def do(self, problem, pop, parents=None, **kwargs):
+    @default_random_state
+    def do(self, problem, pop, parents=None, *args, random_state=None, **kwargs):
 
         # if a parents with array with mating indices is provided -> transform the input first
         if parents is not None:
@@ -39,26 +41,26 @@ class Crossover(Operator):
         prob = get(self.prob, size=n_matings)
 
         # a boolean mask when crossover is actually executed
-        cross = np.random.random(n_matings) < prob
+        cross = random_state.random(n_matings) < prob
 
         # the design space from the parents used for the crossover
         if np.any(cross):
 
             # we can not prefilter for cross first, because there might be other variables using the same shape as X
-            Q = self._do(problem, X, **kwargs)
+            Q = self._do(problem, X, *args, random_state=random_state, **kwargs)
             assert Q.shape == (n_offsprings, n_matings, problem.n_var), "Shape is incorrect of crossover impl."
             Xp[:, cross] = Q[:, cross]
 
         # now set the parents whenever NO crossover has been applied
         for k in np.flatnonzero(~cross):
             if n_offsprings < n_parents:
-                s = np.random.choice(np.arange(self.n_parents), size=n_offsprings, replace=False)
+                s = random_state.choice(np.arange(self.n_parents), size=n_offsprings, replace=False)
             elif n_offsprings == n_parents:
                 s = np.arange(n_parents)
             else:
                 s = []
                 while len(s) < n_offsprings:
-                    s.extend(np.random.permutation(n_parents))
+                    s.extend(random_state.permutation(n_parents))
                 s = s[:n_offsprings]
 
             Xp[:, k] = np.copy(X[s, k])
@@ -71,7 +73,7 @@ class Crossover(Operator):
 
         return off
 
-    def _do(self, problem, X, **kwargs):
+    def _do(self, problem, X, *args, random_state=None, **kwargs):
         pass
 
 

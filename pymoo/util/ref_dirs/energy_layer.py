@@ -62,7 +62,7 @@ class LayerwiseRieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
         self.scalings = scalings
         return get_points(X, scalings)
 
-    def do(self):
+    def do(self, **kwargs):
 
         X = []
         scalings = []

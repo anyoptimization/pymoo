@@ -4,6 +4,7 @@ from pymoo.core.problem import Problem
 from pymoo.problems.many import generic_sphere, get_ref_dirs
 from pymoo.functions import load_function
 from pymoo.util.misc import powerset
+from pymoo.util import default_random_state
 
 
 class WFG(Problem):
@@ -54,8 +55,9 @@ class WFG(Problem):
     def _calculate(self, x, s, h):
         return x[:, -1][:, None] + s * np.column_stack(h)
 
-    def _rand_optimal_position(self, n):
-        return np.random.random((n, self.k))
+    @default_random_state
+    def _rand_optimal_position(self, n, random_state=None):
+        return random_state.random((n, self.k))
 
     def _positional_to_optimal(self, K):
         suffix = np.full((len(K), self.l), 0.35)
@@ -141,8 +143,9 @@ class WFG1(WFG):
 
         out["F"] = self._calculate(y, self.S, h)
 
-    def _rand_optimal_position(self, n):
-        return np.power(np.random.random((n, self.k)), 50.0)
+    @default_random_state
+    def _rand_optimal_position(self, n, random_state=None):
+        return np.power(random_state.random((n, self.k)), 50.0)
 
 
 class WFG2(WFG):

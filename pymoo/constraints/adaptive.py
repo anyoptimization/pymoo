@@ -1,11 +1,8 @@
 from copy import deepcopy
 
-import numpy as np
-
-from pymoo.core.algorithm import Algorithm
+from pymoo.core.algorithm import MetaAlgorithm
 from pymoo.core.evaluator import Evaluator
 from pymoo.core.individual import Individual
-from pymoo.core.meta import Meta
 from pymoo.core.population import Population
 from pymoo.core.problem import Problem
 
@@ -33,7 +30,7 @@ def copy_to_dict(src, dest):
     dest.update(**src)
 
 
-class AdaptiveConstraintHandling(Meta, Algorithm):
+class AdaptiveConstraintHandling(MetaAlgorithm):
 
     def __init__(self, algorithm):
         super().__init__(algorithm)

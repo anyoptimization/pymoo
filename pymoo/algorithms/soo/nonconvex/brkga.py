@@ -58,6 +58,7 @@ class EliteSurvival(Survival):
 class EliteBiasedSelection(Selection):
 
     def _do(self, problem, pop, n_select, n_parents, **kwargs):
+        random_state = kwargs.get('random_state')
         _type = pop.get("type")
         elites = np.where(_type == "elite")[0].astype(int)
         non_elites = np.where(_type == "non_elite")[0].astype(int)
@@ -67,8 +68,8 @@ class EliteBiasedSelection(Selection):
             non_elites = elites
 
         # do the mating selection - always one elite and one non-elites
-        s_elite = np.random.choice(elites, size=n_select)
-        s_non_elite = np.random.choice(non_elites, size=n_select)
+        s_elite = random_state.choice(elites, size=n_select)
+        s_non_elite = random_state.choice(non_elites, size=n_select)
 
         return np.column_stack([s_elite, s_non_elite])
 
@@ -137,10 +138,10 @@ class BRKGA(GeneticAlgorithm):
         pop = self.pop
 
         # actually do the mating given the elite selection and biased crossover
-        off = self.mating.do(self.problem, pop, n_offsprings=self.n_offsprings, algorithm=self)
+        off = self.mating.do(self.problem, pop, n_offsprings=self.n_offsprings, algorithm=self, random_state=self.random_state)
 
         # create the mutants randomly to fill the population with
-        mutants = FloatRandomSampling().do(self.problem, self.n_mutants, algorithm=self)
+        mutants = FloatRandomSampling().do(self.problem, self.n_mutants, algorithm=self, random_state=self.random_state)
 
         # evaluate all the new solutions
         return Population.merge(off, mutants)

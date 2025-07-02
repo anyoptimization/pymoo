@@ -1,7 +1,10 @@
 import numpy as np
-# from moocore import hv_approx, hv_contributions
 
 from pymoo.indicators.hv.exact import DynamicHypervolume
+from pymoo.util import default_random_state
+
+
+# from moocore import hv_approx, hv_contributions
 
 
 def alpha(N, k):
@@ -35,13 +38,15 @@ def hvc_monte_carlo(dom, V, n_dom=None, k=1):
 
 class ApproximateHypervolume(DynamicHypervolume):
 
+    @default_random_state(seed=1)
     def __init__(self, ref_point, n_samples=10000, n_exclusive=1, random_state=None, **kwargs) -> None:
         self.n_samples = n_samples
         self.n_exclusive = n_exclusive
-        self.random_state = random_state if random_state is not None else np.random.RandomState(1)
 
         self.V = None
         self.dom = None
+
+        self.random_state = random_state
 
         super().__init__(ref_point, **kwargs)
 

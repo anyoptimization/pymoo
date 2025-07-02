@@ -1,9 +1,11 @@
 import numpy as np
 
 from pymoo.operators.repair.bounds_repair import BoundsRepair
+from pymoo.util import default_random_state
 
 
-def inverse_penality(x, p, xl, xu, alpha=None):
+@default_random_state
+def inverse_penality(x, p, xl, xu, alpha=None, random_state=None):
     assert len(p) == len(x)
 
     normv = np.linalg.norm(p - x)
@@ -31,7 +33,7 @@ def inverse_penality(x, p, xl, xu, alpha=None):
             alpha = (normv - d) / normv
             alpha += 1e-32
 
-        r = np.random.random()
+        r = random_state.random()
         Y = d * (1.0 + alpha * np.tan(r * np.arctan((D - d) / (alpha * d))))
 
         ret = x + (p - x) * Y / normv

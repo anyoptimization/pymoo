@@ -32,6 +32,7 @@ dependencies = [
     "moocore>=0.1.7",
     "alive_progress",
     "Deprecated",
+    "wrapt>=1.14.0",
 ]
 
 [build-system]

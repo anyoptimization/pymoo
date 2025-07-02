@@ -21,8 +21,8 @@ PROBLEMS = [
 def test_against_original_implementation(problem, seed, bounds):
     problem = copy(problem)
 
-    np.random.seed(seed)
-    x0 = FloatRandomSampling().do(problem, 1)[0].X
+    random_state = np.random.default_rng(seed)
+    x0 = FloatRandomSampling().do(problem, 1, random_state=random_state)[0].X
 
     if not bounds:
         problem.xl = None
