@@ -52,7 +52,10 @@ class KGB(NSGA2):
             not problem.has_constraints()
         ), "KGB-DMOEA only works for unconstrained problems."
         return super().setup(problem, **kwargs)
-    
+
+    def _infill(self):
+
+        return None
 
     def knowledge_reconstruction_examination(self):
         """
