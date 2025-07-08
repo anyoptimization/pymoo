@@ -86,7 +86,7 @@ class MOPSO(Algorithm):
         self.v_max = self.max_velocity_rate * (xu - xl)
         
         # Initialize particles, velocities, and personal bests
-        self.pop = self.sampling.do(problem, self.pop_size)
+        self.pop = self.sampling.do(problem, self.pop_size, random_state=self.random_state)
         self.velocities = self.random_state.uniform(
             -self.v_max, self.v_max,
             (self.pop_size, problem.n_var)
