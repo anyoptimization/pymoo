@@ -12,6 +12,7 @@ algorithm = CMOPSO(
     c2=1.49618,
     max_velocity_rate=0.2,
     elite_size=10,
+    mutate=False,
     seed=1,
 )
 

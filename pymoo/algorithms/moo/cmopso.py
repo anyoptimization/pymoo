@@ -9,6 +9,7 @@ from pymoo.core.population import Population
 from pymoo.core.replacement import ReplacementSurvival
 from pymoo.core.survival import Survival
 from pymoo.docs import parse_doc_string
+from pymoo.operators.mutation.pm import PolynomialMutation
 from pymoo.operators.repair.to_bound import (
     ToBoundOutOfBoundsRepair,
     set_to_bounds_if_outside,
@@ -330,6 +331,7 @@ class CMOPSO(Algorithm):
         initial_velocity="random",  # 'random' | 'zero'
         sampling=FloatRandomSampling(),
         repair=ToBoundOutOfBoundsRepair(),
+        mutate=False,
         termination=None,
         output=MultiObjectiveOutput(),
         display=None,
@@ -364,6 +366,7 @@ class CMOPSO(Algorithm):
         self.repair = repair
         self.replacement = ParetoDominatedReplacement()
         self._cd = get_crowding_function("cd")
+        self.mutate = mutate
 
     def _setup(self, problem, **kwargs):
         super()._setup(problem, **kwargs)
@@ -456,8 +459,9 @@ class CMOPSO(Algorithm):
 
         # create the offspring population
         off = Population.new(X=Xp, V=Vp)
-        # mutation = PolynomialMutation(prob=1.0)
-        # off = mutation(problem, off)
+        if self.mutate:
+            mutation = PolynomialMutation(prob=1.0)
+            off = mutation(problem, off, random_state=self.random_state)
         off = self.repair(problem, off)
 
         return off
