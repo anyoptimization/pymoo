@@ -1,11 +1,11 @@
-from pymoo.algorithms.moo.mopso import MOPSO
+from pymoo.algorithms.moo.mopso_cd import MOPSO_CD
 from pymoo.optimize import minimize
 from pymoo.problems import get_problem
 from pymoo.visualization.scatter import Scatter
 
 problem = get_problem("zdt1")
 
-algorithm = MOPSO(
+algorithm = MOPSO_CD(
     pop_size=100,
     w=0.729844,
     c1=1.49618,
