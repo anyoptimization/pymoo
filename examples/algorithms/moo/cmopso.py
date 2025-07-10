@@ -7,12 +7,9 @@ problem = get_problem("zdt1")
 
 algorithm = CMOPSO(
     pop_size=100,
-    w=0.729844,
-    c1=1.49618,
-    c2=1.49618,
     max_velocity_rate=0.2,
     elite_size=10,
-    mutate=False,
+    mutation_rate=0.5,
     seed=1,
 )
 
