@@ -32,6 +32,7 @@ from pymoo.operators.repair.bounds_repair import repair_random_init, repair_clam
 from pymoo.operators.sampling.rnd import FloatRandomSampling, random
 from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.util.display.single import SingleObjectiveOutput
+from pymoo.util import default_random_state
 from pymoo.util.sliding_window import SlidingWindow
 
 
@@ -40,20 +41,22 @@ from pymoo.util.sliding_window import SlidingWindow
 # =========================================================================================================
 
 
-def pso_canonical(V, X, P_X, L_X, w, c1, c2):
+@default_random_state
+def pso_canonical(V, X, P_X, L_X, w, c1, c2, random_state=None):
     n_particles, n_var = X.shape
-    r1, r2 = np.random.random((n_particles, n_var)), np.random.random((n_particles, n_var))
+    r1, r2 = random_state.random((n_particles, n_var)), random_state.random((n_particles, n_var))
     Vp = w * V + c1 * r1 * (P_X - X) + c2 * r2 * (L_X - X)
     return Vp
 
 
-def pso_rotation_invariant(V, X, P_X, L_X, inertia, c1, c2):
+@default_random_state
+def pso_rotation_invariant(V, X, P_X, L_X, inertia, c1, c2, random_state=None):
     n_particles, n_var = X.shape
 
-    r1 = np.random.random((n_particles, n_var))
+    r1 = random_state.random((n_particles, n_var))
     p = X + c1 * r1 * (P_X - X)
 
-    r2 = np.random.random((n_particles, n_var))
+    r2 = random_state.random((n_particles, n_var))
     l = X + c2 * r2 * (L_X - X)
 
     G = (X + p + l) / 3
@@ -64,13 +67,14 @@ def pso_rotation_invariant(V, X, P_X, L_X, inertia, c1, c2):
     return Vp
 
 
-def alea_sphere(G, radius):
+@default_random_state
+def alea_sphere(G, radius, random_state=None):
     n, m = G.shape
 
-    x = np.random.normal(size=(n, m))
+    x = random_state.normal(size=(n, m))
     l = np.sqrt(np.sum(x ** 2, axis=1, keepdims=True))
 
-    r = np.random.random(size=(n, 1))
+    r = random_state.random(size=(n, 1))
     x = r * radius * x / l
     return x + G
 
@@ -96,14 +100,14 @@ class Swarm(InfillCriterion):
         # of parameter control should be applied on the mating level
         self.control = control(self)
 
-    def do(self, problem, pop, n_offsprings, algorithm=None, **kwargs):
+    def do(self, problem, pop, n_offsprings, algorithm=None, random_state=None, **kwargs):
         control = self.control
 
         # let the parameter control now some information
         control.tell(pop=pop)
 
         # set the controlled parameter for the desired number of offsprings
-        control.do(n_offsprings)
+        control.do(n_offsprings, random_state=random_state)
 
         # get the parameters that will be used
         w, c1, c2 = get(self.w, self.c1, self.c2, size=(len(pop), 1))
@@ -113,8 +117,8 @@ class Swarm(InfillCriterion):
 
         V, X, P_X, L_X = swarm.get("V"), swarm.get("X"), pbest.get("X"), lbest.get("X")
 
-        Vp = pso_canonical(V, X, P_X, L_X, w, c1, c2)
-        # Vp = pso_rotation_invariant(V, X, P_X, L_X, w, c1, c2)
+        Vp = pso_canonical(V, X, P_X, L_X, w, c1, c2, random_state=random_state)
+        # Vp = pso_rotation_invariant(V, X, P_X, L_X, w, c1, c2, random_state=random_state)
 
         # if a maximum velocity has been defined
         V_max = self.V_max
@@ -127,7 +131,7 @@ class Swarm(InfillCriterion):
 
         # if adding the velocity has brought them out of bounds -> bring them back
         if problem.has_bounds():
-            Xp = repair_random_init(Xp, X, *problem.bounds())
+            Xp = repair_random_init(Xp, X, *problem.bounds(), random_state=random_state)
 
         # do a mutation  of the global best solution (helps to keep some diversity)
         # Xm = PM(prob=1.0, eta=20).do(problem, swarm).get("X")
@@ -159,7 +163,8 @@ class Swarm(InfillCriterion):
         return off
 
 
-def get_neighbors(name, N):
+@default_random_state
+def get_neighbors(name, N, random_state=None):
     if name == "star":
         return np.tile(np.arange(N), (N, 1))
     elif name == "ring":
@@ -168,7 +173,7 @@ def get_neighbors(name, N):
         K = 3
         neighbors = []
         for i in range(N):
-            vals = np.random.permutation(N)[:K]
+            vals = random_state.permutation(N)[:K]
             neighbors.append([i] + vals.tolist())
         return neighbors
     else:
@@ -207,7 +212,8 @@ class EPPSO(GeneticAlgorithm):
         self.topology = Choice(topology, options=["star", "ring"])
 
         # create the neighbors of each particle given the topology
-        self.neighbors = get_neighbors(get(self.topology), pop_size)
+        # Note: neighbors will be initialized in _initialize_advance to ensure proper random_state usage
+        self.neighbors = None
 
         # choose the single-objective default termination
         self.termination = DefaultSingleObjectiveTermination()
@@ -230,7 +236,7 @@ class EPPSO(GeneticAlgorithm):
         if init_V == "zero":
             V = np.zeros((len(swarm), n_var))
         elif init_V == "random":
-            Xp = random(self.problem, len(swarm))
+            Xp = random(self.problem, len(swarm), random_state=self.random_state)
             V = (swarm.get("X") - Xp) / 2
         else:
             raise Exception("Unknown velocity initialization.")
@@ -243,6 +249,10 @@ class EPPSO(GeneticAlgorithm):
         self.pbest = self.pop
         self.lbest = Population.create(*self.pbest)
         self.delta = [SlidingWindow(30) for _ in range(len(infills))]
+
+        # Initialize neighbors with proper random_state
+        if self.neighbors is None:
+            self.neighbors = get_neighbors(get(self.topology), len(infills), random_state=self.random_state)
 
         FitnessSurvival().do(self.problem, self.pbest, return_indices=True)
 
@@ -265,7 +275,7 @@ class EPPSO(GeneticAlgorithm):
         self.best = S[0]
 
         if get(self.topology) == "random-adaptive" and pbest[self.best].get("n_gen") != self.n_gen:
-            self.neighbors = get_neighbors(get(self.topology), len(pbest))
+            self.neighbors = get_neighbors(get(self.topology), len(pbest), random_state=self.random_state)
 
         # send the message from each particle to all its neighbors
         msgs = [[] for _ in range(len(pbest))]

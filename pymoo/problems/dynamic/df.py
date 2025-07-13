@@ -380,8 +380,8 @@ class DF13(DF):
         g = g.reshape(len(g), 1)
         f1 = g * np.cos(0.5 * np.pi * x0) ** 2
         f2 = g * np.cos(0.5 * np.pi * x1) ** 2
-        f3 = g * np.sin(0.5 * np.pi * x0) ** 2 + np.sin(0.5 * np.pi * x0) * np.cos(p * np.pi * x0) ** 2 + np.sin(
-            0.5 * np.pi * x1) ** 2 + np.sin(0.5 * np.pi * x1) * np.cos(p * np.pi * x1) ** 2
+        f3 = g * (np.sin(0.5 * np.pi * x0) ** 2 + np.sin(0.5 * np.pi * x0) * np.cos(p * np.pi * x0) ** 2 + np.sin(
+            0.5 * np.pi * x1) ** 2 + np.sin(0.5 * np.pi * x1) * np.cos(p * np.pi * x1) ** 2)
 
         out["F"] = np.column_stack([f1, f2, f3])
 
@@ -394,8 +394,7 @@ class DF13(DF):
         f1 = np.cos(0.5 * np.pi * x1) ** 2
         f2 = np.cos(0.5 * np.pi * x2) ** 2
         f3 = np.sin(0.5 * np.pi * x1) ** 2 + np.sin(0.5 * np.pi * x1) * np.cos(p * np.pi * x1) ** 2 + np.sin(
-            0.5 * np.pi * x2) ** 2 + \
-             np.sin(0.5 * np.pi * x2) * np.cos(p * np.pi * x2) ** 2
+            0.5 * np.pi * x2) ** 2 + np.sin(0.5 * np.pi * x2) * np.cos(p * np.pi * x2) ** 2
 
         return get_PF(np.array([f1, f2, f3]), True)
 

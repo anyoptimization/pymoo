@@ -5,11 +5,12 @@ import numpy as np
 
 from pymoo.core.callback import Callback
 from pymoo.core.evaluator import Evaluator
+from pymoo.core.meta import Meta
 from pymoo.core.population import Population
 from pymoo.core.result import Result
+from pymoo.functions import FunctionLoader
 from pymoo.termination.default import DefaultMultiObjectiveTermination, DefaultSingleObjectiveTermination
 from pymoo.util.display.display import Display
-from pymoo.functions import FunctionLoader
 from pymoo.util.misc import termination_from_tuple
 from pymoo.util.optimum import filter_optimum
 
@@ -65,6 +66,7 @@ class Algorithm:
 
         # the random seed that was used
         self.seed = seed
+        self.random_state = None
 
         # the function evaluator object (can be used to inject code)
         if evaluator is None:
@@ -95,7 +97,7 @@ class Algorithm:
         # the time when the algorithm has been setup for the first time
         self.start_time = None
 
-    def setup(self, problem, **kwargs):
+    def setup(self, problem, verbose=False, progress=False, **kwargs):
 
         # the problem to be solved by the algorithm
         self.problem = problem
@@ -108,17 +110,8 @@ class Algorithm:
         for key, value in kwargs.items():
             self.__dict__[key] = value
 
-        # if seed is a boolean and true, then randomly set a seed (useful to reproduce runs)
-        seed = self.seed
-        if isinstance(seed, bool) and seed:
-            seed = np.random.randint(0, 10000000)
-            self.seed = seed
-
-        # if a seed is set, then use it to call the random number generators
-        if seed is not None:
-            import random
-            random.seed(seed)
-            np.random.seed(seed)
+        # set random state
+        self.random_state = np.random.default_rng(self.seed)
 
         # make sure that some type of termination criterion is set
         if self.termination is None:
@@ -128,8 +121,6 @@ class Algorithm:
 
         # set up the display during the algorithm execution
         if self.display is None:
-            verbose = kwargs.get("verbose", False)
-            progress = kwargs.get("progress", False)
             self.display = Display(self.output, verbose=verbose, progress=progress)
 
         # finally call the function that can be overwritten by the actual algorithm
@@ -396,3 +387,22 @@ def default_termination(problem):
     else:
         termination = DefaultSingleObjectiveTermination()
     return termination
+
+
+class MetaAlgorithm(Meta):
+    """
+    An algorithm wrapper that combines Algorithm's functionality with Meta's delegation behavior.
+    Uses Meta to provide transparent proxying with the ability to override specific methods.
+    """
+
+    def __init__(self, algorithm, copy=True, **kwargs):
+        # If the algorithm is already a Meta object, don't copy to avoid deepcopy issues with nested proxies
+        if isinstance(algorithm, Meta):
+            copy = False
+            
+        # Initialize Meta (which initializes wrapt.ObjectProxy)
+        super().__init__(algorithm, copy=copy)
+        
+        # Pass any additional kwargs to the wrapped algorithm if needed
+        for key, value in kwargs.items():
+            setattr(self, key, value)

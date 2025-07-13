@@ -17,6 +17,7 @@ from pymoo.operators.mutation.pm import PM
 from pymoo.operators.mutation.rm import ChoiceRandomMutation
 from pymoo.operators.repair.rounding import RoundingRepair
 from pymoo.operators.selection.tournament import TournamentSelection, compare
+from pymoo.util import default_random_state
 
 
 class ParameterControl:
@@ -31,8 +32,9 @@ class ParameterControl:
 
         # print("PARAMETER CONTROL:", list(self.params))
 
-    def do(self, N, set_to_params=True):
-        vals = self._do(N)
+    @default_random_state
+    def do(self, N, set_to_params=True, random_state=None):
+        vals = self._do(N, random_state=random_state)
         if set_to_params:
             if vals is not None:
                 for k, v in vals.items():
@@ -40,7 +42,7 @@ class ParameterControl:
         return vals
 
     @abstractmethod
-    def _do(self, N):
+    def _do(self, N, random_state=None):
         pass
 
     def tell(self, **kwargs):
@@ -58,14 +60,14 @@ class NoParameterControl(ParameterControl):
     def __init__(self, _) -> None:
         super().__init__(None)
 
-    def _do(self, N):
+    def _do(self, N, random_state=None):
         return {}
 
 
 class RandomParameterControl(ParameterControl):
 
-    def _do(self, N):
-        return {key: value.sample(N) for key, value in self.params.items()}
+    def _do(self, N, random_state=None):
+        return {key: value.sample(N, random_state=random_state) for key, value in self.params.items()}
 
 
 class EvolutionaryParameterControl(ParameterControl):
@@ -74,7 +76,7 @@ class EvolutionaryParameterControl(ParameterControl):
         super().__init__(obj)
         self.eps = 0.05
 
-    def _do(self, N):
+    def _do(self, N, random_state=None):
         params = self.params
         pop = self.data.get("pop")
 
@@ -82,7 +84,7 @@ class EvolutionaryParameterControl(ParameterControl):
         for name, param in params.items():
             is_none = np.where(pop.get(name) == None)[0]
             if len(is_none) > 0:
-                pop[is_none].set(name, param.sample(len(is_none)))
+                pop[is_none].set(name, param.sample(len(is_none), random_state=random_state))
 
         selection = AgeBasedTournamentSelection()
 
@@ -108,10 +110,10 @@ class EvolutionaryParameterControl(ParameterControl):
 
         problem = Problem(vars=params)
 
-        parents = selection(problem, pop, N, n_parents=2)
+        parents = selection(problem, pop, N, n_parents=2, random_state=random_state)
         parents = [[Individual(X={key: parent.get(key) for key in params}) for parent in mating] for mating in parents]
 
-        off = mating(problem, parents, N, parents=True)
+        off = mating(problem, parents, N, parents=True, random_state=random_state)
 
         Xp = off.get("X")
         ret = {param: np.array([Xp[i][param] for i in range(len(Xp))]) for param in params}
@@ -132,11 +134,12 @@ def age_binary_tournament(pop, P, **kwargs):
         raise ValueError("Only implemented for binary tournament!")
 
     S = np.full(n_tournaments, np.nan)
+    random_state = kwargs.get('random_state', None)
 
     for i in range(n_tournaments):
         a, b = P[i, 0], P[i, 1]
         a_gen, b_gen = pop[a].get("n_gen"), pop[b].get("n_gen")
-        S[i] = compare(a, a_gen, b, b_gen, method='larger_is_better', return_random_if_equal=True)
+        S[i] = compare(a, a_gen, b, b_gen, method='larger_is_better', return_random_if_equal=True, random_state=random_state)
 
     return S[:, None].astype(int, copy=False)
 

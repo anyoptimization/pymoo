@@ -1,9 +1,10 @@
 import numpy as np
-from pymoo.util.randomized_argsort import randomized_argsort
-from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-from pymoo.core.survival import Survival, split_by_feasibility
+
 from pymoo.core.population import Population
+from pymoo.core.survival import Survival, split_by_feasibility
 from pymoo.operators.survival.rank_and_crowding.metrics import get_crowding_function
+from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
+from pymoo.util.randomized_argsort import randomized_argsort
 
 
 class RankAndCrowding(Survival):
@@ -48,10 +49,12 @@ class RankAndCrowding(Survival):
         self.nds = nds if nds is not None else NonDominatedSorting()
         self.crowding_func = crowding_func_
 
+
     def _do(self,
             problem,
             pop,
             *args,
+            random_state=None,
             n_survive=None,
             **kwargs):
 
@@ -81,7 +84,7 @@ class RankAndCrowding(Survival):
                         n_remove=n_remove
                     )
 
-                I = randomized_argsort(crowding_of_front, order='descending', method='numpy')
+                I = randomized_argsort(crowding_of_front, order='descending', method='numpy', random_state=random_state)
                 I = I[:-n_remove]
 
             # otherwise take the whole front unsorted

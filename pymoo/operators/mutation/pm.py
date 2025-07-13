@@ -4,6 +4,7 @@ from pymoo.core.mutation import Mutation
 from pymoo.core.variable import get, Real
 from pymoo.operators.crossover.binx import mut_binomial
 from pymoo.operators.repair.to_bound import set_to_bounds_if_outside
+from pymoo.util import default_random_state
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -11,14 +12,15 @@ from pymoo.operators.repair.to_bound import set_to_bounds_if_outside
 # ---------------------------------------------------------------------------------------------------------
 
 
-def mut_pm(X, xl, xu, eta, prob, at_least_once):
+@default_random_state
+def mut_pm(X, xl, xu, eta, prob, at_least_once, random_state=None):
     n, n_var = X.shape
     assert len(eta) == n
     assert len(prob) == n
 
     Xp = np.full(X.shape, np.inf)
 
-    mut = mut_binomial(n, n_var, prob, at_least_once=at_least_once)
+    mut = mut_binomial(n, n_var, prob, at_least_once=at_least_once, random_state=random_state)
     mut[:, xl == xu] = False
 
     Xp[:, :] = X
@@ -34,7 +36,7 @@ def mut_pm(X, xl, xu, eta, prob, at_least_once):
 
     mut_pow = 1.0 / (eta + 1.0)
 
-    rand = np.random.random(X.shape)
+    rand = random_state.random(X.shape)
     mask = rand <= 0.5
     mask_not = np.logical_not(mask)
 
@@ -78,13 +80,13 @@ class PolynomialMutation(Mutation):
         self.at_least_once = at_least_once
         self.eta = Real(eta, bounds=(3.0, 30.0), strict=(1.0, 100.0))
 
-    def _do(self, problem, X, params=None, **kwargs):
+    def _do(self, problem, X, params=None, *args, random_state=None, **kwargs):
         X = X.astype(float)
 
         eta = get(self.eta, size=len(X))
         prob_var = self.get_prob_var(problem, size=len(X))
 
-        Xp = mut_pm(X, problem.xl, problem.xu, eta, prob_var, at_least_once=self.at_least_once)
+        Xp = mut_pm(X, problem.xl, problem.xu, eta, prob_var, at_least_once=self.at_least_once, random_state=random_state)
 
         return Xp
 

@@ -12,9 +12,9 @@ from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.tournament import TournamentSelection
+from pymoo.util import default_random_state
 from pymoo.util.display.multi import MultiObjectiveOutput
 from pymoo.util.dominator import Dominator
-
 from pymoo.util.misc import has_feasible, random_permutations
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
@@ -25,7 +25,8 @@ from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 # =========================================================================================================
 
 
-def comp_by_cv_dom_then_random(pop, P, **kwargs):
+@default_random_state
+def comp_by_cv_dom_then_random(pop, P, random_state=None, **kwargs):
     S = np.full(P.shape[0], np.nan)
 
     for i in range(P.shape[0]):
@@ -38,13 +39,13 @@ def comp_by_cv_dom_then_random(pop, P, **kwargs):
             elif rel == -1:
                 S[i] = b
             else:
-                S[i] = np.random.choice([a, b])
+                S[i] = random_state.choice([a, b])
         elif pop[a].CV <= 0.0:
             S[i] = a
         elif pop[b].CV <= 0.0:
             S[i] = b
         else:
-            S[i] = np.random.choice([a, b])
+            S[i] = random_state.choice([a, b])
 
     return S[:, None].astype(int)
 
@@ -52,7 +53,8 @@ def comp_by_cv_dom_then_random(pop, P, **kwargs):
 class RestrictedMating(TournamentSelection):
     """Restricted mating approach to balance convergence and diversity archives"""
 
-    def _do(self, problem, Hm, n_select, n_parents, **kwargs):
+    @default_random_state
+    def _do(self, problem, Hm, n_select, n_parents, random_state=None, **kwargs):
         n_pop = len(Hm) // 2
 
         _, rank = NonDominatedSorting().do(Hm.get('F'), return_rank=True)
@@ -64,16 +66,16 @@ class RestrictedMating(TournamentSelection):
         n_random = n_select * n_parents * self.pressure
         n_perms = math.ceil(n_random / n_pop)
         # get random permutations and reshape them
-        P = random_permutations(n_perms, n_pop)[:n_random]
+        P = random_permutations(n_perms, n_pop, random_state=random_state)[:n_random]
         P = np.reshape(P, (n_select * n_parents, self.pressure))
         if Pc <= Pd:
             # Choose from DA
             P[::n_parents, :] += n_pop
-        pf = np.random.random(n_select)
+        pf = random_state.random(n_select)
         P[1::n_parents, :][pf >= Pc] += n_pop
 
         # compare using tournament function
-        S = self.func_comp(Hm, P, **kwargs)
+        S = self.func_comp(Hm, P, random_state=random_state, **kwargs)
 
         return np.reshape(S, (n_select, n_parents))
 
@@ -87,13 +89,16 @@ class CADASurvival:
         self._decomposition = ASF()
         self._calc_perpendicular_distance = load_function("calc_perpendicular_distance")
 
-    def do(self, _, pop, da, n_survive=None, **kwargs):
+    @default_random_state
+    def do(self, _, pop, da, n_survive=None, random_state=None, **kwargs):
+        # Store random_state for use in methods
+        self.random_state = random_state
         # Offspring are last of merged population
         off = pop[-n_survive:]
         # Update ideal point
         self.ideal_point = np.min(np.vstack((self.ideal_point, off.get("F"))), axis=0)
         # Update CA
-        pop = self._updateCA(pop, n_survive)
+        pop = self._updateCA(pop, n_survive, random_state=random_state)
         # Update DA
         Hd = Population.merge(da, off)
         da = self._updateDA(pop, Hd, n_survive)
@@ -110,7 +115,8 @@ class CADASurvival:
         pop.set("FV", FV)
         return niche_of_individuals, FV
 
-    def _updateCA(self, pop, n_survive):
+    @default_random_state
+    def _updateCA(self, pop, n_survive, random_state=None):
         """Update the Convergence archive (CA)"""
         CV = pop.get("CV").flatten()
 
@@ -176,7 +182,7 @@ class CADASurvival:
                         if (delta_d[min_d_i] < 0) or (
                                 delta_d[min_d_i] == 0 and (FV[crowdest[list(min_d_i)]] > niche_worst).any()):
                             min_d_i = list(min_d_i)
-                            np.random.shuffle(min_d_i)
+                            random_state.shuffle(min_d_i)
                             closest = crowdest[min_d_i]
                             niche_worst = closest[np.argmax(FV[closest])]
                         if (FV[niche_worst] > worst_fit).all():
@@ -273,21 +279,21 @@ class CTAEA(GeneticAlgorithm):
                 (self.ref_dirs.shape[1], problem.n_obj))
 
     def _initialize_infill(self):
-        return self.initialization.do(self.problem, self.pop_size, algorithm=self)
+        return self.initialization.do(self.problem, self.pop_size, algorithm=self, random_state=self.random_state)
 
     def _initialize_advance(self, infills=None, **kwargs):
         super()._initialize_advance(infills, **kwargs)
         self.pop, self.da = self.survival.do(self.problem, self.pop, Population(), n_survive=len(self.pop),
-                                             algorithm=self)
+                                             algorithm=self, random_state=self.random_state)
 
     def _infill(self):
         Hm = Population.merge(self.pop, self.da)
-        return self.mating.do(self.problem, Hm, n_offsprings=self.n_offsprings, algorithm=self)
+        return self.mating.do(self.problem, Hm, n_offsprings=self.n_offsprings, algorithm=self, random_state=self.random_state)
 
     def _advance(self, infills=None, **kwargs):
         assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
         pop = Population.merge(self.pop, infills)
-        self.pop, self.da = self.survival.do(self.problem, pop, self.da, self.pop_size, algorithm=self)
+        self.pop, self.da = self.survival.do(self.problem, pop, self.da, self.pop_size, algorithm=self, random_state=self.random_state)
 
     def _set_optimum(self, **kwargs):
         if not has_feasible(self.pop):

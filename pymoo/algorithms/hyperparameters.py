@@ -5,6 +5,7 @@ import numpy as np
 from pymoo.core.parameters import get_params, flatten, set_params, hierarchical
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.optimize import minimize
+from pymoo.util import default_random_state
 
 
 def create(algorithm, params):
@@ -68,7 +69,8 @@ def stats_avg_nevals(rets):
 
 class MultiRun:
 
-    def __init__(self, problem, n_runs=None, seeds=None, func_stats=stats_single_objective_mean, **kwargs):
+    @default_random_state
+    def __init__(self, problem, n_runs=None, seeds=None, func_stats=stats_single_objective_mean, random_state=None, **kwargs):
         super().__init__()
         self.problem = problem
         self.kwargs = kwargs
@@ -77,7 +79,7 @@ class MultiRun:
             if n_runs is None:
                 raise Exception("Either provide number of runs or seeds directly.")
 
-            seeds = np.random.randint(1, 1000000, size=n_runs)
+            seeds = random_state.integers(1, 1000000, size=n_runs)
 
         self.seeds = seeds
         self.func_stats = func_stats

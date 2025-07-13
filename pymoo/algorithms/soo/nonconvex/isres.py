@@ -54,13 +54,13 @@ class ISRES(SRES):
         Xp[:mu - 1] = X[:mu - 1] + self.gamma * (X[0] - X[1:mu])
 
         # update the sigma values for elite and non-elite individuals
-        sigmap[mu - 1:] = np.minimum(self.sigma_max, es_sigma(sigma[mu - 1:], self.tau, self.taup))
+        sigmap[mu - 1:] = np.minimum(self.sigma_max, es_sigma(sigma[mu - 1:], self.tau, self.taup, random_state=self.random_state))
 
         # execute the evolutionary strategy to calculate the offspring solutions
-        Xp[mu - 1:] = X[mu - 1:] + sigmap[mu - 1:] * np.random.normal(size=sigmap[mu - 1:].shape)
+        Xp[mu - 1:] = X[mu - 1:] + sigmap[mu - 1:] * self.random_state.normal(size=sigmap[mu - 1:].shape)
 
         # repair the individuals which are not feasible by sampling from sigma again
-        Xp = es_mut_repair(Xp, X, sigmap, xl, xu, 10)
+        Xp = es_mut_repair(Xp, X, sigmap, xl, xu, 10, random_state=self.random_state)
 
         # now update the sigma values of the non-elites only
         sigmap[mu:] = sigma[mu:] + self.alpha * (sigmap[mu:] - sigma[mu:])

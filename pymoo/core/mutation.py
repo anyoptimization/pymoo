@@ -1,9 +1,8 @@
 from copy import deepcopy
 
-import numpy as np
-
 from pymoo.core.operator import Operator
 from pymoo.core.variable import Real, get
+from pymoo.util import default_random_state
 
 
 class Mutation(Operator):
@@ -13,7 +12,8 @@ class Mutation(Operator):
         self.prob = Real(prob, bounds=(0.7, 1.0), strict=(0.0, 1.0))
         self.prob_var = Real(prob_var, bounds=(0.0, 0.25), strict=(0.0, 1.0)) if prob_var is not None else None
 
-    def do(self, problem, pop, inplace=True, **kwargs):
+    @default_random_state
+    def do(self, problem, pop, inplace=True, *args, random_state=None, **kwargs):
 
         # if not inplace copy the population first
         if not inplace:
@@ -25,18 +25,18 @@ class Mutation(Operator):
         X = pop.get("X")
 
         # retrieve the mutation variables
-        Xp = self._do(problem, X, **kwargs)
+        Xp = self._do(problem, X, *args, random_state=random_state, **kwargs)
 
         # the likelihood for a mutation on the individuals
         prob = get(self.prob, size=n_mut)
-        mut = np.random.random(size=n_mut) <= prob
+        mut = random_state.random(size=n_mut) <= prob
 
         # store the mutated individual back to the population
         pop[mut].set("X", Xp[mut])
 
         return pop
 
-    def _do(self, problem, X, **kwargs):
+    def _do(self, problem, X, *args, random_state=None, **kwargs):
         return X
 
     def get_prob_var(self, problem, **kwargs):

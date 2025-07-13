@@ -12,7 +12,7 @@ class HalfUniformCrossover(Crossover):
         super().__init__(2, 2, **kwargs)
         self.prob_hux = prob_hux
 
-    def _do(self, _, X, **kwargs):
+    def _do(self, _, X, random_state=None, **kwargs):
         _, n_matings, n_var = X.shape
 
         # the mask do to the crossover
@@ -26,7 +26,7 @@ class HalfUniformCrossover(Crossover):
 
             n = math.ceil(len(I) / 2)
             if n > 0:
-                _I = I[np.random.permutation(len(I))[:n]]
+                _I = I[random_state.permutation(len(I))[:n]]
                 M[i, _I] = True
 
         _X = crossover_mask(X, M)

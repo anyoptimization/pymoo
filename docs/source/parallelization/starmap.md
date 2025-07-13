@@ -70,7 +70,7 @@ pycharm:
     '
 ---
 from multiprocessing.pool import ThreadPool
-from pymoo.core.problem import StarmapParallelization
+from pymoo.parallelization.starmap import StarmapParallelization
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.optimize import minimize
 
@@ -95,6 +95,7 @@ pool.close()
 
 ```python
 import multiprocessing
+from pymoo.parallelization.starmap import StarmapParallelization
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.optimize import minimize
 

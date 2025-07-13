@@ -5,7 +5,6 @@ from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population
 from pymoo.util.display.single import SingleObjectiveOutput
-
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from pymoo.util.normalization import normalize, denormalize
 
@@ -98,7 +97,7 @@ class DIRECT(LocalSearch):
             return candidates
         else:
             if len(candidates) > self.n_max_candidates:
-                candidates = RankAndCrowdingSurvival().do(self.problem, pop, n_survive=self.n_max_candidates)
+                candidates = RankAndCrowdingSurvival().do(self.problem, pop, n_survive=self.n_max_candidates, algorithm=self)
 
             return candidates
 

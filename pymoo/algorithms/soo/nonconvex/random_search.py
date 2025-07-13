@@ -19,7 +19,7 @@ class RandomSearch(Algorithm):
         return self._infill()
 
     def _infill(self):
-        return self.sampling.do(self.problem, self.n_points_per_iteration)
+        return self.sampling.do(self.problem, self.n_points_per_iteration, random_state=self.random_state)
 
     def _advance(self, infills=None, **kwargs):
         self.pop = infills if self.opt is None else Population.merge(infills, self.opt)

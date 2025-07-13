@@ -10,10 +10,10 @@ def Cache(func):
 
     def wrapper(self, *args, use_cache=True, set_cache=True, **kwargs):
 
-        if "cache" not in self.__dict__:
-            self.__dict__["cache"] = {}
+        if not hasattr(self, 'cache'):
+            setattr(self, 'cache', {})
 
-        cache = self.__dict__["cache"]
+        cache = getattr(self, 'cache')
 
         if use_cache and func_name in cache:
             return cache[func_name]

@@ -24,7 +24,7 @@ class ReferenceDirectionGA(ReferenceDirectionFactory):
         self.fun = fun
         self.verbose = verbose
 
-    def _do(self):
+    def _do(self, random_state=None):
         pop_size, n_gen = self.pop_size, self.n_gen
         n_points, n_dim, = self.n_points, self.n_dim
         fun = self.fun
@@ -57,6 +57,7 @@ class ReferenceDirectionGA(ReferenceDirectionFactory):
         res = minimize(problem,
                        algorithm,
                        termination=('n_gen', n_gen),
+                       random_state=random_state,
                        verbose=True)
 
         ref_dirs = problem.get_points(res.X)

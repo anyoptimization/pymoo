@@ -5,6 +5,7 @@ from abc import abstractmethod
 import numpy as np
 
 import pymoo.gradient.toolbox as anp
+from pymoo.core.meta import Meta
 from pymoo.util.cache import Cache
 from pymoo.util.misc import at_least_2d_array
 
@@ -371,3 +372,61 @@ def default_shape(problem, n):
         dH=(n, problem.n_eq_constr, n_var),
     )
     return DEFAULTS
+
+
+class MetaProblem(Problem, Meta):
+    """
+    A problem wrapper that combines Problem's functionality with Meta's delegation behavior.
+    Inherits from both Problem and Meta to provide transparent proxying with the ability 
+    to override specific methods.
+    """
+
+    def __init__(self, problem, copy=True, **kwargs):
+        # If the problem is already a Meta object, don't copy to avoid deepcopy issues with nested proxies
+        if isinstance(problem, Meta):
+            copy = False
+            
+        # Initialize Meta first (which initializes wrapt.ObjectProxy)
+        Meta.__init__(self, problem, copy=copy)
+        
+        # Initialize Problem with the wrapped problem's attributes, using getattr with defaults
+        Problem.__init__(self,
+                         n_var=getattr(problem, 'n_var', -1),
+                         n_obj=getattr(problem, 'n_obj', 1),
+                         n_ieq_constr=getattr(problem, 'n_ieq_constr', 0),
+                         n_eq_constr=getattr(problem, 'n_eq_constr', 0),
+                         xl=getattr(problem, 'xl', None),
+                         xu=getattr(problem, 'xu', None),
+                         vtype=getattr(problem, 'vtype', None),
+                         vars=getattr(problem, 'vars', None),
+                         elementwise=getattr(problem, 'elementwise', False),
+                         elementwise_func=getattr(problem, 'elementwise_func', None),
+                         elementwise_runner=getattr(problem, 'elementwise_runner', None),
+                         requires_kwargs=getattr(problem, 'requires_kwargs', False),
+                         replace_nan_values_by=getattr(problem, 'replace_nan_values_by', None),
+                         exclude_from_serialization=getattr(problem, 'exclude_from_serialization', None),
+                         callback=getattr(problem, 'callback', None),
+                         strict=getattr(problem, 'strict', True),
+                         **kwargs)
+
+    def do(self, X, return_values_of, *args, **kwargs):
+        """
+        Override do method to call Problem's do method.
+        This uses Problem's do logic with this object's attributes.
+        """
+        return Problem.do(self, X, return_values_of, *args, **kwargs)
+
+    def evaluate(self, X, *args, **kwargs):
+        """
+        Override evaluate method to call Problem's evaluate method.
+        This uses the Problem's evaluate logic with this object's attributes.
+        """
+        return super().evaluate(X, *args, **kwargs)
+
+    def _calc_pareto_front(self, *args, **kwargs):
+        """Delegate pareto front calculation to wrapped object."""
+        return self.__wrapped__._calc_pareto_front(*args, **kwargs)
+
+    def _calc_pareto_set(self, *args, **kwargs):
+        """Delegate pareto set calculation to wrapped object."""
+        return self.__wrapped__._calc_pareto_set(*args, **kwargs)

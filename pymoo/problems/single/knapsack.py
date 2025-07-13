@@ -2,6 +2,7 @@ import numpy as np
 import numpy as np
 
 from pymoo.core.problem import Problem
+from pymoo.util import default_random_state
 
 
 class Knapsack(Problem):
@@ -34,10 +35,10 @@ class MultiObjectiveKnapsack(Knapsack):
         out["G"] = (np.sum(self.W * x, axis=1) - self.C)
 
 
-def create_random_knapsack_problem(n_items, seed=1, variant="single"):
-    np.random.seed(seed)
-    P = np.random.randint(1, 100, size=n_items)
-    W = np.random.randint(1, 100, size=n_items)
+@default_random_state(seed=1)
+def create_random_knapsack_problem(n_items, variant="single", random_state=None, **kwargs):
+    P = random_state.integers(1, 100, size=n_items)
+    W = random_state.integers(1, 100, size=n_items)
     C = int(np.sum(W) / 10)
 
     if variant == "single":

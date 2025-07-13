@@ -174,6 +174,8 @@ class NicheGA(GA):
                  norm_by_dim=False,
                  return_all_opt=True,
                  output=NicheOutput(),
+                 survival=None,
+                 selection=None,
                  **kwargs):
         """
 
@@ -192,17 +194,15 @@ class NicheGA(GA):
 
         """
 
-        surv = kwargs.get("survival")
-        if surv is None:
-            surv = EpsilonClearingSurvival(norm_niche_size, n_max_each_iter=None, norm_by_dim=norm_by_dim)
+        if survival is None:
+            survival = EpsilonClearingSurvival(norm_niche_size, n_max_each_iter=None, norm_by_dim=norm_by_dim)
 
-        selection = kwargs.get("selection")
         if selection is None:
             selection = TournamentSelection(comp_by_cv_and_clearing_fitness)
 
         super().__init__(pop_size=pop_size,
                          selection=selection,
-                         survival=surv,
+                         survival=survival,
                          output=output,
                          advance_after_initial_infill=True,
                          **kwargs)

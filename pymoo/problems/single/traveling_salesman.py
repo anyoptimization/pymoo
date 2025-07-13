@@ -2,6 +2,7 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from pymoo.core.problem import ElementwiseProblem
+from pymoo.util import default_random_state
 
 
 class TravelingSalesman(ElementwiseProblem):
@@ -45,11 +46,10 @@ class TravelingSalesman(ElementwiseProblem):
         return dist
 
 
-def create_random_tsp_problem(n_cities, grid_width=100.0, grid_height=None, seed=None):
-    if seed is not None:
-        np.random.seed(seed)
+@default_random_state(seed=1)
+def create_random_tsp_problem(n_cities, grid_width=100.0, grid_height=None, random_state=None, **kwargs):
     grid_height = grid_height if grid_height is not None else grid_width
-    cities = np.random.random((n_cities, 2)) * [grid_width, grid_height]
+    cities = random_state.random((n_cities, 2)) * [grid_width, grid_height]
     return TravelingSalesman(cities)
 
 

@@ -1,7 +1,6 @@
 import numpy as np
 
-from pymoo.core.meta import Meta
-from pymoo.core.problem import Problem, ElementwiseEvaluationFunction
+from pymoo.core.problem import ElementwiseEvaluationFunction, MetaProblem
 from pymoo.gradient import activate, deactivate
 
 
@@ -31,7 +30,7 @@ class ElementwiseEvaluationFunctionWithGradient(ElementwiseEvaluationFunction):
         return out
 
 
-class ElementwiseAutomaticDifferentiation(Meta, Problem):
+class ElementwiseAutomaticDifferentiation(MetaProblem):
 
     def __init__(self, problem, backend='autograd', copy=True):
         if not problem.elementwise:
@@ -48,7 +47,7 @@ class ElementwiseAutomaticDifferentiation(Meta, Problem):
         return ElementwiseEvaluationFunctionWithGradient(self.__object__, self.backend, args, kwargs)
 
 
-class AutomaticDifferentiation(Meta, Problem):
+class AutomaticDifferentiation(MetaProblem):
 
     def __init__(self, object, backend='autograd', **kwargs):
         super().__init__(object, **kwargs)

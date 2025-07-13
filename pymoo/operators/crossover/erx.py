@@ -1,6 +1,7 @@
 import numpy as np
 
 from pymoo.core.crossover import Crossover
+from pymoo.util import default_random_state
 
 
 def remove_from_adj_list(H, val):
@@ -18,7 +19,8 @@ def has_duplicates(x):
     return False
 
 
-def erx(a, b):
+@default_random_state
+def erx(a, b, random_state=None):
     """
     http://www.rubicite.com/Tutorials/GeneticAlgorithms/CrossoverOperators/EdgeRecombinationCrossoverOperator.aspx
 
@@ -46,7 +48,7 @@ def erx(a, b):
     H = calc_adjency_matrix(b, H=H)
 
     # randomly select the first node
-    _next = np.random.choice(list(H.keys()))
+    _next = random_state.choice(list(H.keys()))
 
     y = []
     while True:
@@ -64,7 +66,7 @@ def erx(a, b):
 
         # if the current node does not have any neighbors
         if len(neighbors) == 0:
-            _next = np.random.choice(list(H.keys()))
+            _next = random_state.choice(list(H.keys()))
 
         # otherwise search in the neighbors for a node with the fewest neighbors
         else:
@@ -74,7 +76,7 @@ def erx(a, b):
             _next = [neighbors[k] for k in range(len(neighbors)) if n_neighbors[k] == min_n_neighbors]
 
             # break the tie if they might have the same number of neighbors
-            _next = np.random.choice(_next)
+            _next = random_state.choice(_next)
 
     return y
 
@@ -84,13 +86,13 @@ class EdgeRecombinationCrossover(Crossover):
     def __init__(self, **kwargs):
         super().__init__(2, 1, **kwargs)
 
-    def _do(self, problem, X, **kwargs):
+    def _do(self, problem, X, random_state=None, **kwargs):
         _, n_matings, n_var = X.shape
         Y = np.full((self.n_offsprings, n_matings, n_var), -1, dtype=int)
 
         for i in range(n_matings):
             a, b = X[:, i, :]
-            Y[0, i, :] = erx(a, b)
+            Y[0, i, :] = erx(a, b, random_state=random_state)
 
         return Y
 

@@ -2,6 +2,7 @@ from abc import abstractmethod
 
 from pymoo.core.operator import Operator
 from pymoo.core.population import Population
+from pymoo.util import default_random_state
 
 
 class Sampling(Operator):
@@ -13,7 +14,8 @@ class Sampling(Operator):
         """
         super().__init__()
 
-    def do(self, problem, n_samples, **kwargs):
+    @default_random_state
+    def do(self, problem, n_samples, *args, random_state=None, **kwargs):
         """
         Sample new points with problem information if necessary.
 
@@ -32,11 +34,11 @@ class Sampling(Operator):
             The output population after sampling
 
         """
-        val = self._do(problem, n_samples, **kwargs)
+        val = self._do(problem, n_samples, *args, random_state=random_state, **kwargs)
         return Population.new("X", val)
 
     @abstractmethod
-    def _do(self, problem, n_samples, **kwargs):
+    def _do(self, problem, n_samples, *args, random_state=None, **kwargs):
         pass
 
 

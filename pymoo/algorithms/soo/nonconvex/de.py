@@ -35,6 +35,7 @@ from pymoo.operators.repair.bounds_repair import repair_random_init
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.selection.rnd import fast_fill_random
 from pymoo.termination.default import DefaultSingleObjectiveTermination
+from pymoo.util import default_random_state
 from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.misc import where_is_what
 
@@ -43,7 +44,8 @@ from pymoo.util.misc import where_is_what
 # Crossover
 # =========================================================================================================
 
-def de_differential(X, F, jitter, alpha=0.001):
+@default_random_state
+def de_differential(X, F, jitter, alpha=0.001, random_state=None):
     n_parents, n_matings, n_var = X.shape
     assert n_parents % 2 == 1, "For the differential an odd number of values need to be provided"
 
@@ -54,7 +56,8 @@ def de_differential(X, F, jitter, alpha=0.001):
     for i in range(1, n_parents, 2):
         # create the weight vectors with jitter to give some variation
         _F = F[:, None].repeat(n_var, axis=1)
-        _F[jitter] *= (1 + alpha * (np.random.random((jitter.sum(), n_var)) - 0.5))
+        # random_state is guaranteed by decorator
+        _F[jitter] *= (1 + alpha * (random_state.random((jitter.sum(), n_var)) - 0.5))
 
         # add the difference to the vector
         delta += _F * (X[i] - X[i + 1])
@@ -97,6 +100,7 @@ class Variant(InfillCriterion):
         self.control = control(self)
 
     def do(self, problem, pop, n_offsprings, algorithm=None, **kwargs):
+        random_state = algorithm.random_state
         control = self.control
 
         # let the parameter control now some information
@@ -129,17 +133,17 @@ class Variant(InfillCriterion):
 
             itself = np.array(targets)[:, None]
 
-            best = lambda: np.random.choice(np.where(pop.get("rank") == 0)[0], replace=True, size=n_matings)
+            best = lambda: random_state.choice(np.where(pop.get("rank") == 0)[0], replace=True, size=n_matings)
 
             if sel_type == "rand":
-                fast_fill_random(P, len(pop), columns=range(n_parents), Xp=itself)
+                fast_fill_random(P, len(pop), columns=range(n_parents), Xp=itself, random_state=random_state)
             elif sel_type == "best":
                 P[:, 0] = best()
-                fast_fill_random(P, len(pop), columns=range(1, n_parents), Xp=itself)
+                fast_fill_random(P, len(pop), columns=range(1, n_parents), Xp=itself, random_state=random_state)
             elif sel_type == "target-to-best":
                 P[:, 0] = targets
                 P[:, 1] = best()
-                fast_fill_random(P, len(pop), columns=range(2, n_parents), Xp=itself)
+                fast_fill_random(P, len(pop), columns=range(2, n_parents), Xp=itself, random_state=random_state)
             else:
                 raise Exception("Unknown selection method.")
 
@@ -147,11 +151,11 @@ class Variant(InfillCriterion):
             XX = np.swapaxes(X[P], 0, 1)
 
             # do the differential crossover to create the donor vector
-            Xp = de_differential(XX, F[targets], jitter[targets])
+            Xp = de_differential(XX, F[targets], jitter[targets], random_state=random_state)
 
             # make sure everything stays in bounds
             if problem.has_bounds():
-                Xp = repair_random_init(Xp, XX[0], *problem.bounds())
+                Xp = repair_random_init(Xp, XX[0], *problem.bounds(), random_state=random_state)
 
             # set the donors (the one we have created in this step)
             donor[targets] = Xp
@@ -167,18 +171,18 @@ class Variant(InfillCriterion):
             _CR = CR[K]
 
             if name == "bin":
-                M = mut_binomial(len(K), problem.n_var, _CR, at_least_once=True)
+                M = mut_binomial(len(K), problem.n_var, _CR, at_least_once=True, random_state=random_state)
                 _trial = np.copy(_target)
                 _trial[M] = _donor[M]
             elif name == "exp":
-                M = mut_exp(n_offsprings, problem.n_var, _CR, at_least_once=True)
+                M = mut_exp(len(K), problem.n_var, _CR, at_least_once=True, random_state=random_state)
                 _trial = np.copy(_target)
                 _trial[M] = _donor[M]
             elif name == "line":
-                w = np.random.random((len(K), 1)) * _CR[:, None]
+                w = random_state.random((len(K), 1)) * _CR[:, None]
                 _trial = _target + w * (_donor - _target)
             elif name == "hypercube":
-                w = np.random.random((len(K), _target.shape[1])) * _CR[:, None]
+                w = random_state.random((len(K), _target.shape[1])) * _CR[:, None]
                 _trial = _target + w * (_donor - _target)
             else:
                 raise Exception(f"Unknown crossover variant: {name}")
@@ -189,7 +193,7 @@ class Variant(InfillCriterion):
         off = Population.new(X=trial)
 
         # do the mutation which helps to add some more diversity
-        off = self.mutation(problem, off)
+        off = self.mutation(problem, off, random_state=random_state)
 
         # repair the individuals if necessary - disabled if repair is NoRepair
         off = self.repair(problem, off, **kwargs)
@@ -245,14 +249,14 @@ class DE(GeneticAlgorithm):
         FitnessSurvival().do(self.problem, self.pop, return_indices=True)
 
     def _infill(self):
-        infills = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self)
+        infills = self.mating.do(self.problem, self.pop, self.n_offsprings, algorithm=self, random_state=self.random_state)
 
         # tag each individual with an index - if a steady state version is executed
         index = np.arange(len(infills))
 
         # if number of offsprings is set lower than pop_size - randomly select
         if self.n_offsprings < self.pop_size:
-            index = np.random.permutation(len(infills))[:self.n_offsprings]
+            index = self.random_state.permutation(len(infills))[:self.n_offsprings]
             infills = infills[index]
 
         infills.set("index", index)

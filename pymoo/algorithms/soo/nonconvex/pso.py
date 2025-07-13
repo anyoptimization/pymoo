@@ -16,6 +16,7 @@ from pymoo.operators.sampling.lhs import LHS
 from pymoo.util.display.column import Column
 from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.util.misc import norm_eucl_dist
+from pymoo.util import default_random_state
 
 
 # =========================================================================================================
@@ -98,14 +99,15 @@ def S4_jumping_out(f):
 # Equation
 # =========================================================================================================
 
-def pso_equation(X, P_X, S_X, V, V_max, w, c1, c2, r1=None, r2=None):
+@default_random_state
+def pso_equation(X, P_X, S_X, V, V_max, w, c1, c2, r1=None, r2=None, random_state=None):
     n_particles, n_var = X.shape
 
     if r1 is None:
-        r1 = np.random.random((n_particles, n_var))
+        r1 = random_state.random((n_particles, n_var))
 
     if r2 is None:
-        r2 = np.random.random((n_particles, n_var))
+        r2 = random_state.random((n_particles, n_var))
 
     inerta = w * V
     cognitive = c1 * r1 * (P_X - X)
@@ -204,13 +206,13 @@ class PSO(Algorithm):
         self.f, self.strategy = None, None
 
     def _initialize_infill(self):
-        return self.initialization.do(self.problem, self.pop_size, algorithm=self)
+        return self.initialization.do(self.problem, self.pop_size, algorithm=self, random_state=self.random_state)
 
     def _initialize_advance(self, infills=None, **kwargs):
         particles = self.pop
 
         if self.initial_velocity == "random":
-            init_V = np.random.random((len(particles), self.problem.n_var)) * self.V_max[None, :]
+            init_V = self.random_state.random((len(particles), self.problem.n_var)) * self.V_max[None, :]
         elif self.initial_velocity == "zero":
             init_V = np.zeros((len(particles), self.problem.n_var))
         else:
@@ -230,7 +232,7 @@ class PSO(Algorithm):
         sbest = self._social_best()
         S_X = sbest.get("X")
 
-        Xp, Vp = pso_equation(X, P_X, S_X, V, self.V_max, self.w, self.c1, self.c2)
+        Xp, Vp = pso_equation(X, P_X, S_X, V, self.V_max, self.w, self.c1, self.c2, random_state=self.random_state)
 
         # if the problem has boundaries to be considered
         if problem.has_bounds():
@@ -243,10 +245,10 @@ class PSO(Algorithm):
                     break
 
                 # actually execute the differential equation
-                Xp[m], Vp[m] = pso_equation(X[m], P_X[m], S_X[m], V[m], self.V_max, self.w, self.c1, self.c2)
+                Xp[m], Vp[m] = pso_equation(X[m], P_X[m], S_X[m], V[m], self.V_max, self.w, self.c1, self.c2, random_state=self.random_state)
 
             # if still infeasible do a random initialization
-            Xp = repair_random_init(Xp, X, *problem.bounds())
+            Xp = repair_random_init(Xp, X, *problem.bounds(), random_state=self.random_state)
 
         # create the offspring population
         off = Population.new(X=Xp, V=Vp)
@@ -254,8 +256,8 @@ class PSO(Algorithm):
         # try to improve the current best with a pertubation
         if self.pertube_best:
             k = FitnessSurvival().do(problem, pbest, n_survive=1, return_indices=True)[0]
-            mut = PM(prob=0.9, eta=np.random.uniform(5, 30), at_least_once=False)
-            mutant = mut(problem, Population(Individual(X=pbest[k].X)))[0]
+            mut = PM(prob=0.9, eta=self.random_state.uniform(5, 30), at_least_once=False)
+            mutant = mut(problem, Population(Individual(X=pbest[k].X)), random_state=self.random_state)[0]
             off[k].set("X", mutant.X)
 
         self.repair(problem, off)
@@ -300,7 +302,7 @@ class PSO(Algorithm):
         S = np.array([S1_exploration(f), S2_exploitation(f), S3_convergence(f), S4_jumping_out(f)])
         strategy = S.argmax() + 1
 
-        delta = 0.05 + (np.random.random() * 0.05)
+        delta = 0.05 + (self.random_state.random() * 0.05)
 
         if strategy == 1:
             c1 += delta

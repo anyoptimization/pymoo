@@ -1,10 +1,12 @@
-import numpy as np
-import random
 import json
-from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-from pymoo.core.population import Population
+
+import numpy as np
 from sklearn.naive_bayes import GaussianNB
+
+from pymoo.algorithms.moo.nsga2 import NSGA2
+from pymoo.core.population import Population
+from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
+
 
 def euclidean_distance(a, b):
     a = np.array(a)
@@ -37,8 +39,7 @@ class KGB(NSGA2):
         self.nr_rand_solutions = 50 * self.pop_size
         self.t = 0
 
-        self.rng = np.random.RandomState(self.seed)
-        random.seed(self.seed)
+        # Random state will be set up in the base algorithm's setup method
 
     def setup(self, problem, **kwargs):
         """
@@ -51,7 +52,10 @@ class KGB(NSGA2):
             not problem.has_constraints()
         ), "KGB-DMOEA only works for unconstrained problems."
         return super().setup(problem, **kwargs)
-    
+
+    def _infill(self):
+
+        return None
 
     def knowledge_reconstruction_examination(self):
         """
@@ -275,7 +279,7 @@ class KGB(NSGA2):
         """
         # generate a random population of size N_r
         # TODO: Check boundaries
-        random_pop = np.random.random((N_r, self.problem.n_var))
+        random_pop = self.random_state.random((N_r, self.problem.n_var))
 
         # check if any solution is outside the bounds
         for individual in random_pop:
@@ -294,9 +298,9 @@ class KGB(NSGA2):
         :return: Diversified population
         """
         # find indices to be replaced (introduce diversity)
-        I = np.where(np.random.random(len(pop)) < self.PERC_DIVERSITY)[0]
+        I = np.where(self.random_state.random(len(pop)) < self.PERC_DIVERSITY)[0]
         # replace with randomly sampled individuals
-        pop[I] = self.initialization.sampling(self.problem, len(I))
+        pop[I] = self.initialization.sampling(self.problem, len(I), random_state=self.random_state)
         return pop
 
     def _advance(self, **kwargs):
@@ -310,7 +314,7 @@ class KGB(NSGA2):
         n_samples = int(np.ceil(len(pop) * self.PERC_DETECT_CHANGE))
 
         # choose randomly some individuals of the current population to test if there was a change
-        I = np.random.choice(np.arange(len(pop)), size=n_samples)
+        I = self.random_state.choice(np.arange(len(pop)), size=n_samples)
         samples = self.evaluator.eval(self.problem, Population.new(X=X[I]))
 
         # calculate the differences between the old and newly evaluated pop
@@ -337,7 +341,7 @@ class KGB(NSGA2):
             X_test = self.random_strategy(self.nr_rand_solutions)
 
             # introduce noise to vary previously useful solutions
-            noise = np.random.normal(0, self.PERTURB_DEV, self.problem.n_var)
+            noise = self.random_state.normal(0, self.PERTURB_DEV, self.problem.n_var)
             noisy_useful_history = np.asarray(pop_useful) + noise
 
             # check whether solutions are within bounds
@@ -360,9 +364,10 @@ class KGB(NSGA2):
 
             if len(predicted_pop) >= self.pop_size - self.C_SIZE:
                 init_pop = []
-                predicted_pop = random.sample(
-                    predicted_pop, self.pop_size - self.C_SIZE
+                indices = self.random_state.choice(
+                    len(predicted_pop), self.pop_size - self.C_SIZE, replace=False
                 )
+                predicted_pop = [predicted_pop[i] for i in indices]
 
                 # add sampled solutions to init_pop
                 for solution in predicted_pop:
@@ -392,10 +397,13 @@ class KGB(NSGA2):
 
                     nr_sampled_pop_useful = self.pop_size - len(init_pop)
 
+                    indices = self.random_state.choice(
+                        len(pop_useful), self.pop_size - len(init_pop), replace=False
+                    )
                     init_pop = np.vstack(
                         (
                             init_pop,
-                            random.sample(pop_useful, self.pop_size - len(init_pop)),
+                            [pop_useful[i] for i in indices],
                         )
                     )
                 else:
@@ -422,10 +430,10 @@ class KGB(NSGA2):
             self.evaluator.eval(self.problem, pop)
 
             # do a survival to recreate rank and crowding of all individuals
-            pop = self.survival.do(self.problem, pop, n_survive=len(pop))
+            pop = self.survival.do(self.problem, pop, n_survive=len(pop), random_state=self.random_state)
 
         # create the offsprings from the current population
-        off = self.mating.do(self.problem, pop, self.n_offsprings, algorithm=self)
+        off = self.mating.do(self.problem, pop, self.n_offsprings, algorithm=self, random_state=self.random_state)
         self.evaluator.eval(self.problem, off)
 
         # merge the parent population and offsprings
@@ -433,7 +441,7 @@ class KGB(NSGA2):
 
         # execute the survival to find the fittest solutions
         self.pop = self.survival.do(
-            self.problem, pop, n_survive=self.pop_size, algorithm=self
+            self.problem, pop, n_survive=self.pop_size, algorithm=self, random_state=self.random_state
         )
 
         # dump self.ps to file

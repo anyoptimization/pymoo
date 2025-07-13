@@ -50,7 +50,7 @@ class G3PCX(LoopwiseAlgorithm):
         self.mutation.prob = Real(0.25, bounds=(0.0, 1.0))
 
     def _initialize_infill(self):
-        return self.initialization.do(self.problem, get(self.pop_size), algorithm=self)
+        return self.initialization.do(self.problem, get(self.pop_size), algorithm=self, random_state=self.random_state)
 
     def _initialize_advance(self, infills=None, **kwargs):
         self.pop = FitnessSurvival().do(self.problem, infills, n_survive=len(infills), algorithm=self, **kwargs)
@@ -65,11 +65,11 @@ class G3PCX(LoopwiseAlgorithm):
 
             S = np.zeros((n_offsprings, n_parents), dtype=int)
             S[:, 0] = 0
-            fast_fill_random(S, len(self.pop), columns=range(1, n_parents))
+            fast_fill_random(S, len(self.pop), columns=range(1, n_parents), random_state=self.random_state)
 
-            off = self.crossover(self.problem, self.pop, parents=S, algorithm=self)
+            off = self.crossover(self.problem, self.pop, parents=S, algorithm=self, random_state=self.random_state)
 
-            off = self.mutation(self.problem, off, algorithm=self)
+            off = self.mutation(self.problem, off, algorithm=self, random_state=self.random_state)
 
             self.repair(self.problem, off, algorithm=self)
 
@@ -77,7 +77,7 @@ class G3PCX(LoopwiseAlgorithm):
 
             pop, family_size = self.pop, get(self.family_size)
 
-            rnd = np.random.choice(np.arange(len(pop)), size=family_size, replace=False)
+            rnd = self.random_state.choice(np.arange(len(pop)), size=family_size, replace=False)
             family = Population.merge(pop[rnd], off)
             pop[rnd] = FitnessSurvival().do(self.problem, family, n_survive=family_size)
 

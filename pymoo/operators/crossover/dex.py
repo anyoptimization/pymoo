@@ -5,9 +5,11 @@ from pymoo.core.population import Population
 from pymoo.operators.crossover.binx import mut_binomial
 from pymoo.operators.crossover.expx import mut_exp
 from pymoo.operators.repair.bounds_repair import is_out_of_bounds_by_problem, repair_random_init
+from pymoo.util import default_random_state
 
 
-def de_differential(X, F, dither=None, jitter=True, gamma=0.0001, return_differentials=False):
+@default_random_state
+def de_differential(X, F, dither=None, jitter=True, gamma=0.0001, return_differentials=False, random_state=None):
     n_parents, n_matings, n_var = X.shape
     assert n_parents % 2 == 1, "For the differential an odd number of values need to be provided"
 
@@ -24,13 +26,13 @@ def de_differential(X, F, dither=None, jitter=True, gamma=0.0001, return_differe
     for i, j in pairs:
 
         if dither == "vector":
-            F = (F + np.random.random(n_matings) * (1 - F))
+            F = (F + random_state.random(n_matings) * (1 - F))
         elif dither == "scalar":
-            F = F + np.random.random() * (1 - F)
+            F = F + random_state.random() * (1 - F)
 
         # http://www.cs.ndsu.nodak.edu/~siludwig/Publish/papers/SSCI20141.pdf
         if jitter:
-            F = (F * (1 + gamma * (np.random.random(n_matings) - 0.5)))
+            F = (F * (1 + gamma * (random_state.random(n_matings) - 0.5)))
 
         # an add the difference to the first vector
         diffs += F[:, None] * (X[i] - X[j])
@@ -67,7 +69,7 @@ class DEX(Crossover):
         self.jitter = jitter
         self.n_iter = n_iter
 
-    def do(self, problem, pop, parents=None, **kwargs):
+    def do(self, problem, pop, parents=None, *args, random_state, **kwargs):
 
         # if a parents with array with mating indices is provided -> transform the input first
         if parents is not None:
@@ -82,10 +84,10 @@ class DEX(Crossover):
         m = np.arange(n_matings)
 
         # if the user provides directly an F value to use
-        F = self.F if self.F is not None else rnd_F(m)
+        F = self.F if self.F is not None else rnd_F(m, random_state=random_state)
 
         # prepare the out to be set
-        Xp = de_differential(X[:, m], F)
+        Xp = de_differential(X[:, m], F, random_state=random_state)
 
         # if the problem has boundaries to be considered
         if problem.has_bounds():
@@ -94,18 +96,18 @@ class DEX(Crossover):
                 # find the individuals which are still infeasible
                 m = is_out_of_bounds_by_problem(problem, Xp)
 
-                F = rnd_F(m)
+                F = rnd_F(m, random_state=random_state)
 
                 # actually execute the differential equation
-                Xp[m] = de_differential(X[:, m], F)
+                Xp[m] = de_differential(X[:, m], F, random_state=random_state)
 
             # if still infeasible do a random initialization
             Xp = repair_random_init(Xp, X[0], *problem.bounds())
 
         if self.variant == "bin":
-            M = mut_binomial(n_matings, n_var, self.CR, at_least_once=self.at_least_once)
+            M = mut_binomial(n_matings, n_var, self.CR, at_least_once=self.at_least_once, random_state=random_state)
         elif self.variant == "exp":
-            M = mut_exp(n_matings, n_var, self.CR, at_least_once=self.at_least_once)
+            M = mut_exp(n_matings, n_var, self.CR, at_least_once=self.at_least_once, random_state=random_state)
         else:
             raise Exception(f"Unknown variant: {self.variant}")
 
@@ -118,5 +120,6 @@ class DEX(Crossover):
         return Population.new("X", X)
 
 
-def rnd_F(m):
-    return 0.5 * (1 + np.random.uniform(size=len(m)))
+@default_random_state
+def rnd_F(m, random_state=None):
+    return 0.5 * (1 + random_state.uniform(size=len(m)))

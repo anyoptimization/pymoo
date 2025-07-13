@@ -14,13 +14,15 @@ from pymoo.util.display.multi import MultiObjectiveOutput
 from pymoo.functions import load_function
 from pymoo.util.misc import intersect, has_feasible
 from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
+from pymoo.util import default_random_state
 
 
 # =========================================================================================================
 # Implementation
 # =========================================================================================================
 
-def comp_by_cv_then_random(pop, P, **kwargs):
+@default_random_state
+def comp_by_cv_then_random(pop, P, random_state=None, **kwargs):
     S = np.full(P.shape[0], np.nan)
 
     for i in range(P.shape[0]):
@@ -32,7 +34,7 @@ def comp_by_cv_then_random(pop, P, **kwargs):
 
         # both solutions are feasible just set random
         else:
-            S[i] = np.random.choice([a, b])
+            S[i] = random_state.choice([a, b])
 
     return S[:, None].astype(int)
 
@@ -129,7 +131,7 @@ class ReferenceDirectionSurvival(Survival):
         self.opt = None
         self.norm = HyperplaneNormalization(ref_dirs.shape[1])
 
-    def _do(self, problem, pop, n_survive, D=None, **kwargs):
+    def _do(self, problem, pop, n_survive, D=None, random_state=None, **kwargs):
 
         # attributes to be set after the survival
         F = pop.get("F")
@@ -186,7 +188,7 @@ class ReferenceDirectionSurvival(Survival):
                 n_remaining = n_survive - len(until_last_front)
 
             S = niching(pop[last_front], n_remaining, niche_count, niche_of_individuals[last_front],
-                        dist_to_niche[last_front])
+                        dist_to_niche[last_front], random_state=random_state)
 
             survivors = np.concatenate((until_last_front, last_front[S].tolist()))
             pop = pop[survivors]
@@ -194,7 +196,8 @@ class ReferenceDirectionSurvival(Survival):
         return pop
 
 
-def niching(pop, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
+@default_random_state
+def niching(pop, n_remaining, niche_count, niche_of_individuals, dist_to_niche, random_state=None):
     survivors = []
 
     # boolean array of elements that are considered for each iteration
@@ -214,7 +217,7 @@ def niching(pop, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
 
         # all niches with the minimum niche count (truncate randomly if there are more niches than remaining individuals)
         next_niches = next_niches_list[np.where(next_niche_count == min_niche_count)[0]]
-        next_niches = next_niches[np.random.permutation(len(next_niches))[:n_select]]
+        next_niches = next_niches[random_state.permutation(len(next_niches))[:n_select]]
 
         for next_niche in next_niches:
 
@@ -222,7 +225,7 @@ def niching(pop, n_remaining, niche_count, niche_of_individuals, dist_to_niche):
             next_ind = np.where(np.logical_and(niche_of_individuals == next_niche, mask))[0]
 
             # shuffle to break random tie (equal perp. dist) or select randomly
-            np.random.shuffle(next_ind)
+            random_state.shuffle(next_ind)
 
             if niche_count[next_niche] == 0:
                 next_ind = next_ind[np.argmin(dist_to_niche[next_ind])]

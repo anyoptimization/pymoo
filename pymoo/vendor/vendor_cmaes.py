@@ -7,11 +7,14 @@ from cma.evolution_strategy import cma_default_options, CMAEvolutionStrategy
 from cma.utilities import utils
 from cma.utilities.math import Mh
 
+from pymoo.util import default_random_state
+
 all_stoppings = []
 
 def void(_):
     pass
 
+@default_random_state
 def my_fmin(x0,
             sigma0,
             objective_function=void,
@@ -27,7 +30,8 @@ def my_fmin(x0,
             noise_change_sigma_exponent=1,
             noise_kappa_exponent=0,  # TODO: add max kappa value as parameter
             bipop=False,
-            callback=None):
+            callback=None,
+            random_state=None):
 
     if 1 < 3:  # try: # pass on KeyboardInterrupt
         if not objective_function and not parallel_objective:  # cma.fmin(0, 0, 0)
@@ -87,9 +91,9 @@ def my_fmin(x0,
                     restarts += 1  # A small restart doesn't count in the total
                 runs_with_small += 1  # _Before_ it's used in popsize_lastlarge
 
-                sigma_factor = 0.01 ** np.random.uniform()  # Local search
+                sigma_factor = 0.01 ** random_state.uniform()  # Local search
                 popsize_multiplier = fmin_options['incpopsize'] ** (irun - runs_with_small)
-                opts['popsize'] = np.floor(popsize0 * popsize_multiplier ** (np.random.uniform() ** 2))
+                opts['popsize'] = np.floor(popsize0 * popsize_multiplier ** (random_state.uniform() ** 2))
                 opts['maxiter'] = min(maxiter0, 0.5 * sum(large_i) / opts['popsize'])
                 # print('small basemul %s --> %s; maxiter %s' % (popsize_multiplier, opts['popsize'], opts['maxiter']))
 
@@ -120,6 +124,11 @@ def my_fmin(x0,
                     es.opts.set(options)
                 # ignore further input args and keep original options
             else:  # default case
+                # Set seed from random_state for deterministic behavior
+                if 'seed' not in opts or opts['seed'] is None:
+                    # Generate a seed from the random_state for CMA-ES
+                    opts['seed'] = random_state.integers(0, 2**31)
+                
                 if irun and eval(str(fmin_options['restart_from_best'])):
                     utils.print_warning('CAVE: restart_from_best is often not useful',
                                         verbose=opts['verbose'])
@@ -177,7 +186,7 @@ def my_fmin(x0,
                     noisehandler = noise_handler
                 noise_handling = True
                 if fmin_opts['noise_change_sigma_exponent'] > 0:
-                    es.opts['tolfacupx'] = inf
+                    es.opts['tolfacupx'] = float('inf')
             else:
                 noisehandler = ot.NoiseHandler(es.N, 0)  # switched off
                 noise_handling = False
@@ -197,8 +206,8 @@ def my_fmin(x0,
 
                     if 11 < 3 and opts['vv']:  # inject a solution
                         # use option check_point = [0]
-                        if 0 * np.random.randn() >= 0:
-                            X[0] = 0 + opts['vv'] * es.sigma ** 0 * np.random.randn(es.N)
+                        if 0 * random_state.standard_normal() >= 0:
+                            X[0] = 0 + opts['vv'] * es.sigma ** 0 * random_state.standard_normal(es.N)
                             fit[0] = yield X[0]
                             # print fit[0]
                     if es.opts['verbose'] > 4:  # may be undesirable with dynamic fitness (e.g. Augmented Lagrangian)

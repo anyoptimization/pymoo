@@ -3,6 +3,7 @@ import numpy as np
 from pymoo.core.crossover import Crossover
 from pymoo.core.variable import Real, get
 from pymoo.operators.repair.bounds_repair import repair_clamp
+from pymoo.util import default_random_state
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -10,11 +11,12 @@ from pymoo.operators.repair.bounds_repair import repair_clamp
 # ---------------------------------------------------------------------------------------------------------
 
 
-def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14):
+@default_random_state
+def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14, random_state=None):
     n_parents, n_matings, n_var = X.shape
 
     # the probability of a crossover for each of the variables
-    cross = np.random.random((n_matings, n_var)) < prob_var
+    cross = random_state.random((n_matings, n_var)) < prob_var
 
     # when solutions are too close -> do not apply sbx crossover
     too_close = np.abs(X[0] - X[1]) <= eps
@@ -41,7 +43,7 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14):
     prob_bin = prob_bin.repeat(n_var, axis=1)[cross]
 
     # random values for each individual
-    rand = np.random.random(len(eta))
+    rand = random_state.random(len(eta))
 
     def calc_betaq(beta):
         alpha = 2.0 - np.power(beta, -(eta + 1.0))
@@ -71,7 +73,7 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14):
     
     # exchange children with given probability
     b = np.bitwise_xor(
-        np.random.random(len(prob_bin)) < prob_bin,
+        random_state.random(len(prob_bin)) < prob_bin,
         X[0, cross] > X[1, cross]
     )
     child1, child2 = np.where(b, (child2, child1), (child1, child2))
@@ -112,6 +114,7 @@ class SimulatedBinaryCrossover(Crossover):
 
     @Crossover.safe_bounds_do
     def _do(self, problem, X, **kwargs):
+    def _do(self, problem, X, *args, random_state=None, **kwargs):
         _, n_matings, _ = X.shape
 
         # get the parameters required by SBX
@@ -119,13 +122,13 @@ class SimulatedBinaryCrossover(Crossover):
                                                  size=(n_matings, 1))
 
         # set the binomial probability to zero if no exchange between individuals shall happen
-        rand = np.random.random((len(prob_bin), 1))
+        rand = random_state.random((len(prob_bin), 1))
         prob_bin[rand > prob_exch] = 0.0
 
-        Q = cross_sbx(X.astype(float), problem.xl, problem.xu, eta, prob_var, prob_bin)
+        Q = cross_sbx(X.astype(float), problem.xl, problem.xu, eta, prob_var, prob_bin, random_state=random_state)
 
         if self.n_offsprings == 1:
-            rand = np.random.random(size=n_matings) < 0.5
+            rand = random_state.random(size=n_matings) < 0.5
             Q[0, rand] = Q[1, rand]
             Q = Q[[0]]
 

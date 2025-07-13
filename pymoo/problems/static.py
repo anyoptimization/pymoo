@@ -1,8 +1,7 @@
-from pymoo.core.meta import Meta
-from pymoo.core.problem import Problem
+from pymoo.core.problem import MetaProblem
 
 
-class StaticProblem(Meta, Problem):
+class StaticProblem(MetaProblem):
 
     def __init__(self, problem, **kwargs):
         super().__init__(problem)

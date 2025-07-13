@@ -2,6 +2,8 @@ import abc
 
 import numpy as np
 
+from pymoo.util import default_random_state
+
 
 class Operator:
 
@@ -19,8 +21,12 @@ class Operator:
         self.vtype = vtype
         self.repair = repair
 
+    @default_random_state
+    def do(self, problem, elem, *args, random_state, **kwargs):
+        return self._do(problem, elem, *args, random_state=random_state, **kwargs)
+
     @abc.abstractmethod
-    def do(self, problem, elem, *args, **kwargs):
+    def _do(self, problem, elem, *args, random_state, **kwargs):
         pass
 
     def __call__(self, problem, elem, *args, to_numpy=False, **kwargs):
