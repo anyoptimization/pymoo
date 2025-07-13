@@ -23,6 +23,10 @@ class DNSGA2(NSGA2):
         assert not problem.has_constraints(), "DNSGA2 only works for unconstrained problems."
         return super().setup(problem, **kwargs)
 
+    def _infill(self):
+        
+        return None
+
     def _advance(self, **kwargs):
 
         pop = self.pop
