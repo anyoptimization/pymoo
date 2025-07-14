@@ -13,6 +13,7 @@ from pymoo.operators.repair.to_bound import (
 )
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.operators.survival.rank_and_crowding.metrics import get_crowding_function
+from pymoo.util import default_random_state
 from pymoo.util.archive import MultiObjectiveArchive, SurvivalTruncation
 from pymoo.util.display.multi import MultiObjectiveOutput
 
@@ -63,6 +64,7 @@ def angle_between(v1, v2):
     return np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0))
 
 
+@default_random_state
 def cmopso_equation(X, L, V, V_max, random_state=None):
     """
     Calculates the new positions and velocities of particles based on the CMOPSO
@@ -96,20 +98,19 @@ def cmopso_equation(X, L, V, V_max, random_state=None):
     Vp : numpy.ndarray
         New velocities of the particles after the update. Shape `(n_particles, n_var)`.
     """
-    rng = np.random.default_rng(random_state)
 
     W_X = []
     for i in range(np.shape(X)[0]):  # binary tournament selection on elites
-        aidx = rng.choice(range(len(L)))
-        bidx = rng.choice(range(len(L)))
+        aidx = random_state.choice(range(len(L)))
+        bidx = random_state.choice(range(len(L)))
         a = L[aidx]
         b = L[bidx]
         pw = min(a, b, key=lambda x: angle_between(x, X[i]))
         W_X.append(pw)
     W_X = np.asarray(W_X)
 
-    r1 = rng.random(X.shape)
-    r2 = rng.random(X.shape)
+    r1 = random_state.random(X.shape)
+    r2 = random_state.random(X.shape)
 
     # calculate the velocity vector
     Vp = r1 * V + r2 * (W_X - X)

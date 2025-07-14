@@ -104,10 +104,9 @@ class MOPSO_CD(Algorithm):
     def _initialize_infill(self):
         """Initialize the population and velocities"""
         # Initialize population using sampling
-        pop = self.sampling.do(self.problem, self.pop_size)
+        pop = self.sampling.do(self.problem, self.pop_size, random_state=self.random_state)
 
         # Initialize velocities randomly
-        xl, xu = self.problem.bounds()
         self.velocities = self.random_state.uniform(
             -self.v_max, self.v_max, size=(self.pop_size, self.problem.n_var)
         )

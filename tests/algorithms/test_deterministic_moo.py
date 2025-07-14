@@ -1,6 +1,8 @@
 import numpy as np
 import pytest
 
+from pymoo.algorithms.moo.cmopso import CMOPSO
+from pymoo.algorithms.moo.mopso_cd import MOPSO_CD
 # Multi-objective algorithms
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.moo.rnsga2 import RNSGA2
@@ -44,7 +46,7 @@ class SimpleDeterministicDM(AutomatedDM):
 # Helper function to create algorithm instances with required parameters
 def create_algorithm_instance(algorithm_class):
     """Create algorithm instance with proper parameters."""
-    if algorithm_class in [NSGA3, UNSGA3, CTAEA, RVEA]:
+    if algorithm_class in [NSGA3, UNSGA3, CTAEA, RVEA, ]:
         # These algorithms need reference directions - create them manually to avoid random_state issues
         from pymoo.util.ref_dirs.das_dennis import DasDennis
         ref_dirs_gen = DasDennis(n_partitions=12, n_dim=2)
@@ -73,11 +75,11 @@ def create_algorithm_instance(algorithm_class):
         return algorithm_class()
 
 
-# Algorithm classes for testing - ALL 16 ALGORITHMS!
+# Algorithm classes for testing
 MULTI_OBJECTIVE_ALGORITHM_CLASSES = [
     NSGA2, RNSGA2, NSGA3, UNSGA3, RNSGA3, MOEAD, ParallelMOEAD,
     AGEMOEA, AGEMOEA2, CTAEA, SMSEMOA, RVEA, KGB, 
-    SPEA2, DNSGA2, PINSGA2
+    SPEA2, DNSGA2, PINSGA2, MOPSO_CD, CMOPSO
 ]
 
 # Test problem
