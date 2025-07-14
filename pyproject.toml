@@ -46,7 +46,7 @@ version = { attr = "pymoo.version.__version__" }
 where = ["."]
 include = ["pymoo*"]
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
     "numba",
     "pytest",
@@ -67,7 +67,11 @@ parallelization = [
     "ray[default]",
 ]
 full = [
-    {include-group = "visualization"},
-    {include-group = "parallelization"},
+    "matplotlib>=3.0",
+    "joblib",
+    "dask[distributed]",
+    "ray[default]",
     "optuna"
 ]
+
+

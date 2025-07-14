@@ -20,7 +20,7 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install --no-cache-dir --upgrade setuptools>=77.0 
-          pip install numpy Cython scipy
+          pip install numpy Cython scipy optuna scikit-learn
           pip install -r tests/requirements.txt
       - name: Install pymoo (DEBUG)
         run: |
