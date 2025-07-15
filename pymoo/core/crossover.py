@@ -76,4 +76,13 @@ class Crossover(Operator):
     def _do(self, problem, X, *args, random_state=None, **kwargs):
         pass
 
+    @staticmethod
+    def safe_bounds_do(func):
+        @functools.wraps(func)
+        def wrapped_do(self, problem, X, **kwargs):
+            result = func(self, problem, X, **kwargs)
+            if np.any(result < (problem.xl or -np.inf)) or np.any(result > (problem.xu or np.inf)):
+                raise ValueError("The generated solution is out of bounds.")
+            return result
+        return wrapped_do
 
