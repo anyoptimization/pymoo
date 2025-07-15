@@ -163,4 +163,4 @@ The algorithm is based on extensions of traditional MOPSO with crowding distance
 
 ### Implementation
 
-This algorithm has been implemented by [Gideon Oludeyi](https://github.com/gideonoludeyi) and extends traditional MOPSO with crowding distance mechanisms for leader selection and archive management. The implementation is particularly well-suited for multi-objective reinforcement learning problems where maintaining diversity in the objective space is crucial for finding well-distributed trade-off solutions. 
+This algorithm has been implemented by [Rasa Khosrowshahi](github.com/rkhosrowshahi) and extends traditional MOPSO with crowding distance mechanisms for leader selection and archive management. The implementation is particularly well-suited for multi-objective reinforcement learning problems where maintaining diversity in the objective space is crucial for finding well-distributed trade-off solutions. 
