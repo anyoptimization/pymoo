@@ -49,8 +49,8 @@ class ElementwiseAutomaticDifferentiation(MetaProblem):
 
 class AutomaticDifferentiation(MetaProblem):
 
-    def __init__(self, object, backend='autograd', **kwargs):
-        super().__init__(object, **kwargs)
+    def __init__(self, problem, backend='autograd', **kwargs):
+        super().__init__(problem, **kwargs)
         self.backend = backend
 
     def do(self, x, return_values_of, *args, **kwargs):

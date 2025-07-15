@@ -16,8 +16,8 @@ def calc_complex_gradient(problem, return_values_of, x, eps, *args, **kwargs):
 
 class ComplexNumberGradient(MetaProblem):
 
-    def __init__(self, object, eps=1e-8, **kwargs):
-        super().__init__(object, **kwargs)
+    def __init__(self, problem, eps=1e-8, **kwargs):
+        super().__init__(problem, **kwargs)
         self.eps = eps
 
     def do(self, X, return_values_of, *args, **kwargs):

@@ -9,26 +9,26 @@ class Meta(wrapt.ObjectProxy):
     unless the method is explicitly overridden in the Meta subclass.
     """
 
-    def __init__(self, object, copy=True):
+    def __init__(self, wrapped_object, copy=True):
         if copy:
-            object = deepcopy(object)
+            wrapped_object = deepcopy(wrapped_object)
         
         # Initialize wrapt.ObjectProxy with the object
-        super().__init__(object)
+        super().__init__(wrapped_object)
         
         # Keep these attributes for backward compatibility
-        self.__object__ = object
-        self.__super__ = object
-        self.__original__ = object if not copy else None
+        self.__object__ = wrapped_object
+        self.__super__ = wrapped_object
+        self.__original__ = wrapped_object if not copy else None
         
     
     def __setattr__(self, name, value):
         # Store certain attributes on the proxy object itself, not the wrapped object
         if name in ['_self_', '__wrapped__', '__object__', '__super__', '__original__', 'cache'] or name.startswith('_self_'):
-            object.__setattr__(self, name, value)
+            super().__setattr__(name, value)
         else:
             # For all other attributes, store them on this object, not the wrapped one
-            object.__setattr__(self, name, value)
+            super().__setattr__(name, value)
 
     def __deepcopy__(self, memo):
         """Support deepcopy for wrapt.ObjectProxy objects."""

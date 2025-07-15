@@ -28,6 +28,7 @@ __pycache__/
  **/*.ipynb_checkpoints/
 
 
+
 # files which are in pytest
 tests/!archive/*
 tests/scratch*
@@ -46,8 +47,9 @@ benchmark/runs/*
 # any video or other output file
 *.mp4
 
-# pycharm folder
+
 .idea/
+.kiro/
 
 
 # Distribution / packaging
