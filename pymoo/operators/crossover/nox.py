@@ -1,3 +1,5 @@
+import itertools
+
 from pymoo.core.crossover import Crossover
 from pymoo.core.population import Population
 
@@ -7,4 +9,4 @@ class NoCrossover(Crossover):
         super().__init__(n_parents, n_offsprings, prob, **kwargs)
 
     def do(self, problem, pop, *args, random_state, **kwargs):
-        return Population.create(*[random_state.choice(parents) for parents in pop])
+        return Population.create(*itertools.chain.from_iterable(pop))
