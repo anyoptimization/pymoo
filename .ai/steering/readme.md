@@ -137,6 +137,9 @@ These guides provide step-by-step processes for:
 3. Using intelligent caching to avoid re-running successful tests
 4. Final verification
 
+### Project Commands Collection
+The `.ai/commands/` directory contains a collection of predefined commands and workflows that should be executed when requested. These commands encapsulate common development tasks, debugging procedures, and project-specific operations. When asked to perform standard operations like testing, building, or fixing issues, reference and follow these command templates to ensure consistent execution patterns.
+
 ### Key File Structure
 
 ```

@@ -204,3 +204,10 @@ copybutton_only_copy_prompt_lines = True
 copybutton_remove_prompts = True
 copybutton_copy_empty_lines = False
 
+# ===========================================================================
+# nbsphinx
+# ===========================================================================
+
+# Disable RequireJS to avoid conflicts with clipboard.min.js
+nbsphinx_requirejs_path = ""
+

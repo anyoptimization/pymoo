@@ -59,13 +59,13 @@ class AutomaticDifferentiation(MetaProblem):
 
         class F:
 
-            def __init__(self, object):
-                self.__object__ = object
+            def __init__(self, wrapped_problem):
+                self.__object__ = wrapped_problem
 
             def __call__(self, xp):
                 return self.__object__.do(xp, vals_not_grad, *args, **kwargs)
 
-        f = F(self.__object__)
+        f = F(self.__wrapped__)
 
         activate(self.backend)
         if self.backend == "jax":

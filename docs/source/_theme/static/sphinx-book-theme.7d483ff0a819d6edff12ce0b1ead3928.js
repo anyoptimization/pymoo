@@ -4,7 +4,8 @@ var initTriggerNavBar = () => {
     }
 }
 var scrollToActive = () => {
-    var navbar = document.getElementById('site-navigation')
+    var navbar = document.getElementById('bd-docs-nav')
+    if (!navbar) return;
     var active_pages = navbar.querySelectorAll(".active")
     var active_page = active_pages[active_pages.length - 1]
     if (active_page !== undefined && active_page.offsetTop > ($(window).height() * .5)) {
