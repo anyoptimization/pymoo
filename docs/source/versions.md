@@ -37,7 +37,7 @@ kernelspec:
 .. _version_0_6_1_3:
 ```
 
-#### 0.6.1.3 [[Documentation](http://archive.pymoo.org/0.6.3/)]
+#### 0.6.1.3 [[Documentation](http://archive.pymoo.org/0.6.1.3/)]
 
 - Compatibility with Numpy 2.0
 - Make Autograd for Automatic Differentiation Optional

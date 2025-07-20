@@ -82,13 +82,15 @@ html_theme_options = {
     "show_navbar_depth": 1,
     "collapse_navigation": True,
     "navigation_depth": 1,
-    "navbar_end": [],
-    "navbar_center": [],
-    "navbar_start": ["navbar-logo"],
+    # Remove all navbar customizations to test basic functionality
+    # "navbar_start": ["navbar-logo"],
+    # "navbar_center": [],
+    # "navbar_end": [],
     "logo": {
         "text": "pymoo",
         "image_light": "_static/logo.svg",
-    }
+    },
+    "nosidebar": True,  # Disable the right sidebar
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

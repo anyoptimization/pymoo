@@ -1,53 +1,24 @@
-/* Hide most of the header but keep essential structure */
-.bd-header {
-    height: 0;
-    overflow: hidden;
-    padding: 0;
-    margin: 0;
-    border: none;
-}
-
-/* Show sidebar toggle button on mobile/small screens */
-@media (max-width: 992px) {
-    .bd-header {
-        display: flex !important;
-        height: auto;
-        min-height: 50px;
-        padding: 10px;
-        background: white;
-        border-bottom: 1px solid #dee2e6;
-    }
-    
-    /* Hide everything except the sidebar toggle */
-    .bd-header > * {
-        display: none;
-    }
-    
-    .bd-header .sidebar-toggle,
-    .bd-header button[data-bs-toggle="offcanvas"] {
-        display: block !important;
-        margin: 0;
-        padding: 8px 12px;
-        background: #6c757d;
-        border: 1px solid #6c757d;
-        border-radius: 4px;
-        color: white;
-    }
-}
-
-/* Hide right sidebar (table of contents) */
+/* Make right sidebar invisible but keep it as white space/padding */
 .bd-sidebar-secondary {
+    visibility: hidden !important;
+    background: white !important;
+}
+
+/* Hide all content inside the right sidebar */
+.bd-sidebar-secondary * {
     display: none !important;
 }
 
-/* Hide dark mode theme switcher */
+/* Hide theme toggle button */
 .theme-switch-button,
-.bd-header .theme-switch-button,
 button[title*="light"],
 button[title*="dark"],
-.theme-switcher {
+button[title*="theme"],
+.bd-header .theme-switcher {
     display: none !important;
 }
+
+/* Keep original layout spacing since sidebar is still there as white space */
 
 /* Force light theme */
 html[data-theme="dark"],
@@ -64,7 +35,7 @@ body {
     color: #212529 !important;
 }
 
-/* Main content styling inspired by old my-wrapper */
+/* Main content styling */
 .bd-article-container {
     color: #515151;
     font-family: "PT Sans", Helvetica, Arial, sans-serif;
@@ -72,61 +43,42 @@ body {
     font-size: 15px;
     line-height: 1.5em;
     letter-spacing: 0.2px;
-    max-width: 90%;
-    margin: 0 auto;
-    padding: 0 2rem;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 1rem !important;
 }
 
 /* Adjust main container layout */
 .bd-container {
     padding-top: 0;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: none !important;
 }
 
-/* Left sidebar - keep default styling */
-.bd-sidebar-primary {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    overflow-y: auto;
-}
-
-/* Mobile sidebar toggle functionality */
-@media (max-width: 992px) {
-    .bd-sidebar-primary {
-        position: fixed;
-        left: -100%;
-        top: 0;
-        width: 280px;
-        z-index: 1040;
-        background: white;
-        transition: left 0.3s ease;
-        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .bd-article-container {
+        font-size: 14px;
+        padding: 0 0.5rem;
     }
     
-    .bd-sidebar-primary.show {
-        left: 0;
-    }
-    
-    /* Overlay when sidebar is open */
-    body.sidebar-open::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 1030;
-    }
-    
-    /* Adjust main content when sidebar is hidden on mobile */
-    .bd-main {
-        margin-left: 0 !important;
+    .pymoo-icon {
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 
+@media (max-width: 480px) {
+    .bd-article-container {
+        padding: 0 0.25rem;
+    }
+}
 
-/* Add pymoo buttons to sidebar */
+/* Sidebar buttons styling */
 .pymoo-sidebar-buttons {
     padding: 15px;
     border-bottom: 1px solid #dee2e6;
@@ -165,130 +117,11 @@ body {
     text-align: center;
 }
 
-/* Newsletter modal styling */
-#newsletter-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1050;
-    display: none;
-    overflow-x: hidden;
-    overflow-y: auto;
-    outline: 0;
-}
-
-#newsletter-modal.show {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-}
-
-#newsletter-modal .modal-dialog {
-    position: relative;
-    width: 90%;
-    max-width: 500px;
-    margin: 1.75rem auto;
-    z-index: 1051;
-}
-
-#newsletter-modal .modal-content {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    background-color: #fff;
-    border: 1px solid rgba(0,0,0,.2);
-    border-radius: .3rem;
-    box-shadow: 0 .25rem .5rem rgba(0,0,0,.5);
-    z-index: 1052;
-}
-
-#newsletter-modal .modal-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 1rem 1rem;
-    border-bottom: 1px solid #dee2e6;
-    border-top-left-radius: .3rem;
-    border-top-right-radius: .3rem;
-    position: relative;
-}
-
-#newsletter-modal .modal-body {
-    position: relative;
-    flex: 1 1 auto;
-    padding: 1rem;
-}
-
-#newsletter-modal .close {
-    color: #000;
-    opacity: .5;
-    z-index: 1053;
-    position: relative;
-}
-
-#newsletter-modal .close:hover {
-    opacity: .75;
-}
-
-/* Form styling within modal */
-#newsletter-modal .form-control {
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
-    width: 100%;
-}
-
-#newsletter-modal .btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    border: none;
-    cursor: pointer;
-}
-
-#newsletter-modal .btn-primary:hover {
-    background-color: #0056b3;
-}
-
-/* Disable Bootstrap ScrollSpy to prevent selector errors */
-[data-bs-spy="scroll"] {
-    position: static !important;
-}
-
-/* Prevent Bootstrap from initializing ScrollSpy on invalid selectors */
-.bd-main {
-    scroll-behavior: auto !important;
-}
-
-/* Prevent FontAwesome font preloading to reduce console warnings */
-link[rel="preload"][href*="fontawesome"] {
-    display: none !important;
-}
-
-link[rel="preload"][href*="fa-regular"] {
-    display: none !important;
-}
-
-link[rel="preload"][href*="fa-solid"] {
-    display: none !important;
-}
-
-link[rel="preload"][href*="fa-brands"] {
-    display: none !important;
-}
-
-/* Navigation link styling from old CSS */
+/* Basic styling */
 .nav a {
     color: #5a5a5a !important;
 }
 
-/* Portfolio heading styling from old CSS */
 .portfolio-heading {
     font-weight: 400;
     font-size: 1.44em;
@@ -302,26 +135,22 @@ link[rel="preload"][href*="fa-brands"] {
     color: black !important;
 }
 
-/* Table styling from old CSS */
 .my-table {
     margin: 10px 0px;
     font-size: 12.5px;
     width: 80%;
 }
 
-/* Fix new-flag size */
 .new-flag {
     height: 2em;
     display: inline;
     vertical-align: text-top;
 }
 
-/* Ensure strong and bold text is properly bold */
 strong, b {
     font-weight: 700 !important;
 }
 
-/* Link styling - blue by default, underlined on hover only */
 .bd-article-container a {
     color: #007bff;
     text-decoration: none;
@@ -331,13 +160,11 @@ strong, b {
     text-decoration: underline;
 }
 
-/* Table row hover styling - more noticeable */
 .bd-article-container table tbody tr:hover {
     background-color: #e3f2fd !important;
     transition: background-color 0.2s ease;
 }
 
-/* Clean footer and section styling */
 .footer {
     border: 0 !important;
 }

@@ -79,51 +79,97 @@ def install_pymoo():
             return False
 
 
-def smart_build(force=False):
-    """Smart build: find missing notebooks, convert and execute in batches, then build."""
-    print("🚀 Starting smart documentation build...")
+def compile_notebooks(force=False, files=None):
+    """Convert .md files to .ipynb notebooks."""
+    print("📝 Starting notebook compilation...")
     
-    # Find all .md files recursively
-    all_md_files = glob.glob("source/**/*.md", recursive=True)
-    
-    if force:
-        # Process all .md files when force is enabled
-        md_to_process = all_md_files
-        print(f"🔄 Force mode: Processing all {len(md_to_process)} markdown files")
+    if files:
+        # Process specific files provided as arguments
+        md_to_process = files
+        print(f"📋 Processing {len(md_to_process)} specified files")
     else:
-        # Only process .md files that don't have corresponding .ipynb files
-        md_to_process = []
-        for md_file in all_md_files:
-            nb_file = Path(md_file).with_suffix('.ipynb')
-            if not nb_file.exists():
-                md_to_process.append(md_file)
+        # Find all .md files recursively
+        all_md_files = glob.glob("source/**/*.md", recursive=True)
         
-        print(f"📋 Found {len(md_to_process)} markdown files without notebooks (out of {len(all_md_files)} total)")
+        if force:
+            # Process all .md files when force is enabled
+            md_to_process = all_md_files
+            print(f"🔄 Force mode: Processing all {len(md_to_process)} markdown files")
+        else:
+            # Only process .md files that don't have corresponding .ipynb files
+            md_to_process = []
+            for md_file in all_md_files:
+                nb_file = Path(md_file).with_suffix('.ipynb')
+                if not nb_file.exists():
+                    md_to_process.append(md_file)
+            
+            print(f"📋 Found {len(md_to_process)} markdown files without notebooks (out of {len(all_md_files)} total)")
     
     if not md_to_process:
         print("✅ All notebooks already exist. Use --force to regenerate all.")
-    else:
-        # Step 1: Convert all needed .md files to .ipynb in one batch
-        print(f"📝 Converting {len(md_to_process)} markdown files to notebooks...")
-        run_command([
-            "python", "-m", "jupytext", 
-            "--to", "notebook"
-        ] + md_to_process)
-        print("✅ Notebook conversion completed")
-        
-        # Step 2: Execute all newly created notebooks in one batch
-        nb_files = [str(Path(md_file).with_suffix('.ipynb')) for md_file in md_to_process]
-        print(f"⚡ Executing {len(nb_files)} notebooks...")
-        run_command([
-            "python", "-m", "jupyter", "nbconvert",
-            "--execute", "--inplace"
-        ] + nb_files)
-        print("✅ Notebook execution completed")
+        return
     
-    # Step 3: Build HTML documentation
-    print("🏗️  Building HTML documentation...")
-    build_html()
-    print("🎉 Smart build completed!")
+    # Convert all needed .md files to .ipynb in one batch
+    print(f"📝 Converting {len(md_to_process)} markdown files to notebooks...")
+    run_command([
+        "python", "-m", "jupytext", 
+        "--to", "notebook"
+    ] + md_to_process)
+    print("✅ Notebook compilation completed")
+
+
+def run_notebooks(force=False, files=None):
+    """Execute .ipynb notebooks, deleting those that fail."""
+    print("⚡ Starting notebook execution...")
+    
+    if files:
+        # Process specific files provided as arguments
+        nb_files = [str(Path(f).with_suffix('.ipynb')) for f in files]
+        print(f"📋 Processing {len(nb_files)} specified notebooks")
+    else:
+        # Find all .ipynb files that have corresponding .md files
+        all_md_files = glob.glob("source/**/*.md", recursive=True)
+        all_nb_files = [str(Path(md_file).with_suffix('.ipynb')) for md_file in all_md_files]
+        
+        if force:
+            # Process all notebooks when force is enabled
+            nb_files = [nb for nb in all_nb_files if Path(nb).exists()]
+            print(f"🔄 Force mode: Processing all {len(nb_files)} existing notebooks")
+        else:
+            # Only process notebooks that exist (skip missing ones)
+            nb_files = [nb for nb in all_nb_files if Path(nb).exists()]
+            print(f"📋 Found {len(nb_files)} existing notebooks to execute")
+    
+    if not nb_files:
+        print("✅ No notebooks found to execute.")
+        return
+    
+    # Execute notebooks individually and delete if execution fails
+    print(f"⚡ Executing {len(nb_files)} notebooks individually...")
+    
+    failed_files = []
+    for nb_file in nb_files:
+        print(f"   Executing: {nb_file}")
+        result = run_command([
+            "python", "-m", "jupyter", "nbconvert",
+            "--execute", "--inplace", nb_file
+        ], check=False)
+        
+        if result.returncode != 0:
+            print(f"   ❌ Execution failed for {nb_file} - deleting notebook")
+            Path(nb_file).unlink(missing_ok=True)
+            failed_files.append(nb_file)
+        else:
+            print(f"   ✅ Successfully executed {nb_file}")
+    
+    if failed_files:
+        print(f"⚠️  {len(failed_files)} notebooks failed execution and were deleted:")
+        for failed_file in failed_files:
+            print(f"   - {failed_file}")
+        print("   These will be recompiled on next compile run.")
+    
+    successful_count = len(nb_files) - len(failed_files)
+    print(f"✅ Notebook execution completed: {successful_count}/{len(nb_files)} successful")
 
 
 def build_html():
@@ -202,16 +248,18 @@ def main():
         epilog="""
 Examples:
   uvx pymoo-docs clean                           # Clean all generated files
-  uvx pymoo-docs compile                         # Convert all .md to .ipynb
-  uvx pymoo-docs compile --skip-existing         # Only convert missing notebooks
+  uvx pymoo-docs compile                         # Convert missing .md to .ipynb
   uvx pymoo-docs compile --force                 # Force regenerate all notebooks
   uvx pymoo-docs compile file1.md file2.md      # Convert specific files
   uvx pymoo-docs compile algorithms/nsga2.md    # Convert single file
+  uvx pymoo-docs run                             # Execute existing notebooks
+  uvx pymoo-docs run --force                     # Force re-execute all notebooks
+  uvx pymoo-docs run file1.md file2.md          # Execute specific notebooks
   uvx pymoo-docs build                           # Build HTML documentation
   uvx pymoo-docs serve                           # Serve documentation locally
   uvx pymoo-docs check                           # Fast build for testing
-  uvx pymoo-docs all                             # Clean, compile, and build
-  uvx pymoo-docs all --skip-existing             # Full build, skip existing notebooks
+  uvx pymoo-docs all                             # Compile, run, and build
+  uvx pymoo-docs all --force                     # Force full rebuild
         """
     )
     
@@ -229,14 +277,22 @@ Examples:
         help="Force compilation of all files"
     )
     compile_parser.add_argument(
-        "--skip-existing",
-        action="store_true",
-        help="Skip files that already have notebooks"
-    )
-    compile_parser.add_argument(
         "files",
         nargs="*",
         help="Specific files to compile (optional)"
+    )
+    
+    # Run command
+    run_parser = subparsers.add_parser("run", help="Execute .ipynb notebooks")
+    run_parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force execution of all notebooks"
+    )
+    run_parser.add_argument(
+        "files",
+        nargs="*",
+        help="Specific files to run (optional)"
     )
     
     # Build command
@@ -255,16 +311,11 @@ Examples:
     check_parser = subparsers.add_parser("check", help="Fast build for testing")
     
     # All command
-    all_parser = subparsers.add_parser("all", help="Clean, compile, and build")
-    all_parser.add_argument(
-        "--skip-existing",
-        action="store_true",
-        help="Skip files that already have notebooks"
-    )
+    all_parser = subparsers.add_parser("all", help="Compile, run, and build")
     all_parser.add_argument(
         "--force",
         action="store_true",
-        help="Force compilation of all files"
+        help="Force compilation and execution of all files"
     )
     
     args = parser.parse_args()
@@ -300,15 +351,16 @@ Examples:
             sys.exit(1)
     
     # Install pymoo if needed for build commands
-    if args.command in ["compile", "build", "check", "all"]:
+    if args.command in ["compile", "run", "build", "check", "all"]:
         install_pymoo()
     
     # Execute the requested command
     if args.command == "clean":
         clean_docs()
     elif args.command == "compile":
-        # Legacy compile command - use smart_build with force if specified
-        smart_build(force=args.force)
+        compile_notebooks(force=args.force, files=args.files)
+    elif args.command == "run":
+        run_notebooks(force=args.force, files=args.files)
     elif args.command == "build":
         build_html()
     elif args.command == "serve":
@@ -316,8 +368,9 @@ Examples:
     elif args.command == "check":
         check_mode()
     elif args.command == "all":
-        clean_docs()
-        smart_build(force=args.force)
+        compile_notebooks(force=args.force)
+        run_notebooks(force=args.force)
+        build_html()
         print("🎉 Full documentation build completed!")
 
 
