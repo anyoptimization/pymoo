@@ -44,9 +44,9 @@ Moreover, in *pymoo* there exist three different ways for defining a problem:
 .. admonition:: Overview
     :class: myOwnStyle
 
-    - `Problem <#nb-problem-definition-vectorized>`_: Object-oriented definition :code:`Problem` which implements a method evaluating a **set** of solutions.
-    - `ElementwiseProblem <#nb-problem-definition-elementwise>`_: Object-oriented definition :code:`ElementwiseProblem` which implements a function evaluating a **single** solution at a time. 
-    - `FunctionalProblem <#nb-problem-definition-functional>`_: Define a problem :code:`FunctionalProblem` by using a **function** for each objective and constraint.
+    - `Problem <#nb_problem_definition_vectorized>`_: Object-oriented definition :code:`Problem` which implements a method evaluating a **set** of solutions.
+    - `ElementwiseProblem <#nb_problem_definition_elementwise>`_: Object-oriented definition :code:`ElementwiseProblem` which implements a function evaluating a **single** solution at a time. 
+    - `FunctionalProblem <#nb_problem_definition_functional>`_: Define a problem :code:`FunctionalProblem` by using a **function** for each objective and constraint.
 ```
 
 ```{raw-cell}

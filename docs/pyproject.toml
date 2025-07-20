@@ -1,0 +1,117 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pymoo-docs"
+version = "0.1.0"
+description = "Documentation builder for pymoo"
+authors = [
+    {name = "Julian Blank", email = "blankjul@msu.edu"}
+]
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Apache-2.0"}
+
+dependencies = [
+    # Core documentation dependencies
+    "sphinx>=3.5.4,<8.0",
+    "jinja2>=2.10.1,<4.0",
+    "markupsafe>=1.1.1,<3.0",
+    "sphinxcontrib-serializinghtml>=1.1.4,<2.0",
+    "sphinxcontrib-applehelp>=1.0.4,<2.0",
+    "nbsphinx>=0.8.8,<1.0",
+    "pydata-sphinx-theme>=0.13.0,<0.16.0",
+    "sphinx-book-theme>=1.0.0,<2.0",
+    "sphinxcontrib-bibtex>=1.0.0,<3.0",
+    "sphinx-copybutton",
+    "numpydoc",
+    "wrapt",  # Required by pymoo's Meta classes
+    "alive-progress",  # Required by pymoo algorithms
+    
+    # Jupyter and notebook support
+    "ipython",
+    "ipykernel",
+    "jupyter",
+    "jupyterlab",
+    "nbconvert",
+    "nbformat",
+    "jupytext",
+    
+    # Core scientific computing
+    "numpy>=1.19.3,<3.0",
+    "scipy>=1.1,<2.0",
+    "matplotlib>=3.0,<4.0",
+    "pandas>=1.0,<3.0",
+    "numba",
+    
+    # Optimization and ML
+    "autograd>=1.4",
+    "scikit-learn",
+    "optuna",
+    "joblib",
+    "dask[distributed]",
+    
+    # Visualization
+    "seaborn",
+    "plotly",
+    "bokeh",
+    "holoviews",
+    "panel",
+    "datashader",
+    
+    # Additional dependencies
+    "dill",
+    "torch",
+    "cython>=3.0",
+    "pygments",
+    "beautifulsoup4",
+    "moocore>=0.1.7",
+    
+    # Build and development tools
+    "setuptools",
+    "wheel",
+    "build",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "isort",
+    "flake8",
+    "mypy",
+]
+
+[project.urls]
+Homepage = "https://pymoo.org"
+Documentation = "https://pymoo.org"
+Repository = "https://github.com/anyoptimization/pymoo"
+
+[project.scripts]
+pymoo-docs = "cli:main"
+
+[tool.setuptools]
+py-modules = ["cli"]
+
+[tool.setuptools.package-data]
+"*" = ["*.md", "*.rst", "*.txt", "*.yml", "*.yaml", "*.json", "*.toml"]
+
+# Black configuration
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+
+# isort configuration  
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+# pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

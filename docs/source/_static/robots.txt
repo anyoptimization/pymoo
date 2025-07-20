@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Block crawling of archive.julianblank.com
+Disallow: /archive.julianblank.com/
+Disallow: /*archive.julianblank.com*
+
+# Common crawl optimizations
+Crawl-delay: 1
+
+# Sitemap location (if you have one)
+# Sitemap: https://pymoo.org/sitemap.xml

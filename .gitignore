@@ -40,6 +40,8 @@ pymoo/cache/*
 pymoo/data
 pymoo/docs/build
 pymoo/docs/nbconvert
+.claude
+.kiro
 
 
 benchmark/runs/*

@@ -42,10 +42,28 @@ class DocsManager:
         try:
             nb = jupytext.read(md_file)
             nb_file = md_file.with_suffix('.ipynb')
-            jupytext.write(nb, nb_file)
+            self._write_notebook_with_fixed_lexer(nb, nb_file)
             return True, "Conversion successful"
         except Exception as e:
             return False, f"Conversion failed: {str(e)}"
+    
+    def _write_notebook_with_fixed_lexer(self, nb, nb_file: Path):
+        """Write notebook with corrected lexer settings."""
+        # Fix jupytext metadata
+        if 'jupytext' in nb.metadata and 'default_lexer' in nb.metadata['jupytext']:
+            if nb.metadata['jupytext']['default_lexer'] in ['ipython3', 'ipython']:
+                nb.metadata['jupytext']['default_lexer'] = 'python3'
+        
+        # Fix language_info metadata
+        if 'language_info' not in nb.metadata:
+            nb.metadata['language_info'] = {"name": "python", "pygments_lexer": "python3"}
+        elif 'pygments_lexer' in nb.metadata['language_info']:
+            if nb.metadata['language_info']['pygments_lexer'] in ['ipython3', 'ipython']:
+                nb.metadata['language_info']['pygments_lexer'] = 'python3'
+        
+        # Write the notebook
+        with open(nb_file, 'w') as f:
+            nbformat.write(nb, f)
     
     def execute_notebook(self, nb_file: Path) -> Tuple[bool, str, float]:
         """Execute notebook and return success, message, and execution time."""
@@ -59,9 +77,8 @@ class DocsManager:
             ep.preprocess(nb, {'metadata': {'path': str(nb_file.parent)}})
             execution_time = time.time() - start_time
             
-            # Write back the executed notebook
-            with open(nb_file, 'w') as f:
-                nbformat.write(nb, f)
+            # Write back the executed notebook with fixed lexer
+            self._write_notebook_with_fixed_lexer(nb, nb_file)
             
             return True, f"Executed successfully in {execution_time:.2f}s", execution_time
             
@@ -106,12 +123,15 @@ def test_documentation_file(md_file: Path):
     nb_file = md_file.with_suffix('.ipynb')
     relative_path = md_file.relative_to(docs_manager.docs_source)
 
-    # Convert markdown to notebook if needed
-    if not nb_file.exists():
-        success, message = docs_manager.convert_to_notebook(md_file)
-        if not success:
-            pytest.fail(f"Failed to convert {relative_path}: {message}")
+    # Always delete existing notebook first to ensure fresh conversion
+    if nb_file.exists():
+        nb_file.unlink()
     
+    # Convert markdown to notebook
+    success, message = docs_manager.convert_to_notebook(md_file)
+    if not success:
+        pytest.fail(f"Failed to convert {relative_path}: {message}")
+
     # Execute the notebook
     success, message, exec_time = docs_manager.execute_notebook(nb_file)
     

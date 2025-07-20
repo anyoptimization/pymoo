@@ -16,7 +16,7 @@ from os.path import dirname
 SOURCE = os.path.dirname(os.path.realpath(__file__))
 
 sys.path.insert(0, SOURCE)
-from _theme import *
+# from _theme import *  # Disabled custom theme imports
 
 ROOT = dirname(dirname(SOURCE))
 sys.path.insert(0, ROOT)
@@ -56,6 +56,8 @@ extensions = [
     'matplotlib.sphinxext.plot_directive',
     'sphinxcontrib.bibtex',
     'sphinx_copybutton',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.githubpages',
 ]
 
 bibtex_bibfiles = ['references.bib']
@@ -66,15 +68,47 @@ bibtex_bibfiles = ['references.bib']
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = '_theme'
-html_theme_path = ['.']
+html_theme = 'sphinx_book_theme'
+# html_theme_path = ['.']  # Disabled custom theme
 html_logo = "_static/logo.svg"
 html_favicon = '_static/favicon.ico'
+
+# Sphinx Book Theme configuration
+html_theme_options = {
+    "use_repository_button": False,
+    "use_issues_button": False,
+    "use_download_button": False,
+    "use_edit_page_button": False,
+    "show_navbar_depth": 1,
+    "collapse_navigation": True,
+    "navigation_depth": 1,
+    "navbar_end": [],
+    "navbar_center": [],
+    "navbar_start": ["navbar-logo"],
+    "logo": {
+        "text": "pymoo",
+        "image_light": "_static/logo.svg",
+    }
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# Add custom CSS
+html_css_files = [
+    'css/custom.css',
+]
+
+# Add custom JS
+html_js_files = [
+    'js/pymoo-sidebar.js',
+]
+
+# Copy specific files to the root of the build directory
+html_extra_path = ['_static/llms.txt', '_static/robots.txt']
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -97,28 +131,13 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
 
 # Exclude build directory and Jupyter backup files:
 exclude_patterns = ['build', '**.ipynb_checkpoints']
-if DEBUG:
-    # exclude_patterns.append("**ipynb")
 
+# Check mode for fast testing (triggered by make check)
+CHECK_MODE = os.environ.get('PYMOO_DOCS_CHECK_MODE', '0') == '1'
 
-    # exclude_patterns.append("getting_started*")
-    # exclude_patterns.append("interface*")
-    # exclude_patterns.append("problems*")
-    #
-    # exclude_patterns.append("problems/single/*")
-    # exclude_patterns.append("problems/multi/*")
-    # exclude_patterns.append("problems/many/*")
-    # exclude_patterns.append("problems/constrained/*")
-    #
-    # exclude_patterns.append("algorithms*")
-    # exclude_patterns.append("customization*")
-    # exclude_patterns.append("operators*")
-    # exclude_patterns.append("visualization*")
-    # exclude_patterns.append("api*")
-    # exclude_patterns.append("decision_making*")
-    # exclude_patterns.append("misc*")
-
-    pass
+if CHECK_MODE:
+    print("Fast check mode enabled - excluding all ipynb files for faster testing")
+    exclude_patterns.append("**/*.ipynb")
 
 
 # Default language for syntax highlighting in reST and Markdown cells
@@ -151,7 +170,7 @@ nbsphinx_execute_arguments = [
 # nbsphinx_timeout = 60
 
 # Default Pygments lexer for syntax highlighting in code cells:
-# nbsphinx_codecell_lexer = 'ipython3'
+nbsphinx_codecell_lexer = 'python'
 
 # Width of input/output prompts used in CSS:
 # nbsphinx_prompt_width = '8ex'
@@ -210,4 +229,5 @@ copybutton_copy_empty_lines = False
 
 # Disable RequireJS to avoid conflicts with clipboard.min.js
 nbsphinx_requirejs_path = ""
+
 
