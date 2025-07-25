@@ -5,6 +5,12 @@ News
 ==============================================================================
 
 
+**May 26, 2025:** A new pymoo version **0.6.1.5** has been released with further refinements and bug fixes to ensure stability and performance across different environments.
+
+**July 28, 2024:** We are excited to announce pymoo version **0.6.1.3** with significant improvements! This release brings **NumPy 2.0 compatibility**, ensuring pymoo works seamlessly with the latest scientific computing ecosystem. We've also made **Autograd optional** for automatic differentiation, incorporated numerous bug fixes from community pull requests, and improved overall stability. (:ref:`Release Notes<version_0_6_1_3>`)
+
+**December 11, 2022:** Following the major 0.6.0 release, we've published pymoo **0.6.0.1** with important bug fixes and stability improvements to address issues discovered by the community.
+
 **July 11, 2022:** It just happened. The new pymoo (version **0.6.0**) version has been released. Many things happened under the hood; however, the code base has changed quite a bit. The individual class has been reimplemented, and the meta algorithms can now be constructed much simpler. New algorithms have been added (G3PXC, RVEA, SMS-EMOA), and dynamic optimization problems and a simple implementation of D-NSGA-II are available. For more details, please have a look at the changelogs. (:ref:`Release Notes<version_0_6_0>`)
 
 

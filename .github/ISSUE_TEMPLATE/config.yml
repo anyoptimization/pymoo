@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Documentation
+    url: https://pymoo.org
+    about: Check the documentation first
+  - name: 💬 Discussions
+    url: https://github.com/anyoptimization/pymoo/discussions
+    about: Ask questions and discuss ideas

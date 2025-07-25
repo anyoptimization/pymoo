@@ -20,6 +20,48 @@ button[title*="theme"],
 
 /* Keep original layout spacing since sidebar is still there as white space */
 
+/* Make left sidebar wider (about 50% increase) without creating gaps */
+.bd-sidebar-primary {
+    width: 375px !important;
+    min-width: 375px !important;
+    flex: 0 0 375px !important;
+}
+
+/* Ensure main content flows right next to sidebar without gap */
+.bd-main {
+    margin-left: 0 !important;
+}
+
+/* When sidebar is hidden, expand main content to full width */
+.bd-container.hide-primary .bd-main {
+    margin-left: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+.bd-container.hide-primary .bd-article-container {
+    max-width: none !important;
+    width: 100% !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .bd-sidebar-primary {
+        width: 320px !important;
+        min-width: 320px !important;
+        flex: 0 0 320px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .bd-sidebar-primary {
+        width: 280px !important;
+        min-width: 280px !important;
+        flex: 0 0 280px !important;
+    }
+}
+
+
 /* Force light theme */
 html[data-theme="dark"],
 html[data-theme="auto"] {
@@ -177,3 +219,4 @@ strong, b {
 .section-nav {
     border-left: 0 !important;
 }
+

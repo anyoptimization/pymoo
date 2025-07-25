@@ -1,0 +1,45 @@
+name: Bug Report
+description: Report a bug in pymoo
+title: "[BUG] "
+labels: ["bug"]
+
+body:
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues
+          required: true
+        - label: I'm using the latest pymoo version
+          required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: What's wrong?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal Code to Reproduce
+      render: python
+    validations:
+      required: true
+
+  - type: textarea
+    id: error
+    attributes:
+      label: Error Message
+      render: shell
+
+  - type: input
+    id: version
+    attributes:
+      label: PyMoo & Python Version
+      placeholder: "pymoo 0.6.1.5, Python 3.9"
+    validations:
+      required: true

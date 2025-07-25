@@ -1,0 +1,9 @@
+{% extends "sphinx_book_theme/layout.html" %}
+
+{# Inject JavaScript to fix edit button URLs #}
+{% block footer %}
+  {{ super() }}
+  {% if fix_edit_urls_js %}
+    {{ fix_edit_urls_js | safe }}
+  {% endif %}
+{% endblock %}

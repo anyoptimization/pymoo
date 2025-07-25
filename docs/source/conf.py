@@ -75,10 +75,14 @@ html_favicon = '_static/favicon.ico'
 
 # Sphinx Book Theme configuration
 html_theme_options = {
-    "use_repository_button": False,
-    "use_issues_button": False,
+    "repository_url": "https://github.com/anyoptimization/pymoo",
+    "repository_branch": "main",
+    "path_to_docs": "docs/source",
+    "use_repository_button": True,
+    "use_issues_button": True,
     "use_download_button": False,
-    "use_edit_page_button": False,
+    "use_edit_page_button": True,
+    "use_source_button": True,
     "show_navbar_depth": 1,
     "collapse_navigation": True,
     "navigation_depth": 1,
@@ -231,5 +235,45 @@ copybutton_copy_empty_lines = False
 
 # Disable RequireJS to avoid conflicts with clipboard.min.js
 nbsphinx_requirejs_path = ""
+
+# ===========================================================================
+# Custom Source File Mapping for Edit Button
+# ===========================================================================
+
+def setup(app):
+    """
+    Custom setup function to modify the source file mapping.
+    This ensures that the "Edit Source" button links to .md files instead of .ipynb files.
+    """
+    def html_page_context(app, pagename, templatename, context, doctree):
+        """
+        Add JavaScript to fix edit button URLs to point to .md files.
+        """
+        # Add JavaScript that will fix the edit button URLs after page load
+        fix_edit_urls_js = """
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Find all edit and source buttons and fix their URLs
+            const editButtons = document.querySelectorAll('a[href*="/edit/"], a[href*="/blob/"]');
+            editButtons.forEach(button => {
+                if (button.href.includes('.ipynb')) {
+                    button.href = button.href.replace('.ipynb', '.md');
+                }
+            });
+        });
+        </script>
+        """
+        
+        # Add the JavaScript to the page context
+        context['fix_edit_urls_js'] = fix_edit_urls_js
+    
+    # Connect the function to the html-page-context event
+    app.connect('html-page-context', html_page_context)
+    
+    return {
+        'version': '1.0',
+        'parallel_read_safe': True,
+        'parallel_write_safe': True,
+    }
 
 

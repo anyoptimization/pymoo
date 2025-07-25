@@ -34,6 +34,18 @@ kernelspec:
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
 
+.. _version_0_6_1_5:
+```
+
+#### 0.6.1.5 [[Documentation](http://archive.pymoo.org/0.6.1.5/)]
+
+- Additional bug fixes and stability improvements
+- Enhanced compatibility across different environments
+- Performance optimizations
+
+```{raw-cell}
+:raw_mimetype: text/restructuredtext
+
 .. _version_0_6_1_3:
 ```
 
