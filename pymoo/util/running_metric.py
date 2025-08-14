@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 
 from pymoo.core.callback import Callback
@@ -7,7 +6,7 @@ from pymoo.indicators.igd import IGD
 from pymoo.termination.ftol import calc_delta_norm
 from pymoo.util.normalization import normalize
 from pymoo.util.sliding_window import SlidingWindow
-from pymoo.visualization.video.callback_video import AnimationCallback
+from pymoo.visualization.matplotlib import is_matplotlib_available
 
 
 class RunningMetric(Callback):
@@ -64,65 +63,69 @@ class RunningMetric(Callback):
 
         self.delta_ideal, self.delta_nadir, self.delta_f = delta_ideal, delta_nadir, delta_f
 
+if is_matplotlib_available():
+    # only conditionally define `RunningMetricAnimation` if matplotlib is available
+    from pymoo.visualization.matplotlib import plt
+    from pymoo.visualization.video.callback_video import AnimationCallback
 
-class RunningMetricAnimation(AnimationCallback):
+    class RunningMetricAnimation(AnimationCallback):
 
-    def __init__(self,
-                 delta_gen,
-                 n_plots=4,
-                 key_press=True,
-                 **kwargs) -> None:
+        def __init__(self,
+                    delta_gen,
+                    n_plots=4,
+                    key_press=True,
+                    **kwargs) -> None:
 
-        super().__init__(**kwargs)
-        self.running = RunningMetric()
-        self.delta_gen = delta_gen
-        self.key_press = key_press
-        self.data = SlidingWindow(n_plots)
+            super().__init__(**kwargs)
+            self.running = RunningMetric()
+            self.delta_gen = delta_gen
+            self.key_press = key_press
+            self.data = SlidingWindow(n_plots)
 
-    def draw(self, data, ax):
+        def draw(self, data, ax):
 
-        for tau, x, f, v in data[:-1]:
-            ax.plot(x, f, label="t=%s" % tau, alpha=0.6, linewidth=3)
+            for tau, x, f, v in data[:-1]:
+                ax.plot(x, f, label="t=%s" % tau, alpha=0.6, linewidth=3)
 
-        tau, x, f, v = data[-1]
-        ax.plot(x, f, label="t=%s (*)" % tau, alpha=0.9, linewidth=3)
+            tau, x, f, v = data[-1]
+            ax.plot(x, f, label="t=%s (*)" % tau, alpha=0.9, linewidth=3)
 
-        for k in range(len(v)):
-            if v[k]:
-                ax.plot([k + 1, k + 1], [0, f[k]], color="black", linewidth=0.5, alpha=0.5)
-                ax.plot([k + 1], [f[k]], "o", color="black", alpha=0.5, markersize=2)
+            for k in range(len(v)):
+                if v[k]:
+                    ax.plot([k + 1, k + 1], [0, f[k]], color="black", linewidth=0.5, alpha=0.5)
+                    ax.plot([k + 1], [f[k]], "o", color="black", alpha=0.5, markersize=2)
 
-        ax.set_yscale("symlog")
-        ax.legend()
+            ax.set_yscale("symlog")
+            ax.legend()
 
-        ax.set_xlabel("Generation")
-        ax.set_ylabel("$\Delta \, f$", rotation=0)
+            ax.set_xlabel("Generation")
+            ax.set_ylabel("$\Delta \, f$", rotation=0)
 
-    def do(self, _, algorithm, force_plot=False, **kwargs):
-        running = self.running
+        def do(self, _, algorithm, force_plot=False, **kwargs):
+            running = self.running
 
-        # update the running metric to have the most recent information
-        running.update(algorithm)
+            # update the running metric to have the most recent information
+            running.update(algorithm)
 
-        tau = algorithm.n_gen
+            tau = algorithm.n_gen
 
-        if (tau > 0 and tau % self.delta_gen == 0) or force_plot:
+            if (tau > 0 and tau % self.delta_gen == 0) or force_plot:
 
-            f = running.delta_f
-            x = np.arange(len(f)) + 1
-            v = [max(ideal, nadir) > 0.005 for ideal, nadir in zip(running.delta_ideal, running.delta_nadir)]
-            self.data.append((tau, x, f, v))
+                f = running.delta_f
+                x = np.arange(len(f)) + 1
+                v = [max(ideal, nadir) > 0.005 for ideal, nadir in zip(running.delta_ideal, running.delta_nadir)]
+                self.data.append((tau, x, f, v))
 
-            fig, ax = plt.subplots()
-            self.draw(self.data, ax)
+                fig, ax = plt.subplots()
+                self.draw(self.data, ax)
 
-            if self.key_press:
-                def press(event):
-                    if event.key == 'q':
-                        algorithm.termination.force_termination = True
+                if self.key_press:
+                    def press(event):
+                        if event.key == 'q':
+                            algorithm.termination.force_termination = True
 
-                fig.canvas.mpl_connect('key_press_event', press)
+                    fig.canvas.mpl_connect('key_press_event', press)
 
-                plt.draw()
-                plt.waitforbuttonpress()
-                plt.close('all')
+                    plt.draw()
+                    plt.waitforbuttonpress()
+                    plt.close('all')

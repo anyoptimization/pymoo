@@ -24,7 +24,7 @@ try:
     # Export all commonly used matplotlib objects
     __all__ = [
         'matplotlib', 'plt', 'patches', 'colors', 'cm', 'animation', 
-        'LineCollection', 'PatchCollection', 'ListedColormap', 'is_available'
+        'LineCollection', 'PatchCollection', 'ListedColormap', 'is_matplotlib_available'
     ]
     
 except ImportError:
@@ -57,7 +57,7 @@ except ImportError:
     ListedColormap = _MatplotlibNotAvailable()
 
 
-def is_available():
+def is_matplotlib_available():
     """Check if matplotlib is available for visualization."""
     return _MATPLOTLIB_AVAILABLE
 
