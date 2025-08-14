@@ -129,3 +129,19 @@ if is_matplotlib_available():
                     plt.draw()
                     plt.waitforbuttonpress()
                     plt.close('all')
+else:
+    class RunningMetricAnimation:
+        """Helper class that raises informative errors when matplotlib is not available."""
+        
+        def __getattr__(self, name):
+            raise ImportError(
+                "Visualization features require matplotlib.\n"
+                "Install with: pip install pymoo[visualization]"
+            )
+        
+        def __call__(self, *args, **kwargs):
+            raise ImportError(
+                "Visualization features require matplotlib.\n"
+                "Install with: pip install pymoo[visualization]"
+            )
+    
