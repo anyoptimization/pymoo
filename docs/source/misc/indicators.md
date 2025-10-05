@@ -146,7 +146,7 @@ print("IGD+", ind(A))
 
 +++
 
-For all performance indicators shown so far, a target set needs to be known. For Hypervolume only a reference point needs to be provided. First, I would like to mention that we are using the Hypervolume implementation from [DEAP](https://deap.readthedocs.io/en/master/). It calculates the area/volume, which is dominated by the provided set of solutions with respect to a reference point.
+For all performance indicators shown so far, a target set needs to be known. For Hypervolume only a reference point needs to be provided. First, I would like to mention that we are using the Hypervolume implementation from [moocore](https://github.com/multi-objective/moocore). It calculates the area/volume, which is dominated by the provided set of solutions with respect to a reference point.
 
 +++
 
