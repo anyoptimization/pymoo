@@ -12,6 +12,19 @@ from pymoo.util.dominator import Dominator
 
 def fast_non_dominated_sort(F, dominator=Dominator(), **kwargs):
     """Fast non-dominated sorting algorithm."""
+    if F.size == 0:
+        return []
+    
+    n_points, n_objectives = F.shape
+    
+    # For single objective or single point, return immediately
+    if n_points <= 1:
+        return [list(range(n_points))] if n_points == 1 else []
+    
+    # For bi-objective problems, use specialized O(N log N) algorithm
+    if n_objectives == 2:
+        return _fast_biobjective_nondominated_sort(F)
+    
     if "dominator" in kwargs:
         M = Dominator.calc_domination_matrix(F)
     else:
@@ -38,8 +51,7 @@ def fast_non_dominated_sort(F, dominator=Dominator(), **kwargs):
     current_front = []
 
     for i in range(n):
-
-        for j in range(i + 1, n):
+        for j in range(i + 1, n):  
             rel = M[i, j]
             if rel == 1:
                 is_dominating[i].append(j)
@@ -58,12 +70,10 @@ def fast_non_dominated_sort(F, dominator=Dominator(), **kwargs):
 
     # while not all solutions are assigned to a pareto front
     while n_ranked < n:
-
         next_front = []
 
         # for each individual in the current front
         for i in current_front:
-
             # all solutions that are dominated by this individuals
             for j in is_dominating[i]:
                 n_dominated[j] -= 1
@@ -77,6 +87,59 @@ def fast_non_dominated_sort(F, dominator=Dominator(), **kwargs):
 
     return fronts
 
+
+def _fast_biobjective_nondominated_sort(F):
+    """
+    Specialized algorithm for bi-objective problems.
+    Uses the efficient skyline/multi-criteria approach with O(N log N) complexity.
+    """
+    n_points = F.shape[0]
+    
+    if n_points == 0:
+        return []
+    
+    # Sort by first objective ascending
+    sorted_indices = np.argsort(F[:, 0])
+    sorted_F = F[sorted_indices]
+    
+    fronts = []
+    assigned = [False] * n_points
+    n_assigned = 0
+    
+    while n_assigned < n_points:
+        current_front = []
+        current_indices = []
+        
+        # Track the minimum second objective seen in the current front
+        min_second_obj = float('inf')
+        
+        for i in range(n_points):
+            if assigned[i]:
+                continue
+                
+            # Check if current point is dominated by any point in current front  
+            is_dominated = False
+            if current_indices:  # If there are already points in the current front
+                # Since points are sorted by first objective, we only need to check 
+                # if its second objective is greater than the minimum second objective in front
+                if sorted_F[i, 1] >= min_second_obj:
+                    is_dominated = True
+            
+            if not is_dominated:
+                # Add this point to the current front
+                current_front.append(sorted_indices[i])
+                current_indices.append(i)
+                assigned[i] = True
+                n_assigned += 1
+                # Update the minimum second objective
+                min_second_obj = min(min_second_obj, sorted_F[i, 1])
+        
+        if current_front:
+            fronts.append(current_front)
+        else:
+            break
+    
+    return fronts
 
 def find_non_dominated(F, epsilon=0.0):
     """
