@@ -3,7 +3,7 @@ name = "pymoo"
 description = "Multi-Objective Optimization in Python"
 authors = [{ name = "Julian Blank", email = "blankjul@outlook.com" }]
 readme = "README.rst"
-license = "Apache-2.0"
+license = {text = "Apache-2.0"}
 classifiers = [
     'Intended Audience :: Developers',
     'Intended Audience :: Science/Research',
