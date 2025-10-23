@@ -49,19 +49,15 @@ jobs:
             # Ensure that a wheel builder finishes even if another fails
             fail-fast: false
             matrix:
-                os: [windows-latest, ubuntu-latest, macos-latest]
+                os: [windows-latest, ubuntu-latest, ubuntu-24.04-arm64, macos-latest]
                 python: [39, 310, 311, 312, 313, 314]
-                arch: [auto64, universal2, aarch64]
+                arch: [auto64, universal2]
                 build: ["cp"]
                 exclude:
                     - os: ubuntu-latest
                       arch: universal2
                     - os: windows-latest
                       arch: universal2
-                    - os: windows-latest
-                      arch: aarch64
-                    - os: macos-latest
-                      arch: aarch64
         steps:
             - uses: actions/checkout@v5
             - uses: astral-sh/setup-uv@v7
