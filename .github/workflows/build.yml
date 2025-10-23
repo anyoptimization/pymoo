@@ -56,6 +56,8 @@ jobs:
                 exclude:
                     - os: ubuntu-latest
                       arch: universal2
+                    - os: ubuntu-24.04-arm
+                      arch: universal2
                     - os: windows-latest
                       arch: universal2
         steps:
