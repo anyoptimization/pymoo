@@ -50,7 +50,7 @@ jobs:
             fail-fast: false
             matrix:
                 os: [windows-latest, ubuntu-latest, ubuntu-24.04-arm64, macos-latest]
-                python: [39, 310, 311, 312, 313, 314]
+                python: [310, 311, 312, 313, 314]
                 arch: [auto64, universal2]
                 build: ["cp"]
                 exclude:
