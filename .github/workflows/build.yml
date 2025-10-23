@@ -50,14 +50,18 @@ jobs:
             fail-fast: false
             matrix:
                 os: [windows-latest, ubuntu-latest, macos-latest]
-                python: [39, 310, 311, 312, 313]
-                arch: [auto64, universal2]
+                python: [39, 310, 311, 312, 313, 314]
+                arch: [auto64, universal2, aarch64]
                 build: ["cp"]
                 exclude:
                     - os: ubuntu-latest
                       arch: universal2
                     - os: windows-latest
                       arch: universal2
+                    - os: windows-latest
+                      arch: aarch64
+                    - os: macos-latest
+                      arch: aarch64
         steps:
             - uses: actions/checkout@v4
             - uses: astral-sh/setup-uv@v5
