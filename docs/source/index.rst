@@ -134,9 +134,9 @@ it meets the industry's current needs.
 
 Moreover, any kind of **contribution** is more than welcome:
 
-.. |star| image:: _static/star.png
-  :height: 25
-  :target: https://github.com/anyoptimization/pymoo
+.. |star| raw:: html
+
+   <a href="https://github.com/anyoptimization/pymoo" style="text-decoration: none;">⭐</a>
 
 .. raw:: html
 

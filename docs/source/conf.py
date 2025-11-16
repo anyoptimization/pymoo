@@ -86,7 +86,7 @@ html_theme_options = {
     "show_navbar_depth": 1,
     "collapse_navigation": True,
     "navigation_depth": 1,
-    # Remove all navbar customizations to test basic functionality
+    # Disable navbar - logo will show in sidebar only
     # "navbar_start": ["navbar-logo"],
     # "navbar_center": [],
     # "navbar_end": [],

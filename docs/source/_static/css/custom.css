@@ -1,7 +1,6 @@
-/* Make right sidebar invisible but keep it as white space/padding */
+/* Make right sidebar invisible and remove it from layout */
 .bd-sidebar-secondary {
-    visibility: hidden !important;
-    background: white !important;
+    display: none !important;
 }
 
 /* Hide all content inside the right sidebar */
