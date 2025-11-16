@@ -49,19 +49,21 @@ jobs:
             # Ensure that a wheel builder finishes even if another fails
             fail-fast: false
             matrix:
-                os: [windows-latest, ubuntu-latest, macos-latest]
-                python: [39, 310, 311, 312, 313]
+                os: [windows-latest, ubuntu-latest, ubuntu-24.04-arm, macos-latest]
+                python: [310, 311, 312, 313, 314]
                 arch: [auto64, universal2]
                 build: ["cp"]
                 exclude:
                     - os: ubuntu-latest
                       arch: universal2
+                    - os: ubuntu-24.04-arm
+                      arch: universal2
                     - os: windows-latest
                       arch: universal2
         steps:
-            - uses: actions/checkout@v4
-            - uses: astral-sh/setup-uv@v5
-            - uses: pypa/cibuildwheel@v2.23
+            - uses: actions/checkout@v5
+            - uses: astral-sh/setup-uv@v7
+            - uses: pypa/cibuildwheel@v3.2
               env:
                 CIBW_BUILD_FRONTEND: "build[uv]"
                 CIBW_BUILD: "${{ matrix.build }}${{ matrix.python }}*"
@@ -80,8 +82,8 @@ jobs:
         needs: check_approval
         if: needs.check_approval.outputs.should_build == 'true'
         steps:
-            - uses: actions/checkout@v4
-            - uses: astral-sh/setup-uv@v5
+            - uses: actions/checkout@v5
+            - uses: astral-sh/setup-uv@v7
             - run: uv build --sdist
             - uses: actions/upload-artifact@v4
               with:
