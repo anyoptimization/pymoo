@@ -39,7 +39,7 @@ class SPEA2Survival(Survival):
         M = Dominator().calc_domination_matrix(F)
 
         # the number of solutions each individual dominates
-        S = (M == 1).sum(axis=0)
+        S = (M == 1).sum(axis=1)
 
         # the raw fitness of each solution - strength of its dominators
         R = ((M == -1) * S).sum(axis=1)
