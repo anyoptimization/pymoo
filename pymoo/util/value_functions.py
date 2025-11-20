@@ -5,7 +5,6 @@ from pymoo.optimize import minimize as moomin
 from scipy.optimize import minimize as scimin
 from scipy.optimize import OptimizeResult
 from pymoo.core.problem import Problem
-import matplotlib.pyplot as plt
 from scipy.optimize import NonlinearConstraint
 from scipy.optimize import Bounds
 from pymoo.algorithms.soo.nonconvex.es import ES
@@ -278,7 +277,8 @@ def poly_vf(P, x):
 
 
 def plot_vf(P, vf, show=True): 
-
+    # import plt function locally as matplotlib is an optional dependency
+    from pymoo.visualization.matplotlib import plt
     plt.scatter(P[:,0], P[:,1], marker=".", color="red", s=200 )
   
 
