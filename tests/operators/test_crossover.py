@@ -2,6 +2,7 @@ import pytest
 
 from pymoo.operators.crossover.erx import ERX
 from pymoo.operators.crossover.hux import HUX
+from pymoo.operators.crossover.nox import NoCrossover
 from pymoo.operators.crossover.ox import OrderCrossover
 from pymoo.operators.crossover.spx import SPX
 
@@ -37,6 +38,13 @@ def test_crossover_bin(crossover):
 def test_crossover_perm(crossover):
     method = GA(pop_size=20, crossover=crossover, mutation=InversionMutation(), sampling=PermutationRandomSampling())
     minimize(create_random_tsp_problem(10), method, ("n_gen", 20))
+    assert True
+
+
+@pytest.mark.parametrize('crossover', [NoCrossover(), NoCrossover(n_parents=2), NoCrossover(n_parents=2, n_offsprings=1), NoCrossover(n_parents=2, n_offsprings=3)])
+def test_no_crossover(crossover):
+    method = NSGA2(pop_size=20, crossover=crossover)
+    minimize(get_problem("zdt1"), method, ("n_gen", 20))
     assert True
 
 
