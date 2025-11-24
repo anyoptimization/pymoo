@@ -1,5 +1,4 @@
 import math
-from copy import deepcopy
 
 import numpy as np
 
@@ -11,7 +10,7 @@ from pymoo.core.infill import InfillCriterion
 from pymoo.core.population import Population
 from pymoo.core.problem import Problem
 from pymoo.core.sampling import Sampling
-from pymoo.core.variable import Choice, Real, Integer, Binary, BoundedVariable
+from pymoo.core.variable import Choice, Real, Integer, Binary
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.crossover.ux import UX
 from pymoo.operators.mutation.bitflip import BFM

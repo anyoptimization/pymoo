@@ -1,6 +1,7 @@
 import numpy as np
 
-from pymoo.core.problem import ElementwiseEvaluationFunction, MetaProblem
+from pymoo.core.meta import Meta
+from pymoo.core.problem import Problem, ElementwiseEvaluationFunction
 from pymoo.gradient import activate, deactivate
 
 
@@ -30,7 +31,7 @@ class ElementwiseEvaluationFunctionWithGradient(ElementwiseEvaluationFunction):
         return out
 
 
-class ElementwiseAutomaticDifferentiation(MetaProblem):
+class ElementwiseAutomaticDifferentiation(Meta, Problem):
 
     def __init__(self, problem, backend='autograd', copy=True):
         if not problem.elementwise:
@@ -47,10 +48,10 @@ class ElementwiseAutomaticDifferentiation(MetaProblem):
         return ElementwiseEvaluationFunctionWithGradient(self.__object__, self.backend, args, kwargs)
 
 
-class AutomaticDifferentiation(MetaProblem):
+class AutomaticDifferentiation(Meta, Problem):
 
-    def __init__(self, problem, backend='autograd', **kwargs):
-        super().__init__(problem, **kwargs)
+    def __init__(self, object, backend='autograd', **kwargs):
+        super().__init__(object, **kwargs)
         self.backend = backend
 
     def do(self, x, return_values_of, *args, **kwargs):
@@ -59,13 +60,13 @@ class AutomaticDifferentiation(MetaProblem):
 
         class F:
 
-            def __init__(self, wrapped_problem):
-                self.__object__ = wrapped_problem
+            def __init__(self, object):
+                self.__object__ = object
 
             def __call__(self, xp):
                 return self.__object__.do(xp, vals_not_grad, *args, **kwargs)
 
-        f = F(self.__wrapped__)
+        f = F(self.__object__)
 
         activate(self.backend)
         if self.backend == "jax":

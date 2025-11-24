@@ -1,12 +1,13 @@
+import pymoo.gradient.toolbox as anp
 import numpy as np
 
-import pymoo.gradient.toolbox as anp
 from pymoo.core.individual import calc_cv
-from pymoo.core.problem import MetaProblem
+from pymoo.core.meta import Meta
+from pymoo.core.problem import Problem
 from pymoo.util.misc import from_dict
 
 
-class ConstraintsAsObjective(MetaProblem):
+class ConstraintsAsObjective(Meta, Problem):
 
     def __init__(self,
                  problem,
@@ -14,8 +15,6 @@ class ConstraintsAsObjective(MetaProblem):
                  append=True):
 
         super().__init__(problem)
-        
-        # Store configuration
         self.config = config
         self.append = append
 
@@ -27,24 +26,17 @@ class ConstraintsAsObjective(MetaProblem):
         self.n_ieq_constr = 0
         self.n_eq_constr = 0
 
-    def _evaluate(self, X, out, *args, **kwargs):
-        # Call the wrapped problem's evaluate method
-        wrapped_out = self.__wrapped__.evaluate(X, return_as_dictionary=True, *args, **kwargs)
+    def do(self, X, return_values_of, *args, **kwargs):
+        out = self.__object__.do(X, return_values_of, *args, **kwargs)
 
         # get at the values from the output
-        F, G, H = from_dict(wrapped_out, "F", "G", "H")
+        F, G, H = from_dict(out, "F", "G", "H")
 
         # store a backup of the values in out
         out["__F__"], out["__G__"], out["__H__"] = F, G, H
 
         # calculate the total constraint violation (here normalization shall be already included)
         CV = calc_cv(G=G, H=H, config=self.config)
-        
-        # Ensure CV has the right shape
-        if isinstance(CV, (int, float)):
-            CV = np.full((len(X),), CV)
-        elif CV.ndim == 1:
-            CV = CV[:, None]
 
         # append the constraint violation as objective
         if self.append:
@@ -52,8 +44,13 @@ class ConstraintsAsObjective(MetaProblem):
         else:
             out["F"] = CV
 
+        del out["G"]
+        del out["H"]
+
+        return out
+
     def pareto_front(self, *args, **kwargs):
-        pf = self.__wrapped__.pareto_front(*args, **kwargs)
+        pf = super().pareto_front(*args, **kwargs)
         if pf is not None:
             pf = np.column_stack([np.zeros(len(pf)), pf])
         return pf
