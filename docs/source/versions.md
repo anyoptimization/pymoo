@@ -34,6 +34,23 @@ kernelspec:
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
 
+.. _version_0_6_1_6:
+```
+
+#### 0.6.1.6 [[Documentation](http://archive.pymoo.org/0.6.1.6/)]
+
+- Updated documentation with new Sphinx Book Theme
+- Fix PCP visualization not displaying plots (#752)
+- Fix SPEA2 strength calculation axis (#755)
+- Faster bi-objective non-dominated sorting with O(N log N) complexity (#754)
+- Fix NoCrossover to properly handle n_offsprings parameter (#744)
+- Python 3.14 and aarch64 Linux wheels support (#758)
+- Revert Meta class to original shared __dict__ implementation for stability
+- Remove forced Agg backend to allow interactive matplotlib displays
+
+```{raw-cell}
+:raw_mimetype: text/restructuredtext
+
 .. _version_0_6_1_5:
 ```
 

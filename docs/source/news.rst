@@ -5,6 +5,8 @@ News
 ==============================================================================
 
 
+**November 23, 2025:** pymoo version **0.6.1.6** has been released with visualization fixes, SPEA2 improvements, faster bi-objective non-dominated sorting, and updated documentation with a new Sphinx Book Theme.
+
 **May 26, 2025:** A new pymoo version **0.6.1.5** has been released with further refinements and bug fixes to ensure stability and performance across different environments.
 
 **July 28, 2024:** We are excited to announce pymoo version **0.6.1.3** with significant improvements! This release brings **NumPy 2.0 compatibility**, ensuring pymoo works seamlessly with the latest scientific computing ecosystem. We've also made **Autograd optional** for automatic differentiation, incorporated numerous bug fixes from community pull requests, and improved overall stability. (:ref:`Release Notes<version_0_6_1_3>`)
