@@ -1,30 +1,28 @@
 import numpy as np
 import pytest
 
+from pymoo.algorithms.moo.age import AGEMOEA
+from pymoo.algorithms.moo.age2 import AGEMOEA2
 from pymoo.algorithms.moo.cmopso import CMOPSO
+from pymoo.algorithms.moo.ctaea import CTAEA
+from pymoo.algorithms.moo.dnsga2 import DNSGA2
+from pymoo.algorithms.moo.kgb import KGB
+from pymoo.algorithms.moo.moead import MOEAD
+from pymoo.algorithms.moo.moead import ParallelMOEAD
 from pymoo.algorithms.moo.mopso_cd import MOPSO_CD
 # Multi-objective algorithms
 from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.algorithms.moo.rnsga2 import RNSGA2
 from pymoo.algorithms.moo.nsga3 import NSGA3
-from pymoo.algorithms.moo.unsga3 import UNSGA3
-from pymoo.algorithms.moo.rnsga3 import RNSGA3
-from pymoo.algorithms.moo.moead import MOEAD
-from pymoo.algorithms.moo.age import AGEMOEA
-from pymoo.algorithms.moo.age2 import AGEMOEA2
-from pymoo.algorithms.moo.ctaea import CTAEA
-from pymoo.algorithms.moo.sms import SMSEMOA
-from pymoo.algorithms.moo.rvea import RVEA
-from pymoo.algorithms.moo.kgb import KGB
-from pymoo.algorithms.moo.spea2 import SPEA2
-from pymoo.algorithms.moo.dnsga2 import DNSGA2
+from pymoo.algorithms.moo.pinsga2 import AutomatedDM
 from pymoo.algorithms.moo.pinsga2 import PINSGA2
-from pymoo.algorithms.moo.moead import ParallelMOEAD
-
+from pymoo.algorithms.moo.rnsga2 import RNSGA2
+from pymoo.algorithms.moo.rnsga3 import RNSGA3
+from pymoo.algorithms.moo.rvea import RVEA
+from pymoo.algorithms.moo.sms import SMSEMOA
+from pymoo.algorithms.moo.spea2 import SPEA2
+from pymoo.algorithms.moo.unsga3 import UNSGA3
 from pymoo.optimize import minimize
 from pymoo.problems.multi import ZDT1
-from pymoo.util.ref_dirs import get_reference_directions
-from pymoo.algorithms.moo.pinsga2 import AutomatedDM
 
 
 # Simple deterministic automated decision maker for testing
