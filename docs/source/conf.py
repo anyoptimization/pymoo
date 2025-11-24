@@ -86,14 +86,7 @@ html_theme_options = {
     "show_navbar_depth": 1,
     "collapse_navigation": True,
     "navigation_depth": 1,
-    # Disable navbar - logo will show in sidebar only
-    # "navbar_start": ["navbar-logo"],
-    # "navbar_center": [],
-    # "navbar_end": [],
-    "logo": {
-        "text": "pymoo",
-        "image_light": "_static/logo.svg",
-    },
+    "navbar_end": ["navbar-icon-links"],
     "nosidebar": True,  # Disable the right sidebar
 }
 

@@ -256,6 +256,7 @@ Examples:
   uvx pymoo-docs run --force                     # Force re-execute all notebooks
   uvx pymoo-docs run file1.md file2.md          # Execute specific notebooks
   uvx pymoo-docs build                           # Build HTML documentation
+  uvx pymoo-docs build --fast                    # Fast build with few sample notebooks
   uvx pymoo-docs serve                           # Serve documentation locally
   uvx pymoo-docs check                           # Fast build for testing
   uvx pymoo-docs all                             # Compile, run, and build
@@ -297,6 +298,11 @@ Examples:
     
     # Build command
     build_parser = subparsers.add_parser("build", help="Build HTML documentation")
+    build_parser.add_argument(
+        "--fast",
+        action="store_true",
+        help="Fast build: only compile/run a few sample notebooks"
+    )
     
     # Serve command
     serve_parser = subparsers.add_parser("serve", help="Serve documentation locally")
@@ -362,6 +368,10 @@ Examples:
     elif args.command == "run":
         run_notebooks(force=args.force, files=args.files)
     elif args.command == "build":
+        if args.fast:
+            # Fast build: set environment variable to exclude most files
+            os.environ["PYMOO_DOCS_FAST_MODE"] = "1"
+            print("⚡ Fast build mode: excluding most directories")
         build_html()
     elif args.command == "serve":
         serve_docs(args.port)
