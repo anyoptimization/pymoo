@@ -1,10 +1,10 @@
 import numpy as np
 
-import pymoo.visualization.util
 from pymoo.docs import parse_doc_string
 from pymoo.core.plot import Plot
 from pymoo.util.misc import set_if_none, set_if_none_from_tuples
 from pymoo.visualization.util import parse_bounds, normalize
+from pymoo.visualization.matplotlib import plt
 
 
 class PCP(Plot):
@@ -79,7 +79,7 @@ class PCP(Plot):
             set_if_none(_kwargs, "color", self.colors[k % len(self.colors)])
 
             for i in range(len(F)):
-                pymoo.visualization.util.plot(np.arange(F.shape[1]), F[i, :], **_kwargs)
+                plt.plot(np.arange(F.shape[1]), F[i, :], **_kwargs)
 
         # Plot the parallel coordinate axes
         for i in range(self.n_dim):

@@ -170,7 +170,7 @@ class Plot:
         self.plot_if_not_done_yet()
 
         # in a notebook the plot method need not to be called explicitly
-        if not in_notebook() and matplotlib.get_backend() != "agg":
+        if not in_notebook() and matplotlib.get_backend().lower() != "agg":
             plt.show(**kwargs)
             plt.close()
 

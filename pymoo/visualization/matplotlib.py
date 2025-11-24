@@ -15,10 +15,7 @@ try:
     from matplotlib import animation
     from matplotlib.collections import LineCollection, PatchCollection
     from matplotlib.colors import ListedColormap
-    
-    # Set backend and configuration
-    matplotlib.use('Agg', force=False)  # Use non-interactive backend by default
-    
+
     _MATPLOTLIB_AVAILABLE = True
     
     # Export all commonly used matplotlib objects
