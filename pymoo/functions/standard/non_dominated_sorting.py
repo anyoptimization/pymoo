@@ -10,19 +10,30 @@ from typing import Literal, List
 from pymoo.util.dominator import Dominator
 
 
-def fast_non_dominated_sort(F, dominator=Dominator(), **kwargs):
-    """Fast non-dominated sorting algorithm."""
+def fast_non_dominated_sort(F, dominator=Dominator(), native_biobj_sorting=False, **kwargs):
+    """Fast non-dominated sorting algorithm.
+
+    Parameters
+    ----------
+    F : np.ndarray
+        Objective values for each individual.
+    dominator : Dominator
+        Dominator object for custom dominance relations.
+    native_biobj_sorting : bool
+        If True, use specialized O(N log N) algorithm for bi-objective problems.
+        Default is False.
+    """
     if F.size == 0:
         return []
-    
+
     n_points, n_objectives = F.shape
-    
+
     # For single objective or single point, return immediately
     if n_points <= 1:
         return [list(range(n_points))] if n_points == 1 else []
-    
-    # For bi-objective problems, use specialized O(N log N) algorithm
-    if n_objectives == 2:
+
+    # For bi-objective problems, optionally use specialized O(N log N) algorithm
+    if native_biobj_sorting and n_objectives == 2:
         return _fast_biobjective_nondominated_sort(F)
     
     if "dominator" in kwargs:
