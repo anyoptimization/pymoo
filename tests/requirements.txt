@@ -11,3 +11,7 @@ jupytext
 pandas
 ipython
 ipykernel
+scipy
+optuna
+scikit-learn
+matplotlib

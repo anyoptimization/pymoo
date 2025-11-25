@@ -400,7 +400,7 @@ class MetaAlgorithm(Meta):
         if isinstance(algorithm, Meta):
             copy = False
             
-        # Initialize Meta (which initializes wrapt.ObjectProxy)
+        # Initialize Meta
         super().__init__(algorithm, copy=copy)
         
         # Pass any additional kwargs to the wrapped algorithm if needed

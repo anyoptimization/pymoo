@@ -26,13 +26,11 @@ requires-python = ">= 3.10"
 dependencies = [
     "numpy>=1.19.3",
     "scipy>=1.1",
-    "matplotlib>=3",
+    "moocore>=0.1.7",
     "autograd>=1.4",
     "cma>=3.2.2",
-    "moocore>=0.1.7",
     "alive_progress",
     "Deprecated",
-    "wrapt>=1.14.0",
 ]
 
 [build-system]
@@ -59,19 +57,20 @@ dev = [
     "ipykernel",
 ]
 visualization = [
-    "matplotlib>=3.0",
+    "matplotlib>=3",
 ]
 parallelization = [
     "joblib",
     "dask[distributed]",
     "ray[default]",
 ]
+others = [
+    "optuna",
+]
 full = [
-    "matplotlib>=3.0",
-    "joblib",
-    "dask[distributed]",
-    "ray[default]",
-    "optuna"
+    "pymoo[visualization]",
+    "pymoo[parallelization]",
+    "pymoo[others]",
 ]
 
 
