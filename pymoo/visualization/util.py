@@ -29,12 +29,12 @@ def get_uniform_points_around_circle(n):
 def plot_circle(ax, center=0, radius=1, **kwargs):
     P = get_circle_points(5000)
     P = (P + center) * radius
-    plot(P[:, 0], P[:, 1], **kwargs)
+    plt.plot(P[:, 0], P[:, 1], **kwargs)
 
 
 def plot_radar_line(ax, x, **kwargs):
     x = np.vstack([x, x[0]])
-    plot(x[:, 0], x[:, 1], **kwargs)
+    plt.plot(x[:, 0], x[:, 1], **kwargs)
 
 
 def plot_axes_arrow(ax, X, extend_factor=1.0, **kwargs):
@@ -44,7 +44,7 @@ def plot_axes_arrow(ax, X, extend_factor=1.0, **kwargs):
 
 def plot_axes_lines(ax, X, extend_factor=1.0, **kwargs):
     for (x, y) in X:
-        plot([0, x * extend_factor], [0, y * extend_factor], **kwargs)
+        plt.plot([0, x * extend_factor], [0, y * extend_factor], **kwargs)
 
 
 def plot_polygon(ax, x, **kwargs):
