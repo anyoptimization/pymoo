@@ -85,6 +85,7 @@ html_theme_options = {
     "navigation_depth": 1,
     "navbar_end": ["navbar-icon-links"],
     "nosidebar": True,  # Disable the right sidebar
+    "home_page_in_toc": True,  # Show Home link in sidebar
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
