@@ -1,7 +1,7 @@
 import sys
 
 import numpy as np
-from pymoo.visualization.matplotlib import patches, PatchCollection, plt, animation
+from pymoo.visualization.matplotlib import matplotlib, patches, PatchCollection, plt, animation
 
 
 def get_circle_points(n_points):
@@ -142,7 +142,7 @@ def plot(*args, show=True, labels=None, no_fill=False, **kwargs):
     if labels:
         plt.legend()
 
-    if show:
+    if show and matplotlib.get_backend().lower() != "agg":
         plt.show()
 
     return ret

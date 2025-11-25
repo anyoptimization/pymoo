@@ -67,6 +67,7 @@ jobs:
               env:
                 CIBW_BUILD_FRONTEND: "build[uv]"
                 CIBW_BUILD: "${{ matrix.build }}${{ matrix.python }}*"
+                CIBW_SKIP: "*t-*"
                 CIBW_ARCHS: ${{ matrix.arch }}
                 CIBW_TEST_COMMAND: >
                   uv run python -c "import sys; import pymoo; print(pymoo); from pymoo.functions import is_compiled; sys.exit(0 if is_compiled() else 42)"

@@ -151,17 +151,7 @@ Or execute the same command by
     python setup.py build_ext --inplace
 ```
 
-Or if Cython shall be used to create the `cpp` files from scratch use
-
-```{raw-cell}
-:raw_mimetype: text/restructuredtext
-
-.. code:: bash
-
-    python setup.py build_ext --inplace --cythonize
-```
-
-All the commands above will show you detailed error messages if the compilation has failed.
+Both commands will show you detailed error messages if the compilation has failed.
 
 +++
 
@@ -193,7 +183,7 @@ Otherwise, create a new python environment with NumPy preinstalled and activate 
 
 .. code:: bash
 
-    conda create -n pymoo -y python==3.9 numpy
+    conda create -n pymoo -y python==3.12 numpy
     conda activate pymoo
     pip install -U pymoo
 ```

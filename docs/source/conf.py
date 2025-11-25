@@ -66,10 +66,7 @@ bibtex_bibfiles = ['references.bib']
 # HTML
 # ===========================================================================
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
 html_theme = 'sphinx_book_theme'
-# html_theme_path = ['.']  # Disabled custom theme
 html_logo = "_static/logo.svg"
 html_favicon = '_static/favicon.ico'
 

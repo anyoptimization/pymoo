@@ -17,6 +17,12 @@ button[title*="theme"],
     display: none !important;
 }
 
+/* Hide secondary sidebar toggle */
+.secondary-toggle,
+label.secondary-toggle {
+    display: none !important;
+}
+
 /* Keep original layout spacing since sidebar is still there as white space */
 
 /* Make left sidebar wider (about 50% increase) without creating gaps */
