@@ -29,6 +29,7 @@ dependencies = [
     "moocore>=0.1.7",
     "autograd>=1.4",
     "cma>=3.2.2",
+    "matplotlib>=3",
     "alive_progress",
     "Deprecated",
 ]
@@ -56,9 +57,6 @@ dev = [
     "ipython",
     "ipykernel",
 ]
-visualization = [
-    "matplotlib>=3",
-]
 parallelization = [
     "joblib",
     "dask[distributed]",
@@ -68,7 +66,9 @@ others = [
     "optuna",
 ]
 full = [
-    "pymoo[visualization]",
+    "numba",
+    "scikit-learn",
+    "pandas",
     "pymoo[parallelization]",
     "pymoo[others]",
 ]
