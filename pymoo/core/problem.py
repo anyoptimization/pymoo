@@ -371,3 +371,26 @@ def default_shape(problem, n):
         dH=(n, problem.n_eq_constr, n_var),
     )
     return DEFAULTS
+
+
+# ===========================================================================
+# Backward compatibility for moved parallelization classes
+# ===========================================================================
+
+def __getattr__(name):
+    """
+    Provide backward compatibility for StarmapParallelization import.
+    This class was moved from pymoo.core.problem to pymoo.parallelization.
+    """
+    if name == 'StarmapParallelization':
+        import warnings
+        warnings.warn(
+            "Importing 'StarmapParallelization' from 'pymoo.core.problem' is deprecated. "
+            "Please use 'from pymoo.parallelization import StarmapParallelization' instead. "
+            "This backward compatibility import will be removed in a future version.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        from pymoo.parallelization import StarmapParallelization
+        return StarmapParallelization
+    raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
