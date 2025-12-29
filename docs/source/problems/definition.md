@@ -59,8 +59,8 @@ Moreover, in *pymoo* there exist three different ways for defining a problem:
 
 +++
 
-The majority of optimization algorithms implemented in *pymoo* are population-based, which means that more than one solution is evaluated in each generation. This is ideal for implementing a parallelization of function evaluations. Thus, the default definition of a problem retrieves a **set** of solutions to be evaluated. The actual function evaluation takes place in the `_evaluate` method, which aims to fill the `out` dictionary with the corresponding data. 
-The function values are supposed to be written into `out["F"]` and the constraints into `out["G"]` if `n_constr` is greater than zero. If another approach is used to compute the function values or the constraints, they must be appropriately converted into a two-dimensional `numpy` array (one dimension for the function values, the other dimension for each element of the population evaluated in the current round). For example, if the function values are written in a regular python list like `F_list = [[<func values for individual 1>], [<func values for individual 2>], ...]`, before returning from the `_evaluate` method, the list must be converted to numpy array with `out["F"] = np.row_stack(F_list_of_lists)`. 
+The majority of optimization algorithms implemented in *pymoo* are population-based, which means that more than one solution is evaluated in each generation. This is ideal for implementing a parallelization of function evaluations. Thus, the default definition of a problem receives a **set** of solutions to be evaluated. The actual function evaluation takes place in the `_evaluate` method, which aims to fill the `out` dictionary with the corresponding data. 
+The function values are supposed to be written into `out["F"]` and the constraints into `out["G"]` if `n_constr` is greater than zero. If another approach is used to compute the function values or the constraints, they must be appropriately converted into a two-dimensional `numpy` array (one dimension for the function values, the other dimension for each element of the population evaluated in the current round). For example, if the function values are written in a regular Python list like `F_list = [[<func values for individual 1>], [<func values for individual 2>], ...]`, before returning from the `_evaluate` method, the list must be converted to NumPy array with `out["F"] = np.row_stack(F_list)`. 
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
@@ -68,10 +68,10 @@ The function values are supposed to be written into `out["F"]` and the constrain
 .. admonition:: Tip
     :class: myOwnStyle
 
-    How the objective and constraint values are calculate is **irrelevant** from a pymoo's point of view. Whether it is a simple mathematical equation or a discrete-event simulation, you only have to ensure that for each input the corresponding values have been set.
+    How the objective and constraint values are calculated is **irrelevant** from pymoo's point of view. Whether it is a simple mathematical equation or a discrete-event simulation, you only have to ensure that for each input the corresponding values have been set.
 ```
 
-The example below shows a modified **Sphere** problem with a radial constraint located at the center. The problem consists of 10 design variables, one objective, one constraint, and the lower and upper bounds of each variable are in the range of 0 and 1. 
+The example below shows a modified **Sphere** problem with a radial constraint located at the center. The problem consists of 10 design variables, one objective, one constraint, and lower and upper bounds of 0 and 1 for each variable. 
 
 ```{code-cell} ipython3
 import numpy as np
@@ -88,7 +88,7 @@ class SphereWithConstraint(Problem):
         out["G"] = 0.1 - out["F"]
 ```
 
-Assuming the algorithm being used requests to evaluate a set of solutions of size 100, then the input NumPy matrix `x`  will be of the shape `(100,10)`. Please note that the two-dimensional matrix is summed up on the first axis which results in a vector of length 100 for `out["F"]`. Thus, NumPy performs a vectorized operation on a matrix to speed up the evaluation.
+Assuming the algorithm being used requests to evaluate a set of 100 solutions, the input NumPy matrix `x`  will be of the shape `(100,10)`. Please note that the two-dimensional matrix is summed up along each row, which results in a column vector of length 100 for `out["F"]`. NumPy performs vectorized operations on the matrix to speed up the evaluation.
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
@@ -119,7 +119,7 @@ class ElementwiseSphereWithConstraint(ElementwiseProblem):
         out["G"] = np.column_stack([0.1 - out["F"], out["F"] - 0.5])
 ```
 
-Regardless of the number of solutions being asked to be evaluated, the `_evaluate` function retrieves a vector of length 10. The `_evaluate`, however, will be called for each solution. Implementing an element-wise problem, the [Parallelization](../parallelization/index.ipynb) available in *pymoo* using processes or threads can be directly used.
+Regardless of the number of solutions to be evaluated, the `_evaluate` function retrieves a vector of length 10. `_evaluate` will be called for each solution. Implementing an element-wise problem, the [Parallelization](../parallelization/index.ipynb) available in *pymoo* using processes or threads can be directly used.
 Moreover, note that the problem above uses a vector definition for the lower and upper bounds (`xl` and `xu`) because the first variables should cover a different range of values.
 
 ```{raw-cell}
