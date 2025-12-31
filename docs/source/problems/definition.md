@@ -119,8 +119,8 @@ class ElementwiseSphereWithConstraint(ElementwiseProblem):
         out["G"] = np.column_stack([0.1 - out["F"], out["F"] - 0.5])
 ```
 
-Regardless of the number of solutions to be evaluated, the `_evaluate` function retrieves a vector of length 10. `_evaluate` will be called for each solution. Implementing an element-wise problem, the [Parallelization](../parallelization/index.ipynb) available in *pymoo* using processes or threads can be directly used.
-Moreover, note that the problem above uses a vector definition for the lower and upper bounds (`xl` and `xu`) because the first variables should cover a different range of values.
+Regardless of the number of solutions to be evaluated, the `_evaluate` function receives a vector of length 10. `_evaluate` will be called for each solution. Implementing an element-wise problem, the [Parallelization](../parallelization/index.ipynb) available in *pymoo* using processes or threads can be directly used.
+Note that the problem above uses a vector definition for the lower and upper bounds (`xl` and `xu`) so the first variable can have different bounds than the others.
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
