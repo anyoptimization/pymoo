@@ -88,7 +88,7 @@ class SphereWithConstraint(Problem):
         out["G"] = 0.1 - out["F"]
 ```
 
-Assuming the algorithm being used requests to evaluate a set of 100 solutions, the input NumPy matrix `x`  will be of the shape `(100,10)`. Please note that the two-dimensional matrix is summed up along each row, which results in a column vector of length 100 for `out["F"]`. NumPy performs vectorized operations on the matrix to speed up the evaluation.
+Assuming the algorithm being used requests to evaluate a set of 100 solutions, the input NumPy matrix `x` will be of the shape `(100,10)`. Please note that the two-dimensional matrix is summed up along each row, which results in a vector of length 100 for `out["F"]`. NumPy performs vectorized operations on the matrix to speed up the evaluation.
 
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
