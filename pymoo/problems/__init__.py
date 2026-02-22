@@ -14,7 +14,9 @@ def get_problem(name, *args, **kwargs):
     from pymoo.problems.single import Ackley
     from pymoo.problems.many import DTLZ1, C1DTLZ1, DC1DTLZ1, DC1DTLZ3, DC2DTLZ1, DC2DTLZ3, DC3DTLZ1, DC3DTLZ3, C1DTLZ3, \
         C2DTLZ2, C3DTLZ1, C3DTLZ4, ScaledDTLZ1, ConvexDTLZ2, ConvexDTLZ4, DTLZ2, DTLZ3, DTLZ4, DTLZ5, DTLZ6, DTLZ7, \
-        InvertedDTLZ1, WFG1, WFG2, WFG3, WFG4, WFG5, WFG6, WFG7, WFG8, WFG9
+        InvertedDTLZ1, WFG1, WFG2, WFG3, WFG4, WFG5, WFG6, WFG7, WFG8, WFG9, ZCAT1, ZCAT2, ZCAT3, ZCAT4, ZCAT5, \
+        ZCAT6, ZCAT7, ZCAT8, ZCAT9, ZCAT10, ZCAT11, ZCAT12, ZCAT13, ZCAT14, ZCAT15, ZCAT16, ZCAT17, ZCAT18, ZCAT19, \
+        ZCAT20
     from pymoo.problems.multi import Kursawe, OSY, SRN, TNK, Truss2D, WeldedBeam, ZDT1, ZDT2, ZDT3, ZDT4, ZDT5, ZDT6
     from pymoo.problems.single import CantileveredBeam, Griewank, Himmelblau, Knapsack, PressureVessel, Rastrigin, \
         Rosenbrock, Schwefel, Sphere, Zakharov
@@ -148,7 +150,27 @@ def get_problem(name, *args, **kwargs):
         'wfg6': WFG6,
         'wfg7': WFG7,
         'wfg8': WFG8,
-        'wfg9': WFG9
+        'wfg9': WFG9,
+        'zcat1': ZCAT1,
+        'zcat2': ZCAT2,
+        'zcat3': ZCAT3,
+        'zcat4': ZCAT4,
+        'zcat5': ZCAT5,
+        'zcat6': ZCAT6,
+        'zcat7': ZCAT7,
+        'zcat8': ZCAT8,
+        'zcat9': ZCAT9,
+        'zcat10': ZCAT10,
+        'zcat11': ZCAT11,
+        'zcat12': ZCAT12,
+        'zcat13': ZCAT13,
+        'zcat14': ZCAT14,
+        'zcat15': ZCAT15,
+        'zcat16': ZCAT16,
+        'zcat17': ZCAT17,
+        'zcat18': ZCAT18,
+        'zcat19': ZCAT19,
+        'zcat20': ZCAT20
     }
 
     if name not in PROBLEM:
