@@ -33,12 +33,7 @@ def swap(M, a, b):
 
 # repairs a numpy array to be in bounds
 def repair(X, xl, xu):
-    larger_than_xu = X[0, :] > xu
-    X[0, larger_than_xu] = xu[larger_than_xu]
-
-    smaller_than_xl = X[0, :] < xl
-    X[0, smaller_than_xl] = xl[smaller_than_xl]
-
+    X[0] = np.clip(X[0], xl, xu)
     return X
 
 
@@ -58,12 +53,8 @@ def parameter_less_constraints(F, CV, F_max=None):
 
 @default_random_state
 def random_permutations(n, l, concat=True, random_state=None):
-    P = []
-    for i in range(n):
-        P.append(random_state.permutation(l))
-    if concat:
-        P = np.concatenate(P)
-    return P
+    P = np.argsort(random_state.random((n, l)), axis=1)
+    return P.reshape(-1) if concat else P
 
 
 def get_duplicates(M):
