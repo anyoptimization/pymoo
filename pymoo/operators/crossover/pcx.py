@@ -28,14 +28,11 @@ def pcx(X, eta, zeta, index, random_state=None):
     dist_to_centroid = np.maximum(eps, dist_to_centroid)
 
     # orthogonal directions are computed
-    orth_dir = np.zeros_like(dist_to_index)
-
-    for i in range(n_parents):
-        if i != index:
-            temp1 = (diff_to_index[i] * diff_to_centroid).sum(axis=-1)
-            temp2 = temp1 / (dist_to_index[i] * dist_to_centroid)
-            temp3 = np.maximum(0.0, 1.0 - temp2 ** 2)
-            orth_dir[i] = dist_to_index[i] * (temp3 ** 0.5)
+    temp1 = (diff_to_index * diff_to_centroid).sum(axis=-1)
+    temp2 = temp1 / (dist_to_index * dist_to_centroid)
+    temp3 = np.maximum(0.0, 1.0 - temp2**2)
+    orth_dir = dist_to_index * (temp3**0.5)
+    orth_dir[index] = 0.0
 
     # this is the avg of the perpendicular distances from other parents to the parent k
     D_not = orth_dir.sum(axis=0) / (n_parents - 1)

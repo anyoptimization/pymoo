@@ -37,16 +37,11 @@ class BinaryRandomSampling(Sampling):
 
 
 class IntegerRandomSampling(FloatRandomSampling):
-
     def _do(self, problem, n_samples, *args, random_state=None, **kwargs):
-        n, (xl, xu) = problem.n_var, problem.bounds()
-        return np.column_stack([random_state.integers(xl[k], xu[k] + 1, size=n_samples) for k in range(n)])
+        xl, xu = problem.bounds()
+        return random_state.integers(xl, xu + 1, size=(n_samples, problem.n_var))
 
 
 class PermutationRandomSampling(Sampling):
-
     def _do(self, problem, n_samples, *args, random_state=None, **kwargs):
-        X = np.full((n_samples, problem.n_var), 0, dtype=int)
-        for i in range(n_samples):
-            X[i, :] = random_state.permutation(problem.n_var)
-        return X
+        return np.argsort(random_state.random((n_samples, problem.n_var)), axis=1)
