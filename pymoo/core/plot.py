@@ -31,12 +31,15 @@ class Plot:
         # change the font of plots to serif (looks better)
         plt.rc('font', family='serif')
 
-        # the matplotlib classes
+        # the matplotlib classes — publicly accessible after do()/show()/save()
+        # you can also use get_figure() and get_axes() helper methods
         self.fig = fig
         self.ax = ax
         self.figsize = figsize
 
         # whether the figure should be closed when object is destroyed
+        # set to False if you want to keep the figure alive after the Plot object
+        # goes out of scope (e.g. to further customise or display it)
         self.close_on_destroy = close_on_destroy
 
         # the title of the figure - can also be a list if subfigures
@@ -172,9 +175,44 @@ class Plot:
         # in a notebook the plot method need not to be called explicitly
         if not in_notebook() and matplotlib.get_backend().lower() != "agg":
             plt.show(**kwargs)
-            plt.close()
+            # NOTE: plt.close() removed — callers can now close the figure themselves
+            # if needed, e.g.: plot.fig.savefig(...); plt.close(plot.fig)
 
         return self
+
+    def get_figure(self):
+        """Return the underlying matplotlib Figure object.
+
+        Useful for further customisation after calling .show() or .save()::
+
+            plot = Scatter().add(F).show()
+            fig = plot.get_figure()
+            fig.suptitle("My custom title")
+            fig.savefig("result.png")
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+        """
+        self.plot_if_not_done_yet()
+        return self.fig
+
+    def get_axes(self):
+        """Return the matplotlib Axes object (or array of Axes for multi-panel plots).
+
+        Useful for adding annotations, changing limits, or any other per-axis
+        customisation after plotting::
+
+            plot = Scatter().add(F).show()
+            ax = plot.get_axes()
+            ax.set_xlim(0, 1)
+
+        Returns
+        -------
+        matplotlib.axes.Axes or numpy.ndarray of Axes
+        """
+        self.plot_if_not_done_yet()
+        return self.ax
 
     def save(self, fname, **kwargs):
         self.plot_if_not_done_yet()
