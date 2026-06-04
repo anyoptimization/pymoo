@@ -14,6 +14,18 @@ from pymoo.util.dominator import Dominator
 from pymoo.util.misc import vectorized_cdist
 
 
+def _truncation_candidate(dists, survivors):
+    """Return the local index of the SPEA2 survivor to truncate.
+
+    SPEA2 compares the sorted distance vectors lexicographically when the
+    archive contains too many non-dominated solutions. This uses the nearest
+    distance first and, in tie cases, the second nearest distance, then the
+    third nearest distance, and so on.
+    """
+    D = dists[np.ix_(survivors, survivors)]
+    return np.lexsort(np.sort(D, axis=1).T[::-1])[0]
+
+
 # ---------------------------------------------------------------------------------------------------------
 # Environmental Survival (in the original paper it is referred to as archiving)
 # ---------------------------------------------------------------------------------------------------------
@@ -102,8 +114,7 @@ class SPEA2Survival(Survival):
 
             # remove one individual per loop, until we hit n_survive
             while len(survivors) > n_survive:
-                D = dists[np.ix_(survivors, survivors)]
-                i = np.lexsort(np.sort(D, axis=1).T[::-1])[0]
+                i = _truncation_candidate(dists, survivors)
                 survivors = [survivors[j] for j in range(len(survivors)) if j != i]
 
         return pop[survivors]
