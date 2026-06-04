@@ -181,36 +181,10 @@ class Plot:
         return self
 
     def get_figure(self):
-        """Return the underlying matplotlib Figure object.
-
-        Useful for further customisation after calling .show() or .save()::
-
-            plot = Scatter().add(F).show()
-            fig = plot.get_figure()
-            fig.suptitle("My custom title")
-            fig.savefig("result.png")
-
-        Returns
-        -------
-        matplotlib.figure.Figure
-        """
         self.plot_if_not_done_yet()
         return self.fig
 
     def get_axes(self):
-        """Return the matplotlib Axes object (or array of Axes for multi-panel plots).
-
-        Useful for adding annotations, changing limits, or any other per-axis
-        customisation after plotting::
-
-            plot = Scatter().add(F).show()
-            ax = plot.get_axes()
-            ax.set_xlim(0, 1)
-
-        Returns
-        -------
-        matplotlib.axes.Axes or numpy.ndarray of Axes
-        """
         self.plot_if_not_done_yet()
         return self.ax
 
