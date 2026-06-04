@@ -102,7 +102,8 @@ class SPEA2Survival(Survival):
 
             # remove one individual per loop, until we hit n_survive
             while len(survivors) > n_survive:
-                i = dists[survivors][:, survivors].min(axis=1).argmin()
+                D = dists[np.ix_(survivors, survivors)]
+                i = np.lexsort(np.sort(D, axis=1).T[::-1])[0]
                 survivors = [survivors[j] for j in range(len(survivors)) if j != i]
 
         return pop[survivors]
@@ -188,4 +189,3 @@ class SPEA2(GeneticAlgorithm):
 
 
 parse_doc_string(SPEA2.__init__)
-
