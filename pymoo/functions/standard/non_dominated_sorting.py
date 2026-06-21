@@ -36,10 +36,7 @@ def fast_non_dominated_sort(F, dominator=Dominator(), native_biobj_sorting=False
     if native_biobj_sorting and n_objectives == 2:
         return _fast_biobjective_nondominated_sort(F)
     
-    if "dominator" in kwargs:
-        M = Dominator.calc_domination_matrix(F)
-    else:
-        M = dominator.calc_domination_matrix(F)
+    M = dominator.calc_domination_matrix(F)
 
     # calculate the dominance matrix
     n = M.shape[0]

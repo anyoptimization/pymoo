@@ -4,10 +4,7 @@ from pymoo.util.dominator import Dominator
 
 
 def fast_non_dominated_sort(F, dominator=Dominator(), **kwargs):
-    if "dominator" in kwargs:
-        M = Dominator.calc_domination_matrix(F)
-    else:
-        M = dominator.calc_domination_matrix(F)
+    M = dominator.calc_domination_matrix(F)
 
     # calculate the dominance matrix
     n = M.shape[0]
