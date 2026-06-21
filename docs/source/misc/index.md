@@ -31,6 +31,7 @@ Topics which did not directly fit into one of our main categories:
    decomposition.ipynb
    kktpm.ipynb
    checkpoint.ipynb
+   lexicographic_pareto_selection.rst
    
    
 ```
