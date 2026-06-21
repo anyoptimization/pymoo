@@ -8,6 +8,8 @@ from pymoo.util.misc import crossover_mask, row_at_least_once_true
 
 @default_random_state
 def mut_exp(n_matings, n_var, prob, at_least_once=True, random_state=None):
+    if np.isscalar(prob):
+        prob = np.full(n_matings, prob)
     assert len(prob) == n_matings
 
     # the mask do to the crossover
