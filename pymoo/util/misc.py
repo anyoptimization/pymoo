@@ -33,12 +33,7 @@ def swap(M, a, b):
 
 # repairs a numpy array to be in bounds
 def repair(X, xl, xu):
-    larger_than_xu = X[0, :] > xu
-    X[0, larger_than_xu] = xu[larger_than_xu]
-
-    smaller_than_xl = X[0, :] < xl
-    X[0, smaller_than_xl] = xl[smaller_than_xl]
-
+    X[0] = np.clip(X[0], xl, xu)
     return X
 
 
