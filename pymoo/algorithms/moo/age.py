@@ -129,7 +129,8 @@ class AGEMOEASurvival(Survival):
         for i in range(1, max_f_no):  # skip first front since it is normalized by survival_score
             front = F[front_no == i, :]
             m, _ = front.shape
-            front = front / normalization
+            with np.errstate(divide='ignore', invalid='ignore'):
+                front = front / normalization
             crowd_dist[front_no == i] = 1. / self.minkowski_distances(front, ideal_point[None, :], p=p).squeeze()
 
         # Select the solutions in the last front based on their crowding distances
@@ -205,7 +206,8 @@ class AGEMOEASurvival(Survival):
         d[extreme] = np.inf
         index = np.argmin(d)
 
-        p = np.log(n) / np.log(1.0 / np.mean(front[index, :]))
+        with np.errstate(divide='ignore', invalid='ignore'):
+            p = np.log(n) / np.log(1.0 / np.mean(front[index, :]))
 
         if np.isnan(p) or p <= 0.1:
             p = 1.0
