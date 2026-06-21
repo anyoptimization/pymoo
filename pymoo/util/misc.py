@@ -1,3 +1,5 @@
+import typing
+
 from collections import OrderedDict
 from itertools import combinations
 
@@ -6,6 +8,10 @@ import numpy as np
 from pymoo.core.population import Population
 from pymoo.core.sampling import Sampling
 from pymoo.util import default_random_state
+
+if typing.TYPE_CHECKING:
+    from pymoo.core.termination import Termination
+
 
 
 def parameter_less(F, CV, fmax=None, inplace=False):
@@ -348,7 +354,7 @@ def to_numpy(a):
     return np.array(a)
 
 
-def termination_from_tuple(termination):
+def termination_from_tuple(termination: typing.Union["Termination", str, tuple[str, ...]]) -> "Termination":
     from pymoo.core.termination import Termination
 
     # get the termination if provided as a tuple - create an object

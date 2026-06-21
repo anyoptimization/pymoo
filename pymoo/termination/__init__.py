@@ -1,5 +1,10 @@
+import typing
 
-def get_termination(name, *args, **kwargs):
+if typing.TYPE_CHECKING:
+    from pymoo.core.termination import Termination
+
+
+def get_termination(name, *args, **kwargs) -> "Termination":
     from pymoo.termination.default import DefaultMultiObjectiveTermination, DefaultSingleObjectiveTermination
     from pymoo.termination.max_eval import MaximumFunctionCallTermination
     from pymoo.termination.max_gen import MaximumGenerationTermination

@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy as np
 
 from pymoo.core.individual import Individual
@@ -38,8 +40,8 @@ class Evaluator:
     def eval(self,
              problem: Problem,
              pop: Population,
-             skip_already_evaluated: bool = None,
-             evaluate_values_of: list = None,
+             skip_already_evaluated: bool | None = None,
+             evaluate_values_of: list[Any] | None = None,
              count_evals: bool = True,
              **kwargs):
 
@@ -56,7 +58,7 @@ class Evaluator:
 
         # filter the index to have individual where not all attributes have been evaluated
         if skip_already_evaluated:
-            I = [i for i, ind in enumerate(pop) if not all([e in ind.evaluated for e in evaluate_values_of])]
+            I = np.array([i for i, ind in enumerate(pop) if not all([e in ind.evaluated for e in evaluate_values_of])])
 
         # if skipping is deactivated simply make the index being all individuals
         else:

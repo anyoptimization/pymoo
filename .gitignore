@@ -150,3 +150,7 @@ ENV/
 
 # Package manager lock files
 uv.lock
+
+# pixi environments
+.pixi
+*.egg-info
