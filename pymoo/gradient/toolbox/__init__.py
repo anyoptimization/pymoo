@@ -16,4 +16,4 @@ class LazyBackend:
         return dir(backend_module)
 
 # Replace this module with the lazy backend
-sys.modules[__name__] = LazyBackend()
+sys.modules[__name__] = LazyBackend()  # type: ignore[assignment]

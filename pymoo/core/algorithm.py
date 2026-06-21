@@ -69,7 +69,7 @@ class Algorithm:
 
         # the random seed that was used
         self.seed = seed
-        self.random_state = None
+        self.random_state: np.random.Generator | None = None
 
         # the function evaluator object (can be used to inject code)
         if evaluator is None:
@@ -386,6 +386,7 @@ class LoopwiseAlgorithm(Algorithm):
 
 
 def default_termination(problem: Problem) -> Termination:
+    termination: Termination
     if problem.n_obj > 1:
         termination = DefaultMultiObjectiveTermination()
     else:

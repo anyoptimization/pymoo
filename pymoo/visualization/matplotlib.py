@@ -43,15 +43,15 @@ except ImportError:
             )
     
     # Create placeholder objects that give helpful errors
-    matplotlib = _MatplotlibNotAvailable()
-    plt = _MatplotlibNotAvailable()
-    patches = _MatplotlibNotAvailable()
-    colors = _MatplotlibNotAvailable()
-    cm = _MatplotlibNotAvailable()
-    animation = _MatplotlibNotAvailable()
-    LineCollection = _MatplotlibNotAvailable()
-    PatchCollection = _MatplotlibNotAvailable()
-    ListedColormap = _MatplotlibNotAvailable()
+    matplotlib = _MatplotlibNotAvailable()  # type: ignore[assignment]
+    plt = _MatplotlibNotAvailable()  # type: ignore[assignment]
+    patches = _MatplotlibNotAvailable()  # type: ignore[assignment]
+    colors = _MatplotlibNotAvailable()  # type: ignore[assignment]
+    cm = _MatplotlibNotAvailable()  # type: ignore[assignment]
+    animation = _MatplotlibNotAvailable()  # type: ignore[assignment]
+    LineCollection = _MatplotlibNotAvailable()  # type: ignore[assignment]
+    PatchCollection = _MatplotlibNotAvailable()  # type: ignore[assignment]
+    ListedColormap = _MatplotlibNotAvailable()  # type: ignore[assignment]
 
 
 def is_available():

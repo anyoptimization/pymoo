@@ -9,7 +9,7 @@ class Callback:
 
     def __init__(self) -> None:
         super().__init__()
-        self.data: dict[Any, Any] = {}
+        self.data: Any = {}
         self.is_initialized: bool = False
 
     def initialize(self, algorithm: "Algorithm") -> None:

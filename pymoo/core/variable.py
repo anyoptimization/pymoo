@@ -265,6 +265,7 @@ class Integer(BoundedVariable):
             decision variables.
         """
         low, high = self.bounds
+        assert high is not None, "Integer variable requires an upper bound"
         return random_state.integers(low, high + 1, size=n)
 
 

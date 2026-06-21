@@ -11,7 +11,7 @@ class Recorder(Callback):
 
     def __init__(self, nth_evals=None) -> None:
         super().__init__()
-        self.data = []
+        self.data: list = []
         self.nth_evals = nth_evals
         self.rec_n_evals = 0
 
