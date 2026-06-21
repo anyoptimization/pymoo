@@ -17,7 +17,6 @@ def get_functions():
     )
     from pymoo.functions.standard.decomposition import calc_distance_to_weights
     from pymoo.functions.standard.calc_perpendicular_distance import calc_perpendicular_distance
-    from pymoo.functions.standard.hv import hv
     from pymoo.functions.standard.stochastic_ranking import stochastic_ranking
     from pymoo.functions.standard.mnn import calc_mnn, calc_2nn
     from pymoo.functions.standard.pruning_cd import calc_pcd

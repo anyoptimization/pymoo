@@ -44,16 +44,3 @@ class HV(Hypervolume):
     pass
 
 
-def hvc_looped(ref_point, F, func):
-    hv = func(ref_point, F)
-
-    hvc = []
-
-    for k in range(len(F)):
-        v = np.full(len(F), True)
-        v[k] = False
-        _hv = func(ref_point, F[v])
-        hvc.append(hv - _hv)
-
-    hvc = np.array(hvc)
-    return hvc

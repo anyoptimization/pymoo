@@ -1,12 +1,10 @@
 import numpy as np
+from moocore import hv_contributions
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.core.population import Population
 from pymoo.core.survival import Survival
 from pymoo.docs import parse_doc_string
-from pymoo.indicators.hv.exact import ExactHypervolume
-from pymoo.indicators.hv.exact_2d import ExactHypervolume2D
-from pymoo.indicators.hv.approximate import ApproximateHypervolume
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
@@ -64,22 +62,10 @@ class LeastHypervolumeContributionSurvival(Survival):
                 # define the reference point and shift it a bit - F is already normalized!
                 ref_point = np.full(problem.n_obj, 1.0 + self.eps)
 
-                _, n_obj = F.shape
-
-                # choose the suitable hypervolume method
-                clazz = ExactHypervolume
-                if n_obj == 2:
-                    clazz = ExactHypervolume2D
-                elif n_obj > 3:
-                    clazz = ApproximateHypervolume
-
-                # finally do the computation
-                hv = clazz(ref_point).add(F)
-
                 # current front sorted by crowding distance if splitting
                 while len(survivors) + len(front) > n_survive:
-                    k = hv.hvc.argmin()
-                    hv.delete(k)
+                    k = hv_contributions(F, ref=ref_point).argmin()
+                    F = np.delete(F, k, axis=0)
                     front = np.delete(front, k)
 
             # extend the survivors by all or selected individuals

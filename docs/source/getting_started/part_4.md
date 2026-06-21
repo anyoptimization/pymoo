@@ -221,7 +221,7 @@ plt.ylabel("Hypervolume")
 plt.show()
 ```
 
-**Note:** Hypervolume becomes computationally expensive with increasing dimensionality. The exact hypervolume can be calculated efficiently for 2 and 3 objectives. For higher dimensions, some researchers use a hypervolume approximation, which is not available yet in pymoo.
+**Note:** Hypervolume becomes computationally expensive with increasing dimensionality. pymoo uses [moocore](https://github.com/multi-objective/moocore) for exact hypervolume computation, which is efficient up to around 5 objectives. For higher dimensions, an approximate hypervolume is available via `pymoo.indicators.hv.ApproximateHypervolume`.
 
 +++
 
