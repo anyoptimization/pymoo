@@ -7,14 +7,14 @@ from pymoo.util import default_random_state
 
 
 @default_random_state
-def stochastic_ranking(double[:] f, double[:] phi, double pr, long[:] I=None, random_state=None):
+def stochastic_ranking(double[:] f, double[:] phi, double pr, long long[:] I=None, random_state=None):
     if I is None:
         I = np.arange(len(f))
     return np.array(c_stochastic_ranking(f, phi, pr, I, random_state))
 
 
 
-def c_stochastic_ranking(double[:] f, double[:] phi, double pr, long[:] I, random_state):
+def c_stochastic_ranking(double[:] f, double[:] phi, double pr, long long[:] I, random_state):
     cdef int _lambda, i, j, at_least_one_swap
     cdef double u
 
@@ -44,9 +44,8 @@ def c_stochastic_ranking(double[:] f, double[:] phi, double pr, long[:] I, rando
     return I
 
 
-cdef c_swap(long[:] x, int a, int b):
+cdef c_swap(long long[:] x, int a, int b):
     cdef int tmp
     tmp = x[a]
     x[a] = x[b]
     x[b] = tmp
-

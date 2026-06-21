@@ -579,7 +579,7 @@ cdef vector[vector[int]] c_construct_domination_matrix(double[:, :]& F):
         long i
         int n = F.shape[0]
         int m = F.shape[1]
-        long [:, ::1] b = np.apply_over_axes(np.argsort, F.T, axes=1)
+        long long [:, ::1] b = np.apply_over_axes(np.argsort, F.T, axes=1)
 
         vector[vector[int]] C = vector[vector[int]](n, vector[int](n, 0))
         vector[vector[int]] D = vector[vector[int]](n, vector[int](n, 0))
@@ -590,7 +590,7 @@ cdef vector[vector[int]] c_construct_domination_matrix(double[:, :]& F):
     c_remove_dominators(D, n, m)
     return D
 
-cdef void c_construct_comparison_matrix(double[:]& v, long[:]& b, vector[vector[int]] &C, vector[vector[int]]& D, int n):
+cdef void c_construct_comparison_matrix(double[:]& v, long long[:]& b, vector[vector[int]] &C, vector[vector[int]]& D, int n):
     cdef:
         int i, j
 
@@ -660,7 +660,7 @@ cdef vector[vector[int]] c_dda_ns_get_fronts(vector[vector[int]]& D, int n, int 
         count += front.size()
     return fronts
 
-cdef vector[vector[int]] c_dda_ens_get_fronts(vector[vector[int]]& D, int m, long[::1]& sorted_indices):
+cdef vector[vector[int]] c_dda_ens_get_fronts(vector[vector[int]]& D, int m, long long[::1]& sorted_indices):
     cdef:
         int k, sd, s, n_fronts = 0
         vector[int] fk
