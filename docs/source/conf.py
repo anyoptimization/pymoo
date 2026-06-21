@@ -72,6 +72,7 @@ html_favicon = '_static/favicon.ico'
 
 # Sphinx Book Theme configuration
 html_theme_options = {
+    "default_mode": "light",
     "repository_url": "https://github.com/anyoptimization/pymoo",
     "repository_branch": "main",
     "path_to_docs": "docs/source",
