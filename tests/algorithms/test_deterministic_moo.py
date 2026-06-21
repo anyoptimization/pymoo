@@ -19,6 +19,7 @@ from pymoo.algorithms.moo.rnsga2 import RNSGA2
 from pymoo.algorithms.moo.rnsga3 import RNSGA3
 from pymoo.algorithms.moo.rvea import RVEA
 from pymoo.algorithms.moo.sms import SMSEMOA
+from pymoo.algorithms.moo.omni import OmniOptimizer
 from pymoo.algorithms.moo.spea2 import SPEA2
 from pymoo.algorithms.moo.unsga3 import UNSGA3
 from pymoo.optimize import minimize

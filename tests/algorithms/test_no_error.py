@@ -4,6 +4,7 @@ import pytest
 from pymoo.algorithms.moo.age import AGEMOEA
 from pymoo.algorithms.moo.moead import MOEAD, ParallelMOEAD
 from pymoo.algorithms.moo.nsga2 import NSGA2
+from pymoo.algorithms.moo.omni import OmniOptimizer
 from pymoo.algorithms.moo.rvea import RVEA
 from pymoo.algorithms.soo.nonconvex.cmaes import CMAES
 from pymoo.algorithms.soo.nonconvex.de import DE
@@ -41,7 +42,8 @@ MULTI_OBJECTIVE_ALGORITHMS = [NSGA2(),
                               RVEA(ref_dirs),
                               MOEAD(ref_dirs),
                               ParallelMOEAD(ref_dirs),
-                              AGEMOEA()]
+                              AGEMOEA(),
+                              OmniOptimizer()]
 
 
 @pytest.mark.long
