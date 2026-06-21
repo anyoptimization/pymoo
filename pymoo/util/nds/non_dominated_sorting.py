@@ -1,6 +1,7 @@
 import sys
 
 import numpy as np
+from moocore import pareto_rank, is_nondominated
 
 from pymoo.functions import load_function
 from pymoo.util.dominator import Dominator
@@ -17,54 +18,41 @@ class NonDominatedSorting:
     def do(self, F, return_rank=False, only_non_dominated_front=False, n_stop_if_ranked=None, n_fronts=None, **kwargs):
         F = F.astype(float)
 
-        # if not set just set it to a very large values because the cython algorithms do not take None
-        if n_stop_if_ranked is None:
-            n_stop_if_ranked = int(1e8)
-
-        # if only_non_dominated_front is True, we only need 1 front
         if only_non_dominated_front:
             n_fronts = 1
-        elif n_fronts is None:
-            n_fronts = int(1e8)
 
-        # if a custom dominator is provided, use the custom dominator and run fast_non_dominated_sort
-        if self.dominator is not None:
-            # Use the custom dominator directly
-            from pymoo.util.nds.fast_non_dominated_sort import fast_non_dominated_sort
-            fronts = fast_non_dominated_sort(F, dominator=self.dominator, **kwargs)
+        if len(F) == 0:
+            fronts = []
+        elif self.dominator is None:
+            F_sort = F - self.epsilon if self.epsilon is not None else F
+            ranks = pareto_rank(F_sort)
+            fronts = []
+            n_ranked = 0
+            for r in range(ranks.max() + 1):
+                if n_fronts is not None and r >= n_fronts:
+                    break
+                front = np.where(ranks == r)[0]
+                fronts.append(front)
+                n_ranked += len(front)
+                if n_stop_if_ranked is not None and n_ranked >= n_stop_if_ranked:
+                    break
         else:
-            # Use the standard function loader approach
-            func = load_function(self.method)
-
-            # set the epsilon if it should be set
-            if self.epsilon is not None:
-                kwargs["epsilon"] = float(self.epsilon)
-
-            # add n_fronts parameter if the method supports it
-            if self.method == "fast_non_dominated_sort":
-                kwargs["n_fronts"] = n_fronts
-                kwargs["n_stop_if_ranked"] = n_stop_if_ranked
-
-            fronts = func(F, **kwargs)
-
-        # convert to numpy array for each front and filter by n_stop_if_ranked
-        _fronts = []
-        n_ranked = 0
-        for front in fronts:
-
-            _fronts.append(np.array(front, dtype=int))
-
-            # increment the n_ranked solution counter
-            n_ranked += len(front)
-
-            # stop if more solutions than n_ranked are ranked
-            if n_ranked >= n_stop_if_ranked:
-                break
-
-        fronts = _fronts
+            if n_stop_if_ranked is None:
+                n_stop_if_ranked = int(1e8)
+            if n_fronts is None:
+                n_fronts = int(1e8)
+            from pymoo.util.nds.fast_non_dominated_sort import fast_non_dominated_sort
+            raw = fast_non_dominated_sort(F, dominator=self.dominator, **kwargs)
+            fronts = []
+            n_ranked = 0
+            for front in raw:
+                fronts.append(np.array(front, dtype=int))
+                n_ranked += len(front)
+                if n_ranked >= n_stop_if_ranked:
+                    break
 
         if only_non_dominated_front:
-            return fronts[0]
+            return fronts[0] if fronts else np.array([], dtype=int)
 
         if return_rank:
             rank = rank_from_fronts(fronts, F.shape[0])
@@ -83,12 +71,11 @@ def rank_from_fronts(fronts, n):
 
 
 # Returns all indices of F that are not dominated by the other objective values
-def find_non_dominated(F, _F=None, func=load_function("find_non_dominated")):
+def find_non_dominated(F, _F=None):
+    if len(F) == 0:
+        return np.array([], dtype=int)
     if _F is None:
-        indices = func(F.astype(float))
-        return np.array(indices, dtype=int)
+        return np.where(is_nondominated(F.astype(float), keep_weakly=True))[0]
     else:
-        # Fallback to the matrix-based approach when _F is provided
         M = Dominator.calc_domination_matrix(F, _F)
-        I = np.where(np.all(M >= 0, axis=1))[0]
-        return I
+        return np.where(np.all(M >= 0, axis=1))[0]
