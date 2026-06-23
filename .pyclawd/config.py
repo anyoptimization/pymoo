@@ -62,6 +62,8 @@ project = Project(
     name="pymoo",
     conda_env="default",
     root_markers=["pymoo/__init__.py", "setup.py"],
+    # Default root for `pyclawd ls` — pymoo uses a flat package layout (not src/).
+    src_dir="pymoo",
     # `pyclawd compile` / `pyclawd dist` — args handed to the dev Python.
     compile_cmd=["setup.py", "build_ext", "--inplace"],
     dist_cmd=["setup.py", "sdist"],
