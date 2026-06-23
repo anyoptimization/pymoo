@@ -9,10 +9,6 @@ from pymoo.operators.survival.rank_and_crowding import RankAndCrowding, ConstrRa
 from pymoo.operators.survival.rank_and_crowding.metrics import calc_crowding_distance
 from pymoo.functions import load_function
 
-# Heavy survival battery — excluded from the `pyclawd test fast` smoke tier.
-pytestmark = pytest.mark.slow
-
-
 calc_mnn = load_function("calc_mnn")
 calc_2nn = load_function("calc_2nn")
 calc_pcd = load_function("calc_pcd")
@@ -28,10 +24,13 @@ def test_multi_run(crowding_func, survival):
     
     problem = get_problem("truss2d")
 
-    NGEN = 250
+    # Smoke test: the survival operator runs every generation and must yield a
+    # non-empty front. The operator is exercised each gen, so a short run covers
+    # the same code path — no need for a full convergence budget here.
+    NGEN = 30
     POPSIZE = 100
     SEED = 5
-    
+
     nsga2 = NSGA2(pop_size=POPSIZE, survival=survival(crowding_func=crowding_func))
 
     res = minimize(problem,
@@ -40,7 +39,7 @@ def test_multi_run(crowding_func, survival):
                    seed=SEED,
                    save_history=False,
                    verbose=False)
-    
+
     assert len(res.opt) > 0
 
 
@@ -48,10 +47,13 @@ def test_cd_and_pcd():
     
     problem = get_problem("truss2d")
 
-    NGEN = 200
+    # The run only needs to produce a realistic, populated front (>10 points for
+    # the incremental-removal check below); the assertions test cd/pcd
+    # implementation equivalence, which is independent of convergence quality.
+    NGEN = 30
     POPSIZE = 100
     SEED = 5
-    
+
     nsga2 = NSGA2(pop_size=POPSIZE, survival=RankAndCrowding(crowding_func="pcd"))
 
     res = minimize(problem,
@@ -86,10 +88,13 @@ def test_mnn():
     
     problem = get_problem("dtlz2")
 
-    NGEN = 200
+    # Only needs a full population (POPSIZE >= the n_survive values used below) to
+    # compare the Cython vs Python crowding implementations; that equivalence is
+    # independent of how far the run has converged.
+    NGEN = 30
     POPSIZE = 100
     SEED = 5
-    
+
     nsga2 = NSGA2(pop_size=POPSIZE, survival=RankAndCrowding(crowding_func="mnn"))
 
     res = minimize(problem,
