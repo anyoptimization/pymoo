@@ -49,6 +49,7 @@ include = ["pymoo*"]
 dev = [
     "numba",
     "pytest",
+    "pytest-xdist",
     "nbformat",
     "jupyter",
     "pyrecorder",

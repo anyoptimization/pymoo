@@ -52,13 +52,13 @@ from pymoo.problems.single import Sphere
 algorithm = G3PCX()
 
 problem = Sphere(n_var=10)
-n_evals = 500
+n_evals = 200
 
 performance = SingleObjectiveSingleRun(problem, termination=("n_evals", n_evals), seed=1)
 
 res = minimize(HyperparameterProblem(algorithm, performance),
                Optuna(),
-               termination=('n_evals', 50),
+               termination=('n_evals', 20),
                seed=1,
                verbose=False)
 
@@ -85,13 +85,13 @@ from pymoo.problems.single import Sphere
 algorithm = G3PCX()
 
 problem = Sphere(n_var=10)
-n_evals = 500
+n_evals = 200
 
 performance = SingleObjectiveSingleRun(problem, termination=("n_evals", n_evals), seed=1)
 
 res = minimize(HyperparameterProblem(algorithm, performance),
                MixedVariableGA(pop_size=5),
-               termination=('n_evals', 50),
+               termination=('n_evals', 20),
                seed=1,
                verbose=False)
 
@@ -117,14 +117,14 @@ from pymoo.problems.single import Sphere
 algorithm = G3PCX()
 
 problem = Sphere(n_var=10)
-n_evals = 500
+n_evals = 200
 seeds = [5, 50, 500]
 
 performance = MultiRun(problem, seeds=seeds, func_stats=stats_single_objective_mean, termination=("n_evals", n_evals))
 
 res = minimize(HyperparameterProblem(algorithm, performance),
                MixedVariableGA(pop_size=5),
-               termination=('n_evals', 50),
+               termination=('n_evals', 20),
                seed=1,
                verbose=True)
 
@@ -153,13 +153,13 @@ algorithm = G3PCX()
 
 problem = Sphere(n_var=10)
 
-termination = TerminateIfAny(MinimumFunctionValueTermination(1e-5), MaximumFunctionCallTermination(500))
+termination = TerminateIfAny(MinimumFunctionValueTermination(1e-5), MaximumFunctionCallTermination(300))
 
 performance = MultiRun(problem, seeds=[5, 50, 500], func_stats=stats_avg_nevals, termination=termination)
 
 res = minimize(HyperparameterProblem(algorithm, performance),
                MixedVariableGA(pop_size=5),
-               ('n_evals', 50),
+               ('n_evals', 20),
                seed=1,
                verbose=True)
 

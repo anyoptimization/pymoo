@@ -3,6 +3,9 @@ import pytest
 from pymoo.util import value_functions as mvf
 import numpy as np
 
+# Value-function fitting is heavy — excluded from the `pyclawd test fast` smoke tier.
+pytestmark = pytest.mark.slow
+
 
 ## ----------------------- Constructor test ----------------------
 # It should take in a set of PO points, and then return a function. 

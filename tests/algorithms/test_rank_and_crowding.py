@@ -9,6 +9,9 @@ from pymoo.operators.survival.rank_and_crowding import RankAndCrowding, ConstrRa
 from pymoo.operators.survival.rank_and_crowding.metrics import calc_crowding_distance
 from pymoo.functions import load_function
 
+# Heavy survival battery — excluded from the `pyclawd test fast` smoke tier.
+pytestmark = pytest.mark.slow
+
 
 calc_mnn = load_function("calc_mnn")
 calc_2nn = load_function("calc_2nn")

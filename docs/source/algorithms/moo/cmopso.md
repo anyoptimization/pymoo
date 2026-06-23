@@ -78,7 +78,7 @@ algorithm = CMOPSO(
 
 res = minimize(problem,
                algorithm,
-               ('n_gen', 200),
+               ('n_gen', 80),
                seed=1,
                verbose=False)
 
@@ -104,7 +104,7 @@ problem = get_problem("zdt2")
 
 # Customized CMOPSO with different parameters
 algorithm = CMOPSO(
-    pop_size=150,           # Larger population for better diversity
+    pop_size=100,           # Larger population for better diversity
     max_velocity_rate=0.3,  # Higher velocity for more exploration
     elite_size=20,          # Larger elite archive
     mutation_rate=0.3,      # Lower mutation rate for more exploitation
@@ -114,7 +114,7 @@ algorithm = CMOPSO(
 
 res = minimize(problem,
                algorithm,
-               ('n_gen', 300),
+               ('n_gen', 120),
                seed=1,
                verbose=False)
 

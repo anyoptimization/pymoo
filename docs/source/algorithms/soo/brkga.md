@@ -79,15 +79,15 @@ from pymoo.algorithms.soo.nonconvex.brkga import BRKGA
 from pymoo.optimize import minimize
 
 algorithm = BRKGA(
-    n_elites=200,
-    n_offsprings=700,
-    n_mutants=100,
+    n_elites=100,
+    n_offsprings=300,
+    n_mutants=50,
     bias=0.7,
     eliminate_duplicates=MyElementwiseDuplicateElimination())
 
 res = minimize(problem,
                algorithm,
-               ("n_gen", 75),
+               ("n_gen", 50),
                seed=1,
                verbose=False)
 

@@ -24,6 +24,9 @@ from pymoo.algorithms.moo.unsga3 import UNSGA3
 from pymoo.optimize import minimize
 from pymoo.problems.multi import ZDT1
 
+# Full multi-objective optimization runs — excluded from the `pyclawd test fast` smoke tier.
+pytestmark = pytest.mark.slow
+
 
 # Simple deterministic automated decision maker for testing
 class SimpleDeterministicDM(AutomatedDM):

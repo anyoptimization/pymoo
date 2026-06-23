@@ -87,7 +87,7 @@ algorithm = PINSGA2(pop_size=30,
 
 res = minimize(problem,
                algorithm,
-               ('n_gen', 100),
+               ('n_gen', 60),
                seed=1,
                verbose=False)
 

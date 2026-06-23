@@ -127,7 +127,7 @@ Scatter().add(ref_dirs).show()
 ```
 
 ```{code-cell} ipython3
-ref_dirs = get_reference_directions("energy", 3, 250, seed=1)
+ref_dirs = get_reference_directions("energy", 3, 150, seed=1)
 Scatter().add(ref_dirs).show()
 ```
 

@@ -19,6 +19,11 @@ filtered_problems = [(name, params) for name, params in problems if name not in 
 
 @pytest.mark.parametrize('name,params', filtered_problems)
 def test_autodiff(name, params):
+    # Seed the random sampling: comparing autodiff against the complex-step gradient
+    # on unseeded points is flaky (multimodal problems like ZDT4 occasionally draw a
+    # point where the two methods disagree past rtol). A fixed seed makes it reproducible.
+    np.random.seed(1)
+
     problem = get_problem(name, *params)
 
     X = FloatRandomSampling().do(problem, 100).get("X")

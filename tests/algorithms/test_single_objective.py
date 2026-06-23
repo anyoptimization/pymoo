@@ -10,6 +10,9 @@ from pymoo.algorithms.soo.nonconvex.pso import PSO
 from pymoo.optimize import minimize
 from pymoo.problems.single import Sphere, Problem
 
+# Single-objective algorithm sweep over multiple seeds — excluded from `pyclawd test fast`.
+pytestmark = pytest.mark.slow
+
 SEEDS = np.arange(2, 5)
 
 

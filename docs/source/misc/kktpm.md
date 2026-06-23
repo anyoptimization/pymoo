@@ -65,14 +65,14 @@ from pymoo.visualization.scatter import Scatter
 from pymoo.core.evaluator import Evaluator
 
 
-algorithm = NSGA2(pop_size=100, eliminate_duplicates=True)
+algorithm = NSGA2(pop_size=60, eliminate_duplicates=True)
 
 # make sure each evaluation also has the derivatives - necessary for KKTPM
 evaluator = Evaluator(evaluate_values_of=["F", "G", "dF", "dG"])
 
 res = minimize(problem,
                algorithm,
-               ('n_gen', 100),
+               ('n_gen', 50),
                evaluator=evaluator,
                seed=1,
                save_history=True,

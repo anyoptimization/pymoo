@@ -37,7 +37,7 @@ algorithm = MOEAD(
 
 res = minimize(problem,
                algorithm,
-               ('n_gen', 200),
+               ('n_gen', 100),
                seed=1,
                verbose=False)
 

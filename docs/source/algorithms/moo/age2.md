@@ -36,7 +36,7 @@ algorithm = AGEMOEA2(pop_size=100)
 
 res = minimize(problem,
                algorithm,
-               ('n_gen', 200),
+               ('n_gen', 80),
                seed=1,
                verbose=False)
 

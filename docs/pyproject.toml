@@ -37,6 +37,7 @@ dependencies = [
     "nbconvert",
     "nbformat",
     "jupytext",
+    "jupyter-cache",  # content-addressed execution cache (skip unchanged notebooks)
     
     # Core scientific computing
     "numpy>=1.19.3,<3.0",
@@ -51,7 +52,9 @@ dependencies = [
     "optuna",
     "joblib",
     "dask[distributed]",
-    
+    "cma",   # algorithms/soo/cmaes
+    "jax",   # parallelization/gpu, gradients/index
+
     # Visualization
     "seaborn",
     "plotly",
@@ -59,6 +62,7 @@ dependencies = [
     "holoviews",
     "panel",
     "datashader",
+    "pyrecorder",   # visualization/video
     
     # Additional dependencies
     "dill",
@@ -67,6 +71,8 @@ dependencies = [
     "pygments",
     "beautifulsoup4",
     "moocore>=0.1.7",
+    # problems/constrained/modact — GitHub-only, installs cleanly via git URL
+    "modact @ git+https://github.com/epfl-lamd/modact",
     
     # Build and development tools
     "setuptools",

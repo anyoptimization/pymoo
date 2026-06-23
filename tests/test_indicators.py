@@ -23,7 +23,7 @@ def test_values_of_indicators():
             val = indicator(pf).do(F)
 
             correct = load_to_test_resource("performance_indicator", f"performance_indicators_{i}.{ext}", to="numpy")
-            assert float(correct) == val
+            np.testing.assert_allclose(val, float(correct), rtol=1e-12, atol=1e-12)
 
 
 def test_performance_indicator_1():

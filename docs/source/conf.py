@@ -130,11 +130,16 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
 # Exclude build directory and Jupyter backup files:
 exclude_patterns = ['build', '**.ipynb_checkpoints']
 
-# Check mode for fast testing (triggered by make check)
+# Fast/check mode: render only non-notebook pages by excluding every .ipynb.
+# A fast smoke-render of the Sphinx pipeline (seconds, not minutes) — useful for
+# iterating on render config/logging without paying for the full notebook set.
+# Triggered by `pyclawd docs render --fast` / `build --fast` (PYMOO_DOCS_FAST_MODE)
+# or the legacy check mode (PYMOO_DOCS_CHECK_MODE).
 CHECK_MODE = os.environ.get('PYMOO_DOCS_CHECK_MODE', '0') == '1'
+FAST_MODE = os.environ.get('PYMOO_DOCS_FAST_MODE', '0') == '1'
 
-if CHECK_MODE:
-    print("Fast check mode enabled - excluding all ipynb files for faster testing")
+if CHECK_MODE or FAST_MODE:
+    print("Fast/check mode enabled - excluding all ipynb files for faster rendering")
     exclude_patterns.append("**/*.ipynb")
 
 

@@ -37,7 +37,7 @@ algorithm = CTAEA(ref_dirs=ref_dirs)
 # execute the optimization
 res = minimize(problem,
                algorithm,
-               ('n_gen', 600),
+               ('n_gen', 250),
                seed=1,
                verbose=False
                )
@@ -55,7 +55,7 @@ algorithm = CTAEA(ref_dirs=ref_dirs)
 
 res = minimize(problem,
                algorithm,
-               ('n_gen', 600),
+               ('n_gen', 250),
                seed=1
                )
 

@@ -40,8 +40,12 @@ pymoo/cache/*
 pymoo/data
 pymoo/docs/build
 pymoo/docs/nbconvert
-.claude
+# Claude Code: share AGENTS.md, CLAUDE.md, .claude/{commands,docs,skills}; keep only personal settings out
+.claude/settings.local.json
 .kiro
+
+# Docs: executed notebooks and their cache never go in git (only .md sources do)
+.jupyter_cache/
 
 
 benchmark/runs/*
@@ -154,3 +158,6 @@ uv.lock
 # pixi environments
 .pixi
 *.egg-info
+
+# felix-loop bookkeeping (not committed)
+.claude/loop/

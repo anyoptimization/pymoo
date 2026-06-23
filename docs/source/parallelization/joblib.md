@@ -62,7 +62,7 @@ class MyProblem(ElementwiseProblem):
 runner = JoblibParallelization()
 problem = MyProblem(elementwise_runner=runner)
 
-res = minimize(problem, GA(), termination=("n_gen", 200), seed=1)
+res = minimize(problem, GA(), termination=("n_gen", 50), seed=1)
 print(f'Joblib runtime: {res.exec_time:.2f} sec with {os.cpu_count()} cores')
 ```
 
@@ -159,6 +159,6 @@ runner = JoblibParallelization(
 )
 
 problem = MyProblem(elementwise_runner=runner)
-res = minimize(problem, GA(), termination=("n_gen", 100), seed=1)
+res = minimize(problem, GA(), termination=("n_gen", 40), seed=1)
 print(f'Advanced config runtime: {res.exec_time:.2f} sec')
 ```

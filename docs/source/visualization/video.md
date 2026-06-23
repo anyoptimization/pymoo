@@ -109,13 +109,9 @@ with Recorder(Video("ga.mp4")) as rec:
 The callback directive can be used to initiate a video by `Video(Streamer())` to stream the current algorithm state directly to the screen.
 This allows the streaming of the current status of the algorithm.
 
-```{code-cell}
----
-pycharm:
-  name: '#%%
+Because this streams frames to an interactive window (via `cv2.imshow`), it requires a display and is therefore shown here as a non-executed example:
 
-    '
----
+```python
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.core.callback import Callback
 from pymoo.problems import get_problem
