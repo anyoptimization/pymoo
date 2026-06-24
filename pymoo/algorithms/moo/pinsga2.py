@@ -56,6 +56,7 @@ class PINSGA2(GeneticAlgorithm):
                  opt_method="trust-constr",
                  vf_type="poly",
                  eps_max=1000,
+                 vf_max_iter=400,
                  ranking_type='pairwise',
                  presi_signs=None,
                  automated_dm=None,
@@ -94,6 +95,9 @@ class PINSGA2(GeneticAlgorithm):
         self.prev_pop = None
         self.fronts = []
         self.eps_max = eps_max
+        # Cap the scipy VF fit; infeasible instances otherwise grind to scipy's
+        # maxiter=1000 and are discarded anyway. Set None to restore the full budget.
+        self.vf_max_iter = vf_max_iter
 
         self.verbose = verbose
 
@@ -315,17 +319,19 @@ class PINSGA2(GeneticAlgorithm):
 
                 if self.vf_type == "linear":
 
-                    vf_res = mvf.create_linear_vf(eta_F * -1, 
-                                                  dm_ranks.tolist(), 
-                                                  eps_max=self.eps_max, 
-                                                  method=self.opt_method)
+                    vf_res = mvf.create_linear_vf(eta_F * -1,
+                                                  dm_ranks.tolist(),
+                                                  eps_max=self.eps_max,
+                                                  method=self.opt_method,
+                                                  max_iter=self.vf_max_iter)
 
                 elif self.vf_type == "poly":
 
-                    vf_res = mvf.create_poly_vf(eta_F * -1, 
-                                                dm_ranks.tolist(), 
-                                                eps_max=self.eps_max, 
-                                                method=self.opt_method)
+                    vf_res = mvf.create_poly_vf(eta_F * -1,
+                                                dm_ranks.tolist(),
+                                                eps_max=self.eps_max,
+                                                method=self.opt_method,
+                                                max_iter=self.vf_max_iter)
     
                 else:
                     

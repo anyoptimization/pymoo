@@ -33,28 +33,28 @@ def create_vf(P, ranks, ineq_constr, vf="linear", delta=0.1, eps_max=1000, metho
 
     return lambda f_new:  np.sum(f_new)
 
-def create_poly_vf(P, ranks, delta=0.1, eps_max=1000, method="trust-constr", verbose=False):
+def create_poly_vf(P, ranks, delta=0.1, eps_max=1000, method="trust-constr", verbose=False, max_iter=None):
 
-    if method == "trust-constr" or method == "SLSQP": 
-        return create_vf_scipy_poly(P, ranks, delta, eps_max, method=method, verbose=verbose)
-    elif method == "ES": 
+    if method == "trust-constr" or method == "SLSQP":
+        return create_vf_scipy_poly(P, ranks, delta, eps_max, method=method, verbose=verbose, max_iter=max_iter)
+    elif method == "ES":
         return create_vf_pymoo_poly(P, ranks, delta, eps_max, method=method, verbose=verbose)
-    else: 
-        raise ValueError("Optimization method %s not supported" % method) 
+    else:
+        raise ValueError("Optimization method %s not supported" % method)
 
 
 
-def create_linear_vf(P, ranks, delta=0.1, eps_max=1000, method="trust-constr"): 
-    
-    if method == "trust-constr" or method == "SLSQP": 
-        return create_vf_scipy_linear(P, ranks, delta, eps_max, method)
-    elif method == "ES": 
+def create_linear_vf(P, ranks, delta=0.1, eps_max=1000, method="trust-constr", max_iter=None):
+
+    if method == "trust-constr" or method == "SLSQP":
+        return create_vf_scipy_linear(P, ranks, delta, eps_max, method, max_iter=max_iter)
+    elif method == "ES":
         return create_vf_pymoo_linear(P, ranks, delta, eps_max, method)
-    else: 
-        raise ValueError("Optimization method %s not supported" % method) 
+    else:
+        raise ValueError("Optimization method %s not supported" % method)
 
 
-def create_vf_scipy_poly(P, ranks, delta, eps_max, method="trust-constr", verbose=False):
+def create_vf_scipy_poly(P, ranks, delta, eps_max, method="trust-constr", verbose=False, max_iter=None):
 
     # Gathering basic info
     M = P.shape[1]
@@ -105,14 +105,17 @@ def create_vf_scipy_poly(P, ranks, delta, eps_max, method="trust-constr", verbos
     else: 
         hess = None
 
-    res = scimin(_obj_func, 
-                 x0, 
-                 constraints=constr, 
-                 bounds=bounds, 
-                 method=method, 
-                 hess=hess)
+    options = {"maxiter": max_iter} if max_iter is not None else None
 
-    # package up results 
+    res = scimin(_obj_func,
+                 x0,
+                 constraints=constr,
+                 bounds=bounds,
+                 method=method,
+                 hess=hess,
+                 options=options)
+
+    # package up results
     vf =  lambda P_in: poly_vf(P_in, res.x[0:-1])
     params = res.x[0:-1]
     epsilon = res.x[-1]
@@ -122,7 +125,7 @@ def create_vf_scipy_poly(P, ranks, delta, eps_max, method="trust-constr", verbos
     return vfResults(vf, params, epsilon, fit)
 
 
-def create_vf_scipy_linear(P, ranks, delta, eps_max, method="trust-constr", verbose=False): 
+def create_vf_scipy_linear(P, ranks, delta, eps_max, method="trust-constr", verbose=False, max_iter=None):
 
     # Gathering basic info
     M = P.shape[1]
@@ -163,12 +166,15 @@ def create_vf_scipy_linear(P, ranks, delta, eps_max, method="trust-constr", verb
     else: 
         hess = None
 
-    res = scimin(_obj_func, 
-                 x0, 
+    options = {"maxiter": max_iter} if max_iter is not None else None
+
+    res = scimin(_obj_func,
+                 x0,
                  constraints= constr,
-                 bounds=bounds, 
-                 method=method, 
-                 hess=hess)
+                 bounds=bounds,
+                 method=method,
+                 hess=hess,
+                 options=options)
 
     # package up results
     vf =  lambda P_in: linear_vf(P_in, res.x[0:-1])
@@ -400,21 +406,20 @@ def _ineq_constr_1D_poly(x, P, vf, ranks, delta):
     G[:, 0:S_constr_len] = S.reshape(1, S_constr_len)
 
 
-    # Pair-wise compare each ranked member of P, seeing if our proposed utility 
-    #  function increases monotonically as rank increases
-    for p in range(P_count - 1):
+    # Pair-wise compare each ranked member of P, seeing if our proposed utility
+    #  function increases monotonically as rank increases. Each point is evaluated
+    #  once with the same single-row call as before (bitwise-identical), instead of
+    #  re-evaluating every interior point twice.
+    vals = np.array([vf(P[[p], :], x[0:-1]) for p in range(P_count)])
+    diff = vals[:-1] - vals[1:]
 
-        current_P_val = vf(P[[p],:], x[0:-1])
-        next_P_val = vf(P[[p+1],:], x[0:-1])
-
-        current_rank = ranks[p]
-        next_rank = ranks[p+1]
-
-        if current_rank == next_rank: 
-            # Handle ties
-            G[:,[p + S_constr_len]] = np.abs(current_P_val - next_P_val) - delta*ep
-        else: 
-            G[:,[p + S_constr_len]] = -(current_P_val - next_P_val) + ep
+    # Default (non-tie) branch; only the tied pairs use the delta*ep form, matching
+    # the original per-pair if/else (which never touched delta when there were no ties).
+    g = -diff + ep
+    tie = np.asarray(ranks)[:-1] == np.asarray(ranks)[1:]
+    if tie.any():
+        g[tie] = np.abs(diff[tie]) - delta*ep
+    G[:, S_constr_len:] = g
 
 
     return G
@@ -478,23 +483,20 @@ def _ineq_constr_1D_linear(x, P, vf, ranks, delta):
 
     G = np.ones((1, np.size(P,0)-1))*-99
 
-    # Pair-wise compare each ranked member of P, seeing if our proposed utility 
-    #  function increases monotonically as rank increases
-    for p in range(np.size(P,0) - 1):
+    # Pair-wise compare each ranked member of P, seeing if our proposed utility
+    #  function increases monotonically as rank increases. Each point is evaluated
+    #  once with the same single-row call as before (bitwise-identical), instead of
+    #  re-evaluating every interior point twice.
+    vals = np.array([vf(P[[p], :], x[0:-1]) for p in range(np.size(P, 0))]).ravel()
+    diff = vals[:-1] - vals[1:]
 
-        current_P_val = vf(P[[p],:], x[0:-1])
-        next_P = vf(P[[p+1],:], x[0:-1])
-
-        current_rank = ranks[p]
-        next_rank = ranks[p+1]
-
-        if current_rank == next_rank: 
-            # Handle ties 
-            G[:,[p]] = np.abs(current_P_val - next_P) - delta*ep
-        else: 
-            G[:,[p]] = -(current_P_val - next_P) + ep
-        
-
+    # Default (non-tie) branch; only the tied pairs use the delta*ep form, matching
+    # the original per-pair if/else (which never touched delta when there were no ties).
+    g = -diff + ep
+    tie = np.asarray(ranks)[:-1] == np.asarray(ranks)[1:]
+    if tie.any():
+        g[tie] = np.abs(diff[tie]) - delta*ep
+    G[:, :] = g
 
     return G
 
