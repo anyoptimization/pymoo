@@ -46,6 +46,7 @@ pyclawd python -c "import pymoo" # quick check
 
 - **Unit tests** live in `tests/`, mirroring the package layout. Markers: `long`, `slow`, `examples`, `docs`, `gradient` (`pytest.ini`, `--strict-markers`).
 - **`examples/`** files are executed as integration tests (`pyclawd test examples`). Each example must be self-contained and runnable.
+  - **Headless note:** a few examples render a *live animation* via pyrecorder/opencv `cv2.imshow` (`dnsga2.py`, `kgb.py`, `tsp.py`, `stream.py`). On a headless box (no `$DISPLAY`) these need a virtual framebuffer. The `pytest-xvfb` dev dep auto-starts one when `$DISPLAY` is unset — so `pyclawd test examples` just works — **but it requires the system `xvfb` binary** (`apt-get install xvfb`, not a pip dep) and the GUI `opencv-python` (pulled in by `pyrecorder`; do **not** install `opencv-python-headless`, which has no `imshow`). If those two examples fail with a Qt/`xcb` "could not connect to display" or `cv2.imshow ... not implemented` error, that's the missing piece — not a code bug.
 - **Docs** are `.md` sources converted to Jupyter notebooks via **jupytext**, executed, then built with Sphinx (`pyclawd test docs`). **Never edit generated `.ipynb` directly** — edit the `.md` source.
 
 ## Test pipeline (`pyclawd test`)
