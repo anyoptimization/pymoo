@@ -85,7 +85,11 @@ project = Project(
         classname_prefix="tests.",
         integration_files=["tests/test_examples.py", "tests/test_docs.py"],
         markers={
-            "default": "not examples and not docs and not long",
+            # Two unit tiers (everything runs under xdist now, so a middle tier
+            # buys little): `fast` is the quick smoke (excludes the heavy
+            # slow+long tests); `default`/`run`/`all` are the full unit suite.
+            # `slow` and `long` therefore both mean "kept out of the fast tier".
+            "default": "not examples and not docs",
             "fast": "not examples and not docs and not long and not slow",
             "all": "not examples and not docs",
             "examples": "examples",

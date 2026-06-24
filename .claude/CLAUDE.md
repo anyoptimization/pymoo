@@ -56,14 +56,13 @@ Mirrors `pyclawd docs`: a logged, instrumented runner with **fast / comprehensiv
 | Task | Command |
 |---|---|
 | Fast smoke tier (<30s, xdist `-n auto`) | `pyclawd test fast` |
-| Full default gate (everything but `long`) | `pyclawd test run` |
-| Everything incl. `long` | `pyclawd test all` |
+| Full unit suite (`run`/`all`/bare `test` are identical) | `pyclawd test run` |
 | The fix-list (lastfailed cache) | `pyclawd test failures` |
 | Debug the next failure (live, `--lf -x`) | `pyclawd test fix` |
 | Slowest tests from last run | `pyclawd test timings [--top N]` |
 | Select a file/dir/nodeid/keyword | `pyclawd test tests/path::name -x` · `pyclawd test -k nsga2` |
 
-- **Tiers via markers.** `fast` = `not slow and not long` under **pytest-xdist**; the comprehensive `run`/`all` include them. Exclude a heavy module from `fast` with `pytestmark = pytest.mark.slow` at module top (a real marker on the tests — **not** a hardcoded list in `conftest.py`). On a 4-core box: fast ≈14s/590 tests, `run` ≈85s/691 tests.
+- **Two unit tiers (everything runs under pytest-xdist now).** `fast` = `not slow and not long` (the quick smoke); `run`/`all`/bare `test` are the full unit suite (everything but `examples`/`docs`) — collapsed into one because parallelism made a middle tier pointless, so `slow` and `long` now both just mean "kept out of `fast`". Exclude a heavy module from `fast` with `pytestmark = pytest.mark.slow` at module top (a real marker on the tests — **not** a hardcoded list in `conftest.py`). On a 4-core box: fast ≈15s/602 tests, full ≈48s/721 tests. (`examples` and `docs` are separate integration tiers — `all` does **not** include them.)
 - **Logs & timing:** `run`/`fast`/`all` tee full output to a per-run log (+ sibling `.junit.xml`), and the log **ends with the same timing + failure tables and verdict** printed to the console — self-contained, like the docs logs.
 - **The fix-loop:** stop-early to fix, full run to verify. `pyclawd test failures` → `pyclawd test fix` (reruns only last-failed within the tier, stops at the first, full traceback) → fix the cause → `pyclawd test fix` again → finally `pyclawd test run`. The lastfailed cache (`.pytest_cache`) drives `--lf`; the `examples`/`docs` suites are deselected by the unit tiers, so `failures` lists their stale entries separately. Common fixes: **float-equality assert → `np.testing.assert_allclose(rtol/atol)`**; **unseeded stochastic test → fix the `seed`**; broken-env mass failures → `pyclawd doctor` + `pyclawd compile`.
 
