@@ -1,3 +1,5 @@
+"""Fit linear and polynomial value functions to ranked solutions (the preference model behind PINSGA2)."""
+
 import numpy as np
 import pymoo
 import scipy

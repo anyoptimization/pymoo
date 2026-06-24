@@ -1,3 +1,5 @@
+"""PINSGA2 — interactive NSGA-II that guides selection with a value function learned from decision-maker preferences."""
+
 import sys
 from abc import ABC, abstractmethod
 
