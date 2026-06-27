@@ -1,3 +1,5 @@
+"""NSDER - Many-objective differential evolution with reference directions."""
+
 import numpy as np
 
 from pymoo.algorithms.moo.nsde import NSDE
@@ -5,44 +7,36 @@ from pymoo.algorithms.moo.nsga3 import ReferenceDirectionSurvival
 from pymoo.util.misc import has_feasible
 
 
-# =========================================================================================================
-# NSDER
-# =========================================================================================================
-
 class NSDER(NSDE):
+    """Many-objective DE with reference-direction survival (NSDE-R).
 
-    def __init__(self,
-                 ref_dirs,
-                 pop_size=None,
-                 variant="DE/rand/1/bin",
-                 CR=0.7,
-                 F=None,
-                 gamma=1e-4,
-                 **kwargs):
+    Extends NSDE to many-objective problems using NSGA-III reference-direction survival.
+
+    Reference: S. R. Reddy & G. S. Dulikravich, "Many-objective differential evolution
+    optimization based on reference points: NSDE-R," Struct. Multidisc. Optim., 2019.
+    """
+
+    def __init__(
+        self,
+        ref_dirs,
+        pop_size=None,
+        variant="DE/rand/1/bin",
+        CR=0.7,
+        F=None,
+        gamma=1e-4,
+        **kwargs,
+    ):
+        """Initialize NSDER algorithm.
+
+        Args:
+            ref_dirs: Reference directions (shape: [n_dirs, n_obj]).
+            pop_size: Population size. Defaults to len(ref_dirs).
+            variant: DE strategy string. Defaults to 'DE/rand/1/bin'.
+            CR: Crossover rate. Defaults to 0.7.
+            F: Scale factor(s). Defaults to randomized in (0, 1).
+            gamma: Jitter deviation. Defaults to 1e-4.
+            **kwargs: Additional arguments (including de_repair for donor vector repair).
         """
-        NSDE-R extends NSDE to many-objective problems using NSGA-III reference-direction survival.
-
-        Reference: S. R. Reddy & G. S. Dulikravich, "Many-objective differential evolution
-        optimization based on reference points: NSDE-R," Struct. Multidisc. Optim., 2019.
-
-        Parameters
-        ----------
-        ref_dirs : array-like
-            Reference directions (shape: [n_dirs, n_obj]).
-        pop_size : int, optional
-            Population size. Defaults to len(ref_dirs).
-        variant : str
-            DE strategy string. Defaults to 'DE/rand/1/bin'.
-        CR : float
-            Crossover rate. Defaults to 0.7.
-        F : float or (float, float)
-            Scale factor(s). Defaults to randomized in (0, 1).
-        gamma : float
-            Jitter deviation. Defaults to 1e-4.
-        de_repair : str or callable
-            Donor vector repair. Defaults to 'bounce-back'.
-        """
-
         self.ref_dirs = ref_dirs
 
         if pop_size is None:
@@ -61,13 +55,15 @@ class NSDER(NSDE):
         else:
             survival = ReferenceDirectionSurvival(ref_dirs)
 
-        super().__init__(pop_size=pop_size,
-                         variant=variant,
-                         CR=CR,
-                         F=F,
-                         gamma=gamma,
-                         survival=survival,
-                         **kwargs)
+        super().__init__(
+            pop_size=pop_size,
+            variant=variant,
+            CR=CR,
+            F=F,
+            gamma=gamma,
+            survival=survival,
+            **kwargs,
+        )
 
     def _setup(self, problem, **kwargs):
         if self.ref_dirs is not None and self.ref_dirs.shape[1] != problem.n_obj:

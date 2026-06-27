@@ -1,52 +1,46 @@
+"""Star coordinate plot visualization for multi-objective optimization results."""
+
 import numpy as np
 
-from pymoo.visualization.util import plot_axes_arrow, plot_axis_labels, equal_axis, no_ticks, parse_bounds, \
-    normalize, get_uniform_points_around_circle
+from pymoo.visualization.util import (
+    plot_axes_arrow,
+    plot_axis_labels,
+    equal_axis,
+    no_ticks,
+    parse_bounds,
+    normalize,
+    get_uniform_points_around_circle,
+)
 from pymoo.docs import parse_doc_string
 from pymoo.core.plot import Plot
 
 
 class StarCoordinate(Plot):
+    """Star coordinate plot visualization.
 
-    def __init__(self,
-                 axis_extension=1.03,
-                 **kwargs):
-        """
+    Args:
+        axis_extension: Extension factor for the axes.
+        axis_style: {axis_style}
+        labels: {labels}
+        endpoint_style: Endpoints are drawn at each extreme point of an objective. This style can be modified.
+        figsize: {figsize}
+        title: {title}
+        legend: {legend}
+        tight_layout: {tight_layout}
+        cmap: {cmap}
+    """
 
-        Star Coordinate Plot
-
-        Parameters
-        ----------
-
-        axis_style : {axis_style}
-        labels : {labels}
-        endpoint_style : dict
-            Endpoints are drawn at each extreme point of an objective. This style can be modified.
-
-        Other Parameters
-        ----------------
-
-        figsize : {figsize}
-        title : {title}
-        legend : {legend}
-        tight_layout : {tight_layout}
-        cmap : {cmap}
-
-        """
+    def __init__(self, axis_extension: float = 1.03, **kwargs) -> None:
         super().__init__(**kwargs)
 
         self.axis_extension = axis_extension
 
         if "arrow_style" not in kwargs:
-            self.arrow_style = {
-                "head_width": 0.02,
-                "head_length": 0.01
-            }
+            self.arrow_style = {"head_width": 0.02, "head_length": 0.01}
         else:
             self.arrow_style = kwargs["arrow_style"]
 
-    def _do(self):
-
+    def _do(self) -> None:
         # initial a figure with a single plot
         self.init_figure()
 
@@ -60,7 +54,12 @@ class StarCoordinate(Plot):
 
         V = get_uniform_points_around_circle(self.n_dim)
 
-        plot_axes_arrow(self.ax, V, extend_factor=self.axis_extension, **{**self.axis_style, **self.arrow_style})
+        plot_axes_arrow(
+            self.ax,
+            V,
+            extend_factor=self.axis_extension,
+            **{**self.axis_style, **self.arrow_style},
+        )
         plot_axis_labels(self.ax, V, self.get_labels(), **self.axis_label_style)
 
         # normalize in range for this plot - here no implicit normalization as in radviz

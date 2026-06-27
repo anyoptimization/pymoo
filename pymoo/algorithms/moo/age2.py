@@ -1,9 +1,11 @@
+"""AGEMOEA2 many-objective optimization algorithm with improved Pareto-front geometry modeling."""
+
 from pymoo.docs import parse_doc_string
 
 try:
     import numba
     from numba import jit
-except:
+except:  # noqa: E722
     raise Exception("Please install numba to use AGEMOEA2: pip install numba")
 
 import numpy as np
@@ -20,18 +22,20 @@ from pymoo.util.display.multi import MultiObjectiveOutput
 
 
 class AGEMOEA2(GeneticAlgorithm):
+    def __init__(
+        self,
+        pop_size=100,
+        sampling=FloatRandomSampling(),
+        selection=TournamentSelection(func_comp=binary_tournament),
+        crossover=SBX(prob=0.9, eta=15),
+        mutation=PM(eta=20),
+        eliminate_duplicates=True,
+        n_offsprings=None,
+        output=MultiObjectiveOutput(),
+        **kwargs,
+    ):
+        """Initialize the AGEMOEA2 algorithm.
 
-    def __init__(self,
-                 pop_size=100,
-                 sampling=FloatRandomSampling(),
-                 selection=TournamentSelection(func_comp=binary_tournament),
-                 crossover=SBX(prob=0.9, eta=15),
-                 mutation=PM(eta=20),
-                 eliminate_duplicates=True,
-                 n_offsprings=None,
-                 output=MultiObjectiveOutput(),
-                 **kwargs):
-        """
         Adapted from:
         Panichella, A. (2022). An Improved Pareto Front Modeling Algorithm for Large-scale Many-Objective Optimization.
         Proceedings of the 2022 Genetic and Evolutionary Computation Conference (GECCO 2022).
@@ -39,38 +43,37 @@ class AGEMOEA2(GeneticAlgorithm):
 
         @author: Annibale Panichella
 
-        Parameters
-        ----------
-        pop_size : {pop_size}
-        sampling : {sampling}
-        selection : {selection}
-        crossover : {crossover}
-        mutation : {mutation}
-        eliminate_duplicates : {eliminate_duplicates}
-        n_offsprings : {n_offsprings}
+        Args:
+            pop_size: {pop_size}
+            sampling: {sampling}
+            selection: {selection}
+            crossover: {crossover}
+            mutation: {mutation}
+            eliminate_duplicates: {eliminate_duplicates}
+            n_offsprings: {n_offsprings}
+            output: Display output used to report progress during the run.
+            **kwargs: Additional keyword arguments forwarded to the base genetic algorithm.
         """
-
-        super().__init__(pop_size=pop_size,
-                         sampling=sampling,
-                         selection=selection,
-                         crossover=crossover,
-                         mutation=mutation,
-                         survival=AGEMOEA2Survival(),
-                         eliminate_duplicates=eliminate_duplicates,
-                         n_offsprings=n_offsprings,
-                         output=output,
-                         advance_after_initial_infill=True,
-                         **kwargs)
-        self.tournament_type = 'comp_by_rank_and_crowding'
+        super().__init__(
+            pop_size=pop_size,
+            sampling=sampling,
+            selection=selection,
+            crossover=crossover,
+            mutation=mutation,
+            survival=AGEMOEA2Survival(),
+            eliminate_duplicates=eliminate_duplicates,
+            n_offsprings=n_offsprings,
+            output=output,
+            advance_after_initial_infill=True,
+            **kwargs,
+        )
+        self.tournament_type = "comp_by_rank_and_crowding"
 
 
 @jit(nopython=True, fastmath=True)
 def project_on_manifold(point, p):
-    dist = np.sum(point[point > 0] ** p) ** (1/p)
+    dist = np.sum(point[point > 0] ** p) ** (1 / p)
     return np.multiply(point, 1 / dist)
-
-
-import numpy as np
 
 
 def find_zero(point, n, precision):
@@ -81,7 +84,6 @@ def find_zero(point, n, precision):
     log_max_float = np.log(max_float)  # Logarithm of the maximum float
 
     for i in range(0, 100):
-
         # Original function with regularization
         f = 0.0
         for obj_index in range(0, n):
@@ -142,7 +144,6 @@ def find_zero(point, n, precision):
 
 
 class AGEMOEA2Survival(AGEMOEASurvival):
-
     @staticmethod
     def compute_geometry(front, extreme, n):
         m, _ = np.shape(front)
@@ -178,17 +179,28 @@ class AGEMOEA2Survival(AGEMOEASurvival):
         if 0.95 < p < 1.05:
             for row in range(0, m - 1):
                 for column in range(row + 1, m):
-                    distances[row][column] = np.sum(np.abs(projected_front[row] - projected_front[column]) ** 2) ** 0.5
+                    distances[row][column] = (
+                        np.sum(
+                            np.abs(projected_front[row] - projected_front[column]) ** 2
+                        )
+                        ** 0.5
+                    )
 
         else:
-            for row in range(0, m-1):
-                for column in range(row+1, m):
-                    mid_point = projected_front[row] * 0.5 + projected_front[column] * 0.5
+            for row in range(0, m - 1):
+                for column in range(row + 1, m):
+                    mid_point = (
+                        projected_front[row] * 0.5 + projected_front[column] * 0.5
+                    )
                     mid_point = project_on_manifold(mid_point, p)
 
-                    distances[row][column] = np.sum(np.abs(projected_front[row] - mid_point) ** 2) ** 0.5 + \
-                                            np.sum(np.abs(projected_front[column] - mid_point) ** 2) ** 0.5
+                    distances[row][column] = (
+                        np.sum(np.abs(projected_front[row] - mid_point) ** 2) ** 0.5
+                        + np.sum(np.abs(projected_front[column] - mid_point) ** 2)
+                        ** 0.5
+                    )
 
         return distances + distances.T
+
 
 parse_doc_string(AGEMOEA2.__init__)

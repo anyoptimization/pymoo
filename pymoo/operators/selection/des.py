@@ -1,3 +1,5 @@
+"""Differential-evolution parent selection."""
+
 import numpy as np
 
 from pymoo.core.selection import Selection
@@ -55,10 +57,10 @@ class DES(Selection):
     def _current_to_best(self, pop, n_select, n_parents, random_state):
         n_pop = len(pop)
         P = np.empty([n_select, n_parents], dtype=int)
-        P[:, 0] = np.arange(n_pop)   # target
-        P[:, 1] = np.arange(n_pop)   # current (mutation base)
-        P[:, 2] = 0                   # best
-        P[:, 3] = np.arange(n_pop)   # current (first of second diff pair)
+        P[:, 0] = np.arange(n_pop)  # target
+        P[:, 1] = np.arange(n_pop)  # current (mutation base)
+        P[:, 2] = 0  # best
+        P[:, 3] = np.arange(n_pop)  # current (first of second diff pair)
         for j in range(4, n_parents):
             P[:, j] = random_state.choice(n_pop, n_select)
             reselect = (P[:, j].reshape([-1, 1]) == P[:, :j]).any(axis=1)
@@ -70,9 +72,9 @@ class DES(Selection):
     def _current_to_rand(self, pop, n_select, n_parents, random_state):
         n_pop = len(pop)
         P = np.empty([n_select, n_parents], dtype=int)
-        P[:, 0] = np.arange(n_pop)   # target
-        P[:, 1] = np.arange(n_pop)   # current (mutation base)
-        P[:, 3] = np.arange(n_pop)   # current (first of second diff pair)
+        P[:, 0] = np.arange(n_pop)  # target
+        P[:, 1] = np.arange(n_pop)  # current (mutation base)
+        P[:, 3] = np.arange(n_pop)  # current (first of second diff pair)
         P[:, 2] = random_state.choice(n_pop, n_select)
         reselect = (P[:, 2].reshape([-1, 1]) == P[:, [0, 1, 3]]).any(axis=1)
         while np.any(reselect):

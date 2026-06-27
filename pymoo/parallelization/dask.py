@@ -1,15 +1,11 @@
-"""
-Dask-based parallelization for pymoo.
-"""
+"""Dask-based parallelization for pymoo."""
 
 
 class DaskParallelization:
     """Parallelization using Dask distributed client.
-    
-    Parameters
-    ----------
-    client : dask.distributed.Client
-        Dask client for distributed computing
+
+    Args:
+        client: Dask client for distributed computing.
     """
 
     def __init__(self, client):

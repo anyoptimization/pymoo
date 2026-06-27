@@ -1,21 +1,31 @@
+"""Non-dominated sorting by Pareto rank."""
+
 import sys
 
 import numpy as np
 from moocore import pareto_rank, is_nondominated
 
-from pymoo.functions import load_function
 from pymoo.util.dominator import Dominator
 
 
 class NonDominatedSorting:
-
-    def __init__(self, epsilon=None, method="fast_non_dominated_sort", dominator=None) -> None:
+    def __init__(
+        self, epsilon=None, method="fast_non_dominated_sort", dominator=None
+    ) -> None:
         super().__init__()
         self.epsilon = epsilon
         self.method = method
         self.dominator = dominator
 
-    def do(self, F, return_rank=False, only_non_dominated_front=False, n_stop_if_ranked=None, n_fronts=None, **kwargs):
+    def do(
+        self,
+        F,
+        return_rank=False,
+        only_non_dominated_front=False,
+        n_stop_if_ranked=None,
+        n_fronts=None,
+        **kwargs,
+    ):
         F = F.astype(float)
 
         if only_non_dominated_front:
@@ -42,6 +52,7 @@ class NonDominatedSorting:
             if n_fronts is None:
                 n_fronts = int(1e8)
             from pymoo.util.nds.fast_non_dominated_sort import fast_non_dominated_sort
+
             raw = fast_non_dominated_sort(F, dominator=self.dominator, **kwargs)
             fronts = []
             n_ranked = 0

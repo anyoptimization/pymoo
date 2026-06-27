@@ -1,3 +1,5 @@
+"""Edge Recombination (ERX) crossover operator."""
+
 import numpy as np
 
 from pymoo.core.crossover import Crossover
@@ -21,26 +23,24 @@ def has_duplicates(x):
 
 @default_random_state
 def erx(a, b, random_state=None):
+    """Edge Recombination (ERX) operator.
+
+    Reference:
+        http://www.rubicite.com/Tutorials/GeneticAlgorithms/CrossoverOperators/EdgeRecombinationCrossoverOperator.aspx
+
+    Algorithm:
+        1. X = the first node from a random parent.
+        2. While the CHILD chromo isn't full, Loop:
+           - Append X to CHILD
+           - Remove X from Neighbor Lists
+           - if X's neighbor list is empty:
+             - Xp = random node not already in CHILD
+           - else:
+             - Determine neighbor of X that has fewest neighbors
+             - If there is a tie, randomly choose 1
+             - Xp = chosen node
+           - X = Xp
     """
-    http://www.rubicite.com/Tutorials/GeneticAlgorithms/CrossoverOperators/EdgeRecombinationCrossoverOperator.aspx
-
-    Algorithm Pseudo Code:
-
-    1. X = the first node from a random parent.
-
-    2. While the CHILD chromo isn't full, Loop:
-        - Append X to CHILD
-        - Remove X from Neighbor Lists
-
-        if X's neighbor list is empty:
-           - Xp = random node not already in CHILD
-        else
-           - Determine neighbor of X that has fewest neighbors
-           - If there is a tie, randomly choose 1
-           - Xp = chosen node
-        X = Xp
-     """
-
     assert len(a) == len(b)
 
     # calculate the edge matrix considering both permutation
@@ -52,7 +52,6 @@ def erx(a, b, random_state=None):
 
     y = []
     while True:
-
         # append to the child
         y.append(_next)
 
@@ -73,7 +72,11 @@ def erx(a, b, random_state=None):
             # search for the one with minimum neighbors
             n_neighbors = [len(H[e]) for e in neighbors]
             min_n_neighbors = min(n_neighbors)
-            _next = [neighbors[k] for k in range(len(neighbors)) if n_neighbors[k] == min_n_neighbors]
+            _next = [
+                neighbors[k]
+                for k in range(len(neighbors))
+                if n_neighbors[k] == min_n_neighbors
+            ]
 
             # break the tie if they might have the same number of neighbors
             _next = random_state.choice(_next)
@@ -82,7 +85,6 @@ def erx(a, b, random_state=None):
 
 
 class EdgeRecombinationCrossover(Crossover):
-
     def __init__(self, **kwargs):
         super().__init__(2, 1, **kwargs)
 
@@ -96,11 +98,13 @@ class EdgeRecombinationCrossover(Crossover):
 
         return Y
 
+
 class ERX(EdgeRecombinationCrossover):
     pass
 
+
 def number_to_letter(n):
-    return chr(ord('@') + n)
+    return chr(ord("@") + n)
 
 
 def numbers_to_letters(numbers):
@@ -130,8 +134,8 @@ def calc_adjency_matrix(x, H=None):
 
 
 if __name__ == "__main__":
-    a = ['A', 'B', 'F', 'E', 'D', 'G', 'C']
-    b = ['G', 'F', 'A', 'B', 'C', 'D', 'E']
+    a = ["A", "B", "F", "E", "D", "G", "C"]
+    b = ["G", "F", "A", "B", "C", "D", "E"]
 
     """
     A: B C F
@@ -147,18 +151,18 @@ if __name__ == "__main__":
     H = calc_adjency_matrix(b, H=H)
 
     assert len(H["A"]) == 3
-    assert 'B' in H["A"] and 'C' in H["A"] and 'F' in H["A"]
+    assert "B" in H["A"] and "C" in H["A"] and "F" in H["A"]
     assert len(H["B"]) == 3
-    assert 'A' in H["B"] and 'F' in H["B"] and 'C' in H["B"]
+    assert "A" in H["B"] and "F" in H["B"] and "C" in H["B"]
     assert len(H["C"]) == 4
-    assert 'A' in H["C"] and 'G' in H["C"] and 'B' in H["C"] and 'D' in H["C"]
+    assert "A" in H["C"] and "G" in H["C"] and "B" in H["C"] and "D" in H["C"]
     assert len(H["D"]) == 3
-    assert 'E' in H["D"] and 'G' in H["D"] and 'C' in H["D"]
+    assert "E" in H["D"] and "G" in H["D"] and "C" in H["D"]
     assert len(H["E"]) == 3
-    assert 'F' in H["E"] and 'D' in H["E"] and 'G' in H["E"]
+    assert "F" in H["E"] and "D" in H["E"] and "G" in H["E"]
     assert len(H["F"]) == 4
-    assert 'B' in H["F"] and 'E' in H["F"] and 'G' in H["F"] and 'A' in H["F"]
+    assert "B" in H["F"] and "E" in H["F"] and "G" in H["F"] and "A" in H["F"]
     assert len(H["G"]) == 4
-    assert 'D' in H["G"] and 'E' in H["G"] and 'E' in H["G"] and 'F' in H["G"]
+    assert "D" in H["G"] and "E" in H["G"] and "E" in H["G"] and "F" in H["G"]
 
     c = erx(a, b)

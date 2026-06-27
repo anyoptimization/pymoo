@@ -1,25 +1,41 @@
+"""Fast non-dominated sorting algorithm."""
+
+from typing import Any, List
+
 import numpy as np
 
 from pymoo.util.dominator import Dominator
 
 
-def fast_non_dominated_sort(F, dominator=Dominator(), **kwargs):
+def fast_non_dominated_sort(
+    F: Any, dominator: Any = None, **kwargs: Any
+) -> List[List[int]]:
+    """Perform fast non-dominated sorting on objectives.
+
+    Args:
+        F: Objective values array.
+        dominator: Dominator instance for calculating domination matrix.
+        **kwargs: Additional arguments.
+
+    Returns:
+        List of fronts, each containing indices of non-dominated solutions.
+    """
+    if dominator is None:
+        dominator = Dominator()
+
     M = dominator.calc_domination_matrix(F)
 
-    # calculate the dominance matrix
     n = M.shape[0]
 
-    fronts = []
+    fronts: List[List[int]] = []
 
     if n == 0:
         return fronts
 
-    # final rank that will be returned
     n_ranked = 0
     ranked = np.zeros(n, dtype=int)
 
-    # for each individual a list of all individuals that are dominated by this one
-    is_dominating = [[] for _ in range(n)]
+    is_dominating: List[List[int]] = [[] for _ in range(n)]
 
     # storage for the number of solutions dominated this one
     n_dominated = np.zeros(n)
@@ -27,7 +43,6 @@ def fast_non_dominated_sort(F, dominator=Dominator(), **kwargs):
     current_front = []
 
     for i in range(n):
-
         for j in range(i + 1, n):
             rel = M[i, j]
             if rel == 1:
@@ -47,12 +62,10 @@ def fast_non_dominated_sort(F, dominator=Dominator(), **kwargs):
 
     # while not all solutions are assigned to a pareto front
     while n_ranked < n:
-
         next_front = []
 
         # for each individual in the current front
         for i in current_front:
-
             # all solutions that are dominated by this individuals
             for j in is_dominating[i]:
                 n_dominated[j] -= 1

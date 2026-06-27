@@ -1,11 +1,10 @@
-import numpy as np
+"""Uniform Crossover (UX) operator implementation."""
 
 from pymoo.core.crossover import Crossover
 from pymoo.util.misc import crossover_mask
 
 
 class UniformCrossover(Crossover):
-
     def __init__(self, **kwargs):
         super().__init__(2, 2, **kwargs)
 

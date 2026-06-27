@@ -1,36 +1,62 @@
+"""Autograd-based automatic differentiation backend."""
+
 import warnings
+
 import numpy as np
 
 try:
     import autograd.numpy as anp
     from autograd.core import VJPNode, backward_pass
     from autograd.tracer import new_box, isbox
-except:
+except Exception:  # noqa: E722
     print("autograd only supports numpy < 2.0.0 versions.")
 
 
-def value_and_grad(*args, **kwargs):
+def value_and_grad(*args, **kwargs):  # type: ignore[name-defined]
+    """Compute value and gradient using autograd.
+
+    Args:
+        *args: Arguments to autograd.value_and_grad.
+        **kwargs: Keyword arguments to autograd.value_and_grad.
+
+    Returns:
+        Value and gradient computation function.
+    """
     from autograd import value_and_grad as vag
+
     return vag(*args, **kwargs)
 
 
-def log(*args, **kwargs):
+def log(*args, **kwargs):  # type: ignore[name-defined]
+    """Natural logarithm."""
     return anp.log(*args, **kwargs)
 
 
-def sqrt(*args, **kwargs):
+def sqrt(*args, **kwargs):  # type: ignore[name-defined]
+    """Square root."""
     return anp.sqrt(*args, **kwargs)
 
 
-def row_stack(*args, **kwargs):
+def row_stack(*args, **kwargs):  # type: ignore[name-defined]
+    """Stack arrays vertically."""
     return anp.row_stack(*args, **kwargs)
 
 
-def triu_indices(*args, **kwargs):
+def triu_indices(*args, **kwargs):  # type: ignore[name-defined]
+    """Return indices of upper triangular matrix."""
     return anp.triu_indices(*args, **kwargs)
 
 
-def run_and_trace(f, x):
+def run_and_trace(f, x):  # type: ignore[name-defined]
+    """Run function and trace computation graph.
+
+    Args:
+        f: Function to trace.
+        x: Input value.
+
+    Returns:
+        Output value and traced input box.
+    """
     start_node = VJPNode.new_root()
 
     start_box = new_box(x, 0, start_node)
@@ -39,7 +65,16 @@ def run_and_trace(f, x):
     return out, start_box
 
 
-def autograd_elementwise_value_and_grad(f, x):
+def autograd_elementwise_value_and_grad(f, x):  # type: ignore[name-defined]
+    """Compute value and gradient for elementwise function.
+
+    Args:
+        f: Function to differentiate.
+        x: Input value.
+
+    Returns:
+        Dictionary with output and jacobian dictionary.
+    """
     out, pullback = run_and_trace(f, x)
 
     jac = dict()
@@ -47,14 +82,12 @@ def autograd_elementwise_value_and_grad(f, x):
         val = out[name]
 
         if val is not None:
-
             if len(val.shape) == 0:
                 val = anp.array([val])
 
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
 
-                # the backward pass is done for each objective function once
                 grad = []
                 for j in range(len(val)):
                     b = np.zeros(val.shape)
@@ -70,7 +103,16 @@ def autograd_elementwise_value_and_grad(f, x):
     return out, jac
 
 
-def autograd_vectorized_value_and_grad(f, x):
+def autograd_vectorized_value_and_grad(f, x):  # type: ignore[name-defined]
+    """Compute value and gradient for vectorized function.
+
+    Args:
+        f: Function to differentiate.
+        x: Input array of shape (n, p).
+
+    Returns:
+        Dictionary with output and jacobian dictionary.
+    """
     end, start = run_and_trace(f, x)
 
     out, jac = dict(), dict()
@@ -78,20 +120,16 @@ def autograd_vectorized_value_and_grad(f, x):
     end = {k: v for k, v in end.items() if v is not None}
 
     for name, val in end.items():
-
         v = val
         if hasattr(v, "_value"):
             v = np.array(v._value)
         out[name] = v
 
-        # if the end_box is not a box - autograd can not track back
         if not isbox(val):
             n, m = val.shape
             jac[name] = np.zeros((n, m, x.shape[1]))
 
         else:
-
-            # the backward pass is done for each objective function once
             grad = []
             for j in range(val.shape[1]):
                 b = anp.zeros(val.shape)

@@ -1,28 +1,45 @@
+"""Single-objective optimization output display."""
+
+from typing import Any
+
 from pymoo.util.display.column import Column
 from pymoo.util.display.output import Output, pareto_front_if_possible
 
 
 class MinimumConstraintViolation(Column):
+    """Column displaying minimum constraint violation."""
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__("cv_min", **kwargs)
 
-    def update(self, algorithm):
+    def update(self, algorithm: Any) -> None:
+        """Update the column value with minimum constraint violation.
+
+        Args:
+            algorithm: The optimization algorithm instance.
+        """
         self.value = algorithm.opt.get("cv").min()
 
 
 class AverageConstraintViolation(Column):
+    """Column displaying average constraint violation."""
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__("cv_avg", **kwargs)
 
-    def update(self, algorithm):
+    def update(self, algorithm: Any) -> None:
+        """Update the column value with average constraint violation.
+
+        Args:
+            algorithm: The optimization algorithm instance.
+        """
         self.value = algorithm.pop.get("cv").mean()
 
 
 class SingleObjectiveOutput(Output):
+    """Output columns for single-objective optimization results."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.cv_min = MinimumConstraintViolation()
         self.cv_avg = AverageConstraintViolation()
@@ -31,9 +48,14 @@ class SingleObjectiveOutput(Output):
         self.f_avg = Column(name="f_avg")
         self.f_gap = Column(name="f_gap")
 
-        self.best = None
+        self.best: Any = None
 
-    def initialize(self, algorithm):
+    def initialize(self, algorithm: Any) -> None:
+        """Initialize output columns based on the problem.
+
+        Args:
+            algorithm: The optimization algorithm instance.
+        """
         problem = algorithm.problem
 
         if problem.has_constraints():
@@ -46,7 +68,12 @@ class SingleObjectiveOutput(Output):
             self.best = pf.flatten()[0]
             self.columns += [self.f_gap]
 
-    def update(self, algorithm):
+    def update(self, algorithm: Any) -> None:
+        """Update output columns with current algorithm state.
+
+        Args:
+            algorithm: The optimization algorithm instance.
+        """
         super().update(algorithm)
 
         f, cv, feas = algorithm.pop.get("f", "cv", "feas")

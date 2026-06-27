@@ -1,24 +1,20 @@
+"""Miscellaneous utilities for reference direction computations."""
+
 import numpy as np
+from numpy.typing import NDArray
 
 
-def project_onto(y, p, n):
+def project_onto(y: NDArray, p: NDArray, n: NDArray) -> NDArray:
+    """Project a point onto a plane.
+
+    Args:
+        y: The point to project.
+        p: A point which lies on the plane.
+        n: The normal vector of the plane.
+
+    Returns:
+        The projection of y onto the plane.
     """
-
-    Project a point onto a plane.
-
-    Parameters
-    ----------
-    y : The point that should be project
-    p : A point which lies on the plane
-    n : The normal vector of the plane
-
-    Returns
-    -------
-
-    proj_y : The projection onto the plane
-
-    """
-
     is_1d = False
     if len(y.shape) == 1:
         is_1d = True
@@ -35,28 +31,48 @@ def project_onto(y, p, n):
     return proj_y
 
 
-def project_onto_sum_equals_one_plane(y):
+def project_onto_sum_equals_one_plane(y: NDArray) -> NDArray:
+    """Project a point onto a plane where coordinates sum to one.
+
+    Args:
+        y: The point to project.
+
+    Returns:
+        The projection of y onto the sum-equals-one plane.
+    """
     n_dim = y.shape[-1]
     return project_onto(y, np.eye(n_dim)[0], np.ones(n_dim))
 
 
-def project_onto_sum_equals_zero_plane(y):
+def project_onto_sum_equals_zero_plane(y: NDArray) -> NDArray:
+    """Project a point onto a plane where coordinates sum to zero.
+
+    Args:
+        y: The point to project.
+
+    Returns:
+        The projection of y onto the sum-equals-zero plane.
+    """
     n_dim = y.shape[-1]
     return project_onto(y, np.zeros(n_dim), np.ones(n_dim))
 
 
-def project_onto_unit_simplex(X):
+def project_onto_unit_simplex(X: NDArray) -> None:
+    """Project points onto the unit simplex in-place.
+
+    Args:
+        X: Array of points to project, modified in-place.
+    """
     n_points, n_dim = X.shape
 
     # a boolean mask of violating values - less than 0
-    I = X < 0
+    I = X < 0  # noqa: E741
 
     # get all the points which are out of bounds and need to be fixed
     out_of_unit_simplex = np.where(I.sum(axis=1) > 0)[0]
 
     # now check for each point if it is still in bound
     for j in out_of_unit_simplex:
-
         # indices where the last point was already out of bounds
         subspace = np.logical_not(I[j])
 
@@ -70,20 +86,27 @@ def project_onto_unit_simplex(X):
         test1 = matrix_project_onto_sum_equals_one_plane(X[j][subspace])
         test2 = project_onto_sum_equals_one_plane(X[j][subspace])
 
-        if not np.allclose(test1, test2):
-            print("test")
+        if not np.allclose(test1, test2):  # noqa: T201
+            print("test")  # noqa: T201
 
-        if np.any(X[j] < 0):
-            print("test")
+        if np.any(X[j] < 0):  # noqa: T201
+            print("test")  # noqa: T201
 
 
-def project_onto_unit_simplex_recursive(X):
+def project_onto_unit_simplex_recursive(X: NDArray) -> NDArray:
+    """Recursively project points onto the unit simplex.
+
+    Args:
+        X: Array of points to project.
+
+    Returns:
+        The projected points.
+    """
     # get all the points which are out of bounds and need to be fixed
     out_of_unit_simplex = np.where(np.any(X < 0, axis=1))[0]
 
     # now check for each point if it is still in bound
     for j in out_of_unit_simplex:
-
         while True:
             X[j, X[j] < 0] = 0
 
@@ -99,7 +122,15 @@ def project_onto_unit_simplex_recursive(X):
     return X
 
 
-def matrix_project_onto_sum_equals_one_plane(next):
+def matrix_project_onto_sum_equals_one_plane(next: NDArray) -> NDArray:
+    """Project a point onto a plane where coordinates sum to one using matrix method.
+
+    Args:
+        next: The point to project.
+
+    Returns:
+        The projected point.
+    """
     n_dim = len(next)
     P, S = np.eye(n_dim)[0], next
 
@@ -123,6 +154,6 @@ def matrix_project_onto_sum_equals_one_plane(next):
     x = np.linalg.solve(A, b)
 
     # finally calculate the projection onto the plane
-    proj = (P + x @ v)
+    proj = P + x @ v
 
     return proj

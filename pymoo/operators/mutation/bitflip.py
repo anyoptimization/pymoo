@@ -1,10 +1,11 @@
+"""Bitflip mutation operator for binary variables."""
+
 import numpy as np
 
 from pymoo.core.mutation import Mutation
 
 
 class BitflipMutation(Mutation):
-
     def _do(self, problem, X, random_state=None, **kwargs):
         prob_var = self.get_prob_var(problem, size=(len(X), 1))
         Xp = np.copy(X)

@@ -1,3 +1,5 @@
+"""Sphere single-objective optimization problem."""
+
 import pymoo.gradient.toolbox as anp
 import numpy as np
 
@@ -5,7 +7,6 @@ from pymoo.core.problem import Problem
 
 
 class Sphere(Problem):
-
     def __init__(self, n_var=10):
         super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=0, xl=-0, xu=1, vtype=float)
 

@@ -1,24 +1,53 @@
+"""Random sampling and mapping reference direction factory."""
+
 import numpy as np
+from numpy.typing import NDArray
 
 from pymoo.core.problem import Problem
 from pymoo.operators.sampling.lhs import LatinHypercubeSampling
-from pymoo.util.reference_direction import ReferenceDirectionFactory, map_onto_unit_simplex
+from pymoo.util.reference_direction import (
+    ReferenceDirectionFactory,
+    map_onto_unit_simplex,
+)
 
 
 class RandomSamplingAndMap(ReferenceDirectionFactory):
+    """Factory for generating reference directions via random sampling and mapping."""
 
-    def __init__(self,
-                 n_dim,
-                 n_points,
-                 **kwargs):
+    def __init__(
+        self,
+        n_dim: int,
+        n_points: int,
+        **kwargs,  # type: ignore[no-untyped-def]
+    ) -> None:
+        """Initialize the random sampling and map factory.
+
+        Args:
+            n_dim: Number of objectives.
+            n_points: Number of reference directions to generate.
+            **kwargs: Additional arguments for parent class.
+        """
         super().__init__(n_dim, **kwargs)
         self.n_points = n_points
 
-    def _do(self, random_state=None):
-        problem = Problem(n_var=self.n_dim, xl=0.0, xu=1.0)
+    def _do(self, random_state: int | None = None) -> NDArray:
+        """Generate reference directions via Latin Hypercube sampling.
+
+        Args:
+            random_state: Random seed for reproducibility.
+
+        Returns:
+            Array of reference directions.
+        """
+        problem = Problem(n_var=self.n_dim, xl=0.0, xu=1.0)  # type: ignore[abstract]
         sampling = LatinHypercubeSampling()
 
-        x = sampling(problem, self.n_points - self.n_dim, to_numpy=True, random_state=random_state)
+        x = sampling(
+            problem,
+            self.n_points - self.n_dim,
+            to_numpy=True,
+            random_state=random_state,
+        )
         x = map_onto_unit_simplex(x, "kraemer")
         x = np.vstack([x, np.eye(self.n_dim)])
         return x

@@ -1,52 +1,40 @@
+"""Fitness landscape visualization for optimization problems."""
+
 import numpy as np
 
 import pymoo.visualization.util
-from pymoo.docs import parse_doc_string
 from pymoo.core.plot import Plot
 from pymoo.util.misc import all_combinations
 
 
 class FitnessLandscape(Plot):
+    """Visualize the fitness landscape of optimization problems."""
 
-    def __init__(self,
-                 problem,
-                 _type="surface+contour",
-                 n_samples=100,
-                 colorbar=False,
-                 contour_levels=30,
-                 kwargs_surface=None,
-                 kwargs_contour=None,
-                 kwargs_contour_labels=None,
-                 **kwargs):
+    def __init__(
+        self,
+        problem,
+        _type="surface+contour",
+        n_samples=100,
+        colorbar=False,
+        contour_levels=30,
+        kwargs_surface=None,
+        kwargs_contour=None,
+        kwargs_contour_labels=None,
+        **kwargs,
+    ):
+        """Initialize FitnessLandscape.
 
+        Args:
+            problem: The problem to be plotted.
+            _type: Either "contour", "surface" or "surface+contour".
+            n_samples: Number of samples for evaluation.
+            colorbar: Whether to display colorbar.
+            contour_levels: Number of contour levels.
+            kwargs_surface: Keyword arguments for surface plot.
+            kwargs_contour: Keyword arguments for contour plot.
+            kwargs_contour_labels: Keyword arguments for contour labels.
+            **kwargs: Additional keyword arguments passed to parent Plot class.
         """
-
-        Fitness Landscape
-
-        Parameters
-        ----------------
-
-        problem : The problem to be plotted
-        _type : str
-            Either "contour", "surface" or "contour+surface"
-        labels : {labels}
-
-        Other Parameters
-        ----------------
-
-        figsize : {figsize}
-        title : {title}
-        legend : {legend}
-        tight_layout : {tight_layout}
-        cmap : {cmap}
-
-
-        Returns
-        -------
-        FitnessLandscape : :class:`~pymoo.core.analytics.visualization.fitness_landscape.FitnessLandscape`
-
-        """
-
         super().__init__(**kwargs)
         self.problem = problem
         self.n_samples = n_samples
@@ -70,7 +58,6 @@ class FitnessLandscape(Plot):
         problem, n_samples, _type = self.problem, self.n_samples, self._type
 
         if problem.n_var == 1 and problem.n_obj == 1:
-
             self.init_figure()
 
             X = np.linspace(problem.xl[0], problem.xu[0], num=n_samples)[:, None]
@@ -80,12 +67,13 @@ class FitnessLandscape(Plot):
             self.ax.set_ylabel("f(x)")
 
         elif problem.n_var == 2 and problem.n_obj == 1:
-
             A = np.linspace(problem.xl[0], problem.xu[0], n_samples)
             B = np.linspace(problem.xl[1], problem.xu[1], n_samples)
             X = all_combinations(A, B)
 
-            F = np.reshape(problem.evaluate(X, return_values_of=["F"]), (n_samples, n_samples))
+            F = np.reshape(
+                problem.evaluate(X, return_values_of=["F"]), (n_samples, n_samples)
+            )
 
             _X = X[:, 0].reshape((n_samples, n_samples))
             _Y = X[:, 1].reshape((n_samples, n_samples))
@@ -98,7 +86,9 @@ class FitnessLandscape(Plot):
                     self.fig.colorbar(surf)
 
             def plot_contour():
-                CS = self.ax.contour(_X, _Y, _Z, self.contour_levels, **self.kwargs_contour)
+                CS = self.ax.contour(
+                    _X, _Y, _Z, self.contour_levels, **self.kwargs_contour
+                )
                 if self.kwargs_contour_labels is not None:
                     self.ax.clabel(CS, **self.kwargs_contour_labels)
 
@@ -116,13 +106,11 @@ class FitnessLandscape(Plot):
 
                 plot_contour()
             elif _type == "surface+contour":
-
                 self.init_figure(plot_3D=True)
                 plot_surface()
                 plot_contour()
 
         else:
-            raise Exception("Only landscapes of problems with one or two variables and one objective can be visualized.")
-
-
-parse_doc_string(FitnessLandscape.__init__)
+            raise Exception(
+                "Only landscapes of problems with one or two variables and one objective can be visualized."
+            )

@@ -1,3 +1,5 @@
+"""Filter and extract optimum solutions from a population."""
+
 import numpy as np
 
 from pymoo.core.individual import Individual
@@ -16,12 +18,11 @@ def filter_optimum(pop, least_infeasible=False):
 
     # if at least one feasible solution was found
     if len(ret) > 0:
-
         # then check the objective values
         F = ret.get("F")
 
         if F.shape[1] > 1:
-            I = NonDominatedSorting().do(F, only_non_dominated_front=True)
+            I = NonDominatedSorting().do(F, only_non_dominated_front=True)  # noqa: E741
             ret = ret[I]
 
         else:

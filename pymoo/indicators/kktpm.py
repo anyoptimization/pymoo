@@ -1,33 +1,28 @@
+"""Karush-Kuhn-Tucker Approximate Measure (KKTPM) indicator."""
+
 import numpy as np
 
 from pymoo.core.individual import calc_cv
 
 
 class KKTPM:
+    """Karush-Kuhn-Tucker Approximate Measure (KKTPM) indicator."""
 
     def calc(self, X, problem, ideal=None, utopian_eps=1e-4, rho=1e-3):
+        """Calculate the Karush-Kuhn-Tucker Approximate Measure.
+
+        Args:
+            X: Decision variables.
+            problem: Optimization problem.
+            ideal: The ideal point if not in the problem defined or intentionally
+                overwritten.
+            utopian_eps: Epsilon for decreasing the ideal point to get the utopian
+                point.
+            rho: Coefficient for augmented achievement scalarization function.
+
+        Returns:
+            KKTPM value for each solution.
         """
-
-        Returns the Karush-Kuhn-Tucker Approximate Measure.
-
-        Parameters
-        ----------
-        X : np.array
-
-        problem : pymoo.core.problem
-        ideal : np.array
-            The ideal point if not in the problem defined or intentionally overwritten.
-        utopian_eps : float
-            The epsilon used for decrease the ideal point to get the utopian point.
-        rho : float
-            Since augmented achievement scalarization function is used the F for all other weights
-            - here rho - needs to be defined.
-
-        Returns
-        -------
-
-        """
-
         # the final result to be returned
         kktpm = np.full((X.shape[0], 1), np.inf)
         fval = np.full((X.shape[0], 1), np.inf)
@@ -41,16 +36,19 @@ class KKTPM:
         z -= utopian_eps
 
         # for convenience get the counts directly
-        n_solutions, n_var, n_obj, n_ieq_constr = X.shape[0], problem.n_var, problem.n_obj, problem.n_ieq_constr
+        n_solutions, n_obj, n_ieq_constr = (
+            X.shape[0],
+            problem.n_obj,
+            problem.n_ieq_constr,
+        )  # noqa: F841
 
         F, G, dF, dG = problem.evaluate(X, return_values_of=["F", "G", "dF", "dG"])
         CV = calc_cv(G=G)
 
         # loop through each solution to be considered
         for i in range(n_solutions):
-
             # get the corresponding values for this solution
-            x, f, cv, df = X[i, :], F[i, :], CV[i], dF[i, :].swapaxes(1, 0)
+            f, cv, df = F[i, :], CV[i], dF[i, :].swapaxes(1, 0)  # noqa: F841
             if n_ieq_constr > 0:
                 g, dg = G[i, :], dG[i].T
 
@@ -60,7 +58,6 @@ class KKTPM:
                 _fval = None
 
             else:
-
                 w = np.sqrt(np.sum(np.power(f - z, 2))) / (f - z)
                 a_m = (df * w + (rho * np.sum(df * w, axis=1))[:, None]).T
 
@@ -76,7 +73,12 @@ class KKTPM:
                     np.fill_diagonal(gsq, g * g)
 
                     # now add the constraints to the optimization problem
-                    A = np.vstack([np.hstack([A, a_m @ a_j.T]), np.hstack([a_j @ a_m.T, a_j @ a_j.T + gsq])])
+                    A = np.vstack(
+                        [
+                            np.hstack([A, a_m @ a_j.T]),
+                            np.hstack([a_j @ a_m.T, a_j @ a_j.T + gsq]),
+                        ]
+                    )
                     b = np.hstack([b, np.zeros(n_ieq_constr)])
 
                 method = "qr"
@@ -84,10 +86,8 @@ class KKTPM:
 
                 # until all the lagrange multiplier are positive
                 while np.any(u < 0):
-
                     # go through one by one
                     for j in range(len(u)):
-
                         # if a lagrange multiplier is negative - we need to fix it
                         if u[j] < 0:
                             # modify the optimization problem
@@ -101,7 +101,9 @@ class KKTPM:
                 u_m, u_j = u[:n_obj], u[n_obj:]
 
                 if n_ieq_constr > 0:
-                    _kktpm = (1 - np.sum(u_m)) ** 2 + np.sum((np.vstack([a_m, a_j]).T @ u) ** 2)
+                    _kktpm = (1 - np.sum(u_m)) ** 2 + np.sum(
+                        (np.vstack([a_m, a_j]).T @ u) ** 2
+                    )
                     _fval = _kktpm + np.sum((u_j * g.T) ** 2)
                 else:
                     _kktpm = (1 - np.sum(u_m)) ** 2 + np.sum((a_m.T @ u) ** 2)
@@ -109,7 +111,7 @@ class KKTPM:
 
                 ujgj = -g @ u_j
                 if np.sum(u_m) + ujgj * (1 + ujgj) > 1:
-                    adjusted_kktpm = - (u_j @ g.T)
+                    adjusted_kktpm = -(u_j @ g.T)
                     projected_kktpm = (_kktpm * g @ g.T - g @ u_j) / (1 + g @ g.T)
                     _kktpm = (_kktpm + adjusted_kktpm + projected_kktpm) / 3
 
@@ -135,17 +137,50 @@ def solve(A, b, method="elim"):
         return A_inv @ b
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from pymoo.problems import get_problem
     from pymoo.gradient.automatic import AutomaticDifferentiation
 
     from pymoo.constraints.from_bounds import ConstraintsFromBounds
-    problem = ConstraintsFromBounds(AutomaticDifferentiation(get_problem("zdt2", n_var=30)))
+
+    problem = ConstraintsFromBounds(  # type: ignore[abstract]
+        AutomaticDifferentiation(get_problem("zdt2", n_var=30))  # type: ignore[abstract]
+    )
 
     # X = (0.5 * np.ones(10))[None, :]
     X = np.array(
-        [0.394876, 0.963263, 0.173956, 0.126330, 0.135079, 0.505662, 0.021525, 0.947970, 0.827115, 0.015019, 0.176196,
-         0.332064, 0.130997, 0.809491, 0.344737, 0.940107, 0.582014, 0.878832, 0.844734, 0.905392, 0.459880, 0.546347,
-         0.798604, 0.285719, 0.490254, 0.599110, 0.015533, 0.593481, 0.433676, 0.807361])
+        [
+            0.394876,
+            0.963263,
+            0.173956,
+            0.126330,
+            0.135079,
+            0.505662,
+            0.021525,
+            0.947970,
+            0.827115,
+            0.015019,
+            0.176196,
+            0.332064,
+            0.130997,
+            0.809491,
+            0.344737,
+            0.940107,
+            0.582014,
+            0.878832,
+            0.844734,
+            0.905392,
+            0.459880,
+            0.546347,
+            0.798604,
+            0.285719,
+            0.490254,
+            0.599110,
+            0.015533,
+            0.593481,
+            0.433676,
+            0.807361,
+        ]
+    )
 
     print(KKTPM().calc(X[None, :], problem))

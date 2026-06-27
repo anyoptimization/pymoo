@@ -1,3 +1,5 @@
+"""Callback interface for algorithm execution hooks."""
+
 from typing import Any
 import typing
 
@@ -6,7 +8,6 @@ if typing.TYPE_CHECKING:
 
 
 class Callback:
-
     def __init__(self) -> None:
         super().__init__()
         self.data: Any = {}
@@ -35,11 +36,9 @@ class Callback:
 
 
 class CallbackCollection(Callback):
-
-    def __init__(self, *args) -> None:
+    def __init__(self, *args: Callback) -> None:
         super().__init__()
-        self.callbacks: typing.Iterable[Callback] = args
+        self.callbacks: tuple[Callback, ...] = args
 
-    def update(self, algorithm) -> None:
+    def update(self, algorithm: "Algorithm") -> None:
         [callback.update(algorithm) for callback in self.callbacks]
-

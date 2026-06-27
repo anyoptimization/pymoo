@@ -1,17 +1,32 @@
+"""Differential Evolution (DE) crossover operators."""
+
 import numpy as np
 
 from pymoo.core.crossover import Crossover
 from pymoo.core.population import Population
 from pymoo.operators.crossover.binx import mut_binomial
 from pymoo.operators.crossover.expx import mut_exp
-from pymoo.operators.repair.bounds_repair import is_out_of_bounds_by_problem, repair_random_init
+from pymoo.operators.repair.bounds_repair import (
+    is_out_of_bounds_by_problem,
+    repair_random_init,
+)
 from pymoo.util import default_random_state
 
 
 @default_random_state
-def de_differential(X, F, dither=None, jitter=True, gamma=0.0001, return_differentials=False, random_state=None):
+def de_differential(
+    X,
+    F,
+    dither=None,
+    jitter=True,
+    gamma=0.0001,
+    return_differentials=False,
+    random_state=None,
+):
     n_parents, n_matings, n_var = X.shape
-    assert n_parents % 2 == 1, "For the differential an odd number of values need to be provided"
+    assert n_parents % 2 == 1, (
+        "For the differential an odd number of values need to be provided"
+    )
 
     # make sure F is a one-dimensional vector
     F = np.ones(n_matings) * F
@@ -24,15 +39,14 @@ def de_differential(X, F, dither=None, jitter=True, gamma=0.0001, return_differe
 
     # for each difference
     for i, j in pairs:
-
         if dither == "vector":
-            F = (F + random_state.random(n_matings) * (1 - F))
+            F = F + random_state.random(n_matings) * (1 - F)
         elif dither == "scalar":
             F = F + random_state.random() * (1 - F)
 
         # http://www.cs.ndsu.nodak.edu/~siludwig/Publish/papers/SSCI20141.pdf
         if jitter:
-            F = (F * (1 + gamma * (random_state.random(n_matings) - 0.5)))
+            F = F * (1 + gamma * (random_state.random(n_matings) - 0.5))
 
         # an add the difference to the first vector
         diffs += F[:, None] * (X[i] - X[j])
@@ -47,17 +61,18 @@ def de_differential(X, F, dither=None, jitter=True, gamma=0.0001, return_differe
 
 
 class DEX(Crossover):
-
-    def __init__(self,
-                 F=None,
-                 CR=0.7,
-                 variant="bin",
-                 dither=None,
-                 jitter=False,
-                 n_diffs=1,
-                 n_iter=1,
-                 at_least_once=True,
-                 **kwargs):
+    def __init__(
+        self,
+        F=None,
+        CR=0.7,
+        variant="bin",
+        dither=None,
+        jitter=False,
+        n_diffs=1,
+        n_iter=1,
+        at_least_once=True,
+        **kwargs,
+    ):
 
         super().__init__(1 + 2 * n_diffs, 1, **kwargs)
         self.n_diffs = n_diffs
@@ -76,7 +91,9 @@ class DEX(Crossover):
             pop = [pop[mating] for mating in parents]
 
         # get the actual values from each of the parents
-        X = np.swapaxes(np.array([[parent.get("X") for parent in mating] for mating in pop]), 0, 1).copy()
+        X = np.swapaxes(
+            np.array([[parent.get("X") for parent in mating] for mating in pop]), 0, 1
+        ).copy()
 
         n_parents, n_matings, n_var = X.shape
 
@@ -91,7 +108,6 @@ class DEX(Crossover):
 
         # if the problem has boundaries to be considered
         if problem.has_bounds():
-
             for k in range(self.n_iter):
                 # find the individuals which are still infeasible
                 m = is_out_of_bounds_by_problem(problem, Xp)
@@ -105,9 +121,21 @@ class DEX(Crossover):
             Xp = repair_random_init(Xp, X[0], *problem.bounds())
 
         if self.variant == "bin":
-            M = mut_binomial(n_matings, n_var, self.CR, at_least_once=self.at_least_once, random_state=random_state)
+            M = mut_binomial(
+                n_matings,
+                n_var,
+                self.CR,
+                at_least_once=self.at_least_once,
+                random_state=random_state,
+            )
         elif self.variant == "exp":
-            M = mut_exp(n_matings, n_var, self.CR, at_least_once=self.at_least_once, random_state=random_state)
+            M = mut_exp(
+                n_matings,
+                n_var,
+                self.CR,
+                at_least_once=self.at_least_once,
+                random_state=random_state,
+            )
         else:
             raise Exception(f"Unknown variant: {self.variant}")
 
@@ -128,6 +156,7 @@ def rnd_F(m, random_state=None):
 # =========================================================================================================
 # DE Repair strategies
 # =========================================================================================================
+
 
 def bounce_back(X, Xb, xl, xu, random_state=None):
     XL = xl[None, :].repeat(len(X), axis=0)
@@ -192,10 +221,13 @@ DE_REPAIRS = {
 # DEM — DE Mutation as a Crossover operator
 # =========================================================================================================
 
+
 class DEM(Crossover):
     """DE mutation operator (donor vector computation), usable as a standalone Crossover."""
 
-    def __init__(self, F=None, gamma=1e-4, de_repair="bounce-back", n_diffs=1, **kwargs):
+    def __init__(
+        self, F=None, gamma=1e-4, de_repair="bounce-back", n_diffs=1, **kwargs
+    ):
         if F is None:
             F = (0.0, 1.0)
         self.F = F
@@ -204,7 +236,9 @@ class DEM(Crossover):
             self.de_repair = de_repair
         else:
             if de_repair not in DE_REPAIRS:
-                raise KeyError(f"de_repair must be callable or one of {list(DE_REPAIRS.keys())}")
+                raise KeyError(
+                    f"de_repair must be callable or one of {list(DE_REPAIRS.keys())}"
+                )
             self.de_repair = DE_REPAIRS[de_repair]
         super().__init__(1 + 2 * n_diffs, 1, prob=1.0, **kwargs)
 
@@ -223,7 +257,9 @@ class DEM(Crossover):
         for i, j in pairs:
             F = self._sample_F(n_matings, random_state)
             if self.gamma is not None:
-                F = F[:, None] * (1 + self.gamma * (random_state.random((n_matings, n_var)) - 0.5))
+                F = F[:, None] * (
+                    1 + self.gamma * (random_state.random((n_matings, n_var)) - 0.5)
+                )
                 diffs += F * (Xr[i] - Xr[j])
             else:
                 diffs += F[:, None] * (Xr[i] - Xr[j])

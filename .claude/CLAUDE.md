@@ -92,7 +92,7 @@ Building docs executes ~126 notebooks (real optimization) then renders HTML. Exe
 
 ## Conventions
 
-- **numpy-style docstrings** throughout.
+- **google-style docstrings** (ruff `convention = "google"`), with **types only in annotations — never duplicated in the docstring**. The codebase is migrating numpy → google module-by-module; the docs render both via sphinx `napoleon` during the transition (set `napoleon_numpy_docstring = False` once done). Every file also opens with a one-line module description (`pyclawd ls --missing`).
 - Match existing patterns before inventing new ones. Core abstractions: `Problem`, `Algorithm`, `Operator`, `Population`, `Individual`, `Result`. Main entry point: `from pymoo.optimize import minimize`.
 - Performance-critical code has **Cython** counterparts in `pymoo/functions/`; check `is_compiled()`.
 - Adjust numerical tolerances (`atol`/`rtol`) rather than chasing exact float equality in tests.

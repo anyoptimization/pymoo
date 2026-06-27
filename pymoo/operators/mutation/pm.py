@@ -1,3 +1,5 @@
+"""Polynomial mutation operator."""
+
 import numpy as np
 
 from pymoo.core.mutation import Mutation
@@ -14,13 +16,29 @@ from pymoo.util import default_random_state
 
 @default_random_state
 def mut_pm(X, xl, xu, eta, prob, at_least_once, random_state=None):
+    """Apply polynomial mutation to a population.
+
+    Args:
+        X: Population variables of shape (n, n_var).
+        xl: Lower bounds for variables.
+        xu: Upper bounds for variables.
+        eta: Distribution indices (eta values) of shape (n,).
+        prob: Mutation probabilities per variable of shape (n_var,).
+        at_least_once: Whether to mutate at least one variable per individual.
+        random_state: Random state for reproducibility.
+
+    Returns:
+        Mutated population of same shape as X.
+    """
     n, n_var = X.shape
     assert len(eta) == n
     assert len(prob) == n
 
     Xp = np.full(X.shape, np.inf)
 
-    mut = mut_binomial(n, n_var, prob, at_least_once=at_least_once, random_state=random_state)
+    mut = mut_binomial(
+        n, n_var, prob, at_least_once=at_least_once, random_state=random_state
+    )
     mut[:, xl == xu] = False
 
     Xp[:, :] = X
@@ -42,15 +60,16 @@ def mut_pm(X, xl, xu, eta, prob, at_least_once, random_state=None):
 
     deltaq = np.zeros(X.shape)
 
-    xy = 1.0 - delta1
-    val = 2.0 * rand + (1.0 - 2.0 * rand) * (np.power(xy, (eta + 1.0)))
-    d = np.power(val, mut_pow) - 1.0
-    deltaq[mask] = d[mask]
+    with np.errstate(invalid="ignore"):
+        xy = 1.0 - delta1
+        val = 2.0 * rand + (1.0 - 2.0 * rand) * (np.power(xy, (eta + 1.0)))
+        d = np.power(val, mut_pow) - 1.0
+        deltaq[mask] = d[mask]
 
-    xy = 1.0 - delta2
-    val = 2.0 * (1.0 - rand) + 2.0 * (rand - 0.5) * (np.power(xy, (eta + 1.0)))
-    d = 1.0 - (np.power(val, mut_pow))
-    deltaq[mask_not] = d[mask_not]
+        xy = 1.0 - delta2
+        val = 2.0 * (1.0 - rand) + 2.0 * (rand - 0.5) * (np.power(xy, (eta + 1.0)))
+        d = 1.0 - (np.power(val, mut_pow))
+        deltaq[mask_not] = d[mask_not]
 
     # mutated values
     _Y = X + deltaq * (_xu - _xl)
@@ -74,23 +93,44 @@ def mut_pm(X, xl, xu, eta, prob, at_least_once, random_state=None):
 
 
 class PolynomialMutation(Mutation):
+    """Polynomial mutation operator for continuous variables."""
 
     def __init__(self, prob=0.9, eta=20, at_least_once=False, **kwargs):
         super().__init__(prob=prob, **kwargs)
         self.at_least_once = at_least_once
         self.eta = Real(eta, bounds=(3.0, 30.0), strict=(1.0, 100.0))
 
-    def _do(self, problem, X, params=None, *args, random_state=None, **kwargs):
+    def _do(self, problem, X, params=None, *args, random_state=None, **kwargs):  # noqa: D417
+        """Perform polynomial mutation.
+
+        Args:
+            problem: The optimization problem.
+            X: Population variables.
+            params: Additional parameters.
+            random_state: Random state for reproducibility.
+
+        Returns:
+            Mutated population.
+        """
         X = X.astype(float)
 
         eta = get(self.eta, size=len(X))
         prob_var = self.get_prob_var(problem, size=len(X))
 
-        Xp = mut_pm(X, problem.xl, problem.xu, eta, prob_var, at_least_once=self.at_least_once, random_state=random_state)
+        Xp = mut_pm(
+            X,
+            problem.xl,
+            problem.xu,
+            eta,
+            prob_var,
+            at_least_once=self.at_least_once,
+            random_state=random_state,
+        )
 
         return Xp
 
 
 class PM(PolynomialMutation):
-    pass
+    """Alias for PolynomialMutation."""
 
+    pass

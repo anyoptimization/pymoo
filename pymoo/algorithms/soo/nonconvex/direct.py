@@ -1,3 +1,5 @@
+"""DIviding RECTangles (DIRECT) algorithm."""
+
 import numpy as np
 
 from pymoo.algorithms.base.local import LocalSearch
@@ -26,15 +28,16 @@ def update_bounds(ind, xl, xu, k, delta):
 
 
 class DIRECT(LocalSearch):
-
-    def __init__(self,
-                 eps=1e-2,
-                 penalty=0.1,
-                 n_max_candidates=10,
-                 n_max_archive=400,
-                 archive_reduct=0.66,
-                 output=SingleObjectiveOutput(),
-                 **kwargs):
+    def __init__(
+        self,
+        eps=1e-2,
+        penalty=0.1,
+        n_max_candidates=10,
+        n_max_archive=400,
+        archive_reduct=0.66,
+        output=SingleObjectiveOutput(),
+        **kwargs,
+    ):
         super().__init__(output=output, **kwargs)
         self.eps = eps
         self.penalty = penalty
@@ -83,13 +86,21 @@ class DIRECT(LocalSearch):
 
             # calculate the number of solutions after truncation and filter the best ones out
             n_truncated = int(self.archive_reduct * self.n_max_archive)
-            I = np.argsort(rank)[:n_truncated]
+            I = np.argsort(rank)[:n_truncated]  # noqa: E741
 
             # also update all the utility variables defined so far to match the truncation
-            pop, F, nxl, nxu, length, val, obj = pop[I], F[I], nxl[I], nxu[I], length[I], val[I], obj[I]
+            pop, F, nxl, nxu, length, val, obj = (
+                pop[I],
+                F[I],
+                nxl[I],
+                nxu[I],
+                length[I],
+                val[I],
+                obj[I],
+            )
             self.pop = pop
 
-        I = NonDominatedSorting().do(obj, only_non_dominated_front=True)
+        I = NonDominatedSorting().do(obj, only_non_dominated_front=True)  # noqa: E741
         candidates, F, xl, xu, val = pop[I], F[I], xl[I], xu[I], val[I]
 
         # if all candidates are expanded in each iteration this can cause issues - here use crowding distance to decide
@@ -97,7 +108,9 @@ class DIRECT(LocalSearch):
             return candidates
         else:
             if len(candidates) > self.n_max_candidates:
-                candidates = RankAndCrowdingSurvival().do(self.problem, pop, n_survive=self.n_max_candidates, algorithm=self)
+                candidates = RankAndCrowdingSurvival().do(
+                    self.problem, pop, n_survive=self.n_max_candidates, algorithm=self
+                )
 
             return candidates
 
@@ -111,7 +124,6 @@ class DIRECT(LocalSearch):
 
         # for each of those solutions execute the division move
         for current in potential_optimal:
-
             # find the largest dimension the solution has not been evaluated yet
             nxl, nxu = norm_bounds(current, self.problem)
             k = np.argmax(nxu - nxl)
@@ -144,5 +156,7 @@ class DIRECT(LocalSearch):
         return infills
 
     def _advance(self, infills=None, **kwargs):
-        assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
+        assert infills is not None, (
+            "This algorithms uses the AskAndTell interface thus infills must to be provided."
+        )
         self.pop = Population.merge(self.pop, infills)

@@ -1,36 +1,45 @@
+"""Construction-based reference direction generation with gradient descent."""
+
 import numpy as np
 
 from pymoo.util.misc import vectorized_cdist
-from pymoo.util.ref_dirs.misc import project_onto_sum_equals_zero_plane, project_onto_unit_simplex_recursive
+from pymoo.util.ref_dirs.misc import (
+    project_onto_sum_equals_zero_plane,
+    project_onto_unit_simplex_recursive,
+)
 from pymoo.util.ref_dirs.optimizer import Adam
-from pymoo.util.reference_direction import ReferenceDirectionFactory, map_onto_unit_simplex
+from pymoo.util.reference_direction import (
+    ReferenceDirectionFactory,
+    map_onto_unit_simplex,
+)
 
 
 def calc_dist_to_others(x, X):
-    return - np.sqrt(((x - X) ** 2).sum(axis=1)).min()
+    return -np.sqrt(((x - X) ** 2).sum(axis=1)).min()
 
 
 def calc_dist_to_others_with_gradient(x, X):
-    diff = (x - X)
-    D = np.sqrt((diff ** 2).sum(axis=1))
+    diff = x - X
+    D = np.sqrt((diff**2).sum(axis=1))
 
     k = D.argmin()
 
-    obj = - D.min()
-    grad = - diff[k] / D[k]
+    obj = -D.min()
+    grad = -diff[k] / D[k]
 
     return obj, grad
 
 
 class ConstructionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
-
-    def __init__(self,
-                 n_dim,
-                 n_points,
-                 n_samples=100,
-                 gradient_descent=True,
-                 verbose=False,
-                 **kwargs):
+    def __init__(
+        self,
+        n_dim,
+        n_points,
+        n_samples=100,
+        gradient_descent=True,
+        verbose=False,
+        **kwargs,
+    ):
 
         super().__init__(n_dim, **kwargs)
         self.n_points = n_points
@@ -60,12 +69,10 @@ class ConstructionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
         x = x[vectorized_cdist(x, self.X).min(axis=1).argmax()]
 
         if self.gradient_descent:
-
             optimizer = Adam(precision=1e-4)
 
             # for each iteration of gradient descent
             for i in range(1000):
-
                 # calculate the function value and the gradient
                 # auto_obj, auto_grad = value_and_grad(calc_dist_to_others)(x, self.X)
                 _obj, _grad = calc_dist_to_others_with_gradient(x, self.X)

@@ -1,3 +1,5 @@
+"""Sampling operators for population initialization."""
+
 from abc import abstractmethod
 
 from pymoo.core.operator import Operator
@@ -6,33 +8,28 @@ from pymoo.util import default_random_state
 
 
 class Sampling(Operator):
-
     def __init__(self) -> None:
-        """
-        This abstract class represents any sampling strategy that can be used to create an initial population or
-        an initial search point.
+        """Initialize a Sampling operator.
+
+        This abstract class represents any sampling strategy that can be used
+        to create an initial population or an initial search point.
         """
         super().__init__()
 
     @default_random_state
     def do(self, problem, n_samples, *args, random_state=None, **kwargs):
-        """
-        Sample new points with problem information if necessary.
+        """Sample new points with problem information if necessary.
 
-        Parameters
-        ----------
+        Args:
+            problem: The problem to which points should be sampled
+                (lower and upper bounds, discrete, binary, ...).
+            n_samples: Number of samples.
+            *args: Additional positional arguments.
+            random_state: Random state for reproducibility.
+            **kwargs: Additional keyword arguments.
 
-        problem : :class:`~pymoo.core.problem.Problem`
-            The problem to which points should be sampled. (lower and upper bounds, discrete, binary, ...)
-
-        n_samples : int
-            Number of samples
-
-        Returns
-        -------
-        pop : Population
-            The output population after sampling
-
+        Returns:
+            Population: The output population after sampling.
         """
         val = self._do(problem, n_samples, *args, random_state=random_state, **kwargs)
         return Population.new("X", val)
@@ -40,6 +37,3 @@ class Sampling(Operator):
     @abstractmethod
     def _do(self, problem, n_samples, *args, random_state=None, **kwargs):
         pass
-
-
-

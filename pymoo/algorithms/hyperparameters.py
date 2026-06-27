@@ -1,3 +1,5 @@
+"""Optimize an algorithm's hyperparameters by wrapping them as an optimization problem."""
+
 from copy import deepcopy
 
 import numpy as np
@@ -15,7 +17,6 @@ def create(algorithm, params):
 
 
 class HyperparameterProblem(ElementwiseProblem):
-
     def __init__(self, algorithm, performance, func_create=create, vars=None, **kwargs):
 
         # get the parameters from the algorithm object
@@ -40,7 +41,6 @@ class HyperparameterProblem(ElementwiseProblem):
 
 
 class SingleObjectiveSingleRun:
-
     def __init__(self, problem, **kwargs):
         super().__init__()
         self.problem = problem
@@ -68,9 +68,16 @@ def stats_avg_nevals(rets):
 
 
 class MultiRun:
-
     @default_random_state
-    def __init__(self, problem, n_runs=None, seeds=None, func_stats=stats_single_objective_mean, random_state=None, **kwargs):
+    def __init__(
+        self,
+        problem,
+        n_runs=None,
+        seeds=None,
+        func_stats=stats_single_objective_mean,
+        random_state=None,
+        **kwargs,
+    ):
         super().__init__()
         self.problem = problem
         self.kwargs = kwargs
@@ -85,7 +92,10 @@ class MultiRun:
         self.func_stats = func_stats
 
     def __call__(self, algorithm):
-        rets = [minimize(self.problem, algorithm, seed=seed, **self.kwargs) for seed in self.seeds]
+        rets = [
+            minimize(self.problem, algorithm, seed=seed, **self.kwargs)
+            for seed in self.seeds
+        ]
         out = self.func_stats(rets)
         out["__results__"] = rets
         return out

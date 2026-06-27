@@ -1,3 +1,5 @@
+"""Base callback class for recording optimization data."""
+
 from abc import abstractmethod
 
 import numpy as np
@@ -8,7 +10,6 @@ from pymoo.indicators.igd_plus import IGDPlus
 
 
 class Recorder(Callback):
-
     def __init__(self, nth_evals=None) -> None:
         super().__init__()
         self.data: list = []
@@ -42,7 +43,6 @@ class Recorder(Callback):
 
 
 class DefaultSingleObjectiveRecorder(Recorder):
-
     def save(self, algorithm):
         n_evals = algorithm.evaluator.n_eval
 
@@ -59,7 +59,7 @@ class DefaultSingleObjectiveRecorder(Recorder):
         fgap = np.inf
         try:
             pf = algorithm.problem.pareto_front()
-        except:
+        except:  # noqa: E722
             pf = None
 
         if pf is not None:
@@ -69,7 +69,6 @@ class DefaultSingleObjectiveRecorder(Recorder):
 
 
 class DefaultMultiObjectiveRecorder(Recorder):
-
     def save(self, algorithm):
 
         igd, igd_plus = np.inf, np.inf
@@ -80,10 +79,9 @@ class DefaultMultiObjectiveRecorder(Recorder):
         feas_opt = opt[opt.get("feas")]
 
         if len(feas_opt) > 0:
-
             try:
                 pf = algorithm.problem.pareto_front()
-            except:
+            except:  # noqa: E722
                 pf = None
 
             if pf is not None:

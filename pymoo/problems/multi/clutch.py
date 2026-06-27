@@ -1,3 +1,5 @@
+"""Multi-objective clutch design optimization problem."""
+
 import pymoo.gradient.toolbox as anp
 import numpy as np
 
@@ -5,21 +7,20 @@ from pymoo.core.problem import Problem
 
 
 class Clutch(Problem):
-
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(n_var=5, n_obj=2, n_ieq_constr=19, vtype=int)
         # ri, ro, t, F, Xp
         # self.xl = np.array([60, 90, 1, 600, 2])
-        self.xl = np.array([0, 0, 0, 0, 0])
-        self.xu = np.array([20, 20, 4, 400, 7])
+        self.xl: np.ndarray = np.array([0, 0, 0, 0, 0])
+        self.xu: np.ndarray = np.array([20, 20, 4, 400, 7])
 
-        self.x1 = np.arange(60, 81)
-        self.x2 = np.arange(90, 111)
-        self.x3 = np.arange(1, 3.5, 0.5)
-        self.x4 = np.arange(600, 1001)
-        self.x5 = np.arange(2, 11)
+        self.x1: np.ndarray = np.arange(60, 81)
+        self.x2: np.ndarray = np.arange(90, 111)
+        self.x3: np.ndarray = np.arange(1, 3.5, 0.5)
+        self.x4: np.ndarray = np.arange(600, 1001)
+        self.x5: np.ndarray = np.arange(2, 11)
 
-    def _evaluate(self, x, out, *args, **kwargs):
+    def _evaluate(self, x: np.ndarray, out: dict, *args, **kwargs) -> None:  # noqa: ARG002
 
         x1, x2, x3, x4, x5 = anp.split(x, 5, axis=1)
 
@@ -36,8 +37,8 @@ class Clutch(Problem):
         ri_max = 80  # mm
         t_max = 3  # mm
         n = 250  # rpm
-        w = pi * n/30  # rad/s
-        R_sr = (2/3) * ((x2**3 - x1**3)/(x2**2 - x1**2))  # mm
+        w = pi * n / 30  # rad/s
+        R_sr = (2 / 3) * ((x2**3 - x1**3) / (x2**2 - x1**2))  # mm
         p_max = 1  # MPa
         T_max = 15  # s
         I_z = 55  # kg*m^2
@@ -50,24 +51,24 @@ class Clutch(Problem):
         ro_max = 110  # mm
 
         Z_max = 9
-        p_rz = x4/A  # N/mm^2
+        p_rz = x4 / A  # N/mm^2
         L_max = 30  # mm
-        Vsr_max = 10  #m/s
+        Vsr_max = 10  # m/s
         M_s = 40  # Nm
         ri_min = 60  # mm
         t_min = 1.5  # mm
 
-        M_h = (2/3) * mu * x4 * x5 * ((x2**3 - x1**3)/(x2**2 - x1**2))  # N*mm
-        Vsr = (pi * R_sr * n)/30  # mm/s
+        M_h = (2 / 3) * mu * x4 * x5 * ((x2**3 - x1**3) / (x2**2 - x1**2))  # N*mm
+        Vsr = (pi * R_sr * n) / 30  # mm/s
 
-        T = (I_z * w)/(M_h/1000 + M_f)
+        T = (I_z * w) / (M_h / 1000 + M_f)
 
         g1 = (x2 - x1 - deltaR) * -1
         g2 = (L_max - (x5 + 1) * (x3 + delta)) * -1
         g3 = (p_max - p_rz) * -1
-        g4 = (p_max * Vsr_max*1000 - p_rz * Vsr) * -1
-        g5 = (Vsr_max*1000 - Vsr) * -1
-        g6 = (M_h/1000 - (s * M_s)) * -1
+        g4 = (p_max * Vsr_max * 1000 - p_rz * Vsr) * -1
+        g5 = (Vsr_max * 1000 - Vsr) * -1
+        g6 = (M_h / 1000 - (s * M_s)) * -1
         g7 = T * -1
         g8 = (T_max - T) * -1
 

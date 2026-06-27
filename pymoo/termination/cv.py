@@ -1,9 +1,10 @@
+"""Constraint violation termination criteria."""
+
 from pymoo.core.termination import Termination
 from pymoo.termination.delta import DeltaToleranceTermination
 
 
 class ConstraintViolationTermination(DeltaToleranceTermination):
-
     def __init__(self, tol=1e-6, terminate_when_feasible=True, **kwargs):
         super().__init__(tol, **kwargs)
         self.terminate_when_feasible = terminate_when_feasible
@@ -31,7 +32,6 @@ class ConstraintViolationTermination(DeltaToleranceTermination):
 
 
 class UntilFeasibleTermination(Termination):
-
     def __init__(self) -> None:
         super().__init__()
         self.initial_cv = None

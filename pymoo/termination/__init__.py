@@ -1,3 +1,5 @@
+"""Termination criteria for optimization algorithms."""
+
 import typing
 
 if typing.TYPE_CHECKING:
@@ -5,7 +7,10 @@ if typing.TYPE_CHECKING:
 
 
 def get_termination(name, *args, **kwargs) -> "Termination":
-    from pymoo.termination.default import DefaultMultiObjectiveTermination, DefaultSingleObjectiveTermination
+    from pymoo.termination.default import (
+        DefaultMultiObjectiveTermination,
+        DefaultSingleObjectiveTermination,
+    )
     from pymoo.termination.max_eval import MaximumFunctionCallTermination
     from pymoo.termination.max_gen import MaximumGenerationTermination
     from pymoo.termination.max_time import TimeBasedTermination

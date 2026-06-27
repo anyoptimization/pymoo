@@ -1,3 +1,7 @@
+"""Multi-objective optimization output display."""
+
+from typing import Any
+
 from pymoo.indicators.gd import GD
 from pymoo.indicators.hv import Hypervolume
 from pymoo.indicators.igd import IGD
@@ -5,21 +9,32 @@ from pymoo.termination.ftol import MultiObjectiveSpaceTermination
 
 from pymoo.util.display.column import Column
 from pymoo.util.display.output import Output, pareto_front_if_possible
-from pymoo.util.display.single import MinimumConstraintViolation, AverageConstraintViolation
+from pymoo.util.display.single import (
+    MinimumConstraintViolation,
+    AverageConstraintViolation,
+)
 
 
 class NumberOfNondominatedSolutions(Column):
+    """Column displaying the number of non-dominated solutions."""
 
-    def __init__(self, width=6, **kwargs) -> None:
+    def __init__(self, width: int = 6, **kwargs: Any) -> None:
         super().__init__("n_nds", width=width, **kwargs)
+        self.value: Any = None
 
-    def update(self, algorithm):
+    def update(self, algorithm: Any) -> None:
+        """Update the column value with current non-dominated solutions count.
+
+        Args:
+            algorithm: The optimization algorithm instance.
+        """
         self.value = len(algorithm.opt)
 
 
 class MultiObjectiveOutput(Output):
+    """Output columns for multi-objective optimization results."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.cv_min = MinimumConstraintViolation()
         self.cv_avg = AverageConstraintViolation()
@@ -31,10 +46,15 @@ class MultiObjectiveOutput(Output):
         self.eps = Column("eps")
         self.indicator = Column("indicator")
 
-        self.pf = None
-        self.indicator_no_pf = None
+        self.pf: Any = None
+        self.indicator_no_pf: Any = None
 
-    def initialize(self, algorithm):
+    def initialize(self, algorithm: Any) -> None:
+        """Initialize output columns based on the problem.
+
+        Args:
+            algorithm: The optimization algorithm instance.
+        """
         problem = algorithm.problem
 
         self.columns += [self.n_nds]
@@ -53,7 +73,12 @@ class MultiObjectiveOutput(Output):
             self.indicator_no_pf = MultiObjectiveSpaceTermination()
             self.columns += [self.eps, self.indicator]
 
-    def update(self, algorithm):
+    def update(self, algorithm: Any) -> None:
+        """Update output columns with current algorithm state.
+
+        Args:
+            algorithm: The optimization algorithm instance.
+        """
         super().update(algorithm)
 
         for col in [self.igd, self.gd, self.hv, self.eps, self.indicator]:
@@ -63,13 +88,11 @@ class MultiObjectiveOutput(Output):
         F = F[feas]
 
         if len(F) > 0:
-            
             problem = algorithm.problem
             if hasattr(problem, "time"):
                 self.pf = pareto_front_if_possible(problem)
 
             if self.pf is not None:
-
                 if feas.sum() > 0:
                     self.igd.set(IGD(self.pf, zero_to_one=True).do(F))
                     self.gd.set(GD(self.pf, zero_to_one=True).do(F))
@@ -78,14 +101,12 @@ class MultiObjectiveOutput(Output):
                         self.hv.set(Hypervolume(pf=self.pf, zero_to_one=True).do(F))
 
             if self.indicator_no_pf is not None:
-
                 ind = self.indicator_no_pf
                 ind.update(algorithm)
 
                 valid = ind.delta_ideal is not None
 
                 if valid:
-
                     if ind.delta_ideal > ind.tol:
                         max_from = "ideal"
                         eps = ind.delta_ideal

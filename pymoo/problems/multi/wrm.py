@@ -1,3 +1,7 @@
+"""Water Resource Management multi-objective optimization problem."""
+
+from typing import Any
+
 import pymoo.gradient.toolbox as anp
 import numpy as np
 
@@ -5,14 +9,14 @@ from pymoo.core.problem import Problem
 
 
 class WRM(Problem):
+    """Water Resource Management problem with five objectives and seven constraints."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         xl = np.array([0.01, 0.01, 0.01])
         xu = np.array([0.45, 0.10, 0.10])
         super().__init__(n_var=3, n_obj=5, n_ieq_constr=7, xl=xl, xu=xu, vtype=float)
 
-    def _evaluate(self, x, out, *args, **kwargs):
-
+    def _evaluate(self, x: Any, out: Any, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG002
         # the definition is index 1 based -> simply add a dummy var in the beginning
         x = anp.column_stack([anp.zeros((len(x), 1)), x])
 
@@ -22,7 +26,7 @@ class WRM(Problem):
         f4 = 250 * 2289 * anp.exp(-39.75 * x[:, 2] + 9.9 * x[:, 3] + 2.74)
         f5 = 25 * (1.39 / (x[:, 1] * x[:, 2]) + 4940 * x[:, 3] - 80)
 
-        deno = 1. / (x[:, 1] * x[:, 2])
+        deno = 1.0 / (x[:, 1] * x[:, 2])
 
         g1 = -(1.0 - (0.00139 * deno + 4.94 * x[:, 3] - 0.08))
         g2 = -(1.0 - (0.000306 * deno + 1.082 * x[:, 3] - 0.0986))

@@ -1,4 +1,7 @@
+"""Adaptive constraint handling wrapper for algorithms."""
+
 from copy import deepcopy
+from typing import Any
 
 from pymoo.core.algorithm import MetaAlgorithm
 from pymoo.core.evaluator import Evaluator
@@ -8,19 +11,38 @@ from pymoo.core.problem import Problem
 
 
 class AttachConfigEvaluator(Evaluator):
-
-    def __init__(self, wrapped, config):
+    def __init__(self, wrapped: Evaluator, config: dict[str, Any]) -> None:
         super().__init__()
         self.wrapped = wrapped
         self.config = config
-        
+
         # Copy all attributes from wrapped evaluator
-        for attr_name in ['evaluate_values_of', 'skip_already_evaluated', 'callback', 'n_eval']:
+        for attr_name in [
+            "evaluate_values_of",
+            "skip_already_evaluated",
+            "callback",
+            "n_eval",
+        ]:
             if hasattr(wrapped, attr_name):
                 setattr(self, attr_name, getattr(wrapped, attr_name))
 
-    def eval(self, problem: Problem, pop: Population, **kwargs):
-        pop = self.wrapped.eval(problem, pop, **kwargs)
+    def eval(
+        self,
+        problem: Problem,
+        pop: Population,
+        skip_already_evaluated: bool | None = None,
+        evaluate_values_of: list[Any] | None = None,
+        count_evals: bool = True,
+        **kwargs: Any,
+    ) -> Population:
+        pop = self.wrapped.eval(
+            problem,
+            pop,
+            skip_already_evaluated=skip_already_evaluated,
+            evaluate_values_of=evaluate_values_of,
+            count_evals=count_evals,
+            **kwargs,
+        )
         pop.apply(lambda ind: ind.set("config", self.config))
         return pop
 
@@ -31,7 +53,6 @@ def copy_to_dict(src, dest):
 
 
 class AdaptiveConstraintHandling(MetaAlgorithm):
-
     def __init__(self, algorithm):
         super().__init__(algorithm)
 

@@ -1,3 +1,5 @@
+"""Core optimization algorithm framework."""
+
 import copy
 import time
 from typing import Any
@@ -11,7 +13,11 @@ from pymoo.core.population import Population
 from pymoo.core.problem import Problem
 from pymoo.core.result import Result
 from pymoo.functions import FunctionLoader
-from pymoo.termination.default import DefaultMultiObjectiveTermination, DefaultSingleObjectiveTermination, Termination
+from pymoo.termination.default import (
+    DefaultMultiObjectiveTermination,
+    DefaultSingleObjectiveTermination,
+    Termination,
+)
 from pymoo.util.archive import Archive
 from pymoo.util.display.display import Display
 from pymoo.util.misc import termination_from_tuple
@@ -19,19 +25,20 @@ from pymoo.util.optimum import filter_optimum
 
 
 class Algorithm:
-
-    def __init__(self,
-                 termination: Termination | str | tuple[str, ...] | None = None,
-                 output: str | None = None,
-                 display: Display | None = None,
-                 callback: Callback | None = None,
-                 archive: Archive | None = None,
-                 return_least_infeasible: bool = False,
-                 save_history: bool = False,
-                 verbose: bool = False,
-                 seed: int | None = None,
-                 evaluator: Evaluator | None = None,
-                 **kwargs):
+    def __init__(
+        self,
+        termination: Termination | str | tuple[str, ...] | None = None,
+        output: str | None = None,
+        display: Display | None = None,
+        callback: Callback | None = None,
+        archive: Archive | None = None,
+        return_least_infeasible: bool = False,
+        save_history: bool = False,
+        verbose: bool = False,
+        seed: int | None = None,
+        evaluator: Evaluator | None = None,
+        **kwargs,
+    ):
 
         super().__init__()
 
@@ -100,7 +107,9 @@ class Algorithm:
         # the time when the algorithm has been setup for the first time
         self.start_time: float | None = None
 
-    def setup(self, problem: Problem, verbose=False, progress=False, **kwargs) -> "Algorithm":
+    def setup(
+        self, problem: Problem, verbose=False, progress=False, **kwargs
+    ) -> "Algorithm":
 
         # the problem to be solved by the algorithm
         self.problem = problem
@@ -177,7 +186,6 @@ class Algorithm:
 
         # the first time next is called simply initial the algorithm - makes the interface cleaner
         if not self.is_initialized:
-
             # hook mostly used by the class to happen before even to initialize
             self._initialize()
 
@@ -195,14 +203,15 @@ class Algorithm:
 
         return infills
 
-    def advance(self, infills: Population | None = None, **kwargs) -> Population | Result:
+    def advance(
+        self, infills: Population | None = None, **kwargs
+    ) -> Population | Result:
 
         # if infills have been provided set them as offsprings and feed them into advance
         self.off = infills
 
         # if the algorithm has not been already initialized
         if not self.is_initialized:
-
             # set the generation counter to 1
             self.n_iter = 1
 
@@ -219,7 +228,6 @@ class Algorithm:
             self._post_advance()
 
         else:
-
             # call the implementation of the advance method - if the infill is not None
             val = self._advance(infills=infills, **kwargs)
 
@@ -358,7 +366,6 @@ class Algorithm:
 
 
 class LoopwiseAlgorithm(Algorithm):
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.generator = None
@@ -395,19 +402,19 @@ def default_termination(problem: Problem) -> Termination:
 
 
 class MetaAlgorithm(Meta):
-    """
-    An algorithm wrapper that combines Algorithm's functionality with Meta's delegation behavior.
+    """Algorithm wrapper combining functionality with Meta delegation behavior.
+
     Uses Meta to provide transparent proxying with the ability to override specific methods.
     """
 
-    def __init__(self, algorithm, copy=True, **kwargs):
+    def __init__(self, algorithm: Algorithm, copy: bool = True, **kwargs: Any) -> None:
         # If the algorithm is already a Meta object, don't copy to avoid deepcopy issues with nested proxies
         if isinstance(algorithm, Meta):
             copy = False
-            
+
         # Initialize Meta
         super().__init__(algorithm, copy=copy)
-        
+
         # Pass any additional kwargs to the wrapped algorithm if needed
         for key, value in kwargs.items():
             setattr(self, key, value)

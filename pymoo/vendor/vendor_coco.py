@@ -1,3 +1,5 @@
+"""Vendored COCO/BBOB benchmark interface code."""
+
 import os
 
 import numpy as np

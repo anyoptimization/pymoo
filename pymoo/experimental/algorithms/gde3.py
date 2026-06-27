@@ -1,3 +1,5 @@
+"""GDE3: Generalized Differential Evolution 3 algorithm."""
+
 from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
 from pymoo.algorithms.soo.nonconvex.de import DE, Variant
 from pymoo.core.population import Population
@@ -10,11 +12,9 @@ from pymoo.termination.default import DefaultMultiObjectiveTermination
 
 
 class GDE3(DE):
-
     def __init__(self, variant=None, **kwargs):
 
         if variant is None:
-
             if "control" not in kwargs:
                 kwargs["control"] = NoParameterControl
 
@@ -28,7 +28,9 @@ class GDE3(DE):
         RankAndCrowdingSurvival().do(self.problem, infills, return_indices=True)
 
     def _advance(self, infills=None, **kwargs):
-        assert infills is not None, "This algorithms uses the AskAndTell interface thus 'infills' must to be provided."
+        assert infills is not None, (
+            "This algorithms uses the AskAndTell interface thus 'infills' must to be provided."
+        )
         pop = self.pop
 
         # the pool of solutions considered to survive
@@ -51,7 +53,9 @@ class GDE3(DE):
 
         # set the rank and crowding in the current population
         pool = Population.create(*pool)
-        self.pop = RankAndCrowdingSurvival().do(self.problem, pool, n_survive=self.pop_size)
+        self.pop = RankAndCrowdingSurvival().do(
+            self.problem, pool, n_survive=self.pop_size
+        )
 
 
 parse_doc_string(GDE3.__init__)

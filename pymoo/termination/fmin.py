@@ -1,8 +1,9 @@
+"""Termination based on minimum function value reached."""
+
 from pymoo.core.termination import Termination
 
 
 class MinimumFunctionValueTermination(Termination):
-
     def __init__(self, fmin) -> None:
         super().__init__()
         self.fmin = fmin

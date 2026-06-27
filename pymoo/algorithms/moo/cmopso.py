@@ -1,9 +1,15 @@
+"""Competitive Mechanism based Multi-objective Particle Swarm Optimizer (CMOPSO)."""
+
+from typing import Any
+
 import numpy as np
 
 from pymoo.algorithms.moo.spea2 import SPEA2Survival
 from pymoo.core.algorithm import Algorithm
 from pymoo.core.initialization import Initialization
 from pymoo.core.population import Population
+from pymoo.core.repair import Repair
+from pymoo.core.sampling import Sampling
 from pymoo.core.survival import Survival
 from pymoo.docs import parse_doc_string
 from pymoo.operators.mutation.pm import PolynomialMutation
@@ -16,21 +22,20 @@ from pymoo.operators.survival.rank_and_crowding.metrics import get_crowding_func
 from pymoo.util import default_random_state
 from pymoo.util.archive import MultiObjectiveArchive, SurvivalTruncation
 from pymoo.util.display.multi import MultiObjectiveOutput
+from pymoo.util.display.output import Output
 
 
 class CrowdingDistanceTournamentSurvival(Survival):
-    def __init__(self, tournament_size=3):
-        """
-        Survival strategy that uses tournament selection based on crowding distance.
+    def __init__(self, tournament_size: int = 3):
+        """Select survivors via tournament selection based on crowding distance.
 
         This class inherits from :class:`~pymoo.core.survival.Survival` and implements a
         tournament selection mechanism where individuals with higher crowding distance
         (indicating better diversity) are preferred.
 
-        Parameters
-        ----------
-        tournament_size : int, optional
-            The number of individuals participating in each tournament. Defaults to 3.
+        Args:
+            tournament_size: The number of individuals participating in each tournament.
+                Defaults to 3.
         """
         super().__init__(filter_infeasible=True)
         self._tournament_size = tournament_size
@@ -65,10 +70,14 @@ def angle_between(v1, v2):
 
 
 @default_random_state
-def cmopso_equation(X, L, V, V_max, random_state=None):
-    """
-    Calculates the new positions and velocities of particles based on the CMOPSO
-    competition-based learning strategy.
+def cmopso_equation(
+    X: np.ndarray,
+    L: np.ndarray,
+    V: np.ndarray,
+    V_max: np.ndarray,
+    random_state=None,
+):
+    """Calculate the new positions and velocities of particles using CMOPSO learning.
 
     This function implements the core update equations for the Competitive Mechanism
     based Multi-objective Particle Swarm Optimizer (CMOPSO). Each particle's
@@ -77,29 +86,20 @@ def cmopso_equation(X, L, V, V_max, random_state=None):
     angle between the particle's current position and the elite's position, promoting
     diversity.
 
-    Parameters
-    ----------
-    X : numpy.ndarray
-        Current positions of the particles (population). Shape `(n_particles, n_var)`.
-    L : numpy.ndarray
-        Positions of the elite particles from the archive. Shape `(n_elites, n_var)`.
-    V : numpy.ndarray
-        Current velocities of the particles. Shape `(n_particles, n_var)`.
-    V_max : numpy.ndarray
-        Maximum allowed velocity for each decision variable. Shape `(n_var,)`.
-    random_state : numpy.random.RandomState, optional
-        Random state for reproducibility. If None, a new default random number
-        generator is used.
+    Args:
+        X: Current positions of the particles (population). Shape `(n_particles, n_var)`.
+        L: Positions of the elite particles from the archive. Shape `(n_elites, n_var)`.
+        V: Current velocities of the particles. Shape `(n_particles, n_var)`.
+        V_max: Maximum allowed velocity for each decision variable. Shape `(n_var,)`.
+        random_state: Random state for reproducibility. If None, a new default random
+            number generator is used.
 
-    Returns
-    -------
-    Xp : numpy.ndarray
-        New positions of the particles after the update. Shape `(n_particles, n_var)`.
-    Vp : numpy.ndarray
-        New velocities of the particles after the update. Shape `(n_particles, n_var)`.
+    Returns:
+        A tuple `(Xp, Vp)` where `Xp` holds the new positions and `Vp` the new
+        velocities of the particles after the update. Both have shape
+        `(n_particles, n_var)`.
     """
-
-    W_X = []
+    W_X: Any = []
     for i in range(np.shape(X)[0]):  # binary tournament selection on elites
         aidx = random_state.choice(range(len(L)))
         bidx = random_state.choice(range(len(L)))
@@ -124,19 +124,19 @@ def cmopso_equation(X, L, V, V_max, random_state=None):
 class CMOPSO(Algorithm):
     def __init__(
         self,
-        pop_size=100,
-        max_velocity_rate=0.2,
-        elite_size=10,
-        initial_velocity="random",  # 'random' | 'zero'
-        mutation_rate=0.5,
-        sampling=FloatRandomSampling(),
-        repair=ToBoundOutOfBoundsRepair(),
-        output=MultiObjectiveOutput(),
+        pop_size: int = 100,
+        max_velocity_rate: float = 0.2,
+        elite_size: int = 10,
+        initial_velocity: str = "random",  # 'random' | 'zero'
+        mutation_rate: float = 0.5,
+        sampling: Sampling = FloatRandomSampling(),
+        repair: Repair = ToBoundOutOfBoundsRepair(),
+        output: Output = MultiObjectiveOutput(),
         **kwargs,
     ):
-        """
-        Competitive mechanism based Multi-objective Particle Swarm Optimizer (CMOPSO).
+        """Initialize the CMOPSO algorithm.
 
+        Competitive mechanism based Multi-objective Particle Swarm Optimizer (CMOPSO).
         Particle updates are based on learning from the "winner" of binary tournaments
         of randomly selected elites. Replacement strategy is based on SPEA2.
 
@@ -144,30 +144,21 @@ class CMOPSO(Algorithm):
         based multi-objective particle swarm optimizer with fast convergence.
         Inf. Sci., 427, 63-76.
 
-        Parameters
-        ----------
-        pop_size : int, optional
-            The population size. Defaults to 100.
-        max_velocity_rate : float, optional
-            The maximum velocity rate. Defaults to 0.2.
-        max_elite_size : int, optional
-            The maximum size of the elite archive. Defaults to 10.
-        initial_velocity : str, optional
-            Defines how the initial velocity of particles is set. Can be "random" or "zero".
-            Defaults to "random".
-        mutate_rate : float, optional
-            Rate at which to apply polynomial mutation to the offspring. Defaults to 0.5.
-        sampling : :class:`~pymoo.core.sampling.Sampling`, optional
-            Sampling strategy used to generate the initial population. Defaults to
-            :class:`~pymoo.operators.sampling.rnd.FloatRandomSampling`.
-        repair : :class:`~pymoo.operators.repair.Repair`, optional
-            Repair method for out-of-bounds variables. Defaults to
-            :class:`~pymoo.operators.repair.to_bound.ToBoundOutOfBoundsRepair`.
-        output : :class:`~pymoo.util.display.output.Output`, optional
-            Output object to be used for logging. Defaults to
-            :class:`~pymoo.util.display.multi.MultiObjectiveOutput`.
-        **kwargs
-            Additional keyword arguments to be passed to the Algorithm superclass.
+        Args:
+            pop_size: The population size. Defaults to 100.
+            max_velocity_rate: The maximum velocity rate. Defaults to 0.2.
+            elite_size: The maximum size of the elite archive. Defaults to 10.
+            initial_velocity: Defines how the initial velocity of particles is set. Can
+                be "random" or "zero". Defaults to "random".
+            mutation_rate: Rate at which to apply polynomial mutation to the offspring.
+                Defaults to 0.5.
+            sampling: Sampling strategy used to generate the initial population. Defaults
+                to :class:`~pymoo.operators.sampling.rnd.FloatRandomSampling`.
+            repair: Repair method for out-of-bounds variables. Defaults to
+                :class:`~pymoo.operators.repair.to_bound.ToBoundOutOfBoundsRepair`.
+            output: Output object to be used for logging. Defaults to
+                :class:`~pymoo.util.display.multi.MultiObjectiveOutput`.
+            **kwargs: Additional keyword arguments to be passed to the Algorithm superclass.
         """
         super().__init__(output=output, **kwargs)
         self.pop_size = pop_size

@@ -1,3 +1,5 @@
+"""R-NSGA-II: NSGA-II with reference point-based selection."""
+
 import numpy as np
 
 from pymoo.algorithms.moo.nsga2 import NSGA2
@@ -13,27 +15,25 @@ from pymoo.util.normalization import get_extreme_points_c
 
 
 class RNSGA2(NSGA2):
+    def __init__(
+        self,
+        ref_points,
+        epsilon=0.001,
+        normalization="front",
+        weights=None,
+        extreme_points_as_reference_points=False,
+        **kwargs,
+    ):
+        """Initialize R-NSGA-II algorithm.
 
-    def __init__(self,
-                 ref_points,
-                 epsilon=0.001,
-                 normalization="front",
-                 weights=None,
-                 extreme_points_as_reference_points=False,
-                 **kwargs):
+        Args:
+            ref_points: Reference points.
+            epsilon: Distance threshold for epsilon-neighbor clustering.
+            normalization: Normalization strategy ('no', 'front', 'ever').
+            weights: Weight vector for objectives.
+            extreme_points_as_reference_points: Whether to include extreme points as references.
+            **kwargs: Additional arguments passed to NSGA2.
         """
-
-        Parameters
-        ----------
-
-        ref_points : {ref_points}
-        epsilon : float
-        weights : np.array
-        normalization : {{'no', 'front', 'ever'}}
-        extreme_points_as_reference_points : bool
-
-        """
-
         self.epsilon = epsilon
         self.weights = weights
         self.normalization = normalization
@@ -41,18 +41,24 @@ class RNSGA2(NSGA2):
 
         super().__init__(**kwargs)
 
-        self.survival = RankAndModifiedCrowdingSurvival(ref_points, epsilon, weights, normalization,
-                                                        extreme_points_as_reference_points)
+        self.survival = RankAndModifiedCrowdingSurvival(
+            ref_points,
+            epsilon,
+            weights,
+            normalization,
+            extreme_points_as_reference_points,
+        )
 
 
 class RankAndModifiedCrowdingSurvival(Survival):
-
-    def __init__(self, ref_points,
-                 epsilon,
-                 weights,
-                 normalization,
-                 extreme_points_as_reference_points
-                 ) -> None:
+    def __init__(
+        self,
+        ref_points,
+        epsilon,
+        weights,
+        normalization,
+        extreme_points_as_reference_points,
+    ) -> None:
 
         super().__init__(True)
         self.n_obj = ref_points.shape[1]
@@ -95,14 +101,16 @@ class RankAndModifiedCrowdingSurvival(Survival):
             self.nadir_point = np.ones(self.n_obj)
 
         if self.extreme_points_as_reference_points:
-            self.ref_points = np.vstack([self.ref_points, get_extreme_points_c(F, self.ideal_point)])
+            self.ref_points = np.vstack(
+                [self.ref_points, get_extreme_points_c(F, self.ideal_point)]
+            )
 
         # calculate the distance matrix from ever solution to all reference point
-        dist_to_ref_points = calc_norm_pref_distance(F, self.ref_points, self.weights, self.ideal_point,
-                                                     self.nadir_point)
+        dist_to_ref_points = calc_norm_pref_distance(
+            F, self.ref_points, self.weights, self.ideal_point, self.nadir_point
+        )
 
         for k, front in enumerate(fronts):
-
             # save rank attributes to the individuals - rank = front here
             pop[front].set("rank", np.full(len(front), k))
 
@@ -110,7 +118,9 @@ class RankAndModifiedCrowdingSurvival(Survival):
             n_remaining = n_survive - len(survivors)
 
             # the ranking of each point regarding each reference point (two times argsort is necessary)
-            rank_by_distance = np.argsort(np.argsort(dist_to_ref_points[front], axis=0), axis=0)
+            rank_by_distance = np.argsort(
+                np.argsort(dist_to_ref_points[front], axis=0), axis=0
+            )
 
             # the reference point where the best ranking is coming from
             ref_point_of_best_rank = np.argmin(rank_by_distance, axis=1)
@@ -119,16 +129,15 @@ class RankAndModifiedCrowdingSurvival(Survival):
             ranking = rank_by_distance[np.arange(len(front)), ref_point_of_best_rank]
 
             if len(front) <= n_remaining:
-
                 # we can simply copy the crowding to ranking. not epsilon selection here
                 crowding = ranking
-                I = np.arange(len(front))
+                I = np.arange(len(front))  # noqa: E741
 
             else:
-
                 # Distance from solution to every other solution and set distance to itself to infinity
-                dist_to_others = calc_norm_pref_distance(F[front], F[front], self.weights, self.ideal_point,
-                                                         self.nadir_point)
+                dist_to_others = calc_norm_pref_distance(
+                    F[front], F[front], self.weights, self.ideal_point, self.nadir_point
+                )
                 np.fill_diagonal(dist_to_others, np.inf)
 
                 # the crowding that will be used for selection
@@ -139,7 +148,6 @@ class RankAndModifiedCrowdingSurvival(Survival):
 
                 # until we have saved a crowding for each solution
                 while len(not_selected) > 0:
-
                     # select the closest solution
                     idx = not_selected[0]
 
@@ -161,10 +169,12 @@ class RankAndModifiedCrowdingSurvival(Survival):
                         # remove group from not_selected array
                         to_remove.extend(group)
 
-                    not_selected = np.array([i for i in not_selected if i not in to_remove])
+                    not_selected = np.array(
+                        [i for i in not_selected if i not in to_remove]
+                    )
 
                 # now sort by the crowding (actually modified rank) ascending and let the best survive
-                I = np.argsort(crowding)[:n_remaining]
+                I = np.argsort(crowding)[:n_remaining]  # noqa: E741
 
             # set the crowding to all individuals
             pop[front].set("crowding", crowding)

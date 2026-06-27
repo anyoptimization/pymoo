@@ -1,3 +1,5 @@
+"""KGB-DMOEA: knowledge-guided Bayesian prediction strategy for dynamic multi-objective optimization."""
+
 import json
 
 import numpy as np
@@ -42,15 +44,18 @@ class KGB(NSGA2):
         # Random state will be set up in the base algorithm's setup method
 
     def setup(self, problem, **kwargs):
+        """Set up the KGB-DMOEA algorithm.
+
+        Args:
+            problem: The optimization problem instance.
+            kwargs: Additional keyword arguments.
+
+        Returns:
+            The result of the superclass setup method.
         """
-        Set up the KGB-DMOEA algorithm.
-        :param problem: The optimization problem instance
-        :param kwargs: Additional keyword arguments
-        :return: The result of the superclass setup method
-        """
-        assert (
-            not problem.has_constraints()
-        ), "KGB-DMOEA only works for unconstrained problems."
+        assert not problem.has_constraints(), (
+            "KGB-DMOEA only works for unconstrained problems."
+        )
         return super().setup(problem, **kwargs)
 
     def _infill(self):
@@ -58,9 +63,10 @@ class KGB(NSGA2):
         return None
 
     def knowledge_reconstruction_examination(self):
-        """
-        Perform the knowledge reconstruction examination.
-        :return: Tuple containing the useful population, useless population, and cluster centroids
+        """Perform the knowledge reconstruction examination.
+
+        Returns:
+            Tuple containing the useful population, useless population, and cluster centroids.
         """
         clusters = self.ps  # set historical PS set as clusters
         Nc = self.C_SIZE  # set final nr of clusters
@@ -69,7 +75,6 @@ class KGB(NSGA2):
 
         # while there are still clusters to be condensed
         while size > Nc:
-
             counter = 0
             min_distance = None
             min_distance_index = []
@@ -81,13 +86,12 @@ class KGB(NSGA2):
                         clusters[keys_i]["solutions"]
                         is not clusters[keys_j]["solutions"]
                     ):
-
                         dst = euclidean_distance(
                             clusters[keys_i]["centroid"],
                             clusters[keys_j]["centroid"],
                         )
 
-                        if min_distance == None:
+                        if min_distance is None:
                             min_distance = dst
                             min_distance_index = [keys_i, keys_j]
                         elif dst < min_distance:
@@ -102,10 +106,10 @@ class KGB(NSGA2):
                 clusters[min_distance_index[0]]["solutions"].append(solution)
 
             # calculate new centroid for merged cluster
-            clusters[min_distance_index[0]][
-                "centroid"
-            ] = self.calculate_cluster_centroid(
-                clusters[min_distance_index[0]]["solutions"]
+            clusters[min_distance_index[0]]["centroid"] = (
+                self.calculate_cluster_centroid(
+                    clusters[min_distance_index[0]]["solutions"]
+                )
             )
 
             # remove cluster that was merged
@@ -147,14 +151,16 @@ class KGB(NSGA2):
 
         # return useful and useless population and the centroid solutions
         return pop_useful, pop_useless, c
-    
 
     def naive_bayesian_classifier(self, pop_useful, pop_useless):
-        """
-        Train a naive Bayesian classifier using the useful and useless populations.
-        :param pop_useful: Useful population
-        :param pop_useless: Useless population
-        :return: Trained GaussianNB classifier
+        """Train a naive Bayesian classifier using the useful and useless populations.
+
+        Args:
+            pop_useful: Useful population.
+            pop_useless: Useless population.
+
+        Returns:
+            Trained GaussianNB classifier.
         """
         labeled_useful_solutions = []
         labeled_useless_solutions = []
@@ -187,14 +193,10 @@ class KGB(NSGA2):
         return model
 
     def add_to_ps(self):
-        """
-        Add the current Pareto optimal set (POS) to the Pareto set (PS) with individual keys.
-        """
-
+        """Add the current Pareto optimal set (POS) to the Pareto set (PS) with individual keys."""
         PS_counter = 0
 
         for individual in self.opt:
-
             if isinstance(individual.X, list):
                 individual.X = np.asarray(individual.X)
 
@@ -208,11 +210,14 @@ class KGB(NSGA2):
             PS_counter += 1
 
     def predicted_population(self, X_test, Y_test):
-        """
-        Create a predicted population from the test set with positive labels.
-        :param X_test: Test set of features
-        :param Y_test: Test set of labels
-        :return: Predicted population
+        """Create a predicted population from the test set with positive labels.
+
+        Args:
+            X_test: Test set of features.
+            Y_test: Test set of labels.
+
+        Returns:
+            Predicted population.
         """
         predicted_pop = []
         for i in range(len(Y_test)):
@@ -221,10 +226,13 @@ class KGB(NSGA2):
         return predicted_pop
 
     def calculate_cluster_centroid(self, solution_cluster):
-        """
-        Calculate the centroid for a given cluster of solutions.
-        :param solution_cluster: List of solutions in the cluster
-        :return: Cluster centroid
+        """Calculate the centroid for a given cluster of solutions.
+
+        Args:
+            solution_cluster: List of solutions in the cluster.
+
+        Returns:
+            Cluster centroid.
         """
         # Get number of variable shape
         try:
@@ -253,10 +261,13 @@ class KGB(NSGA2):
         return [x / length for x in centroid_points]
 
     def check_boundaries(self, pop):
-        """
-        Check and fix the boundaries of the given population.
-        :param pop: Population to check and fix boundaries
-        :return: Population with corrected boundaries
+        """Check and fix the boundaries of the given population.
+
+        Args:
+            pop: Population to check and fix boundaries.
+
+        Returns:
+            Population with corrected boundaries.
         """
         # check whether numpy array or pymoo population is given
         if isinstance(pop, Population):
@@ -272,10 +283,13 @@ class KGB(NSGA2):
         return pop
 
     def random_strategy(self, N_r):
-        """
-        Generate a random population within the problem boundaries.
-        :param N_r: Number of random solutions to generate
-        :return: Randomly generated population
+        """Generate a random population within the problem boundaries.
+
+        Args:
+            N_r: Number of random solutions to generate.
+
+        Returns:
+            Randomly generated population.
         """
         # generate a random population of size N_r
         # TODO: Check boundaries
@@ -292,21 +306,26 @@ class KGB(NSGA2):
         return random_pop
 
     def diversify_population(self, pop):
-        """
-        Introduce diversity in the population by replacing a percentage of individuals.
-        :param pop: Population to diversify
-        :return: Diversified population
+        """Introduce diversity in the population by replacing a percentage of individuals.
+
+        Args:
+            pop: Population to diversify.
+
+        Returns:
+            Diversified population.
         """
         # find indices to be replaced (introduce diversity)
-        I = np.where(self.random_state.random(len(pop)) < self.PERC_DIVERSITY)[0]
+        replace_idx = np.where(
+            self.random_state.random(len(pop)) < self.PERC_DIVERSITY
+        )[0]
         # replace with randomly sampled individuals
-        pop[I] = self.initialization.sampling(self.problem, len(I), random_state=self.random_state)
+        pop[replace_idx] = self.initialization.sampling(
+            self.problem, len(replace_idx), random_state=self.random_state
+        )
         return pop
 
     def _advance(self, **kwargs):
-        """
-        Advance the optimization algorithm by one iteration.
-        """
+        """Advance the optimization algorithm by one iteration."""
         pop = self.pop
         X, F = pop.get("X", "F")
 
@@ -314,11 +333,11 @@ class KGB(NSGA2):
         n_samples = int(np.ceil(len(pop) * self.PERC_DETECT_CHANGE))
 
         # choose randomly some individuals of the current population to test if there was a change
-        I = self.random_state.choice(np.arange(len(pop)), size=n_samples)
-        samples = self.evaluator.eval(self.problem, Population.new(X=X[I]))
+        sample_idx = self.random_state.choice(np.arange(len(pop)), size=n_samples)
+        samples = self.evaluator.eval(self.problem, Population.new(X=X[sample_idx]))
 
         # calculate the differences between the old and newly evaluated pop
-        delta = ((samples.get("F") - F[I]) ** 2).mean()
+        delta = ((samples.get("F") - F[sample_idx]) ** 2).mean()
 
         # archive the current POS
         self.add_to_ps()
@@ -327,7 +346,6 @@ class KGB(NSGA2):
         change_detected = delta > self.EPS
 
         if change_detected:
-
             # increase t counter for unique key of PS
             self.t += 1
 
@@ -359,9 +377,6 @@ class KGB(NSGA2):
             # ------ POPULATION GENERATION --------
             # take a random sample from predicted pop and known useful pop
 
-            nr_sampled_pop_useful = 0
-            nr_random_filler_solutions = 0
-
             if len(predicted_pop) >= self.pop_size - self.C_SIZE:
                 init_pop = []
                 indices = self.random_state.choice(
@@ -378,7 +393,6 @@ class KGB(NSGA2):
                     init_pop.append(np.asarray(solution))
 
             else:
-
                 # if not enough predicted solutions are available, add all predicted solutions to init_pop
                 init_pop = []
 
@@ -391,12 +405,8 @@ class KGB(NSGA2):
 
             # if there are still not enough solutions in init_pop randomly sample previously useful solutions directly without noise to init_pop
             if len(init_pop) < self.pop_size:
-
                 # fill up init_pop with randomly sampled solutions from pop_useful
                 if len(pop_useful) >= self.pop_size - len(init_pop):
-
-                    nr_sampled_pop_useful = self.pop_size - len(init_pop)
-
                     indices = self.random_state.choice(
                         len(pop_useful), self.pop_size - len(init_pop), replace=False
                     )
@@ -411,13 +421,8 @@ class KGB(NSGA2):
                     for solution in pop_useful:
                         init_pop.append(solution)
 
-                    nr_sampled_pop_useful = len(pop_useful)
-
             # if there are still not enough solutions in init_pop generate random solutions with the dimensions of problem decision space
             if len(init_pop) < self.pop_size:
-
-                nr_random_filler_solutions = self.pop_size - len(init_pop)
-
                 # fill up with random solutions
                 init_pop = np.vstack(
                     (init_pop, self.random_strategy(self.pop_size - len(init_pop)))
@@ -430,10 +435,18 @@ class KGB(NSGA2):
             self.evaluator.eval(self.problem, pop)
 
             # do a survival to recreate rank and crowding of all individuals
-            pop = self.survival.do(self.problem, pop, n_survive=len(pop), random_state=self.random_state)
+            pop = self.survival.do(
+                self.problem, pop, n_survive=len(pop), random_state=self.random_state
+            )
 
         # create the offsprings from the current population
-        off = self.mating.do(self.problem, pop, self.n_offsprings, algorithm=self, random_state=self.random_state)
+        off = self.mating.do(
+            self.problem,
+            pop,
+            self.n_offsprings,
+            algorithm=self,
+            random_state=self.random_state,
+        )
         self.evaluator.eval(self.problem, off)
 
         # merge the parent population and offsprings
@@ -441,7 +454,11 @@ class KGB(NSGA2):
 
         # execute the survival to find the fittest solutions
         self.pop = self.survival.do(
-            self.problem, pop, n_survive=self.pop_size, algorithm=self, random_state=self.random_state
+            self.problem,
+            pop,
+            n_survive=self.pop_size,
+            algorithm=self,
+            random_state=self.random_state,
         )
 
         # dump self.ps to file

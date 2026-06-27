@@ -1,6 +1,8 @@
-import pymoo.gradient.toolbox as anp
+"""Rastrigin single-objective test problem."""
+
 import numpy as np
 
+import pymoo.gradient.toolbox as anp
 from pymoo.core.problem import Problem
 
 

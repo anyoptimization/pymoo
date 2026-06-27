@@ -1,3 +1,7 @@
+"""2D truss optimization problem."""
+
+from typing import Any
+
 import pymoo.gradient.toolbox as anp
 import numpy as np
 
@@ -5,8 +9,9 @@ from pymoo.core.problem import Problem
 
 
 class Truss2D(Problem):
+    """2D Truss structural optimization problem with two objectives and one constraint."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(n_var=3, n_obj=2, n_ieq_constr=1, vtype=float)
 
         self.Amax = 0.01
@@ -15,8 +20,7 @@ class Truss2D(Problem):
         self.xl = np.array([0.0, 0.0, 1.0])
         self.xu = np.array([self.Amax, self.Amax, 3.0])
 
-    def _evaluate(self, x, out, *args, **kwargs):
-
+    def _evaluate(self, x: Any, out: Any, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG002
         # variable names for convenient access
         x1 = x[:, 0]
         x2 = x[:, 1]
@@ -38,8 +42,7 @@ class Truss2D(Problem):
         out["F"] = anp.column_stack([f1, f2])
         out["G"] = g1
 
-    def _calc_pareto_front(self, *args, **kwargs):
-
+    def _calc_pareto_front(self, *args: Any, **kwargs: Any) -> np.ndarray:  # noqa: ARG002
         T = 2 * np.sqrt(5) * self.Amax
 
         # Part A - before transition point T
@@ -50,16 +53,16 @@ class Truss2D(Problem):
 
         # Part B - after transition point T
 
-        def calc_y(V):
+        def calc_y(V: np.ndarray) -> np.ndarray:
             return np.sqrt(3200 * V**2 + 40 * V * np.sqrt(6400 * V**2 - 12) - 4)
 
-        def calc_SV(y):
+        def calc_SV(y: np.ndarray) -> np.ndarray:
             return (4 + y**2) / (0.01 * y)
 
-        def calc_x1(y):
+        def calc_x1(y: np.ndarray) -> np.ndarray:
             return 0.0025 * np.sqrt((16 + y**2) / (1 + y**2))
 
-        def calc_S(V):
+        def calc_S(V: np.ndarray) -> np.ndarray:
             y = calc_y(V)
             SV = calc_SV(y)
             S = SV / V
@@ -79,5 +82,3 @@ class Truss2D(Problem):
         pf = np.vstack([part_a, part_b])
 
         return pf
-
-

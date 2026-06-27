@@ -1,24 +1,17 @@
+"""Termination that becomes robust over a sliding window."""
+
 from pymoo.core.termination import Termination
 from pymoo.util.sliding_window import SlidingWindow
 
 
 class RobustTermination(Termination):
+    def __init__(self, termination, period=30) -> None:
+        """Initialize robust termination.
 
-    def __init__(self,
-                 termination,
-                 period=30,
-                 ) -> None:
-        """
-
-        Parameters
-        ----------
-
-        termination : Termination
-            The termination criterion that shall become robust
-
-        period : int
-            The number of last generations to be considered for termination.
-
+        Args:
+            termination: The termination criterion that shall become robust.
+            period: The number of last generations to be considered for
+                termination.
         """
         super().__init__()
 

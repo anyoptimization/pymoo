@@ -1,3 +1,5 @@
+"""Result object returned from an optimization run."""
+
 import typing
 from typing import Any, Optional
 
@@ -11,9 +13,7 @@ if typing.TYPE_CHECKING:
 
 
 class Result:
-    """
-    The resulting object of an optimization run.
-    """
+    """The resulting object of an optimization run."""
 
     def __init__(self) -> None:
         super().__init__()

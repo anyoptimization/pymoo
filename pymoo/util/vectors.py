@@ -1,3 +1,5 @@
+"""Utility functions for vector operations."""
+
 import numpy as np
 
 
@@ -24,7 +26,7 @@ def max_alpha(point, direction, xl, xu, mode="one_hits_bound"):
     val = (bounds - point[:, None]) / dir[:, None]
 
     # remove nan values by setting them to a negative number
-    val[np.isnan(val)] = - np.inf
+    val[np.isnan(val)] = -np.inf
 
     # if no value there - no bound exist
     if len(val) == 0:

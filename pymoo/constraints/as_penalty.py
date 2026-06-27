@@ -1,3 +1,5 @@
+"""Constraint handling via penalty method."""
+
 from pymoo.core.individual import calc_cv
 from pymoo.core.meta import Meta
 from pymoo.core.problem import Problem
@@ -7,10 +9,7 @@ import numpy as np
 
 
 class ConstraintsAsPenalty(Meta, Problem):
-
-    def __init__(self,
-                 problem,
-                 penalty: float = 0.1):
+    def __init__(self, problem, penalty: float = 0.1):
         super().__init__(problem)
 
         # the amount of penalty to add for this type

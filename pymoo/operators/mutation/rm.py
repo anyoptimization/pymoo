@@ -1,11 +1,24 @@
+"""Random choice mutation operator for categorical variables."""
+
 import numpy as np
 
 from pymoo.core.mutation import Mutation
 
 
 class ChoiceRandomMutation(Mutation):
+    """Mutation operator that randomly samples values from a variable's choice set."""
 
-    def _do(self, problem, X, random_state=None, **kwargs):
+    def _do(self, problem, X, random_state=None, **kwargs):  # noqa: D417
+        """Perform random choice mutation.
+
+        Args:
+            problem: The optimization problem.
+            X: Population variables.
+            random_state: Random state for reproducibility.
+
+        Returns:
+            Mutated population.
+        """
         assert problem.vars is not None
 
         # ensure the type object (fixed string length <UX can cause issues)
@@ -20,4 +33,3 @@ class ChoiceRandomMutation(Mutation):
             X[mut, k] = v
 
         return X
-

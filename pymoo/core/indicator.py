@@ -1,10 +1,11 @@
+"""Performance indicators for multi-objective optimization."""
+
 import abc
 
 from pymoo.util.normalization import PreNormalization
 
 
 class Indicator(PreNormalization):
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 

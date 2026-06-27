@@ -1,32 +1,41 @@
+"""Riesz energy-based reference direction generation."""
+
 import numpy as np
 
 from pymoo.gradient.grad_autograd import triu_indices, sqrt, log
 from pymoo.util.ref_dirs.construction import ConstructionBasedReferenceDirectionFactory
-from pymoo.util.ref_dirs.misc import project_onto_sum_equals_zero_plane, project_onto_unit_simplex_recursive
+from pymoo.util.ref_dirs.misc import (
+    project_onto_sum_equals_zero_plane,
+    project_onto_unit_simplex_recursive,
+)
 from pymoo.util.ref_dirs.optimizer import Adam
 from pymoo.util.ref_dirs.reduction import ReductionBasedReferenceDirectionFactory
-from pymoo.util.reference_direction import ReferenceDirectionFactory, scale_reference_directions
+from pymoo.util.reference_direction import (
+    ReferenceDirectionFactory,
+    scale_reference_directions,
+)
 
 
 class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
-
-    def __init__(self,
-                 n_dim,
-                 n_points,
-                 ref_points=None,
-                 return_as_tuple=False,
-                 n_max_iter=1000,
-                 n_until_optimizer_reset=30,
-                 sampling="reduction",
-                 norm_gradients=True,
-                 verify_gradient=False,
-                 freeze_edges=False,
-                 precision=1e-5,
-                 restarts=True,
-                 X=None,
-                 d=None,
-                 callback=None,
-                 **kwargs):
+    def __init__(
+        self,
+        n_dim,
+        n_points,
+        ref_points=None,
+        return_as_tuple=False,
+        n_max_iter=1000,
+        n_until_optimizer_reset=30,
+        sampling="reduction",
+        norm_gradients=True,
+        verify_gradient=False,
+        freeze_edges=False,
+        precision=1e-5,
+        restarts=True,
+        X=None,
+        d=None,
+        callback=None,
+        **kwargs,
+    ):
 
         super().__init__(n_dim, **kwargs)
 
@@ -52,11 +61,14 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
     def _step(self, optimizer, X, freeze=None):
         free = np.logical_not(freeze)
 
-        obj, grad, mutual_dist = calc_potential_energy_with_grad(X, self.d, return_mutual_dist=True)
+        obj, grad, mutual_dist = calc_potential_energy_with_grad(
+            X, self.d, return_mutual_dist=True
+        )
         # obj, grad = value_and_grad(calc_potential_energy)(X, self.d)
 
         if self.verify_gradient:
             from autograd import value_and_grad
+
             obj, grad = calc_potential_energy_with_grad(X, self.d)
             _obj, _grad = value_and_grad(calc_potential_energy)(X, self.d)
             if np.abs(grad - _grad).mean() > 1e-5:
@@ -72,7 +84,7 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
         # normalize the gradients by the largest gradient norm
         if self.norm_gradients:
             norm = np.linalg.norm(proj_grad, axis=1)
-            proj_grad = (proj_grad / max(norm.max(), 1e-24))
+            proj_grad = proj_grad / max(norm.max(), 1e-24)
 
         # apply a step of gradient descent by subtracting the projected gradient with a learning rate
         X = optimizer.next(X, proj_grad)
@@ -113,7 +125,6 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
 
         # for each iteration of gradient descent
         for i in range(self.n_max_iter):
-
             # execute one optimization step
             _X, _obj = self._step(self.optimizer, X, freeze=freeze)
 
@@ -153,18 +164,18 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
         # if no initial points are provided by the user
         if X is None:
             if self.sampling == "reduction":
-                X = ReductionBasedReferenceDirectionFactory(self.n_dim,
-                                                            self.n_points,
-                                                            kmeans=True,
-                                                            lexsort=False) \
-                    .do(random_state=random_state)
+                X = ReductionBasedReferenceDirectionFactory(
+                    self.n_dim, self.n_points, kmeans=True, lexsort=False
+                ).do(random_state=random_state)
 
             elif self.sampling == "construction":
-                X = ConstructionBasedReferenceDirectionFactory(self.n_dim,
-                                                               self.n_points) \
-                    .do(random_state=random_state)
+                X = ConstructionBasedReferenceDirectionFactory(
+                    self.n_dim, self.n_points
+                ).do(random_state=random_state)
             else:
-                raise Exception("Unknown sampling method. Either reduction or construction.")
+                raise Exception(
+                    "Unknown sampling method. Either reduction or construction."
+                )
 
         X = self._solve(X, freeze_edges=self.freeze_edges)
 
@@ -206,12 +217,13 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
             X_t = scale_reference_directions(X_t, 1 / scale)
 
             # find the indices of points which are used as edges
-            I = np.where(np.any(X_t < 1e-5, axis=1))[0]
+            I = np.where(np.any(X_t < 1e-5, axis=1))[0]  # noqa: E741
 
             # create new points in the simplex where reference directions are supposed to be optimized
             _n_points = n_points_of_ref + (n_points - len(I))
-            _R = ReductionBasedReferenceDirectionFactory(self.n_dim, n_points=_n_points, kmeans=True,
-                                                         lexsort=False).do()
+            _R = ReductionBasedReferenceDirectionFactory(
+                self.n_dim, n_points=_n_points, kmeans=True, lexsort=False
+            ).do()
 
             # detect the edges and just optimize them and shrink later
             outer = np.any(_R == 0, axis=1)
@@ -221,7 +233,9 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
             _R = scale_reference_directions(_R, 0.9)
 
             # optimize just the edges
-            _R[outer] = self._solve(_R[outer], F=np.vstack([X_t[I], _R[inner]]), freeze_edges=False)
+            _R[outer] = self._solve(
+                _R[outer], F=np.vstack([X_t[I], _R[inner]]), freeze_edges=False
+            )
 
             # no set the reference point and freeze it
             # closest_to_centroid = cdist(centroid, _R).argmin()
@@ -230,7 +244,9 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
             # _R[closest_to_centroid] = centroid
 
             # now when translated the reference point becomes the centroid - fix that point to be included
-            _R[inner] = self._solve(_R[inner], F=np.vstack([X_t[I], _R[outer]]), freeze_edges=False)
+            _R[inner] = self._solve(
+                _R[inner], F=np.vstack([X_t[I], _R[outer]]), freeze_edges=False
+            )
 
             # rescale and translate them back
             _R_t = scale_reference_directions(_R, scale)
@@ -238,9 +254,8 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
 
             # if any point is out of bounds - volume was too large
             if not np.all(_R_t >= 0):
-
                 # get the corner points if not transformed
-                V = (np.eye(self.n_dim) - centroid)
+                V = np.eye(self.n_dim) - centroid
 
                 # get the corner points of the ref dir simplex
                 P = ref_point + scale * V
@@ -250,7 +265,6 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
                 P_proj = project_onto_unit_simplex_recursive(np.copy(P))
 
                 for i in range(len(P)):
-
                     if not np.all(P[i] == P_proj[i]):
                         _R_t = scale_reference_directions(_R, scale)
                         _R_t = _R_t - (E[i] - P_proj[i])
@@ -281,14 +295,14 @@ def squared_dist(A, B):
 def calc_potential_energy(A, d):
     i, j = triu_indices(len(A), 1)
     D = sqrt(squared_dist(A, A)[i, j])
-    energy = log((1 / D ** d).mean())
+    energy = log((1 / D**d).mean())
     return energy
 
 
 def calc_potential_energy_with_grad(x, d, return_mutual_dist=False):
-    diff = (x[:, None] - x[None, :])
+    diff = x[:, None] - x[None, :]
     # calculate the squared euclidean from each point to another
-    dist = np.sqrt((diff ** 2).sum(axis=2))
+    dist = np.sqrt((diff**2).sum(axis=2))
 
     # make sure the distance to itself does not count
     np.fill_diagonal(dist, np.inf)
@@ -302,8 +316,8 @@ def calc_potential_energy_with_grad(x, d, return_mutual_dist=False):
     mutual_dist = dist[np.triu_indices(len(x), 1)]
 
     # calculate the energy by summing up the squared distances
-    energy = (1 / mutual_dist ** d).sum()
-    log_energy = - np.log(len(mutual_dist)) + np.log(energy)
+    energy = (1 / mutual_dist**d).sum()
+    log_energy = -np.log(len(mutual_dist)) + np.log(energy)
 
     # calculate the gradient
     grad = (-d * diff) / (dist ** (d + 2))[..., None]

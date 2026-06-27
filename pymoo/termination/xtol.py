@@ -1,3 +1,5 @@
+"""Termination based on design space tolerance."""
+
 import numpy as np
 
 from pymoo.indicators.igd import IGD
@@ -5,20 +7,19 @@ from pymoo.termination.delta import DeltaToleranceTermination
 from pymoo.util.normalization import normalize
 
 
-
 class DesignSpaceTermination(DeltaToleranceTermination):
-
     def __init__(self, tol=0.005, **kwargs):
-        """
+        """Initialize design space termination.
+
         Check the distance in the design-space and terminate based on tolerance.
-        (only works if variables can be converted to float)
+        Only works if variables can be converted to float.
         """
         super().__init__(tol, **kwargs)
 
     def _delta(self, prev, current):
         try:
             return IGD(current.astype(float)).do(prev.astype(float))
-        except:
+        except Exception:  # noqa: E722
             return np.inf
 
     def _data(self, algorithm):

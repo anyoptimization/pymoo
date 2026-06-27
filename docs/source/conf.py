@@ -49,7 +49,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'numpydoc',
+    'sphinx.ext.napoleon',
     'nbsphinx',
     'sphinx.ext.intersphinx',
     'sphinx.ext.coverage',
@@ -186,34 +186,18 @@ pygments_style = 'friendly'
 
 
 # ===========================================================================
-# Numpydoc
+# Napoleon (numpy + google docstrings)
 # ===========================================================================
 
-
-# Whether to produce plot:: directives for Examples sections that contain import matplotlib or from matplotlib import.
-numpydoc_use_plots = True
-
-# Whether to show all members of a class in the Methods and Attributes sections automatically. True by default.
-numpydoc_show_class_members = True
-
-# Whether to show all inherited members of a class in the Methods and Attributes sections automatically.
-# If it’s false, inherited members won’t shown. True by default.
-numpydoc_show_inherited_class_members = False
-
-# Whether to create a Sphinx table of contents for the lists of class algorithms and attributes.
-# If a table of contents is made, Sphinx expects each entry to have a separate page. True by default.
-numpydoc_class_members_toctree = False
-
-# A regular expression matching citations which should be mangled to avoid conflicts due to duplication across
-# the documentation. Defaults to [\w-]+.
-# numpydoc_citation_re = False
-
-# Until version 0.8, parameter definitions were shown as blockquotes, rather than in a definition list.
-# If your styling requires blockquotes, switch this config option to True. This option will be removed in version 0.10.
-numpydoc_use_blockquotes = False
-
-# Deprecated since version edit: your HTML template instead. Whether to insert an edit link after docstrings.
-numpydoc_edit_link = False
+# Both styles are enabled so the codebase can migrate numpy -> google
+# module-by-module without ever breaking the docs build. Once the migration is
+# complete, set napoleon_numpy_docstring = False.
+napoleon_numpy_docstring = True
+napoleon_google_docstring = True
+napoleon_include_init_with_doc = False
+napoleon_use_param = True
+napoleon_use_rtype = True
+napoleon_use_ivar = True
 
 # ===========================================================================
 # sphinx-copybutton

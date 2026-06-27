@@ -1,3 +1,5 @@
+"""Quadratic interpolation search algorithm."""
+
 from pymoo.algorithms.base.bracket import BracketSearch
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population
@@ -15,18 +17,16 @@ def quadr_interp(a, b, c):
 
 
 class QuadraticInterpolationSearch(BracketSearch):
-
     def __init__(self, a=None, b=None, **kwargs):
-        """
+        """Quadratic interpolation search.
 
-        7.1.2 Quadratic Interpolation Search
+        References: 7.1.2 Quadratic Interpolation Search
         http://www.mathcs.emory.edu/~haber/math315/chap7.pdf
 
-        Parameters
-        ----------
-        a
-        b
-        kwargs
+        Args:
+            a: Lower bound individual.
+            b: Upper bound individual.
+            **kwargs: Additional keyword arguments.
         """
         super().__init__(a, b, **kwargs)
 
@@ -49,7 +49,6 @@ class QuadraticInterpolationSearch(BracketSearch):
 
         # if this is the case then the function is not convex (which means U shaped)
         if c.F[0] >= a.F[0] or c.F[0] >= b.F[0]:
-
             # choose the left side if a smaller than b, or the right side otherwise
             if a.F[0] <= b.F[0]:
                 a = c
@@ -61,7 +60,6 @@ class QuadraticInterpolationSearch(BracketSearch):
             self.infills = c
 
         else:
-
             d = quadr_interp(a, b, c)
             self.evaluator.eval(self.problem, d, algorithm=self)
             self.infills = d

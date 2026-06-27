@@ -1,3 +1,5 @@
+"""Archive and truncation strategies for maintaining solution collections."""
+
 import numpy as np
 
 from pymoo.core.duplicate import DefaultDuplicateElimination
@@ -7,26 +9,24 @@ from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
 
 class Truncation:
-
     def __call__(self, sols, k):
         pass
 
 
 class RandomTruncation(Truncation):
-
     @default_random_state
     def __call__(self, sols, k, random_state=None):
         return random_state.choice(sols, size=k, replace=False)
 
 
 class SurvivalTruncation(Truncation):
-
     def __init__(self, survival, problem=None) -> None:
         super().__init__()
         self.survival = survival
 
         if problem is None:
             from pymoo.core.problem import Problem
+
             # TODO: this line is probably never evaluated. It would raise as Problem is ABC
             problem = Problem()  # type: ignore
 
@@ -37,17 +37,20 @@ class SurvivalTruncation(Truncation):
 
 
 class Archive(Population):
-
-    def __new__(cls,
-                individuals=[],
-                max_size=None,
-                truncate_size=None,
-                truncation=RandomTruncation(),
-                duplicate_elimination=DefaultDuplicateElimination(epsilon=1e-32)):
+    def __new__(
+        cls,
+        individuals=[],
+        max_size=None,
+        truncate_size=None,
+        truncation=RandomTruncation(),
+        duplicate_elimination=DefaultDuplicateElimination(epsilon=1e-32),
+    ):
 
         obj = super().__new__(cls, individuals)
         obj.max_size = max_size
-        obj.truncate_size = min(max_size, truncate_size) if truncate_size is not None else max_size
+        obj.truncate_size = (
+            min(max_size, truncate_size) if truncate_size is not None else max_size
+        )
         obj.truncation = truncation
         obj.duplicate_elimination = duplicate_elimination
 
@@ -57,13 +60,17 @@ class Archive(Population):
         if obj is None:  # __new__ handles instantiation
             return
 
-        max_size = getattr(obj, 'max_size', None)
-        truncate_size = getattr(obj, 'truncate_size', None)
-        truncation = getattr(obj, 'truncation', RandomTruncation())
-        duplicate_elimination = getattr(obj, 'duplicate_elimination', DefaultDuplicateElimination(epsilon=1e-32))
+        max_size = getattr(obj, "max_size", None)
+        truncate_size = getattr(obj, "truncate_size", None)
+        truncation = getattr(obj, "truncation", RandomTruncation())
+        duplicate_elimination = getattr(
+            obj, "duplicate_elimination", DefaultDuplicateElimination(epsilon=1e-32)
+        )
 
         self.max_size = max_size
-        self.truncate_size = min(max_size, truncate_size) if truncate_size is not None else max_size
+        self.truncate_size = (
+            min(max_size, truncate_size) if truncate_size is not None else max_size
+        )
         self.truncation = truncation
         self.duplicate_elimination = duplicate_elimination
 
@@ -89,13 +96,11 @@ class Archive(Population):
 
 
 class VoidArchive(Archive):
-
     def add(self, sols):
         return self
 
 
 class SingleObjectiveArchive(Archive):
-
     def __new__(cls, max_size=10, **kwargs):
         return super().__new__(cls, max_size=max_size, **kwargs).view(cls)
 
@@ -106,22 +111,20 @@ class SingleObjectiveArchive(Archive):
             sols = sols[feas]
 
             f = sols.get("f")
-            I, = np.where(f == f[f.argmin()])
+            (I,) = np.where(f == f[f.argmin()])  # noqa: E741
 
         else:
             cv = sols.get("cv")
-            I, = np.where(cv == cv[cv.argmin()])
+            (I,) = np.where(cv == cv[cv.argmin()])  # noqa: E741
 
         return sols[I]
 
 
 class MultiObjectiveArchive(Archive):
-
     def __new__(cls, max_size=200, truncate_size=100, **kwargs):
-        return super().__new__(cls,
-                               max_size=max_size,
-                               truncate_size=truncate_size,
-                               **kwargs)
+        return super().__new__(
+            cls, max_size=max_size, truncate_size=truncate_size, **kwargs
+        )
 
     def _find_opt(self, sols):
         feas = sols.get("feas")
@@ -130,10 +133,10 @@ class MultiObjectiveArchive(Archive):
             sols = sols[feas]
 
             F = sols.get("F")
-            I = NonDominatedSorting().do(F, only_non_dominated_front=True)
+            I = NonDominatedSorting().do(F, only_non_dominated_front=True)  # noqa: E741
         else:
             cv = sols.get("cv")
-            I, = np.where(cv == cv[cv.argmin()])
+            (I,) = np.where(cv == cv[cv.argmin()])  # noqa: E741
 
         return sols[I]
 
@@ -144,10 +147,16 @@ def default_archive(problem, **kwargs):
 
     elif problem.n_obj == 2:
         from pymoo.algorithms.moo.sms import LeastHypervolumeContributionSurvival
+
         survival = LeastHypervolumeContributionSurvival()
-        return MultiObjectiveArchive(truncation=SurvivalTruncation(survival, problem=problem), **kwargs)
+        return MultiObjectiveArchive(
+            truncation=SurvivalTruncation(survival, problem=problem), **kwargs
+        )
 
     elif problem.n_obj >= 3:
         from pymoo.algorithms.moo.spea2 import SPEA2Survival
+
         survival = SPEA2Survival()
-        return MultiObjectiveArchive(truncation=SurvivalTruncation(survival, problem=problem), **kwargs)
+        return MultiObjectiveArchive(
+            truncation=SurvivalTruncation(survival, problem=problem), **kwargs
+        )

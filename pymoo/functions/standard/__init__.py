@@ -1,1 +1,1 @@
-# Standard (Python) function implementations
+"""Standard (pure Python) implementations of optimization functions."""

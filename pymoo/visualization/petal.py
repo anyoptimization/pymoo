@@ -1,45 +1,42 @@
+"""Petal diagram visualization for multi-objective optimization."""
+
 import numpy as np
 
-from pymoo.docs import parse_doc_string
 from pymoo.core.plot import Plot
 from pymoo.util.misc import set_if_none
-from pymoo.visualization.util import get_circle_points, plot_axes_lines, \
-    plot_axis_labels, plot_circle, plot_polygon, parse_bounds, normalize, equal_axis, no_ticks
+from pymoo.visualization.util import (
+    equal_axis,
+    get_circle_points,
+    no_ticks,
+    normalize,
+    parse_bounds,
+    plot_axes_lines,
+    plot_axis_labels,
+    plot_circle,
+    plot_polygon,
+)
 
 
 class Petal(Plot):
+    """Petal diagram for multi-objective visualization."""
 
-    def __init__(self,
-                 bounds=None,
-                 **kwargs):
+    def __init__(
+        self,
+        bounds=None,
+        **kwargs,
+    ):
+        """Initialize Petal diagram.
+
+        Args:
+            bounds: The boundaries for each objective. Necessary to be provided for this plot!
+            **kwargs: Additional keyword arguments passed to parent Plot class.
         """
-
-        Petal Diagram
-
-
-        Parameters
-        ----------
-        bounds : tuple
-            The boundaries for each objective. Necessary to be provided for this plot!
-        axis_style : {axis_style}
-        reverse : bool
-            Default false. Otherwise, larger area means smaller value.
-
-        Other Parameters
-        ----------------
-
-        figsize : {figsize}
-        title : {title}
-        legend : {legend}
-        tight_layout : {tight_layout}
-        cmap : {cmap}
-
-        """
-
         super().__init__(bounds=bounds, **kwargs)
 
         if bounds is None:
-            raise Exception("Boundaries must be provided for Petal Width. Otherwise, no trade-offs can be calculated.")
+            raise Exception(
+                "Boundaries must be provided for Petal Width. Otherwise, no trade-offs can be calculated."
+            )
 
         set_if_none(self.axis_style, "color", "black")
         set_if_none(self.axis_style, "linewidth", 2)
@@ -86,6 +83,3 @@ class Petal(Plot):
         for k, (F, kwargs) in enumerate(to_plot_norm):
             for j, _F in enumerate(F):
                 self._plot(self.ax[k, j], _F)
-
-
-parse_doc_string(Petal.__init__)

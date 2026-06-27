@@ -1,3 +1,5 @@
+"""Particle Swarm Optimization (PSO) with adaptive parameters."""
+
 import numpy as np
 
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
@@ -23,8 +25,8 @@ from pymoo.util import default_random_state
 # Display
 # =========================================================================================================
 
-class PSOFuzzyOutput(SingleObjectiveOutput):
 
+class PSOFuzzyOutput(SingleObjectiveOutput):
     def __init__(self):
         super().__init__()
 
@@ -99,6 +101,7 @@ def S4_jumping_out(f):
 # Equation
 # =========================================================================================================
 
+
 @default_random_state
 def pso_equation(X, P_X, S_X, V, V_max, w, c1, c2, r1=None, r2=None, random_state=None):
     n_particles, n_var = X.shape
@@ -115,7 +118,7 @@ def pso_equation(X, P_X, S_X, V, V_max, w, c1, c2, r1=None, r2=None, random_stat
 
     # calculate the velocity vector
     Vp = inerta + cognitive + social
-    Vp = set_to_bounds_if_outside(Vp, - V_max, V_max)
+    Vp = set_to_bounds_if_outside(Vp, -V_max, V_max)
 
     Xp = X + Vp
 
@@ -128,60 +131,37 @@ def pso_equation(X, P_X, S_X, V, V_max, w, c1, c2, r1=None, r2=None, random_stat
 
 
 class PSO(Algorithm):
+    def __init__(
+        self,
+        pop_size=25,
+        sampling=LHS(),
+        w=0.9,
+        c1=2.0,
+        c2=2.0,
+        adaptive=True,
+        initial_velocity="random",
+        max_velocity_rate=0.20,
+        pertube_best=True,
+        repair=NoRepair(),
+        output=PSOFuzzyOutput(),
+        **kwargs,
+    ):
+        """Particle Swarm Optimization algorithm.
 
-    def __init__(self,
-                 pop_size=25,
-                 sampling=LHS(),
-                 w=0.9,
-                 c1=2.0,
-                 c2=2.0,
-                 adaptive=True,
-                 initial_velocity="random",
-                 max_velocity_rate=0.20,
-                 pertube_best=True,
-                 repair=NoRepair(),
-                 output=PSOFuzzyOutput(),
-                 **kwargs):
+        Args:
+            pop_size: The size of the swarm being used.
+            sampling: Sampling strategy.
+            adaptive: Whether w, c1, and c2 are changed dynamically over time.
+            w: Inertia weight for velocity update.
+            c1: Cognitive impact (personal best) during velocity update.
+            c2: Social impact (global best) during velocity update.
+            initial_velocity: How to initialize particle velocities ('random' or 'zero').
+            max_velocity_rate: Maximum velocity rate normalized by problem bounds.
+            pertube_best: Whether to mutate the global best solution.
+            repair: Repair strategy for handling constraints.
+            output: Output display strategy.
+            **kwargs: Additional algorithm parameters.
         """
-
-        Parameters
-        ----------
-        pop_size : The size of the swarm being used.
-
-        sampling : {sampling}
-
-        adaptive : bool
-            Whether w, c1, and c2 are changed dynamically over time. The update uses the spread from the global
-            optimum to determine suitable values.
-
-        w : float
-            The inertia F to be used in each iteration for the velocity update. This can be interpreted
-            as the momentum term regarding the velocity. If `adaptive=True` this is only the
-            initially used value.
-
-        c1 : float
-            The cognitive impact (personal best) during the velocity update. If `adaptive=True` this is only the
-            initially used value.
-        c2 : float
-            The social impact (global best) during the velocity update. If `adaptive=True` this is only the
-            initially used value.
-
-        initial_velocity : str - ('random', or 'zero')
-            How the initial velocity of each particle should be assigned. Either 'random' which creates a
-            random velocity vector or 'zero' which makes the particles start to find the direction through the
-            velocity update equation.
-
-        max_velocity_rate : float
-            The maximum velocity rate. It is determined variable (and not vector) wise. We consider the rate here
-            since the value is normalized regarding the `xl` and `xu` defined in the problem.
-
-        pertube_best : bool
-            Some studies have proposed to mutate the global best because it has been found to converge better.
-            Which means the population size is reduced by one particle and one function evaluation is spend
-            additionally to permute the best found solution so far.
-
-        """
-
         super().__init__(output=output, **kwargs)
 
         self.initialization = Initialization(sampling)
@@ -206,13 +186,18 @@ class PSO(Algorithm):
         self.f, self.strategy = None, None
 
     def _initialize_infill(self):
-        return self.initialization.do(self.problem, self.pop_size, algorithm=self, random_state=self.random_state)
+        return self.initialization.do(
+            self.problem, self.pop_size, algorithm=self, random_state=self.random_state
+        )
 
     def _initialize_advance(self, infills=None, **kwargs):
         particles = self.pop
 
         if self.initial_velocity == "random":
-            init_V = self.random_state.random((len(particles), self.problem.n_var)) * self.V_max[None, :]
+            init_V = (
+                self.random_state.random((len(particles), self.problem.n_var))
+                * self.V_max[None, :]
+            )
         elif self.initial_velocity == "zero":
             init_V = np.zeros((len(particles), self.problem.n_var))
         else:
@@ -232,11 +217,20 @@ class PSO(Algorithm):
         sbest = self._social_best()
         S_X = sbest.get("X")
 
-        Xp, Vp = pso_equation(X, P_X, S_X, V, self.V_max, self.w, self.c1, self.c2, random_state=self.random_state)
+        Xp, Vp = pso_equation(
+            X,
+            P_X,
+            S_X,
+            V,
+            self.V_max,
+            self.w,
+            self.c1,
+            self.c2,
+            random_state=self.random_state,
+        )
 
         # if the problem has boundaries to be considered
         if problem.has_bounds():
-
             for k in range(20):
                 # find the individuals which are still infeasible
                 m = is_out_of_bounds_by_problem(problem, Xp)
@@ -245,19 +239,39 @@ class PSO(Algorithm):
                     break
 
                 # actually execute the differential equation
-                Xp[m], Vp[m] = pso_equation(X[m], P_X[m], S_X[m], V[m], self.V_max, self.w, self.c1, self.c2, random_state=self.random_state)
+                Xp[m], Vp[m] = pso_equation(
+                    X[m],
+                    P_X[m],
+                    S_X[m],
+                    V[m],
+                    self.V_max,
+                    self.w,
+                    self.c1,
+                    self.c2,
+                    random_state=self.random_state,
+                )
 
             # if still infeasible do a random initialization
-            Xp = repair_random_init(Xp, X, *problem.bounds(), random_state=self.random_state)
+            Xp = repair_random_init(
+                Xp, X, *problem.bounds(), random_state=self.random_state
+            )
 
         # create the offspring population
         off = Population.new(X=Xp, V=Vp)
 
         # try to improve the current best with a pertubation
         if self.pertube_best:
-            k = FitnessSurvival().do(problem, pbest, n_survive=1, return_indices=True)[0]
-            mut = PM(prob=0.9, eta=self.random_state.uniform(5, 30), at_least_once=False)
-            mutant = mut(problem, Population(Individual(X=pbest[k].X)), random_state=self.random_state)[0]
+            k = FitnessSurvival().do(problem, pbest, n_survive=1, return_indices=True)[
+                0
+            ]
+            mut = PM(
+                prob=0.9, eta=self.random_state.uniform(5, 30), at_least_once=False
+            )
+            mutant = mut(
+                problem,
+                Population(Individual(X=pbest[k].X)),
+                random_state=self.random_state,
+            )[0]
             off[k].set("X", mutant.X)
 
         self.repair(problem, off)
@@ -266,13 +280,17 @@ class PSO(Algorithm):
         return off
 
     def _advance(self, infills=None, **kwargs):
-        assert infills is not None, "This algorithms uses the AskAndTell interface thus 'infills' must to be provided."
+        assert infills is not None, (
+            "This algorithms uses the AskAndTell interface thus 'infills' must to be provided."
+        )
 
         # set the new population to be equal to the offsprings
         self.particles = infills
 
         # if an offspring has improved the personal store that index
-        has_improved = ImprovementReplacement().do(self.problem, self.pop, infills, return_indices=True)
+        has_improved = ImprovementReplacement().do(
+            self.problem, self.pop, infills, return_indices=True
+        )
 
         # set the personal best which have been improved
         self.pop[has_improved] = infills[has_improved]
@@ -288,7 +306,11 @@ class PSO(Algorithm):
 
         X, F = pop.get("X", "F")
         sbest = self.sbest
-        w, c1, c2, = self.w, self.c1, self.c2
+        (
+            w,
+            c1,
+            c2,
+        ) = self.w, self.c1, self.c2
 
         # get the average distance from one to another for normalization
         D = norm_eucl_dist(self.problem, X, X)
@@ -299,7 +321,14 @@ class PSO(Algorithm):
         g_D = norm_eucl_dist(self.problem, sbest.get("X"), X).mean()
         f = (g_D - _min) / (_max - _min + 1e-32)
 
-        S = np.array([S1_exploration(f), S2_exploitation(f), S3_convergence(f), S4_jumping_out(f)])
+        S = np.array(
+            [
+                S1_exploration(f),
+                S2_exploitation(f),
+                S3_convergence(f),
+                S4_jumping_out(f),
+            ]
+        )
         strategy = S.argmax() + 1
 
         delta = 0.05 + (self.random_state.random() * 0.05)
@@ -331,7 +360,6 @@ class PSO(Algorithm):
         self.c1 = c1
         self.c2 = c2
         self.w = w
-
 
 
 parse_doc_string(PSO.__init__)

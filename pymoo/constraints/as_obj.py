@@ -1,3 +1,5 @@
+"""Constraint handling by conversion to objectives."""
+
 import pymoo.gradient.toolbox as anp
 import numpy as np
 
@@ -8,11 +10,7 @@ from pymoo.util.misc import from_dict
 
 
 class ConstraintsAsObjective(Meta, Problem):
-
-    def __init__(self,
-                 problem,
-                 config=None,
-                 append=True):
+    def __init__(self, problem, config=None, append=True):
 
         super().__init__(problem)
         self.config = config

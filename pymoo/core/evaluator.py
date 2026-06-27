@@ -1,3 +1,5 @@
+"""Evaluation infrastructure for connecting problems and populations."""
+
 from typing import Any
 
 import numpy as np
@@ -8,28 +10,23 @@ from pymoo.core.problem import Problem
 
 
 class Evaluator:
+    def __init__(
+        self,
+        skip_already_evaluated: bool = True,
+        evaluate_values_of: list = ["F", "G", "H"],
+        callback=None,
+    ):
+        """Glue problem evaluation with population/individual objects.
 
-    def __init__(self,
-                 skip_already_evaluated: bool = True,
-                 evaluate_values_of: list = ["F", "G", "H"],
-                 callback=None):
+        Additionally, serves as a bookkeeper to store the number of function evaluations,
+        time, and other metadata.
 
+        Args:
+            skip_already_evaluated: If individuals that are already evaluated shall be skipped.
+            evaluate_values_of: Types of values to be evaluated by the problem.
+                By default all objective, inequality and equality constraints.
+            callback: Optional callback function to execute after evaluation.
         """
-        The evaluator has the purpose to glue the problem with the population/individual objects.
-        Additionally, it serves as a bookkeeper to store determine the number of function evaluations of runs, time,
-        and others.
-
-
-        Parameters
-        ----------
-        skip_already_evaluated : bool
-            If individual that are already evaluated shall be skipped.
-
-        evaluate_values_of : list
-            The type of values to be asked the problem to evaluated. By default all objective, ieq. and eq. constraints.
-
-        """
-
         self.evaluate_values_of = evaluate_values_of
         self.skip_already_evaluated = skip_already_evaluated
         self.callback = callback
@@ -37,17 +34,27 @@ class Evaluator:
         # current number of function evaluations - initialized to zero
         self.n_eval = 0
 
-    def eval(self,
-             problem: Problem,
-             pop: Population,
-             skip_already_evaluated: bool | None = None,
-             evaluate_values_of: list[Any] | None = None,
-             count_evals: bool = True,
-             **kwargs):
+    def eval(
+        self,
+        problem: Problem,
+        pop: Population,
+        skip_already_evaluated: bool | None = None,
+        evaluate_values_of: list[Any] | None = None,
+        count_evals: bool = True,
+        **kwargs,
+    ):
 
         # load the default settings from the evaluator object if not already provided
-        evaluate_values_of = self.evaluate_values_of if evaluate_values_of is None else evaluate_values_of
-        skip_already_evaluated = self.skip_already_evaluated if skip_already_evaluated is None else skip_already_evaluated
+        evaluate_values_of = (
+            self.evaluate_values_of
+            if evaluate_values_of is None
+            else evaluate_values_of
+        )
+        skip_already_evaluated = (
+            self.skip_already_evaluated
+            if skip_already_evaluated is None
+            else skip_already_evaluated
+        )
 
         # check the type of the input
         is_individual = isinstance(pop, Individual)
@@ -58,15 +65,20 @@ class Evaluator:
 
         # filter the index to have individual where not all attributes have been evaluated
         if skip_already_evaluated:
-            I = np.array([i for i, ind in enumerate(pop) if not all([e in ind.evaluated for e in evaluate_values_of])])
+            I = np.array(  # noqa: E741
+                [
+                    i
+                    for i, ind in enumerate(pop)
+                    if not all([e in ind.evaluated for e in evaluate_values_of])
+                ]
+            )
 
         # if skipping is deactivated simply make the index being all individuals
         else:
-            I = np.arange(len(pop))
+            I = np.arange(len(pop))  # noqa: E741
 
         # evaluate the solutions (if there are any)
         if len(I) > 0:
-
             # do the actual evaluation - call the sub-function to set the corresponding values to the population
             self._eval(problem, pop[I], evaluate_values_of, **kwargs)
 
@@ -89,7 +101,9 @@ class Evaluator:
         X = pop.get("X")
 
         # call the problem to evaluate the solutions
-        out = problem.evaluate(X, return_values_of=evaluate_values_of, return_as_dictionary=True, **kwargs)
+        out = problem.evaluate(
+            X, return_values_of=evaluate_values_of, return_as_dictionary=True, **kwargs
+        )
 
         # for each of the attributes set it to the problem
         for key, val in out.items():
@@ -101,7 +115,6 @@ class Evaluator:
 
 
 class VoidEvaluator(Evaluator):
-
     def __init__(self, value=np.inf, **kwargs):
         super().__init__(**kwargs)
         self.value = value
@@ -112,7 +125,15 @@ class VoidEvaluator(Evaluator):
             for individual in pop:
                 if len(individual.evaluated) == 0:
                     individual.F = np.full(problem.n_obj, val)
-                    individual.G = np.full(problem.n_ieq_constr, val) if problem.n_ieq_constr > 0 else None
-                    individual.H = np.full(problem.n_eq_constr, val) if problem.n_eq_constr else None
+                    individual.G = (
+                        np.full(problem.n_ieq_constr, val)
+                        if problem.n_ieq_constr > 0
+                        else None
+                    )
+                    individual.H = (
+                        np.full(problem.n_eq_constr, val)
+                        if problem.n_eq_constr
+                        else None
+                    )
                     individual.CV = [-np.inf]
                     individual.feas = [False]

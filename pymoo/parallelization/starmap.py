@@ -1,15 +1,11 @@
-"""
-Starmap-based parallelization for pymoo.
-"""
+"""Starmap-based parallelization for pymoo."""
 
 
 class StarmapParallelization:
     """Parallelization using a starmap function.
-    
-    Parameters
-    ----------
-    starmap : callable
-        A starmap function like multiprocessing.Pool.starmap
+
+    Args:
+        starmap: A starmap function like multiprocessing.Pool.starmap.
     """
 
     def __init__(self, starmap):

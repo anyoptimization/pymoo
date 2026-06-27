@@ -1,3 +1,5 @@
+"""Constraint handling by converting variable bounds to constraints."""
+
 import numpy as np
 
 import pymoo.gradient.toolbox as anp
@@ -7,7 +9,6 @@ from pymoo.core.problem import Problem
 
 
 class ConstraintsFromBounds(Meta, Problem):
-
     def __init__(self, problem, remove_bonds=False):
         super().__init__(problem)
         self.n_ieq_constr += 2 * self.n_var
@@ -29,8 +30,8 @@ class ConstraintsFromBounds(Meta, Problem):
 
         if "dG" in out:
             _dG = np.zeros((len(X), 2 * self.n_var, self.n_var))
-            _dG[:, :self.n_var, :] = - np.eye(self.n_var)
-            _dG[:, self.n_var:, :] = np.eye(self.n_var)
+            _dG[:, : self.n_var, :] = -np.eye(self.n_var)
+            _dG[:, self.n_var :, :] = np.eye(self.n_var)
             out["dG"] = np.column_stack([out["dG"], _dG])
 
         return out

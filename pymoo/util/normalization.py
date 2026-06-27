@@ -1,18 +1,13 @@
+"""Normalization and standardization of variables and objectives."""
+
 import warnings
 from abc import abstractmethod
 
 import numpy as np
-
-# ---------------------------------------------------------------------------------------------------------
-# Object Oriented Interface
-# ---------------------------------------------------------------------------------------------------------
-
-# ---- Abstract Class
 from numpy.linalg import LinAlgError
 
 
 class Normalization:
-
     def __init__(self) -> None:
         super().__init__()
 
@@ -27,7 +22,6 @@ class Normalization:
 
 # ---- Useful if normalization is optional - can be simply disabled by using this object
 class NoNormalization(Normalization):
-
     def forward(self, X):
         return X
 
@@ -37,7 +31,6 @@ class NoNormalization(Normalization):
 
 # ---- Normalizes between zero and one given bounds or estimating them
 class ZeroToOneNormalization(Normalization):
-
     def __init__(self, xl=None, xu=None) -> None:
         super().__init__()
 
@@ -64,13 +57,18 @@ class ZeroToOneNormalization(Normalization):
         xl_nan, xu_nan = np.isnan(xl), np.isnan(xu)
 
         # now create all the masks that are necessary
-        self.xl_only, self.xu_only = np.logical_and(~xl_nan, xu_nan), np.logical_and(xl_nan, ~xu_nan)
+        self.xl_only, self.xu_only = (
+            np.logical_and(~xl_nan, xu_nan),
+            np.logical_and(xl_nan, ~xu_nan),
+        )
         self.both_nan = np.logical_and(np.isnan(xl), np.isnan(xu))
         self.neither_nan = np.logical_and(~np.isnan(xl), ~np.isnan(xu))
 
         # if neither is nan than xu must be greater or equal than xl
         any_nan = np.logical_or(np.isnan(xl), np.isnan(xu))
-        assert np.all(np.logical_or(xu >= xl, any_nan)), "xl must be less or equal than xu."
+        assert np.all(np.logical_or(xu >= xl, any_nan)), (
+            "xl must be less or equal than xu."
+        )
 
     def forward(self, X):
         if X is None or (self.xl is None and self.xu is None):
@@ -80,7 +78,9 @@ class ZeroToOneNormalization(Normalization):
         N = np.copy(X)
 
         # normalize between zero and one if neither of them is nan
-        N[...,  self.neither_nan] = (X[...,  self.neither_nan] - self.xl[self.neither_nan]) / (self.xu[self.neither_nan] - self.xl[self.neither_nan])
+        N[..., self.neither_nan] = (
+            X[..., self.neither_nan] - self.xl[self.neither_nan]
+        ) / (self.xu[self.neither_nan] - self.xl[self.neither_nan])
 
         N[..., self.xl_only] = X[..., self.xl_only] - self.xl[self.xl_only]
 
@@ -93,10 +93,12 @@ class ZeroToOneNormalization(Normalization):
             return N
 
         xl, xu, xl_only, xu_only = self.xl, self.xu, self.xl_only, self.xu_only
-        both_nan, neither_nan = self.both_nan, self.neither_nan
+        neither_nan = self.neither_nan
 
         X = N.copy()
-        X[..., neither_nan] = xl[neither_nan] + N[..., neither_nan] * (xu[neither_nan] - xl[neither_nan])
+        X[..., neither_nan] = xl[neither_nan] + N[..., neither_nan] * (
+            xu[neither_nan] - xl[neither_nan]
+        )
 
         X[..., xl_only] = N[..., xl_only] + xl[xl_only]
 
@@ -112,7 +114,6 @@ class ZeroToOneNormalization(Normalization):
 
 
 class SimpleZeroToOneNormalization(Normalization):
-
     def __init__(self, xl=None, xu=None, estimate_bounds=True) -> None:
         super().__init__()
         self.xl = xl
@@ -202,14 +203,15 @@ def destandardize(x, mean, std):
 
 
 class PreNormalization:
-
     def __init__(self, zero_to_one=False, ideal=None, nadir=None, **kwargs):
 
         # normalization related stuff if that should be performed beforehand
         self.ideal, self.nadir = ideal, nadir
 
         if zero_to_one:
-            assert self.ideal is not None and self.nadir is not None, "For normalization either provide pf or bounds!"
+            assert self.ideal is not None and self.nadir is not None, (
+                "For normalization either provide pf or bounds!"
+            )
 
             n_dim = len(self.ideal)
             self.normalization = ZeroToOneNormalization(self.ideal, self.nadir)
@@ -253,15 +255,16 @@ def get_extreme_points_c(F, ideal_point, extreme_points=None):
     # update the extreme points for the normalization having the highest asf value each
     F_asf = np.max(__F * weights[:, None, :], axis=2)
 
-    I = np.argmin(F_asf, axis=1)
+    I = np.argmin(F_asf, axis=1)  # noqa: E741
     extreme_points = _F[I, :]
 
     return extreme_points
 
 
-def get_nadir_point(extreme_points, ideal_point, worst_point, worst_of_front, worst_of_population):
+def get_nadir_point(
+    extreme_points, ideal_point, worst_point, worst_of_front, worst_of_population
+):
     try:
-
         # find the intercepts using gaussian elimination
         M = extreme_points - ideal_point
         b = np.ones(extreme_points.shape[1])
@@ -282,7 +285,6 @@ def get_nadir_point(extreme_points, ideal_point, worst_point, worst_of_front, wo
         nadir_point[b] = worst_point[b]
 
     except LinAlgError:
-
         # fall back to worst of front otherwise
         nadir_point = worst_of_front
 
@@ -294,7 +296,6 @@ def get_nadir_point(extreme_points, ideal_point, worst_point, worst_of_front, wo
 
 
 class ObjectiveSpaceNormalization:
-
     def __init__(self) -> None:
         super().__init__()
         self._ideal = None

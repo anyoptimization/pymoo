@@ -1,10 +1,11 @@
+"""Adaptive epsilon constraint handling."""
+
 import numpy as np
 
 from pymoo.constraints.adaptive import AdaptiveConstraintHandling
 
 
 class AdaptiveEpsilonConstraintHandling(AdaptiveConstraintHandling):
-
     def __init__(self, algorithm, perc_eps_until=0.5):
         super().__init__(algorithm)
         self.perc_eps_until = perc_eps_until

@@ -1,3 +1,5 @@
+"""Inversion mutation operator for permutations."""
+
 import numpy as np
 
 from pymoo.core.mutation import Mutation
@@ -11,23 +13,20 @@ def inversion_mutation(y, seq, inplace=True):
         seq = random_sequence(len(y))
     start, end = seq
 
-    y[start:end + 1] = np.flip(y[start:end + 1])
+    y[start : end + 1] = np.flip(y[start : end + 1])
     return y
 
 
 class InversionMutation(Mutation):
-
     def __init__(self, prob=1.0):
-        """
+        """Initialize inversion mutation operator.
 
-        This mutation is applied to permutations. It randomly selects a segment of a chromosome and reverse its order.
-        For instance, for the permutation `[1, 2, 3, 4, 5]` the segment can be `[2, 3, 4]` which results in `[1, 4, 3, 2, 5]`.
+        This mutation is applied to permutations. It randomly selects a segment of
+        a chromosome and reverses its order. For instance, for the permutation
+        [1, 2, 3, 4, 5], the segment can be [2, 3, 4] which results in [1, 4, 3, 2, 5].
 
-        Parameters
-        ----------
-        prob : float
-            Probability to apply the mutation to the individual
-            
+        Args:
+            prob: Probability to apply the mutation to the individual.
         """
         super().__init__()
         self.prob = prob

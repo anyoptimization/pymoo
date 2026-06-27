@@ -1,3 +1,5 @@
+"""Inverse penalty out-of-bounds repair strategy."""
+
 import numpy as np
 
 from pymoo.operators.repair.bounds_repair import BoundsRepair
@@ -6,6 +8,19 @@ from pymoo.util import default_random_state
 
 @default_random_state
 def inverse_penality(x, p, xl, xu, alpha=None, random_state=None):
+    """Repair out-of-bounds variables using inverse penalty method.
+
+    Args:
+        x: Out-of-bounds variables to repair.
+        p: Parent/reference solution within bounds.
+        xl: Lower bounds.
+        xu: Upper bounds.
+        alpha: Distribution index for penalty method.
+        random_state: Random state for reproducibility.
+
+    Returns:
+        Repaired variables.
+    """
     assert len(p) == len(x)
 
     normv = np.linalg.norm(p - x)
@@ -20,7 +35,7 @@ def inverse_penality(x, p, xl, xu, alpha=None, random_state=None):
 
     else:
         # lower bounds of Y
-        diff = (p - x)
+        diff = p - x
         diff[diff == 0] = 1e-32
         d = normv * np.max(np.maximum(idl * (xl - x) / diff, idr * (xu - x) / diff))
 
@@ -45,15 +60,39 @@ def inverse_penality(x, p, xl, xu, alpha=None, random_state=None):
         return ret
 
 
-def inverse_penality_by_problem(problem, x, p, **kwargs):
+def inverse_penality_by_problem(problem, x, p, **kwargs):  # noqa: D417
+    """Repair out-of-bounds variables using problem bounds.
+
+    Args:
+        problem: The optimization problem.
+        x: Out-of-bounds variables to repair.
+        p: Parent/reference solution within bounds.
+
+    Returns:
+        Repaired variables.
+    """
     return inverse_penality(x, p, problem.xl, problem.xu, **kwargs)
 
 
 class InversePenaltyOutOfBoundsRepair(BoundsRepair):
+    """Inverse penalty repair operator for out-of-bounds variables."""
 
-    def repair_out_of_bounds(self, problem, X, P=None, **kwargs):
+    def repair_out_of_bounds(self, problem, X, P=None, **kwargs):  # noqa: D417
+        """Repair out-of-bounds variables using inverse penalty.
+
+        Args:
+            problem: The optimization problem.
+            X: Population variables to repair.
+            P: Parent solutions within bounds.
+
+        Returns:
+            Repaired population.
+        """
         if P is None:
-            raise Exception("For this out of bounds handling a parent solution in bounds needs to be provided.")
+            raise Exception(
+                "For this out of bounds handling a parent solution in bounds "
+                "needs to be provided."
+            )
         assert len(X) == len(P)
         n = len(X)
 
@@ -63,8 +102,7 @@ class InversePenaltyOutOfBoundsRepair(BoundsRepair):
         return X
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     # lower and upper bounds
     xl = np.zeros(2)
     xu = np.ones(2)
@@ -80,7 +118,7 @@ if __name__ == '__main__':
     plt.scatter(p[0], p[1], color="green", label="Parent")
     plt.scatter(c[0], c[1], color="orange", label="Offspring")
 
-    data = []
+    data: list = []
     for j in range(200):
         ret = inverse_penality(c, p, xl, xu, alpha=None)
         plt.scatter(ret[0], ret[1], facecolor="none", edgecolor="red", s=10, alpha=0.6)

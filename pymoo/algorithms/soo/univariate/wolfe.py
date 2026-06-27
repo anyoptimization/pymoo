@@ -1,3 +1,5 @@
+"""Wolfe line search algorithm."""
+
 import numpy as np
 
 from pymoo.algorithms.base.line import LineSearchProblem
@@ -8,7 +10,6 @@ from pymoo.core.solution import SolutionSet
 
 
 class WolfeSearch(Algorithm):
-
     def __init__(self, c1=1e-4, c2=0.9, max_iter=10, **kwargs):
 
         super().__init__(**kwargs)
@@ -17,8 +18,9 @@ class WolfeSearch(Algorithm):
         self.max_iter = max_iter
 
     def _setup(self, problem, **kwargs):
-        assert isinstance(problem,
-                          LineSearchProblem), "The wolfe search only purpose is to solve a line search problem!"
+        assert isinstance(problem, LineSearchProblem), (
+            "The wolfe search only purpose is to solve a line search problem!"
+        )
         self.pop = SolutionSet.create(problem.point)
         self.opt = self.pop
 
@@ -45,12 +47,14 @@ class WolfeSearch(Algorithm):
         def zoom(alpha_low, alpha_high, max_iter=100):
 
             while True:
-
                 _alpha = (alpha_high.get("alpha") + alpha_low.get("alpha")) / 2
                 _point = Individual(X=_alpha)
                 evaluator.eval(problem, _point, evaluate_values_of=["F", "CV"])
 
-                if _point.F[0] > sol_F + self.c1 * _alpha * sol_dF @ direction or _point.F[0] > alpha_low.F[0]:
+                if (
+                    _point.F[0] > sol_F + self.c1 * _alpha * sol_dF @ direction
+                    or _point.F[0] > alpha_low.F[0]
+                ):
                     alpha_high = _point
                 else:
                     evaluator.eval(problem, _point, evaluate_values_of=["dF"])
@@ -59,7 +63,9 @@ class WolfeSearch(Algorithm):
                     if np.abs(point_dF @ direction) <= -self.c2 * sol_dF @ direction:
                         return _point
 
-                    if (point_dF @ direction) * (alpha_high.get("alpha") - alpha_low.get("alpha")) >= 0:
+                    if (point_dF @ direction) * (
+                        alpha_high.get("alpha") - alpha_low.get("alpha")
+                    ) >= 0:
                         alpha_high = alpha_low
 
                     alpha_low = _point
@@ -70,12 +76,11 @@ class WolfeSearch(Algorithm):
         current = Individual(X=alpha)
 
         for i in range(1, self.max_iter + 1):
-
             # evaluate the solutions
             evaluator.eval(problem, current, evaluate_values_of=["F", "CV"])
 
             # get the values from the solution to be used to evaluate the conditions
-            F, dF, _F = last.F[0], last.get("dF")[0], current.F[0]
+            F, dF, _F = last.F[0], last.get("dF")[0], current.F[0]  # noqa: F841
 
             # if the wolfe condition is violate we have found our upper bound
             if _F > sol_F + self.c1 * sol_dF @ direction or (i > 1 and F >= _F):
@@ -98,7 +103,9 @@ class WolfeSearch(Algorithm):
         return current
 
 
-def wolfe_line_search(problem, sol, direction, c1=1e-4, c2=0.9, max_iter=10, evaluator=None):
+def wolfe_line_search(
+    problem, sol, direction, c1=1e-4, c2=0.9, max_iter=10, evaluator=None
+):
     # initialize the evaluator to be used (this will make sure evaluations are counted)
     evaluator = evaluator if evaluator is not None else Evaluator()
     evaluator.skip_already_evaluated = False
@@ -110,12 +117,14 @@ def wolfe_line_search(problem, sol, direction, c1=1e-4, c2=0.9, max_iter=10, eva
     def zoom(alpha_low, alpha_high, max_iter=100):
 
         while True:
-
             _alpha = (alpha_high.get("alpha") + alpha_low.get("alpha")) / 2
             _point = Individual(X=sol.X + _alpha * direction, alpha=_alpha)
             evaluator.eval(problem, _point, evaluate_values_of=["F", "CV"])
 
-            if _point.F[0] > sol_F + c1 * _alpha * sol_dF @ direction or _point.F[0] > alpha_low.F[0]:
+            if (
+                _point.F[0] > sol_F + c1 * _alpha * sol_dF @ direction
+                or _point.F[0] > alpha_low.F[0]
+            ):
                 alpha_high = _point
             else:
                 evaluator.eval(problem, _point, evaluate_values_of=["dF"])
@@ -124,7 +133,9 @@ def wolfe_line_search(problem, sol, direction, c1=1e-4, c2=0.9, max_iter=10, eva
                 if np.abs(point_dF @ direction) <= -c2 * sol_dF @ direction:
                     return _point
 
-                if (point_dF @ direction) * (alpha_high.get("alpha") - alpha_low.get("alpha")) >= 0:
+                if (point_dF @ direction) * (
+                    alpha_high.get("alpha") - alpha_low.get("alpha")
+                ) >= 0:
                     alpha_high = alpha_low
 
                 alpha_low = _point
@@ -135,12 +146,11 @@ def wolfe_line_search(problem, sol, direction, c1=1e-4, c2=0.9, max_iter=10, eva
     current = Individual(X=sol.X + alpha * direction, alpha=alpha)
 
     for i in range(1, max_iter + 1):
-
         # evaluate the solutions
         evaluator.eval(problem, current, evaluate_values_of=["F", "CV"])
 
         # get the values from the solution to be used to evaluate the conditions
-        F, dF, _F = last.F[0], last.get("dF")[0], current.F[0]
+        F, dF, _F = last.F[0], last.get("dF")[0], current.F[0]  # noqa: F841
 
         # if the wolfe condition is violate we have found our upper bound
         if _F > sol_F + c1 * sol_dF @ direction or (i > 1 and F >= _F):

@@ -1,3 +1,10 @@
+"""ZCAT problem family of multi-objective problems.
+
+.. module:: ZCAT
+   :platform: Unix, Windows
+   :synopsis: ZCAT problem family of multi-objective problems.
+"""
+
 from __future__ import annotations
 
 import math
@@ -6,12 +13,6 @@ import numpy as np
 
 from pymoo.core.problem import Problem
 from pymoo.util.remote import Remote
-
-"""
-.. module:: ZCAT
-   :platform: Unix, Windows
-   :synopsis: ZCAT problem family of multi-objective problems.
-"""
 
 _DBL_EPSILON = 2.220446049250313e-16
 _DOUBLE_MIN_VALUE = 5e-324
@@ -45,6 +46,7 @@ _ONE_DIMENSIONAL_PARETO_SET_PROBLEMS = (14, 15, 16)
 
 
 def _fix_to_01(value: float) -> float:
+    """Correct value to valid [0, 1] range with numerical tolerance."""
     if value <= 0.0 and value >= -_DBL_EPSILON:
         return 0.0
     if value >= 1.0 and value <= 1.0 + _DBL_EPSILON:
@@ -53,14 +55,17 @@ def _fix_to_01(value: float) -> float:
 
 
 def _leq(value: float, bound: float) -> bool:
+    """Check if value is less than or equal to bound with tolerance."""
     return value < bound or abs(bound - value) < _DBL_EPSILON
 
 
 def _value_in(value: float, lower: float, upper: float) -> bool:
+    """Check if value is in range [lower, upper] with tolerance."""
     return _leq(lower, value) and _leq(value, upper)
 
 
 def _all_values_in(values: np.ndarray, m: int, lower: float, upper: float) -> bool:
+    """Check if all m values in array are in range [lower, upper]."""
     limit = min(max(m, 0), int(values.shape[0]))
     for i in range(limit):
         if not _value_in(float(values[i]), lower, upper):
@@ -69,10 +74,12 @@ def _all_values_in(values: np.ndarray, m: int, lower: float, upper: float) -> bo
 
 
 def _theta_j(j: int, m: int, n: int) -> float:
+    """Compute theta_j angle parameter."""
     return 2.0 * _PI * (j - 1.0) / (n - m)
 
 
 def _g0(y: np.ndarray, m: int, n: int) -> np.ndarray:
+    """G function 0: constant values."""
     size = n - m
     g = np.empty(size, dtype=float)
     g.fill(0.2210)
@@ -80,6 +87,7 @@ def _g0(y: np.ndarray, m: int, n: int) -> np.ndarray:
 
 
 def _g1(y: np.ndarray, m: int, n: int) -> np.ndarray:
+    """G function 1: sinusoidal transformation."""
     size = n - m
     g = np.empty(size, dtype=float)
     for j in range(1, size + 1):
@@ -92,6 +100,7 @@ def _g1(y: np.ndarray, m: int, n: int) -> np.ndarray:
 
 
 def _g2(y: np.ndarray, m: int, n: int) -> np.ndarray:
+    """G function 2: quadratic-sinusoidal transformation."""
     size = n - m
     g = np.empty(size, dtype=float)
     for j in range(1, size + 1):
@@ -105,6 +114,7 @@ def _g2(y: np.ndarray, m: int, n: int) -> np.ndarray:
 
 
 def _g3(y: np.ndarray, m: int, n: int) -> np.ndarray:
+    """G function 3: cosine-squared transformation."""
     size = n - m
     g = np.empty(size, dtype=float)
     for j in range(1, size + 1):
@@ -117,6 +127,7 @@ def _g3(y: np.ndarray, m: int, n: int) -> np.ndarray:
 
 
 def _g4(y: np.ndarray, m: int, n: int) -> np.ndarray:
+    """G function 4: mean-based cosine transformation."""
     size = n - m
     g = np.empty(size, dtype=float)
     mu = float(np.sum(y[:m])) / m
@@ -126,6 +137,7 @@ def _g4(y: np.ndarray, m: int, n: int) -> np.ndarray:
 
 
 def _g5(y: np.ndarray, m: int, n: int) -> np.ndarray:
+    """G function 5: cubic sinusoidal transformation."""
     size = n - m
     g = np.empty(size, dtype=float)
     for j in range(1, size + 1):
@@ -138,6 +150,7 @@ def _g5(y: np.ndarray, m: int, n: int) -> np.ndarray:
 
 
 def _g6(y: np.ndarray, m: int, n: int) -> np.ndarray:
+    """G function 6: exponential-cosine transformation."""
     size = n - m
     g = np.empty(size, dtype=float)
     denominator = -10.0 * math.exp(-2.0 / 5.0) - math.exp(-1.0) + 10.0 + _E
@@ -151,23 +164,29 @@ def _g6(y: np.ndarray, m: int, n: int) -> np.ndarray:
             s2 += math.cos(11.0 * _PI * yi + angle) ** 3.0
         s1 /= m
         s2 /= m
-        numerator = -10.0 * math.exp((-2.0 / 5.0) * math.sqrt(s1)) - math.exp(s2) + 10.0 + _E
+        numerator = (
+            -10.0 * math.exp((-2.0 / 5.0) * math.sqrt(s1)) - math.exp(s2) + 10.0 + _E
+        )
         g[j - 1] = numerator / denominator
     return g
 
 
 def _g7(y: np.ndarray, m: int, n: int) -> np.ndarray:
+    """G function 7: exponential sinusoidal transformation."""
     size = n - m
     g = np.empty(size, dtype=float)
     mu = float(np.sum(y[:m])) / m
     denominator = 1.0 + _E - math.exp(-1.0)
     for j in range(1, size + 1):
         angle = _theta_j(j, m, n)
-        g[j - 1] = (mu + math.exp(math.sin(7.0 * _PI * mu - _PI / 2.0 + angle)) - math.exp(-1.0)) / denominator
+        g[j - 1] = (
+            mu + math.exp(math.sin(7.0 * _PI * mu - _PI / 2.0 + angle)) - math.exp(-1.0)
+        ) / denominator
     return g
 
 
 def _g8(y: np.ndarray, m: int, n: int) -> np.ndarray:
+    """G function 8: absolute sine transformation."""
     size = n - m
     g = np.empty(size, dtype=float)
     for j in range(1, size + 1):
@@ -180,6 +199,7 @@ def _g8(y: np.ndarray, m: int, n: int) -> np.ndarray:
 
 
 def _g9(y: np.ndarray, m: int, n: int) -> np.ndarray:
+    """G function 9: mean-based absolute sine transformation."""
     size = n - m
     g = np.empty(size, dtype=float)
     mu = float(np.sum(y[:m])) / m
@@ -193,6 +213,7 @@ def _g9(y: np.ndarray, m: int, n: int) -> np.ndarray:
 
 
 def _g10(y: np.ndarray, m: int, n: int) -> np.ndarray:
+    """G function 10: cubic sine transformation."""
     size = n - m
     g = np.empty(size, dtype=float)
     denominator = 2.0 * (m**3.0)
@@ -206,6 +227,7 @@ def _g10(y: np.ndarray, m: int, n: int) -> np.ndarray:
 
 
 def _evaluate_g(g_function_id: int, y: np.ndarray, m: int, n: int) -> np.ndarray:
+    """Evaluate G function by ID."""
     if g_function_id == 0:
         return _g0(y, m, n)
     if g_function_id == 1:
@@ -232,24 +254,30 @@ def _evaluate_g(g_function_id: int, y: np.ndarray, m: int, n: int) -> np.ndarray
 
 
 def _z1(j_values: np.ndarray) -> float:
+    """Z function 1: sum of squares."""
     j_size = int(j_values.shape[0])
     return (10.0 / j_size) * float(np.sum(j_values * j_values))
 
 
 def _z2(j_values: np.ndarray) -> float:
+    """Z function 2: maximum absolute value."""
     return 10.0 * float(np.max(np.abs(j_values)))
 
 
 def _z3(j_values: np.ndarray) -> float:
+    """Z function 3: cosine-based transformation."""
     j_size = int(j_values.shape[0])
     k = 5.0
     total = 0.0
     for value in j_values:
-        total += (float(value) ** 2.0 - math.cos((2.0 * k - 1.0) * _PI * float(value)) + 1.0) / 3.0
+        total += (
+            float(value) ** 2.0 - math.cos((2.0 * k - 1.0) * _PI * float(value)) + 1.0
+        ) / 3.0
     return (10.0 / j_size) * total
 
 
 def _z4(j_values: np.ndarray) -> float:
+    """Z function 4: exponential-cosine transformation."""
     j_size = int(j_values.shape[0])
     k = 5.0
     pow1 = float(np.max(np.abs(j_values)))
@@ -261,6 +289,7 @@ def _z4(j_values: np.ndarray) -> float:
 
 
 def _z5(j_values: np.ndarray) -> float:
+    """Z function 5: hybrid of z3 and power transformation."""
     j_size = int(j_values.shape[0])
     total = 0.0
     for value in j_values:
@@ -269,6 +298,7 @@ def _z5(j_values: np.ndarray) -> float:
 
 
 def _z6(j_values: np.ndarray) -> float:
+    """Z function 6: hybrid of z4 and power transformation."""
     j_size = int(j_values.shape[0])
     total = 0.0
     for value in j_values:
@@ -277,10 +307,14 @@ def _z6(j_values: np.ndarray) -> float:
 
 
 def _zbias(z_value: float) -> float:
+    """Apply bias transformation to Z value."""
     return abs(z_value) ** 0.05
 
 
-def _get_j(objective_index: int, number_of_objectives: int, w: np.ndarray, w_size: int) -> np.ndarray:
+def _get_j(
+    objective_index: int, number_of_objectives: int, w: np.ndarray, w_size: int
+) -> np.ndarray:
+    """Extract J values from W array for a specific objective."""
     values = []
     for j in range(1, w_size + 1):
         if (j - objective_index) % number_of_objectives == 0:
@@ -290,7 +324,10 @@ def _get_j(objective_index: int, number_of_objectives: int, w: np.ndarray, w_siz
     return np.asarray(values, dtype=float)
 
 
-def _evaluate_z(j_values: np.ndarray, objective_index: int, imbalance: bool, level: int) -> float:
+def _evaluate_z(
+    j_values: np.ndarray, objective_index: int, imbalance: bool, level: int
+) -> float:
+    """Evaluate Z function for given J values."""
     if imbalance:
         return _z4(j_values) if objective_index % 2 == 0 else _z1(j_values)
 
@@ -310,6 +347,7 @@ def _evaluate_z(j_values: np.ndarray, objective_index: int, imbalance: bool, lev
 
 
 def _f1(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 1: sine-cosine mixture."""
     f = np.zeros(n_obj, dtype=float)
 
     f[0] = 1.0
@@ -329,6 +367,7 @@ def _f1(y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 def _f2(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 2: inverted sine-cosine mixture."""
     f = np.zeros(n_obj, dtype=float)
 
     value = 1.0
@@ -348,6 +387,7 @@ def _f2(y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 def _f3(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 3: linear mixture."""
     f = np.zeros(n_obj, dtype=float)
 
     total = 0.0
@@ -367,6 +407,7 @@ def _f3(y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 def _f4(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 4: direct assignment with linear constraint."""
     f = np.zeros(n_obj, dtype=float)
 
     total = 0.0
@@ -379,6 +420,7 @@ def _f4(y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 def _f5(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 5: exponential-based constraint."""
     f = np.zeros(n_obj, dtype=float)
 
     total = 0.0
@@ -393,6 +435,7 @@ def _f5(y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 def _f6(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 6: logistic-based constraint."""
     f = np.zeros(n_obj, dtype=float)
     k = 40.0
     r = 0.05
@@ -403,13 +446,19 @@ def _f6(y: np.ndarray, n_obj: int) -> np.ndarray:
         mu += float(y[j - 1])
     mu /= n_obj - 1.0
 
-    numerator = (1.0 + math.exp(2.0 * k * mu - k)) ** -1.0 - r * mu - (1.0 + math.exp(k)) ** -1.0 + r
+    numerator = (
+        (1.0 + math.exp(2.0 * k * mu - k)) ** -1.0
+        - r * mu
+        - (1.0 + math.exp(k)) ** -1.0
+        + r
+    )
     denominator = (1.0 + math.exp(-k)) ** -1.0 - (1.0 + math.exp(k)) ** -1.0 + r
     f[n_obj - 1] = numerator / denominator
     return f
 
 
 def _f7(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 7: power-based constraint."""
     f = np.zeros(n_obj, dtype=float)
 
     total = 0.0
@@ -422,6 +471,7 @@ def _f7(y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 def _f8(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 8: inverted sine-cosine mixture variant."""
     f = np.zeros(n_obj, dtype=float)
 
     value = 1.0
@@ -441,6 +491,7 @@ def _f8(y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 def _f9(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 9: averaged sine-cosine mixture."""
     f = np.zeros(n_obj, dtype=float)
 
     total = 0.0
@@ -460,6 +511,7 @@ def _f9(y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 def _f10(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 10: reciprocal-based constraint."""
     f = np.zeros(n_obj, dtype=float)
     r = 0.02
 
@@ -475,6 +527,7 @@ def _f10(y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 def _f11(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 11: linear with cosine deformation."""
     f = np.zeros(n_obj, dtype=float)
     k = 4.0
 
@@ -491,11 +544,14 @@ def _f11(y: np.ndarray, n_obj: int) -> np.ndarray:
         f[j - 1] = total / (n_obj - j + 1.0)
 
     y0 = float(y[0])
-    f[n_obj - 1] = (math.cos((2.0 * k - 1.0) * y0 * _PI) + 2.0 * y0 + 4.0 * k * (1.0 - y0) - 1.0) / (4.0 * k)
+    f[n_obj - 1] = (
+        math.cos((2.0 * k - 1.0) * y0 * _PI) + 2.0 * y0 + 4.0 * k * (1.0 - y0) - 1.0
+    ) / (4.0 * k)
     return f
 
 
 def _f12(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 12: nonlinear with cosine deformation."""
     f = np.zeros(n_obj, dtype=float)
     k = 3.0
 
@@ -512,11 +568,14 @@ def _f12(y: np.ndarray, n_obj: int) -> np.ndarray:
         f[j - 1] = 1.0 - value
 
     y0 = float(y[0])
-    f[n_obj - 1] = (math.cos((2.0 * k - 1.0) * y0 * _PI) + 2.0 * y0 + 4.0 * k * (1.0 - y0) - 1.0) / (4.0 * k)
+    f[n_obj - 1] = (
+        math.cos((2.0 * k - 1.0) * y0 * _PI) + 2.0 * y0 + 4.0 * k * (1.0 - y0) - 1.0
+    ) / (4.0 * k)
     return f
 
 
 def _f13(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 13: inverted sine mixture with cosine deformation."""
     f = np.zeros(n_obj, dtype=float)
     k = 3.0
 
@@ -534,12 +593,14 @@ def _f13(y: np.ndarray, n_obj: int) -> np.ndarray:
 
     y0 = float(y[0])
     f[n_obj - 1] = 1.0 - (
-        math.cos((2.0 * k - 1.0) * y0 * _PI) + 2.0 * y0 + 4.0 * k * (1.0 - y0) - 1.0
-    ) / (4.0 * k)
+        (math.cos((2.0 * k - 1.0) * y0 * _PI) + 2.0 * y0 + 4.0 * k * (1.0 - y0) - 1.0)
+        / (4.0 * k)
+    )
     return f
 
 
 def _f14(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 14: power-based sine deformation."""
     f = np.zeros(n_obj, dtype=float)
     y0 = float(y[0])
     sin_term = math.sin(y0 * _PI / 2.0)
@@ -556,6 +617,7 @@ def _f14(y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 def _f15(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 15: power-deformed first variable."""
     f = np.zeros(n_obj, dtype=float)
     k = 3.0
     y0 = float(y[0])
@@ -563,11 +625,14 @@ def _f15(y: np.ndarray, n_obj: int) -> np.ndarray:
     for j in range(1, n_obj):
         f[j - 1] = y0 ** (1.0 + (j - 1.0) / (4.0 * n_obj))
 
-    f[n_obj - 1] = (math.cos((2.0 * k - 1.0) * y0 * _PI) + 2.0 * y0 + 4.0 * k * (1.0 - y0) - 1.0) / (4.0 * k)
+    f[n_obj - 1] = (
+        math.cos((2.0 * k - 1.0) * y0 * _PI) + 2.0 * y0 + 4.0 * k * (1.0 - y0) - 1.0
+    ) / (4.0 * k)
     return f
 
 
 def _f16(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 16: power-deformed first variable with cosine deformation."""
     f = np.zeros(n_obj, dtype=float)
     k = 5.0
     y0 = float(y[0])
@@ -580,11 +645,14 @@ def _f16(y: np.ndarray, n_obj: int) -> np.ndarray:
     if n_obj > 2:
         f[n_obj - 2] = 0.5 * (1.0 + math.sin(10.0 * y0 * _PI / 2.0 - _PI / 2.0))
 
-    f[n_obj - 1] = (math.cos((2.0 * k - 1.0) * y0 * _PI) + 2.0 * y0 + 4.0 * k * (1.0 - y0) - 1.0) / (4.0 * k)
+    f[n_obj - 1] = (
+        math.cos((2.0 * k - 1.0) * y0 * _PI) + 2.0 * y0 + 4.0 * k * (1.0 - y0) - 1.0
+    ) / (4.0 * k)
     return f
 
 
 def _f17(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 17: wedge-defined behavior."""
     f = np.zeros(n_obj, dtype=float)
 
     wedge_flag = True
@@ -612,6 +680,7 @@ def _f17(y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 def _f18(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 18: two-region wedge-defined behavior."""
     f = np.zeros(n_obj, dtype=float)
 
     in_first = _all_values_in(y, n_obj - 1, 0.0, 0.4)
@@ -635,6 +704,7 @@ def _f18(y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 def _f19(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 19: degenerate region with cosine constraint."""
     f = np.zeros(n_obj, dtype=float)
     a = 5.0
 
@@ -653,6 +723,7 @@ def _f19(y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 def _f20(y: np.ndarray, n_obj: int) -> np.ndarray:
+    """F function 20: two-region degenerate behavior."""
     f = np.zeros(n_obj, dtype=float)
 
     deg_flag = _value_in(float(y[0]), 0.1, 0.4) or _value_in(float(y[0]), 0.6, 0.9)
@@ -671,6 +742,7 @@ def _f20(y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 def _evaluate_f(function_id: int, y: np.ndarray, n_obj: int) -> np.ndarray:
+    """Evaluate F function by ID."""
     if function_id == 1:
         return _f1(y, n_obj)
     if function_id == 2:
@@ -715,6 +787,8 @@ def _evaluate_f(function_id: int, y: np.ndarray, n_obj: int) -> np.ndarray:
 
 
 class ZCAT(Problem):
+    """ZCAT family of test problems for many-objective optimization."""
+
     def __init__(
         self,
         problem_id: int,
@@ -726,6 +800,21 @@ class ZCAT(Problem):
         imbalance: bool = False,
         **kwargs,
     ) -> None:
+        """Initialize a ZCAT problem.
+
+        Args:
+            problem_id: Problem identifier in [1, 20].
+            n_var: Number of decision variables (default 30).
+            n_obj: Number of objectives (default 2).
+            complicated_pareto_set: Use complicated G function (default False).
+            level: Z function level in [1, 6] (default 1).
+            bias: Apply bias transformation (default False).
+            imbalance: Use imbalanced Z functions (default False).
+            **kwargs: Additional keyword arguments passed to Problem base class.
+
+        Raises:
+            ValueError: If parameters are invalid.
+        """
         if problem_id < 1 or problem_id > 20:
             raise ValueError("ZCAT problem id must be in [1, 20].")
         if n_obj < 2:
@@ -733,7 +822,9 @@ class ZCAT(Problem):
         if n_var <= 0:
             raise ValueError("ZCAT requires n_var > 0.")
 
-        min_required_n_var = 1 if problem_id in _ONE_DIMENSIONAL_PARETO_SET_PROBLEMS else n_obj - 1
+        min_required_n_var = (
+            1 if problem_id in _ONE_DIMENSIONAL_PARETO_SET_PROBLEMS else n_obj - 1
+        )
         if n_var < min_required_n_var:
             raise ValueError(
                 f"ZCAT{problem_id} requires n_var >= {min_required_n_var} for n_obj={n_obj}. "
@@ -753,6 +844,7 @@ class ZCAT(Problem):
         super().__init__(n_var=n_var, n_obj=n_obj, xl=xl, xu=xu, vtype=float, **kwargs)
 
     def _pareto_set_dimension(self, y0: float) -> int:
+        """Determine Pareto set dimension based on first variable."""
         if self.problem_id in _ONE_DIMENSIONAL_PARETO_SET_PROBLEMS:
             return 1
 
@@ -769,21 +861,27 @@ class ZCAT(Problem):
         return self.n_obj - 1
 
     def _g_function_id(self) -> int:
+        """Get G function ID based on problem configuration."""
         if not self.complicated_pareto_set:
             return 0
         return _COMPLICATED_G_FUNCTION_BY_PROBLEM[self.problem_id]
 
     def _evaluate_row(self, x_row: np.ndarray) -> np.ndarray:
+        """Evaluate a single solution row."""
         y = (x_row - self.xl) / (self.xu - self.xl)
         pareto_set_dimension = self._pareto_set_dimension(float(y[0]))
 
         alpha = _evaluate_f(self.problem_id, y, self.n_obj)
         for objective_index in range(1, self.n_obj + 1):
-            alpha[objective_index - 1] = (objective_index**2.0) * float(alpha[objective_index - 1])
+            alpha[objective_index - 1] = (objective_index**2.0) * float(
+                alpha[objective_index - 1]
+            )
 
         beta = np.zeros(self.n_obj, dtype=float)
         if pareto_set_dimension != self.n_var:
-            g_values = _evaluate_g(self._g_function_id(), y, pareto_set_dimension, self.n_var)
+            g_values = _evaluate_g(
+                self._g_function_id(), y, pareto_set_dimension, self.n_var
+            )
             z_values = y[pareto_set_dimension:] - g_values
 
             for idx in range(z_values.shape[0]):
@@ -800,12 +898,15 @@ class ZCAT(Problem):
             w_size = self.n_var - pareto_set_dimension
             for objective_index in range(1, self.n_obj + 1):
                 j_values = _get_j(objective_index, self.n_obj, w_values, w_size)
-                z_score = _evaluate_z(j_values, objective_index, self.imbalance, self.level)
+                z_score = _evaluate_z(
+                    j_values, objective_index, self.imbalance, self.level
+                )
                 beta[objective_index - 1] = (objective_index**2.0) * z_score
 
         return alpha + beta
 
     def _evaluate(self, x, out, *args, **kwargs):
+        """Evaluate objective values for a population."""
         x = np.asarray(x, dtype=float)
         f = np.empty((x.shape[0], self.n_obj), dtype=float)
         for row_index in range(x.shape[0]):
@@ -813,8 +914,11 @@ class ZCAT(Problem):
         out["F"] = f
 
     def _calc_pareto_front(self, n_pareto_points=None):
+        """Calculate the Pareto front from bundled reference data."""
         if self.n_obj not in (2, 3, 4, 6):
-            raise Exception("Only n_obj in {2, 3, 4, 6} has a bundled reference front for ZCAT.")
+            raise Exception(
+                "Only n_obj in {2, 3, 4, 6} has a bundled reference front for ZCAT."
+            )
 
         file_candidates = []
         if self.n_obj == 2:
@@ -848,7 +952,11 @@ class ZCAT(Problem):
                 f"Reference front for ZCAT{self.problem_id} with n_obj={self.n_obj} not found in pymoo/pf/ZCAT."
             )
 
-        if n_pareto_points is not None and n_pareto_points > 0 and len(pf) > n_pareto_points:
+        if (
+            n_pareto_points is not None
+            and n_pareto_points > 0
+            and len(pf) > n_pareto_points
+        ):
             idx = np.linspace(0, len(pf) - 1, n_pareto_points).astype(int)
             pf = pf[idx]
 
@@ -856,100 +964,160 @@ class ZCAT(Problem):
 
 
 class ZCAT1(ZCAT):
+    """ZCAT problem variant 1."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT1."""
         super().__init__(1, *args, **kwargs)
 
 
 class ZCAT2(ZCAT):
+    """ZCAT problem variant 2."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT2."""
         super().__init__(2, *args, **kwargs)
 
 
 class ZCAT3(ZCAT):
+    """ZCAT problem variant 3."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT3."""
         super().__init__(3, *args, **kwargs)
 
 
 class ZCAT4(ZCAT):
+    """ZCAT problem variant 4."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT4."""
         super().__init__(4, *args, **kwargs)
 
 
 class ZCAT5(ZCAT):
+    """ZCAT problem variant 5."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT5."""
         super().__init__(5, *args, **kwargs)
 
 
 class ZCAT6(ZCAT):
+    """ZCAT problem variant 6."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT6."""
         super().__init__(6, *args, **kwargs)
 
 
 class ZCAT7(ZCAT):
+    """ZCAT problem variant 7."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT7."""
         super().__init__(7, *args, **kwargs)
 
 
 class ZCAT8(ZCAT):
+    """ZCAT problem variant 8."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT8."""
         super().__init__(8, *args, **kwargs)
 
 
 class ZCAT9(ZCAT):
+    """ZCAT problem variant 9."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT9."""
         super().__init__(9, *args, **kwargs)
 
 
 class ZCAT10(ZCAT):
+    """ZCAT problem variant 10."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT10."""
         super().__init__(10, *args, **kwargs)
 
 
 class ZCAT11(ZCAT):
+    """ZCAT problem variant 11."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT11."""
         super().__init__(11, *args, **kwargs)
 
 
 class ZCAT12(ZCAT):
+    """ZCAT problem variant 12."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT12."""
         super().__init__(12, *args, **kwargs)
 
 
 class ZCAT13(ZCAT):
+    """ZCAT problem variant 13."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT13."""
         super().__init__(13, *args, **kwargs)
 
 
 class ZCAT14(ZCAT):
+    """ZCAT problem variant 14."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT14."""
         super().__init__(14, *args, **kwargs)
 
 
 class ZCAT15(ZCAT):
+    """ZCAT problem variant 15."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT15."""
         super().__init__(15, *args, **kwargs)
 
 
 class ZCAT16(ZCAT):
+    """ZCAT problem variant 16."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT16."""
         super().__init__(16, *args, **kwargs)
 
 
 class ZCAT17(ZCAT):
+    """ZCAT problem variant 17."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT17."""
         super().__init__(17, *args, **kwargs)
 
 
 class ZCAT18(ZCAT):
+    """ZCAT problem variant 18."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT18."""
         super().__init__(18, *args, **kwargs)
 
 
 class ZCAT19(ZCAT):
+    """ZCAT problem variant 19."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT19."""
         super().__init__(19, *args, **kwargs)
 
 
 class ZCAT20(ZCAT):
+    """ZCAT problem variant 20."""
+
     def __init__(self, *args, **kwargs):
+        """Initialize ZCAT20."""
         super().__init__(20, *args, **kwargs)

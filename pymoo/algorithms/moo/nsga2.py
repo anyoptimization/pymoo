@@ -1,5 +1,6 @@
+"""NSGA-II (Non-dominated Sorting Genetic Algorithm II) multi-objective optimization."""
+
 import numpy as np
-import warnings
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
 from pymoo.docs import parse_doc_string
@@ -29,7 +30,6 @@ def binary_tournament(pop, P, algorithm, **kwargs):
     S = np.full(n_tournaments, np.nan)
 
     for i in range(n_tournaments):
-
         a, b = P[i, 0], P[i, 1]
         a_cv, a_f, b_cv, b_f = pop[a].CV[0], pop[a].F, pop[b].CV[0], pop[b].F
         rank_a, cd_a = pop[a].get("rank", "crowding")
@@ -37,27 +37,42 @@ def binary_tournament(pop, P, algorithm, **kwargs):
 
         # if at least one solution is infeasible
         if a_cv > 0.0 or b_cv > 0.0:
-            S[i] = compare(a, a_cv, b, b_cv, method='smaller_is_better', return_random_if_equal=True, random_state=algorithm.random_state)
+            S[i] = compare(
+                a,
+                a_cv,
+                b,
+                b_cv,
+                method="smaller_is_better",
+                return_random_if_equal=True,
+                random_state=algorithm.random_state,
+            )
 
         # both solutions are feasible
         else:
-
-            if tournament_type == 'comp_by_dom_and_crowding':
+            if tournament_type == "comp_by_dom_and_crowding":
                 rel = Dominator.get_relation(a_f, b_f)
                 if rel == 1:
                     S[i] = a
                 elif rel == -1:
                     S[i] = b
 
-            elif tournament_type == 'comp_by_rank_and_crowding':
-                S[i] = compare(a, rank_a, b, rank_b, method='smaller_is_better')
+            elif tournament_type == "comp_by_rank_and_crowding":
+                S[i] = compare(a, rank_a, b, rank_b, method="smaller_is_better")
 
             else:
                 raise Exception("Unknown tournament type.")
 
             # if rank or domination relation didn't make a decision compare by crowding
             if np.isnan(S[i]):
-                S[i] = compare(a, cd_a, b, cd_b, method='larger_is_better', return_random_if_equal=True, random_state=algorithm.random_state)
+                S[i] = compare(
+                    a,
+                    cd_a,
+                    b,
+                    cd_b,
+                    method="larger_is_better",
+                    return_random_if_equal=True,
+                    random_state=algorithm.random_state,
+                )
 
     return S[:, None].astype(int, copy=False)
 
@@ -68,9 +83,9 @@ def binary_tournament(pop, P, algorithm, **kwargs):
 
 
 class RankAndCrowdingSurvival(RankAndCrowding):
-    
     def __init__(self, nds=None, crowding_func="cd"):
         super().__init__(nds, crowding_func)
+
 
 # =========================================================================================================
 # Implementation
@@ -78,17 +93,18 @@ class RankAndCrowdingSurvival(RankAndCrowding):
 
 
 class NSGA2(GeneticAlgorithm):
+    def __init__(
+        self,
+        pop_size=100,
+        sampling=FloatRandomSampling(),
+        selection=TournamentSelection(func_comp=binary_tournament),
+        crossover=SBX(eta=15, prob=0.9),
+        mutation=PM(eta=20),
+        survival=RankAndCrowding(),
+        output=MultiObjectiveOutput(),
+        **kwargs,
+    ):
 
-    def __init__(self,
-                 pop_size=100,
-                 sampling=FloatRandomSampling(),
-                 selection=TournamentSelection(func_comp=binary_tournament),
-                 crossover=SBX(eta=15, prob=0.9),
-                 mutation=PM(eta=20),
-                 survival=RankAndCrowding(),
-                 output=MultiObjectiveOutput(),
-                 **kwargs):
-        
         super().__init__(
             pop_size=pop_size,
             sampling=sampling,
@@ -98,10 +114,11 @@ class NSGA2(GeneticAlgorithm):
             survival=survival,
             output=output,
             advance_after_initial_infill=True,
-            **kwargs)
+            **kwargs,
+        )
 
         self.termination = DefaultMultiObjectiveTermination()
-        self.tournament_type = 'comp_by_dom_and_crowding'
+        self.tournament_type = "comp_by_dom_and_crowding"
 
     def _set_optimum(self, **kwargs):
         if not has_feasible(self.pop):

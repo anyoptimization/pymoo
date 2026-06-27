@@ -1,3 +1,7 @@
+"""Epsilon indicator for multi-objective optimization."""
+
+from numpy import ndarray
+
 from moocore import epsilon_additive as _epsilon_additive
 from moocore import epsilon_mult as _epsilon_mult
 
@@ -7,27 +11,36 @@ from pymoo.indicators.distance_indicator import derive_ideal_and_nadir_from_pf
 
 
 class EpsilonIndicator(Indicator):
+    """Base class for epsilon indicators."""
 
-    def __init__(self, pf, **kwargs):
-        pf = at_least_2d_array(pf, extend_as="row")
+    def __init__(self, pf: ndarray, **kwargs) -> None:
+        """Initialize epsilon indicator.
+
+        Args:
+            pf: Pareto front reference.
+            **kwargs: Additional keyword arguments passed to parent.
+        """
+        pf = at_least_2d_array(pf, extend_as="row")  # type: ignore[assignment]
         ideal, nadir = derive_ideal_and_nadir_from_pf(pf)
         super().__init__(ideal=ideal, nadir=nadir, **kwargs)
         self.pf = self.normalization.forward(pf)
 
-    def _do(self, F):
+    def _do(self, F: ndarray) -> float:
         return self._calc(F, self.pf)
 
-    def _calc(self, F, pf):
+    def _calc(self, F: ndarray, pf: ndarray) -> float:
         raise NotImplementedError
 
 
 class Epsilon(EpsilonIndicator):
+    """Additive epsilon indicator."""
 
-    def _calc(self, F, pf):
+    def _calc(self, F: ndarray, pf: ndarray) -> float:
         return _epsilon_additive(F, ref=pf)
 
 
 class EpsilonMultiplicative(EpsilonIndicator):
+    """Multiplicative epsilon indicator."""
 
-    def _calc(self, F, pf):
+    def _calc(self, F: ndarray, pf: ndarray) -> float:
         return _epsilon_mult(F, ref=pf)

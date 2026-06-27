@@ -1,3 +1,5 @@
+"""Half-Uniform Crossover (HUX) operator."""
+
 import math
 
 import numpy as np
@@ -7,7 +9,6 @@ from pymoo.util.misc import crossover_mask
 
 
 class HalfUniformCrossover(Crossover):
-
     def __init__(self, prob_hux=0.5, **kwargs):
         super().__init__(2, 2, **kwargs)
         self.prob_hux = prob_hux
@@ -22,7 +23,7 @@ class HalfUniformCrossover(Crossover):
 
         # create for each individual the crossover range
         for i in range(n_matings):
-            I = np.where(not_equal[i])[0]
+            I = np.where(not_equal[i])[0]  # noqa: E741
 
             n = math.ceil(len(I) / 2)
             if n > 0:

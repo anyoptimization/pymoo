@@ -1,3 +1,5 @@
+"""Base class for operators in evolutionary algorithms."""
+
 import abc
 
 import numpy as np
@@ -6,11 +8,14 @@ from pymoo.util import default_random_state
 
 
 class Operator:
+    """Base class for all operators (sampling, crossover, mutation, selection)."""
 
-    def __init__(self,
-                 name=None,
-                 vtype=None,
-                 repair=None) -> None:
+    def __init__(
+        self,
+        name=None,
+        vtype=None,
+        repair=None,
+    ) -> None:
 
         super().__init__()
 

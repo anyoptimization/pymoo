@@ -1,3 +1,5 @@
+"""Build script for the pymoo package (Cython extension compilation)."""
+
 import numpy
 import setuptools
 import Cython.Build

@@ -1,8 +1,11 @@
+"""Base class for bracketing search algorithms over a single-variable interval."""
+
 from pymoo.core.algorithm import Algorithm
 from pymoo.core.individual import Individual
 
 
 class BracketSearch(Algorithm):
+    """Search an interval ``[a, b]`` bracketing the optimum of a 1-D problem."""
 
     def __init__(self, a=None, b=None, **kwargs):
         super().__init__(**kwargs)
@@ -10,7 +13,9 @@ class BracketSearch(Algorithm):
 
     def _setup(self, problem, a=None, b=None, **kwargs):
         msg = "Only problems with one variable, one objective and no constraints can be solved!"
-        assert problem.n_var == 1 and not problem.has_constraints() and problem.n_obj == 1, msg
+        assert (
+            problem.n_var == 1 and not problem.has_constraints() and problem.n_obj == 1
+        ), msg
         self.a, self.b = a, b
 
     def _initialize_infill(self):
@@ -20,7 +25,9 @@ class BracketSearch(Algorithm):
 
         # take care of the lower bound - make sure it is an individual and make sure it is evaluated
         if self.a is None:
-            assert xl is not None, "Either provide a left bound or set the xl attribute in the problem."
+            assert xl is not None, (
+                "Either provide a left bound or set the xl attribute in the problem."
+            )
             self.a = Individual(X=xl)
 
         if self.a.F is None:
@@ -28,11 +35,14 @@ class BracketSearch(Algorithm):
 
         # take care of the upper bound - make sure it is an individual and make sure it is evaluated
         if self.b is None:
-            assert xl is not None, "Either provide a right bound or set the xu attribute in the problem."
+            assert xl is not None, (
+                "Either provide a right bound or set the xu attribute in the problem."
+            )
             self.b = Individual(X=xu)
 
         if self.b.F is None:
             self.evaluator.eval(self.problem, self.b, algorithm=self)
 
-        assert self.a.X[0] <= self.b.X[0], "The left bound must be smaller than the left bound!"
-
+        assert self.a.X[0] <= self.b.X[0], (
+            "The left bound must be smaller than the left bound!"
+        )

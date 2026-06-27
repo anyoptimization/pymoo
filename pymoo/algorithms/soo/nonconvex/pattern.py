@@ -1,3 +1,5 @@
+"""Hooke and Jeeves pattern search local search algorithm."""
+
 import numpy as np
 
 from pymoo.algorithms.base.local import LocalSearch
@@ -17,40 +19,23 @@ from pymoo.util import default_random_state
 
 
 class PatternSearch(LocalSearch):
-    def __init__(self,
-                 init_delta=0.25,
-                 init_rho=0.5,
-                 step_size=1.0,
-                 output=SingleObjectiveOutput(),
-                 **kwargs):
+    def __init__(
+        self,
+        init_delta=0.25,
+        init_rho=0.5,
+        step_size=1.0,
+        output=SingleObjectiveOutput(),
+        **kwargs,
+    ):
+        """Hooke and Jeeves Pattern Search local optimizer.
+
+        Args:
+            init_delta: Initial step size for exploration. Scaled relative to bounds.
+            init_rho: Contraction factor for step size reduction on unsuccessful moves.
+            step_size: Scaling factor for pattern moves along promising directions.
+            output: Output handler for convergence information.
+            **kwargs: Additional arguments passed to parent class.
         """
-        An implementation of well-known Hooke and Jeeves Pattern Search.
-
-        Parameters
-        ----------
-
-        x0 : numpy.array
-            The initial value where the local search should be initiated. If not provided `n_sample_points` are
-            created using latin hypercube sampling and the best solution found is set to `x0`.
-
-        n_sample_points : int
-            Number of sample points to be used to determine the initial search point. (Only used of `x0` is not provided)
-
-        delta : float
-            The `delta` values which is used for the exploration move. If lower and upper bounds are provided the
-            value is in relation to the overall search space. For instance, a value of 0.25 means that initially the
-            pattern is created in 25% distance of the initial search point.
-
-        rho : float
-            If the move was unsuccessful then the `delta` value is reduced by multiplying it with the value provided.
-            For instance, `explr_rho` implies that with a value of `delta/2` is continued.
-
-        step_size : float
-            After the exploration move the new center is determined by following a promising direction.
-            This value defines how large to step on this direction will be.
-
-        """
-
         super().__init__(output=output, **kwargs)
         self.init_rho = init_rho
         self.init_delta = init_delta
@@ -85,33 +70,37 @@ class PatternSearch(LocalSearch):
 
         # that means that the exploration did not find any new point and was thus unsuccessful
         if not has_improved:
-
             # increase the counter (by default this will be initialized to 0 and directly increased to 1)
             self.n_not_improved += 1
 
             # keep track of the rho values in the normalized space
-            self._rho = self.init_rho ** self.n_not_improved
+            self._rho = self.init_rho**self.n_not_improved
 
             # explore around the current center - try finding a suitable direction
-            self._explr = yield from exploration_move(self.problem, self._center, self._sign, self._delta, self._rho)
+            self._explr = yield from exploration_move(
+                self.problem, self._center, self._sign, self._delta, self._rho
+            )
 
         # if we have found a direction in the last iteration to be worth following
         else:
-
             # get the direction which was successful in the last move
-            self._direction = (self._explr.X - self._center.X)
+            self._direction = self._explr.X - self._center.X
 
             # declare the exploration point the new center (it has led to an improvement in the last iteration!)
             self._center = self._explr
 
             # use the pattern move to get a new trial vector along that given direction
-            self._trial = yield pattern_move(self.problem, self._center, self._direction, self.step_size)
+            self._trial = yield pattern_move(
+                self.problem, self._center, self._direction, self.step_size
+            )
 
             # get the delta sign adjusted for the exploration
             self._sign = calc_sign(self._direction)
 
             # explore around the current center to try finding a suitable direction
-            self._explr = yield from exploration_move(self.problem, self._trial, self._sign, self._delta, self._rho)
+            self._explr = yield from exploration_move(
+                self.problem, self._trial, self._sign, self._delta, self._rho
+            )
 
         self.pop = Population.create(self._center, self._explr)
 
@@ -121,7 +110,9 @@ class PatternSearch(LocalSearch):
 
 
 @default_random_state
-def exploration_move(problem, center, sign, delta, rho, randomize=True, random_state=None):
+def exploration_move(
+    problem, center, sign, delta, rho, randomize=True, random_state=None
+):
     n_var = problem.n_var
 
     # the order for the variable iteration
@@ -132,7 +123,6 @@ def exploration_move(problem, center, sign, delta, rho, randomize=True, random_s
 
     # iterate over each variable
     for k in K:
-
         # the value to be tried first is given by the amount times the sign
         _delta = sign[k] * rho * delta
 
@@ -144,7 +134,6 @@ def exploration_move(problem, center, sign, delta, rho, randomize=True, random_s
 
         # if not successful try the other direction
         else:
-
             # now try the negative value of delta and see if we can improve
             _explr = yield step_along_axis(problem, center.X, -1 * _delta, k)
 

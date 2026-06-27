@@ -1,10 +1,11 @@
+"""Repair operator for repairing infeasible solutions."""
+
 import numpy as np
 
 from pymoo.core.operator import Operator
 
 
 class Repair(Operator):
-
     def do(self, problem, pop, **kwargs):
         X = np.array([ind.X for ind in pop])
         if self.vtype is not None:

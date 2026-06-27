@@ -1,12 +1,18 @@
-"""
-Standard Python implementation of perpendicular distance calculation.
-"""
+"""Standard Python implementation of perpendicular distance calculation."""
 
 import numpy as np
 
 
 def calc_perpendicular_distance(N, ref_dirs):
-    """Calculate perpendicular distance from points to reference directions."""
+    """Calculate perpendicular distance from points to reference directions.
+
+    Args:
+        N: Array of points.
+        ref_dirs: Array of reference directions.
+
+    Returns:
+        Matrix of perpendicular distances.
+    """
     u = np.tile(ref_dirs, (len(N), 1))
     v = np.repeat(N, len(ref_dirs), axis=0)
 

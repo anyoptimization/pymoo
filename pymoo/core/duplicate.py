@@ -1,3 +1,5 @@
+"""Duplicate elimination strategies for populations."""
+
 import numpy as np
 
 from pymoo.util.misc import cdist
@@ -8,7 +10,6 @@ def default_attr(pop):
 
 
 class DuplicateElimination:
-
     def __init__(self, func=None) -> None:
         super().__init__()
         self.func = func
@@ -27,7 +28,6 @@ class DuplicateElimination:
 
         for arg in args:
             if len(arg) > 0:
-
                 if len(pop) == 0:
                     break
                 elif len(arg) == 0:
@@ -54,7 +54,6 @@ class DuplicateElimination:
 
 
 class DefaultDuplicateElimination(DuplicateElimination):
-
     def __init__(self, epsilon=1e-16, **kwargs) -> None:
         super().__init__(**kwargs)
         self.epsilon = epsilon
@@ -87,7 +86,6 @@ def to_float(val):
 
 
 class ElementwiseDuplicateElimination(DefaultDuplicateElimination):
-
     def __init__(self, cmp_func=None, **kwargs) -> None:
         super().__init__(**kwargs)
 
@@ -122,17 +120,18 @@ class ElementwiseDuplicateElimination(DefaultDuplicateElimination):
 def to_hash(x):
     try:
         h = hash(x)
-    except:
+    except:  # noqa: E722
         try:
             h = hash(str(x))
-        except:
-            raise Exception("Hash could not be calculated. Please use another duplicate elimination.")
+        except:  # noqa: E722
+            raise Exception(
+                "Hash could not be calculated. Please use another duplicate elimination."
+            )
 
     return h
 
 
 class HashDuplicateElimination(DuplicateElimination):
-
     def __init__(self, func=to_hash) -> None:
         super().__init__()
         self.func = func
@@ -158,6 +157,5 @@ class HashDuplicateElimination(DuplicateElimination):
 
 
 class NoDuplicateElimination(DuplicateElimination):
-
     def do(self, pop, *args, **kwargs):
         return pop

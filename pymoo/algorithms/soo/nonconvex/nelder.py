@@ -1,3 +1,5 @@
+"""Nelder-Mead local search algorithm."""
+
 import numpy as np
 
 from pymoo.algorithms.base.local import LocalSearch
@@ -20,12 +22,7 @@ from pymoo.util.vectors import max_alpha
 
 
 class NelderAndMeadTermination(Termination):
-
-    def __init__(self,
-                 x_tol=1e-6,
-                 f_tol=1e-6,
-                 n_max_iter=1e6,
-                 n_max_evals=1e6):
+    def __init__(self, x_tol=1e-6, f_tol=1e-6, n_max_iter=1e6, n_max_evals=1e6):
 
         super().__init__()
         self.x_tol = x_tol
@@ -96,7 +93,6 @@ def initialize_simplex(problem, x0, scale=0.05):
     X = x0[None, :].repeat(n, axis=0)
 
     for k in range(n):
-
         # if the problem has bounds do the check
         if problem.has_bounds():
             if X[k, k] + delta[k] < problem.xu[k]:
@@ -112,12 +108,13 @@ def initialize_simplex(problem, x0, scale=0.05):
 
 
 class NelderMead(LocalSearch):
-
-    def __init__(self,
-                 init_simplex_scale=0.05,
-                 func_params=adaptive_params,
-                 output=SingleObjectiveOutput(),
-                 **kwargs):
+    def __init__(
+        self,
+        init_simplex_scale=0.05,
+        func_params=adaptive_params,
+        output=SingleObjectiveOutput(),
+        **kwargs,
+    ):
 
         super().__init__(output=output, **kwargs)
 
@@ -143,7 +140,9 @@ class NelderMead(LocalSearch):
         self.alpha, self.beta, self.gamma, self.delta = self.func_params(self.problem)
 
     def _initialize_simplex(self):
-        simplex = pop_from_array_or_individual(initialize_simplex(self.problem, self.x0.X, scale=0.05))
+        simplex = pop_from_array_or_individual(
+            initialize_simplex(self.problem, self.x0.X, scale=0.05)
+        )
         return Population.merge(self.x0, simplex)
 
     def _next(self):
@@ -160,7 +159,7 @@ class NelderMead(LocalSearch):
         pop, n = self.pop, self.problem.n_var - 1
 
         # calculate the centroid
-        centroid = pop[:n + 1].get("X").mean(axis=0)
+        centroid = pop[: n + 1].get("X").mean(axis=0)
 
         # -------------------------------------------------------------------------------------------
         # REFLECT
@@ -183,7 +182,6 @@ class NelderMead(LocalSearch):
 
         # if better than the current best - check for expansion
         if better_than_current_best:
-
             # -------------------------------------------------------------------------------------------
             # EXPAND
             # -------------------------------------------------------------------------------------------
@@ -208,7 +206,6 @@ class NelderMead(LocalSearch):
 
         # if not worse than the worst - outside contraction
         elif not better_than_second_worst and better_than_worst:
-
             # -------------------------------------------------------------------------------------------
             # Outside Contraction
             # -------------------------------------------------------------------------------------------
@@ -223,7 +220,6 @@ class NelderMead(LocalSearch):
 
         # if the reflection was worse than the worst - inside contraction
         else:
-
             # -------------------------------------------------------------------------------------------
             # Inside Contraction
             # -------------------------------------------------------------------------------------------

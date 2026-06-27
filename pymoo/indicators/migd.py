@@ -1,3 +1,5 @@
+"""Mean Inverted Generational Distance (MIGD) callback."""
+
 import numpy as np
 
 from pymoo.core.callback import Callback
@@ -5,30 +7,29 @@ from pymoo.indicators.igd import IGD
 
 
 class MIGD(Callback):
+    """Mean Inverted Generational Distance (MIGD) callback."""
 
-    def __init__(self, reevaluate=True) -> None:
+    def __init__(self, reevaluate: bool = True) -> None:
+        """Initialize MIGD callback.
+
+        Args:
+            reevaluate: Whether the MIGD should be based on reevaluated solutions.
         """
-        Mean Inverted Generational Distance (MIGD)
-
-        For dynamic optimization problems the performance metric needs to involve the IGD value over time as the
-        problem is changing. Thus, the performance needs to be evaluated in each iteration for which
-        defining a callback is ideal.
-
-        """
-
         super().__init__()
 
         # whether the MIGD should be based on reevaluated solutions
         self.reevaluate = reevaluate
 
         # the list where each of the recordings are stored: timesteps and igd
-        self.records = []
+        self.records: list[tuple[float, float]] = []
 
     def update(self, algorithm, **kwargs):
 
         # the problem to be solved
         problem = algorithm.problem
-        assert problem.n_constr == 0, "The current implementation only works for unconstrained problems!"
+        assert problem.n_constr == 0, (
+            "The current implementation only works for unconstrained problems!"
+        )
 
         # the current time
         t = problem.time

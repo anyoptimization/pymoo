@@ -1,25 +1,36 @@
+"""Infill criteria for generating candidate solutions."""
+
 from pymoo.core.duplicate import NoDuplicateElimination
 from pymoo.core.population import Population
 from pymoo.core.repair import NoRepair
 
 
 class InfillCriterion:
-
-    def __init__(self,
-                 repair=None,
-                 eliminate_duplicates=None,
-                 n_max_iterations=100,
-                 **kwargs):
+    def __init__(
+        self, repair=None, eliminate_duplicates=None, n_max_iterations=100, **kwargs
+    ):
 
         super().__init__()
         self.n_max_iterations = n_max_iterations
-        self.eliminate_duplicates = eliminate_duplicates if eliminate_duplicates is not None else NoDuplicateElimination()
+        self.eliminate_duplicates = (
+            eliminate_duplicates
+            if eliminate_duplicates is not None
+            else NoDuplicateElimination()
+        )
         self.repair = repair if repair is not None else NoRepair()
 
     def __call__(self, problem, pop, n_offsprings, random_state=None, **kwargs):
         return self.do(problem, pop, n_offsprings, random_state=random_state, **kwargs)
 
-    def do(self, problem, pop, n_offsprings, random_state=None, n_max_iterations=None, **kwargs):
+    def do(
+        self,
+        problem,
+        pop,
+        n_offsprings,
+        random_state=None,
+        n_max_iterations=None,
+        **kwargs,
+    ):
         if n_max_iterations is None:
             n_max_iterations = self.n_max_iterations
 
@@ -31,12 +42,13 @@ class InfillCriterion:
 
         # iterate until enough offsprings are created
         while len(off) < n_offsprings:
-
             # how many offsprings are remaining to be created
             n_remaining = n_offsprings - len(off)
 
             # do the mating
-            _off = self._do(problem, pop, n_remaining, random_state=random_state, **kwargs)
+            _off = self._do(
+                problem, pop, n_remaining, random_state=random_state, **kwargs
+            )
 
             # repair the individuals if necessary - disabled if repair is NoRepair
             _off = self.repair(problem, _off, random_state=random_state, **kwargs)
@@ -46,7 +58,6 @@ class InfillCriterion:
 
             # if more offsprings than necessary - truncate them randomly
             if len(off) + len(_off) > n_offsprings:
-
                 # IMPORTANT: Interestingly, this makes a difference in performance for some algorithms
                 n_remaining = n_offsprings - len(off)
                 _off = _off[:n_remaining]

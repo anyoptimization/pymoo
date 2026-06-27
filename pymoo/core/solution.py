@@ -1,10 +1,12 @@
+"""Solution and solution set classes for backward compatibility."""
+
 from pymoo.core.individual import Individual
 from pymoo.core.population import Population
 
 
 class Solution(Individual):
-    pass
+    """Backward-compatible alias for Individual."""
 
 
 class SolutionSet(Population):
-    pass
+    """Backward-compatible alias for Population."""

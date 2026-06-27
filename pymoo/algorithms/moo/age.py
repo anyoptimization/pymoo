@@ -1,7 +1,9 @@
+"""AGEMOEA: an adaptive evolutionary algorithm based on non-euclidean geometry for many-objective optimization."""
+
 try:
     import numba
     from numba import jit
-except:
+except:  # noqa: E722
     raise Exception("Please install numba to use AGEMOEA: pip install numba")
 
 import numpy as np
@@ -24,49 +26,54 @@ from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 # Implementation
 # =========================================================================================================
 
-class AGEMOEA(GeneticAlgorithm):
 
-    def __init__(self,
-                 pop_size=100,
-                 sampling=FloatRandomSampling(),
-                 selection=TournamentSelection(func_comp=binary_tournament),
-                 crossover=SBX(eta=15, prob=0.9),
-                 mutation=PM(eta=20),
-                 eliminate_duplicates=True,
-                 n_offsprings=None,
-                 output=MultiObjectiveOutput(),
-                 **kwargs):
-        """
+class AGEMOEA(GeneticAlgorithm):
+    def __init__(
+        self,
+        pop_size=100,
+        sampling=FloatRandomSampling(),
+        selection=TournamentSelection(func_comp=binary_tournament),
+        crossover=SBX(eta=15, prob=0.9),
+        mutation=PM(eta=20),
+        eliminate_duplicates=True,
+        n_offsprings=None,
+        output=MultiObjectiveOutput(),
+        **kwargs,
+    ):
+        """Initialize the AGEMOEA algorithm.
+
         Adapted from:
         Panichella, A. (2019). An adaptive evolutionary algorithm based on non-euclidean geometry for many-objective
         optimization. GECCO 2019 - Proceedings of the 2019 Genetic and Evolutionary Computation Conference, July, 595–603.
         https://doi.org/10.1145/3321707.3321839
 
-        Parameters
-        ----------
-        pop_size : {pop_size}
-        sampling : {sampling}
-        selection : {selection}
-        crossover : {crossover}
-        mutation : {mutation}
-        eliminate_duplicates : {eliminate_duplicates}
-        n_offsprings : {n_offsprings}
+        Args:
+            pop_size: {pop_size}
+            sampling: {sampling}
+            selection: {selection}
+            crossover: {crossover}
+            mutation: {mutation}
+            eliminate_duplicates: {eliminate_duplicates}
+            n_offsprings: {n_offsprings}
+            output: The display output used to report progress during the run.
+            **kwargs: Additional keyword arguments passed to the base algorithm.
         """
-
-        super().__init__(pop_size=pop_size,
-                         sampling=sampling,
-                         selection=selection,
-                         crossover=crossover,
-                         mutation=mutation,
-                         survival=AGEMOEASurvival(),
-                         eliminate_duplicates=eliminate_duplicates,
-                         n_offsprings=n_offsprings,
-                         output=output,
-                         advance_after_initial_infill=True,
-                         **kwargs)
+        super().__init__(
+            pop_size=pop_size,
+            sampling=sampling,
+            selection=selection,
+            crossover=crossover,
+            mutation=mutation,
+            survival=AGEMOEASurvival(),
+            eliminate_duplicates=eliminate_duplicates,
+            n_offsprings=n_offsprings,
+            output=output,
+            advance_after_initial_infill=True,
+            **kwargs,
+        )
         self.default_termination = DefaultMultiObjectiveTermination()
 
-        self.tournament_type = 'comp_by_rank_and_crowding'
+        self.tournament_type = "comp_by_rank_and_crowding"
 
     def _set_optimum(self, **kwargs):
         if not has_feasible(self.pop):
@@ -79,8 +86,8 @@ class AGEMOEA(GeneticAlgorithm):
 # Survival Selection
 # ---------------------------------------------------------------------------------------------------------
 
-class AGEMOEASurvival(Survival):
 
+class AGEMOEASurvival(Survival):
     def __init__(self) -> None:
         super().__init__(filter_infeasible=True)
         self.nds = NonDominatedSorting()
@@ -125,13 +132,20 @@ class AGEMOEASurvival(Survival):
         ideal_point = np.min(front1, axis=0)
 
         # Calculate the crowding distance of the first front as well as p and the normalization constants
-        crowd_dist[front_no == 0], p, normalization = self.survival_score(front1, ideal_point)
-        for i in range(1, max_f_no):  # skip first front since it is normalized by survival_score
+        crowd_dist[front_no == 0], p, normalization = self.survival_score(
+            front1, ideal_point
+        )
+        for i in range(
+            1, max_f_no
+        ):  # skip first front since it is normalized by survival_score
             front = F[front_no == i, :]
             m, _ = front.shape
-            with np.errstate(divide='ignore', invalid='ignore'):
+            with np.errstate(divide="ignore", invalid="ignore"):
                 front = front / normalization
-            crowd_dist[front_no == i] = 1. / self.minkowski_distances(front, ideal_point[None, :], p=p).squeeze()
+            crowd_dist[front_no == i] = (
+                1.0
+                / self.minkowski_distances(front, ideal_point[None, :], p=p).squeeze()
+            )
 
         # Select the solutions in the last front based on their crowding distances
         last = np.arange(selected.shape[0])[front_no == max_f_no]
@@ -172,7 +186,9 @@ class AGEMOEASurvival(Survival):
         nn[nn < 1e-8] = 1
 
         distances = self.pairwise_distances(front, p)
-        distances[distances < 1e-8] = 1e-8  # Replace very small entries to prevent division by zero
+        distances[distances < 1e-8] = (
+            1e-8  # Replace very small entries to prevent division by zero
+        )
 
         distances = distances / (nn[:, None])
 
@@ -180,8 +196,15 @@ class AGEMOEASurvival(Survival):
         remaining = np.arange(m)
         remaining = list(remaining[~selected])
         for i in range(m - np.sum(selected)):
-            mg = np.meshgrid(np.arange(selected.shape[0])[selected], remaining, copy=False, sparse=False)
-            D_mg = distances[tuple(mg)]  # avoid Numpy's future deprecation of array special indexing
+            mg = np.meshgrid(
+                np.arange(selected.shape[0])[selected],
+                remaining,
+                copy=False,
+                sparse=False,
+            )
+            D_mg = distances[
+                tuple(mg)
+            ]  # avoid Numpy's future deprecation of array special indexing
 
             if D_mg.shape[1] > 1:
                 # equivalent to mink(distances(remaining, selected),neighbors,2); in Matlab
@@ -206,7 +229,7 @@ class AGEMOEASurvival(Survival):
         d[extreme] = np.inf
         index = np.argmin(d)
 
-        with np.errstate(divide='ignore', invalid='ignore'):
+        with np.errstate(divide="ignore", invalid="ignore"):
             p = np.log(n) / np.log(1.0 / np.mean(front[index, :]))
 
         if np.isnan(p) or p <= 0.1:
@@ -217,7 +240,7 @@ class AGEMOEASurvival(Survival):
         return p
 
     @staticmethod
-    #@jit(nopython=True, fastmath=True)
+    # @jit(nopython=True, fastmath=True)
     def pairwise_distances(front, p):
         m = np.shape(front)[0]
         distances = np.zeros((m, m))
@@ -241,8 +264,7 @@ class AGEMOEASurvival(Survival):
 
 @jit(nopython=True, fastmath=True)
 def find_corner_solutions(front):
-    """Return the indexes of the extreme points"""
-
+    """Return the indexes of the extreme points."""
     m, n = front.shape
 
     if m <= n:
@@ -279,6 +301,7 @@ def point_2_line_distance(P, A, B):
 # Normalization
 # =========================================================================================================
 
+
 def normalize(front, extreme):
     m, n = front.shape
 
@@ -292,10 +315,14 @@ def normalize(front, extreme):
 
     try:
         hyperplane = np.linalg.solve(front[extreme], np.ones(n))
-        if any(np.isnan(hyperplane)) or any(np.isinf(hyperplane)) or any(hyperplane <= 0):
+        if (
+            any(np.isnan(hyperplane))
+            or any(np.isinf(hyperplane))
+            or any(hyperplane <= 0)
+        ):
             normalization = np.max(front, axis=0)
         else:
-            normalization = 1. / hyperplane
+            normalization = 1.0 / hyperplane
             if any(np.isnan(normalization)) or any(np.isinf(normalization)):
                 normalization = np.max(front, axis=0)
     except np.linalg.LinAlgError:

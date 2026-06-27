@@ -1,18 +1,38 @@
-import numpy as np
+"""Hypervolume indicator for multi-objective optimization."""
+
+from numpy import ndarray
 
 from pymoo.core.indicator import Indicator
-from pymoo.functions import FunctionLoader, load_function
 from pymoo.indicators.distance_indicator import derive_ideal_and_nadir_from_pf
 from pymoo.util.misc import at_least_2d_array
-from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 from moocore import hypervolume as _hypervolume
 
 
 class Hypervolume(Indicator):
+    """Hypervolume indicator for solution quality assessment."""
 
-    def __init__(self, ref_point=None, pf=None, nds=True, norm_ref_point=True, ideal=None, nadir=None, **kwargs):
+    def __init__(
+        self,
+        ref_point: ndarray | None = None,
+        pf: ndarray | None = None,
+        nds: bool = True,
+        norm_ref_point: bool = True,
+        ideal: ndarray | None = None,
+        nadir: ndarray | None = None,
+        **kwargs,
+    ) -> None:
+        """Initialize hypervolume indicator.
 
-        pf = at_least_2d_array(pf, extend_as="row")
+        Args:
+            ref_point: Reference point for hypervolume calculation.
+            pf: Pareto front reference.
+            nds: Whether to use non-dominated sorting (deprecated).
+            norm_ref_point: Whether to normalize the reference point.
+            ideal: Ideal point.
+            nadir: Nadir point.
+            **kwargs: Additional keyword arguments passed to parent.
+        """
+        pf = at_least_2d_array(pf, extend_as="row")  # type: ignore[assignment]
         ideal, nadir = derive_ideal_and_nadir_from_pf(pf, ideal=ideal, nadir=nadir)
 
         super().__init__(ideal=ideal, nadir=nadir, **kwargs)
@@ -32,15 +52,17 @@ class Hypervolume(Indicator):
             ref_point = self.normalization.forward(ref_point)
 
         self.ref_point = ref_point
-        assert self.ref_point is not None, "For Hypervolume a reference point needs to be provided!"
+        assert self.ref_point is not None, (
+            "For Hypervolume a reference point needs to be provided!"
+        )
 
-    def _do(self, F):
+    def _do(self, F: ndarray) -> float:
         # calculate the hypervolume using moocore
-        val = _hypervolume(F, ref = self.ref_point)
+        val = _hypervolume(F, ref=self.ref_point)
         return val
 
 
 class HV(Hypervolume):
-    pass
+    """Alias for Hypervolume indicator."""
 
-
+    pass  # noqa: E701

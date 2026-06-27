@@ -1,3 +1,5 @@
+"""Tournament selection operator."""
+
 import math
 
 import numpy as np
@@ -8,24 +10,25 @@ from pymoo.util import default_random_state
 
 
 class TournamentSelection(Selection):
+    """Tournament selection operator for genetic algorithms.
+
+    Simulates a tournament between individuals. The selection pressure balances
+    the greediness of the genetic algorithm.
     """
-      The Tournament selection is used to simulate a tournament between individuals. The pressure balances
-      greedy the genetic algorithm will be.
-    """
 
-    def __init__(self, func_comp=None, pressure=2, **kwargs):
+    def __init__(self, func_comp=None, pressure: int = 2, **kwargs) -> None:
+        """Initialize the tournament selection operator.
+
+        Args:
+            func_comp: Comparison function with signature comp(pop, indices).
+                Returns the index of the winner. If None, population is assumed
+                to be sorted by criterion and indices are compared directly.
+            pressure: Selection pressure (tournament size). Default is 2 for binary tournament.
+            **kwargs: Additional keyword arguments.
+
+        Raises:
+            Exception: If func_comp is not provided.
         """
-
-        Parameters
-        ----------
-        func_comp: func
-            The function to compare two individuals. It has the shape: comp(pop, indices) and returns the winner.
-            If the function is None it is assumed the population is sorted by a criterion and only indices are compared.
-
-        pressure: int
-            The selection pressure to be applied. Default it is a binary tournament.
-        """
-
         super().__init__(**kwargs)
 
         # selection pressure to be applied
@@ -33,9 +36,26 @@ class TournamentSelection(Selection):
 
         self.func_comp = func_comp
         if self.func_comp is None:
-            raise Exception("Please provide the comparing function for the tournament selection!")
+            raise Exception(
+                "Please provide the comparing function for the tournament selection!"
+            )
 
-    def _do(self, _, pop, n_select, n_parents=1, random_state=None, **kwargs):
+    def _do(  # type: ignore[override]
+        self, _, pop, n_select: int, n_parents: int = 1, random_state=None, **kwargs
+    ) -> np.ndarray:
+        """Select parents using tournament selection.
+
+        Args:
+            _: Optimization problem (unused).
+            pop: Population.
+            n_select: Number of selections.
+            n_parents: Number of parents per selection.
+            random_state: Random state for reproducibility.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            Index matrix of shape (n_select, n_parents).
+        """
         # number of random individuals needed
         n_random = n_select * n_parents * self.pressure
 
@@ -53,8 +73,34 @@ class TournamentSelection(Selection):
 
 
 @default_random_state
-def compare(a, a_val, b, b_val, method, return_random_if_equal=False, random_state=None):
-    if method == 'larger_is_better':
+def compare(
+    a,
+    a_val,
+    b,
+    b_val,
+    method: str,
+    return_random_if_equal: bool = False,
+    random_state=None,
+):
+    """Compare two individuals based on their values.
+
+    Args:
+        a: First individual index.
+        a_val: Value of first individual.
+        b: Second individual index.
+        b_val: Value of second individual.
+        method: Comparison method ('larger_is_better' or 'smaller_is_better').
+        return_random_if_equal: Whether to return random choice if values are equal.
+        random_state: Random state for reproducibility.
+
+    Returns:
+        Index of the winning individual, or None if values are equal and
+        return_random_if_equal is False.
+
+    Raises:
+        Exception: If method is not recognized.
+    """
+    if method == "larger_is_better":
         if a_val > b_val:
             return a
         elif a_val < b_val:
@@ -64,7 +110,7 @@ def compare(a, a_val, b, b_val, method, return_random_if_equal=False, random_sta
                 return random_state.choice([a, b])
             else:
                 return None
-    elif method == 'smaller_is_better':
+    elif method == "smaller_is_better":
         if a_val < b_val:
             return a
         elif a_val > b_val:
@@ -75,4 +121,5 @@ def compare(a, a_val, b, b_val, method, return_random_if_equal=False, random_sta
             else:
                 return None
     else:
-        raise Exception("Unknown method.")
+        msg = "Unknown method."
+        raise ValueError(msg)

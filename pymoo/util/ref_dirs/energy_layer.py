@@ -1,4 +1,4 @@
-
+"""Layerwise Riesz energy-based reference direction generation."""
 
 import numpy as np
 
@@ -6,19 +6,23 @@ from pymoo.gradient.grad_autograd import value_and_grad, triu_indices, row_stack
 from pymoo.util.normalization import normalize
 from pymoo.util.ref_dirs.energy import squared_dist
 from pymoo.util.ref_dirs.optimizer import Adam
-from pymoo.util.reference_direction import ReferenceDirectionFactory, scale_reference_directions
+from pymoo.util.reference_direction import (
+    ReferenceDirectionFactory,
+    scale_reference_directions,
+)
 
 
 class LayerwiseRieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
-
-    def __init__(self,
-                 n_dim,
-                 partitions,
-                 return_as_tuple=False,
-                 n_max_iter=1000,
-                 verbose=False,
-                 X=None,
-                 **kwargs):
+    def __init__(
+        self,
+        n_dim,
+        partitions,
+        return_as_tuple=False,
+        n_max_iter=1000,
+        verbose=False,
+        X=None,
+        **kwargs,
+    ):
 
         super().__init__(n_dim, **kwargs)
         self.scalings = None
@@ -41,7 +45,6 @@ class LayerwiseRieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
 
         # for each iteration of gradient descent
         for i in range(self.n_max_iter):
-
             # execute one optimization step
             _scalings, _obj = self._step(optimizer, X, scalings)
 
@@ -68,7 +71,6 @@ class LayerwiseRieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
         scalings = []
 
         for k, p in enumerate(self.partitions):
-
             if p > 1:
                 val = np.linspace(0, 1, p + 1)[1:-1]
                 _X = []

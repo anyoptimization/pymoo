@@ -1,14 +1,15 @@
-from pymoo.problems.multi.bnh import *
-from pymoo.problems.multi.carside import *
-from pymoo.problems.multi.ctp import *
-from pymoo.problems.multi.dascmop import *
-from pymoo.problems.multi.kursawe import *
-from pymoo.problems.multi.modact import *
-from pymoo.problems.multi.mw import *
-from pymoo.problems.multi.osy import *
-from pymoo.problems.multi.srn import *
-from pymoo.problems.multi.tnk import *
-from pymoo.problems.multi.truss2d import *
-from pymoo.problems.multi.welded_beam import *
-from pymoo.problems.multi.zdt import *
+"""Multi-objective optimization test problems."""
 
+from pymoo.problems.multi.bnh import *  # noqa: F401, F403
+from pymoo.problems.multi.carside import *  # noqa: F401, F403
+from pymoo.problems.multi.ctp import *  # noqa: F401, F403
+from pymoo.problems.multi.dascmop import *  # noqa: F401, F403
+from pymoo.problems.multi.kursawe import *  # noqa: F401, F403
+from pymoo.problems.multi.modact import *  # noqa: F401, F403
+from pymoo.problems.multi.mw import *  # noqa: F401, F403
+from pymoo.problems.multi.osy import *  # noqa: F401, F403
+from pymoo.problems.multi.srn import *  # noqa: F401, F403
+from pymoo.problems.multi.tnk import *  # noqa: F401, F403
+from pymoo.problems.multi.truss2d import *  # noqa: F401, F403
+from pymoo.problems.multi.welded_beam import *  # noqa: F401, F403
+from pymoo.problems.multi.zdt import *  # noqa: F401, F403

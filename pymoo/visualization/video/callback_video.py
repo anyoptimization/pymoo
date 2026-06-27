@@ -1,3 +1,5 @@
+"""Animation callback for visualization."""
+
 from pymoo.visualization.matplotlib import plt
 
 from pymoo.core.callback import Callback
@@ -5,16 +7,18 @@ from pymoo.visualization.scatter import Scatter
 
 
 class AnimationCallback(Callback):
+    """Base class for animation callbacks."""
 
-    def __init__(self,
-                 do_show=False,
-                 do_close=True,
-                 nth_gen=1,
-                 dpi=None,
-                 recorder=None,
-                 fname=None,
-                 exception_if_not_applicable=True):
-
+    def __init__(  # noqa: ANN201
+        self,
+        do_show: bool = False,
+        do_close: bool = True,
+        nth_gen: int = 1,
+        dpi=None,  # noqa: ANN001
+        recorder=None,  # noqa: ANN001
+        fname=None,  # noqa: ANN001
+        exception_if_not_applicable: bool = True,
+    ) -> None:
         super().__init__()
         self.nth_gen = nth_gen
         self.do_show = do_show
@@ -27,14 +31,16 @@ class AnimationCallback(Callback):
                 from pyrecorder.recorder import Recorder
                 from pyrecorder.writers.video import Video
                 from pyrecorder.converters.matplotlib import Matplotlib
-                self.recorder = Recorder(Video(fname), converter=Matplotlib(dpi=dpi))
-            except:
-                raise Exception("Please install or update pyrecorder for animation support: pip install -U pyrecorder")
 
-    def update(self, algorithm):
+                self.recorder = Recorder(Video(fname), converter=Matplotlib(dpi=dpi))
+            except Exception as e:
+                raise Exception(
+                    "Please install or update pyrecorder for animation support: pip install -U pyrecorder"
+                ) from e
+
+    def update(self, algorithm):  # noqa: ANN001, ANN201
         if algorithm.n_gen == 1 or algorithm.n_gen % self.nth_gen == 0:
             try:
-
                 figure = self.do(algorithm.problem, algorithm)
 
                 if self.do_show:
@@ -55,20 +61,22 @@ class AnimationCallback(Callback):
                 if self.exception_if_not_applicable:
                     raise ex
 
-    def do(self, problem, algorithm, **kwargs):
+    def do(self, problem, algorithm, **kwargs):  # noqa: ANN001, ANN201
         pass
 
 
 class ObjectiveSpaceAnimation(AnimationCallback):
+    """Animation callback for objective space visualization."""
 
-    def __init__(self, recorder=None, **kwargs):
+    def __init__(self, recorder=None, **kwargs) -> None:  # noqa: ANN001
         if recorder is None:
             from pyrecorder.recorder import Recorder
             from pyrecorder.writers.streamer import Streamer
+
             recorder = Recorder(Streamer())
         super().__init__(recorder=recorder, **kwargs)
 
-    def update(self, algorithm):
+    def update(self, algorithm):  # noqa: ANN001, ANN201
         F = algorithm.opt.get("F")
         pf = algorithm.problem.pareto_front()
 
@@ -79,4 +87,3 @@ class ObjectiveSpaceAnimation(AnimationCallback):
         sc.do()
 
         self.recorder.record()
-

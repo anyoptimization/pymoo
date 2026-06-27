@@ -1,3 +1,5 @@
+"""Mutation operator for evolutionary algorithms."""
+
 from copy import deepcopy
 
 from pymoo.core.operator import Operator
@@ -6,11 +8,16 @@ from pymoo.util import default_random_state
 
 
 class Mutation(Operator):
+    """Base class for mutation operators."""
 
     def __init__(self, prob=1.0, prob_var=None, **kwargs) -> None:
         super().__init__(**kwargs)
         self.prob = Real(prob, bounds=(0.7, 1.0), strict=(0.0, 1.0))
-        self.prob_var = Real(prob_var, bounds=(0.0, 0.25), strict=(0.0, 1.0)) if prob_var is not None else None
+        self.prob_var = (
+            Real(prob_var, bounds=(0.0, 0.25), strict=(0.0, 1.0))
+            if prob_var is not None
+            else None
+        )
 
     @default_random_state
     def do(self, problem, pop, inplace=True, *args, random_state=None, **kwargs):
@@ -40,5 +47,7 @@ class Mutation(Operator):
         return X
 
     def get_prob_var(self, problem, **kwargs):
-        prob_var = self.prob_var if self.prob_var is not None else min(0.5, 1 / problem.n_var)
+        prob_var = (
+            self.prob_var if self.prob_var is not None else min(0.5, 1 / problem.n_var)
+        )
         return get(prob_var, **kwargs)

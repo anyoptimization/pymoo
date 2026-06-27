@@ -1,3 +1,5 @@
+"""SMS-EMOA — S-Metric Selection Evolutionary Multi-Objective Algorithm."""
+
 import numpy as np
 from moocore import hv_contributions
 
@@ -22,12 +24,21 @@ from pymoo.util import default_random_state
 
 
 class LeastHypervolumeContributionSurvival(Survival):
-
     def __init__(self, eps=10.0) -> None:
         super().__init__(filter_infeasible=True)
         self.eps = eps
 
-    def _do(self, problem, pop, *args, n_survive=None, ideal=None, nadir=None, random_state=None, **kwargs):
+    def _do(
+        self,
+        problem,
+        pop,
+        *args,
+        n_survive=None,
+        ideal=None,
+        nadir=None,
+        random_state=None,
+        **kwargs,
+    ):
 
         # get the objective space values and objects
         F = pop.get("F").astype(float, copy=False)
@@ -48,13 +59,11 @@ class LeastHypervolumeContributionSurvival(Survival):
         fronts = NonDominatedSorting().do(F, n_stop_if_ranked=n_survive)
 
         for k, front in enumerate(fronts):
-
             # get the actual front as individuals
             front = pop[front]
             front.set("rank", k)
 
             if len(survivors) + len(front) > n_survive:
-
                 # normalize all the function values for the front
                 F = front.get("F")
                 F = normalize(F, ideal, nadir)
@@ -89,17 +98,28 @@ def cv_and_dom_tournament(pop, P, *args, random_state=None, **kwargs):
     S = np.full(n_tournaments, np.nan)
 
     for i in range(n_tournaments):
-
         a, b = P[i, 0], P[i, 1]
-        a_cv, a_f, b_cv, b_f, = pop[a].CV[0], pop[a].F, pop[b].CV[0], pop[b].F
+        (
+            a_cv,
+            a_f,
+            b_cv,
+            b_f,
+        ) = pop[a].CV[0], pop[a].F, pop[b].CV[0], pop[b].F
 
         # if at least one solution is infeasible
         if a_cv > 0.0 or b_cv > 0.0:
-            S[i] = compare(a, a_cv, b, b_cv, method='smaller_is_better', return_random_if_equal=True, random_state=random_state)
+            S[i] = compare(
+                a,
+                a_cv,
+                b,
+                b_cv,
+                method="smaller_is_better",
+                return_random_if_equal=True,
+                random_state=random_state,
+            )
 
         # both solutions are feasible
         else:
-
             # if one dominates another choose the nds one
             rel = Dominator.get_relation(a_f, b_f)
             if rel == 1:
@@ -118,44 +138,51 @@ def cv_and_dom_tournament(pop, P, *args, random_state=None, **kwargs):
 # Algorithm
 # ---------------------------------------------------------------------------------------------------------
 
+
 class SMSEMOA(GeneticAlgorithm):
+    def __init__(
+        self,
+        pop_size=100,
+        sampling=FloatRandomSampling(),
+        selection=TournamentSelection(func_comp=cv_and_dom_tournament),
+        crossover=SBX(),
+        mutation=PM(),
+        survival=LeastHypervolumeContributionSurvival(),
+        eliminate_duplicates=True,
+        n_offsprings=None,
+        normalize=True,
+        output=MultiObjectiveOutput(),
+        **kwargs,
+    ):
+        """Initialize the SMS-EMOA algorithm.
 
-    def __init__(self,
-                 pop_size=100,
-                 sampling=FloatRandomSampling(),
-                 selection=TournamentSelection(func_comp=cv_and_dom_tournament),
-                 crossover=SBX(),
-                 mutation=PM(),
-                 survival=LeastHypervolumeContributionSurvival(),
-                 eliminate_duplicates=True,
-                 n_offsprings=None,
-                 normalize=True,
-                 output=MultiObjectiveOutput(),
-                 **kwargs):
+        Args:
+            pop_size: {pop_size}
+            sampling: {sampling}
+            selection: {selection}
+            crossover: {crossover}
+            mutation: {mutation}
+            survival: {survival}
+            eliminate_duplicates: {eliminate_duplicates}
+            n_offsprings: {n_offsprings}
+            normalize: {normalize}
+            output: {output}
+            **kwargs: Additional keyword arguments passed to the parent class.
+
         """
-
-        Parameters
-        ----------
-        pop_size : {pop_size}
-        sampling : {sampling}
-        selection : {selection}
-        crossover : {crossover}
-        mutation : {mutation}
-        eliminate_duplicates : {eliminate_duplicates}
-        n_offsprings : {n_offsprings}
-
-        """
-        super().__init__(pop_size=pop_size,
-                         sampling=sampling,
-                         selection=selection,
-                         crossover=crossover,
-                         mutation=mutation,
-                         survival=survival,
-                         eliminate_duplicates=eliminate_duplicates,
-                         n_offsprings=n_offsprings,
-                         output=output,
-                         advance_after_initial_infill=True,
-                         **kwargs)
+        super().__init__(
+            pop_size=pop_size,
+            sampling=sampling,
+            selection=selection,
+            crossover=crossover,
+            mutation=mutation,
+            survival=survival,
+            eliminate_duplicates=eliminate_duplicates,
+            n_offsprings=n_offsprings,
+            output=output,
+            advance_after_initial_infill=True,
+            **kwargs,
+        )
 
         self.normalize = normalize
 
@@ -174,9 +201,16 @@ class SMSEMOA(GeneticAlgorithm):
         else:
             pop = self.pop
 
-
-        self.pop = self.survival.do(self.problem, pop, n_survive=self.pop_size, algorithm=self,
-                                    ideal=ideal, nadir=nadir, random_state=self.random_state, **kwargs)
+        self.pop = self.survival.do(
+            self.problem,
+            pop,
+            n_survive=self.pop_size,
+            algorithm=self,
+            ideal=ideal,
+            nadir=nadir,
+            random_state=self.random_state,
+            **kwargs,
+        )
 
 
 parse_doc_string(SMSEMOA.__init__)

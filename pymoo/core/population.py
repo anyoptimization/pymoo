@@ -1,3 +1,5 @@
+"""Population class for managing multiple individuals."""
+
 from typing import Callable, Any, Optional
 
 import numpy as np
@@ -6,7 +8,6 @@ from pymoo.core.individual import Individual
 
 
 class Population(np.ndarray):
-
     def __new__(cls, individuals: Individual | list[Individual] | None = None):
         individuals = individuals if individuals is not None else []
         if isinstance(individuals, Individual):
@@ -38,10 +39,12 @@ class Population(np.ndarray):
 
         # for each entry in the dictionary set it to each individual
         for key, values in kwargs.items():
-            is_iterable = hasattr(values, '__len__') and not isinstance(values, str)
+            is_iterable = hasattr(values, "__len__") and not isinstance(values, str)
 
             if is_iterable and len(values) != len(self):
-                raise Exception("Population Set Attribute Error: Number of values and population size do not match!")
+                raise Exception(
+                    "Population Set Attribute Error: Number of values and population size do not match!"
+                )
 
             for i in range(len(self)):
                 val = values[i] if is_iterable else values
@@ -62,7 +65,6 @@ class Population(np.ndarray):
 
         # for each individual
         for i in range(len(self)):
-
             # for each argument
             for c in args:
                 val[c].append(self[i].get(c, **kwargs))
@@ -111,7 +113,9 @@ class Population(np.ndarray):
             if len(sizes) == 1:
                 size = sizes[0]
             else:
-                raise Exception(f"Population.new needs to be called with same-sized inputs, but the sizes are {sizes}")
+                raise Exception(
+                    f"Population.new needs to be called with same-sized inputs, but the sizes are {sizes}"
+                )
         else:
             size = 0
 
@@ -121,7 +125,9 @@ class Population(np.ndarray):
         return pop
 
 
-def pop_from_array_or_individual(array: Population | np.ndarray | Individual, pop: Population | None = None) -> Population:
+def pop_from_array_or_individual(
+    array: Population | np.ndarray | Individual, pop: Population | None = None
+) -> Population:
     # the population type can be different - (different type of individuals)
     if pop is None:
         pop = Population.empty()
@@ -140,7 +146,10 @@ def pop_from_array_or_individual(array: Population | np.ndarray | Individual, po
     return pop
 
 
-def merge(a: Population | np.ndarray | Individual | None, b: Population | np.ndarray | Individual | None) -> Population:
+def merge(
+    a: Population | np.ndarray | Individual | None,
+    b: Population | np.ndarray | Individual | None,
+) -> Population:
     if a is None:
         assert b is not None, "Merge requires at least on non-empty Individual"
         return pop_from_array_or_individual(b)
@@ -161,7 +170,9 @@ def merge(a: Population | np.ndarray | Individual | None, b: Population | np.nda
 
 def interleaving_args(*args, kwargs=None):
     if len(args) % 2 != 0:
-        raise Exception(f"Even number of arguments are required but {len(args)} arguments were provided.")
+        raise Exception(
+            f"Even number of arguments are required but {len(args)} arguments were provided."
+        )
 
     if kwargs is None:
         kwargs = {}
@@ -180,6 +191,7 @@ def calc_cv(pop: Population, config: dict[Any, Any] | None = None) -> np.ndarray
     G, H = pop.get("G", "H")
 
     from pymoo.core.individual import calc_cv as func
+
     CV = np.array([func(g, h, config) for g, h in zip(G, H)])
-    
+
     return CV

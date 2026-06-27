@@ -1,3 +1,5 @@
+"""G3PCX algorithm for single-objective optimization."""
+
 import numpy as np
 
 from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival
@@ -15,29 +17,39 @@ from pymoo.operators.selection.rnd import fast_fill_random
 from pymoo.util.display.single import SingleObjectiveOutput
 
 
-# =========================================================================================================
-# Implementation
-# =========================================================================================================
-
-
 class G3PCX(LoopwiseAlgorithm):
+    """G3PCX algorithm for single-objective optimization.
 
-    def __init__(self,
-                 pop_size=100,
-                 sampling=FloatRandomSampling(),
-                 n_offsprings=2,
-                 n_parents=3,
-                 family_size=2,
-                 repair=NoRepair(),
-                 output=SingleObjectiveOutput(),
-                 **kwargs):
+    Args:
+        pop_size: The population size.
+        sampling: The sampling strategy.
+        n_offsprings: The number of offsprings per generation.
+        n_parents: The number of parents for crossover.
+        family_size: The family size for replacement.
+        repair: The repair method for out-of-bound solutions.
+        output: The output display configuration.
+    """
+
+    def __init__(
+        self,
+        pop_size=100,
+        sampling=FloatRandomSampling(),
+        n_offsprings=2,
+        n_parents=3,
+        family_size=2,
+        repair=NoRepair(),
+        output=SingleObjectiveOutput(),
+        **kwargs,
+    ):
 
         super().__init__(output=output, **kwargs)
 
         self.pop_size = Integer(pop_size, bounds=(20, 200))
         self.repair = repair
 
-        self.initialization = Initialization(sampling, repair=self.repair, eliminate_duplicates=False)
+        self.initialization = Initialization(
+            sampling, repair=self.repair, eliminate_duplicates=False
+        )
 
         self.n_offsprings = Integer(n_offsprings, bounds=(1, 10))
         self.n_parents = Integer(n_parents, bounds=(3, 10))
@@ -50,26 +62,47 @@ class G3PCX(LoopwiseAlgorithm):
         self.mutation.prob = Real(0.25, bounds=(0.0, 1.0))
 
     def _initialize_infill(self):
-        return self.initialization.do(self.problem, get(self.pop_size), algorithm=self, random_state=self.random_state)
+        return self.initialization.do(
+            self.problem,
+            get(self.pop_size),
+            algorithm=self,
+            random_state=self.random_state,
+        )
 
     def _initialize_advance(self, infills=None, **kwargs):
-        self.pop = FitnessSurvival().do(self.problem, infills, n_survive=len(infills), algorithm=self, **kwargs)
+        self.pop = FitnessSurvival().do(
+            self.problem, infills, n_survive=len(infills), algorithm=self, **kwargs
+        )
 
     def _next(self, **kwargs):
-        pop_size, n_offsprings, n_parents = get(self.pop_size, self.n_offsprings, self.n_parents)
+        pop_size, n_offsprings, n_parents = get(
+            self.pop_size, self.n_offsprings, self.n_parents
+        )
 
         # how many loops shall be iterated until one iteration has ended
         loops_per_iter = pop_size // n_offsprings
 
         for _ in range(loops_per_iter):
-
             S = np.zeros((n_offsprings, n_parents), dtype=int)
             S[:, 0] = 0
-            fast_fill_random(S, len(self.pop), columns=range(1, n_parents), random_state=self.random_state)
+            fast_fill_random(
+                S,
+                len(self.pop),
+                columns=range(1, n_parents),
+                random_state=self.random_state,
+            )
 
-            off = self.crossover(self.problem, self.pop, parents=S, algorithm=self, random_state=self.random_state)
+            off = self.crossover(
+                self.problem,
+                self.pop,
+                parents=S,
+                algorithm=self,
+                random_state=self.random_state,
+            )
 
-            off = self.mutation(self.problem, off, algorithm=self, random_state=self.random_state)
+            off = self.mutation(
+                self.problem, off, algorithm=self, random_state=self.random_state
+            )
 
             self.repair(self.problem, off, algorithm=self)
 
@@ -77,7 +110,9 @@ class G3PCX(LoopwiseAlgorithm):
 
             pop, family_size = self.pop, get(self.family_size)
 
-            rnd = self.random_state.choice(np.arange(len(pop)), size=family_size, replace=False)
+            rnd = self.random_state.choice(
+                np.arange(len(pop)), size=family_size, replace=False
+            )
             family = Population.merge(pop[rnd], off)
             pop[rnd] = FitnessSurvival().do(self.problem, family, n_survive=family_size)
 

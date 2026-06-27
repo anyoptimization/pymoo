@@ -1,10 +1,9 @@
-from math import log
+"""Termination based on an indicator reaching a threshold."""
 
 from pymoo.core.termination import Termination
 
 
 class IndicatorTermination(Termination):
-
     def __init__(self, indicator, threshold, goal, **kwargs) -> None:
         super().__init__()
 

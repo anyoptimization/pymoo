@@ -1,3 +1,5 @@
+"""Exponential crossover operator."""
+
 import numpy as np
 
 from pymoo.core.crossover import Crossover
@@ -20,11 +22,9 @@ def mut_exp(n_matings, n_var, prob, at_least_once=True, random_state=None):
 
     # create for each individual the crossover range
     for i in range(n_matings):
-
         # the actual index where we start
         start = s[i]
         for j in range(n_var):
-
             # the current position where we are pointing to
             current = (start + j) % n_var
 
@@ -41,7 +41,6 @@ def mut_exp(n_matings, n_var, prob, at_least_once=True, random_state=None):
 
 
 class ExponentialCrossover(Crossover):
-
     def __init__(self, prob_exp=0.75, **kwargs):
         super().__init__(2, 2, **kwargs)
         self.prob_exp = Real(prob_exp, bounds=(0.5, 0.9), strict=(0.0, 1.0))
@@ -50,6 +49,8 @@ class ExponentialCrossover(Crossover):
         _, n_matings, n_var = X.shape
         prob_exp = get(self.prob_exp, size=n_matings)
 
-        M = mut_exp(n_matings, n_var, prob_exp, at_least_once=True, random_state=random_state)
+        M = mut_exp(
+            n_matings, n_var, prob_exp, at_least_once=True, random_state=random_state
+        )
         _X = crossover_mask(X, M)
         return _X

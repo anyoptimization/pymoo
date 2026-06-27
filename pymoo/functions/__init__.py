@@ -1,5 +1,4 @@
-# Function package for pymoo
-# Contains both compiled (Cython) and standard (Python) implementations
+"""Function package for pymoo with compiled and standard implementations."""
 
 import importlib
 
@@ -16,7 +15,9 @@ def get_functions():
         fast_best_order_sort,
     )
     from pymoo.functions.standard.decomposition import calc_distance_to_weights
-    from pymoo.functions.standard.calc_perpendicular_distance import calc_perpendicular_distance
+    from pymoo.functions.standard.calc_perpendicular_distance import (
+        calc_perpendicular_distance,
+    )
     from pymoo.functions.standard.stochastic_ranking import stochastic_ranking
     from pymoo.functions.standard.mnn import calc_mnn, calc_2nn
     from pymoo.functions.standard.pruning_cd import calc_pcd
@@ -60,7 +61,10 @@ def get_functions():
         },
         "calc_mnn": {"python": calc_mnn, "cython": "pymoo.functions.compiled.mnn"},
         "calc_2nn": {"python": calc_2nn, "cython": "pymoo.functions.compiled.mnn"},
-        "calc_pcd": {"python": calc_pcd, "cython": "pymoo.functions.compiled.pruning_cd"},
+        "calc_pcd": {
+            "python": calc_pcd,
+            "cython": "pymoo.functions.compiled.pruning_cd",
+        },
     }
 
     return FUNCTIONS
@@ -130,5 +134,5 @@ def is_compiled():
             return True
         else:
             return False
-    except:
+    except Exception:  # noqa: BLE001
         return False

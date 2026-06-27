@@ -1,3 +1,5 @@
+"""Random selection operator (uniformly sample parents)."""
+
 import math
 
 import numpy as np
@@ -8,7 +10,6 @@ from pymoo.util import default_random_state
 
 
 class RandomSelection(Selection):
-
     def _do(self, _, pop, n_select, n_parents, *args, random_state=None, **kwargs):
         # number of random individuals needed
         n_random = n_select * n_parents
@@ -24,21 +25,7 @@ class RandomSelection(Selection):
 
 @default_random_state
 def fast_fill_random(X, N, columns=None, Xp=None, n_max_attempts=10, random_state=None):
-    """
-
-    Parameters
-    ----------
-    X : np.ndarray
-        The actually array to fill with random values.
-    N : int
-        The upper limit for the values. The values will be in range (0, ..., N)
-    columns : list
-        The columns which should be filled randomly. Other columns indicate duplicates
-    Xp : np.ndarray
-        If some other duplicates shall be avoided by default
-
-    """
-
+    """Fill the designated columns of X with non-duplicate random values."""
     _, n_cols = X.shape
 
     if columns is None:
@@ -49,7 +36,6 @@ def fast_fill_random(X, N, columns=None, Xp=None, n_max_attempts=10, random_stat
 
     # for each of the columns which should be set to be no duplicates
     for col in columns:
-
         D = X[:, J]
         if Xp is not None:
             D = np.column_stack([D, Xp])
@@ -58,12 +44,11 @@ def fast_fill_random(X, N, columns=None, Xp=None, n_max_attempts=10, random_stat
         rem = np.arange(len(X))
 
         for _ in range(n_max_attempts):
-
             # random_state is guaranteed to be set by decorator
             if len(rem) > N:
                 X[rem, col] = random_state.choice(N, replace=True, size=len(rem))
             else:
-                X[rem, col] = random_state.permutation(N)[:len(rem)]
+                X[rem, col] = random_state.permutation(N)[: len(rem)]
 
             rem = np.where((X[rem, col][:, None] == D[rem]).any(axis=1))[0]
 

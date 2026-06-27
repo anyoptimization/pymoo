@@ -1,3 +1,5 @@
+"""C-TAEA: constrained two-archive evolutionary algorithm for multi-objective optimization."""
+
 import math
 
 import numpy as np
@@ -51,13 +53,13 @@ def comp_by_cv_dom_then_random(pop, P, random_state=None, **kwargs):
 
 
 class RestrictedMating(TournamentSelection):
-    """Restricted mating approach to balance convergence and diversity archives"""
+    """Restricted mating approach to balance convergence and diversity archives."""
 
     @default_random_state
     def _do(self, problem, Hm, n_select, n_parents, random_state=None, **kwargs):
         n_pop = len(Hm) // 2
 
-        _, rank = NonDominatedSorting().do(Hm.get('F'), return_rank=True)
+        _, rank = NonDominatedSorting().do(Hm.get("F"), return_rank=True)
 
         Pc = (rank[:n_pop] == 0).sum() / len(Hm)
         Pd = (rank[n_pop:] == 0).sum() / len(Hm)
@@ -81,7 +83,6 @@ class RestrictedMating(TournamentSelection):
 
 
 class CADASurvival:
-
     def __init__(self, ref_dirs):
         self.ref_dirs = ref_dirs
         self.opt = None
@@ -105,26 +106,32 @@ class CADASurvival:
         return pop, da
 
     def _associate(self, pop):
-        """Associate each individual with a F vector and calculate decomposed fitness"""
+        """Associate each individual with a F vector and calculate decomposed fitness."""
         F = pop.get("F")
-        dist_matrix = self._calc_perpendicular_distance(F - self.ideal_point, self.ref_dirs)
+        dist_matrix = self._calc_perpendicular_distance(
+            F - self.ideal_point, self.ref_dirs
+        )
         niche_of_individuals = np.argmin(dist_matrix, axis=1)
-        FV = self._decomposition.do(F, weights=self.ref_dirs[niche_of_individuals, :],
-                                    ideal_point=self.ideal_point, weight_0=1e-4)
+        FV = self._decomposition.do(
+            F,
+            weights=self.ref_dirs[niche_of_individuals, :],
+            ideal_point=self.ideal_point,
+            weight_0=1e-4,
+        )
         pop.set("niche", niche_of_individuals)
         pop.set("FV", FV)
         return niche_of_individuals, FV
 
     @default_random_state
     def _updateCA(self, pop, n_survive, random_state=None):
-        """Update the Convergence archive (CA)"""
+        """Update the Convergence archive (CA)."""
         CV = pop.get("CV").flatten()
 
         Sc = pop[CV == 0]  # ConstraintsAsObjective population
         if len(Sc) == n_survive:  # Exactly n_survive feasible individuals
             F = Sc.get("F")
             fronts, rank = NonDominatedSorting().do(F, return_rank=True)
-            Sc.set('rank', rank)
+            Sc.set("rank", rank)
             self.opt = Sc[fronts[0]]
             return Sc
         elif len(Sc) < n_survive:  # Not enough feasible individuals
@@ -135,7 +142,7 @@ class CADASurvival:
             _, f2 = self._associate(SI)
             sub_F = np.column_stack([f1, f2])
             fronts = NonDominatedSorting().do(sub_F, n_stop_if_ranked=remainder)
-            I = []
+            I = []  # noqa: E741
             for front in fronts:
                 if len(I) + len(front) <= remainder:
                     I.extend(front)
@@ -147,14 +154,16 @@ class CADASurvival:
             S = Population.merge(Sc, SI)
             F = S.get("F")
             fronts, rank = NonDominatedSorting().do(F, return_rank=True)
-            S.set('rank', rank)
+            S.set("rank", rank)
             self.opt = S[fronts[0]]
             return S
         else:  # Too many feasible individuals
             F = Sc.get("F")
             # Filter by non-dominated sorting
-            fronts, rank = NonDominatedSorting().do(F, return_rank=True, n_stop_if_ranked=n_survive)
-            I = np.concatenate(fronts)
+            fronts, rank = NonDominatedSorting().do(
+                F, return_rank=True, n_stop_if_ranked=n_survive
+            )
+            I = np.concatenate(fronts)  # noqa: E741
             S, rank, F = Sc[I], rank[I], F[I]
             if len(S) > n_survive:
                 # Remove individual in most crowded niche and with worst fitness
@@ -162,12 +171,14 @@ class CADASurvival:
                 index, count = np.unique(niche_of_individuals, return_counts=True)
                 survivors = np.full(S.shape[0], True)
                 while survivors.sum() > n_survive:
-                    crowdest_niches, = np.where(count == count.max())
+                    (crowdest_niches,) = np.where(count == count.max())
                     worst_idx = None
                     worst_niche = None
                     worst_fit = -1
                     for crowdest_niche in crowdest_niches:
-                        crowdest, = np.where((niche_of_individuals == index[crowdest_niche]) & survivors)
+                        (crowdest,) = np.where(
+                            (niche_of_individuals == index[crowdest_niche]) & survivors
+                        )
                         niche_worst = crowdest[FV[crowdest].argmax()]
                         dist_to_max_fit = cdist(F[[niche_worst], :], F).flatten()
                         dist_to_max_fit[niche_worst] = np.inf
@@ -178,9 +189,13 @@ class CADASurvival:
                         np.fill_diagonal(dist_in_niche, np.inf)
 
                         delta_d = dist_in_niche - min_d_to_max_fit
-                        min_d_i = np.unravel_index(np.argmin(delta_d, axis=None), dist_in_niche.shape)
+                        min_d_i = np.unravel_index(
+                            np.argmin(delta_d, axis=None), dist_in_niche.shape
+                        )
                         if (delta_d[min_d_i] < 0) or (
-                                delta_d[min_d_i] == 0 and (FV[crowdest[list(min_d_i)]] > niche_worst).any()):
+                            delta_d[min_d_i] == 0
+                            and (FV[crowdest[list(min_d_i)]] > niche_worst).any()
+                        ):
                             min_d_i = list(min_d_i)
                             random_state.shuffle(min_d_i)
                             closest = crowdest[min_d_i]
@@ -192,12 +207,12 @@ class CADASurvival:
                     survivors[worst_idx] = False
                     count[worst_niche] -= 1
                 S, rank = S[survivors], rank[survivors]
-            S.set('rank', rank)
+            S.set("rank", rank)
             self.opt = S[rank == 0]
             return S
 
     def _updateDA(self, pop, Hd, n_survive):
-        """Update the Diversity archive (DA)"""
+        """Update the Diversity archive (DA)."""
         niche_Hd, FV = self._associate(Hd)
         niche_CA, _ = self._associate(pop)
 
@@ -205,13 +220,15 @@ class CADASurvival:
         S = []
         while len(S) < n_survive:
             for i in range(n_survive):
-                current_ca, = np.where(niche_CA == i)
+                (current_ca,) = np.where(niche_CA == i)
                 if len(current_ca) < itr:
                     for _ in range(itr - len(current_ca)):
                         current_da = np.where(niche_Hd == i)[0]
                         if current_da.size > 0:
-                            F = Hd[current_da].get('F')
-                            nd = NonDominatedSorting().do(F, only_non_dominated_front=True, n_stop_if_ranked=0)
+                            F = Hd[current_da].get("F")
+                            nd = NonDominatedSorting().do(
+                                F, only_non_dominated_front=True, n_stop_if_ranked=0
+                            )
                             i_best = current_da[nd[np.argmin(FV[current_da[nd]])]]
                             niche_Hd[i_best] = -1
                             if len(S) < n_survive:
@@ -225,75 +242,101 @@ class CADASurvival:
 
 
 class CTAEA(GeneticAlgorithm):
+    def __init__(
+        self,
+        ref_dirs,
+        sampling=FloatRandomSampling(),
+        selection=RestrictedMating(func_comp=comp_by_cv_dom_then_random),
+        crossover=SBX(n_offsprings=1, eta=30, prob=1.0),
+        mutation=PM(prob_var=None, eta=20),
+        eliminate_duplicates=True,
+        output=MultiObjectiveOutput(),
+        **kwargs,
+    ):
+        """C-TAEA algorithm.
 
-    def __init__(self,
-                 ref_dirs,
-                 sampling=FloatRandomSampling(),
-                 selection=RestrictedMating(func_comp=comp_by_cv_dom_then_random),
-                 crossover=SBX(n_offsprings=1, eta=30, prob=1.0),
-                 mutation=PM(prob_var=None, eta=20),
-                 eliminate_duplicates=True,
-                 output=MultiObjectiveOutput(),
-                 **kwargs):
+        Args:
+            ref_dirs: {ref_dirs}
+            sampling: {sampling}
+            selection: {selection}
+            crossover: {crossover}
+            mutation: {mutation}
+            eliminate_duplicates: {eliminate_duplicates}
+            output: The display output used to report optimization progress.
+            **kwargs: Additional keyword arguments forwarded to the base algorithm.
         """
-        CTAEA
-
-        Parameters
-        ----------
-        ref_dirs : {ref_dirs}
-        sampling : {sampling}
-        selection : {selection}
-        crossover : {crossover}
-        mutation : {mutation}
-        eliminate_duplicates : {eliminate_duplicates}
-        """
-
         self.ref_dirs = ref_dirs
         pop_size = len(ref_dirs)
 
-        if 'survival' in kwargs:
-            survival = kwargs['survival']
-            del kwargs['survival']
+        if "survival" in kwargs:
+            survival = kwargs["survival"]
+            del kwargs["survival"]
         else:
             survival = CADASurvival(ref_dirs)
 
         # Initialize diversity archives
         self.da = None
 
-        super().__init__(pop_size=pop_size,
-                         sampling=sampling,
-                         selection=selection,
-                         crossover=crossover,
-                         mutation=mutation,
-                         survival=survival,
-                         eliminate_duplicates=eliminate_duplicates,
-                         n_offsprings=pop_size,
-                         output=output,
-                         **kwargs)
+        super().__init__(
+            pop_size=pop_size,
+            sampling=sampling,
+            selection=selection,
+            crossover=crossover,
+            mutation=mutation,
+            survival=survival,
+            eliminate_duplicates=eliminate_duplicates,
+            n_offsprings=pop_size,
+            output=output,
+            **kwargs,
+        )
 
     def _setup(self, problem, **kwargs):
 
         if self.ref_dirs is not None and self.ref_dirs.shape[1] != problem.n_obj:
             raise Exception(
-                "Dimensionality of reference points must be equal to the number of objectives: %s != %s" %
-                (self.ref_dirs.shape[1], problem.n_obj))
+                "Dimensionality of reference points must be equal to the number of objectives: %s != %s"
+                % (self.ref_dirs.shape[1], problem.n_obj)
+            )
 
     def _initialize_infill(self):
-        return self.initialization.do(self.problem, self.pop_size, algorithm=self, random_state=self.random_state)
+        return self.initialization.do(
+            self.problem, self.pop_size, algorithm=self, random_state=self.random_state
+        )
 
     def _initialize_advance(self, infills=None, **kwargs):
         super()._initialize_advance(infills, **kwargs)
-        self.pop, self.da = self.survival.do(self.problem, self.pop, Population(), n_survive=len(self.pop),
-                                             algorithm=self, random_state=self.random_state)
+        self.pop, self.da = self.survival.do(
+            self.problem,
+            self.pop,
+            Population(),
+            n_survive=len(self.pop),
+            algorithm=self,
+            random_state=self.random_state,
+        )
 
     def _infill(self):
         Hm = Population.merge(self.pop, self.da)
-        return self.mating.do(self.problem, Hm, n_offsprings=self.n_offsprings, algorithm=self, random_state=self.random_state)
+        return self.mating.do(
+            self.problem,
+            Hm,
+            n_offsprings=self.n_offsprings,
+            algorithm=self,
+            random_state=self.random_state,
+        )
 
     def _advance(self, infills=None, **kwargs):
-        assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
+        assert infills is not None, (
+            "This algorithms uses the AskAndTell interface thus infills must to be provided."
+        )
         pop = Population.merge(self.pop, infills)
-        self.pop, self.da = self.survival.do(self.problem, pop, self.da, self.pop_size, algorithm=self, random_state=self.random_state)
+        self.pop, self.da = self.survival.do(
+            self.problem,
+            pop,
+            self.da,
+            self.pop_size,
+            algorithm=self,
+            random_state=self.random_state,
+        )
 
     def _set_optimum(self, **kwargs):
         if not has_feasible(self.pop):

@@ -1,3 +1,5 @@
+"""Termination based on maximum elapsed time."""
+
 import time
 
 from pymoo.core.termination import Termination
@@ -5,11 +7,10 @@ from pymoo.util.misc import time_to_int
 
 
 class TimeBasedTermination(Termination):
-
     def __init__(self, max_time) -> None:
         super().__init__()
         if isinstance(max_time, str):
-            self.max_time = time_to_int(max_time)
+            self.max_time: float = time_to_int(max_time)
         elif isinstance(max_time, int) or isinstance(max_time, float):
             self.max_time = max_time
         else:

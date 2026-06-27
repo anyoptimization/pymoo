@@ -1,9 +1,6 @@
 # mypy: disable-error-code="return-value"
 
-"""
-Module containing infrastructure for representing individuals in 
-population-based optimization algorithms.
-"""
+"""Infrastructure for representing individuals in population-based optimization."""
 
 # public API for when using ``from pymoo.core.individual import *``
 __all__ = [
@@ -15,71 +12,58 @@ __all__ = [
 
 import copy
 from typing import Optional, Callable, Any
-from typing import Tuple
 from typing import Union
 from warnings import warn
 import numpy as np
 
 
 def default_config() -> dict:
-    """
-    Get default constraint violation configuration settings.
+    """Get default constraint violation configuration settings.
 
-    Returns
-    -------
-    out : dict
-        A dictionary of default constraint violation settings.
+    Returns:
+        dict: A dictionary of default constraint violation settings.
     """
     return dict(
-        cache = True,
-        cv_eps = 0.0,
-        cv_ieq = dict(scale=None, eps=0.0, pow=None, func=np.sum),
-        cv_eq = dict(scale=None, eps=1e-4, pow=None, func=np.sum),
+        cache=True,
+        cv_eps=0.0,
+        cv_ieq=dict(scale=None, eps=0.0, pow=None, func=np.sum),
+        cv_eq=dict(scale=None, eps=1e-4, pow=None, func=np.sum),
     )
 
 
 class Individual:
-    """
-    Base class for representing an individual in a population-based 
-    optimization algorithm.
-    """
+    """Base class for representing an individual in a population-based optimization."""
 
     # function: function to generate default configuration settings
     default_config = default_config
 
     def __init__(
-            self, 
-            config: Optional[dict] = None, 
-            **kwargs: Any,
-        ) -> None:
-        """
-        Constructor for the ``Invididual`` class.
+        self,
+        config: Optional[dict] = None,
+        **kwargs: Any,
+    ) -> None:
+        """Constructor for the Individual class.
 
-        Parameters
-        ----------
-        config : dict, None
-            A dictionary of configuration metadata.
-            If ``None``, use a class-dependent default configuration.
-        kwargs : Any
-            Additional keyword arguments containing data which is to be stored 
-            in the ``Individual``.
+        Args:
+            config: A dictionary of configuration metadata. If None, uses a class-dependent default.
+            kwargs: Additional keyword arguments containing data to store in the Individual.
         """
         # set decision variable vector to None
         self._X: np.ndarray | None = None
 
-        # set values objective(s), inequality constraint(s), equality 
+        # set values objective(s), inequality constraint(s), equality
         # contstraint(s) to None
         self._F: np.ndarray | None = None
         self._G: np.ndarray | None = None
         self._H: np.ndarray | None = None
-        
-        # set first derivatives of objective(s), inequality constraint(s), 
+
+        # set first derivatives of objective(s), inequality constraint(s),
         # equality contstraint(s) to None
         self._dF: np.ndarray | None = None
         self._dG: np.ndarray | None = None
         self._dH: np.ndarray | None = None
-        
-        # set second derivatives of objective(s), inequality constraint(s), 
+
+        # set second derivatives of objective(s), inequality constraint(s),
         # equality contstraint(s) to None
         self._ddF: np.ndarray | None = None
         self._ddG: np.ndarray | None = None
@@ -110,18 +94,16 @@ class Individual:
                 self.data[k] = v
 
     def reset(
-            self, 
-            data: bool = True,
-        ) -> None:
-        """
-        Reset the value of objective(s), inequality constraint(s), equality 
-        constraint(s), their first and second derivatives, the constraint 
-        violation, and the metadata to empty values.
+        self,
+        data: bool = True,
+    ) -> None:
+        """Reset objectives, constraints, derivatives, and violation values.
 
-        Parameters
-        ----------
-        data : bool
-            Whether to reset metadata associated with the ``Individiual``.
+        Resets all objective values, inequality/equality constraints, their first
+        and second derivatives, constraint violations, and metadata to empty values.
+
+        Args:
+            data: Whether to reset metadata associated with the Individual.
         """
         # create an empty array to share
         empty = np.array([])
@@ -154,21 +136,16 @@ class Individual:
         self.evaluated = set()
 
     def has(
-            self, 
-            key: str,
-        ) -> bool:
-        """
-        Determine whether an individual has a provided key or not.
+        self,
+        key: str,
+    ) -> bool:
+        """Determine whether an individual has a provided key.
 
-        Parameters
-        ----------
-        key : str
-            The key for which to test.
-        
-        Returns
-        -------
-        out : bool
-            Whether the ``Individual`` has the provided key.
+        Args:
+            key: The key for which to test.
+
+        Returns:
+            bool: Whether the Individual has the provided key.
         """
         return hasattr(self.__class__, key) or key in self.data
 
@@ -178,110 +155,82 @@ class Individual:
 
     @property
     def X(self) -> np.ndarray:
-        """
-        Get the decision vector for an individual.
+        """Get the decision vector for an individual.
 
-        Returns
-        -------
-        out : np.ndarray
-            The decision variable for the individual.
+        Returns:
+            np.ndarray: The decision variable for the individual.
         """
         return self._X
 
     @X.setter
     def X(self, value: np.ndarray) -> None:
-        """
-        Set the decision vector for an individual.
+        """Set the decision vector for an individual.
 
-        Parameters
-        ----------
-        value : np.ndarray
-            The decision variable for the individual.
+        Args:
+            value: The decision variable for the individual.
         """
         self._X = value
 
     @property
     def F(self) -> np.ndarray:
-        """
-        Get the objective function vector for an individual.
+        """Get the objective function vector for an individual.
 
-        Returns
-        -------
-        out : np.ndarray
-            The objective function vector for the individual.
+        Returns:
+            np.ndarray: The objective function vector for the individual.
         """
         return self._F
 
     @F.setter
     def F(self, value: np.ndarray) -> None:
-        """
-        Set the objective function vector for an individual.
+        """Set the objective function vector for an individual.
 
-        Parameters
-        ----------
-        value : np.ndarray
-            The objective function vector for the individual.
+        Args:
+            value: The objective function vector for the individual.
         """
         self._F = value
 
     @property
     def G(self) -> np.ndarray:
-        """
-        Get the inequality constraint vector for an individual.
+        """Get the inequality constraint vector for an individual.
 
-        Returns
-        -------
-        out : np.ndarray
-            The inequality constraint vector for the individual.
+        Returns:
+            np.ndarray: The inequality constraint vector for the individual.
         """
         return self._G
 
     @G.setter
     def G(self, value: np.ndarray) -> None:
-        """
-        Set the inequality constraint vector for an individual.
+        """Set the inequality constraint vector for an individual.
 
-        Parameters
-        ----------
-        value : np.ndarray
-            The inequality constraint vector for the individual.
+        Args:
+            value: The inequality constraint vector for the individual.
         """
         self._G = value
 
     @property
     def H(self) -> np.ndarray:
-        """
-        Get the equality constraint vector for an individual.
+        """Get the equality constraint vector for an individual.
 
-        Returns
-        -------
-        out : np.ndarray
-            The equality constraint vector for the individual.
+        Returns:
+            np.ndarray: The equality constraint vector for the individual.
         """
         return self._H
 
     @H.setter
     def H(self, value: np.ndarray) -> None:
-        """
-        Get the equality constraint vector for an individual.
+        """Set the equality constraint vector for an individual.
 
-        Parameters
-        ----------
-        value : np.ndarray
-            The equality constraint vector for the individual.
+        Args:
+            value: The equality constraint vector for the individual.
         """
         self._H = value
 
     @property
     def CV(self) -> np.ndarray:
-        """
-        Get the constraint violation vector for an individual by either reading 
-        it from the cache or calculating it.
+        """Get the constraint violation vector from cache or calculate it.
 
-        Returns
-        -------
-        out : np.ndarray
-            The constraint violation vector for an individual.
+        Returns:
+            np.ndarray: The constraint violation vector for the individual.
         """
         config = self.config
         cache = config["cache"]
@@ -294,26 +243,19 @@ class Individual:
 
     @CV.setter
     def CV(self, value: np.ndarray) -> None:
-        """
-        Set the constraint violation vector for an individual.
+        """Set the constraint violation vector for an individual.
 
-        Parameters
-        ----------
-        value : np.ndarray
-            The constraint violation vector for the individual.
+        Args:
+            value: The constraint violation vector for the individual.
         """
         self._CV = value
 
     @property
     def FEAS(self) -> np.ndarray:
-        """
-        Get whether an individual is feasible for each constraint.
+        """Get whether an individual is feasible for each constraint.
 
-        Returns
-        -------
-        out : np.ndarray
-            An array containing whether each constraint is feasible for an 
-            individual.
+        Returns:
+            np.ndarray: An array of feasibility flags for each constraint.
         """
         eps = self.config.get("cv_eps", 0.0)
         return self.CV <= eps
@@ -324,73 +266,55 @@ class Individual:
 
     @property
     def dF(self) -> np.ndarray:
-        """
-        Get the objective function vector first derivatives for an individual.
+        """Get the objective function first derivatives for an individual.
 
-        Returns
-        -------
-        out : np.ndarray
-            The objective function vector first derivatives for the individual.
+        Returns:
+            np.ndarray: The first derivatives of the objective function vector.
         """
         return self._dF
 
     @dF.setter
     def dF(self, value: np.ndarray) -> None:
-        """
-        Set the objective function vector first derivatives for an individual.
+        """Set the objective function first derivatives for an individual.
 
-        Parameters
-        ----------
-        value : np.ndarray
-            The objective function vector first derivatives for the individual.
+        Args:
+            value: The first derivatives of the objective function vector.
         """
         self._dF = value
 
     @property
     def dG(self) -> np.ndarray:
-        """
-        Get the inequality constraint(s) first derivatives for an individual.
+        """Get the inequality constraint first derivatives for an individual.
 
-        Returns
-        -------
-        out : np.ndarray
-            The inequality constraint(s) first derivatives for the individual.
+        Returns:
+            np.ndarray: The first derivatives of the inequality constraints.
         """
         return self._dG
 
     @dG.setter
     def dG(self, value: np.ndarray) -> None:
-        """
-        Set the inequality constraint(s) first derivatives for an individual.
+        """Set the inequality constraint first derivatives for an individual.
 
-        Parameters
-        ----------
-        value : np.ndarray
-            The inequality constraint(s) first derivatives for the individual.
+        Args:
+            value: The first derivatives of the inequality constraints.
         """
         self._dG = value
 
     @property
     def dH(self) -> np.ndarray:
-        """
-        Get the equality constraint(s) first derivatives for an individual.
+        """Get the equality constraint first derivatives for an individual.
 
-        Returns
-        -------
-        out : np.ndarray
-            The equality constraint(s) first derivatives for the individual.
+        Returns:
+            np.ndarray: The first derivatives of the equality constraints.
         """
         return self._dH
 
     @dH.setter
     def dH(self, value: np.ndarray) -> None:
-        """
-        Set the equality constraint(s) first derivatives for an individual.
+        """Set the equality constraint first derivatives for an individual.
 
-        Parameters
-        ----------
-        value : np.ndarray
-            The equality constraint(s) first derivatives for the individual.
+        Args:
+            value: The first derivatives of the equality constraints.
         """
         self._dH = value
 
@@ -400,73 +324,55 @@ class Individual:
 
     @property
     def ddF(self) -> np.ndarray:
-        """
-        Get the objective function vector second derivatives for an individual.
+        """Get the objective function second derivatives for an individual.
 
-        Returns
-        -------
-        out : np.ndarray
-            The objective function vector second derivatives for the individual.
+        Returns:
+            np.ndarray: The second derivatives of the objective function vector.
         """
         return self._ddF
 
     @ddF.setter
     def ddF(self, value: np.ndarray) -> None:
-        """
-        Set the objective function vector second derivatives for an individual.
+        """Set the objective function second derivatives for an individual.
 
-        Parameters
-        ----------
-        value : np.ndarray
-            The objective function vector second derivatives for the individual.
+        Args:
+            value: The second derivatives of the objective function vector.
         """
         self._ddF = value
 
     @property
     def ddG(self) -> np.ndarray:
-        """
-        Get the inequality constraint(s) second derivatives for an individual.
+        """Get the inequality constraint second derivatives for an individual.
 
-        Returns
-        -------
-        out : np.ndarray
-            The inequality constraint(s) second derivatives for the individual.
+        Returns:
+            np.ndarray: The second derivatives of the inequality constraints.
         """
         return self._ddG
 
     @ddG.setter
     def ddG(self, value: np.ndarray) -> None:
-        """
-        Set the inequality constraint(s) second derivatives for an individual.
+        """Set the inequality constraint second derivatives for an individual.
 
-        Parameters
-        ----------
-        value : np.ndarray
-            The inequality constraint(s) second derivatives for the individual.
+        Args:
+            value: The second derivatives of the inequality constraints.
         """
         self._ddG = value
 
     @property
     def ddH(self) -> np.ndarray:
-        """
-        Get the equality constraint(s) second derivatives for an individual.
+        """Get the equality constraint second derivatives for an individual.
 
-        Returns
-        -------
-        out : np.ndarray
-            The equality constraint(s) second derivatives for the individual.
+        Returns:
+            np.ndarray: The second derivatives of the equality constraints.
         """
         return self._ddH
 
     @ddH.setter
     def ddH(self, value: np.ndarray) -> None:
-        """
-        Set the equality constraint(s) second derivatives for an individual.
+        """Set the equality constraint second derivatives for an individual.
 
-        Parameters
-        ----------
-        value : np.ndarray
-            The equality constraint(s) second derivatives for the individual.
+        Args:
+            value: The second derivatives of the equality constraints.
         """
         self._ddH = value
 
@@ -476,38 +382,28 @@ class Individual:
 
     @property
     def x(self) -> np.ndarray:
-        """
-        Convenience property. Get the decision vector for an individual.
+        """Get the decision vector for an individual.
 
-        Returns
-        -------
-        out : np.ndarray
-            The decision variable for the individual.
+        Returns:
+            np.ndarray: The decision variable for the individual.
         """
         return self.X
 
     @property
     def f(self) -> float:
-        """
-        Convenience property. Get the first objective function value for an individual.
+        """Get the first objective function value for an individual.
 
-        Returns
-        -------
-        out : float
-            The first objective function value for the individual.
+        Returns:
+            float: The first objective function value for the individual.
         """
         return self.F[0]
 
     @property
-    def cv(self) -> Union[float,None]:
-        """
-        Convenience property. Get the first constraint violation value for an 
-        individual by either reading it from the cache or calculating it.
+    def cv(self) -> Union[float, None]:
+        """Get the first constraint violation value for an individual.
 
-        Returns
-        -------
-        out : float, None
-            The constraint violation vector for an individual.
+        Returns:
+            float or None: The first constraint violation value for the individual.
         """
         if self.CV is None:
             return None
@@ -516,14 +412,10 @@ class Individual:
 
     @property
     def feas(self) -> bool:
-        """
-        Convenience property. Get whether an individual is feasible for the 
-        first constraint.
+        """Get whether an individual is feasible for the first constraint.
 
-        Returns
-        -------
-        out : bool
-            Whether an individual is feasible for the first constraint.
+        Returns:
+            bool: Whether the individual is feasible for the first constraint.
         """
         return self.FEAS[0]
 
@@ -533,19 +425,17 @@ class Individual:
 
     @property
     def feasible(self) -> np.ndarray:
-        """
-        Deprecated. Get whether an individual is feasible for each constraint.
+        """Get whether an individual is feasible for each constraint.
 
-        Returns
-        -------
-        out : np.ndarray
-            An array containing whether each constraint is feasible for an 
-            individual.
+        Deprecated. Use FEAS instead.
+
+        Returns:
+            np.ndarray: An array of feasibility flags for each constraint.
         """
         warn(
             "The ``feasible`` property for ``pymoo.core.individual.Individual`` is deprecated",
             DeprecationWarning,
-            stacklevel = 2,
+            stacklevel=2,
         )
         return self.FEAS
 
@@ -553,40 +443,28 @@ class Individual:
     # Other Functions
     # -------------------------------------------------------
 
-    def set_by_dict(
-            self, 
-            **kwargs: Any
-        ) -> None:
-        """
-        Set an individual's data or metadata using values in a dictionary.
+    def set_by_dict(self, **kwargs: Any) -> None:
+        """Set an individual's data or metadata using values in a dictionary.
 
-        Parameters
-        ----------
-        kwargs : Any
-            Keyword arguments defining the data to set.
+        Args:
+            kwargs: Keyword arguments defining the data to set.
         """
         for k, v in kwargs.items():
             self.set(k, v)
 
     def set(
-            self, 
-            key: str, 
-            value: object,
-        ) -> 'Individual':
-        """
-        Set an individual's data or metadata based on a key and value.
+        self,
+        key: str,
+        value: object,
+    ) -> "Individual":
+        """Set an individual's data or metadata based on a key and value.
 
-        Parameters
-        ----------
-        key : str
-            Key of the data for which to set.
-        value : object
-            Value of the data for which to set.
-        
-        Returns
-        -------
-        out : Individual
-            A reference to the ``Individual`` for which values were set.
+        Args:
+            key: Key of the data for which to set.
+            value: Value of the data for which to set.
+
+        Returns:
+            Individual: A reference to the Individual for which values were set.
         """
         if hasattr(self, key):
             setattr(self, key, value)
@@ -595,22 +473,17 @@ class Individual:
         return self
 
     def get(
-            self, 
-            *keys: str,
-        ) -> Union[tuple, object]:
-        """
-        Get the values for one or more keys for an individual.
+        self,
+        *keys: str,
+    ) -> Union[tuple, object]:
+        """Get the values for one or more keys for an individual.
 
-        Parameters
-        ----------
-        keys : str
-            Keys for which to get values.
+        Args:
+            keys: Keys for which to get values.
 
-        Returns
-        -------
-        out : tuple, object
-            If more than one key provided, return a ``tuple`` of retrieved values.
-            If a single key provided, return the retrieved value.
+        Returns:
+            tuple or object: If more than one key provided, returns a tuple of values.
+                If a single key provided, returns the retrieved value.
         """
         ret = []
 
@@ -630,52 +503,39 @@ class Individual:
             return tuple(ret)
 
     def duplicate(
-            self, 
-            key: str, 
-            new_key: str,
-        ) -> None:
-        """
-        Duplicate a key to a new key.
+        self,
+        key: str,
+        new_key: str,
+    ) -> None:
+        """Duplicate a key to a new key.
 
-        Parameters
-        ----------
-        key : str
-            Name of the key to duplicated.
-        new_key : str
-            Name of the key to which to duplicate the original key.
+        Args:
+            key: Name of the key to duplicate.
+            new_key: Name of the key to which to duplicate the original key.
         """
         self.set(new_key, self.get(key))
 
-    def new(self) -> 'Individual':
-        """
-        Create a new instance of this class.
+    def new(self) -> "Individual":
+        """Create a new instance of this class.
 
-        Returns
-        -------
-        out : Individual
-            A new instance of an ``Individual``.
+        Returns:
+            Individual: A new instance of an Individual.
         """
         return self.__class__()
 
     def copy(
-            self, 
-            other: Optional['Individual'] = None, 
-            deep: bool = True,
-        ) -> 'Individual':
-        """
-        Copy an individual.
+        self,
+        other: Optional["Individual"] = None,
+        deep: bool = True,
+    ) -> "Individual":
+        """Copy an individual.
 
-        Parameters
-        ----------
-        other : Individual, None
-            The individual to copy. If ``None``, assumed to be self.
-        deep : bool
-            Whether to deep copy the individual.
-        
-        Returns
-        -------
-        out : Individual
-            A copy of the individual.
+        Args:
+            other: The individual to copy. If None, assumed to be self.
+            deep: Whether to deep copy the individual.
+
+        Returns:
+            Individual: A copy of the individual.
         """
         obj = self.new()
 
@@ -697,27 +557,19 @@ class Individual:
 
 
 def calc_cv(
-        G: Optional[np.ndarray] = None, 
-        H: Optional[np.ndarray] = None, 
-        config: Optional[dict] = None,
-    ) -> np.ndarray:
-    """
-    Calculate the constraint violation(s) for a set of inequality constraint(s), 
-    equality constraint(s), and a scoring configuration.
+    G: Optional[np.ndarray] = None,
+    H: Optional[np.ndarray] = None,
+    config: Optional[dict] = None,
+) -> np.ndarray:
+    """Calculate constraint violations from inequality and equality constraints.
 
-    Parameters
-    ----------
-    G : np.ndarray, None
-        A vector of inequality constraint(s).
-    H : np.ndarray, None
-        A vector of equality constraint(s).
-    config : dict, None
-        A dictionary of constraint violation scoring configuration settings.
-    
-    Returns
-    -------
-    out : np.ndarray
-        An array of constraint violations for each objective.
+    Args:
+        G: A vector of inequality constraint(s).
+        H: A vector of equality constraint(s).
+        config: A dictionary of constraint violation scoring configuration settings.
+
+    Returns:
+        np.ndarray: An array of constraint violations for each objective.
     """
     if G is None:
         G = np.array([])
@@ -746,27 +598,23 @@ def calc_cv(
 
 
 def constr_to_cv(
-        c: Union[np.ndarray,None], 
-        eps: float = 0.0, 
-        scale: Optional[float] = None, 
-        pow: Optional[float] = None, 
-        func: Callable = np.mean,
-    ) -> float:
-    """
-    Convert a constraint to a constraint violation.
+    c: Union[np.ndarray, None],
+    eps: float = 0.0,
+    scale: Optional[float] = None,
+    pow: Optional[float] = None,
+    func: Callable = np.mean,
+) -> float:
+    """Convert a constraint to a constraint violation.
 
-    c : np.ndarray
-        An array of constraint violations.
-    eps : float
-        Error tolerance bounds.
-    scale : float, None
-        The scale to apply to a constraint violation.
-        If ``None``, no scale alteration is applied.
-    pow : float, None
-        A power to apply to a constraint violation.
-        If ``None``, no power alteration is applied.
-    func : function
-        A function to convert multiple constraint violations into a single score.
+    Args:
+        c: An array of constraint violations.
+        eps: Error tolerance bounds.
+        scale: The scale to apply to a constraint violation. If None, no scale is applied.
+        pow: A power to apply to a constraint violation. If None, no power is applied.
+        func: A function to convert multiple constraint violations into a single score.
+
+    Returns:
+        float: The constraint violation score.
     """
     if c is None or len(c) == 0:
         return 0.0
@@ -780,6 +628,6 @@ def constr_to_cv(
 
     # if a pow factor has been provided
     if pow is not None:
-        c = c ** pow
+        c = c**pow
 
     return func(c)

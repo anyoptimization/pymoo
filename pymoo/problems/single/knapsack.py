@@ -1,4 +1,5 @@
-import numpy as np
+"""Knapsack optimization problems (single and multi-objective)."""
+
 import numpy as np
 
 from pymoo.core.problem import Problem
@@ -6,12 +7,13 @@ from pymoo.util import default_random_state
 
 
 class Knapsack(Problem):
-    def __init__(self,
-                 n_items,  # number of items that can be picked up
-                 W,  # weights for each item
-                 P,  # profit of each item
-                 C,  # maximum capacity
-                 ):
+    def __init__(
+        self,
+        n_items,  # number of items that can be picked up
+        W,  # weights for each item
+        P,  # profit of each item
+        C,  # maximum capacity
+    ):
         super().__init__(n_var=n_items, n_obj=1, n_ieq_constr=1, xl=0, xu=1, vtype=bool)
 
         self.W = W
@@ -20,7 +22,7 @@ class Knapsack(Problem):
 
     def _evaluate(self, x, out, *args, **kwargs):
         out["F"] = -np.sum(self.P * x, axis=1)
-        out["G"] = (np.sum(self.W * x, axis=1) - self.C)
+        out["G"] = np.sum(self.W * x, axis=1) - self.C
 
 
 class MultiObjectiveKnapsack(Knapsack):
@@ -28,15 +30,17 @@ class MultiObjectiveKnapsack(Knapsack):
         super().__init__(*args)
 
     def _evaluate(self, x, out, *args, **kwargs):
-        f1 = - np.sum(self.P * x, axis=1)
+        f1 = -np.sum(self.P * x, axis=1)
         f2 = np.sum(x, axis=1)
 
         out["F"] = np.column_stack([f1, f2])
-        out["G"] = (np.sum(self.W * x, axis=1) - self.C)
+        out["G"] = np.sum(self.W * x, axis=1) - self.C
 
 
 @default_random_state(seed=1)
-def create_random_knapsack_problem(n_items, variant="single", random_state=None, **kwargs):
+def create_random_knapsack_problem(
+    n_items, variant="single", random_state=None, **kwargs
+):
     P = random_state.integers(1, 100, size=n_items)
     W = random_state.integers(1, 100, size=n_items)
     C = int(np.sum(W) / 10)

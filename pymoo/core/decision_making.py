@@ -1,3 +1,5 @@
+"""Decision making indicators for multi-objective optimization."""
+
 import numpy as np
 from scipy.spatial.ckdtree import cKDTree
 
@@ -5,7 +7,6 @@ from pymoo.core.indicator import Indicator
 
 
 class DecisionMaking(Indicator):
-
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.default_if_empty = None
@@ -15,12 +16,9 @@ class DecisionMaking(Indicator):
 
 
 class NeighborFinder:
-
-    def __init__(self, N,
-                 epsilon=0.125,
-                 n_neighbors=None,
-                 n_min_neigbors=None,
-                 consider_2d=True):
+    def __init__(
+        self, N, epsilon=0.125, n_neighbors=None, n_min_neigbors=None, consider_2d=True
+    ):
 
         super().__init__()
         self.N = N
@@ -65,18 +63,23 @@ class NeighborFinder:
                 neighbours.append(self.rank[pos + 1])
 
         else:
-
             # for each neighbour in a specific radius of that solution
             if self.epsilon is not None:
-                neighbours = self.tree.query_ball_point([self.N[i]], self.epsilon).tolist()[0]
+                neighbours = self.tree.query_ball_point(
+                    [self.N[i]], self.epsilon
+                ).tolist()[0]
             elif self.n_neighbors is not None:
-                neighbours = self.tree.query([self.N[i]], k=self.n_neighbors + 1)[1].tolist()[0]
+                neighbours = self.tree.query([self.N[i]], k=self.n_neighbors + 1)[
+                    1
+                ].tolist()[0]
             else:
                 raise Exception("Either define epsilon or number of neighbors.")
 
             # in case n_min_neigbors is enabled
             if len(neighbours) < self.n_min_neigbors:
-                neighbours = self.tree.query([self.N[i]], k=self.n_min_neigbors + 1)[1].tolist()[0]
+                neighbours = self.tree.query([self.N[i]], k=self.n_min_neigbors + 1)[
+                    1
+                ].tolist()[0]
 
         return neighbours
 
@@ -84,7 +87,9 @@ class NeighborFinder:
 def find_outliers_upper_tail(mu):
 
     # remove values that are nan
-    I = np.where(np.logical_and(np.logical_not(np.isnan(mu)), np.logical_not(np.isinf(mu))))[0]
+    I = np.where(  # noqa: E741
+        np.logical_and(np.logical_not(np.isnan(mu)), np.logical_not(np.isinf(mu)))
+    )[0]
     mu = mu[I]
 
     # calculate mean and sigma

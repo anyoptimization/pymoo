@@ -1,3 +1,5 @@
+"""Vendored CMA-ES helper routines."""
+
 import time
 
 import numpy as np
@@ -9,7 +11,7 @@ from cma.utilities.math import Mh
 
 from pymoo.util import default_random_state
 
-all_stoppings = []
+all_stoppings: list = []
 
 def void(_):
     pass

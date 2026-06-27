@@ -1,46 +1,48 @@
+"""Radviz plot visualization for multi-objective optimization results."""
+
 from pymoo.docs import parse_doc_string
 from pymoo.core.plot import Plot
 from pymoo.util.misc import set_if_none_from_tuples
-from pymoo.visualization.util import plot_circle, plot_radar_line, plot_axis_labels, equal_axis, no_ticks, \
-    get_uniform_points_around_circle
+from pymoo.visualization.util import (
+    plot_circle,
+    plot_radar_line,
+    plot_axis_labels,
+    equal_axis,
+    no_ticks,
+    get_uniform_points_around_circle,
+)
 
 
 class Radviz(Plot):
+    """Radviz plot visualization.
 
-    def __init__(self, endpoint_style={}, **kwargs):
-        """
+    Args:
+        axis_style: {axis_style}
+        endpoint_style: Endpoints are drawn at each extreme point of an objective. This style can be modified.
+        labels: {labels}
+        figsize: {figsize}
+        title: {title}
+        legend: {legend}
+        tight_layout: {tight_layout}
+        cmap: {cmap}
+    """
 
-        Radviz Plot
-
-        Parameters
-        ----------
-
-        axis_style : {axis_style}
-        endpoint_style : dict
-            Endpoints are drawn at each extreme point of an objective. This style can be modified.
-        labels : {labels}
-
-        Other Parameters
-        ----------------
-
-        figsize : {figsize}
-        title : {title}
-        legend : {legend}
-        tight_layout : {tight_layout}
-        cmap : {cmap}
-
-        """
-
+    def __init__(self, endpoint_style: dict | None = None, **kwargs) -> None:
         super().__init__(**kwargs)
 
         # set the default axis style
-        set_if_none_from_tuples(self.axis_style, ("color", "black"), ("linewidth", 1), ("alpha", 0.75))
+        set_if_none_from_tuples(
+            self.axis_style, ("color", "black"), ("linewidth", 1), ("alpha", 0.75)
+        )
 
+        if endpoint_style is None:
+            endpoint_style = {}
         self.endpoint_style = endpoint_style
-        set_if_none_from_tuples(self.endpoint_style, ("color", "black"), ("s", 70), ("alpha", 0.3))
+        set_if_none_from_tuples(
+            self.endpoint_style, ("color", "black"), ("s", 70), ("alpha", 0.3)
+        )
 
-    def _do(self):
-
+    def _do(self) -> None:
         # initial a figure with a single plot
         self.init_figure()
 

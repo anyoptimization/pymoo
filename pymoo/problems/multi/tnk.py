@@ -1,3 +1,7 @@
+"""TNK test problem."""
+
+from typing import Any
+
 import pymoo.gradient.toolbox as anp
 import numpy as np
 
@@ -6,19 +10,26 @@ from pymoo.util.remote import Remote
 
 
 class TNK(Problem):
-    def __init__(self):
+    """TNK test problem with constraints."""
+
+    def __init__(self) -> None:
         super().__init__(n_var=2, n_obj=2, n_ieq_constr=2, vtype=float)
         self.xl = np.array([0, 1e-30])
         self.xu = np.array([np.pi, np.pi])
 
-    def _evaluate(self, x, out, *args, **kwargs):
+    def _evaluate(self, x: Any, out: Any, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG002
         f1 = x[:, 0]
         f2 = x[:, 1]
-        g1 = -(anp.square(x[:, 0]) + anp.square(x[:, 1]) - 1.0 - 0.1 * anp.cos(16.0 * anp.arctan(x[:, 0] / x[:, 1])))
+        g1 = -(
+            anp.square(x[:, 0])
+            + anp.square(x[:, 1])
+            - 1.0
+            - 0.1 * anp.cos(16.0 * anp.arctan(x[:, 0] / x[:, 1]))
+        )
         g2 = 2 * (anp.square(x[:, 0] - 0.5) + anp.square(x[:, 1] - 0.5)) - 1
 
         out["F"] = anp.column_stack([f1, f2])
         out["G"] = anp.column_stack([g1, g2])
 
-    def _calc_pareto_front(self, *args, **kwargs):
+    def _calc_pareto_front(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG002
         return Remote.get_instance().load("pymoo", "pf", "tnk.pf")

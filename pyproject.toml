@@ -28,7 +28,7 @@ dependencies = [
     "scipy>=1.1",
     "moocore>=0.1.7",
     "autograd>=1.4",
-    "cma>=3.2.2",
+    "cma>=3.4.0",
     "matplotlib>=3",
     "alive_progress",
     "Deprecated",
@@ -45,11 +45,42 @@ version = { attr = "pymoo.version.__version__" }
 where = ["."]
 include = ["pymoo*"]
 
+# Docstrings: google convention (types live in annotations, not duplicated in
+# docstrings). Migrating numpy -> google module-by-module; the docs build renders
+# both via sphinx napoleon during the transition.
+[tool.ruff]
+# Whole-project (target-less `ruff check`/`format`) scopes to the package, matching
+# mypy's files=["pymoo"]; the non-source trees aren't part of the quality gate.
+# Per-file `pyclawd check <file>` still works on any explicitly-passed path.
+extend-exclude = ["docs", "examples", "tests", "benchmark", "pymoo/vendor"]
+
+[tool.ruff.lint]
+extend-select = ["D"]
+# Enforce docstring *style* (D2xx/D4xx) + module/package descriptions (D100/D104,
+# = the one-line-per-file convention). Do NOT mandate a docstring on every class/
+# method/function/init/magic — that's a separate "document the whole API" effort.
+ignore = ["D101", "D102", "D103", "D105", "D107"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+# The gate runs `mypy pymoo` (whole package, ~315 files). A bare module target
+# (files=["pymoo"]) collapses to the top module and checks only one file, so the
+# package is passed explicitly via typecheck_cmd. explicit_package_bases + mypy_path
+# keep module resolution stable.
+explicit_package_bases = true
+mypy_path = "."
+
 [project.optional-dependencies]
 dev = [
     "numba",
     "pytest",
     "pytest-xdist",
+    # pyclawd provides the golden behavior-regression plugin (auto-registered via
+    # its pytest11 entry point): `@pytest.mark.golden` + return-capture, run as
+    # `pyclawd golden`. See tests/test_golden.py and the `golden` marker.
+    "pyclawd",
     # pytest-xvfb auto-starts a virtual display when $DISPLAY is unset, so the
     # live-animation examples (pyrecorder/opencv cv2.imshow) run headlessly in CI.
     # Requires the system `xvfb` binary (apt-get install xvfb) — not a pip dep.

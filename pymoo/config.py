@@ -1,20 +1,15 @@
-from os.path import dirname, realpath
+"""Configuration for the pymoo package."""
 
-from pymoo.version import __version__
+from os.path import dirname, realpath
 
 
 class Config:
-    """
-    The configuration of this package in general providing the place
-    for declaring global variables.
-    """
+    """Configuration of the package with global variables."""
 
     # the root directory where the package is located at
     root = dirname(realpath(__file__))
 
-    warnings = {
-        "not_compiled": True
-    }
+    warnings = {"not_compiled": True}
 
     # whether a warning should be printed if compiled modules are not available
     show_compile_hint = True
@@ -25,7 +20,7 @@ class Config:
     # a method defining the endpoint to load data remotely - default from GitHub repo
     @classmethod
     def data(cls):
-        return f"https://raw.githubusercontent.com/anyoptimization/pymoo-data/main/"
+        return "https://raw.githubusercontent.com/anyoptimization/pymoo-data/main/"
 
 
 # returns the directory to be used for imports

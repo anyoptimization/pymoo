@@ -1,3 +1,5 @@
+"""Utility functions for problem decomposition and data loading."""
+
 import copy
 import os
 import types

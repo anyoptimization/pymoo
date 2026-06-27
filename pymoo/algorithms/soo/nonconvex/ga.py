@@ -1,3 +1,5 @@
+"""Genetic algorithm (GA) for single-objective optimization."""
+
 import numpy as np
 
 from pymoo.algorithms.base.genetic import GeneticAlgorithm
@@ -19,14 +21,16 @@ from pymoo.util.display.single import SingleObjectiveOutput
 # Survival
 # =========================================================================================================
 
-class FitnessSurvival(Survival):
 
+class FitnessSurvival(Survival):
     def __init__(self) -> None:
         super().__init__(filter_infeasible=False)
 
     def _do(self, problem, pop, n_survive=None, **kwargs):
         F, cv = pop.get("F", "cv")
-        assert F.shape[1] == 1, "FitnessSurvival can only used for single objective single!"
+        assert F.shape[1] == 1, (
+            "FitnessSurvival can only used for single objective single!"
+        )
         S = np.lexsort([F[:, 0], cv])
         pop.set("rank", np.argsort(S))
         return pop[S[:n_survive]]
@@ -46,50 +50,94 @@ def comp_by_cv_and_fitness(pop, P, random_state=None, **kwargs):
 
         # if at least one solution is infeasible
         if pop[a].CV > 0.0 or pop[b].CV > 0.0:
-            S[i] = compare(a, pop[a].CV, b, pop[b].CV, method='smaller_is_better', return_random_if_equal=True, random_state=random_state)
+            S[i] = compare(
+                a,
+                pop[a].CV,
+                b,
+                pop[b].CV,
+                method="smaller_is_better",
+                return_random_if_equal=True,
+                random_state=random_state,
+            )
 
         # both solutions are feasible just set random
         else:
-            S[i] = compare(a, pop[a].F, b, pop[b].F, method='smaller_is_better', return_random_if_equal=True, random_state=random_state)
+            S[i] = compare(
+                a,
+                pop[a].F,
+                b,
+                pop[b].F,
+                method="smaller_is_better",
+                return_random_if_equal=True,
+                random_state=random_state,
+            )
 
     return S[:, None].astype(int)
 
 
 class GA(GeneticAlgorithm):
+    """Genetic algorithm for single-objective optimization.
 
-    def __init__(self,
-                 pop_size=100,
-                 sampling=FloatRandomSampling(),
-                 selection=TournamentSelection(func_comp=comp_by_cv_and_fitness),
-                 crossover=SBX(),
-                 mutation=PM(),
-                 survival=FitnessSurvival(),
-                 eliminate_duplicates=True,
-                 n_offsprings=None,
-                 output=SingleObjectiveOutput(),
-                 **kwargs):
-        super().__init__(pop_size=pop_size,
-                         sampling=sampling,
-                         selection=selection,
-                         crossover=crossover,
-                         mutation=mutation,
-                         survival=survival,
-                         eliminate_duplicates=eliminate_duplicates,
-                         n_offsprings=n_offsprings,
-                         output=output,
-                         **kwargs)
+    Args:
+        pop_size: The population size.
+        sampling: The sampling strategy.
+        selection: The selection strategy for parent selection.
+        crossover: The crossover operator.
+        mutation: The mutation operator.
+        survival: The survival strategy.
+        eliminate_duplicates: Whether to eliminate duplicate solutions.
+        n_offsprings: The number of offsprings per generation.
+        output: The output display configuration.
+    """
+
+    def __init__(
+        self,
+        pop_size=100,
+        sampling=FloatRandomSampling(),
+        selection=TournamentSelection(func_comp=comp_by_cv_and_fitness),
+        crossover=SBX(),
+        mutation=PM(),
+        survival=FitnessSurvival(),
+        eliminate_duplicates=True,
+        n_offsprings=None,
+        output=SingleObjectiveOutput(),
+        **kwargs,
+    ):
+        super().__init__(
+            pop_size=pop_size,
+            sampling=sampling,
+            selection=selection,
+            crossover=crossover,
+            mutation=mutation,
+            survival=survival,
+            eliminate_duplicates=eliminate_duplicates,
+            n_offsprings=n_offsprings,
+            output=output,
+            **kwargs,
+        )
 
         self.termination = DefaultSingleObjectiveTermination()
 
 
 class BGA(GA):
+    """Binary genetic algorithm using binary operators.
 
-    def __init__(self,
-                 sampling=BinaryRandomSampling(),
-                 crossover=SPX(),
-                 mutation=BitflipMutation(),
-                 **kwargs):
-        super().__init__(sampling=sampling, crossover=crossover, mutation=mutation, **kwargs)
+    Args:
+        sampling: The binary sampling strategy.
+        crossover: The binary crossover operator.
+        mutation: The binary mutation operator.
+    """
+
+    def __init__(
+        self,
+        sampling=BinaryRandomSampling(),
+        crossover=SPX(),
+        mutation=BitflipMutation(),
+        **kwargs,
+    ):
+        super().__init__(
+            sampling=sampling, crossover=crossover, mutation=mutation, **kwargs
+        )
 
 
 parse_doc_string(GA.__init__)

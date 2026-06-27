@@ -1,0 +1,1 @@
+"""Single-objective optimization algorithms."""

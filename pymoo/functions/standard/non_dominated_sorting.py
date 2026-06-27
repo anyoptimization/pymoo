@@ -1,6 +1,4 @@
-"""
-Standard Python implementations of non-dominated sorting algorithms.
-"""
+"""Standard Python implementations of non-dominated sorting algorithms."""
 
 import numpy as np
 from math import floor
@@ -10,18 +8,16 @@ from typing import Literal, List
 from pymoo.util.dominator import Dominator
 
 
-def fast_non_dominated_sort(F, dominator=Dominator(), native_biobj_sorting=False, **kwargs):
+def fast_non_dominated_sort(
+    F, dominator=Dominator(), native_biobj_sorting=False, **kwargs
+):
     """Fast non-dominated sorting algorithm.
 
-    Parameters
-    ----------
-    F : np.ndarray
-        Objective values for each individual.
-    dominator : Dominator
-        Dominator object for custom dominance relations.
-    native_biobj_sorting : bool
-        If True, use specialized O(N log N) algorithm for bi-objective problems.
-        Default is False.
+    Args:
+        F: Objective values for each individual.
+        dominator: Dominator object for custom dominance relations.
+        native_biobj_sorting: If True, use specialized O(N log N) algorithm for bi-objective problems.
+        **kwargs: Additional keyword arguments.
     """
     if F.size == 0:
         return []
@@ -35,7 +31,7 @@ def fast_non_dominated_sort(F, dominator=Dominator(), native_biobj_sorting=False
     # For bi-objective problems, optionally use specialized O(N log N) algorithm
     if native_biobj_sorting and n_objectives == 2:
         return _fast_biobjective_nondominated_sort(F)
-    
+
     M = dominator.calc_domination_matrix(F)
 
     # calculate the dominance matrix
@@ -59,7 +55,7 @@ def fast_non_dominated_sort(F, dominator=Dominator(), native_biobj_sorting=False
     current_front = []
 
     for i in range(n):
-        for j in range(i + 1, n):  
+        for j in range(i + 1, n):
             rel = M[i, j]
             if rel == 1:
                 is_dominating[i].append(j)
@@ -97,42 +93,46 @@ def fast_non_dominated_sort(F, dominator=Dominator(), native_biobj_sorting=False
 
 
 def _fast_biobjective_nondominated_sort(F):
-    """
-    Specialized algorithm for bi-objective problems.
-    Uses the efficient skyline/multi-criteria approach with O(N log N) complexity.
+    """Specialized algorithm for bi-objective problems with O(N log N) complexity.
+
+    Args:
+        F: Objective values.
+
+    Returns:
+        List of fronts.
     """
     n_points = F.shape[0]
-    
+
     if n_points == 0:
         return []
-    
+
     # Sort by first objective ascending
     sorted_indices = np.argsort(F[:, 0])
     sorted_F = F[sorted_indices]
-    
+
     fronts = []
     assigned = [False] * n_points
     n_assigned = 0
-    
+
     while n_assigned < n_points:
         current_front = []
         current_indices = []
-        
+
         # Track the minimum second objective seen in the current front
-        min_second_obj = float('inf')
-        
+        min_second_obj = float("inf")
+
         for i in range(n_points):
             if assigned[i]:
                 continue
-                
-            # Check if current point is dominated by any point in current front  
+
+            # Check if current point is dominated by any point in current front
             is_dominated = False
             if current_indices:  # If there are already points in the current front
-                # Since points are sorted by first objective, we only need to check 
+                # Since points are sorted by first objective, we only need to check
                 # if its second objective is greater than the minimum second objective in front
                 if sorted_F[i, 1] >= min_second_obj:
                     is_dominated = True
-            
+
             if not is_dominated:
                 # Add this point to the current front
                 current_front.append(sorted_indices[i])
@@ -141,72 +141,87 @@ def _fast_biobjective_nondominated_sort(F):
                 n_assigned += 1
                 # Update the minimum second objective
                 min_second_obj = min(min_second_obj, sorted_F[i, 1])
-        
+
         if current_front:
             fronts.append(current_front)
         else:
             break
-    
+
     return fronts
 
+
 def find_non_dominated(F, epsilon=0.0):
-    """
-    Simple and efficient implementation to find only non-dominated points.
-    Uses straightforward O(n²) algorithm with early termination.
+    """Find only non-dominated points using O(n²) algorithm with early termination.
+
+    Args:
+        F: Objective values.
+        epsilon: Tolerance for dominance.
+
+    Returns:
+        Array of non-dominated indices.
     """
     n_points = F.shape[0]
     non_dominated_indices = []
-    
+
     if n_points == 0:
         return np.array([], dtype=int)
-    
+
     # Check each point to see if it's non-dominated
     for i in range(n_points):
         is_dominated = False
-        
+
         # Check if point i is dominated by any other point j
         for j in range(n_points):
             if i != j:
                 # Check if j dominates i
                 dominates = True
                 at_least_one_better = False
-                
+
                 for k in range(F.shape[1]):  # for each objective
                     if F[j, k] + epsilon < F[i, k]:  # j is better than i in objective k
                         at_least_one_better = True
-                    elif F[j, k] > F[i, k] + epsilon:  # j is worse than i in objective k
+                    elif (
+                        F[j, k] > F[i, k] + epsilon
+                    ):  # j is worse than i in objective k
                         dominates = False
                         break  # Early termination in objective loop
-                
+
                 # j dominates i if j is at least as good in all objectives and better in at least one
                 if dominates and at_least_one_better:
                     is_dominated = True
                     break  # Early termination - no need to check other points
-        
+
         # If point i is not dominated by any other point, it's non-dominated
         if not is_dominated:
             non_dominated_indices.append(i)
-    
+
     return np.array(non_dominated_indices, dtype=int)
 
 
 def efficient_non_dominated_sort(F, strategy="sequential"):
-    """Efficient Non-dominated Sorting (ENS)"""
-    assert (strategy in ["sequential", 'binary']), "Invalid search strategy"
+    """Efficient Non-dominated Sorting (ENS).
+
+    Args:
+        F: Objective values.
+        strategy: Search strategy ('sequential' or 'binary').
+
+    Returns:
+        List of fronts.
+    """
+    assert strategy in ["sequential", "binary"], "Invalid search strategy"
 
     # the shape of the input
     N, M = F.shape
 
     # do a lexicographic ordering
-    I = np.lexsort(F.T[::-1])
+    I = np.lexsort(F.T[::-1])  # noqa: E741
     F = F[I]
 
     # front ranks for each individual
     fronts = []
 
     for i in range(N):
-
-        if strategy == 'sequential':
+        if strategy == "sequential":
             k = sequential_search(F, i, fronts)
         else:
             k = binary_search(F, i, fronts)
@@ -227,7 +242,16 @@ def efficient_non_dominated_sort(F, strategy="sequential"):
 
 
 def sequential_search(F, i, fronts) -> int:
-    """Find the front rank for the i-th individual through sequential search."""
+    """Find the front rank for the i-th individual through sequential search.
+
+    Args:
+        F: Objective values.
+        i: Index of individual.
+        fronts: Current fronts.
+
+    Returns:
+        Front rank.
+    """
     num_found_fronts = len(fronts)
     k = 0  # the front now checked
     current = F[i]
@@ -253,7 +277,16 @@ def sequential_search(F, i, fronts) -> int:
 
 
 def binary_search(F, i, fronts):
-    """Find the front rank for the i-th individual through binary search."""
+    """Find the front rank for the i-th individual through binary search.
+
+    Args:
+        F: Objective values.
+        i: Index of individual.
+        fronts: Current fronts.
+
+    Returns:
+        Front rank.
+    """
     num_found_fronts = len(fronts)
     if num_found_fronts == 0:
         return 0
@@ -263,7 +296,6 @@ def binary_search(F, i, fronts):
     k = floor((k_max + k_min) / 2 + 0.5)  # the front now checked
     current = F[i]
     while True:
-
         # solutions in the k-th front, examine in reverse order
         fk_indices = fronts[k - 1]
         solutions = F[fk_indices[::-1]]
@@ -294,7 +326,7 @@ def binary_search(F, i, fronts):
 
 class Tree:
     """Implementation of N-ary tree for tree-based non-dominated sorting."""
-    
+
     def __init__(self, key, num_branch, children=None, parent=None):
         self.key = key
         self.children = children or [None for _ in range(num_branch)]
@@ -316,15 +348,22 @@ class Tree:
     def traversal(self, visit=None, *args, **kwargs):
         if visit is not None:
             visit(self, *args, **kwargs)
-        l = [self]
+        l = [self]  # noqa: E741
         for child in self.children:
             if child is not None:
-                l += child.traversal(visit, *args, **kwargs)
+                l += child.traversal(visit, *args, **kwargs)  # noqa: E741
         return l
 
 
 def tree_based_non_dominated_sort(F):
-    """Tree-based efficient non-dominated sorting (T-ENS)."""
+    """Tree-based efficient non-dominated sorting (T-ENS).
+
+    Args:
+        F: Objective values.
+
+    Returns:
+        List of fronts.
+    """
     N, M = F.shape
     # sort the rows in F
     indices = np.lexsort(F.T[::-1])
@@ -352,7 +391,16 @@ def tree_based_non_dominated_sort(F):
 
 
 def update_tree(F, p, forest, k, left, obj_seq):
-    """Update tree for tree-based non-dominated sorting."""
+    """Update tree for tree-based non-dominated sorting.
+
+    Args:
+        F: Objective values.
+        p: Point index.
+        forest: Tree forest.
+        k: Tree index.
+        left: Boolean array.
+        obj_seq: Objective sequence.
+    """
     _, M = F.shape
     if forest[k] is None:
         forest[k] = Tree(key=p, num_branch=M - 1)
@@ -362,7 +410,18 @@ def update_tree(F, p, forest, k, left, obj_seq):
 
 
 def check_tree(F, p, tree, obj_seq, add_pos):
-    """Check tree for tree-based non-dominated sorting."""
+    """Check tree for tree-based non-dominated sorting.
+
+    Args:
+        F: Objective values.
+        p: Point index.
+        tree: Tree node.
+        obj_seq: Objective sequence.
+        add_pos: Whether to add position.
+
+    Returns:
+        Boolean result.
+    """
     if tree is None:
         return True
 
@@ -390,7 +449,15 @@ def check_tree(F, p, tree, obj_seq, add_pos):
 
 
 def construct_comp_matrix(vec: np.ndarray, sorted_idx: np.ndarray) -> np.ndarray:
-    """Construct the comparison matrix from a row-vector vec."""
+    """Construct the comparison matrix from a row-vector vec.
+
+    Args:
+        vec: Input vector.
+        sorted_idx: Sorted indices.
+
+    Returns:
+        Comparison matrix.
+    """
     n = vec.shape[0]
     c = np.zeros(shape=(n, n), dtype=np.int32)
 
@@ -408,7 +475,15 @@ def construct_comp_matrix(vec: np.ndarray, sorted_idx: np.ndarray) -> np.ndarray
 
 
 def construct_domination_matrix(f_scores: np.ndarray, **kwargs) -> np.ndarray:
-    """Calculate the dominance degree matrix for a set of vectors."""
+    """Calculate the dominance degree matrix for a set of vectors.
+
+    Args:
+        f_scores: Score values.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Dominance matrix.
+    """
     d = np.zeros((f_scores.shape[0], f_scores.shape[0]), dtype=np.int32)
     b = np.apply_over_axes(np.argsort, f_scores, axes=0)
     for vec, srt in zip(f_scores.T, b.T):
@@ -420,7 +495,15 @@ def construct_domination_matrix(f_scores: np.ndarray, **kwargs) -> np.ndarray:
 
 
 def dda_ns(f_scores: np.ndarray, **kwargs) -> List[List[int]]:
-    """DDA-NS algorithm."""
+    """DDA-NS algorithm.
+
+    Args:
+        f_scores: Score values.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        List of fronts.
+    """
     d_mx = construct_domination_matrix(f_scores)
     max_d = np.empty((f_scores.shape[0],), dtype=np.int32)
 
@@ -439,7 +522,15 @@ def dda_ns(f_scores: np.ndarray, **kwargs) -> List[List[int]]:
 
 
 def dda_ens(f_scores: np.ndarray, **kwargs) -> List[List[int]]:
-    """DDA-ENS (efficient DDA) algorithm."""
+    """DDA-ENS (efficient DDA) algorithm.
+
+    Args:
+        f_scores: Score values.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        List of fronts.
+    """
     d_mx = construct_domination_matrix(f_scores)
 
     fronts: List[List[int]] = []
@@ -458,7 +549,18 @@ def dda_ens(f_scores: np.ndarray, **kwargs) -> List[List[int]]:
 def dominance_degree_non_dominated_sort(
     f_scores: np.ndarray, strategy: Literal["efficient", "fast"] = "efficient"
 ) -> List[List[int]]:
-    """Perform non-dominating sort with the specified algorithm."""
+    """Perform non-dominating sort with the specified algorithm.
+
+    Args:
+        f_scores: Score values.
+        strategy: Algorithm strategy ('efficient' or 'fast').
+
+    Returns:
+        List of fronts.
+
+    Raises:
+        ValueError: If strategy is invalid.
+    """
     if strategy == "efficient":
         return dda_ens(f_scores)
     if strategy == "fast":
@@ -467,5 +569,11 @@ def dominance_degree_non_dominated_sort(
 
 
 def fast_best_order_sort(*args, **kwargs):
-    """Placeholder for fast_best_order_sort - only available in Cython."""
-    raise NotImplementedError("fast_best_order_sort is only available in compiled (Cython) version")
+    """Placeholder for fast_best_order_sort - only available in Cython.
+
+    Raises:
+        NotImplementedError: Always, as this function requires compilation.
+    """
+    raise NotImplementedError(
+        "fast_best_order_sort is only available in compiled (Cython) version"
+    )

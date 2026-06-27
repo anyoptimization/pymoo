@@ -1,3 +1,5 @@
+"""Multi-objective SRN problem."""
+
 import pymoo.gradient.toolbox as anp
 import numpy as np
 
@@ -5,10 +7,10 @@ from pymoo.core.problem import Problem
 
 
 class SRN(Problem):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(n_var=2, n_obj=2, n_ieq_constr=2, xl=-20, xu=+20, vtype=float)
 
-    def _evaluate(self, x, out, *args, **kwargs):
+    def _evaluate(self, x: np.ndarray, out: dict, *args, **kwargs) -> None:  # type: ignore[override]  # noqa: ARG002
         f1 = 2 + (x[:, 0] - 2) ** 2 + (x[:, 1] - 1) ** 2
         f2 = 9 * x[:, 0] - (x[:, 1] - 1) ** 2
 
@@ -18,11 +20,11 @@ class SRN(Problem):
         out["F"] = anp.column_stack([f1, f2])
         out["G"] = anp.column_stack([g1, g2])
 
-    def _calc_pareto_front(self, *args, n_points=100, **kwargs):
+    def _calc_pareto_front(self, *args, n_points: int = 100, **kwargs) -> np.ndarray:  # noqa: ARG002
         ps = self.pareto_set(n_points=n_points)
         return self.evaluate(ps, return_values_of=["F"])
 
-    def _calc_pareto_set(self, *args, n_points=100, **kwargs):
+    def _calc_pareto_set(self, *args, n_points: int = 100, **kwargs) -> np.ndarray:  # noqa: ARG002
         x1 = np.full(n_points, -2.5)
         x2 = np.linspace(2.5, 14.7902, n_points)
         return np.column_stack([x1, x2])

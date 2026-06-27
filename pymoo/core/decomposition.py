@@ -1,10 +1,11 @@
+"""Decomposition methods for multi-objective optimization."""
+
 import numpy as np
 
 from pymoo.util.misc import at_least_2d_array, to_1d_array_if_possible
 
 
 class Decomposition:
-
     def __init__(self, eps=0.0, _type="auto", **kwargs) -> None:
         super().__init__()
         self.eps = eps
@@ -14,14 +15,16 @@ class Decomposition:
     def __call__(self, *args, **kwargs):
         return self.do(*args, **kwargs)
 
-    def do(self,
-           F,
-           weights,
-           _type="auto",
-           ideal_point=None,
-           utopian_point=None,
-           nadir_point=None,
-           **kwargs):
+    def do(
+        self,
+        F,
+        weights,
+        _type="auto",
+        ideal_point=None,
+        utopian_point=None,
+        nadir_point=None,
+        **kwargs,
+    ):
 
         _F, _weights = to_1d_array_if_possible(F), to_1d_array_if_possible(weights)
 
@@ -30,7 +33,9 @@ class Decomposition:
                 _type = "one_to_many"
             elif _F.ndim > 1 and _weights.ndim == 1:
                 _type = "many_to_one"
-            elif _F.ndim == 2 and _weights.ndim == 2 and _F.shape[0] == _weights.shape[0]:
+            elif (
+                _F.ndim == 2 and _weights.ndim == 2 and _F.shape[0] == _weights.shape[0]
+            ):
                 _type = "one_to_one"
             else:
                 _type = "many_to_many"

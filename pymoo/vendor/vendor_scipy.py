@@ -1,3 +1,5 @@
+"""Vendored scipy helper routines."""
+
 
 from pymoo.core.termination import NoTermination
 from pymoo.termination.max_eval import MaximumFunctionCallTermination
