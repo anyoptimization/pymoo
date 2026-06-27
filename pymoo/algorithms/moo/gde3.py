@@ -66,7 +66,10 @@ class GDE3(NSDE):
 
         survivors = Population.create(*survivors)
         self.pop = self.survival.do(
-            self.problem, survivors, n_survive=self.n_offsprings
+            self.problem,
+            survivors,
+            n_survive=self.n_offsprings,
+            random_state=self.random_state,
         )
 
 

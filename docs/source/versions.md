@@ -34,6 +34,32 @@ kernelspec:
 ```{raw-cell}
 :raw_mimetype: text/restructuredtext
 
+.. _version_0_6_2:
+```
+
+#### 0.6.2
+
+**Bug fixes**
+
+- Fixed GDE3 (and its MNN/2NN/PCD variants) to be fully deterministic for a fixed seed — its survival step previously fell back to an unseeded random state, so repeated runs with the same seed could differ
+- Restored CMA-ES compatibility with NumPy 2.x by requiring ``cma>=3.4.0`` (the older pinned ``cma`` used a NumPy-1-only ``np.array(..., copy=False)`` call)
+
+**Documentation**
+
+- Reworked the algorithm overview so it now lists every available algorithm and is consistent between the homepage and the algorithm table
+- Added documentation pages for SPEA2, GDE3, NSDE, and NSDE-R
+- Added the previously undocumented PSO, G3PCX, AGE-MOEA2, D-NSGA-II, KGB, and C-TAEA to the algorithm listing
+- Refreshed the news section and the "new" feature highlights
+
+**Testing & quality**
+
+- Added a behavior-regression ("golden") test suite that pins each algorithm's seeded output against committed baselines, so a refactor that changes a result is caught immediately
+- Extended the determinism tests to cover the differential-evolution variants (GDE3, NSDE, NSDE-R)
+- Repo-wide code-quality pass: consistent linting and formatting, whole-package type-checking, and a single developer task runner for tests/lint/type-check/docs
+
+```{raw-cell}
+:raw_mimetype: text/restructuredtext
+
 .. _version_0_6_1_6:
 ```
 

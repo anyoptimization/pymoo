@@ -6,10 +6,14 @@ from pymoo.algorithms.moo.age2 import AGEMOEA2
 from pymoo.algorithms.moo.cmopso import CMOPSO
 from pymoo.algorithms.moo.ctaea import CTAEA
 from pymoo.algorithms.moo.dnsga2 import DNSGA2
+from pymoo.algorithms.moo.gde3 import GDE3
 from pymoo.algorithms.moo.kgb import KGB
 from pymoo.algorithms.moo.moead import MOEAD
 from pymoo.algorithms.moo.moead import ParallelMOEAD
 from pymoo.algorithms.moo.mopso_cd import MOPSO_CD
+from pymoo.algorithms.moo.nsde import NSDE
+from pymoo.algorithms.moo.nsder import NSDER
+
 # Multi-objective algorithms
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.moo.nsga3 import NSGA3
@@ -33,11 +37,11 @@ class SimpleDeterministicDM(AutomatedDM):
     def __init__(self, random_state=None):
         super().__init__()
         self.random_state = random_state
-    
+
     def makeDecision(self, F):
         # Simple deterministic preference: prefer solutions with lower first objective
         return F[:, 0].argsort()
-    
+
     def makePairwiseDecision(self, F):
         # For pairwise comparison, create deterministic rankings based on first objective
         ranks = self.makeDecision(F)
@@ -47,9 +51,16 @@ class SimpleDeterministicDM(AutomatedDM):
 # Helper function to create algorithm instances with required parameters
 def create_algorithm_instance(algorithm_class):
     """Create algorithm instance with proper parameters."""
-    if algorithm_class in [NSGA3, UNSGA3, CTAEA, RVEA, ]:
+    if algorithm_class in [
+        NSGA3,
+        UNSGA3,
+        CTAEA,
+        RVEA,
+        NSDER,
+    ]:
         # These algorithms need reference directions - create them manually to avoid random_state issues
         from pymoo.util.ref_dirs.das_dennis import DasDennis
+
         ref_dirs_gen = DasDennis(n_partitions=12, n_dim=2)
         ref_dirs = ref_dirs_gen.next()
         return algorithm_class(ref_dirs=ref_dirs)
@@ -64,6 +75,7 @@ def create_algorithm_instance(algorithm_class):
     elif algorithm_class in [MOEAD, ParallelMOEAD]:
         # MOEAD and ParallelMOEAD need reference directions - create them manually to avoid random_state issues
         from pymoo.util.ref_dirs.das_dennis import DasDennis
+
         ref_dirs_gen = DasDennis(n_partitions=12, n_dim=2)
         ref_dirs = ref_dirs_gen.next()
         return algorithm_class(ref_dirs=ref_dirs)
@@ -78,46 +90,84 @@ def create_algorithm_instance(algorithm_class):
 
 # Algorithm classes for testing
 MULTI_OBJECTIVE_ALGORITHM_CLASSES = [
-    NSGA2, RNSGA2, NSGA3, UNSGA3, RNSGA3, MOEAD, ParallelMOEAD,
-    AGEMOEA, AGEMOEA2, CTAEA, SMSEMOA, RVEA, KGB, 
-    SPEA2, DNSGA2, PINSGA2, MOPSO_CD, CMOPSO
+    NSGA2,
+    RNSGA2,
+    NSGA3,
+    UNSGA3,
+    RNSGA3,
+    MOEAD,
+    ParallelMOEAD,
+    AGEMOEA,
+    AGEMOEA2,
+    CTAEA,
+    SMSEMOA,
+    RVEA,
+    KGB,
+    SPEA2,
+    DNSGA2,
+    PINSGA2,
+    MOPSO_CD,
+    CMOPSO,
+    GDE3,
+    NSDE,
+    NSDER,
 ]
 
 # Test problem
 MULTI_OBJECTIVE_PROBLEM = ZDT1()
 
 
-@pytest.mark.parametrize('algorithm_class', MULTI_OBJECTIVE_ALGORITHM_CLASSES)
+@pytest.mark.parametrize("algorithm_class", MULTI_OBJECTIVE_ALGORITHM_CLASSES)
 def test_multi_objective_deterministic(algorithm_class):
     """Test that multi-objective algorithms produce identical results with the same seed."""
     seed = 42
     n_gen = 10
-    
+
     # Create fresh algorithm instances for each run using helper function
     algorithm1 = create_algorithm_instance(algorithm_class)
     algorithm2 = create_algorithm_instance(algorithm_class)
-    
+
     # Run algorithm twice with same seed
-    res1 = minimize(MULTI_OBJECTIVE_PROBLEM, algorithm1, ('n_gen', n_gen), seed=seed, verbose=False)
-    res2 = minimize(MULTI_OBJECTIVE_PROBLEM, algorithm2, ('n_gen', n_gen), seed=seed, verbose=False)
-    
+    res1 = minimize(
+        MULTI_OBJECTIVE_PROBLEM, algorithm1, ("n_gen", n_gen), seed=seed, verbose=False
+    )
+    res2 = minimize(
+        MULTI_OBJECTIVE_PROBLEM, algorithm2, ("n_gen", n_gen), seed=seed, verbose=False
+    )
+
     # Results should be identical
-    np.testing.assert_allclose(res1.F, res2.F, rtol=1e-6, atol=1e-6,
-                                  err_msg=f"Algorithm {algorithm_class.__name__} is not deterministic")
-    np.testing.assert_allclose(res1.X, res2.X, rtol=1e-6, atol=1e-6,
-                                  err_msg=f"Algorithm {algorithm_class.__name__} is not deterministic")
+    np.testing.assert_allclose(
+        res1.F,
+        res2.F,
+        rtol=1e-6,
+        atol=1e-6,
+        err_msg=f"Algorithm {algorithm_class.__name__} is not deterministic",
+    )
+    np.testing.assert_allclose(
+        res1.X,
+        res2.X,
+        rtol=1e-6,
+        atol=1e-6,
+        err_msg=f"Algorithm {algorithm_class.__name__} is not deterministic",
+    )
 
 
 def test_different_seeds_produce_different_results():
     """Test that different seeds produce different results."""
     n_gen = 10
-    
+
     results = []
     for seed in [1, 42, 123]:
         algorithm = create_algorithm_instance(NSGA2)
-        res = minimize(MULTI_OBJECTIVE_PROBLEM, algorithm, ('n_gen', n_gen), seed=seed, verbose=False)
+        res = minimize(
+            MULTI_OBJECTIVE_PROBLEM,
+            algorithm,
+            ("n_gen", n_gen),
+            seed=seed,
+            verbose=False,
+        )
         results.append(res)
-    
+
     # At least one pair should be different
     different_found = False
     for i in range(len(results)):
@@ -127,5 +177,5 @@ def test_different_seeds_produce_different_results():
                 break
         if different_found:
             break
-    
+
     assert different_found, "Different seeds should produce different results"

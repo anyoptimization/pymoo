@@ -1,5 +1,6 @@
     :ref:`Genetic Algorithm <nb_ga>`, GA, single, x,A modular implementation of a genetic algorithm. It can be easily customized with different evolutionary operators and applies to a broad category of problems.
    :ref:`Differential Evolution <nb_de>`, DE, single, x, Different variants of differential evolution which is a well-known concept for in continuous optimization especially for global optimization.
+   :ref:`Particle Swarm Optimization <nb_pso>`, PSO, single, x, A swarm intelligence algorithm where each particle is guided by its own and the swarm's best-known positions to explore the search space.
    :ref:`Biased Random Key Genetic Algorithm <nb_brkga>`, BRKGA, single, x, Mostly used for combinatorial optimization where instead of custom evolutionary operators the complexity is put into an advanced variable encoding.
    :ref:`Nelder Mead <nb_nelder_mead>`, NelderMead, single, x, A point-by-point based algorithm which keeps track of a simplex with is either extended  reflected or shrunk.
    :ref:`Pattern Search <nb_pattern_search>`, PatternSearch, single, x, Iterative approach where the search direction is estimated by forming a specific exploration pattern around the current best solution.
@@ -7,6 +8,7 @@
    :ref:`Evolutionary Strategy <nb_es>`, ES, single, x, The evolutionary strategy algorithm proposed for real-valued optimization problems.
    :ref:`Stochastic Ranking Evolutionary Strategy <nb_sres>`, SRES, single, x, An evolutionary strategy with constrained handling using stochastic ranking.
    :ref:`Improved Stochastic Ranking Evolutionary Strategy <nb_isres>`, ISRES, single, x, An improved version of SRES being able to deal dependent variables efficiently.
+   :ref:`G3PCX <nb_g3pcx>`, G3PCX, single, , A real-coded genetic algorithm using the generalized generation gap (G3) model with the parent-centric recombination (PCX) operator.
    :ref:`Newton-Raphson-based Optimizer <nb_nrbo>`, NRBO, single, x, A population-based metaheuristic inspired by Newton-Raphson method with high optimization efficiency.
    :ref:`NSGA-II <nb_nsga2>`, NSGA2, multi, x, Well-known multi-objective optimization algorithm based on non-dominated sorting and crowding.
    :ref:`R-NSGA-II <nb_rnsga2>`, RNSGA2, multi, x, An extension of NSGA-II where reference/aspiration points can be provided by the user.
@@ -16,8 +18,15 @@
    :ref:`R-NSGA-III <nb_rnsga3>`, RNSGA3, many, x, Allows defining aspiration points for NSGA-III to incorporate the user's preference.
    :ref:`MOEA\D <nb_moead>`, MOEAD, many,, Another well-known multi-objective optimization algorithm based on decomposition.
    :ref:`AGE-MOEA <nb_agemoea>`, AGEMOEA, many,, Similar to NSGA-II but estimates the shape of the Pareto-front to compute a score replacing the crowding distance.
+   :ref:`AGE-MOEA2 <nb_agemoea2>`, AGEMOEA2, many,, An improved AGE-MOEA with a more accurate estimation of the Pareto-front geometry used to compute the survival score.
    :ref:`C-TAEA <nb_ctaea>`, CTAEA, many, x, An algorithm with a more sophisticated constraint-handling for many-objective optimization algoritms.
    :ref:`SMS-EMOA <nb_sms>`, SMSEMOA, many, x, An algorithm that uses hypervolume during the environmental survival.
+   :ref:`SPEA2 <nb_spea2>`, SPEA2, multi, x, Strength Pareto evolutionary algorithm using a strength-based fitness with a k-th nearest neighbor density estimate and an archive truncation operator for diversity.
    :ref:`RVEA <nb_rvea>`, RVEA, many, , A reference direction based algorithm used an angle-penalized metric.
    :ref:`CMOPSO <nb_cmopso>`, CMOPSO, multi, x, A competitive mechanism based multi-objective particle swarm optimizer with fast convergence using binary tournament selection on elites.
    :ref:`MOPSO-CD <nb_mopso_cd>`, MOPSO_CD, multi, x, Multi-objective particle swarm optimization with crowding distance mechanism for leader selection and archive management.
+   :ref:`D-NSGA-II <nb_dnsga2>`, DNSGA2, multi, x, A dynamic version of NSGA-II that detects and reacts to changes of the objectives over time.
+   :ref:`KGB-DMOEA <nb_kgb>`, KGB, multi, x, A knowledge-guided Bayesian dynamic multi-objective optimizer that reuses past search knowledge when the problem changes.
+   :ref:`NSDE <nb_nsde>`, NSDE, multi, x, NSGA-II combined with differential evolution variation operators instead of simulated binary crossover and polynomial mutation.
+   :ref:`GDE3 <nb_gde3>`, GDE3, multi, x, Generalized Differential Evolution 3 - differential evolution variation with non-dominated sorting survival and a greedy parent-trial comparison.
+   :ref:`NSDE-R <nb_nsder>`, NSDER, many, x, A reference-direction based differential evolution algorithm extending NSGA-III's survival to many-objective problems.

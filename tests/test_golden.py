@@ -44,7 +44,9 @@ MOO_PROBLEM = ZDT1()
 )
 def test_golden_soo(algorithm_class):
     """Single-objective algorithm output on Sphere must not drift across refactors."""
-    res = minimize(SOO_PROBLEM, algorithm_class(), ("n_gen", N_GEN), seed=SEED, verbose=False)
+    res = minimize(
+        SOO_PROBLEM, algorithm_class(), ("n_gen", N_GEN), seed=SEED, verbose=False
+    )
     return res.F
 
 
