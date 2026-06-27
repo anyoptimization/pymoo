@@ -132,7 +132,7 @@ benchmark/                # performance benchmarking scripts
 
 ## Technology stack
 
-- **Python** 3.9+ (3.9–3.13). **Build:** setuptools + Cython. Distributed on PyPI.
+- **Python** 3.10+ (3.10–3.14). **Build:** setuptools + Cython. Distributed on PyPI.
 - **Core deps:** numpy (≥1.19.3), scipy (≥1.1), matplotlib (≥3), autograd (≥1.4), cma (≥3.2.2), moocore (≥0.1.7), Cython (compiled extensions).
 - **Optional:** parallelization (joblib, dask, ray); dev (pytest, jupyter, pandas, numba); optimization (optuna).
 - **User install:** `pip install -U pymoo` · `pip install pymoo[full]` (all features) · `pip install pymoo[visualization]`. From source: `git clone … && cd pymoo && pip install .`.
