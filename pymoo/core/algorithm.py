@@ -262,17 +262,24 @@ class Algorithm:
         res.archive = self.archive
         res.data = self.data
 
-        # get the optimal solution found
+        # get the optimal solution found, and report it honestly via
+        # success/message (left as None only if result() never ran).
         opt = self.opt
+        res.success, res.message = True, "Optimization terminated successfully."
         if opt is None or len(opt) == 0:  # type: ignore
             opt = None
+            res.success = False
+            res.message = "No solution found — the optimum is empty."
 
         # if no feasible solution has been found
         elif not np.any(opt.get("FEAS")):
+            res.success = False
             if self.return_least_infeasible:
                 opt = filter_optimum(opt, least_infeasible=True)
+                res.message = "No feasible solution found — returning the least-infeasible solution."
             else:
                 opt = None
+                res.message = "No feasible solution found."
         res.opt = opt
 
         # if optimum is set to none to not report anything
