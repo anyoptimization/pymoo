@@ -42,7 +42,9 @@ jobs:
           # the release carrying `pyclawd docs validate`.
           pip install "pyclawd>=0.1.1" pytest-xdist pytest-xvfb ruff mypy
       - name: Compiled extensions present
-        run: python -c "from pymoo.functions import is_compiled; print('compiled:', is_compiled())"
+        # fail if the Cython extensions didn't compile — otherwise the suite would
+        # silently run the slow pure-Python fallback (P-5b).
+        run: python -c "import sys; from pymoo.functions import is_compiled; ok=is_compiled(); print('compiled:', ok); sys.exit(0 if ok else 1)"
       - name: Lint + format + typecheck
         run: |
           ruff check pymoo

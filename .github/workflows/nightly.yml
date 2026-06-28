@@ -57,7 +57,8 @@ jobs:
           pip install -r tests/requirements.txt
           pip install "pyclawd>=0.1.1" pytest-xdist
       - name: Compiled extensions present
-        run: python -c "from pymoo.functions import is_compiled; print('compiled:', is_compiled())"
+        # fail if the Cython extensions didn't compile (P-5b) — no silent slow fallback.
+        run: python -c "import sys; from pymoo.functions import is_compiled; ok=is_compiled(); print('compiled:', ok); sys.exit(0 if ok else 1)"
       - name: Full unit suite (incl. long convergence tests)
         run: pytest -n auto -m "not examples and not docs and not golden"
       - name: Golden behavior-regression
