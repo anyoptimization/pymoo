@@ -18,9 +18,7 @@ class WeldedBeam(Problem):
         self.xu = np.array([5.0, 10.0, 10.0, 5.0])
 
     def _evaluate(self, x: Any, out: Any, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG002
-        f1 = 1.10471 * x[:, 0] ** 2 * x[:, 1] + 0.04811 * x[:, 2] * x[:, 3] * (
-            14.0 + x[:, 1]
-        )
+        f1 = 1.10471 * x[:, 0] ** 2 * x[:, 1] + 0.04811 * x[:, 2] * x[:, 3] * (14.0 + x[:, 1])
         f2 = 2.1952 / (x[:, 3] * x[:, 2] ** 3)
 
         P = 6000
@@ -30,13 +28,7 @@ class WeldedBeam(Problem):
 
         R = anp.sqrt(0.25 * (x[:, 1] ** 2 + (x[:, 0] + x[:, 2]) ** 2))
         M = P * (L + x[:, 1] / 2)
-        J = (
-            2
-            * anp.sqrt(0.5)
-            * x[:, 0]
-            * x[:, 1]
-            * (x[:, 1] ** 2 / 12 + 0.25 * (x[:, 0] + x[:, 2]) ** 2)
-        )
+        J = 2 * anp.sqrt(0.5) * x[:, 0] * x[:, 1] * (x[:, 1] ** 2 / 12 + 0.25 * (x[:, 0] + x[:, 2]) ** 2)
         t1 = P / (anp.sqrt(2) * x[:, 0] * x[:, 1])
         t2 = M * R / J
         t = anp.sqrt(t1**2 + t2**2 + t1 * t2 * x[:, 1] / R)

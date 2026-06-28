@@ -49,9 +49,7 @@ class Remote:
             Remote.__instance = Remote(server, _user_cache_dir(), package_data)
         return Remote.__instance
 
-    def __init__(
-        self, server: str, folder: str | None = None, package_data: str | None = None
-    ) -> None:
+    def __init__(self, server: str, folder: str | None = None, package_data: str | None = None) -> None:
         """Initialize the Remote instance.
 
         Args:

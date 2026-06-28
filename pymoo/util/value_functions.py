@@ -52,34 +52,24 @@ def create_poly_vf(
 ):
 
     if method == "trust-constr" or method == "SLSQP":
-        return create_vf_scipy_poly(
-            P, ranks, delta, eps_max, method=method, verbose=verbose, max_iter=max_iter
-        )
+        return create_vf_scipy_poly(P, ranks, delta, eps_max, method=method, verbose=verbose, max_iter=max_iter)
     elif method == "ES":
-        return create_vf_pymoo_poly(
-            P, ranks, delta, eps_max, method=method, verbose=verbose
-        )
+        return create_vf_pymoo_poly(P, ranks, delta, eps_max, method=method, verbose=verbose)
     else:
         raise ValueError("Optimization method %s not supported" % method)
 
 
-def create_linear_vf(
-    P, ranks, delta=0.1, eps_max=1000, method="trust-constr", max_iter=None
-):
+def create_linear_vf(P, ranks, delta=0.1, eps_max=1000, method="trust-constr", max_iter=None):
 
     if method == "trust-constr" or method == "SLSQP":
-        return create_vf_scipy_linear(
-            P, ranks, delta, eps_max, method, max_iter=max_iter
-        )
+        return create_vf_scipy_linear(P, ranks, delta, eps_max, method, max_iter=max_iter)
     elif method == "ES":
         return create_vf_pymoo_linear(P, ranks, delta, eps_max, method)
     else:
         raise ValueError("Optimization method %s not supported" % method)
 
 
-def create_vf_scipy_poly(
-    P, ranks, delta, eps_max, method="trust-constr", verbose=False, max_iter=None
-):
+def create_vf_scipy_poly(P, ranks, delta, eps_max, method="trust-constr", verbose=False, max_iter=None):
 
     # Gathering basic info
     M = P.shape[1]
@@ -102,9 +92,7 @@ def create_vf_scipy_poly(
     P_sorted = _sort_P(P, ranks)
     ranks.sort()
 
-    constr = NonlinearConstraint(
-        _build_constr_poly(P_sorted, poly_vf, ranks, delta), ineq_lb, ineq_ub
-    )
+    constr = NonlinearConstraint(_build_constr_poly(P_sorted, poly_vf, ranks, delta), ineq_lb, ineq_ub)
 
     # Bounds on x
     x_lb = []
@@ -155,9 +143,7 @@ def create_vf_scipy_poly(
     return vfResults(vf, params, epsilon, fit)
 
 
-def create_vf_scipy_linear(
-    P, ranks, delta, eps_max, method="trust-constr", verbose=False, max_iter=None
-):
+def create_vf_scipy_linear(P, ranks, delta, eps_max, method="trust-constr", verbose=False, max_iter=None):
 
     # Gathering basic info
     M = P.shape[1]
@@ -174,9 +160,7 @@ def create_vf_scipy_linear(
     lb.append(0)
     ub.append(0)
 
-    constr = NonlinearConstraint(
-        _build_constr_linear(P_sorted, linear_vf, ranks, delta), lb, ub
-    )
+    constr = NonlinearConstraint(_build_constr_linear(P_sorted, linear_vf, ranks, delta), lb, ub)
 
     # Bounds on x
     x_lb = []
@@ -251,9 +235,7 @@ def create_vf_pymoo_linear(P, ranks, delta, eps_max, method="ES", verbose=False)
     return vfResults(vf, params, epsilon, fit)
 
 
-def create_vf_pymoo_poly(
-    P, ranks, delta, eps_max, method="trust-constr", verbose=False
-):
+def create_vf_pymoo_poly(P, ranks, delta, eps_max, method="trust-constr", verbose=False):
 
     vf_prob = OptimizePolyVF(P, ranks, delta, eps_max, poly_vf)
 

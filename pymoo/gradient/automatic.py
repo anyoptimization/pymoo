@@ -37,9 +37,7 @@ class ElementwiseEvaluationFunctionWithGradient(ElementwiseEvaluationFunction):
 class ElementwiseAutomaticDifferentiation(Meta, Problem):
     def __init__(self, problem, backend="autograd", copy=True):
         if not problem.elementwise:
-            raise Exception(
-                "Elementwise automatic differentiation can only be applied to elementwise problems."
-            )
+            raise Exception("Elementwise automatic differentiation can only be applied to elementwise problems.")
 
         super().__init__(problem, copy)
         self.backend = backend
@@ -49,9 +47,7 @@ class ElementwiseAutomaticDifferentiation(Meta, Problem):
 
     def _create_elementwise_func(self, problem, args, kwargs):
         """Create an elementwise function that matches the expected signature."""
-        return ElementwiseEvaluationFunctionWithGradient(
-            self.__object__, self.backend, args, kwargs
-        )
+        return ElementwiseEvaluationFunctionWithGradient(self.__object__, self.backend, args, kwargs)
 
 
 class AutomaticDifferentiation(Meta, Problem):

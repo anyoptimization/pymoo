@@ -18,9 +18,7 @@ class ExponentialSearch(Algorithm):
 
     def _setup(self, problem, x0=None, **kwargs):
         msg = "Only problems with one variable, one objective and no constraints can be solved!"
-        assert (
-            problem.n_var == 1 and not problem.has_constraints() and problem.n_obj == 1
-        ), msg
+        assert problem.n_var == 1 and not problem.has_constraints() and problem.n_obj == 1, msg
         self.point = x0
 
     def _initialize_infill(self):

@@ -9,16 +9,12 @@ from pymoo.core.indicator import Indicator
 from pymoo.util.misc import vectorized_cdist, at_least_2d_array
 
 
-def euclidean_distance(
-    a: ndarray, b: ndarray, norm: ndarray | float | None = None
-) -> ndarray:
+def euclidean_distance(a: ndarray, b: ndarray, norm: ndarray | float | None = None) -> ndarray:
     """Calculate Euclidean distance between points."""
     return np.sqrt((((a - b) / norm) ** 2).sum(axis=1))
 
 
-def modified_distance(
-    z: ndarray, a: ndarray, norm: ndarray | float | None = None
-) -> ndarray:
+def modified_distance(z: ndarray, a: ndarray, norm: ndarray | float | None = None) -> ndarray:
     """Calculate modified distance (truncated below zero)."""
     d = a - z
     d[d < 0] = 0

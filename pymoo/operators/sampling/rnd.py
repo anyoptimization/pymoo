@@ -97,9 +97,7 @@ class IntegerRandomSampling(FloatRandomSampling):
             Sample matrix of shape (n_samples, n_var) with integer values.
         """
         n, (xl, xu) = problem.n_var, problem.bounds()
-        return np.column_stack(
-            [random_state.integers(xl[k], xu[k] + 1, size=n_samples) for k in range(n)]
-        )
+        return np.column_stack([random_state.integers(xl[k], xu[k] + 1, size=n_samples) for k in range(n)])
 
 
 class PermutationRandomSampling(Sampling):

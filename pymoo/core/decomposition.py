@@ -33,9 +33,7 @@ class Decomposition:
                 _type = "one_to_many"
             elif _F.ndim > 1 and _weights.ndim == 1:
                 _type = "many_to_one"
-            elif (
-                _F.ndim == 2 and _weights.ndim == 2 and _F.shape[0] == _weights.shape[0]
-            ):
+            elif _F.ndim == 2 and _weights.ndim == 2 and _F.shape[0] == _weights.shape[0]:
                 _type = "one_to_one"
             else:
                 _type = "many_to_many"

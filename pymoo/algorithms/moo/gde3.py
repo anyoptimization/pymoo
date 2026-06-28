@@ -44,14 +44,10 @@ class GDE3(NSDE):
             survival: Survival operator applied when pool > pop_size. Defaults to RankAndCrowding().
             **kwargs: Additional keyword arguments forwarded to the NSDE base class.
         """
-        super().__init__(
-            pop_size=pop_size, variant=variant, CR=CR, F=F, gamma=gamma, **kwargs
-        )
+        super().__init__(pop_size=pop_size, variant=variant, CR=CR, F=F, gamma=gamma, **kwargs)
 
     def _advance(self, infills=None, **kwargs):
-        assert infills is not None, (
-            "This algorithm uses the AskAndTell interface; 'infills' must be provided."
-        )
+        assert infills is not None, "This algorithm uses the AskAndTell interface; 'infills' must be provided."
 
         survivors = []
         for k in range(len(self.pop)):

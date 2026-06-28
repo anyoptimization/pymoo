@@ -44,9 +44,7 @@ def incremental_lattice(n_partitions, n_dim):
 
 
 class IncrementalReferenceDirectionFactory(ReferenceDirectionFactory):
-    def __init__(
-        self, n_dim, scaling=None, n_points=None, n_partitions=None, **kwargs
-    ) -> None:
+    def __init__(self, n_dim, scaling=None, n_points=None, n_partitions=None, **kwargs) -> None:
         super().__init__(n_dim, scaling=scaling, **kwargs)
 
         if n_points is not None:
@@ -57,8 +55,7 @@ class IncrementalReferenceDirectionFactory(ReferenceDirectionFactory):
                 raise Exception(
                     "The number of points (n_points = %s) can not be created uniformly.\n"
                     "Either choose n_points = %s (n_partitions = %s) or "
-                    "n_points = %s (n_partitions = %s)."
-                    % (n_points, results[0], results[1], results[2], results[3])
+                    "n_points = %s (n_partitions = %s)." % (n_points, results[0], results[1], results[2], results[3])
                 )
 
             self.n_partitions = results[0]

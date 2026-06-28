@@ -17,9 +17,7 @@ class PointCrossover(Crossover):
         _, n_matings, n_var = X.shape
 
         # start point of crossover
-        r = np.vstack(
-            [random_state.permutation(n_var - 1) + 1 for _ in range(n_matings)]
-        )[:, : self.n_points]
+        r = np.vstack([random_state.permutation(n_var - 1) + 1 for _ in range(n_matings)])[:, : self.n_points]
         r.sort(axis=1)
         r = np.column_stack([r, np.full(n_matings, n_var)])
 

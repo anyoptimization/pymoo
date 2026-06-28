@@ -49,8 +49,6 @@ class ExponentialCrossover(Crossover):
         _, n_matings, n_var = X.shape
         prob_exp = get(self.prob_exp, size=n_matings)
 
-        M = mut_exp(
-            n_matings, n_var, prob_exp, at_least_once=True, random_state=random_state
-        )
+        M = mut_exp(n_matings, n_var, prob_exp, at_least_once=True, random_state=random_state)
         _X = crossover_mask(X, M)
         return _X

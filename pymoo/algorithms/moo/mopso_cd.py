@@ -81,16 +81,10 @@ class MOPSO_CD(Algorithm):
         self.v_max = self.max_velocity_rate * (xu - xl)
 
         # Initialize particles, velocities, and personal bests
-        self.pop = self.sampling.do(
-            problem, self.pop_size, random_state=self.random_state
-        )
-        self.velocities = self.random_state.uniform(
-            -self.v_max, self.v_max, (self.pop_size, problem.n_var)
-        )
+        self.pop = self.sampling.do(problem, self.pop_size, random_state=self.random_state)
+        self.velocities = self.random_state.uniform(-self.v_max, self.v_max, (self.pop_size, problem.n_var))
         self.pbest = self.pop.copy()  # Personal bests
-        self.pbest_f = np.full(
-            (self.pop_size, problem.n_obj), np.inf
-        )  # Initialize with inf
+        self.pbest_f = np.full((self.pop_size, problem.n_obj), np.inf)  # Initialize with inf
 
         # Evaluate initial population to set personal best objectives
         self.evaluator.eval(self.problem, self.pop)
@@ -98,14 +92,10 @@ class MOPSO_CD(Algorithm):
     def _initialize_infill(self):
         """Initialize the population and velocities."""
         # Initialize population using sampling
-        pop = self.sampling.do(
-            self.problem, self.pop_size, random_state=self.random_state
-        )
+        pop = self.sampling.do(self.problem, self.pop_size, random_state=self.random_state)
 
         # Initialize velocities randomly
-        self.velocities = self.random_state.uniform(
-            -self.v_max, self.v_max, size=(self.pop_size, self.problem.n_var)
-        )
+        self.velocities = self.random_state.uniform(-self.v_max, self.v_max, size=(self.pop_size, self.problem.n_var))
 
         # Initialize personal best (initially same as current positions)
         self.pbest = pop.copy()
@@ -146,9 +136,7 @@ class MOPSO_CD(Algorithm):
             self.velocities[i] = self.w * self.velocities[i] + cognitive + social
 
             # Apply velocity bounds
-            self.velocities[i] = set_to_bounds_if_outside(
-                self.velocities[i], -self.v_max, self.v_max
-            )
+            self.velocities[i] = set_to_bounds_if_outside(self.velocities[i], -self.v_max, self.v_max)
 
             # Update position
             X_new[i] = self.pop[i].X + self.velocities[i]
@@ -202,9 +190,7 @@ class MOPSO_CD(Algorithm):
             while len(selected_indices) < self.archive_size and remaining_indices:
                 # Tournament selection favoring higher crowding distance
                 tournament_size = min(3, len(remaining_indices))
-                tournament_indices = self.random_state.choice(
-                    remaining_indices, size=tournament_size, replace=False
-                )
+                tournament_indices = self.random_state.choice(remaining_indices, size=tournament_size, replace=False)
 
                 # Select the one with highest crowding distance in tournament
                 best_idx = tournament_indices[np.argmax(crowding[tournament_indices])]
@@ -214,9 +200,7 @@ class MOPSO_CD(Algorithm):
             non_dominated = non_dominated[selected_indices]
 
         # Create new archive
-        return MultiObjectiveArchive(
-            individuals=non_dominated, max_size=self.archive_size
-        )
+        return MultiObjectiveArchive(individuals=non_dominated, max_size=self.archive_size)
 
     def _select_diverse_leaders(self):
         """Select diverse leaders for all particles."""

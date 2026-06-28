@@ -7,9 +7,7 @@ import numpy as np
 F = TypeVar("F", bound=Callable[..., Any])
 
 
-def default_random_state(
-    func_or_seed: Optional[Any] = None, *, seed: Optional[int] = None
-) -> Any:
+def default_random_state(func_or_seed: Optional[Any] = None, *, seed: Optional[int] = None) -> Any:
     """Decorator that provides a default random state to functions.
 
     Can be used as:

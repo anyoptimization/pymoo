@@ -9,9 +9,7 @@ from pymoo.util.display.progress import ProgressBar
 class Display(Callback):
     """Callback to display optimization progress."""
 
-    def __init__(
-        self, output: Any = None, progress: bool = False, verbose: bool = False
-    ) -> None:
+    def __init__(self, output: Any = None, progress: bool = False, verbose: bool = False) -> None:
         super().__init__()
         self.output = output
         self.verbose = verbose

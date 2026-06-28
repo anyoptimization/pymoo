@@ -38,9 +38,7 @@ class DTLZ(Problem):
         else:
             raise Exception("Either provide number of variables or k!")
 
-        super().__init__(
-            n_var=n_var_val, n_obj=n_obj, xl=0, xu=1, vtype=float, **kwargs
-        )
+        super().__init__(n_var=n_var_val, n_obj=n_obj, xl=0, xu=1, vtype=float, **kwargs)
 
     def g1(self, X_M):
         """Compute g1 auxiliary function.
@@ -51,12 +49,7 @@ class DTLZ(Problem):
         Returns:
             Auxiliary function values.
         """
-        return 100 * (
-            self.k
-            + anp.sum(
-                anp.square(X_M - 0.5) - anp.cos(20 * anp.pi * (X_M - 0.5)), axis=1
-            )
-        )
+        return 100 * (self.k + anp.sum(anp.square(X_M - 0.5) - anp.cos(20 * anp.pi * (X_M - 0.5)), axis=1))
 
     def g2(self, X_M):
         """Compute g2 auxiliary function.
@@ -249,9 +242,7 @@ class DTLZ4(DTLZ):
         **kwargs: Additional arguments passed to parent.
     """
 
-    def __init__(
-        self, n_var: int = 10, n_obj: int = 3, alpha: int = 100, d: int = 100, **kwargs
-    ) -> None:
+    def __init__(self, n_var: int = 10, n_obj: int = 3, alpha: int = 100, d: int = 100, **kwargs) -> None:
         """Initialize DTLZ4."""
         super().__init__(n_var=n_var, n_obj=n_obj, **kwargs)
         self.alpha = alpha
@@ -311,9 +302,7 @@ class DTLZ5(DTLZ):
 
         # Degenerate curve: theta_1 free in [0, pi/2], theta_i = pi/4 for i > 1
         theta1 = np.linspace(0, np.pi / 2, n_points)
-        thetas = np.column_stack(
-            [theta1] + [np.full(n_points, np.pi / 4)] * (self.n_obj - 2)
-        )
+        thetas = np.column_stack([theta1] + [np.full(n_points, np.pi / 4)] * (self.n_obj - 2))
         cos_t, sin_t = np.cos(thetas), np.sin(thetas)
         pf = np.zeros((n_points, self.n_obj))
         for i in range(self.n_obj):
@@ -367,9 +356,7 @@ class DTLZ6(DTLZ):
 
         # Same degenerate curve geometry as DTLZ5 (different g function, same Pareto front shape)
         theta1 = np.linspace(0, np.pi / 2, n_points)
-        thetas = np.column_stack(
-            [theta1] + [np.full(n_points, np.pi / 4)] * (self.n_obj - 2)
-        )
+        thetas = np.column_stack([theta1] + [np.full(n_points, np.pi / 4)] * (self.n_obj - 2))
         cos_t, sin_t = np.cos(thetas), np.sin(thetas)
         pf = np.zeros((n_points, self.n_obj))
         for i in range(self.n_obj):
@@ -427,9 +414,7 @@ class DTLZ7(DTLZ):
         # => f_M = 2*n_obj - sum(f_i*(1+sin(3pi*f_i)))
         rng = np.random.default_rng(42)
         F_first = rng.random((n_points * 20, self.n_obj - 1))
-        F_last = 2 * self.n_obj - np.sum(
-            F_first * (1 + np.sin(3 * np.pi * F_first)), axis=1
-        )
+        F_last = 2 * self.n_obj - np.sum(F_first * (1 + np.sin(3 * np.pi * F_first)), axis=1)
         valid = F_last >= 0
         return np.column_stack([F_first[valid], F_last[valid]])
 
@@ -448,9 +433,7 @@ class DTLZ7(DTLZ):
         f = anp.column_stack(f)
 
         g = 1 + 9 / self.k * anp.sum(x[:, -self.k :], axis=1)
-        h = self.n_obj - anp.sum(
-            f / (1 + g[:, None]) * (1 + anp.sin(3 * anp.pi * f)), axis=1
-        )
+        h = self.n_obj - anp.sum(f / (1 + g[:, None]) * (1 + anp.sin(3 * anp.pi * f)), axis=1)
 
         out["F"] = anp.column_stack([f, (1 + g) * h])
 
@@ -543,9 +526,7 @@ class ScaledProblem(Problem):
         Returns:
             Scaled Pareto front solutions.
         """
-        return self.problem.pareto_front(*args, **kwargs) * ScaledProblem.get_scale(
-            self.n_obj, self.scale_factor
-        )
+        return self.problem.pareto_front(*args, **kwargs) * ScaledProblem.get_scale(self.n_obj, self.scale_factor)
 
 
 class ConvexProblem(Problem):
@@ -617,13 +598,9 @@ class ScaledDTLZ1(ScaledProblem):
         **kwargs: Additional arguments passed to DTLZ1.
     """
 
-    def __init__(
-        self, n_var: int = 7, n_obj: int = 3, scale_factor: float = 10, **kwargs
-    ) -> None:
+    def __init__(self, n_var: int = 7, n_obj: int = 3, scale_factor: float = 10, **kwargs) -> None:
         """Initialize ScaledDTLZ1."""
-        super().__init__(
-            DTLZ1(n_var=n_var, n_obj=n_obj, **kwargs), scale_factor=scale_factor
-        )
+        super().__init__(DTLZ1(n_var=n_var, n_obj=n_obj, **kwargs), scale_factor=scale_factor)
 
 
 class ConvexDTLZ2(ConvexProblem):
@@ -663,9 +640,7 @@ def generic_sphere(ref_dirs):
     Returns:
         Normalized reference directions.
     """
-    return ref_dirs / np.tile(
-        np.linalg.norm(ref_dirs, axis=1)[:, None], (1, ref_dirs.shape[1])
-    )
+    return ref_dirs / np.tile(np.linalg.norm(ref_dirs, axis=1)[:, None], (1, ref_dirs.shape[1]))
 
 
 def get_ref_dirs(n_obj: int):
@@ -685,7 +660,5 @@ def get_ref_dirs(n_obj: int):
     elif n_obj == 3:
         ref_dirs = UniformReferenceDirectionFactory(3, n_partitions=15).do()
     else:
-        raise Exception(
-            "Please provide reference directions for more than 3 objectives!"
-        )
+        raise Exception("Please provide reference directions for more than 3 objectives!")
     return ref_dirs

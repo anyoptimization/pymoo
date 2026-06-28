@@ -59,9 +59,7 @@ class MixedVariableMating(InfillCriterion):
         self.crossover = crossover
         self.mutation = mutation
 
-    def _do(
-        self, problem, pop, n_offsprings, parents=False, random_state=None, **kwargs
-    ):
+    def _do(self, problem, pop, n_offsprings, parents=False, random_state=None, **kwargs):
 
         # So far we assume all crossover need the same amount of parents and create the same number of offsprings
         XOVER_N_PARENTS = 2
@@ -104,10 +102,7 @@ class MixedVariableMating(InfillCriterion):
 
         for clazz, list_of_vars in recomb:
             crossover = self.crossover[clazz]
-            assert (
-                crossover.n_parents == XOVER_N_PARENTS
-                and crossover.n_offsprings == XOVER_N_OFFSPRINGS
-            )
+            assert crossover.n_parents == XOVER_N_PARENTS and crossover.n_offsprings == XOVER_N_OFFSPRINGS
 
             _parents = [
                 [
@@ -123,12 +118,8 @@ class MixedVariableMating(InfillCriterion):
             ]
 
             _vars = {e: vars[e] for e in list_of_vars}
-            _xl = np.array(
-                [vars[e].lb if hasattr(vars[e], "lb") else None for e in list_of_vars]
-            )
-            _xu = np.array(
-                [vars[e].ub if hasattr(vars[e], "ub") else None for e in list_of_vars]
-            )
+            _xl = np.array([vars[e].lb if hasattr(vars[e], "lb") else None for e in list_of_vars])
+            _xu = np.array([vars[e].ub if hasattr(vars[e], "ub") else None for e in list_of_vars])
             _problem = Problem(vars=_vars, xl=_xl, xu=_xu)
 
             _off = crossover(_problem, _parents, random_state=random_state, **kwargs)
@@ -147,10 +138,7 @@ class MixedVariableSampling(Sampling):
     """Sampling strategy for mixed-variable problems."""
 
     def _do(self, problem, n_samples, random_state=None, **kwargs):
-        V = {
-            name: var.sample(n_samples, random_state=random_state)
-            for name, var in problem.vars.items()
-        }
+        V = {name: var.sample(n_samples, random_state=random_state) for name, var in problem.vars.items()}
 
         X = []
         for k in range(n_samples):
@@ -198,9 +186,7 @@ class MixedVariableGA(GeneticAlgorithm):
         n_offsprings=None,
         output=SingleObjectiveOutput(),
         sampling=MixedVariableSampling(),
-        mating=MixedVariableMating(
-            eliminate_duplicates=MixedVariableDuplicateElimination()
-        ),
+        mating=MixedVariableMating(eliminate_duplicates=MixedVariableDuplicateElimination()),
         eliminate_duplicates=MixedVariableDuplicateElimination(),
         survival=FitnessSurvival(),
         **kwargs,

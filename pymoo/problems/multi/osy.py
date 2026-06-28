@@ -15,11 +15,7 @@ class OSY(Problem):
 
     def _evaluate(self, x: np.ndarray, out: dict, *args, **kwargs) -> None:  # type: ignore[override]  # noqa: ARG002
         f1 = -(
-            25 * (x[:, 0] - 2) ** 2
-            + (x[:, 1] - 2) ** 2
-            + (x[:, 2] - 1) ** 2
-            + (x[:, 3] - 4) ** 2
-            + (x[:, 4] - 1) ** 2
+            25 * (x[:, 0] - 2) ** 2 + (x[:, 1] - 2) ** 2 + (x[:, 2] - 1) ** 2 + (x[:, 3] - 4) ** 2 + (x[:, 4] - 1) ** 2
         )
         f2 = anp.sum(anp.square(x), axis=1)
 

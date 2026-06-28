@@ -36,24 +36,16 @@ class DefaultSingleObjectiveTermination(DefaultTermination):
             ConstraintViolationTermination(cvtol, terminate_when_feasible=False),
             period=period,
         )
-        f = RobustTermination(
-            SingleObjectiveSpaceTermination(ftol, only_feas=True), period=period
-        )
+        f = RobustTermination(SingleObjectiveSpaceTermination(ftol, only_feas=True), period=period)
         super().__init__(x, cv, f, **kwargs)
 
 
 class DefaultMultiObjectiveTermination(DefaultTermination):
-    def __init__(
-        self, xtol=0.0005, cvtol=1e-8, ftol=0.005, n_skip=5, period=50, **kwargs
-    ) -> None:
+    def __init__(self, xtol=0.0005, cvtol=1e-8, ftol=0.005, n_skip=5, period=50, **kwargs) -> None:
         x = RobustTermination(DesignSpaceTermination(tol=xtol, n_skip=n_skip), period)
         cv = RobustTermination(
-            ConstraintViolationTermination(
-                cvtol, terminate_when_feasible=False, n_skip=n_skip
-            ),
+            ConstraintViolationTermination(cvtol, terminate_when_feasible=False, n_skip=n_skip),
             period,
         )
-        f = RobustTermination(
-            MultiObjectiveSpaceTermination(ftol, only_feas=True, n_skip=n_skip), period
-        )
+        f = RobustTermination(MultiObjectiveSpaceTermination(ftol, only_feas=True, n_skip=n_skip), period)
         super().__init__(x, cv, f, **kwargs)

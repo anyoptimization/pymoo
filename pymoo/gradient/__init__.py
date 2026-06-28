@@ -22,9 +22,7 @@ def activate(name: str) -> None:
     """
     global active_backend
     if name not in BACKENDS:
-        raise ValueError(
-            f"Unknown backend: {name}. Choose from: {list(BACKENDS.keys())}"
-        )
+        raise ValueError(f"Unknown backend: {name}. Choose from: {list(BACKENDS.keys())}")
     active_backend = name
 
 

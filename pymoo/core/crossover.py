@@ -27,9 +27,7 @@ class Crossover(Operator):
         n_matings, n_var = len(pop), problem.n_var
 
         # get the actual values from each of the parents
-        X = np.swapaxes(
-            np.array([[parent.get("X") for parent in mating] for mating in pop]), 0, 1
-        )
+        X = np.swapaxes(np.array([[parent.get("X") for parent in mating] for mating in pop]), 0, 1)
         if self.vtype is not None:
             X = X.astype(self.vtype)
 
@@ -46,17 +44,13 @@ class Crossover(Operator):
         if np.any(cross):
             # we can not prefilter for cross first, because there might be other variables using the same shape as X
             Q = self._do(problem, X, *args, random_state=random_state, **kwargs)
-            assert Q.shape == (n_offsprings, n_matings, problem.n_var), (
-                "Shape is incorrect of crossover impl."
-            )
+            assert Q.shape == (n_offsprings, n_matings, problem.n_var), "Shape is incorrect of crossover impl."
             Xp[:, cross] = Q[:, cross]
 
         # now set the parents whenever NO crossover has been applied
         for k in np.flatnonzero(~cross):
             if n_offsprings < n_parents:
-                s = random_state.choice(
-                    np.arange(self.n_parents), size=n_offsprings, replace=False
-                )
+                s = random_state.choice(np.arange(self.n_parents), size=n_offsprings, replace=False)
             elif n_offsprings == n_parents:
                 s = np.arange(n_parents)
             else:

@@ -28,9 +28,7 @@ class BinomialCrossover(Crossover):
         _, n_matings, n_var = X.shape
 
         bias = get(self.bias, size=n_matings)
-        M = mut_binomial(
-            n_matings, n_var, bias, at_least_once=True, random_state=random_state
-        )
+        M = mut_binomial(n_matings, n_var, bias, at_least_once=True, random_state=random_state)
 
         if self.n_offsprings == 1:
             Xp = X[0].copy()

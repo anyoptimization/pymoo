@@ -50,9 +50,7 @@ class ZDT2(ZDT):
 class ZDT3(ZDT):
     """ZDT3 test problem with multiple disconnected Pareto fronts."""
 
-    def _calc_pareto_front(
-        self, n_points: int = 100, flatten: bool = True
-    ) -> np.ndarray:
+    def _calc_pareto_front(self, n_points: int = 100, flatten: bool = True) -> np.ndarray:
         regions = [
             [0, 0.0830015349],
             [0.182228780, 0.2577623634],
@@ -79,11 +77,7 @@ class ZDT3(ZDT):
         f1 = x[:, 0]
         c = anp.sum(x[:, 1:], axis=1)
         g = 1.0 + 9.0 * c / (self.n_var - 1)
-        f2 = g * (
-            1
-            - anp.power(f1 * 1.0 / g, 0.5)
-            - (f1 * 1.0 / g) * anp.sin(10 * anp.pi * f1)
-        )
+        f2 = g * (1 - anp.power(f1 * 1.0 / g, 0.5) - (f1 * 1.0 / g) * anp.sin(10 * anp.pi * f1))
 
         out["F"] = anp.column_stack([f1, f2])
 
@@ -118,9 +112,7 @@ class ZDT4(ZDT):
 class ZDT5(ZDT):
     """ZDT5 test problem with binary variables."""
 
-    def __init__(
-        self, m: int = 11, n: int = 5, normalize: bool = True, **kwargs: Any
-    ) -> None:
+    def __init__(self, m: int = 11, n: int = 5, normalize: bool = True, **kwargs: Any) -> None:
         self.m = m
         self.n = n
         self.normalize = normalize

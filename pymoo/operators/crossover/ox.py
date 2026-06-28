@@ -32,11 +32,7 @@ def ox(receiver, donor, seq=None, shift=False, random_state=None):
     assert len(donor) == len(receiver)
 
     # the sequence which shall be use for the crossover
-    seq = (
-        seq
-        if seq is not None
-        else random_sequence(len(receiver), random_state=random_state)
-    )
+    seq = seq if seq is not None else random_sequence(len(receiver), random_state=random_state)
     start, end = seq
 
     # the donation and a set of it to allow a quick lookup
@@ -77,11 +73,7 @@ class OrderCrossover(Crossover):
             # define the sequence to be used for crossover
             start, end = random_sequence(n, random_state=random_state)
 
-            Y[0, i, :] = ox(
-                a, b, seq=(start, end), shift=self.shift, random_state=random_state
-            )
-            Y[1, i, :] = ox(
-                b, a, seq=(start, end), shift=self.shift, random_state=random_state
-            )
+            Y[0, i, :] = ox(a, b, seq=(start, end), shift=self.shift, random_state=random_state)
+            Y[1, i, :] = ox(b, a, seq=(start, end), shift=self.shift, random_state=random_state)
 
         return Y

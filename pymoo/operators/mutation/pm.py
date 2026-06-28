@@ -36,9 +36,7 @@ def mut_pm(X, xl, xu, eta, prob, at_least_once, random_state=None):
 
     Xp = np.full(X.shape, np.inf)
 
-    mut = mut_binomial(
-        n, n_var, prob, at_least_once=at_least_once, random_state=random_state
-    )
+    mut = mut_binomial(n, n_var, prob, at_least_once=at_least_once, random_state=random_state)
     mut[:, xl == xu] = False
 
     Xp[:, :] = X

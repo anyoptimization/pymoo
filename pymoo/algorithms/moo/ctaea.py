@@ -108,9 +108,7 @@ class CADASurvival:
     def _associate(self, pop):
         """Associate each individual with a F vector and calculate decomposed fitness."""
         F = pop.get("F")
-        dist_matrix = self._calc_perpendicular_distance(
-            F - self.ideal_point, self.ref_dirs
-        )
+        dist_matrix = self._calc_perpendicular_distance(F - self.ideal_point, self.ref_dirs)
         niche_of_individuals = np.argmin(dist_matrix, axis=1)
         FV = self._decomposition.do(
             F,
@@ -160,9 +158,7 @@ class CADASurvival:
         else:  # Too many feasible individuals
             F = Sc.get("F")
             # Filter by non-dominated sorting
-            fronts, rank = NonDominatedSorting().do(
-                F, return_rank=True, n_stop_if_ranked=n_survive
-            )
+            fronts, rank = NonDominatedSorting().do(F, return_rank=True, n_stop_if_ranked=n_survive)
             I = np.concatenate(fronts)  # noqa: E741
             S, rank, F = Sc[I], rank[I], F[I]
             if len(S) > n_survive:
@@ -176,9 +172,7 @@ class CADASurvival:
                     worst_niche = None
                     worst_fit = -1
                     for crowdest_niche in crowdest_niches:
-                        (crowdest,) = np.where(
-                            (niche_of_individuals == index[crowdest_niche]) & survivors
-                        )
+                        (crowdest,) = np.where((niche_of_individuals == index[crowdest_niche]) & survivors)
                         niche_worst = crowdest[FV[crowdest].argmax()]
                         dist_to_max_fit = cdist(F[[niche_worst], :], F).flatten()
                         dist_to_max_fit[niche_worst] = np.inf
@@ -189,12 +183,9 @@ class CADASurvival:
                         np.fill_diagonal(dist_in_niche, np.inf)
 
                         delta_d = dist_in_niche - min_d_to_max_fit
-                        min_d_i = np.unravel_index(
-                            np.argmin(delta_d, axis=None), dist_in_niche.shape
-                        )
+                        min_d_i = np.unravel_index(np.argmin(delta_d, axis=None), dist_in_niche.shape)
                         if (delta_d[min_d_i] < 0) or (
-                            delta_d[min_d_i] == 0
-                            and (FV[crowdest[list(min_d_i)]] > niche_worst).any()
+                            delta_d[min_d_i] == 0 and (FV[crowdest[list(min_d_i)]] > niche_worst).any()
                         ):
                             min_d_i = list(min_d_i)
                             random_state.shuffle(min_d_i)
@@ -226,9 +217,7 @@ class CADASurvival:
                         current_da = np.where(niche_Hd == i)[0]
                         if current_da.size > 0:
                             F = Hd[current_da].get("F")
-                            nd = NonDominatedSorting().do(
-                                F, only_non_dominated_front=True, n_stop_if_ranked=0
-                            )
+                            nd = NonDominatedSorting().do(F, only_non_dominated_front=True, n_stop_if_ranked=0)
                             i_best = current_da[nd[np.argmin(FV[current_da[nd]])]]
                             niche_Hd[i_best] = -1
                             if len(S) < n_survive:
@@ -299,9 +288,7 @@ class CTAEA(GeneticAlgorithm):
             )
 
     def _initialize_infill(self):
-        return self.initialization.do(
-            self.problem, self.pop_size, algorithm=self, random_state=self.random_state
-        )
+        return self.initialization.do(self.problem, self.pop_size, algorithm=self, random_state=self.random_state)
 
     def _initialize_advance(self, infills=None, **kwargs):
         super()._initialize_advance(infills, **kwargs)
@@ -325,9 +312,7 @@ class CTAEA(GeneticAlgorithm):
         )
 
     def _advance(self, infills=None, **kwargs):
-        assert infills is not None, (
-            "This algorithms uses the AskAndTell interface thus infills must to be provided."
-        )
+        assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
         pop = Population.merge(self.pop, infills)
         self.pop, self.da = self.survival.do(
             self.problem,

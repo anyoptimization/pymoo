@@ -20,12 +20,7 @@ class TNK(Problem):
     def _evaluate(self, x: Any, out: Any, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG002
         f1 = x[:, 0]
         f2 = x[:, 1]
-        g1 = -(
-            anp.square(x[:, 0])
-            + anp.square(x[:, 1])
-            - 1.0
-            - 0.1 * anp.cos(16.0 * anp.arctan(x[:, 0] / x[:, 1]))
-        )
+        g1 = -(anp.square(x[:, 0]) + anp.square(x[:, 1]) - 1.0 - 0.1 * anp.cos(16.0 * anp.arctan(x[:, 0] / x[:, 1])))
         g2 = 2 * (anp.square(x[:, 0] - 0.5) + anp.square(x[:, 1] - 0.5)) - 1
 
         out["F"] = anp.column_stack([f1, f2])

@@ -27,9 +27,7 @@ class MIGD(Callback):
 
         # the problem to be solved
         problem = algorithm.problem
-        assert problem.n_constr == 0, (
-            "The current implementation only works for unconstrained problems!"
-        )
+        assert problem.n_constr == 0, "The current implementation only works for unconstrained problems!"
 
         # the current time
         t = problem.time

@@ -22,9 +22,7 @@ class TravelingSalesman(ElementwiseProblem):
         self.cities = cities
         self.D = cdist(cities, cities)
 
-        super(TravelingSalesman, self).__init__(
-            n_var=n_cities, n_obj=1, xl=0, xu=n_cities, vtype=int, **kwargs
-        )
+        super(TravelingSalesman, self).__init__(n_var=n_cities, n_obj=1, xl=0, xu=n_cities, vtype=int, **kwargs)
 
     def _evaluate(self, x, out, *args, **kwargs):
         out["F"] = self.get_route_length(x)
@@ -42,9 +40,7 @@ class TravelingSalesman(ElementwiseProblem):
 
 
 @default_random_state(seed=1)
-def create_random_tsp_problem(
-    n_cities, grid_width=100.0, grid_height=None, random_state=None, **kwargs
-):
+def create_random_tsp_problem(n_cities, grid_width=100.0, grid_height=None, random_state=None, **kwargs):
     grid_height = grid_height if grid_height is not None else grid_width
     cities = random_state.random((n_cities, 2)) * [grid_width, grid_height]
     return TravelingSalesman(cities)
@@ -62,9 +58,7 @@ def visualize(problem, x, fig=None, ax=None, show=True, label=True):
         if label:
             # annotate cities
             for i, c in enumerate(problem.cities):
-                ax.annotate(
-                    str(i), xy=c, fontsize=10, ha="center", va="center", color="white"
-                )
+                ax.annotate(str(i), xy=c, fontsize=10, ha="center", va="center", color="white")
 
         # plot the line on the path
         for i in range(len(x)):

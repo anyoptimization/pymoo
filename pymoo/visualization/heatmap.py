@@ -36,9 +36,7 @@ class Heatmap(Plot):
         self.solution_labels = solution_labels
 
         # set default style
-        set_if_none_from_tuples(
-            self.axis_style, ("interpolation", "nearest"), ("vmin", 0), ("vmax", 1)
-        )
+        set_if_none_from_tuples(self.axis_style, ("interpolation", "nearest"), ("vmin", 0), ("vmax", 1))
 
     def _do(self):
 
@@ -54,14 +52,8 @@ class Heatmap(Plot):
         (F, kwargs) = to_plot_norm[0]
 
         # dot the sorting if required
-        if (
-            self.order_by_objectives is not None
-            and self.order_by_objectives is not False
-        ):
-            if (
-                isinstance(self.order_by_objectives, list)
-                and len(self.order_by_objectives) == self.n_dim
-            ):
+        if self.order_by_objectives is not None and self.order_by_objectives is not False:
+            if isinstance(self.order_by_objectives, list) and len(self.order_by_objectives) == self.n_dim:
                 L = self.order_by_objectives
             elif isinstance(self.order_by_objectives, int):
                 L = [i for i in range(F.shape[1]) if i != self.order_by_objectives]

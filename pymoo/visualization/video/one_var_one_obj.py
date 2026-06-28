@@ -22,9 +22,7 @@ class OneVariableOneObjectiveVisualization(AnimationCallback):
 
         # check whether the visualization can be done or not - throw exception or simply do nothing
         if problem.n_var != 1 or problem.n_obj != 1:
-            raise Exception(
-                "This visualization can only be used for problems with one variable and one objective!"
-            )
+            raise Exception("This visualization can only be used for problems with one variable and one objective!")
 
         # draw the problem surface
         xl, xu = problem.bounds()

@@ -17,12 +17,8 @@ def g_multimodal(x: np.ndarray) -> np.ndarray:
 
 
 class CTP(Problem):
-    def __init__(
-        self, n_var: int = 2, n_ieq_constr: int = 1, option: str = "linear"
-    ) -> None:
-        super().__init__(
-            n_var=n_var, n_obj=2, n_ieq_constr=n_ieq_constr, xl=0, xu=1, vtype=float
-        )
+    def __init__(self, n_var: int = 2, n_ieq_constr: int = 1, option: str = "linear") -> None:
+        super().__init__(n_var=n_var, n_obj=2, n_ieq_constr=n_ieq_constr, xl=0, xu=1, vtype=float)
 
         if option == "linear":
             self.calc_g = g_linear
@@ -74,9 +70,7 @@ class CTP(Problem):
         return val
 
     def _calc_pareto_front(self, *args, **kwargs):  # noqa: ARG002
-        return Remote.get_instance().load(
-            "pymoo", "pf", "CTP", str(self.__class__.__name__).lower() + ".pf"
-        )
+        return Remote.get_instance().load("pymoo", "pf", "CTP", str(self.__class__.__name__).lower() + ".pf")
 
 
 class CTP1(CTP):

@@ -77,9 +77,7 @@ class PatternSearch(LocalSearch):
             self._rho = self.init_rho**self.n_not_improved
 
             # explore around the current center - try finding a suitable direction
-            self._explr = yield from exploration_move(
-                self.problem, self._center, self._sign, self._delta, self._rho
-            )
+            self._explr = yield from exploration_move(self.problem, self._center, self._sign, self._delta, self._rho)
 
         # if we have found a direction in the last iteration to be worth following
         else:
@@ -90,17 +88,13 @@ class PatternSearch(LocalSearch):
             self._center = self._explr
 
             # use the pattern move to get a new trial vector along that given direction
-            self._trial = yield pattern_move(
-                self.problem, self._center, self._direction, self.step_size
-            )
+            self._trial = yield pattern_move(self.problem, self._center, self._direction, self.step_size)
 
             # get the delta sign adjusted for the exploration
             self._sign = calc_sign(self._direction)
 
             # explore around the current center to try finding a suitable direction
-            self._explr = yield from exploration_move(
-                self.problem, self._trial, self._sign, self._delta, self._rho
-            )
+            self._explr = yield from exploration_move(self.problem, self._trial, self._sign, self._delta, self._rho)
 
         self.pop = Population.create(self._center, self._explr)
 
@@ -110,9 +104,7 @@ class PatternSearch(LocalSearch):
 
 
 @default_random_state
-def exploration_move(
-    problem, center, sign, delta, rho, randomize=True, random_state=None
-):
+def exploration_move(problem, center, sign, delta, rho, randomize=True, random_state=None):
     n_var = problem.n_var
 
     # the order for the variable iteration

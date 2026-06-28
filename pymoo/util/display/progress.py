@@ -16,9 +16,7 @@ class ProgressBar:
         **kwargs: Keyword arguments passed to alive_bar.
     """
 
-    def __init__(
-        self, *args: Any, start: bool = True, non_decreasing: bool = True, **kwargs: Any
-    ) -> None:
+    def __init__(self, *args: Any, start: bool = True, non_decreasing: bool = True, **kwargs: Any) -> None:
         self.args = args
         self.kwargs = kwargs
 

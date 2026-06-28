@@ -31,9 +31,7 @@ from pymoo.util.misc import where_is_what
 @default_random_state
 def de_differential(X, F, jitter, alpha=0.001, random_state=None):
     n_parents, n_matings, n_var = X.shape
-    assert n_parents % 2 == 1, (
-        "For the differential an odd number of values need to be provided"
-    )
+    assert n_parents % 2 == 1, "For the differential an odd number of values need to be provided"
 
     # the differentials from each pair
     delta = np.zeros((n_matings, n_var))
@@ -74,14 +72,10 @@ class Variant(InfillCriterion):
     ):
 
         super().__init__(**kwargs)
-        self.selection = Choice(
-            selection, options=["rand", "best"], all=["rand", "best", "target-to-best"]
-        )
+        self.selection = Choice(selection, options=["rand", "best"], all=["rand", "best", "target-to-best"])
         self.n_diffs = Choice(n_diffs, options=[1], all=[1, 2])
         self.F = Real(F, bounds=(0.4, 0.7), strict=(0.0, None))
-        self.crossover = Choice(
-            crossover, ["bin"], all=["bin", "exp", "hypercube", "line"]
-        )
+        self.crossover = Choice(crossover, ["bin"], all=["bin", "exp", "hypercube", "line"])
         self.CR = Real(CR, bounds=(0.2, 0.8), strict=(0.0, 1.0))
         self.jitter = Choice(jitter, options=[False], all=[True, False])
 
@@ -162,15 +156,11 @@ class Variant(InfillCriterion):
             XX = np.swapaxes(X[P], 0, 1)
 
             # do the differential crossover to create the donor vector
-            Xp = de_differential(
-                XX, F[targets], jitter[targets], random_state=random_state
-            )
+            Xp = de_differential(XX, F[targets], jitter[targets], random_state=random_state)
 
             # make sure everything stays in bounds
             if problem.has_bounds():
-                Xp = repair_random_init(
-                    Xp, XX[0], *problem.bounds(), random_state=random_state
-                )
+                Xp = repair_random_init(Xp, XX[0], *problem.bounds(), random_state=random_state)
 
             # set the donors (the one we have created in this step)
             donor[targets] = Xp
@@ -263,9 +253,7 @@ class DE(GeneticAlgorithm):
                     **kwargs,
                 )
             except:  # noqa: E722
-                raise Exception(
-                    "Please provide a valid variant: DE/<selection>/<n_diffs>/<crossover>"
-                )
+                raise Exception("Please provide a valid variant: DE/<selection>/<n_diffs>/<crossover>")
 
         super().__init__(
             pop_size=pop_size,
@@ -305,9 +293,7 @@ class DE(GeneticAlgorithm):
         return infills
 
     def _advance(self, infills=None, **kwargs):
-        assert infills is not None, (
-            "This algorithms uses the AskAndTell interface thus infills must to be provided."
-        )
+        assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
 
         # get the indices where each offspring is originating from
         I = infills.get("index")  # noqa: E741

@@ -14,12 +14,7 @@ class Kursawe(Problem):
     def _evaluate(self, x: np.ndarray, out: dict, *args, **kwargs) -> None:  # type: ignore[override]  # noqa: ARG002
         terms = []
         for i in range(2):
-            terms.append(
-                -10
-                * anp.exp(
-                    -0.2 * anp.sqrt(anp.square(x[:, i]) + anp.square(x[:, i + 1]))
-                )
-            )
+            terms.append(-10 * anp.exp(-0.2 * anp.sqrt(anp.square(x[:, i]) + anp.square(x[:, i + 1]))))
         f1 = anp.sum(anp.column_stack(terms), axis=1)
 
         f2 = anp.sum(anp.power(anp.abs(x), 0.8) + 5 * anp.sin(anp.power(x, 3)), axis=1)

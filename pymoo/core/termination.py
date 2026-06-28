@@ -25,9 +25,7 @@ class Termination:
             progress = 1.0
         else:
             progress = self._update(algorithm)
-            assert progress >= 0.0, (
-                "Invalid progress was set by the TerminationCriterion."
-            )
+            assert progress >= 0.0, "Invalid progress was set by the TerminationCriterion."
 
         self.perc = progress
         return self.perc

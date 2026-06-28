@@ -14,12 +14,8 @@ class StochasticRankingSurvival(Survival):
         super().__init__(filter_infeasible=False)
         self.PR = PR
 
-    def _do(
-        self, problem, pop, *args, n_survive=None, tcv=None, random_state=None, **kwargs
-    ):
-        assert problem.n_obj == 1, (
-            "This stochastic ranking implementation only works for single-objective problems."
-        )
+    def _do(self, problem, pop, *args, n_survive=None, tcv=None, random_state=None, **kwargs):
+        assert problem.n_obj == 1, "This stochastic ranking implementation only works for single-objective problems."
 
         F, G = pop.get("F", "G")
         f = F[:, 0]

@@ -52,9 +52,7 @@ class GaussianMutation(Mutation):
         sigma = get(self.sigma, size=len(X))
         prob_var = self.get_prob_var(problem, size=len(X))
 
-        Xp = mut_gauss(
-            X, problem.xl, problem.xu, sigma, prob_var, random_state=random_state
-        )
+        Xp = mut_gauss(X, problem.xl, problem.xu, sigma, prob_var, random_state=random_state)
 
         return Xp
 

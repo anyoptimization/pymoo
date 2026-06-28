@@ -124,9 +124,7 @@ def to_hash(x):
         try:
             h = hash(str(x))
         except:  # noqa: E722
-            raise Exception(
-                "Hash could not be calculated. Please use another duplicate elimination."
-            )
+            raise Exception("Hash could not be calculated. Please use another duplicate elimination.")
 
     return h
 

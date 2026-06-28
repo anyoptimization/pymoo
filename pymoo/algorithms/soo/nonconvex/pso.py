@@ -186,18 +186,13 @@ class PSO(Algorithm):
         self.f, self.strategy = None, None
 
     def _initialize_infill(self):
-        return self.initialization.do(
-            self.problem, self.pop_size, algorithm=self, random_state=self.random_state
-        )
+        return self.initialization.do(self.problem, self.pop_size, algorithm=self, random_state=self.random_state)
 
     def _initialize_advance(self, infills=None, **kwargs):
         particles = self.pop
 
         if self.initial_velocity == "random":
-            init_V = (
-                self.random_state.random((len(particles), self.problem.n_var))
-                * self.V_max[None, :]
-            )
+            init_V = self.random_state.random((len(particles), self.problem.n_var)) * self.V_max[None, :]
         elif self.initial_velocity == "zero":
             init_V = np.zeros((len(particles), self.problem.n_var))
         else:
@@ -252,21 +247,15 @@ class PSO(Algorithm):
                 )
 
             # if still infeasible do a random initialization
-            Xp = repair_random_init(
-                Xp, X, *problem.bounds(), random_state=self.random_state
-            )
+            Xp = repair_random_init(Xp, X, *problem.bounds(), random_state=self.random_state)
 
         # create the offspring population
         off = Population.new(X=Xp, V=Vp)
 
         # try to improve the current best with a pertubation
         if self.pertube_best:
-            k = FitnessSurvival().do(problem, pbest, n_survive=1, return_indices=True)[
-                0
-            ]
-            mut = PM(
-                prob=0.9, eta=self.random_state.uniform(5, 30), at_least_once=False
-            )
+            k = FitnessSurvival().do(problem, pbest, n_survive=1, return_indices=True)[0]
+            mut = PM(prob=0.9, eta=self.random_state.uniform(5, 30), at_least_once=False)
             mutant = mut(
                 problem,
                 Population(Individual(X=pbest[k].X)),
@@ -280,17 +269,13 @@ class PSO(Algorithm):
         return off
 
     def _advance(self, infills=None, **kwargs):
-        assert infills is not None, (
-            "This algorithms uses the AskAndTell interface thus 'infills' must to be provided."
-        )
+        assert infills is not None, "This algorithms uses the AskAndTell interface thus 'infills' must to be provided."
 
         # set the new population to be equal to the offsprings
         self.particles = infills
 
         # if an offspring has improved the personal store that index
-        has_improved = ImprovementReplacement().do(
-            self.problem, self.pop, infills, return_indices=True
-        )
+        has_improved = ImprovementReplacement().do(self.problem, self.pop, infills, return_indices=True)
 
         # set the personal best which have been improved
         self.pop[has_improved] = infills[has_improved]

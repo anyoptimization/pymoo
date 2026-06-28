@@ -52,6 +52,7 @@ include = ["pymoo*"]
 # docstrings). Migrating numpy -> google module-by-module; the docs build renders
 # both via sphinx napoleon during the transition.
 [tool.ruff]
+line-length = 120
 # Whole-project (target-less `ruff check`/`format`) scopes to the package, matching
 # mypy's files=["pymoo"]; the non-source trees aren't part of the quality gate.
 # Per-file `pyclawd check <file>` still works on any explicitly-passed path.

@@ -53,15 +53,10 @@ class RNSGA3(NSGA3):
         n_obj = ref_points.shape[1]
 
         # add the aspiration point lines
-        aspiration_ref_dirs = UniformReferenceDirectionFactory(
-            n_dim=n_obj, n_points=pop_per_ref_point
-        ).do()
+        aspiration_ref_dirs = UniformReferenceDirectionFactory(n_dim=n_obj, n_points=pop_per_ref_point).do()
 
         survival = AspirationPointSurvival(ref_points, aspiration_ref_dirs, mu=mu)
-        pop_size = (
-            ref_points.shape[0] * aspiration_ref_dirs.shape[0]
-            + aspiration_ref_dirs.shape[1]
-        )
+        pop_size = ref_points.shape[0] * aspiration_ref_dirs.shape[0] + aspiration_ref_dirs.shape[1]
         ref_dirs = None
 
         super().__init__(
@@ -108,17 +103,11 @@ class AspirationPointSurvival(Survival):
         F = pop.get("F")
 
         # find or usually update the new ideal point - from feasible solutions
-        self.ideal_point = np.min(
-            np.vstack((self.ideal_point, F, self.ref_points)), axis=0
-        )
-        self.worst_point = np.max(
-            np.vstack((self.worst_point, F, self.ref_points)), axis=0
-        )
+        self.ideal_point = np.min(np.vstack((self.ideal_point, F, self.ref_points)), axis=0)
+        self.worst_point = np.max(np.vstack((self.worst_point, F, self.ref_points)), axis=0)
 
         # calculate the fronts of the population
-        fronts, rank = NonDominatedSorting().do(
-            F, return_rank=True, n_stop_if_ranked=n_survive
-        )
+        fronts, rank = NonDominatedSorting().do(F, return_rank=True, n_stop_if_ranked=n_survive)
         non_dominated, last_front = fronts[0], fronts[-1]
 
         # find the extreme points for normalization
@@ -151,26 +140,18 @@ class AspirationPointSurvival(Survival):
                 counter += 1
         last_front = fronts[-1]
 
-        unit_ref_points = (self.ref_points - self.ideal_point) / (
-            self.nadir_point - self.ideal_point
-        )
-        ref_dirs = get_ref_dirs_from_points(
-            unit_ref_points, self.aspiration_ref_dirs, mu=self.mu
-        )
+        unit_ref_points = (self.ref_points - self.ideal_point) / (self.nadir_point - self.ideal_point)
+        ref_dirs = get_ref_dirs_from_points(unit_ref_points, self.aspiration_ref_dirs, mu=self.mu)
         self.ref_dirs = denormalize(ref_dirs, self.ideal_point, self.nadir_point)
 
         # associate individuals to niches
         niche_of_individuals, dist_to_niche, dist_matrix = associate_to_niches(
             F, ref_dirs, self.ideal_point, self.nadir_point
         )
-        pop.set(
-            "rank", rank, "niche", niche_of_individuals, "dist_to_niche", dist_to_niche
-        )
+        pop.set("rank", rank, "niche", niche_of_individuals, "dist_to_niche", dist_to_niche)
 
         # set the optimum, first front and closest to all reference directions
-        closest = np.unique(
-            dist_matrix[:, np.unique(niche_of_individuals)].argmin(axis=0)
-        )
+        closest = np.unique(dist_matrix[:, np.unique(niche_of_individuals)].argmin(axis=0))
         self.opt = pop[intersect(fronts[0], closest)]
 
         # if we need to select individuals to survive
@@ -184,9 +165,7 @@ class AspirationPointSurvival(Survival):
             # if some individuals already survived
             else:
                 until_last_front = np.concatenate(fronts[:-1])
-                niche_count = calc_niche_count(
-                    len(ref_dirs), niche_of_individuals[until_last_front]
-                )
+                niche_count = calc_niche_count(len(ref_dirs), niche_of_individuals[until_last_front])
                 n_remaining = n_survive - len(until_last_front)
 
             S = niching(
@@ -226,19 +205,13 @@ def get_ref_dirs_from_points(ref_point, ref_dirs, mu=0.1):
     point_on_plane = np.eye(n_obj)[0]  # Point on Das-Dennis
 
     for point in ref_point:
-        ref_dir_for_aspiration_point = np.copy(
-            ref_dirs
-        )  # Copy of computed reference directions
+        ref_dir_for_aspiration_point = np.copy(ref_dirs)  # Copy of computed reference directions
         ref_dir_for_aspiration_point = mu * ref_dir_for_aspiration_point
 
-        cent = np.mean(
-            ref_dir_for_aspiration_point, axis=0
-        )  # Find centroid of shrunken reference points
+        cent = np.mean(ref_dir_for_aspiration_point, axis=0)  # Find centroid of shrunken reference points
 
         # Project shrunken Das-Dennis points back onto original Das-Dennis hyperplane
-        intercept = line_plane_intersection(
-            np.zeros(n_obj), point, point_on_plane, n_vector
-        )
+        intercept = line_plane_intersection(np.zeros(n_obj), point, point_on_plane, n_vector)
         shift = intercept - cent  # shift vector
 
         ref_dir_for_aspiration_point += shift
@@ -247,8 +220,7 @@ def get_ref_dirs_from_points(ref_point, ref_dirs, mu=0.1):
         if not (ref_dir_for_aspiration_point > 0).min():
             ref_dir_for_aspiration_point[ref_dir_for_aspiration_point < 0] = 0
             ref_dir_for_aspiration_point = (
-                ref_dir_for_aspiration_point
-                / np.sum(ref_dir_for_aspiration_point, axis=1)[:, None]
+                ref_dir_for_aspiration_point / np.sum(ref_dir_for_aspiration_point, axis=1)[:, None]
             )
         val.extend(ref_dir_for_aspiration_point)
 

@@ -87,9 +87,7 @@ class LooseDominator:
         better_by_eps = np.any(L + epsilon < R, axis=1).reshape(n, m)
         worse_by_eps = np.any(L > R + epsilon, axis=1).reshape(n, m)
 
-        M = (dominates & better_by_eps).astype(int) - (dominated & worse_by_eps).astype(
-            int
-        )
+        M = (dominates & better_by_eps).astype(int) - (dominated & worse_by_eps).astype(int)
         return M
 
 
@@ -183,18 +181,12 @@ def calc_omni_crowding_distance(F, X, obj_crowding=True, var_crowding=True):
         behavior; disabling the objective-space niching niches purely in variable space.
     """
     if not (obj_crowding or var_crowding):
-        raise ValueError(
-            "At least one of objective- or variable-space crowding must be enabled."
-        )
+        raise ValueError("At least one of objective- or variable-space crowding must be enabled.")
 
     n = len(F)
 
-    obj_cd = (
-        calc_crowding_distance_in_space(F, space="objective") if obj_crowding else None
-    )
-    var_cd = (
-        calc_crowding_distance_in_space(X, space="variable") if var_crowding else None
-    )
+    obj_cd = calc_crowding_distance_in_space(F, space="objective") if obj_crowding else None
+    var_cd = calc_crowding_distance_in_space(X, space="variable") if var_crowding else None
 
     # only a single space is used
     if not var_crowding:
@@ -418,9 +410,7 @@ class OmniOptimizer(GeneticAlgorithm):
             **kwargs: Additional keyword arguments passed to the genetic algorithm base class.
         """
         if survival is None:
-            survival = OmniOptimizerSurvival(
-                delta=delta, obj_crowding=obj_crowding, var_crowding=var_crowding
-            )
+            survival = OmniOptimizerSurvival(delta=delta, obj_crowding=obj_crowding, var_crowding=var_crowding)
 
         super().__init__(
             pop_size=pop_size,

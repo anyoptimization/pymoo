@@ -51,13 +51,9 @@ class Radar(Plot):
         self.point_style = point_style
         set_if_none_from_tuples(self.point_style, ("s", 15))
 
-        set_if_none_from_tuples(
-            self.axis_style, ("color", "black"), ("linewidth", 0.5), ("alpha", 0.75)
-        )
+        set_if_none_from_tuples(self.axis_style, ("color", "black"), ("linewidth", 0.5), ("alpha", 0.75))
 
-    def _plot(
-        self, ax, _F: np.ndarray, inner: np.ndarray, outer: np.ndarray, kwargs: dict
-    ) -> None:
+    def _plot(self, ax, _F: np.ndarray, inner: np.ndarray, outer: np.ndarray, kwargs: dict) -> None:
         set_if_none_from_tuples(kwargs, ("alpha", 0.5))
 
         # equal axis length and no ticks
@@ -66,9 +62,7 @@ class Radar(Plot):
 
         # draw the axis lines and labels
         plot_axes_lines(ax, outer, extend_factor=1.0, **self.axis_style)
-        plot_axis_labels(
-            ax, outer, self.get_labels(), margin=0.015, **self.axis_label_style
-        )
+        plot_axis_labels(ax, outer, self.get_labels(), margin=0.015, **self.axis_label_style)
 
         # plot the outer radar line and the inner polygon
         plot_radar_line(ax, outer, **self.axis_style)

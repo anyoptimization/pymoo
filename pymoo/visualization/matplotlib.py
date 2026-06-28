@@ -39,14 +39,12 @@ except ImportError:
 
         def __getattr__(self, name):
             raise ImportError(
-                "Visualization features require matplotlib.\n"
-                "Install with: pip install pymoo[visualization]"
+                "Visualization features require matplotlib.\nInstall with: pip install pymoo[visualization]"
             )
 
         def __call__(self, *args, **kwargs):
             raise ImportError(
-                "Visualization features require matplotlib.\n"
-                "Install with: pip install pymoo[visualization]"
+                "Visualization features require matplotlib.\nInstall with: pip install pymoo[visualization]"
             )
 
     # Create placeholder objects that give helpful errors

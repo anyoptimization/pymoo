@@ -134,9 +134,7 @@ class RMetric(Indicator):
             pf = self.problem.pareto_front()
 
         if pf is None:
-            raise Exception(
-                "Please provide the Pareto front to calculate the R-Metric!"
-            )
+            raise Exception("Please provide the Pareto front to calculate the R-Metric!")
 
         labels = np.argmin(cdist(pop, self.ref_points), axis=1)
 
@@ -144,21 +142,15 @@ class RMetric(Indicator):
             cluster = pop[np.where(labels == i)]
             if len(cluster) != 0:
                 # 2. Representative Point Identification
-                zp = self._preprocess(
-                    cluster, self.ref_points[i], w_point=self.w_points[i]
-                )[0]
+                zp = self._preprocess(cluster, self.ref_points[i], w_point=self.w_points[i])[0]
                 # 3. Filtering Procedure - Filter points
                 trimmed_data = self._trim(cluster, zp, range=self.delta)
                 # 4. Solution Translation
-                pop_t = self._translate(
-                    zp, trimmed_data, self.ref_points[i], w_point=self.w_points[i]
-                )
+                pop_t = self._translate(zp, trimmed_data, self.ref_points[i], w_point=self.w_points[i])
                 translated.extend(pop_t)
 
             # 5. R-Metric Computation
-            target = self._preprocess(
-                data=pf, ref_point=self.ref_points[i], w_point=self.w_points[i]
-            )
+            target = self._preprocess(data=pf, ref_point=self.ref_points[i], w_point=self.w_points[i])
             PF = self._trim(pf, target)
             final_PF.extend(PF)
 

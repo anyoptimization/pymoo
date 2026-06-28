@@ -80,6 +80,4 @@ class TimeSimulation(Callback):
         if hasattr(problem, "tic"):
             problem.tic()
         else:
-            raise Exception(
-                "TimeSimulation can only be used for dynamic test problems."
-            )
+            raise Exception("TimeSimulation can only be used for dynamic test problems.")

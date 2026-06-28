@@ -28,9 +28,7 @@ class Evaluator:
                 (``["F", "G", "H"]``) when ``None``.
             callback: Optional callback function to execute after evaluation.
         """
-        self.evaluate_values_of = (
-            ["F", "G", "H"] if evaluate_values_of is None else evaluate_values_of
-        )
+        self.evaluate_values_of = ["F", "G", "H"] if evaluate_values_of is None else evaluate_values_of
         self.skip_already_evaluated = skip_already_evaluated
         self.callback = callback
 
@@ -48,15 +46,9 @@ class Evaluator:
     ):
 
         # load the default settings from the evaluator object if not already provided
-        evaluate_values_of = (
-            self.evaluate_values_of
-            if evaluate_values_of is None
-            else evaluate_values_of
-        )
+        evaluate_values_of = self.evaluate_values_of if evaluate_values_of is None else evaluate_values_of
         skip_already_evaluated = (
-            self.skip_already_evaluated
-            if skip_already_evaluated is None
-            else skip_already_evaluated
+            self.skip_already_evaluated if skip_already_evaluated is None else skip_already_evaluated
         )
 
         # check the type of the input
@@ -69,11 +61,7 @@ class Evaluator:
         # filter the index to have individual where not all attributes have been evaluated
         if skip_already_evaluated:
             I = np.array(  # noqa: E741
-                [
-                    i
-                    for i, ind in enumerate(pop)
-                    if not all([e in ind.evaluated for e in evaluate_values_of])
-                ]
+                [i for i, ind in enumerate(pop) if not all([e in ind.evaluated for e in evaluate_values_of])]
             )
 
         # if skipping is deactivated simply make the index being all individuals
@@ -104,9 +92,7 @@ class Evaluator:
         X = pop.get("X")
 
         # call the problem to evaluate the solutions
-        out = problem.evaluate(
-            X, return_values_of=evaluate_values_of, return_as_dictionary=True, **kwargs
-        )
+        out = problem.evaluate(X, return_values_of=evaluate_values_of, return_as_dictionary=True, **kwargs)
 
         # for each of the attributes set it to the problem
         for key, val in out.items():

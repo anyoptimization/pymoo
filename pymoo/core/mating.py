@@ -21,9 +21,7 @@ class Mating(InfillCriterion):
         self.crossover = crossover
         self.mutation = mutation
 
-    def _do(
-        self, problem, pop, n_offsprings, parents=None, random_state=None, **kwargs
-    ):
+    def _do(self, problem, pop, n_offsprings, parents=None, random_state=None, **kwargs):
 
         # how many parents need to be select for the mating - depending on number of offsprings remaining
         n_matings = math.ceil(n_offsprings / self.crossover.n_offsprings)

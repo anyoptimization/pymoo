@@ -58,9 +58,7 @@ def pymoo_doctor_checks() -> list[Check]:
                 )
             )
     except Exception as exc:  # noqa: BLE001
-        checks.append(
-            Check(WARN, "compiled ext", f"could not determine ({type(exc).__name__})")
-        )
+        checks.append(Check(WARN, "compiled ext", f"could not determine ({type(exc).__name__})"))
     return checks
 
 
@@ -130,8 +128,6 @@ project = Project(
     # bless time; 1e-6 absorbs cross-platform float jitter while still catching real
     # drift. Dependency-averse forks can instead `pyclawd golden vendor` a single
     # self-contained file — pymoo installs pyclawd, so it uses the plugin directly.
-    golden=GoldenConfig(
-        baseline_dir="tests/golden", marker="golden", rtol=1e-6, atol=1e-6
-    ),
+    golden=GoldenConfig(baseline_dir="tests/golden", marker="golden", rtol=1e-6, atol=1e-6),
     extra_doctor_checks=pymoo_doctor_checks,
 )

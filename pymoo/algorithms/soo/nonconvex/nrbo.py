@@ -25,9 +25,7 @@ class FitnessSurvival(Survival):
 
     def _do(self, problem, pop, n_survive=None, **kwargs):
         F, cv = pop.get("F", "cv")
-        assert F.shape[1] == 1, (
-            "FitnessSurvival can only used for single objective single!"
-        )
+        assert F.shape[1] == 1, "FitnessSurvival can only used for single objective single!"
         S = np.lexsort([F[:, 0], cv])
         pop.set("rank", np.argsort(S))
         return pop[S[:n_survive]]
@@ -106,9 +104,7 @@ class NRBO(Algorithm):
         return super()._setup(problem, **kwargs)
 
     def _initialize_infill(self):
-        return self.initialization.do(
-            self.problem, self.pop_size, algorithm=self, random_state=self.random_state
-        )
+        return self.initialization.do(self.problem, self.pop_size, algorithm=self, random_state=self.random_state)
 
     def _initialize_advance(self, infills=None, **kwargs):
         self.pop = self.survial.do(self.problem, infills)
@@ -136,9 +132,7 @@ class NRBO(Algorithm):
             rho = a * (Xb - X[i]) + b * (X[r1] - X[r2])
 
             # NRSR
-            X1, X2 = Search_Rule(
-                Xb=Xb, Xw=Xw, Xn=X[i], rho=rho, random_state=self.random_state
-            )
+            X1, X2 = Search_Rule(Xb=Xb, Xw=Xw, Xn=X[i], rho=rho, random_state=self.random_state)
 
             X3 = X[i] - delta * (X2 - X1)
 
@@ -154,9 +148,7 @@ class NRBO(Algorithm):
                 u1 = beta * 3 * self.random_state.random() + (1 - beta)
                 u2 = beta * self.random_state.random() + (1 - beta)
 
-                tmp = theta1 * (u1 * Xb - u2 * X[i]) + theta2 * delta * (
-                    u1 * np.mean(X[i]) - u2 * X[i]
-                )
+                tmp = theta1 * (u1 * Xb - u2 * X[i]) + theta2 * delta * (u1 * np.mean(X[i]) - u2 * X[i])
                 if u1 < 0.5:
                     X_tao = Xn_new + tmp
                 else:
@@ -168,9 +160,7 @@ class NRBO(Algorithm):
         off = np.array(off)
         if self.problem.has_bounds():
             # off = set_to_bounds_if_outside(off, *self.problem.bounds())
-            off = repair_random_init(
-                off, X, *self.problem.bounds(), random_state=self.random_state
-            )
+            off = repair_random_init(off, X, *self.problem.bounds(), random_state=self.random_state)
 
         off = Population.new(X=off)
 
@@ -179,9 +169,7 @@ class NRBO(Algorithm):
 
     def _advance(self, infills=None, **kwargs):
         off = infills
-        has_improved = ImprovementReplacement().do(
-            self.problem, self.pop, off, return_indices=True
-        )
+        has_improved = ImprovementReplacement().do(self.problem, self.pop, off, return_indices=True)
 
         self.pop[has_improved] = off[has_improved]
         self.survial.do(self.problem, self.pop)

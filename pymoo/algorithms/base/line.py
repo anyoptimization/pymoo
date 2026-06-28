@@ -20,14 +20,10 @@ class LineSearch(Algorithm):
         msg = "Only problems with one objective and no constraints can be solved using a line search!"
         assert not problem.has_constraints() and problem.n_obj == 1, msg
 
-        assert point is not None, (
-            "You have to define a starting point for the algorithm"
-        )
+        assert point is not None, "You have to define a starting point for the algorithm"
         self.point = point
 
-        assert direction is not None, (
-            "You have to define a direction point for the algorithm"
-        )
+        assert direction is not None, "You have to define a direction point for the algorithm"
         self.direction = direction
 
         return self
@@ -46,9 +42,7 @@ class LineSearch(Algorithm):
 
 
 class LineSearchProblem(Meta, Problem):
-    def __init__(
-        self, problem, point, direction, strict_bounds=True, xl=0.0, xu=np.inf
-    ):
+    def __init__(self, problem, point, direction, strict_bounds=True, xl=0.0, xu=np.inf):
         super().__init__(problem)
         self.n_var = 1
         self.xl, self.xu = np.array([xl]), np.array([xu])

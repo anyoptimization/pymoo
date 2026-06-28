@@ -148,9 +148,7 @@ class ReferenceDirectionSurvival(Survival):
         F = pop.get("F")
 
         # calculate the fronts of the population
-        fronts, rank = NonDominatedSorting().do(
-            F, return_rank=True, n_stop_if_ranked=n_survive
-        )
+        fronts, rank = NonDominatedSorting().do(F, return_rank=True, n_stop_if_ranked=n_survive)
         non_dominated, last_front = fronts[0], fronts[-1]
 
         # update the hyperplane based boundary estimation
@@ -171,19 +169,13 @@ class ReferenceDirectionSurvival(Survival):
         last_front = fronts[-1]
 
         # associate individuals to niches
-        niche_of_individuals, dist_to_niche, dist_matrix = associate_to_niches(
-            F, self.ref_dirs, ideal, nadir
-        )
+        niche_of_individuals, dist_to_niche, dist_matrix = associate_to_niches(F, self.ref_dirs, ideal, nadir)
 
         # attributes of a population
-        pop.set(
-            "rank", rank, "niche", niche_of_individuals, "dist_to_niche", dist_to_niche
-        )
+        pop.set("rank", rank, "niche", niche_of_individuals, "dist_to_niche", dist_to_niche)
 
         # set the optimum, first front and closest to all reference directions
-        closest = np.unique(
-            dist_matrix[:, np.unique(niche_of_individuals)].argmin(axis=0)
-        )
+        closest = np.unique(dist_matrix[:, np.unique(niche_of_individuals)].argmin(axis=0))
         self.opt = pop[intersect(fronts[0], closest)]
         if len(self.opt) == 0:
             self.opt = pop[fronts[0]]
@@ -199,9 +191,7 @@ class ReferenceDirectionSurvival(Survival):
             # if some individuals already survived
             else:
                 until_last_front = np.concatenate(fronts[:-1])
-                niche_count = calc_niche_count(
-                    len(self.ref_dirs), niche_of_individuals[until_last_front]
-                )
+                niche_count = calc_niche_count(len(self.ref_dirs), niche_of_individuals[until_last_front])
                 n_remaining = n_survive - len(until_last_front)
 
             S = niching(
@@ -250,9 +240,7 @@ def niching(
 
         for next_niche in next_niches:
             # indices of individuals that are considered and assign to next_niche
-            next_ind = np.where(
-                np.logical_and(niche_of_individuals == next_niche, mask)
-            )[0]
+            next_ind = np.where(np.logical_and(niche_of_individuals == next_niche, mask))[0]
 
             # shuffle to break random tie (equal perp. dist) or select randomly
             random_state.shuffle(next_ind)
@@ -319,9 +307,7 @@ class HyperplaneNormalization:
             nds = np.arange(len(F))
 
         # find the extreme points for normalization
-        self.extreme_points = get_extreme_points_c(
-            F[nds, :], self.ideal_point, extreme_points=self.extreme_points
-        )
+        self.extreme_points = get_extreme_points_c(F[nds, :], self.ideal_point, extreme_points=self.extreme_points)
 
         # find the intercepts for normalization and do backup if gaussian elimination fails
         worst_of_population = np.max(F, axis=0)
@@ -359,9 +345,7 @@ def get_extreme_points_c(F, ideal_point, extreme_points=None):
     return extreme_points
 
 
-def get_nadir_point(
-    extreme_points, ideal_point, worst_point, worst_of_front, worst_of_population
-):
+def get_nadir_point(extreme_points, ideal_point, worst_point, worst_of_front, worst_of_population):
     try:
         # find the intercepts using gaussian elimination
         M = extreme_points - ideal_point

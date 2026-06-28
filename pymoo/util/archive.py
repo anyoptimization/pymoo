@@ -48,9 +48,7 @@ class Archive(Population):
 
         obj = super().__new__(cls, individuals)
         obj.max_size = max_size
-        obj.truncate_size = (
-            min(max_size, truncate_size) if truncate_size is not None else max_size
-        )
+        obj.truncate_size = min(max_size, truncate_size) if truncate_size is not None else max_size
         obj.truncation = truncation
         obj.duplicate_elimination = duplicate_elimination
 
@@ -63,14 +61,10 @@ class Archive(Population):
         max_size = getattr(obj, "max_size", None)
         truncate_size = getattr(obj, "truncate_size", None)
         truncation = getattr(obj, "truncation", RandomTruncation())
-        duplicate_elimination = getattr(
-            obj, "duplicate_elimination", DefaultDuplicateElimination(epsilon=1e-32)
-        )
+        duplicate_elimination = getattr(obj, "duplicate_elimination", DefaultDuplicateElimination(epsilon=1e-32))
 
         self.max_size = max_size
-        self.truncate_size = (
-            min(max_size, truncate_size) if truncate_size is not None else max_size
-        )
+        self.truncate_size = min(max_size, truncate_size) if truncate_size is not None else max_size
         self.truncation = truncation
         self.duplicate_elimination = duplicate_elimination
 
@@ -122,9 +116,7 @@ class SingleObjectiveArchive(Archive):
 
 class MultiObjectiveArchive(Archive):
     def __new__(cls, max_size=200, truncate_size=100, **kwargs):
-        return super().__new__(
-            cls, max_size=max_size, truncate_size=truncate_size, **kwargs
-        )
+        return super().__new__(cls, max_size=max_size, truncate_size=truncate_size, **kwargs)
 
     def _find_opt(self, sols):
         feas = sols.get("feas")
@@ -149,14 +141,10 @@ def default_archive(problem, **kwargs):
         from pymoo.algorithms.moo.sms import LeastHypervolumeContributionSurvival
 
         survival = LeastHypervolumeContributionSurvival()
-        return MultiObjectiveArchive(
-            truncation=SurvivalTruncation(survival, problem=problem), **kwargs
-        )
+        return MultiObjectiveArchive(truncation=SurvivalTruncation(survival, problem=problem), **kwargs)
 
     elif problem.n_obj >= 3:
         from pymoo.algorithms.moo.spea2 import SPEA2Survival
 
         survival = SPEA2Survival()
-        return MultiObjectiveArchive(
-            truncation=SurvivalTruncation(survival, problem=problem), **kwargs
-        )
+        return MultiObjectiveArchive(truncation=SurvivalTruncation(survival, problem=problem), **kwargs)

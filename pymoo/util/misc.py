@@ -15,9 +15,7 @@ if typing.TYPE_CHECKING:
     from pymoo.core.termination import Termination
 
 
-def parameter_less(
-    F: Any, CV: Any, fmax: Optional[Any] = None, inplace: bool = False
-) -> Any:
+def parameter_less(F: Any, CV: Any, fmax: Optional[Any] = None, inplace: bool = False) -> Any:
     """Apply parameter-less penalty method to infeasible solutions.
 
     Args:
@@ -198,9 +196,7 @@ def norm_eucl_dist_by_bounds(A: Any, B: Any, xl: Any, xu: Any, **kwargs: Any) ->
     Returns:
         Distance matrix.
     """
-    return vectorized_cdist(
-        A, B, func_dist=func_norm_euclidean_distance(xl, xu), **kwargs
-    )
+    return vectorized_cdist(A, B, func_dist=func_norm_euclidean_distance(xl, xu), **kwargs)
 
 
 def norm_eucl_dist(problem: Any, A: Any, B: Any, **kwargs: Any) -> Any:
@@ -244,9 +240,7 @@ def func_norm_manhatten_distance(xl: Any, xu: Any) -> Callable[[Any, Any], Any]:
     return lambda a, b: np.abs((a - b) / (xu - xl)).sum(axis=1)
 
 
-def norm_manhatten_dist_by_bounds(
-    A: Any, B: Any, xl: Any, xu: Any, **kwargs: Any
-) -> Any:
+def norm_manhatten_dist_by_bounds(A: Any, B: Any, xl: Any, xu: Any, **kwargs: Any) -> Any:
     """Compute normalized manhattan distance by bounds.
 
     Args:
@@ -259,9 +253,7 @@ def norm_manhatten_dist_by_bounds(
     Returns:
         Distance matrix.
     """
-    return vectorized_cdist(
-        A, B, func_dist=func_norm_manhatten_distance(xl, xu), **kwargs
-    )
+    return vectorized_cdist(A, B, func_dist=func_norm_manhatten_distance(xl, xu), **kwargs)
 
 
 def norm_manhatten_dist(problem: Any, A: Any, B: Any, **kwargs: Any) -> Any:
@@ -305,9 +297,7 @@ def func_norm_tchebychev_distance(xl: Any, xu: Any) -> Callable[[Any, Any], Any]
     return lambda a, b: np.abs((a - b) / (xu - xl)).max(axis=1)
 
 
-def norm_tchebychev_dist_by_bounds(
-    A: Any, B: Any, xl: Any, xu: Any, **kwargs: Any
-) -> Any:
+def norm_tchebychev_dist_by_bounds(A: Any, B: Any, xl: Any, xu: Any, **kwargs: Any) -> Any:
     """Compute normalized Chebyshev distance by bounds.
 
     Args:
@@ -320,9 +310,7 @@ def norm_tchebychev_dist_by_bounds(
     Returns:
         Distance matrix.
     """
-    return vectorized_cdist(
-        A, B, func_dist=func_norm_tchebychev_distance(xl, xu), **kwargs
-    )
+    return vectorized_cdist(A, B, func_dist=func_norm_tchebychev_distance(xl, xu), **kwargs)
 
 
 def norm_tchebychev_dist(problem: Any, A: Any, B: Any, **kwargs: Any) -> Any:
@@ -452,9 +440,7 @@ def at_least_2d(*args: Any, **kwargs: Any) -> Any:
     return ret
 
 
-def at_least_2d_array(
-    x: Any, extend_as: str = "row", return_if_reshaped: bool = False
-) -> Union[Any, Tuple[Any, bool]]:
+def at_least_2d_array(x: Any, extend_as: str = "row", return_if_reshaped: bool = False) -> Union[Any, Tuple[Any, bool]]:
     """Ensure array is at least 2D.
 
     Args:
@@ -478,9 +464,7 @@ def at_least_2d_array(
         elif extend_as.startswith("c"):
             x = x[:, None]
         else:
-            raise Exception(
-                "The option `extend_as` should be either `row` or `column`."
-            )
+            raise Exception("The option `extend_as` should be either `row` or `column`.")
 
         has_been_reshaped = True
 
@@ -595,9 +579,7 @@ def pop_from_sampling(
     return pop
 
 
-def evaluate_if_not_done_yet(
-    evaluator: Any, problem: Any, pop: Any, algorithm: Optional[Any] = None
-) -> None:
+def evaluate_if_not_done_yet(evaluator: Any, problem: Any, pop: Any, algorithm: Optional[Any] = None) -> None:
     """Evaluate individuals that haven't been evaluated yet.
 
     Args:
@@ -761,9 +743,7 @@ def unique_and_all_indices(arr: Any) -> Tuple[Any, list]:
     """
     sort_indexes = np.argsort(arr)
     arr = np.asarray(arr)[sort_indexes]
-    vals, first_indexes, inverse, counts = np.unique(
-        arr, return_index=True, return_inverse=True, return_counts=True
-    )
+    vals, first_indexes, inverse, counts = np.unique(arr, return_index=True, return_inverse=True, return_counts=True)
     indexes = np.split(sort_indexes, first_indexes[1:])
     for x in indexes:
         x.sort()

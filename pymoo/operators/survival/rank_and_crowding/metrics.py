@@ -15,13 +15,9 @@ def get_crowding_function(label):
     elif label == "ce":
         fun = FunctionalDiversity(calc_crowding_entropy, filter_out_duplicates=True)
     elif label == "mnn":
-        fun = FuncionalDiversityMNN(
-            load_function("calc_mnn"), filter_out_duplicates=True
-        )
+        fun = FuncionalDiversityMNN(load_function("calc_mnn"), filter_out_duplicates=True)
     elif label == "2nn":
-        fun = FuncionalDiversityMNN(
-            load_function("calc_2nn"), filter_out_duplicates=True
-        )
+        fun = FuncionalDiversityMNN(load_function("calc_2nn"), filter_out_duplicates=True)
     elif hasattr(label, "__call__"):
         fun = FunctionalDiversity(label, filter_out_duplicates=True)
     elif isinstance(label, CrowdingDiversity):
@@ -58,9 +54,7 @@ class FunctionalDiversity(CrowdingDiversity):
         else:
             if self.filter_out_duplicates:
                 # filter out solutions which are duplicates - duplicates get a zero finally
-                is_unique = np.where(np.logical_not(find_duplicates(F, epsilon=1e-32)))[
-                    0
-                ]
+                is_unique = np.where(np.logical_not(find_duplicates(F, epsilon=1e-32)))[0]
             else:
                 # set every point to be unique without checking it
                 is_unique = np.arange(n_points)
@@ -97,9 +91,7 @@ def calc_crowding_distance(F, **kwargs):
     F = F[I, np.arange(n_obj)]
 
     # calculate the distance from each point to the last and next
-    dist = np.vstack([F, np.full(n_obj, np.inf)]) - np.vstack(
-        [np.full(n_obj, -np.inf), F]
-    )
+    dist = np.vstack([F, np.full(n_obj, np.inf)]) - np.vstack([np.full(n_obj, -np.inf), F])
 
     # calculate the norm for each objective - set to NaN if all values are equal
     norm = np.max(F, axis=0) - np.min(F, axis=0)
@@ -146,9 +138,7 @@ def calc_crowding_entropy(F: np.ndarray, **kwargs: object) -> np.ndarray:
     F = F[I, np.arange(n_obj)]
 
     # calculate the distance from each point to the last and next
-    dist = np.vstack([F, np.full(n_obj, np.inf)]) - np.vstack(
-        [np.full(n_obj, -np.inf), F]
-    )
+    dist = np.vstack([F, np.full(n_obj, np.inf)]) - np.vstack([np.full(n_obj, -np.inf), F])
 
     # calculate the norm for each objective - set to NaN if all values are equal
     norm = np.max(F, axis=0) - np.min(F, axis=0)

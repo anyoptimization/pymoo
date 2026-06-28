@@ -35,9 +35,7 @@ class ReplacementSurvival(Survival):
         if len(off) == 0:
             return pop
 
-        assert len(pop) == len(off), (
-            "For the replacement pop and off must have the same number of individuals."
-        )
+        assert len(pop) == len(off), "For the replacement pop and off must have the same number of individuals."
 
         pop = Population.create(pop) if isinstance(pop, Individual) else pop
         off = Population.create(off) if isinstance(off, Individual) else off
@@ -78,9 +76,7 @@ class ImprovementReplacement(ReplacementSurvival):
             ret[off_F < pop_F] = True
 
         # never allow duplicates to become part of the population when replacement is used
-        _, _, is_duplicate = DefaultDuplicateElimination(epsilon=0.0).do(
-            off, pop, return_indices=True
-        )
+        _, _, is_duplicate = DefaultDuplicateElimination(epsilon=0.0).do(off, pop, return_indices=True)
         ret[is_duplicate] = False
 
         return ret[:, 0]

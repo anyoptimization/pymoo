@@ -6,12 +6,8 @@ from pymoo.problems.dyn import DynamicTestProblem
 
 
 class DynamicCEC2015(DynamicTestProblem):
-    def __init__(
-        self, n_var=10, nt=10, taut=20, n_obj=2, xl=0.0, xu=1.0, vtype=float, **kwargs
-    ):
-        super().__init__(
-            nt, taut, n_var=n_var, n_obj=n_obj, xl=xl, xu=xu, vtype=vtype, **kwargs
-        )
+    def __init__(self, n_var=10, nt=10, taut=20, n_obj=2, xl=0.0, xu=1.0, vtype=float, **kwargs):
+        super().__init__(nt, taut, n_var=n_var, n_obj=n_obj, xl=xl, xu=xu, vtype=vtype, **kwargs)
 
 
 class FDA2DEB(DynamicCEC2015):

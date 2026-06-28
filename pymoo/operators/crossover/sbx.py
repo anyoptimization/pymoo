@@ -54,9 +54,7 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14, random_state=None
 
         betaq = np.zeros(mask.shape)
         betaq[mask] = np.power((rand * alpha), (1.0 / (eta + 1.0)))[mask]
-        betaq[mask_not] = np.power((1.0 / (2.0 - rand * alpha)), (1.0 / (eta + 1.0)))[
-            mask_not
-        ]
+        betaq[mask_not] = np.power((1.0 / (2.0 - rand * alpha)), (1.0 / (eta + 1.0)))[mask_not]
 
         return betaq
 
@@ -76,9 +74,7 @@ def cross_sbx(X, xl, xu, eta, prob_var, prob_bin, eps=1.0e-14, random_state=None
     child2 = np.where(sm, c2, c1)  # child for parent 2
 
     # exchange children with given probability
-    b = np.bitwise_xor(
-        random_state.random(len(prob_bin)) < prob_bin, X[0, cross] > X[1, cross]
-    )
+    b = np.bitwise_xor(random_state.random(len(prob_bin)) < prob_bin, X[0, cross] > X[1, cross])
     child1, child2 = np.where(b, (child2, child1), (child1, child2))
 
     # first copy the unmodified parents

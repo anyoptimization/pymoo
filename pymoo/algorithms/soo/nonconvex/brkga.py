@@ -34,9 +34,9 @@ class EliteSurvival(Survival):
             pop = DefaultDuplicateElimination(func=lambda p: p.get("F")).do(pop)
 
         elif isinstance(self.eliminate_duplicates, DuplicateElimination):
-            _, no_candidates, candidates = DefaultDuplicateElimination(
-                func=lambda pop: pop.get("F")
-            ).do(pop, return_indices=True)
+            _, no_candidates, candidates = DefaultDuplicateElimination(func=lambda pop: pop.get("F")).do(
+                pop, return_indices=True
+            )
             _, _, is_duplicate = self.eliminate_duplicates.do(
                 pop[candidates],
                 pop[no_candidates],
@@ -107,9 +107,7 @@ class BRKGA(GeneticAlgorithm):
             **kwargs: Additional keyword arguments.
         """
         if survival is None:
-            survival = EliteSurvival(
-                n_elites, eliminate_duplicates=eliminate_duplicates
-            )
+            survival = EliteSurvival(n_elites, eliminate_duplicates=eliminate_duplicates)
 
         super().__init__(
             pop_size=n_elites + n_offsprings + n_mutants,
@@ -143,9 +141,7 @@ class BRKGA(GeneticAlgorithm):
         )
 
         # create the mutants randomly to fill the population with
-        mutants = FloatRandomSampling().do(
-            self.problem, self.n_mutants, algorithm=self, random_state=self.random_state
-        )
+        mutants = FloatRandomSampling().do(self.problem, self.n_mutants, algorithm=self, random_state=self.random_state)
 
         # evaluate all the new solutions
         return Population.merge(off, mutants)
@@ -160,9 +156,7 @@ class BRKGA(GeneticAlgorithm):
         pop = Population.merge(pop[elites], infills)
 
         # the do survival selection - set the elites for the next round
-        self.pop = self.survival.do(
-            self.problem, pop, n_survive=len(pop), algorithm=self
-        )
+        self.pop = self.survival.do(self.problem, pop, n_survive=len(pop), algorithm=self)
 
 
 parse_doc_string(BRKGA.__init__)

@@ -51,10 +51,7 @@ class WolfeSearch(Algorithm):
                 _point = Individual(X=_alpha)
                 evaluator.eval(problem, _point, evaluate_values_of=["F", "CV"])
 
-                if (
-                    _point.F[0] > sol_F + self.c1 * _alpha * sol_dF @ direction
-                    or _point.F[0] > alpha_low.F[0]
-                ):
+                if _point.F[0] > sol_F + self.c1 * _alpha * sol_dF @ direction or _point.F[0] > alpha_low.F[0]:
                     alpha_high = _point
                 else:
                     evaluator.eval(problem, _point, evaluate_values_of=["dF"])
@@ -63,9 +60,7 @@ class WolfeSearch(Algorithm):
                     if np.abs(point_dF @ direction) <= -self.c2 * sol_dF @ direction:
                         return _point
 
-                    if (point_dF @ direction) * (
-                        alpha_high.get("alpha") - alpha_low.get("alpha")
-                    ) >= 0:
+                    if (point_dF @ direction) * (alpha_high.get("alpha") - alpha_low.get("alpha")) >= 0:
                         alpha_high = alpha_low
 
                     alpha_low = _point
@@ -103,9 +98,7 @@ class WolfeSearch(Algorithm):
         return current
 
 
-def wolfe_line_search(
-    problem, sol, direction, c1=1e-4, c2=0.9, max_iter=10, evaluator=None
-):
+def wolfe_line_search(problem, sol, direction, c1=1e-4, c2=0.9, max_iter=10, evaluator=None):
     # initialize the evaluator to be used (this will make sure evaluations are counted)
     evaluator = evaluator if evaluator is not None else Evaluator()
     evaluator.skip_already_evaluated = False
@@ -121,10 +114,7 @@ def wolfe_line_search(
             _point = Individual(X=sol.X + _alpha * direction, alpha=_alpha)
             evaluator.eval(problem, _point, evaluate_values_of=["F", "CV"])
 
-            if (
-                _point.F[0] > sol_F + c1 * _alpha * sol_dF @ direction
-                or _point.F[0] > alpha_low.F[0]
-            ):
+            if _point.F[0] > sol_F + c1 * _alpha * sol_dF @ direction or _point.F[0] > alpha_low.F[0]:
                 alpha_high = _point
             else:
                 evaluator.eval(problem, _point, evaluate_values_of=["dF"])
@@ -133,9 +123,7 @@ def wolfe_line_search(
                 if np.abs(point_dF @ direction) <= -c2 * sol_dF @ direction:
                     return _point
 
-                if (point_dF @ direction) * (
-                    alpha_high.get("alpha") - alpha_low.get("alpha")
-                ) >= 0:
+                if (point_dF @ direction) * (alpha_high.get("alpha") - alpha_low.get("alpha")) >= 0:
                     alpha_high = alpha_low
 
                 alpha_low = _point

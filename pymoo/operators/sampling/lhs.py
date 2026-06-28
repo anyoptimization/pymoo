@@ -69,9 +69,7 @@ def sampling_lhs(
 
         for j in range(1, n_iter):
             # create new random sample and check the score again
-            _X = sampling_lhs_unit(
-                n_samples, n_var, smooth=smooth, random_state=random_state
-            )
+            _X = sampling_lhs_unit(n_samples, n_var, smooth=smooth, random_state=random_state)
             _score = criterion(_X)
 
             if _score > score:

@@ -31,16 +31,12 @@ class Radviz(Plot):
         super().__init__(**kwargs)
 
         # set the default axis style
-        set_if_none_from_tuples(
-            self.axis_style, ("color", "black"), ("linewidth", 1), ("alpha", 0.75)
-        )
+        set_if_none_from_tuples(self.axis_style, ("color", "black"), ("linewidth", 1), ("alpha", 0.75))
 
         if endpoint_style is None:
             endpoint_style = {}
         self.endpoint_style = endpoint_style
-        set_if_none_from_tuples(
-            self.endpoint_style, ("color", "black"), ("s", 70), ("alpha", 0.3)
-        )
+        set_if_none_from_tuples(self.endpoint_style, ("color", "black"), ("s", 70), ("alpha", 0.3))
 
     def _do(self) -> None:
         # initial a figure with a single plot

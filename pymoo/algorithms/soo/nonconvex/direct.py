@@ -156,7 +156,5 @@ class DIRECT(LocalSearch):
         return infills
 
     def _advance(self, infills=None, **kwargs):
-        assert infills is not None, (
-            "This algorithms uses the AskAndTell interface thus infills must to be provided."
-        )
+        assert infills is not None, "This algorithms uses the AskAndTell interface thus infills must to be provided."
         self.pop = Population.merge(self.pop, infills)

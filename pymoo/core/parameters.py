@@ -56,11 +56,7 @@ def get_params_bfs(obj, flag, only_active):
         prefix, obj = q.pop()
 
         if isinstance(obj, Variable):
-            if (
-                obj not in visited
-                and obj.flag == flag
-                and (not only_active or obj.active)
-            ):
+            if obj not in visited and obj.flag == flag and (not only_active or obj.active):
                 # find the right spot in the ret dictionary
                 e = ret
 
@@ -182,9 +178,7 @@ def flatten_rec(params, prefix=None):
     """
     if hasattr(params, "items"):
         for k, v in params.items():
-            yield from flatten_rec(
-                v, prefix=f"{prefix}.{k}" if prefix is not None else k
-            )
+            yield from flatten_rec(v, prefix=f"{prefix}.{k}" if prefix is not None else k)
     else:
         yield prefix, params
 

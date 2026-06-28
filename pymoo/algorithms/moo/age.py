@@ -132,20 +132,13 @@ class AGEMOEASurvival(Survival):
         ideal_point = np.min(front1, axis=0)
 
         # Calculate the crowding distance of the first front as well as p and the normalization constants
-        crowd_dist[front_no == 0], p, normalization = self.survival_score(
-            front1, ideal_point
-        )
-        for i in range(
-            1, max_f_no
-        ):  # skip first front since it is normalized by survival_score
+        crowd_dist[front_no == 0], p, normalization = self.survival_score(front1, ideal_point)
+        for i in range(1, max_f_no):  # skip first front since it is normalized by survival_score
             front = F[front_no == i, :]
             m, _ = front.shape
             with np.errstate(divide="ignore", invalid="ignore"):
                 front = front / normalization
-            crowd_dist[front_no == i] = (
-                1.0
-                / self.minkowski_distances(front, ideal_point[None, :], p=p).squeeze()
-            )
+            crowd_dist[front_no == i] = 1.0 / self.minkowski_distances(front, ideal_point[None, :], p=p).squeeze()
 
         # Select the solutions in the last front based on their crowding distances
         last = np.arange(selected.shape[0])[front_no == max_f_no]
@@ -186,9 +179,7 @@ class AGEMOEASurvival(Survival):
         nn[nn < 1e-8] = 1
 
         distances = self.pairwise_distances(front, p)
-        distances[distances < 1e-8] = (
-            1e-8  # Replace very small entries to prevent division by zero
-        )
+        distances[distances < 1e-8] = 1e-8  # Replace very small entries to prevent division by zero
 
         distances = distances / (nn[:, None])
 
@@ -202,9 +193,7 @@ class AGEMOEASurvival(Survival):
                 copy=False,
                 sparse=False,
             )
-            D_mg = distances[
-                tuple(mg)
-            ]  # avoid Numpy's future deprecation of array special indexing
+            D_mg = distances[tuple(mg)]  # avoid Numpy's future deprecation of array special indexing
 
             if D_mg.shape[1] > 1:
                 # equivalent to mink(distances(remaining, selected),neighbors,2); in Matlab
@@ -315,11 +304,7 @@ def normalize(front, extreme):
 
     try:
         hyperplane = np.linalg.solve(front[extreme], np.ones(n))
-        if (
-            any(np.isnan(hyperplane))
-            or any(np.isinf(hyperplane))
-            or any(hyperplane <= 0)
-        ):
+        if any(np.isnan(hyperplane)) or any(np.isinf(hyperplane)) or any(hyperplane <= 0):
             normalization = np.max(front, axis=0)
         else:
             normalization = 1.0 / hyperplane

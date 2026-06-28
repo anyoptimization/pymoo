@@ -90,9 +90,7 @@ class MOEAD(LoopwiseAlgorithm, GeneticAlgorithm):
         )
 
     def _setup(self, problem, **kwargs):
-        assert not problem.has_constraints(), (
-            "This implementation of MOEAD does not support any constraints."
-        )
+        assert not problem.has_constraints(), "This implementation of MOEAD does not support any constraints."
 
         # if no reference directions have been provided get them and override the population size and other settings
         if self.ref_dirs is None:
@@ -100,9 +98,9 @@ class MOEAD(LoopwiseAlgorithm, GeneticAlgorithm):
         self.pop_size = len(self.ref_dirs)
 
         # neighbours includes the entry by itself intentionally for the survival method
-        self.neighbors = np.argsort(
-            cdist(self.ref_dirs, self.ref_dirs), axis=1, kind="quicksort"
-        )[:, : self.n_neighbors]
+        self.neighbors = np.argsort(cdist(self.ref_dirs, self.ref_dirs), axis=1, kind="quicksort")[
+            :, : self.n_neighbors
+        ]
 
         # if the decomposition is not set yet, set the default
         if self.decomposition is None:
@@ -153,12 +151,8 @@ class MOEAD(LoopwiseAlgorithm, GeneticAlgorithm):
 
         # calculate the decomposed values for each neighbor
         N = self.neighbors[k]
-        FV = self.decomposition.do(
-            pop[N].get("F"), weights=self.ref_dirs[N, :], ideal_point=self.ideal
-        )
-        off_FV = self.decomposition.do(
-            off.F[None, :], weights=self.ref_dirs[N, :], ideal_point=self.ideal
-        )
+        FV = self.decomposition.do(pop[N].get("F"), weights=self.ref_dirs[N, :], ideal_point=self.ideal)
+        off_FV = self.decomposition.do(off.F[None, :], weights=self.ref_dirs[N, :], ideal_point=self.ideal)
 
         # this makes the algorithm to support constraints - not originally proposed though and not tested enough
         # if self.problem.has_constraints():
@@ -203,12 +197,7 @@ class ParallelMOEAD(MOEAD):
         )
 
         # select a random offspring from each mating
-        off = Population.create(
-            *[
-                self.random_state.choice(pool)
-                for pool in np.reshape(off, (self.n_offsprings, -1))
-            ]
-        )
+        off = Population.create(*[self.random_state.choice(pool) for pool in np.reshape(off, (self.n_offsprings, -1))])
 
         # store the indices because of the neighborhood matching in advance
         self.indices = indices
@@ -216,9 +205,7 @@ class ParallelMOEAD(MOEAD):
         return off
 
     def _advance(self, infills=None, **kwargs):
-        assert len(self.indices) == len(infills), (
-            "Number of infills must be equal to the one created beforehand."
-        )
+        assert len(self.indices) == len(infills), "Number of infills must be equal to the one created beforehand."
 
         # update the ideal point before starting to replace
         self.ideal = np.min(np.vstack([self.ideal, infills.get("F")]), axis=0)

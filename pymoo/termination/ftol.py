@@ -96,9 +96,7 @@ class MultiObjectiveSpaceTermination(DeltaToleranceTermination):
 
 
 class MultiObjectiveSpaceTerminationWithRenormalization(MultiObjectiveSpaceTermination):
-    def __init__(
-        self, n=30, all_to_current=False, sliding_window=True, indicator="igd", **kwargs
-    ) -> None:
+    def __init__(self, n=30, all_to_current=False, sliding_window=True, indicator="igd", **kwargs) -> None:
 
         super().__init__(**kwargs)
         self.n = n

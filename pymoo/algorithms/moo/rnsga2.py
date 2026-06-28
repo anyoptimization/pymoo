@@ -101,9 +101,7 @@ class RankAndModifiedCrowdingSurvival(Survival):
             self.nadir_point = np.ones(self.n_obj)
 
         if self.extreme_points_as_reference_points:
-            self.ref_points = np.vstack(
-                [self.ref_points, get_extreme_points_c(F, self.ideal_point)]
-            )
+            self.ref_points = np.vstack([self.ref_points, get_extreme_points_c(F, self.ideal_point)])
 
         # calculate the distance matrix from ever solution to all reference point
         dist_to_ref_points = calc_norm_pref_distance(
@@ -118,9 +116,7 @@ class RankAndModifiedCrowdingSurvival(Survival):
             n_remaining = n_survive - len(survivors)
 
             # the ranking of each point regarding each reference point (two times argsort is necessary)
-            rank_by_distance = np.argsort(
-                np.argsort(dist_to_ref_points[front], axis=0), axis=0
-            )
+            rank_by_distance = np.argsort(np.argsort(dist_to_ref_points[front], axis=0), axis=0)
 
             # the reference point where the best ranking is coming from
             ref_point_of_best_rank = np.argmin(rank_by_distance, axis=1)
@@ -169,9 +165,7 @@ class RankAndModifiedCrowdingSurvival(Survival):
                         # remove group from not_selected array
                         to_remove.extend(group)
 
-                    not_selected = np.array(
-                        [i for i in not_selected if i not in to_remove]
-                    )
+                    not_selected = np.array([i for i in not_selected if i not in to_remove])
 
                 # now sort by the crowding (actually modified rank) ascending and let the best survive
                 I = np.argsort(crowding)[:n_remaining]  # noqa: E741

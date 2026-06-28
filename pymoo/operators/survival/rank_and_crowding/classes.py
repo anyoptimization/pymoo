@@ -77,9 +77,7 @@ class RankAndCrowding(Survival):
                 n_remove = len(survivors) + len(front) - n_survive
 
                 # re-calculate the crowding distance of the front
-                crowding_of_front = self.crowding_func.do(
-                    F[front, :], n_remove=n_remove
-                )
+                crowding_of_front = self.crowding_func.do(F[front, :], n_remove=n_remove)
 
                 I = randomized_argsort(  # noqa: E741
                     crowding_of_front,
@@ -153,9 +151,7 @@ class ConstrRankAndCrowding(Survival):
         # If the split should be done beforehand
         if problem.n_constr > 0:
             # Split by feasibility
-            feas, infeas = split_by_feasibility(
-                pop, sort_infeas_by_cv=True, sort_feas_by_obj=False, return_pop=False
-            )
+            feas, infeas = split_by_feasibility(pop, sort_infeas_by_cv=True, sort_feas_by_obj=False, return_pop=False)
 
             # Obtain len of feasible
             n_feas = len(feas)
@@ -207,8 +203,6 @@ class ConstrRankAndCrowding(Survival):
                     survivors = Population.merge(survivors, pop[infeas][front[I]])
 
         else:
-            survivors = self.ranking.do(
-                problem, pop, *args, n_survive=n_survive, **kwargs
-            )
+            survivors = self.ranking.do(problem, pop, *args, n_survive=n_survive, **kwargs)
 
         return survivors

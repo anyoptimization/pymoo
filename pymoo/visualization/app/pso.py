@@ -15,9 +15,7 @@ class PSOAnimation(AnimationCallback):
         from pymoo.visualization.matplotlib import plt
 
         if problem.n_var != 2 or problem.n_obj != 1:
-            raise Exception(
-                "This visualization can only be used for problems with two variables and one objective!"
-            )
+            raise Exception("This visualization can only be used for problems with two variables and one objective!")
 
         # draw the problem surface
         FitnessLandscape(

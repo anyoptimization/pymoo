@@ -87,9 +87,7 @@ class Swarm(InfillCriterion):
         # of parameter control should be applied on the mating level
         self.control = control(self)
 
-    def do(
-        self, problem, pop, n_offsprings, algorithm=None, random_state=None, **kwargs
-    ):
+    def do(self, problem, pop, n_offsprings, algorithm=None, random_state=None, **kwargs):
         control = self.control
 
         # let the parameter control now some information
@@ -157,9 +155,7 @@ def get_neighbors(name, N, random_state=None):
     if name == "star":
         return np.tile(np.arange(N), (N, 1))
     elif name == "ring":
-        return (
-            np.array([np.arange(3) for _ in range(N)]) + np.arange(N)[:, None] - 1
-        ) % N
+        return (np.array([np.arange(3) for _ in range(N)]) + np.arange(N)[:, None] - 1) % N
     elif name.startswith("random"):
         K = 3
         neighbors = []
@@ -246,16 +242,12 @@ class EPPSO(GeneticAlgorithm):
 
         # Initialize neighbors with proper random_state
         if self.neighbors is None:
-            self.neighbors = get_neighbors(
-                get(self.topology), len(infills), random_state=self.random_state
-            )
+            self.neighbors = get_neighbors(get(self.topology), len(infills), random_state=self.random_state)
 
         FitnessSurvival().do(self.problem, self.pbest, return_indices=True)
 
     def _advance(self, infills=None, **kwargs):
-        assert infills is not None, (
-            "This algorithms uses the AskAndTell interface thus 'infills' must to be provided."
-        )
+        assert infills is not None, "This algorithms uses the AskAndTell interface thus 'infills' must to be provided."
 
         X = self.pbest.get("X")
 
@@ -272,13 +264,8 @@ class EPPSO(GeneticAlgorithm):
         rank = pbest.get("rank")
         self.best = S[0]
 
-        if (
-            get(self.topology) == "random-adaptive"
-            and pbest[self.best].get("n_gen") != self.n_gen
-        ):
-            self.neighbors = get_neighbors(
-                get(self.topology), len(pbest), random_state=self.random_state
-            )
+        if get(self.topology) == "random-adaptive" and pbest[self.best].get("n_gen") != self.n_gen:
+            self.neighbors = get_neighbors(get(self.topology), len(pbest), random_state=self.random_state)
 
         # send the message from each particle to all its neighbors
         msgs = [[] for _ in range(len(pbest))]

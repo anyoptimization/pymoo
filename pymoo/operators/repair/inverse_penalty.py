@@ -89,10 +89,7 @@ class InversePenaltyOutOfBoundsRepair(BoundsRepair):
             Repaired population.
         """
         if P is None:
-            raise Exception(
-                "For this out of bounds handling a parent solution in bounds "
-                "needs to be provided."
-            )
+            raise Exception("For this out of bounds handling a parent solution in bounds needs to be provided.")
         assert len(X) == len(P)
         n = len(X)
 

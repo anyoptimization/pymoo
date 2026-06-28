@@ -54,9 +54,7 @@ class ES(GeneticAlgorithm):
         assert pop_size is not None and n_offsprings is not None, (
             "You have to at least provivde pop_size of n_offsprings."
         )
-        assert n_offsprings >= 2 * pop_size, (
-            "The number of offsprings should be at least double the population size."
-        )
+        assert n_offsprings >= 2 * pop_size, "The number of offsprings should be at least double the population size."
 
         super().__init__(
             pop_size=pop_size,
@@ -119,9 +117,7 @@ class ES(GeneticAlgorithm):
 
         # if we have bounds to consider -> repair the individuals which are out of bounds
         if self.problem.has_bounds():
-            Xp = es_mut_repair(
-                Xp, X, sigmap, xl, xu, 10, random_state=self.random_state
-            )
+            Xp = es_mut_repair(Xp, X, sigmap, xl, xu, 10, random_state=self.random_state)
 
         # create the population to proceed further
         off = Population.new(X=Xp, sigma=sigmap)
@@ -144,10 +140,7 @@ class ES(GeneticAlgorithm):
 @default_random_state
 def es_sigma(sigma, tau, taup, random_state=None):
     _lambda, _n = sigma.shape
-    return sigma * np.exp(
-        taup * random_state.normal(size=(_lambda, 1))
-        + tau * random_state.normal(size=(_lambda, _n))
-    )
+    return sigma * np.exp(taup * random_state.normal(size=(_lambda, 1)) + tau * random_state.normal(size=(_lambda, _n)))
 
 
 @default_random_state

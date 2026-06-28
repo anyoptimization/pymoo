@@ -72,11 +72,7 @@ def erx(a, b, random_state=None):
             # search for the one with minimum neighbors
             n_neighbors = [len(H[e]) for e in neighbors]
             min_n_neighbors = min(n_neighbors)
-            _next = [
-                neighbors[k]
-                for k in range(len(neighbors))
-                if n_neighbors[k] == min_n_neighbors
-            ]
+            _next = [neighbors[k] for k in range(len(neighbors)) if n_neighbors[k] == min_n_neighbors]
 
             # break the tie if they might have the same number of neighbors
             _next = random_state.choice(_next)

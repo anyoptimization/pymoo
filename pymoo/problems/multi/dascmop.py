@@ -26,9 +26,7 @@ DIFFICULTIES: list = [
 
 
 class DASCMOP(Problem):
-    def __init__(
-        self, n_obj: int, n_ieq_constr: int, difficulty: int | tuple, **kwargs
-    ) -> None:  # noqa: PYI041
+    def __init__(self, n_obj: int, n_ieq_constr: int, difficulty: int | tuple, **kwargs) -> None:  # noqa: PYI041
         super().__init__(
             n_var=30,
             n_obj=n_obj,
@@ -42,9 +40,7 @@ class DASCMOP(Problem):
         if isinstance(difficulty, int):
             self.difficulty: int | float = difficulty
             if not (1 <= difficulty <= len(DIFFICULTIES)):
-                raise Exception(
-                    f"Difficulty must be 1 <= difficulty <= {len(DIFFICULTIES)}, but it is {difficulty}!"
-                )
+                raise Exception(f"Difficulty must be 1 <= difficulty <= {len(DIFFICULTIES)}, but it is {difficulty}!")
             vals = DIFFICULTIES[difficulty - 1]
         else:
             self.difficulty = -1
@@ -66,10 +62,7 @@ class DASCMOP(Problem):
 
     def g3(self, X: np.ndarray) -> np.ndarray:
         j = np.arange(self.n_obj - 1, self.n_var) + 1
-        contrib = (
-            X[:, self.n_obj - 1 :]
-            - np.cos(0.25 * j / self.n_var * np.pi * (X[:, 0:1] + X[:, 1:2]))
-        ) ** 2
+        contrib = (X[:, self.n_obj - 1 :] - np.cos(0.25 * j / self.n_var * np.pi * (X[:, 0:1] + X[:, 1:2]))) ** 2
         return contrib.sum(axis=1)[:, None]
 
     def _calc_pareto_front(self, *args, **kwargs):  # noqa: ARG002
@@ -85,9 +78,7 @@ class DASCMOP1(DASCMOP):
     def __init__(self, difficulty: int | tuple, **kwargs) -> None:  # noqa: PYI041
         super().__init__(2, 11, difficulty)
 
-    def constraints(
-        self, X: np.ndarray, f0: np.ndarray, f1: np.ndarray, g: np.ndarray
-    ) -> np.ndarray:
+    def constraints(self, X: np.ndarray, f0: np.ndarray, f1: np.ndarray, g: np.ndarray) -> np.ndarray:
         a = 20.0
         b = 2.0 * self.eta - 1.0
         d = 0.5 if self.zeta != 0 else 0.0

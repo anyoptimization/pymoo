@@ -67,10 +67,7 @@ class NoParameterControl(ParameterControl):
 
 class RandomParameterControl(ParameterControl):
     def _do(self, N, random_state=None):
-        return {
-            key: value.sample(N, random_state=random_state)
-            for key, value in self.params.items()
-        }
+        return {key: value.sample(N, random_state=random_state) for key, value in self.params.items()}
 
 
 class EvolutionaryParameterControl(ParameterControl):
@@ -86,9 +83,7 @@ class EvolutionaryParameterControl(ParameterControl):
         for name, param in params.items():
             is_none = np.where(pop.get(name) == None)[0]  # noqa: E711
             if len(is_none) > 0:
-                pop[is_none].set(
-                    name, param.sample(len(is_none), random_state=random_state)
-                )
+                pop[is_none].set(name, param.sample(len(is_none), random_state=random_state))
 
         selection = AgeBasedTournamentSelection()
 
@@ -115,20 +110,12 @@ class EvolutionaryParameterControl(ParameterControl):
         problem = Problem(vars=params)
 
         parents = selection(problem, pop, N, n_parents=2, random_state=random_state)
-        parents = [
-            [
-                Individual(X={key: parent.get(key) for key in params})
-                for parent in mating
-            ]
-            for mating in parents
-        ]
+        parents = [[Individual(X={key: parent.get(key) for key in params}) for parent in mating] for mating in parents]
 
         off = mating(problem, parents, N, parents=True, random_state=random_state)
 
         Xp = off.get("X")
-        ret = {
-            param: np.array([Xp[i][param] for i in range(len(Xp))]) for param in params
-        }
+        ret = {param: np.array([Xp[i][param] for i in range(len(Xp))]) for param in params}
 
         return ret
 
@@ -164,9 +151,7 @@ def age_binary_tournament(pop, P, **kwargs):
 
 
 class ParameterControlMating(InfillCriterion):
-    def __init__(
-        self, selection, crossover, mutation, control=NoParameterControl, **kwargs
-    ):
+    def __init__(self, selection, crossover, mutation, control=NoParameterControl, **kwargs):
         super().__init__(**kwargs)
         self.selection = selection
         self.crossover = crossover
@@ -186,9 +171,7 @@ class ParameterControlMating(InfillCriterion):
         # if the parents for the mating are not provided directly - usually selection will be used
         if parents is None:
             # select the parents for the mating - just an index array
-            parents = self.selection.do(
-                problem, pop, n_matings, n_parents=self.crossover.n_parents, **kwargs
-            )
+            parents = self.selection.do(problem, pop, n_matings, n_parents=self.crossover.n_parents, **kwargs)
 
         # do the crossover using the parents index and the population - additional data provided if necessary
         off = self.crossover(problem, parents, **kwargs)

@@ -7,9 +7,7 @@ from pymoo.core.population import Population
 
 
 class DNSGA2(NSGA2):
-    def __init__(
-        self, perc_detect_change=0.1, perc_diversity=0.3, eps=0.0, version="A", **kwargs
-    ):
+    def __init__(self, perc_detect_change=0.1, perc_diversity=0.3, eps=0.0, version="A", **kwargs):
 
         super().__init__(**kwargs)
         self.perc_detect_change = perc_detect_change
@@ -18,9 +16,7 @@ class DNSGA2(NSGA2):
         self.version = version
 
     def setup(self, problem, **kwargs):
-        assert not problem.has_constraints(), (
-            "DNSGA2 only works for unconstrained problems."
-        )
+        assert not problem.has_constraints(), "DNSGA2 only works for unconstrained problems."
         return super().setup(problem, **kwargs)
 
     def _infill(self):
@@ -54,9 +50,7 @@ class DNSGA2(NSGA2):
 
             # replace with randomly sampled individuals
             if self.version == "A":
-                pop[I] = self.initialization.sampling(
-                    self.problem, len(I), random_state=self.random_state
-                )
+                pop[I] = self.initialization.sampling(self.problem, len(I), random_state=self.random_state)
 
             # replace by mutations of existing solutions (this occurs inplace)
             elif self.version == "B":
@@ -68,9 +62,7 @@ class DNSGA2(NSGA2):
             self.evaluator.eval(self.problem, pop)
 
             # do a survival to recreate rank and crowding of all individuals
-            pop = self.survival.do(
-                self.problem, pop, n_survive=len(pop), random_state=self.random_state
-            )
+            pop = self.survival.do(self.problem, pop, n_survive=len(pop), random_state=self.random_state)
 
         # create the offsprings from the current population
         off = self.mating.do(

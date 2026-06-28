@@ -134,8 +134,6 @@ class ReductionBasedReferenceDirectionFactory(ReferenceDirectionFactory):
         centroids = X[I].copy()
 
         if self.kmeans:
-            centroids = kmeans(
-                X, centroids, self.kmeans_max_iter, self.kmeans_a_tol, len(E)
-            )
+            centroids = kmeans(X, centroids, self.kmeans_max_iter, self.kmeans_a_tol, len(E))
 
         return centroids

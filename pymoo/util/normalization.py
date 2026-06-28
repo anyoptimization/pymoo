@@ -66,9 +66,7 @@ class ZeroToOneNormalization(Normalization):
 
         # if neither is nan than xu must be greater or equal than xl
         any_nan = np.logical_or(np.isnan(xl), np.isnan(xu))
-        assert np.all(np.logical_or(xu >= xl, any_nan)), (
-            "xl must be less or equal than xu."
-        )
+        assert np.all(np.logical_or(xu >= xl, any_nan)), "xl must be less or equal than xu."
 
     def forward(self, X):
         if X is None or (self.xl is None and self.xu is None):
@@ -78,9 +76,9 @@ class ZeroToOneNormalization(Normalization):
         N = np.copy(X)
 
         # normalize between zero and one if neither of them is nan
-        N[..., self.neither_nan] = (
-            X[..., self.neither_nan] - self.xl[self.neither_nan]
-        ) / (self.xu[self.neither_nan] - self.xl[self.neither_nan])
+        N[..., self.neither_nan] = (X[..., self.neither_nan] - self.xl[self.neither_nan]) / (
+            self.xu[self.neither_nan] - self.xl[self.neither_nan]
+        )
 
         N[..., self.xl_only] = X[..., self.xl_only] - self.xl[self.xl_only]
 
@@ -96,9 +94,7 @@ class ZeroToOneNormalization(Normalization):
         neither_nan = self.neither_nan
 
         X = N.copy()
-        X[..., neither_nan] = xl[neither_nan] + N[..., neither_nan] * (
-            xu[neither_nan] - xl[neither_nan]
-        )
+        X[..., neither_nan] = xl[neither_nan] + N[..., neither_nan] * (xu[neither_nan] - xl[neither_nan])
 
         X[..., xl_only] = N[..., xl_only] + xl[xl_only]
 
@@ -209,9 +205,7 @@ class PreNormalization:
         self.ideal, self.nadir = ideal, nadir
 
         if zero_to_one:
-            assert self.ideal is not None and self.nadir is not None, (
-                "For normalization either provide pf or bounds!"
-            )
+            assert self.ideal is not None and self.nadir is not None, "For normalization either provide pf or bounds!"
 
             n_dim = len(self.ideal)
             self.normalization = ZeroToOneNormalization(self.ideal, self.nadir)
@@ -261,9 +255,7 @@ def get_extreme_points_c(F, ideal_point, extreme_points=None):
     return extreme_points
 
 
-def get_nadir_point(
-    extreme_points, ideal_point, worst_point, worst_of_front, worst_of_population
-):
+def get_nadir_point(extreme_points, ideal_point, worst_point, worst_of_front, worst_of_population):
     try:
         # find the intercepts using gaussian elimination
         M = extreme_points - ideal_point

@@ -153,9 +153,7 @@ def potential_energy(x: NDArray) -> float:
     return (1 / D).mean()
 
 
-def iterative_igd(
-    X: NDArray, n_partitions: int | None = None, batch_size: int = 100
-) -> float:
+def iterative_igd(X: NDArray, n_partitions: int | None = None, batch_size: int = 100) -> float:
     """Compute inverted generational distance using iterative batch evaluation.
 
     Args:

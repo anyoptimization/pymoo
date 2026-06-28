@@ -17,9 +17,7 @@ class MW(Problem):
             kwargs["xl"] = 0
         if "xu" not in kwargs:
             kwargs["xu"] = 1
-        super().__init__(
-            n_var=n_var, n_obj=n_obj, n_ieq_constr=n_ieq_constr, vtype=float, **kwargs
-        )
+        super().__init__(n_var=n_var, n_obj=n_obj, n_ieq_constr=n_ieq_constr, vtype=float, **kwargs)
 
     @staticmethod
     def LA1(A: float, B: float, C: float, D: float, theta: np.ndarray) -> np.ndarray:
@@ -49,18 +47,14 @@ class MW(Problem):
         n = d
 
         i = np.arange(self.n_obj - 1, d)
-        z = 1 - np.exp(
-            -10.0 * (X[:, self.n_obj - 1 :] - i / n) * (X[:, self.n_obj - 1 :] - i / n)
-        )
+        z = 1 - np.exp(-10.0 * (X[:, self.n_obj - 1 :] - i / n) * (X[:, self.n_obj - 1 :] - i / n))
         contrib = (0.1 / (n)) * z * z + 1.5 - 1.5 * np.cos(2 * np.pi * z)
         distance = 1 + contrib.sum(axis=1)
         return distance
 
     def g3(self, X: np.ndarray) -> np.ndarray:
         contrib = 2.0 * np.power(
-            X[:, self.n_obj - 1 :]
-            + (X[:, self.n_obj - 2 : -1] - 0.5) * (X[:, self.n_obj - 2 : -1] - 0.5)
-            - 1.0,
+            X[:, self.n_obj - 1 :] + (X[:, self.n_obj - 2 : -1] - 0.5) * (X[:, self.n_obj - 2 : -1] - 0.5) - 1.0,
             2.0,
         )
         distance = 1 + contrib.sum(axis=1)
@@ -76,12 +70,7 @@ class MW1(MW):
         f0 = X[:, 0]
         f1 = g * (1 - 0.85 * f0 / g)
 
-        g0 = (
-            f0
-            + f1
-            - 1
-            - self.LA1(0.5, 2.0, 1.0, 8.0, np.sqrt(2.0) * f1 - np.sqrt(2.0) * f0)
-        )
+        g0 = f0 + f1 - 1 - self.LA1(0.5, 2.0, 1.0, 8.0, np.sqrt(2.0) * f1 - np.sqrt(2.0) * f0)
         out["F"] = np.column_stack([f0, f1])
         out["G"] = g0.reshape((-1, 1))
 
@@ -107,12 +96,7 @@ class MW2(MW):
         f0 = X[:, 0]
         f1 = g * (1 - f0 / g)
 
-        g0 = (
-            f0
-            + f1
-            - 1
-            - self.LA1(0.5, 3.0, 1.0, 8.0, np.sqrt(2.0) * f1 - np.sqrt(2.0) * f0)
-        )
+        g0 = f0 + f1 - 1 - self.LA1(0.5, 3.0, 1.0, 8.0, np.sqrt(2.0) * f1 - np.sqrt(2.0) * f0)
         out["F"] = np.column_stack([f0, f1])
         out["G"] = g0.reshape((-1, 1))
 
@@ -135,18 +119,8 @@ class MW3(MW):
         f0 = X[:, 0]
         f1 = g * (1 - f0 / g)
 
-        g0 = (
-            f0
-            + f1
-            - 1.05
-            - self.LA1(0.45, 0.75, 1.0, 6.0, np.sqrt(2.0) * f1 - np.sqrt(2.0) * f0)
-        )
-        g1 = (
-            0.85
-            - f0
-            - f1
-            + self.LA1(0.3, 0.75, 1.0, 2.0, np.sqrt(2.0) * f1 - np.sqrt(2.0) * f0)
-        )
+        g0 = f0 + f1 - 1.05 - self.LA1(0.45, 0.75, 1.0, 6.0, np.sqrt(2.0) * f1 - np.sqrt(2.0) * f0)
+        g1 = 0.85 - f0 - f1 + self.LA1(0.3, 0.75, 1.0, 2.0, np.sqrt(2.0) * f1 - np.sqrt(2.0) * f0)
         out["F"] = np.column_stack([f0, f1])
         out["G"] = np.column_stack([g0, g1])
 
@@ -157,19 +131,11 @@ class MW3(MW):
         else:
             F = ref_dirs
         F[:, 1] = 1 - F[:, 0]
-        invalid = (
-            0.85
-            - F[:, 0]
-            - F[:, 1]
-            + 0.3 * np.sin(0.75 * np.pi * np.sqrt(2) * (F[:, 1] - F[:, 0])) ** 2
-        ) > 0
+        invalid = (0.85 - F[:, 0] - F[:, 1] + 0.3 * np.sin(0.75 * np.pi * np.sqrt(2) * (F[:, 1] - F[:, 0])) ** 2) > 0
         while invalid.any():
             F[invalid, :] *= 1.001
             invalid = (
-                0.85
-                - F[:, 0]
-                - F[:, 1]
-                + 0.3 * np.sin(0.75 * np.pi * np.sqrt(2) * (F[:, 1] - F[:, 0])) ** 2
+                0.85 - F[:, 0] - F[:, 1] + 0.3 * np.sin(0.75 * np.pi * np.sqrt(2) * (F[:, 1] - F[:, 0])) ** 2
             ) > 0
         return F
 
@@ -186,11 +152,7 @@ class MW4(MW):
         f[:, 1:] *= X[:, (self.n_obj - 2) :: -1]
         f[:, 0:-1] *= np.flip(np.cumprod(1 - X[:, : (self.n_obj - 1)], axis=1), axis=1)
 
-        g0 = (
-            f.sum(axis=1)
-            - 1
-            - self.LA1(0.4, 2.5, 1.0, 8.0, f[:, -1] - f[:, :-1].sum(axis=1))
-        )
+        g0 = f.sum(axis=1) - 1 - self.LA1(0.4, 2.5, 1.0, 8.0, f[:, -1] - f[:, :-1].sum(axis=1))
         out["F"] = f
         out["G"] = g0.reshape((-1, 1))
 
@@ -255,11 +217,7 @@ class MW6(MW):
         F[:, 1] = 1 - F[:, 0]
         F = F / np.sqrt(np.sum(F**2, axis=1) / 1.21).reshape((-1, 1))
         length = np.cos(6 * np.arctan(F[:, 1] / F[:, 0]) ** 4) ** 10
-        c = (
-            1
-            - (F[:, 0] / (1 + 0.15 * length)) ** 2
-            - (F[:, 1] / (1 + 0.75 * length)) ** 2
-        )
+        c = 1 - (F[:, 0] / (1 + 0.15 * length)) ** 2 - (F[:, 1] / (1 + 0.75 * length)) ** 2
         return F[c >= 0]
 
 
@@ -275,11 +233,7 @@ class MW7(MW):
         with np.errstate(divide="ignore"):
             atan = np.arctan(f1 / f0)
 
-        g0 = (
-            f0**2
-            + f1**2
-            - np.power(1.2 + np.abs(self.LA2(0.4, 4.0, 1.0, 16.0, atan)), 2.0)
-        )
+        g0 = f0**2 + f1**2 - np.power(1.2 + np.abs(self.LA2(0.4, 4.0, 1.0, 16.0, atan)), 2.0)
         g1 = np.power(1.15 - self.LA2(0.2, 4.0, 1.0, 8.0, atan), 2.0) - f0**2 - f1**2
         out["F"] = np.column_stack([f0, f1])
         out["G"] = np.column_stack([g0, g1])
@@ -302,12 +256,8 @@ class MW8(MW):
         f[:, 0:-1] *= np.flip(np.cumprod(cos, axis=1), axis=1)
 
         f_squared = (f**2).sum(axis=1)
-        g0 = f_squared - (
-            1.25
-            - self.LA2(0.5, 6.0, 1.0, 2.0, np.arcsin(f[:, -1] / np.sqrt(f_squared)))
-        ) * (
-            1.25
-            - self.LA2(0.5, 6.0, 1.0, 2.0, np.arcsin(f[:, -1] / np.sqrt(f_squared)))
+        g0 = f_squared - (1.25 - self.LA2(0.5, 6.0, 1.0, 2.0, np.arcsin(f[:, -1] / np.sqrt(f_squared)))) * (
+            1.25 - self.LA2(0.5, 6.0, 1.0, 2.0, np.arcsin(f[:, -1] / np.sqrt(f_squared)))
         )
         out["F"] = f
         out["G"] = g0.reshape((-1, 1))
@@ -318,9 +268,7 @@ class MW8(MW):
 
         F = ref_dirs
         F = F / np.sqrt(np.sum(F**2, axis=1)).reshape((-1, 1))
-        c = (1.25 - 0.5 * np.sin(6 * np.arcsin(F[:, -1])) ** 2) ** 2 - np.sum(
-            F**2, axis=1
-        )
+        c = (1.25 - 0.5 * np.sin(6 * np.arcsin(F[:, -1])) ** 2) ** 2 - np.sum(F**2, axis=1)
         return F[c >= 0]
 
 
@@ -334,9 +282,7 @@ class MW9(MW):
         f1 = g * (1.0 - np.power(f0 / g, 0.6))
 
         t1 = (1 - 0.64 * f0 * f0 - f1) * (1 - 0.36 * f0 * f0 - f1)
-        t2 = (1.35 * 1.35 - (f0 + 0.35) * (f0 + 0.35) - f1) * (
-            1.15 * 1.15 - (f0 + 0.15) * (f0 + 0.15) - f1
-        )
+        t2 = (1.35 * 1.35 - (f0 + 0.35) * (f0 + 0.35) - f1) * (1.15 * 1.15 - (f0 + 0.15) * (f0 + 0.15) - f1)
         g0 = np.minimum(t1, t2)
         out["F"] = np.column_stack([f0, f1])
         out["G"] = g0.reshape((-1, 1))
@@ -412,29 +358,13 @@ class MW12(MW):
             F = ref_dirs
         F[:, 1] = 0.85 - 0.8 * F[:, 0] - 0.08 * np.abs(np.sin(3.2 * np.pi * F[:, 0]))
 
-        invalid = (
-            1
-            - 0.8 * F[:, 0]
-            - F[:, 1]
-            + 0.08 * np.sin(2 * np.pi * (F[:, 1] - F[:, 0] / 1.5))
-        ) * (
-            1.8
-            - 1.125 * F[:, 0]
-            - F[:, 1]
-            + 0.08 * np.sin(2 * np.pi * (F[:, 1] / 1.8 - F[:, 0] / 1.6))
+        invalid = (1 - 0.8 * F[:, 0] - F[:, 1] + 0.08 * np.sin(2 * np.pi * (F[:, 1] - F[:, 0] / 1.5))) * (
+            1.8 - 1.125 * F[:, 0] - F[:, 1] + 0.08 * np.sin(2 * np.pi * (F[:, 1] / 1.8 - F[:, 0] / 1.6))
         ) > 0
         while invalid.any():
             F[invalid, :] *= 1.001
-            invalid = (
-                1
-                - 0.8 * F[:, 0]
-                - F[:, 1]
-                + 0.08 * np.sin(2 * np.pi * (F[:, 1] - F[:, 0] / 1.5))
-            ) * (
-                1.8
-                - 1.125 * F[:, 0]
-                - F[:, 1]
-                + 0.08 * np.sin(2 * np.pi * (F[:, 1] / 1.8 - F[:, 0] / 1.6))
+            invalid = (1 - 0.8 * F[:, 0] - F[:, 1] + 0.08 * np.sin(2 * np.pi * (F[:, 1] - F[:, 0] / 1.5))) * (
+                1.8 - 1.125 * F[:, 0] - F[:, 1] + 0.08 * np.sin(2 * np.pi * (F[:, 1] / 1.8 - F[:, 0] / 1.6))
             ) > 0
         return F
 

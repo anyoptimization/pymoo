@@ -28,10 +28,7 @@ class ISRES(SRES):
         n = problem.n_var
 
         chi = 1 / (2 * n) + 1 / (2 * (n**0.5))
-        varphi = sqrt(
-            (2 / chi)
-            * log((1 / self.alpha) * (exp(self.phi**2 * chi / 2) - (1 - self.alpha)))
-        )
+        varphi = sqrt((2 / chi) * log((1 / self.alpha) * (exp(self.phi**2 * chi / 2) - (1 - self.alpha))))
 
         self.taup = varphi / ((2 * n) ** 0.5)
         self.tau = varphi / ((2 * (n**0.5)) ** 0.5)
@@ -56,15 +53,11 @@ class ISRES(SRES):
         # update the sigma values for elite and non-elite individuals
         sigmap[mu - 1 :] = np.minimum(
             self.sigma_max,
-            es_sigma(
-                sigma[mu - 1 :], self.tau, self.taup, random_state=self.random_state
-            ),
+            es_sigma(sigma[mu - 1 :], self.tau, self.taup, random_state=self.random_state),
         )
 
         # execute the evolutionary strategy to calculate the offspring solutions
-        Xp[mu - 1 :] = X[mu - 1 :] + sigmap[mu - 1 :] * self.random_state.normal(
-            size=sigmap[mu - 1 :].shape
-        )
+        Xp[mu - 1 :] = X[mu - 1 :] + sigmap[mu - 1 :] * self.random_state.normal(size=sigmap[mu - 1 :].shape)
 
         # repair the individuals which are not feasible by sampling from sigma again
         Xp = es_mut_repair(Xp, X, sigmap, xl, xu, 10, random_state=self.random_state)

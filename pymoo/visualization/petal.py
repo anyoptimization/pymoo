@@ -34,9 +34,7 @@ class Petal(Plot):
         super().__init__(bounds=bounds, **kwargs)
 
         if bounds is None:
-            raise Exception(
-                "Boundaries must be provided for Petal Width. Otherwise, no trade-offs can be calculated."
-            )
+            raise Exception("Boundaries must be provided for Petal Width. Otherwise, no trade-offs can be calculated.")
 
         set_if_none(self.axis_style, "color", "black")
         set_if_none(self.axis_style, "linewidth", 2)

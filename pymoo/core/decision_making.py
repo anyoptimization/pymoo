@@ -16,9 +16,7 @@ class DecisionMaking(Indicator):
 
 
 class NeighborFinder:
-    def __init__(
-        self, N, epsilon=0.125, n_neighbors=None, n_min_neigbors=None, consider_2d=True
-    ):
+    def __init__(self, N, epsilon=0.125, n_neighbors=None, n_min_neigbors=None, consider_2d=True):
 
         super().__init__()
         self.N = N
@@ -65,21 +63,15 @@ class NeighborFinder:
         else:
             # for each neighbour in a specific radius of that solution
             if self.epsilon is not None:
-                neighbours = self.tree.query_ball_point(
-                    [self.N[i]], self.epsilon
-                ).tolist()[0]
+                neighbours = self.tree.query_ball_point([self.N[i]], self.epsilon).tolist()[0]
             elif self.n_neighbors is not None:
-                neighbours = self.tree.query([self.N[i]], k=self.n_neighbors + 1)[
-                    1
-                ].tolist()[0]
+                neighbours = self.tree.query([self.N[i]], k=self.n_neighbors + 1)[1].tolist()[0]
             else:
                 raise Exception("Either define epsilon or number of neighbors.")
 
             # in case n_min_neigbors is enabled
             if len(neighbours) < self.n_min_neigbors:
-                neighbours = self.tree.query([self.N[i]], k=self.n_min_neigbors + 1)[
-                    1
-                ].tolist()[0]
+                neighbours = self.tree.query([self.N[i]], k=self.n_min_neigbors + 1)[1].tolist()[0]
 
         return neighbours
 

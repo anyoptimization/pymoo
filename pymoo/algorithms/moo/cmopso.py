@@ -51,9 +51,7 @@ class CrowdingDistanceTournamentSurvival(Survival):
         while len(selected_indices) < n_survive and remaining_indices:
             # Tournament selection favoring higher crowding distance
             tournament_size = min(self._tournament_size, len(remaining_indices))
-            tournament_indices = random_state.choice(
-                remaining_indices, size=tournament_size, replace=False
-            )
+            tournament_indices = random_state.choice(remaining_indices, size=tournament_size, replace=False)
 
             # Select the one with highest crowding distance in tournament
             best_idx = tournament_indices[np.argmax(crowding[tournament_indices])]
@@ -174,27 +172,20 @@ class CMOPSO(Algorithm):
     def _setup(self, problem, **kwargs):
         super()._setup(problem, **kwargs)
         self.elites = MultiObjectiveArchive(
-            truncation=SurvivalTruncation(
-                CrowdingDistanceTournamentSurvival(), problem=problem
-            ),
+            truncation=SurvivalTruncation(CrowdingDistanceTournamentSurvival(), problem=problem),
             max_size=self.pop_size,
             truncate_size=self.elite_size,
         )
         self.V_max = self.max_velocity_rate * (problem.xu - problem.xl)
 
     def _initialize_infill(self):
-        return self.initialization.do(
-            self.problem, self.pop_size, algorithm=self, random_state=self.random_state
-        )
+        return self.initialization.do(self.problem, self.pop_size, algorithm=self, random_state=self.random_state)
 
     def _initialize_advance(self, infills=None, **kwargs):
         self.pop = infills
 
         if self.initial_velocity == "random":
-            init_V = (
-                self.random_state.random((len(self.pop), self.problem.n_var))
-                * self.V_max[None, :]
-            )
+            init_V = self.random_state.random((len(self.pop), self.problem.n_var)) * self.V_max[None, :]
         elif self.initial_velocity == "zero":
             init_V = np.zeros((len(self.pop), self.problem.n_var))
         else:
@@ -217,9 +208,7 @@ class CMOPSO(Algorithm):
         return off
 
     def _advance(self, infills=None, **kwargs):
-        assert infills is not None, (
-            "This algorithm uses the AskAndTell interface thus 'infills' must to be provided."
-        )
+        assert infills is not None, "This algorithm uses the AskAndTell interface thus 'infills' must to be provided."
 
         particles = Population.merge(self.pop, infills)
         self.elites = self.elites.add(particles)

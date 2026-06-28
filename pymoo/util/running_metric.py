@@ -64,12 +64,10 @@ class RunningMetric(Callback):
 
         # calculate the delta difference for each previous ideal and nadir point to current
         delta_ideal = [
-            calc_delta_norm(history[k]["ideal"], history[k - 1]["ideal"], norm)
-            for k in range(1, len(history))
+            calc_delta_norm(history[k]["ideal"], history[k - 1]["ideal"], norm) for k in range(1, len(history))
         ] + [0.0]
         delta_nadir = [
-            calc_delta_norm(history[k]["nadir"], history[k - 1]["nadir"], norm)
-            for k in range(1, len(history))
+            calc_delta_norm(history[k]["nadir"], history[k - 1]["nadir"], norm) for k in range(1, len(history))
         ] + [0.0]
 
         # now calculate the indicator from each previous one to the current
@@ -127,9 +125,7 @@ class RunningMetricAnimation(AnimationCallback):
 
         for k in range(len(v)):
             if v[k]:
-                ax.plot(
-                    [k + 1, k + 1], [0, f[k]], color="black", linewidth=0.5, alpha=0.5
-                )
+                ax.plot([k + 1, k + 1], [0, f[k]], color="black", linewidth=0.5, alpha=0.5)
                 ax.plot([k + 1], [f[k]], "o", color="black", alpha=0.5, markersize=2)
 
         ax.set_yscale("symlog")
@@ -157,10 +153,7 @@ class RunningMetricAnimation(AnimationCallback):
         if (tau > 0 and tau % self.delta_gen == 0) or force_plot:
             f = running.delta_f
             x = np.arange(len(f)) + 1
-            v = [
-                max(ideal, nadir) > 0.005
-                for ideal, nadir in zip(running.delta_ideal, running.delta_nadir)
-            ]
+            v = [max(ideal, nadir) > 0.005 for ideal, nadir in zip(running.delta_ideal, running.delta_nadir)]
             self.data.append((tau, x, f, v))
 
             fig, ax = plt.subplots()

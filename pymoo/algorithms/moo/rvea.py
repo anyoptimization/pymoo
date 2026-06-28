@@ -79,16 +79,12 @@ class RVEA(GeneticAlgorithm):
 
         # if maximum functions termination convert it to generations
         if isinstance(self.termination, MaximumFunctionCallTermination):
-            n_gen = np.ceil(
-                (self.termination.n_max_evals - self.pop_size) / self.n_offsprings
-            )
+            n_gen = np.ceil((self.termination.n_max_evals - self.pop_size) / self.n_offsprings)
             self.termination = MaximumGenerationTermination(n_gen)
 
         # check whether the n_gen termination is used - otherwise this algorithm can be not run
         if not isinstance(self.termination, MaximumGenerationTermination):
-            raise Exception(
-                "Please use the n_gen or n_eval as a termination criterion to run RVEA!"
-            )
+            raise Exception("Please use the n_gen or n_eval as a termination criterion to run RVEA!")
 
     def _advance(self, **kwargs):
         super()._advance(**kwargs)
@@ -97,10 +93,7 @@ class RVEA(GeneticAlgorithm):
         n_gen, n_max_gen = self.n_gen, self.termination.n_max_gen
 
         # each i-th generation (define by fr and n_max_gen) the reference directions are updated
-        if (
-            self.adapt_freq is not None
-            and n_gen % np.ceil(n_max_gen * self.adapt_freq) == 0
-        ):
+        if self.adapt_freq is not None and n_gen % np.ceil(n_max_gen * self.adapt_freq) == 0:
             self.survival.adapt()
 
     def _set_optimum(self, **kwargs):
@@ -136,9 +129,7 @@ class APDSurvival(Survival):
         self.ideal, self.nadir = np.full(n_dim, np.inf), None
 
         self.ref_dirs = ref_dirs
-        self.extreme_ref_dirs = np.where(
-            np.any(vectorized_cdist(self.ref_dirs, np.eye(n_dim)) == 0, axis=1)
-        )[0]
+        self.extreme_ref_dirs = np.where(np.any(vectorized_cdist(self.ref_dirs, np.eye(n_dim)) == 0, axis=1))[0]
 
         self.V = calc_V(self.ref_dirs)
         self.gamma = calc_gamma(self.V)

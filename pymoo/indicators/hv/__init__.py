@@ -52,9 +52,7 @@ class Hypervolume(Indicator):
             ref_point = self.normalization.forward(ref_point)
 
         self.ref_point = ref_point
-        assert self.ref_point is not None, (
-            "For Hypervolume a reference point needs to be provided!"
-        )
+        assert self.ref_point is not None, "For Hypervolume a reference point needs to be provided!"
 
     def _do(self, F: ndarray) -> float:
         # calculate the hypervolume using moocore

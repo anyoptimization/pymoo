@@ -22,9 +22,7 @@ class MODAct(ElementwiseProblem):
         problem object instance. Example values: cs1, cs3, ct2, ct4, cts3
     """
 
-    def __init__(
-        self, function: str | object, pf: np.ndarray | None = None, **kwargs
-    ) -> None:
+    def __init__(self, function: str | object, pf: np.ndarray | None = None, **kwargs) -> None:
 
         self.function: str | object = function
         self.pf: np.ndarray | None = pf
@@ -32,9 +30,7 @@ class MODAct(ElementwiseProblem):
         try:
             import modact.problems as pb
         except ImportError as e:  # noqa: F841
-            raise Exception(
-                "Please install the modact library: https://github.com/epfl-lamd/modact"
-            ) from e
+            raise Exception("Please install the modact library: https://github.com/epfl-lamd/modact") from e
 
         if isinstance(function, pb.Problem):
             self.fct = function
@@ -69,9 +65,7 @@ class MODAct(ElementwiseProblem):
     def _calc_pareto_front(self, *args, **kwargs):  # noqa: ARG002
         # allows to provide a custom pf - because of the size of files published by the author
         if self.pf is None:
-            pf = Remote.get_instance().load(
-                "pymoo", "pf", "MODACT", f"{self.function}.pf"
-            )
+            pf = Remote.get_instance().load("pymoo", "pf", "MODACT", f"{self.function}.pf")
             # pf = pf * [1, -1]
             pf = pf * self.weights * -1
             return pf

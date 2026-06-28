@@ -42,9 +42,7 @@ class Population(np.ndarray):
             is_iterable = hasattr(values, "__len__") and not isinstance(values, str)
 
             if is_iterable and len(values) != len(self):
-                raise Exception(
-                    "Population Set Attribute Error: Number of values and population size do not match!"
-                )
+                raise Exception("Population Set Attribute Error: Number of values and population size do not match!")
 
             for i in range(len(self)):
                 val = values[i] if is_iterable else values
@@ -113,9 +111,7 @@ class Population(np.ndarray):
             if len(sizes) == 1:
                 size = sizes[0]
             else:
-                raise Exception(
-                    f"Population.new needs to be called with same-sized inputs, but the sizes are {sizes}"
-                )
+                raise Exception(f"Population.new needs to be called with same-sized inputs, but the sizes are {sizes}")
         else:
             size = 0
 
@@ -170,9 +166,7 @@ def merge(
 
 def interleaving_args(*args, kwargs=None):
     if len(args) % 2 != 0:
-        raise Exception(
-            f"Even number of arguments are required but {len(args)} arguments were provided."
-        )
+        raise Exception(f"Even number of arguments are required but {len(args)} arguments were provided.")
 
     if kwargs is None:
         kwargs = {}

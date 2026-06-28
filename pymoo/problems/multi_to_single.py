@@ -15,9 +15,7 @@ class MultiToSingleObjective(Meta, Problem):
         kwargs: Additional keyword arguments for the decomposition.
     """
 
-    def __init__(
-        self, problem: Any, decomposition: Any, kwargs: dict | None = None
-    ) -> None:
+    def __init__(self, problem: Any, decomposition: Any, kwargs: dict | None = None) -> None:
         super().__init__(problem)
         self.decomposition = decomposition
         self.kwargs = kwargs if not None else dict()  # noqa: E712

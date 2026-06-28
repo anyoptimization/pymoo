@@ -74,9 +74,7 @@ def calc_pcd(X, n_remove=0):
 
         _X = X[H].copy()[I, np.arange(M)]
 
-        dist = np.vstack([_X, np.full(M, np.inf)]) - np.vstack(
-            [np.full(M, -np.inf), _X]
-        )
+        dist = np.vstack([_X, np.full(M, np.inf)]) - np.vstack([np.full(M, -np.inf), _X])
 
         dist_to_last, dist_to_next = dist, np.copy(dist)
         dist_to_last, dist_to_next = dist_to_last[:-1], dist_to_next[1:]
@@ -85,9 +83,7 @@ def calc_pcd(X, n_remove=0):
         dist_to_next[np.isnan(dist_to_next)] = 0.0
 
         J = np.argsort(I, axis=0)
-        _d = np.sum(
-            dist_to_last[J, np.arange(M)] + dist_to_next[J, np.arange(M)], axis=1
-        )
+        _d = np.sum(dist_to_last[J, np.arange(M)] + dist_to_next[J, np.arange(M)], axis=1)
         d[H] = _d
         d[extremes] = np.inf
 

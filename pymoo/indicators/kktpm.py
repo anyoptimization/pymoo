@@ -101,9 +101,7 @@ class KKTPM:
                 u_m, u_j = u[:n_obj], u[n_obj:]
 
                 if n_ieq_constr > 0:
-                    _kktpm = (1 - np.sum(u_m)) ** 2 + np.sum(
-                        (np.vstack([a_m, a_j]).T @ u) ** 2
-                    )
+                    _kktpm = (1 - np.sum(u_m)) ** 2 + np.sum((np.vstack([a_m, a_j]).T @ u) ** 2)
                     _fval = _kktpm + np.sum((u_j * g.T) ** 2)
                 else:
                     _kktpm = (1 - np.sum(u_m)) ** 2 + np.sum((a_m.T @ u) ** 2)

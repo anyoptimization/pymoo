@@ -47,9 +47,7 @@ class G3PCX(LoopwiseAlgorithm):
         self.pop_size = Integer(pop_size, bounds=(20, 200))
         self.repair = repair
 
-        self.initialization = Initialization(
-            sampling, repair=self.repair, eliminate_duplicates=False
-        )
+        self.initialization = Initialization(sampling, repair=self.repair, eliminate_duplicates=False)
 
         self.n_offsprings = Integer(n_offsprings, bounds=(1, 10))
         self.n_parents = Integer(n_parents, bounds=(3, 10))
@@ -70,14 +68,10 @@ class G3PCX(LoopwiseAlgorithm):
         )
 
     def _initialize_advance(self, infills=None, **kwargs):
-        self.pop = FitnessSurvival().do(
-            self.problem, infills, n_survive=len(infills), algorithm=self, **kwargs
-        )
+        self.pop = FitnessSurvival().do(self.problem, infills, n_survive=len(infills), algorithm=self, **kwargs)
 
     def _next(self, **kwargs):
-        pop_size, n_offsprings, n_parents = get(
-            self.pop_size, self.n_offsprings, self.n_parents
-        )
+        pop_size, n_offsprings, n_parents = get(self.pop_size, self.n_offsprings, self.n_parents)
 
         # how many loops shall be iterated until one iteration has ended
         loops_per_iter = pop_size // n_offsprings
@@ -100,9 +94,7 @@ class G3PCX(LoopwiseAlgorithm):
                 random_state=self.random_state,
             )
 
-            off = self.mutation(
-                self.problem, off, algorithm=self, random_state=self.random_state
-            )
+            off = self.mutation(self.problem, off, algorithm=self, random_state=self.random_state)
 
             self.repair(self.problem, off, algorithm=self)
 
@@ -110,9 +102,7 @@ class G3PCX(LoopwiseAlgorithm):
 
             pop, family_size = self.pop, get(self.family_size)
 
-            rnd = self.random_state.choice(
-                np.arange(len(pop)), size=family_size, replace=False
-            )
+            rnd = self.random_state.choice(np.arange(len(pop)), size=family_size, replace=False)
             family = Population.merge(pop[rnd], off)
             pop[rnd] = FitnessSurvival().do(self.problem, family, n_survive=family_size)
 

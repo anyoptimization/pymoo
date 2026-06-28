@@ -21,9 +21,7 @@ class LocalSearch(LoopwiseAlgorithm, Algorithm):
         super().__init__(output=output, **kwargs)
 
         # the default termination if not specified otherwise
-        self.termination = RobustTermination(
-            SingleObjectiveSpaceTermination(tol=1e-8), period=10
-        )
+        self.termination = RobustTermination(SingleObjectiveSpaceTermination(tol=1e-8), period=10)
 
         # the type of initial sampling
         initial = initial if "x0" not in kwargs else kwargs["x0"]
@@ -44,6 +42,4 @@ class LocalSearch(LoopwiseAlgorithm, Algorithm):
         )
 
     def _initialize_advance(self, infills=None, **kwargs):
-        self.x0 = FitnessSurvival().do(
-            self.problem, infills, n_survive=1, algorithm=self
-        )[0]
+        self.x0 = FitnessSurvival().do(self.problem, infills, n_survive=1, algorithm=self)[0]

@@ -92,9 +92,7 @@ class Scatter(Plot):
         tight_layout: {tight_layout}
     """
 
-    def __init__(
-        self, plot_3d: bool = True, angle: tuple[int, int] = (45, 45), **kwargs
-    ) -> None:
+    def __init__(self, plot_3d: bool = True, angle: tuple[int, int] = (45, 45), **kwargs) -> None:
         super().__init__(**kwargs)
         self.angle = angle
         self.plot_3d = plot_3d

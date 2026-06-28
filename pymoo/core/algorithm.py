@@ -107,9 +107,7 @@ class Algorithm:
         # the time when the algorithm has been setup for the first time
         self.start_time: float | None = None
 
-    def setup(
-        self, problem: Problem, verbose=False, progress=False, **kwargs
-    ) -> "Algorithm":
+    def setup(self, problem: Problem, verbose=False, progress=False, **kwargs) -> "Algorithm":
 
         # the problem to be solved by the algorithm
         self.problem = problem
@@ -203,9 +201,7 @@ class Algorithm:
 
         return infills
 
-    def advance(
-        self, infills: Population | None = None, **kwargs
-    ) -> Population | Result:
+    def advance(self, infills: Population | None = None, **kwargs) -> Population | Result:
 
         # if infills have been provided set them as offsprings and feed them into advance
         self.off = infills

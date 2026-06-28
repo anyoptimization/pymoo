@@ -6,16 +6,12 @@ from pymoo.core.repair import NoRepair
 
 
 class InfillCriterion:
-    def __init__(
-        self, repair=None, eliminate_duplicates=None, n_max_iterations=100, **kwargs
-    ):
+    def __init__(self, repair=None, eliminate_duplicates=None, n_max_iterations=100, **kwargs):
 
         super().__init__()
         self.n_max_iterations = n_max_iterations
         self.eliminate_duplicates = (
-            eliminate_duplicates
-            if eliminate_duplicates is not None
-            else NoDuplicateElimination()
+            eliminate_duplicates if eliminate_duplicates is not None else NoDuplicateElimination()
         )
         self.repair = repair if repair is not None else NoRepair()
 
@@ -46,9 +42,7 @@ class InfillCriterion:
             n_remaining = n_offsprings - len(off)
 
             # do the mating
-            _off = self._do(
-                problem, pop, n_remaining, random_state=random_state, **kwargs
-            )
+            _off = self._do(problem, pop, n_remaining, random_state=random_state, **kwargs)
 
             # repair the individuals if necessary - disabled if repair is NoRepair
             _off = self.repair(problem, _off, random_state=random_state, **kwargs)

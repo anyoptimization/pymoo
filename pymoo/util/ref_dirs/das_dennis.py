@@ -39,10 +39,7 @@ class DasDennis:
                 point.append(beta / (1.0 * self.n_partitions))
 
                 if self.scaling is not None:
-                    point = [
-                        p * self.scaling + ((1 - self.scaling) / len(point))
-                        for p in point
-                    ]
+                    point = [p * self.scaling + ((1 - self.scaling) / len(point)) for p in point]
 
                 func(point)
                 counter += 1

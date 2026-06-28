@@ -36,9 +36,7 @@ class TournamentSelection(Selection):
 
         self.func_comp = func_comp
         if self.func_comp is None:
-            raise Exception(
-                "Please provide the comparing function for the tournament selection!"
-            )
+            raise Exception("Please provide the comparing function for the tournament selection!")
 
     def _do(  # type: ignore[override]
         self, _, pop, n_select: int, n_parents: int = 1, random_state=None, **kwargs

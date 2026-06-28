@@ -22,8 +22,7 @@ class CantileveredBeam(Problem):
 
         b1, h1, b2, H = x[:, 0], x[:, 1], x[:, 2], x[:, 3]
         I = (  # noqa: E741
-            1 / 12 * b2 * (H - 2 * h1) ** 3
-            + 2 * (1 / 12 * b1 * h1**3 + b1 * h1 * (H - h1) ** 2 / 4)
+            1 / 12 * b2 * (H - 2 * h1) ** 3 + 2 * (1 / 12 * b1 * h1**3 + b1 * h1 * (H - h1) ** 2 / 4)
         )
         volume = (2 * h1 * b1 + (H - 2 * h1) * b2) * L
         out["F"] = volume

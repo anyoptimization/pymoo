@@ -20,9 +20,7 @@ class FlowshopScheduling(ElementwiseProblem):
         n_machines, n_jobs = processing_times.shape
         self.records = processing_times
 
-        super().__init__(
-            n_var=n_jobs, n_obj=1, xl=0, xu=n_machines, vtype=int, **kwargs
-        )
+        super().__init__(n_var=n_jobs, n_obj=1, xl=0, xu=n_machines, vtype=int, **kwargs)
 
     def _evaluate(self, x: Any, out: Any, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG002
         out["F"] = self.makespan(x)
@@ -40,9 +38,7 @@ class FlowshopScheduling(ElementwiseProblem):
         # The makespan is the difference between the starting time of the first job
         # and the latest finish time of any job. Minimizing the makespan amounts to
         # minimizing the total time it takes to process all jobs from start to finish.
-        makespan = (
-            machine_times[-1][-1] + self.records[-1][x[-1]]
-        )  # finish time of the last job
+        makespan = machine_times[-1][-1] + self.records[-1][x[-1]]  # finish time of the last job
         return makespan
 
     def get_machine_times(self, x: np.ndarray) -> list:

@@ -37,9 +37,7 @@ class PCP(Plot):
         self.bbox = bbox
         self.normalize_each_axis = normalize_each_axis
 
-        set_if_none_from_tuples(
-            self.axis_style, ("color", "red"), ("linewidth", 2), ("alpha", 0.75)
-        )
+        set_if_none_from_tuples(self.axis_style, ("color", "red"), ("linewidth", 2), ("alpha", 0.75))
 
     def _do(self):
 
@@ -71,12 +69,8 @@ class PCP(Plot):
             margin_left = 0.08
 
             if self.show_bounds:
-                lower = self.ax.text(
-                    i - margin_left, bottom, self.func_number_to_text(bounds[0][i])
-                )
-                upper = self.ax.text(
-                    i - margin_left, top, self.func_number_to_text(bounds[1][i])
-                )
+                lower = self.ax.text(i - margin_left, bottom, self.func_number_to_text(bounds[0][i]))
+                upper = self.ax.text(i - margin_left, top, self.func_number_to_text(bounds[1][i]))
 
                 if self.bbox:
                     lower.set_bbox(dict(facecolor="white", alpha=0.8))

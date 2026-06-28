@@ -36,9 +36,7 @@ class OmniTest(Problem):
         h = int(n_pareto_points / num_ps)
         PS = np.zeros((num_ps * h, self.n_var))
 
-        candidates = np.array(
-            [np.linspace(2 * m + 1, 2 * m + 3 / 2, h) for m in range(3)]
-        )
+        candidates = np.array([np.linspace(2 * m + 1, 2 * m + 3 / 2, h) for m in range(3)])
         # generate combination indices
         candidates_indices = [[0, 1, 2] for _ in range(self.n_var)]
         a = np.meshgrid(*candidates_indices)

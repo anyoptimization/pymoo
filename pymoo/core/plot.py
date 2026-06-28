@@ -90,16 +90,12 @@ class Plot:
         # the boundaries for normalization
         self.bounds = bounds
 
-    def init_figure(
-        self, n_rows=1, n_cols=1, plot_3D=False, force_axes_as_matrix=False
-    ):
+    def init_figure(self, n_rows=1, n_cols=1, plot_3D=False, force_axes_as_matrix=False):
         if self.ax is not None:
             return
 
         if not plot_3D:
-            self.fig, self.ax = plt.subplots(
-                nrows=n_rows, ncols=n_cols, figsize=self.figsize
-            )
+            self.fig, self.ax = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=self.figsize)
         else:
             importlib.import_module("mpl_toolkits.mplot3d")
             self.fig = plt.figure(figsize=self.figsize)
@@ -114,9 +110,7 @@ class Plot:
         if len(self.to_plot) > 0:
             unique_dim = np.unique(np.array([e[0].shape[-1] for e in self.to_plot]))
             if len(unique_dim) > 1:
-                raise Exception(
-                    "Inputs with different dimensions were added: %s" % unique_dim
-                )
+                raise Exception("Inputs with different dimensions were added: %s" % unique_dim)
 
             self.n_dim = unique_dim[0]
 
@@ -205,9 +199,7 @@ class Plot:
     def get_labels(self):
         if isinstance(self.axis_labels, list):
             if len(self.axis_labels) != self.n_dim:
-                raise Exception(
-                    "Number of axes labels not equal to the number of axes."
-                )
+                raise Exception("Number of axes labels not equal to the number of axes.")
             else:
                 return self.axis_labels
         else:

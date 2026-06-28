@@ -61,9 +61,7 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
     def _step(self, optimizer, X, freeze=None):
         free = np.logical_not(freeze)
 
-        obj, grad, mutual_dist = calc_potential_energy_with_grad(
-            X, self.d, return_mutual_dist=True
-        )
+        obj, grad, mutual_dist = calc_potential_energy_with_grad(X, self.d, return_mutual_dist=True)
         # obj, grad = value_and_grad(calc_potential_energy)(X, self.d)
 
         if self.verify_gradient:
@@ -164,18 +162,14 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
         # if no initial points are provided by the user
         if X is None:
             if self.sampling == "reduction":
-                X = ReductionBasedReferenceDirectionFactory(
-                    self.n_dim, self.n_points, kmeans=True, lexsort=False
-                ).do(random_state=random_state)
+                X = ReductionBasedReferenceDirectionFactory(self.n_dim, self.n_points, kmeans=True, lexsort=False).do(
+                    random_state=random_state
+                )
 
             elif self.sampling == "construction":
-                X = ConstructionBasedReferenceDirectionFactory(
-                    self.n_dim, self.n_points
-                ).do(random_state=random_state)
+                X = ConstructionBasedReferenceDirectionFactory(self.n_dim, self.n_points).do(random_state=random_state)
             else:
-                raise Exception(
-                    "Unknown sampling method. Either reduction or construction."
-                )
+                raise Exception("Unknown sampling method. Either reduction or construction.")
 
         X = self._solve(X, freeze_edges=self.freeze_edges)
 
@@ -233,9 +227,7 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
             _R = scale_reference_directions(_R, 0.9)
 
             # optimize just the edges
-            _R[outer] = self._solve(
-                _R[outer], F=np.vstack([X_t[I], _R[inner]]), freeze_edges=False
-            )
+            _R[outer] = self._solve(_R[outer], F=np.vstack([X_t[I], _R[inner]]), freeze_edges=False)
 
             # no set the reference point and freeze it
             # closest_to_centroid = cdist(centroid, _R).argmin()
@@ -244,9 +236,7 @@ class RieszEnergyReferenceDirectionFactory(ReferenceDirectionFactory):
             # _R[closest_to_centroid] = centroid
 
             # now when translated the reference point becomes the centroid - fix that point to be included
-            _R[inner] = self._solve(
-                _R[inner], F=np.vstack([X_t[I], _R[outer]]), freeze_edges=False
-            )
+            _R[inner] = self._solve(_R[inner], F=np.vstack([X_t[I], _R[outer]]), freeze_edges=False)
 
             # rescale and translate them back
             _R_t = scale_reference_directions(_R, scale)

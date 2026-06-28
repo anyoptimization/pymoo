@@ -72,9 +72,7 @@ class ParentCentricCrossover(Crossover):
         Xp = pcx(X, eta, zeta, index=index, random_state=random_state)
 
         if problem.has_bounds():
-            Xp = repair_random_init(
-                Xp, X[index], *problem.bounds(), random_state=random_state
-            )
+            Xp = repair_random_init(Xp, X[index], *problem.bounds(), random_state=random_state)
 
         return Xp[None, :]
 

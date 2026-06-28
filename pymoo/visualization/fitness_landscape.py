@@ -71,9 +71,7 @@ class FitnessLandscape(Plot):
             B = np.linspace(problem.xl[1], problem.xu[1], n_samples)
             X = all_combinations(A, B)
 
-            F = np.reshape(
-                problem.evaluate(X, return_values_of=["F"]), (n_samples, n_samples)
-            )
+            F = np.reshape(problem.evaluate(X, return_values_of=["F"]), (n_samples, n_samples))
 
             _X = X[:, 0].reshape((n_samples, n_samples))
             _Y = X[:, 1].reshape((n_samples, n_samples))
@@ -86,9 +84,7 @@ class FitnessLandscape(Plot):
                     self.fig.colorbar(surf)
 
             def plot_contour():
-                CS = self.ax.contour(
-                    _X, _Y, _Z, self.contour_levels, **self.kwargs_contour
-                )
+                CS = self.ax.contour(_X, _Y, _Z, self.contour_levels, **self.kwargs_contour)
                 if self.kwargs_contour_labels is not None:
                     self.ax.clabel(CS, **self.kwargs_contour_labels)
 

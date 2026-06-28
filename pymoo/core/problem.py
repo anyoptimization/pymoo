@@ -111,15 +111,9 @@ class Problem:
             self.n_var = len(vars)
 
             if self.xl is None:
-                self.xl = {
-                    name: var.lb if hasattr(var, "lb") else None
-                    for name, var in vars.items()
-                }
+                self.xl = {name: var.lb if hasattr(var, "lb") else None for name, var in vars.items()}
             if self.xu is None:
-                self.xu = {
-                    name: var.ub if hasattr(var, "ub") else None
-                    for name, var in vars.items()
-                }
+                self.xu = {name: var.ub if hasattr(var, "ub") else None for name, var in vars.items()}
 
         # the variable type (only as a type hint at this point)
         self.vtype = vtype
@@ -175,9 +169,7 @@ class Problem:
         # attribute which are excluded from being serialized
         self.exclude_from_serialization = exclude_from_serialization
 
-    def evaluate(
-        self, X, *args, return_values_of=None, return_as_dictionary=False, **kwargs
-    ):
+    def evaluate(self, X, *args, return_values_of=None, return_as_dictionary=False, **kwargs):
 
         # if the problem does not require any kwargs they are re-initialized
         if not self.requires_kwargs:
@@ -192,12 +184,8 @@ class Problem:
 
         # make sure the array is at least 2d. store if reshaping was necessary
         if isinstance(X, np.ndarray) and X.dtype != object:
-            X, only_single_value = at_least_2d_array(
-                X, extend_as="row", return_if_reshaped=True
-            )
-            assert X.shape[1] == self.n_var, (
-                f"Input dimension {X.shape[1]} are not equal to n_var {self.n_var}!"
-            )
+            X, only_single_value = at_least_2d_array(X, extend_as="row", return_if_reshaped=True)
+            assert X.shape[1] == self.n_var, f"Input dimension {X.shape[1]} are not equal to n_var {self.n_var}!"
         else:
             only_single_value = not (isinstance(X, list) or isinstance(X, np.ndarray))
 

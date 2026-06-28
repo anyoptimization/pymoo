@@ -28,9 +28,7 @@ from pymoo.util.misc import norm_eucl_dist
 class NicheOutput(SingleObjectiveOutput):
     def __init__(self):
         super().__init__()
-        self.n_niches = Column(
-            "n_niches", width=10, func=lambda algorithm: len(algorithm.opt)
-        )
+        self.n_niches = Column("n_niches", width=10, func=lambda algorithm: len(algorithm.opt))
         self.columns += [self.n_niches]
 
 
@@ -45,14 +43,10 @@ class NicheSingleObjectiveSpaceToleranceTermination(SingleObjectiveSpaceTerminat
 
 
 class NicheTermination(DefaultTermination):
-    def __init__(
-        self, x_tol=1e-32, cv_tol=1e-6, f_tol=1e-6, period=20, **kwargs
-    ) -> None:
+    def __init__(self, x_tol=1e-32, cv_tol=1e-6, f_tol=1e-6, period=20, **kwargs) -> None:
         super().__init__(
             RobustTermination(DesignSpaceTermination(tol=x_tol), period=period),
-            RobustTermination(
-                ConstraintViolationTermination(tol=cv_tol), period=period
-            ),
+            RobustTermination(ConstraintViolationTermination(tol=cv_tol), period=period),
             RobustTermination(
                 NicheSingleObjectiveSpaceToleranceTermination(tol=f_tol, n_skip=5),
                 period=period,
@@ -85,9 +79,7 @@ def comp_by_cv_and_clearing_fitness(pop, P, **kwargs):
 
         # first compare by the round the individual was selected
         else:
-            S[i] = compare(
-                a, pop[a].get("iter"), b, pop[b].get("iter"), method="smaller_is_better"
-            )
+            S[i] = compare(a, pop[a].get("iter"), b, pop[b].get("iter"), method="smaller_is_better")
 
             # if it was the same round - then use the rank of the fitness directly
             if np.isnan(S[i]):
@@ -119,9 +111,7 @@ class EpsilonClearingSurvival(Survival):
         F = pop.get("F")
 
         if F.shape[1] != 1:
-            raise ValueError(
-                "FitnessSurvival can only used for single objective single!"
-            )
+            raise ValueError("FitnessSurvival can only used for single objective single!")
 
         # this basically sorts the population by constraint and objective value
         pop = FitnessSurvival().do(problem, pop, n_survive=len(pop))
@@ -148,9 +138,7 @@ class EpsilonClearingSurvival(Survival):
             remaining = clearing.remaining()
 
             # if no individuals are left because of clearing - perform a reset
-            if len(remaining) == 0 or (
-                self.n_max_each_iter is not None and rank > self.n_max_each_iter
-            ):
+            if len(remaining) == 0 or (self.n_max_each_iter is not None and rank > self.n_max_each_iter):
                 # reset and retrieve the newly available indices
                 clearing.reset()
                 remaining = clearing.remaining()
@@ -160,9 +148,7 @@ class EpsilonClearingSurvival(Survival):
                 rank = 1
 
                 # get the individual of the first iteration - needed for niche assignment
-                iter_one = (
-                    np.where(pop.get("iter") == 1)[0] if iter_one is None else iter_one
-                )
+                iter_one = np.where(pop.get("iter") == 1)[0] if iter_one is None else iter_one
 
             # since the population is ordered by F and CV it is always the first index
             k = remaining[0]
@@ -220,9 +206,7 @@ class NicheGA(GA):
     ):
 
         if survival is None:
-            survival = EpsilonClearingSurvival(
-                norm_niche_size, n_max_each_iter=None, norm_by_dim=norm_by_dim
-            )
+            survival = EpsilonClearingSurvival(norm_niche_size, n_max_each_iter=None, norm_by_dim=norm_by_dim)
 
         if selection is None:
             selection = TournamentSelection(comp_by_cv_and_clearing_fitness)

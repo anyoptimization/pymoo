@@ -15,9 +15,7 @@ class NoCrossover(Crossover):
         for parents in pop:
             if self.n_offsprings < self.n_parents:
                 # Select without replacement
-                offsprings.extend(
-                    random_state.choice(parents, size=self.n_offsprings, replace=False)
-                )
+                offsprings.extend(random_state.choice(parents, size=self.n_offsprings, replace=False))
             elif self.n_offsprings == self.n_parents:
                 # Return all parents as-is
                 offsprings.extend(parents)
@@ -25,7 +23,5 @@ class NoCrossover(Crossover):
                 # Keep each parent at least once, then fill randomly
                 offsprings.extend(parents)
                 extra = self.n_offsprings - self.n_parents
-                offsprings.extend(
-                    random_state.choice(parents, size=extra, replace=True)
-                )
+                offsprings.extend(random_state.choice(parents, size=extra, replace=True))
         return Population.create(*offsprings)

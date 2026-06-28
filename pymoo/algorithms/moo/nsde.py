@@ -55,9 +55,7 @@ class VariantDE(InfillCriterion):
             self.de_repair = de_repair
         else:
             if de_repair not in DE_REPAIRS:
-                raise KeyError(
-                    f"de_repair must be callable or one of {list(DE_REPAIRS.keys())}"
-                )
+                raise KeyError(f"de_repair must be callable or one of {list(DE_REPAIRS.keys())}")
             self.de_repair = DE_REPAIRS[de_repair]
 
         self.mutation = mutation if mutation is not None else NoMutation()
@@ -86,18 +84,14 @@ class VariantDE(InfillCriterion):
             ai, bi = 2 + 2 * k, 3 + 2 * k
             F = self._sample_F(n_offsprings, random_state)
             if self.gamma is not None:
-                F_mat = F[:, None] * (
-                    1 + self.gamma * (random_state.random((n_offsprings, n_var)) - 0.5)
-                )
+                F_mat = F[:, None] * (1 + self.gamma * (random_state.random((n_offsprings, n_var)) - 0.5))
                 V = V + F_mat * (Xr[:, ai] - Xr[:, bi])
             else:
                 V = V + F[:, None] * (Xr[:, ai] - Xr[:, bi])
 
         # Repair donor vector if bounds are violated
         if problem.has_bounds():
-            V = self.de_repair(
-                V, Xr[:, 1], *problem.bounds(), random_state=random_state
-            )
+            V = self.de_repair(V, Xr[:, 1], *problem.bounds(), random_state=random_state)
 
         # Crossover: trial vector from target (col 0) and donor V
         Xi = Xr[:, 0]
@@ -178,9 +172,7 @@ class NSDE(NSGA2):
         if survival is None:
             survival = RankAndCrowding()
 
-        mating = VariantDE(
-            variant=variant, CR=CR, F=F, gamma=gamma, de_repair=de_repair
-        )
+        mating = VariantDE(variant=variant, CR=CR, F=F, gamma=gamma, de_repair=de_repair)
 
         super().__init__(
             pop_size=pop_size,

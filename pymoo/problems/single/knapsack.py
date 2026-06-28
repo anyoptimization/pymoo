@@ -38,9 +38,7 @@ class MultiObjectiveKnapsack(Knapsack):
 
 
 @default_random_state(seed=1)
-def create_random_knapsack_problem(
-    n_items, variant="single", random_state=None, **kwargs
-):
+def create_random_knapsack_problem(n_items, variant="single", random_state=None, **kwargs):
     P = random_state.integers(1, 100, size=n_items)
     W = random_state.integers(1, 100, size=n_items)
     C = int(np.sum(W) / 10)

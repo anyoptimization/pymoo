@@ -191,9 +191,7 @@ def das_dennis_recursion(
     else:
         for i in range(beta + 1):
             ref_dir[depth] = 1.0 * i / (1.0 * n_partitions)
-            das_dennis_recursion(
-                ref_dirs, np.copy(ref_dir), n_partitions, beta - i, depth + 1
-            )
+            das_dennis_recursion(ref_dirs, np.copy(ref_dir), n_partitions, beta - i, depth + 1)
 
 
 class UniformReferenceDirectionFactory(ReferenceDirectionFactory):
@@ -452,8 +450,6 @@ def select_points_with_maximum_distance(
 
         # add it to the selected and remove from not selected
         selected.append(int(I))
-        not_selected = [
-            i for i, idx in enumerate(not_selected) if idx != index_in_not_selected
-        ]
+        not_selected = [i for i, idx in enumerate(not_selected) if idx != index_in_not_selected]
 
     return selected

@@ -53,9 +53,7 @@ class KGB(NSGA2):
         Returns:
             The result of the superclass setup method.
         """
-        assert not problem.has_constraints(), (
-            "KGB-DMOEA only works for unconstrained problems."
-        )
+        assert not problem.has_constraints(), "KGB-DMOEA only works for unconstrained problems."
         return super().setup(problem, **kwargs)
 
     def _infill(self):
@@ -82,10 +80,7 @@ class KGB(NSGA2):
             # get clusters that are closest to each other by calculating the euclidean distance
             for keys_i in clusters.keys():
                 for keys_j in clusters.keys():
-                    if (
-                        clusters[keys_i]["solutions"]
-                        is not clusters[keys_j]["solutions"]
-                    ):
+                    if clusters[keys_i]["solutions"] is not clusters[keys_j]["solutions"]:
                         dst = euclidean_distance(
                             clusters[keys_i]["centroid"],
                             clusters[keys_j]["centroid"],
@@ -106,10 +101,8 @@ class KGB(NSGA2):
                 clusters[min_distance_index[0]]["solutions"].append(solution)
 
             # calculate new centroid for merged cluster
-            clusters[min_distance_index[0]]["centroid"] = (
-                self.calculate_cluster_centroid(
-                    clusters[min_distance_index[0]]["solutions"]
-                )
+            clusters[min_distance_index[0]]["centroid"] = self.calculate_cluster_centroid(
+                clusters[min_distance_index[0]]["solutions"]
             )
 
             # remove cluster that was merged
@@ -315,13 +308,9 @@ class KGB(NSGA2):
             Diversified population.
         """
         # find indices to be replaced (introduce diversity)
-        replace_idx = np.where(
-            self.random_state.random(len(pop)) < self.PERC_DIVERSITY
-        )[0]
+        replace_idx = np.where(self.random_state.random(len(pop)) < self.PERC_DIVERSITY)[0]
         # replace with randomly sampled individuals
-        pop[replace_idx] = self.initialization.sampling(
-            self.problem, len(replace_idx), random_state=self.random_state
-        )
+        pop[replace_idx] = self.initialization.sampling(self.problem, len(replace_idx), random_state=self.random_state)
         return pop
 
     def _advance(self, **kwargs):
@@ -379,9 +368,7 @@ class KGB(NSGA2):
 
             if len(predicted_pop) >= self.pop_size - self.C_SIZE:
                 init_pop = []
-                indices = self.random_state.choice(
-                    len(predicted_pop), self.pop_size - self.C_SIZE, replace=False
-                )
+                indices = self.random_state.choice(len(predicted_pop), self.pop_size - self.C_SIZE, replace=False)
                 predicted_pop = [predicted_pop[i] for i in indices]
 
                 # add sampled solutions to init_pop
@@ -407,9 +394,7 @@ class KGB(NSGA2):
             if len(init_pop) < self.pop_size:
                 # fill up init_pop with randomly sampled solutions from pop_useful
                 if len(pop_useful) >= self.pop_size - len(init_pop):
-                    indices = self.random_state.choice(
-                        len(pop_useful), self.pop_size - len(init_pop), replace=False
-                    )
+                    indices = self.random_state.choice(len(pop_useful), self.pop_size - len(init_pop), replace=False)
                     init_pop = np.vstack(
                         (
                             init_pop,
@@ -424,9 +409,7 @@ class KGB(NSGA2):
             # if there are still not enough solutions in init_pop generate random solutions with the dimensions of problem decision space
             if len(init_pop) < self.pop_size:
                 # fill up with random solutions
-                init_pop = np.vstack(
-                    (init_pop, self.random_strategy(self.pop_size - len(init_pop)))
-                )
+                init_pop = np.vstack((init_pop, self.random_strategy(self.pop_size - len(init_pop))))
 
             # recreate the current population without being evaluated
             pop = Population.new(X=init_pop)
@@ -435,9 +418,7 @@ class KGB(NSGA2):
             self.evaluator.eval(self.problem, pop)
 
             # do a survival to recreate rank and crowding of all individuals
-            pop = self.survival.do(
-                self.problem, pop, n_survive=len(pop), random_state=self.random_state
-            )
+            pop = self.survival.do(self.problem, pop, n_survive=len(pop), random_state=self.random_state)
 
         # create the offsprings from the current population
         off = self.mating.do(

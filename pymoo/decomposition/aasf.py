@@ -51,9 +51,7 @@ class AASF(ASF):
             AASF scalarization values.
         """
         asf = super()._do(F, weights, weight_0=weight_0, **kwargs)
-        augment = ((F - self.utopian_point) / np.clip(weights, 1e-12, np.inf)).sum(
-            axis=1
-        )
+        augment = ((F - self.utopian_point) / np.clip(weights, 1e-12, np.inf)).sum(axis=1)
         return asf + self.rho * augment
 
 

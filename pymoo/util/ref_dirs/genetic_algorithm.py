@@ -10,9 +10,7 @@ from pymoo.util.reference_direction import (
 
 
 class ReferenceDirectionGA(ReferenceDirectionFactory):
-    def __init__(
-        self, n_dim, n_points, fun, pop_size=20, n_gen=200, verbose=False, **kwargs
-    ):
+    def __init__(self, n_dim, n_points, fun, pop_size=20, n_gen=200, verbose=False, **kwargs):
 
         super().__init__(n_dim, **kwargs)
 

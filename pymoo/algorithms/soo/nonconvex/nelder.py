@@ -140,9 +140,7 @@ class NelderMead(LocalSearch):
         self.alpha, self.beta, self.gamma, self.delta = self.func_params(self.problem)
 
     def _initialize_simplex(self):
-        simplex = pop_from_array_or_individual(
-            initialize_simplex(self.problem, self.x0.X, scale=0.05)
-        )
+        simplex = pop_from_array_or_individual(initialize_simplex(self.problem, self.x0.X, scale=0.05))
         return Population.merge(self.x0, simplex)
 
     def _next(self):

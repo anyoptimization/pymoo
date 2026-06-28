@@ -8,9 +8,7 @@ from typing import Literal, List
 from pymoo.util.dominator import Dominator
 
 
-def fast_non_dominated_sort(
-    F, dominator=Dominator(), native_biobj_sorting=False, **kwargs
-):
+def fast_non_dominated_sort(F, dominator=Dominator(), native_biobj_sorting=False, **kwargs):
     """Fast non-dominated sorting algorithm.
 
     Args:
@@ -180,9 +178,7 @@ def find_non_dominated(F, epsilon=0.0):
                 for k in range(F.shape[1]):  # for each objective
                     if F[j, k] + epsilon < F[i, k]:  # j is better than i in objective k
                         at_least_one_better = True
-                    elif (
-                        F[j, k] > F[i, k] + epsilon
-                    ):  # j is worse than i in objective k
+                    elif F[j, k] > F[i, k] + epsilon:  # j is worse than i in objective k
                         dominates = False
                         break  # Early termination in objective loop
 
@@ -488,9 +484,7 @@ def construct_domination_matrix(f_scores: np.ndarray, **kwargs) -> np.ndarray:
     b = np.apply_over_axes(np.argsort, f_scores, axes=0)
     for vec, srt in zip(f_scores.T, b.T):
         d += construct_comp_matrix(vec, srt)
-    d = np.where(
-        np.logical_and(d == f_scores.shape[-1], d.T == f_scores.shape[-1]), 0, d
-    )
+    d = np.where(np.logical_and(d == f_scores.shape[-1], d.T == f_scores.shape[-1]), 0, d)
     return d
 
 
@@ -574,6 +568,4 @@ def fast_best_order_sort(*args, **kwargs):
     Raises:
         NotImplementedError: Always, as this function requires compilation.
     """
-    raise NotImplementedError(
-        "fast_best_order_sort is only available in compiled (Cython) version"
-    )
+    raise NotImplementedError("fast_best_order_sort is only available in compiled (Cython) version")

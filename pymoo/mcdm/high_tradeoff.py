@@ -19,9 +19,7 @@ class HighTradeoffPoints(DecisionMaking):
     def _do(self, F, **kwargs):
         n, m = F.shape
 
-        neighbors_finder = NeighborFinder(
-            F, epsilon=0.125, n_min_neigbors="auto", consider_2d=False
-        )
+        neighbors_finder = NeighborFinder(F, epsilon=0.125, n_min_neigbors="auto", consider_2d=False)
 
         mu = np.full(n, -np.inf)
 

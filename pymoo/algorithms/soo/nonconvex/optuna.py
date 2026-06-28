@@ -31,9 +31,7 @@ class Optuna(Algorithm):
         get_logger("optuna.storages._in_memory").disabled = True
 
         # create a new study
-        self.study = optuna.create_study(
-            study_name=f"Study@{id(self)}", sampler=sampler, direction="minimize"
-        )
+        self.study = optuna.create_study(study_name=f"Study@{id(self)}", sampler=sampler, direction="minimize")
 
         # the current trial for an individual
         self.trial = None

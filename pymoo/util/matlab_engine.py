@@ -6,9 +6,7 @@ from typing import Any
 def install_matlab() -> None:
     """Print instructions for installing MATLAB Python interface."""
     print("Please install the Matlab python interface:")
-    print(
-        "Tutorial: https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html"
-    )
+    print("Tutorial: https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html")
     print("---------------------------")
     print("Go to:")
     print("Windows:", 'cd "matlabroot\\extern\\engines\\python"')

@@ -76,9 +76,7 @@ class GeneticAlgorithm(Algorithm):
         self.off = None
 
     def _initialize_infill(self):
-        pop = self.initialization.do(
-            self.problem, self.pop_size, algorithm=self, random_state=self.random_state
-        )
+        pop = self.initialization.do(self.problem, self.pop_size, algorithm=self, random_state=self.random_state)
         return pop
 
     def _initialize_advance(self, infills=None, **kwargs):
@@ -111,9 +109,7 @@ class GeneticAlgorithm(Algorithm):
         # if not the desired number of offspring could be created
         elif len(off) < self.n_offsprings:
             if self.verbose:
-                print(
-                    "WARNING: Mating could not produce the required number of (unique) offsprings!"
-                )
+                print("WARNING: Mating could not produce the required number of (unique) offsprings!")
 
         return off
 

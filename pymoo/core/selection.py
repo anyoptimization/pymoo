@@ -54,11 +54,7 @@ class Selection(Operator):
         )
 
         # if some selections return indices they are used to create the individual list
-        if (
-            to_pop
-            and isinstance(ret, np.ndarray)
-            and np.issubdtype(ret.dtype, np.integer)
-        ):
+        if to_pop and isinstance(ret, np.ndarray) and np.issubdtype(ret.dtype, np.integer):
             ret = pop[ret]  # noqa: E501
 
         return ret

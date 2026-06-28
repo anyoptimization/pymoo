@@ -7,9 +7,7 @@ import numpy as np
 from pymoo.util.dominator import Dominator
 
 
-def fast_non_dominated_sort(
-    F: Any, dominator: Any = None, **kwargs: Any
-) -> List[List[int]]:
+def fast_non_dominated_sort(F: Any, dominator: Any = None, **kwargs: Any) -> List[List[int]]:
     """Perform fast non-dominated sorting on objectives.
 
     Args:

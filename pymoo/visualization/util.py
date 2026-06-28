@@ -262,9 +262,7 @@ def plot_problem_surface(
     try:
         from pymoo.visualization.matplotlib import plt  # noqa: F401
     except Exception as e:  # noqa: E722
-        raise Exception(
-            "Please install 'matplotlib' to use the plotting functionality."
-        ) from e
+        raise Exception("Please install 'matplotlib' to use the plotting functionality.") from e
 
     fig = plt.figure()
 
@@ -286,9 +284,7 @@ def plot_problem_surface(
                 A[counter, 1] = y
                 counter += 1
 
-        F = np.reshape(
-            problem.evaluate(A, return_values_of=["F"]), (n_samples, n_samples)
-        )
+        F = np.reshape(problem.evaluate(A, return_values_of=["F"]), (n_samples, n_samples))
 
         # Plot the surface.
         if plot_type == "wireframe":
@@ -309,9 +305,7 @@ def plot_problem_surface(
             raise Exception("Unknown plotting method.")
 
     else:
-        raise Exception(
-            "Can only plot single with less than two variables and one objective."
-        )
+        raise Exception("Can only plot single with less than two variables and one objective.")
 
     if show:
         plt.tight_layout()

@@ -66,9 +66,7 @@ class PINSGA2(GeneticAlgorithm):
         **kwargs,
     ):
 
-        self.survival = RankAndCrowding(
-            nds=NonDominatedSorting(dominator=VFDominator(self))
-        )
+        self.survival = RankAndCrowding(nds=NonDominatedSorting(dominator=VFDominator(self)))
 
         super().__init__(
             pop_size=pop_size,
@@ -123,9 +121,7 @@ class PINSGA2(GeneticAlgorithm):
 
         dim = F.shape[0]
 
-        raw_ranks = input(
-            f'Ranks (e.g., "3, {dim}, ..., 1" for 3rd best, {dim}th best, ..., 1st best): '
-        )
+        raw_ranks = input(f'Ranks (e.g., "3, {dim}, ..., 1" for 3rd best, {dim}th best, ..., 1st best): ')
 
         if raw_ranks == "":
             ranks = []
@@ -169,9 +165,7 @@ class PINSGA2(GeneticAlgorithm):
                 for j, group in enumerate(_ranks):
                     # get pairwise preference from user
                     while True:
-                        points_to_compare = np.array(
-                            [f * presi_signs, F[group[0]] * presi_signs]
-                        )
+                        points_to_compare = np.array([f * presi_signs, F[group[0]] * presi_signs])
                         preference_raw = dm(points_to_compare)
 
                         preference = preference_raw.strip().lower()
@@ -211,9 +205,7 @@ class PINSGA2(GeneticAlgorithm):
 
         dim = F.shape[0]
 
-        print(
-            f"Give each solution a ranking, with 1 being the highest score, and {dim} being the lowest score:"
-        )
+        print(f"Give each solution a ranking, with 1 being the highest score, and {dim} being the lowest score:")
 
         ranks = PINSGA2._prompt_for_ranks(F, presi_signs)
 
@@ -262,9 +254,7 @@ class PINSGA2(GeneticAlgorithm):
             self.presi_signs = np.ones(F.shape[1])
 
         # Eta is the number of solutions displayed to the DM
-        eta_F_indices = select_points_with_maximum_distance(
-            F, to_find, random_state=self.random_state
-        )
+        eta_F_indices = select_points_with_maximum_distance(F, to_find, random_state=self.random_state)
 
         self.eta_F = F[eta_F_indices]
         self.eta_F = self.eta_F[self.eta_F[:, 0].argsort()]
@@ -296,9 +286,7 @@ class PINSGA2(GeneticAlgorithm):
                     dm_ranks = PINSGA2._get_pairwise_ranks(self.eta_F, self.presi_signs)
                     PINSGA2._present_ranks(self.eta_F, dm_ranks, self.presi_signs)
                 else:
-                    raise ValueError(
-                        "Invalid ranking type [%s] given." % self.ranking_type
-                    )
+                    raise ValueError("Invalid ranking type [%s] given." % self.ranking_type)
             else:
                 # Automated DM
                 if self.ranking_type == "absolute":
@@ -306,9 +294,7 @@ class PINSGA2(GeneticAlgorithm):
                 elif self.ranking_type == "pairwise":
                     dm_ranks = self.automated_dm.makePairwiseDecision(self.eta_F)
                 else:
-                    raise ValueError(
-                        "Invalid ranking type [%s] given." % self.ranking_type
-                    )
+                    raise ValueError("Invalid ranking type [%s] given." % self.ranking_type)
 
             if len(set(rank)) == 0:
                 self._warn("No preference between any two points provided.")
@@ -359,9 +345,7 @@ class PINSGA2(GeneticAlgorithm):
                         break
 
                     else:
-                        self._warn(
-                            "Removing the second best preferred solution from the fit."
-                        )
+                        self._warn("Removing the second best preferred solution from the fit.")
 
                         # ranks start at 1, not zero
                         rank_to_remove = dm_ranks[1]
@@ -370,9 +354,7 @@ class PINSGA2(GeneticAlgorithm):
                         dm_ranks = np.concatenate(([dm_ranks[0]], dm_ranks[2:]))
 
                         # update the ranks, since we just removed one
-                        dm_ranks[dm_ranks > rank_to_remove] = (
-                            dm_ranks[dm_ranks > rank_to_remove] - 1
-                        )
+                        dm_ranks[dm_ranks > rank_to_remove] = dm_ranks[dm_ranks > rank_to_remove] - 1
 
 
 parse_doc_string(PINSGA2.__init__)

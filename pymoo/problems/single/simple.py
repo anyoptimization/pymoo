@@ -11,8 +11,4 @@ class SimpleMultiModal01(Problem):
 
     def _evaluate(self, X, out, *args, **kwargs):
         x, y = X[:, 0], X[:, 1]
-        out["F"] = (
-            -anp.exp(-9 * abs(x * y))
-            * anp.sin(3 * anp.pi * x) ** 2
-            * anp.sin(3 * anp.pi * y) ** 2
-        )
+        out["F"] = -anp.exp(-9 * abs(x * y)) * anp.sin(3 * anp.pi * x) ** 2 * anp.sin(3 * anp.pi * y) ** 2

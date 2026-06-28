@@ -37,9 +37,7 @@ class SYMPARTRotated(Problem):
         self.w = angle
 
         # Calculate the inverted rotation matrix, store for fitness evaluation
-        self.IRM = np.array(
-            [[np.cos(self.w), np.sin(self.w)], [-np.sin(self.w), np.cos(self.w)]]
-        )
+        self.IRM = np.array([[np.cos(self.w), np.sin(self.w)], [-np.sin(self.w), np.cos(self.w)]])
 
         r = max(self.b, self.c)
         xl = np.full(2, -10 * r)
@@ -85,9 +83,7 @@ class SYMPARTRotated(Problem):
         if self.w != 0:
             # If rotated, we apply the rotation matrix to PS
             # Calculate the rotation matrix
-            RM = np.array(
-                [[np.cos(self.w), -np.sin(self.w)], [np.sin(self.w), np.cos(self.w)]]
-            )
+            RM = np.array([[np.cos(self.w), -np.sin(self.w)], [np.sin(self.w), np.cos(self.w)]])
             PS = np.array([np.matmul(RM, x) for x in PS])
         return PS
 
@@ -99,7 +95,5 @@ class SYMPARTRotated(Problem):
 class SYMPART(SYMPARTRotated):
     """SYM-PART test problem (non-rotated)."""
 
-    def __init__(
-        self, length: float = 1, v_dist: float = 10, h_dist: float = 10
-    ) -> None:
+    def __init__(self, length: float = 1, v_dist: float = 10, h_dist: float = 10) -> None:
         super().__init__(length, v_dist, h_dist, 0)

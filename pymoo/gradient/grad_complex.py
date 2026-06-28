@@ -41,9 +41,7 @@ class ComplexNumberGradient(Meta, Problem):
         vals_not_grad = [v for v in return_values_of if not v.startswith("d")]
 
         for i, x in enumerate(X):
-            grad = calc_complex_gradient(
-                self.__object__, vals_not_grad, x, self.eps, *args, **kwargs
-            )
+            grad = calc_complex_gradient(self.__object__, vals_not_grad, x, self.eps, *args, **kwargs)
 
             for name, value in grad.items():
                 out["d" + name][i] = value

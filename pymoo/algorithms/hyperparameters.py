@@ -92,10 +92,7 @@ class MultiRun:
         self.func_stats = func_stats
 
     def __call__(self, algorithm):
-        rets = [
-            minimize(self.problem, algorithm, seed=seed, **self.kwargs)
-            for seed in self.seeds
-        ]
+        rets = [minimize(self.problem, algorithm, seed=seed, **self.kwargs) for seed in self.seeds]
         out = self.func_stats(rets)
         out["__results__"] = rets
         return out

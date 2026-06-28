@@ -8,9 +8,7 @@ from pymoo.core.problem import Problem
 
 class Rosenbrock(Problem):
     def __init__(self, n_var=2):
-        super().__init__(
-            n_var=n_var, n_obj=1, n_ieq_constr=0, xl=-2.048, xu=2.048, vtype=float
-        )
+        super().__init__(n_var=n_var, n_obj=1, n_ieq_constr=0, xl=-2.048, xu=2.048, vtype=float)
 
     def _evaluate(self, x, out, *args, **kwargs):
         terms = []

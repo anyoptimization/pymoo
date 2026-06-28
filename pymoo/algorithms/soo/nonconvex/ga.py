@@ -28,9 +28,7 @@ class FitnessSurvival(Survival):
 
     def _do(self, problem, pop, n_survive=None, **kwargs):
         F, cv = pop.get("F", "cv")
-        assert F.shape[1] == 1, (
-            "FitnessSurvival can only used for single objective single!"
-        )
+        assert F.shape[1] == 1, "FitnessSurvival can only used for single objective single!"
         S = np.lexsort([F[:, 0], cv])
         pop.set("rank", np.argsort(S))
         return pop[S[:n_survive]]
@@ -135,9 +133,7 @@ class BGA(GA):
         mutation=BitflipMutation(),
         **kwargs,
     ):
-        super().__init__(
-            sampling=sampling, crossover=crossover, mutation=mutation, **kwargs
-        )
+        super().__init__(sampling=sampling, crossover=crossover, mutation=mutation, **kwargs)
 
 
 parse_doc_string(GA.__init__)

@@ -12,9 +12,7 @@ class DF(DynamicTestProblem):
         super().__init__(nt, taut, n_var=n_var, n_obj=2, xl=0, xu=1, **kwargs)
 
     def _calc_pareto_front(self, *args, **kwargs):
-        return Remote.get_instance().load(
-            "pymoo", "pf", "DF", f"{str(self.__class__.__name__)}.pf"
-        )
+        return Remote.get_instance().load("pymoo", "pf", "DF", f"{str(self.__class__.__name__)}.pf")
 
 
 class DF1(DF):
@@ -180,9 +178,7 @@ class DF7(DF):
 
     def _evaluate(self, x, out, *args, **kwargs):
         a = 5 * np.cos(0.5 * np.pi * self.time)
-        g = 1 + np.sum(
-            (x[:, 1:] - 1 / (1 + np.exp(a * (x[:, [0]] - 2.5)))) ** 2, axis=1
-        )
+        g = 1 + np.sum((x[:, 1:] - 1 / (1 + np.exp(a * (x[:, [0]] - 2.5)))) ** 2, axis=1)
 
         f1 = g * (1 + self.time) / x[:, 0]
         f2 = g * x[:, 0] / (1 + self.time)
@@ -208,11 +204,7 @@ class DF8(DF):
         G = np.sin(0.5 * np.pi * self.time)
         a = 2.25 + 2 * np.cos(2 * np.pi * self.time)
         b = 1
-        tmp = (
-            G
-            * np.sin(4 * np.pi * np.power(x[:, 0].reshape(len(x), 1), b))
-            / (1 + np.abs(G))
-        )
+        tmp = G * np.sin(4 * np.pi * np.power(x[:, 0].reshape(len(x), 1), b)) / (1 + np.abs(G))
         g = 1 + np.sum((x[:, 1:] - tmp) ** 2, axis=1)
         f1 = g * (x[:, 0] + 0.1 * np.sin(3 * np.pi * x[:, 0]))
         f2 = g * np.power(1 - x[:, 0] + 0.1 * np.sin(3 * np.pi * x[:, 0]), a)
@@ -242,14 +234,8 @@ class DF9(DF):
         for i in range(1, n):
             tmp = x[:, i] - np.cos(4 * self.time + x[:, 0] + x[:, i - 1])
             g = g + tmp**2
-        f1 = g * (
-            x[:, 0] + np.maximum(0, (0.1 + 0.5 / N) * np.sin(2 * N * np.pi * x[:, 0]))
-        )
-        f2 = g * (
-            1
-            - x[:, 0]
-            + np.maximum(0, (0.1 + 0.5 / N) * np.sin(2 * N * np.pi * x[:, 0]))
-        )
+        f1 = g * (x[:, 0] + np.maximum(0, (0.1 + 0.5 / N) * np.sin(2 * N * np.pi * x[:, 0])))
+        f2 = g * (1 - x[:, 0] + np.maximum(0, (0.1 + 0.5 / N) * np.sin(2 * N * np.pi * x[:, 0])))
 
         out["F"] = np.column_stack([f1, f2])
 
@@ -282,14 +268,10 @@ class DF10(DF):
         f1 = (g * np.power(np.sin(0.5 * np.pi * x0), H)).reshape(
             len(g),
         )
-        f2 = (
-            g * np.power(np.sin(0.5 * np.pi * x1) * np.cos(0.5 * np.pi * x0), H)
-        ).reshape(
+        f2 = (g * np.power(np.sin(0.5 * np.pi * x1) * np.cos(0.5 * np.pi * x0), H)).reshape(
             len(g),
         )
-        f3 = (
-            g * np.power(np.cos(0.5 * np.pi * x1) * np.cos(0.5 * np.pi * x0), H)
-        ).reshape(
+        f3 = (g * np.power(np.cos(0.5 * np.pi * x1) * np.cos(0.5 * np.pi * x0), H)).reshape(
             len(g),
         )
 
@@ -301,12 +283,8 @@ class DF10(DF):
         H = 2.25 + 2 * np.cos(0.5 * np.pi * self.time)
         g = 1
         f1 = g * np.sin(0.5 * np.pi * x1) ** H
-        f2 = np.multiply(
-            g * np.sin(0.5 * np.pi * x2) ** H, np.cos(0.5 * np.pi * x1) ** H
-        )
-        f3 = np.multiply(
-            g * np.cos(0.5 * np.pi * x2) ** H, np.cos(0.5 * np.pi * x1) ** H
-        )
+        f2 = np.multiply(g * np.sin(0.5 * np.pi * x2) ** H, np.cos(0.5 * np.pi * x1) ** H)
+        f3 = np.multiply(g * np.cos(0.5 * np.pi * x2) ** H, np.cos(0.5 * np.pi * x1) ** H)
 
         return get_PF(np.array([f1, f2, f3]), False)
 
@@ -318,11 +296,7 @@ class DF11(DF):
 
     def _evaluate(self, x, out, *args, **kwargs):
         G = np.abs(np.sin(0.5 * np.pi * self.time))
-        g = (
-            1
-            + G
-            + np.sum((x[:, 2:] - 0.5 * G * x[:, 0].reshape(len(x), 1)) ** 2, axis=1)
-        )
+        g = 1 + G + np.sum((x[:, 2:] - 0.5 * G * x[:, 0].reshape(len(x), 1)) ** 2, axis=1)
         y = [np.pi * G / 6.0 + (np.pi / 2 - np.pi * G / 3.0) * x[:, i] for i in [0, 1]]
 
         f1 = g * np.sin(y[0])
@@ -372,18 +346,11 @@ class DF12(DF):
         x1, x2 = np.meshgrid(np.linspace(0, 1, H), np.linspace(0, 1, H), indexing="xy")
         k = 10 * np.sin(np.pi * self.time)
         tmp2 = np.abs(
-            (
-                np.sin((np.floor(k * (2 * x1 - 1)) * np.pi) / 2)
-                * np.sin((np.floor(k * (2 * x2 - 1)) * np.pi) / 2)
-            )
+            (np.sin((np.floor(k * (2 * x1 - 1)) * np.pi) / 2) * np.sin((np.floor(k * (2 * x2 - 1)) * np.pi) / 2))
         )
         g = 1 + tmp2
-        f1 = np.multiply(
-            np.multiply(g, np.cos(0.5 * np.pi * x2)), np.cos(0.5 * np.pi * x1)
-        )
-        f2 = np.multiply(
-            np.multiply(g, np.sin(0.5 * np.pi * x2)), np.cos(0.5 * np.pi * x1)
-        )
+        f1 = np.multiply(np.multiply(g, np.cos(0.5 * np.pi * x2)), np.cos(0.5 * np.pi * x1))
+        f2 = np.multiply(np.multiply(g, np.sin(0.5 * np.pi * x2)), np.cos(0.5 * np.pi * x1))
         f3 = np.multiply(g, np.sin(0.5 * np.pi * x1))
 
         return get_PF(np.array([f1, f2, f3]), True)
@@ -449,16 +416,8 @@ class DF14(DF):
         y = 0.5 + G * (x0 - 0.5)
 
         f1 = g * (1 - y + 0.05 * np.sin(6 * np.pi * y))
-        f2 = (
-            g
-            * (1 - x1 + 0.05 * np.sin(6 * np.pi * x1))
-            * (y + 0.05 * np.sin(6 * np.pi * y))
-        )
-        f3 = (
-            g
-            * (x1 + 0.05 * np.sin(6 * np.pi * x1))
-            * (y + 0.05 * np.sin(6 * np.pi * y))
-        )
+        f2 = g * (1 - x1 + 0.05 * np.sin(6 * np.pi * x1)) * (y + 0.05 * np.sin(6 * np.pi * y))
+        f3 = g * (x1 + 0.05 * np.sin(6 * np.pi * x1)) * (y + 0.05 * np.sin(6 * np.pi * y))
 
         out["F"] = np.column_stack([f1, f2, f3])
 
@@ -468,12 +427,8 @@ class DF14(DF):
         G = np.sin(0.5 * np.pi * self.time)
         y = 0.5 + G * (x1 - 0.5)
         f1 = 1 - y + 0.05 * np.sin(6 * np.pi * y)
-        f2 = np.multiply(
-            1 - x2 + 0.05 * np.sin(6 * np.pi * x2), y + 0.05 * np.sin(6 * np.pi * y)
-        )
-        f3 = np.multiply(
-            x2 + 0.05 * np.sin(6 * np.pi * x2), y + 0.05 * np.sin(6 * np.pi * y)
-        )
+        f2 = np.multiply(1 - x2 + 0.05 * np.sin(6 * np.pi * x2), y + 0.05 * np.sin(6 * np.pi * y))
+        f3 = np.multiply(x2 + 0.05 * np.sin(6 * np.pi * x2), y + 0.05 * np.sin(6 * np.pi * y))
 
         return get_PF(np.array([f1, f2, f3]), False)
 

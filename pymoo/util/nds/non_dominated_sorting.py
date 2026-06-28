@@ -9,9 +9,7 @@ from pymoo.util.dominator import Dominator
 
 
 class NonDominatedSorting:
-    def __init__(
-        self, epsilon=None, method="fast_non_dominated_sort", dominator=None
-    ) -> None:
+    def __init__(self, epsilon=None, method="fast_non_dominated_sort", dominator=None) -> None:
         super().__init__()
         self.epsilon = epsilon
         self.method = method

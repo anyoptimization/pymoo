@@ -76,15 +76,11 @@ class WFG(Problem):
         if n_obj < 2:
             raise ValueError("WFG problems must have two or more objectives.")
         if not k % (n_obj - 1) == 0:
-            raise ValueError(
-                "Position parameter (k) must be divisible by number of objectives minus one."
-            )
+            raise ValueError("Position parameter (k) must be divisible by number of objectives minus one.")
         if k < 4:
             raise ValueError("Position parameter (k) must be greater or equal than 4.")
         if (k + l) < n_obj:
-            raise ValueError(
-                "Sum of distance and position parameters must be greater than num. of objs. (k + l >= M)."
-            )
+            raise ValueError("Sum of distance and position parameters must be greater than num. of objs. (k + l >= M).")
 
     def _post(self, t, a):
         """Post-process transformed variables."""
@@ -251,10 +247,7 @@ class WFG2(WFG):
         ind_r_sum = k + (n - k) // 2
         gap = k // (m - 1)
 
-        t = [
-            _reduction_weighted_sum_uniform(x[:, (m - 1) * gap : (m * gap)])
-            for m in range(1, m)
-        ]
+        t = [_reduction_weighted_sum_uniform(x[:, (m - 1) * gap : (m * gap)]) for m in range(1, m)]
         t.append(_reduction_weighted_sum_uniform(x[:, k:ind_r_sum]))
 
         return np.column_stack(t)
@@ -329,10 +322,7 @@ class WFG4(WFG):
     def t2(x, m, k):
         """Second transformation: weighted sum reduction."""
         gap = k // (m - 1)
-        t = [
-            _reduction_weighted_sum_uniform(x[:, (m - 1) * gap : (m * gap)])
-            for m in range(1, m)
-        ]
+        t = [_reduction_weighted_sum_uniform(x[:, (m - 1) * gap : (m * gap)]) for m in range(1, m)]
         t.append(_reduction_weighted_sum_uniform(x[:, k:]))
         return np.column_stack(t)
 
@@ -385,10 +375,7 @@ class WFG6(WFG):
     def t2(x, m, n, k):
         """Second transformation: non-separable reduction."""
         gap = k // (m - 1)
-        t = [
-            _reduction_non_sep(x[:, (m - 1) * gap : (m * gap)], gap)
-            for m in range(1, m)
-        ]
+        t = [_reduction_non_sep(x[:, (m - 1) * gap : (m * gap)], gap) for m in range(1, m)]
         t.append(_reduction_non_sep(x[:, k:], n - k))
         return np.column_stack(t)
 
@@ -447,11 +434,7 @@ class WFG8(WFG):
         ret = []
         for i in range(k, n):
             aux = _reduction_weighted_sum_uniform(x[:, :i])
-            ret.append(
-                _transformation_param_dependent(
-                    x[:, i], aux, A=0.98 / 49.98, B=0.02, C=50.0
-                )
-            )
+            ret.append(_transformation_param_dependent(x[:, i], aux, A=0.98 / 49.98, B=0.02, C=50.0))
         return np.column_stack(ret)
 
     def _evaluate(self, x, out, *args, **kwargs):
@@ -497,24 +480,15 @@ class WFG9(WFG):
     @staticmethod
     def t2(x, n, k):
         """Second transformation: deceptive and multi-modal."""
-        a = [
-            _transformation_shift_deceptive(x[:, i], 0.35, 0.001, 0.05)
-            for i in range(k)
-        ]
-        b = [
-            _transformation_shift_multi_modal(x[:, i], 30.0, 95.0, 0.35)
-            for i in range(k, n)
-        ]
+        a = [_transformation_shift_deceptive(x[:, i], 0.35, 0.001, 0.05) for i in range(k)]
+        b = [_transformation_shift_multi_modal(x[:, i], 30.0, 95.0, 0.35) for i in range(k, n)]
         return np.column_stack(a + b)
 
     @staticmethod
     def t3(x, m, n, k):
         """Third transformation: non-separable reduction."""
         gap = k // (m - 1)
-        t = [
-            _reduction_non_sep(x[:, (m - 1) * gap : (m * gap)], gap)
-            for m in range(1, m)
-        ]
+        t = [_reduction_non_sep(x[:, (m - 1) * gap : (m * gap)], gap) for m in range(1, m)]
         t.append(_reduction_non_sep(x[:, k:], n - k))
         return np.column_stack(t)
 
@@ -559,9 +533,7 @@ class WFG9(WFG):
 
 def _transformation_shift_linear(value, shift=0.35):
     """Apply linear shift transformation."""
-    return correct_to_01(
-        np.fabs(value - shift) / np.fabs(np.floor(shift - value) + shift)
-    )
+    return correct_to_01(np.fabs(value - shift) / np.fabs(np.floor(shift - value) + shift))
 
 
 def _transformation_shift_deceptive(y, A=0.35, B=0.005, C=0.05):
@@ -713,9 +685,7 @@ def validate_wfg2_wfg3(l: int) -> None:  # noqa: E741
         ValueError: If l is not divisible by 2.
     """
     if not l % 2 == 0:
-        raise ValueError(
-            "In WFG2/WFG3 the distance-related parameter (l) must be divisible by 2."
-        )
+        raise ValueError("In WFG2/WFG3 the distance-related parameter (l) must be divisible by 2.")
 
 
 def correct_to_01(X, epsilon=1.0e-10):

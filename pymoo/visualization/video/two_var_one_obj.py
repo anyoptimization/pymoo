@@ -23,16 +23,12 @@ class TwoVariablesOneObjectiveVisualization(AnimationCallback):
 
         # check whether the visualization can be done or not - throw exception or simply do nothing
         if problem.n_var != 2 or problem.n_obj != 1:
-            raise Exception(
-                "This visualization can only be used for problems with two variables and one objective!"
-            )
+            raise Exception("This visualization can only be used for problems with two variables and one objective!")
 
         # draw the problem surface
         # if algorithm.surrogate.targets["F"].doe is not None:
         #     problem = algorithm.surrogate
-        plot = FitnessLandscape(
-            problem, _type="contour", kwargs_contour=dict(alpha=0.5)
-        )
+        plot = FitnessLandscape(problem, _type="contour", kwargs_contour=dict(alpha=0.5))
         plot.do()
 
         # get the population
@@ -51,9 +47,7 @@ class TwoVariablesOneObjectiveVisualization(AnimationCallback):
 
         if hasattr(algorithm, "off") and algorithm.off is not None:
             X, F, CV = algorithm.off.get("X", "F", "CV")
-            plt.scatter(
-                X[:, 0], X[:, 1], color="green", marker="D", s=30, label="Offsprings"
-            )
+            plt.scatter(X[:, 0], X[:, 1], color="green", marker="D", s=30, label="Offsprings")
 
         is_new = np.full(len(pop), True)
         if self.last_pop is not None:
@@ -64,9 +58,7 @@ class TwoVariablesOneObjectiveVisualization(AnimationCallback):
         # plot the new population
         if is_new.sum() > 0:
             X, F, CV = pop[is_new].get("X", "F", "CV")
-            plt.scatter(
-                X[:, 0], X[:, 1], color="red", marker="*", s=70, label="Survivors"
-            )
+            plt.scatter(X[:, 0], X[:, 1], color="red", marker="*", s=70, label="Survivors")
 
         xl, xu = problem.bounds()
         plt.xlim(xl[0], xu[0])
