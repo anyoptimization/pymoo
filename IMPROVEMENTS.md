@@ -19,6 +19,46 @@
 
 ---
 
+## ✅ Implementation status (2026-06-28)
+
+Legend: ✅ done & on `main` · ◐ partial (rest deferred) · ⏸️ deferred · 🔁 reverted · ⬜ not started
+
+**Waves 0–3 + all CI/docs/release infra are live on `main` and CI is proven green.**
+
+| Item | Status | Commit / note |
+|---|---|---|
+| **NB-1** honest `Result.success`/`message` | ✅ | `be235ab` |
+| **NB-2** warn on unset `out["F"]` | ✅ | `23b4e35` |
+| **NB-3** validate `Problem` bounds (warn) | ✅ | `23b4e35` |
+| **NB-4** warn on unseeded `minimize()` | 🔁 | reverted `3f196b5` — nagging legitimate usage; against numpy/scipy/sklearn convention |
+| **NB-5** `[visualization]` extra | ✅ | `ba19821` |
+| **NB-6** filterable compile notice | ✅ | `5e77f99` |
+| **NB-7** build numpy pin (`>=2.0`) | ✅ | `5e77f99` |
+| **NB-8** harden `remote.py` | ✅ | `002b87b` (checksum manifest still a follow-up) |
+| **NB-9** operator-default singletons | ⏸️ | 78 sites across ~20 files — own golden-gated pass |
+| **NB-10** deprecate `n_constr` (`FutureWarning`) | ✅ | `5e77f99` |
+| **NB-11** delete `VoidEvaluator` + mutable default | ✅ | `ba19821` |
+| **NB-12** better error messages | ✅ | `23b4e35` |
+| **NB-13** docs fixes | ◐ | doc rot `ba19821` + SEO meta on 38 pages `cdd5565`; **not done:** API autosummary, checkpoint `dill`→`pickle`, ThreadPool example, `save_history`/shape-contract docs |
+| **NB-14** packaging hygiene | ✅ | `10bdfc1` (`prune tests` + dep floors; wheel `.pyx`/`.cpp` exclusion not done) |
+| **P-1** make CI the real gate | ✅ | `01c0532`,`40f946f`,`e9a8537` — **CI run proven green** |
+| **P-2** publish guards (semver tag + version assert + release gate) | ✅ | `01c0532` |
+| **P-3** docs empty-page guardrail | ✅ | shipped in **pyclawd 0.1.1** + wired into CI |
+| **P-4** restore typecheck | ◐ | `name-defined` enabled + enforcing + `Result` annotations `b71069f`; **deferred:** `attr-defined` (~170), `arg-type` (~32), `check_untyped_defs` (~531) |
+| **P-5** regression nets | ◐ | `is_compiled()` CI assertion `a76b789`; **deferred:** `pytest-benchmark` (too noisy on shared runners); golden-gap already caught by the golden run |
+| **B-1…B-4** breaking changes | ⬜ | held for 0.7.0 (each pre-warned by the 0.6.x warnings above) |
+
+**Also delivered (beyond the original list):**
+- **Line width → 120** (`1126aae`) — set ruff `line-length=120` + reformatted.
+- **pyclawd 0.1.1 released** to PyPI + GitHub (carries the P-3 docs guardrail).
+- **Docs-deploy infra provisioned** — AWS OIDC role `pymoo-docs-deploy` (least-privilege) + GitHub `docs` environment (required-reviewer gate) + `docs.yml`.
+- **CI install bug found & fixed** by the first real run (`setup.py build_ext` needs setuptools on py3.12) — `e9a8537`; re-run fully green.
+- **sdist delivery verified** — clean-venv install compiles Cython (build isolation), `is_compiled()=True`, `minimize` runs, `tests/` excluded.
+
+**Not yet validated on a runner:** `nightly.yml` (the macOS/Windows × 3.10–3.14 matrix), `build.yml`, `docs.yml` — they share the fixed install block but haven't executed.
+
+---
+
 ## How to read this
 
 ### What "breaking" means here (precise)
@@ -102,7 +142,7 @@ surface area of the larger releases.
 No *correct* existing user code changes behavior; users gain clarity, warnings, and
 reliability. New warnings are **soft-breaking** under `-W error` (see definition above).
 
-### NB-1 — Populate `Result.success` and `Result.message` (H1) **[S]**
+### ✅ NB-1 — Populate `Result.success` and `Result.message` (H1) **[S]**
 **Today:** `res.success` is always `None`; users write `if res.success:` and it's
 silently falsy.
 **Change:** set both at end of run from termination reason + feasibility.
@@ -124,7 +164,7 @@ else:
     log.warning(res.message)          # e.g. "No feasible solution found."
 ```
 
-### NB-2 — Warn (don't silently return garbage) on bad evaluations (H2)
+### ✅ NB-2 — Warn (don't silently return garbage) on bad evaluations (H2)
 **Today:** forgetting `out["F"]` returns `res.F=[inf]`; an infeasible-only problem
 returns `res.X=res.F=None` — both with no signal.
 **Change (0.6.3, non-breaking):** emit a `RuntimeWarning` ("`_evaluate` did not set
@@ -133,7 +173,7 @@ returns `res.X=res.F=None` — both with no signal.
 **0.7.0 (breaking, see B-1):** unset required `out["F"]` becomes a hard error.
 **Why non-breaking now:** a warning + a populated message doesn't change return values.
 
-### NB-3 — Validate `Problem.__init__`, but warn instead of assert (H2)
+### ✅ NB-3 — Validate `Problem.__init__`, but warn instead of assert (H2)
 **Today:** inverted bounds → message-less `AssertionError` deep in sampling;
 `len(xl) != n_var` → cryptic broadcast error later; NaN objectives flow silently.
 **Change (0.6.3):** check `xl <= xu`, `len(xl)==len(xu)==n_var`, and NaN objectives at
@@ -142,7 +182,7 @@ construction; emit a clear `UserWarning` naming the offending indices. (Promote 
 **Why non-breaking:** code with valid problems is unaffected; code with invalid bounds
 was already crashing later — it now gets a clear message at definition time.
 
-### NB-4 — Warn on the silent RNG entropy fallback (H3) **[M] — soft-breaking**
+### 🔁 NB-4 — Warn on the silent RNG entropy fallback (H3) **[M] — soft-breaking**
 **Today:** `random_state=None` silently builds an OS-seeded generator; reproducibility
 can break with no signal.
 **Change:** when no seed/state is provided to a top-level `minimize`/operator call,
@@ -154,7 +194,7 @@ internal call paths.
 hole) but it **is** a behavior change; don't market it as invisible. Emit once, not
 per-call, to avoid log spam.
 
-### NB-5 — Add the advertised `[visualization]` extra (H4)
+### ✅ NB-5 — Add the advertised `[visualization]` extra (H4)
 **Today:** `pip install pymoo[visualization]` (in the docs) errors — the extra doesn't
 exist.
 **Change:** add `visualization = [matplotlib, ...]` to `pyproject.toml` optional-deps
@@ -164,7 +204,7 @@ exist.
 visualization = ["matplotlib>=3.6", "pyrecorder>=...", ...]
 ```
 
-### NB-6 — Make the compiled→pure-Python fallback diagnosable (H4, Low)
+### ✅ NB-6 — Make the compiled→pure-Python fallback diagnosable (H4, Low)
 **Today:** ABI mismatch silently falls back to slow pure-Python with a one-time
 `print()` to stdout; `is_compiled()` swallows the real exception.
 **Change:** route the notice through `warnings.warn` (stderr, filterable), and expose
@@ -172,7 +212,7 @@ the underlying import error via a debug helper. Add a `pymoo.show_compile_status
 surface it in `minimize(verbose=True)`.
 **Why non-breaking:** same fallback behavior, just observable.
 
-### NB-7 — Align build-time numpy with the runtime floor (H4) **[S] — packaging change**
+### ✅ NB-7 — Align build-time numpy with the runtime floor (H4) **[S] — packaging change**
 **Today:** wheels compiled against numpy 2.x silently fail to load on numpy-1.x envs →
 slow fallback.
 **Change (prefer the non-breaking arm):** pin **build** numpy to the ABI-compatible
@@ -183,7 +223,7 @@ is a **constraint tightening** — it silently excludes users pinned to numpy 1.
 upgrading. If you must, treat it as a minor-version bump with a changelog note, not a
 patch. The first draft mislabeled this as flatly non-breaking; it depends which arm.
 
-### NB-8 — Harden the remote `.pf` data path (C2) ⭐ highest reliability ROI
+### ✅ NB-8 — Harden the remote `.pf` data path (C2) ⭐ highest reliability ROI
 **Today:** cache written into `site-packages` (crashes on read-only installs); no
 checksum/timeout/atomicity (corrupt partial files cached forever; MITM feeds wrong
 Pareto fronts into IGD/HV).
@@ -206,14 +246,14 @@ canonical `.pf` is wrong, prefetch caches it durably. The checksum manifest must
 generated and **committed from a trusted source**, and the offline-bundle/prefetch arm
 is what actually removes the SPOF — keep it in scope, not optional.
 
-### NB-9 — Fix default-operator shared singletons (M1)
+### ⏸️ NB-9 — Fix default-operator shared singletons (M1)
 **Today:** `NSGA2().output is NSGA2().output` → `True`; ask/tell or
 `copy_algorithm=False` share mutable operator state.
 **Change:** default the operator args to `None` and instantiate inside `__init__`.
 **Why non-breaking:** fixes a latent aliasing bug; `minimize`'s deep-copy already hid it
 for the common path, so correct user code is unaffected — buggy sharing is removed.
 
-### NB-10 — Deprecate legacy `n_constr` (M2) **[S]**
+### ✅ NB-10 — Deprecate legacy `n_constr` (M2) **[S]**
 **Today:** `n_constr=` is silently remapped to `n_ieq_constr` (with `max()` merge
 semantics) — equality-constraint users silently misrouted.
 **Change:** emit a deprecation pointing to `n_ieq_constr`/`n_eq_constr`. Keep the remap
@@ -224,13 +264,13 @@ so most users will never see it and will be surprised by the 0.7.0 removal. Eith
 deprecation with a changelog entry + a 0.7.0 migration-guide section. A warning alone is
 not a migration strategy.
 
-### NB-11 — Delete/repair dead always-wrong surfaces (M2)
+### ✅ NB-11 — Delete/repair dead always-wrong surfaces (M2)
 - Remove `VoidEvaluator` (`core/evaluator.py:138-139`) or fix its read-only-property
   crash — it's referenced nowhere.
 - Fix `Evaluator.__init__` mutable default arg → `None`.
 **Why non-breaking:** dead code; nothing depends on it.
 
-### NB-12 — Better error messages (Low + H2 shape hints)
+### ✅ NB-12 — Better error messages (Low + H2 shape hints)
 - Shape-mismatch errors (`core/problem.py:270`) should name the attribute to fix
   ("…did you set `n_ieq_constr`?").
 - Bare `assert np.all(xu >= xl)` (`operators/sampling/rnd.py:25,53`) → add a message.
@@ -239,7 +279,7 @@ not a migration strategy.
   `KeyboardInterrupt` and real causes aren't swallowed.
 **Why non-breaking:** strictly better messages on already-failing paths.
 
-### NB-13 — Documentation fixes (M5, Low)
+### ◐ NB-13 — Documentation fixes (M5, Low)
 - Auto-generate the **API Reference** via `autosummary :recursive:` (or a CI check that
   every `pymoo/algorithms/**` class is listed) so new algorithms can't vanish from
   `api/algorithms.rst` (lists 9 of ~33 today).
@@ -254,7 +294,7 @@ not a migration strategy.
 - Fix `master`→`main` (`installation.md:111`), lead with `setup.py build_ext --inplace`
   over `make compile`, fix landing-page grammar, fix the `cma` version drift in CLAUDE.md.
 
-### NB-14 — Packaging hygiene (Low)
+### ✅ NB-14 — Packaging hygiene (Low)
 - Exclude `*.pyx`/`*.cpp`/`*.pxd` from the **wheel** (keep `.pyx`/`.pxd` in the sdist) —
   removes ~19% bloat.
 - `exclude tests/*` → `prune tests` in `MANIFEST.in`.
@@ -273,7 +313,7 @@ time-consuming** items, and the whole plan depends on them: they stop broken rel
 0.6.3 behavior changes safe to ship. **This is the real critical path** — budget for it
 as the multi-week item, not a "polish" afterthought.
 
-### P-1 — Make CI the real gate (C1, H6) ⭐ highest overall ROI **[L]**
+### ✅ P-1 — Make CI the real gate (C1, H6) ⭐ highest overall ROI **[L]**
 - Add a PR job that runs `pyclawd check` + `examples` + `docs` + **`pyclawd golden`**.
 - ⚠️ **`pyclawd` is NOT in `tests/requirements.txt`** (verified) — so today the golden
   tests run under bare pytest, return their arrays to *nobody*, and degrade to a
@@ -286,12 +326,12 @@ as the multi-week item, not a "polish" afterthought.
 - Re-enable `testing.yml` triggers (currently `branches: [DEACTIVATED]`); replace
   `setup.py install` with `pip install`.
 
-### P-2 — Gate the publish on tests + tag/version consistency (C1)
+### ✅ P-2 — Gate the publish on tests + tag/version consistency (C1)
 - Make `publish_pypi` **depend on** the test job.
 - Restrict the tag trigger to a semver pattern (not any `refs/tags/*`).
 - Add a step asserting `git tag == pymoo.version.__version__` before upload.
 
-### P-3 — Docs build guardrail against empty pages (C3) ⭐ **[M]**
+### ✅ P-3 — Docs build guardrail against empty pages (C3) ⭐ **[M]**
 - Add a post-render validator that **fails non-zero** when a code-bearing notebook page
   renders with zero outputs/images.
 - **Don't only check for *empty* (council):** the next incident may be *truncated* or
@@ -306,12 +346,12 @@ as the multi-week item, not a "polish" afterthought.
   like `all` does.
 - Fail the build verdict on Sphinx ERRORs, not just process returncode.
 
-### P-4 — Restore a meaningful typecheck (H5)
+### ◐ P-4 — Restore a meaningful typecheck (H5)
 Stop disabling `name-defined`/`attr-defined`/`arg-type` in `mypy.ini`; turn on
 `check_untyped_defs`; burn down errors module-by-module. Delete the stale
 `files = pymoo/core/algorithm.py` line.
 
-### P-5 — Close the regression-net gaps (M6)
+### ◐ P-5 — Close the regression-net gaps (M6)
 - Add a test that **fails** when `is_compiled()` is `False` in the should-be-compiled CI
   lane (catch silent slow fallback).
 - Add a minimal `pytest-benchmark` lane with generous tolerances for hot paths
@@ -331,7 +371,7 @@ Every break here is first shipped as a **warning in 0.6.3** (Part 1), so by 0.7.
 have already seen exactly what to change. Bundle them into one minor release with a
 migration guide.
 
-### B-1 — Hard error on unset required `out["F"]` (was NB-2)
+### ⬜ B-1 — Hard error on unset required `out["F"]` (was NB-2)
 **Breaking for:** code that (accidentally) never set `out["F"]` and silently got `[inf]`.
 That code was already broken; it now fails loudly.
 **Migration:** set `out["F"]` in `_evaluate` (the warning in 0.6.3 names the exact problem).
@@ -345,18 +385,18 @@ def _evaluate(self, x, out, *a, **k):
     out["F"] = expensive(x)
 ```
 
-### B-2 — `Problem.__init__` raises `ValueError` on invalid bounds/dims (was NB-3)
+### ⬜ B-2 — `Problem.__init__` raises `ValueError` on invalid bounds/dims (was NB-3)
 **Breaking for:** code constructing problems with `xl>xu` or mismatched bound lengths —
 again, already-crashing code, now caught earlier with a clear message.
 **Migration:** fix the bounds; the 0.6.3 warning already pinpointed the indices.
 
-### B-3 — Remove the `n_constr` alias (was NB-10)
+### ⬜ B-3 — Remove the `n_constr` alias (was NB-10)
 **Breaking for:** pre-0.6 code still passing `n_constr=`.
 **Migration:** rename to `n_ieq_constr=` (or `n_eq_constr=` for equality). NB-10's
 warning flagged call sites — but because `DeprecationWarning` is hidden by default,
 **gate this removal on the migration-guide entry existing**, not just on "we warned."
 
-### B-4 — Consistent result shapes (M3) — **opt-in first, default later**
+### ⬜ B-4 — Consistent result shapes (M3) — **opt-in first, default later**
 This is the most user-visible shape change, so stage it carefully:
 - **0.6.3 (non-breaking):** document the current SOO(1-D)/MOO(2-D) contract; add an
   opt-in `minimize(..., return_2d=True)` (or a `res.opt`/`res.X2d` accessor) that always
