@@ -30,8 +30,8 @@ dependencies = [
     "autograd>=1.4",
     "cma>=3.4.0",
     "matplotlib>=3",
-    "alive_progress",
-    "Deprecated",
+    "alive_progress>=3.0",
+    "Deprecated>=1.2",
 ]
 
 [build-system]
