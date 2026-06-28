@@ -1,0 +1,96 @@
+name: Nightly
+
+# The expensive gate (full OS × Python matrix, examples, full docs build),
+# run once a day — but ONLY if something was committed in the last 24h, so a
+# quiet day costs nothing. Manual dispatch always runs. (IMPROVEMENTS.md P-1.)
+on:
+  schedule:
+    - cron: '0 4 * * *'   # 04:00 UTC daily
+  workflow_dispatch:
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+jobs:
+  changed:
+    name: any commit in the last 24h?
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        run: |
+          latest=$(git log -1 --format=%ct)
+          now=$(date +%s)
+          age=$(( now - latest ))
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$age" -lt 86400 ]; then
+            echo "Last commit ${age}s ago → running nightly."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Last commit ${age}s ago (>24h) → skipping nightly."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  unit-matrix:
+    name: unit ${{ matrix.os }} · py${{ matrix.python }}
+    needs: changed
+    if: needs.changed.outputs.run == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ['3.10', '3.11', '3.12', '3.13', '3.14']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install pymoo (compiled) + deps
+        run: |
+          pip install --upgrade pip
+          pip install -e .
+          python setup.py build_ext --inplace
+          pip install -r tests/requirements.txt
+          pip install pyclawd pytest-xdist
+      - name: Compiled extensions present
+        run: python -c "from pymoo.functions import is_compiled; print('compiled:', is_compiled())"
+      - name: Full unit suite (incl. long convergence tests)
+        run: pytest -n auto -m "not examples and not docs and not golden"
+      - name: Golden behavior-regression
+        run: pytest -m golden
+
+  docs-examples:
+    name: docs + examples (ubuntu)
+    needs: changed
+    if: needs.changed.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: astral-sh/setup-uv@v7
+      - name: System deps
+        run: sudo apt-get update && sudo apt-get install -y pandoc xvfb
+      - name: Install pymoo (compiled) + deps
+        run: |
+          pip install --upgrade pip
+          pip install -e .
+          python setup.py build_ext --inplace
+          pip install -r tests/requirements.txt
+          pip install pyclawd pytest-xdist pytest-xvfb
+      - name: Examples (headless via xvfb)
+        run: pytest -n auto -m examples
+      - name: Restore docs execution cache
+        uses: actions/cache@v4
+        with:
+          path: docs/.jupyter_cache
+          key: jupyter-cache-${{ hashFiles('docs/source/**/*.md', 'pymoo/**/*.py') }}
+          restore-keys: jupyter-cache-
+      - name: Full docs build (all notebooks execute + HTML renders)
+        run: uvx --from ./docs pymoo-docs build

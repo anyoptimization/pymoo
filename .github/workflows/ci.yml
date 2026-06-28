@@ -1,0 +1,65 @@
+name: CI
+
+# No per-commit CI by design. The maintainer commits frequently (often straight
+# to main), so fast feedback lives LOCALLY (`pyclawd test fast` before pushing),
+# not as a run per push. Server-side coverage is:
+#   - this full gate: on PRs and manual dispatch (the consolidation point)
+#   - nightly.yml:    the heavy matrix + docs + golden, once a day IF committed
+#   - build.yml:      the release gate, on a version tag
+on:
+  pull_request:
+  workflow_dispatch:
+
+# If a PR gets several pushes in a row, only the latest gate run survives.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: full gate (3.12, ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # docs --changed compares against origin/main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: astral-sh/setup-uv@v7
+      - name: System deps (docs + headless examples)
+        run: sudo apt-get update && sudo apt-get install -y pandoc xvfb
+      - name: Install pymoo (compiled) + deps
+        run: |
+          pip install --upgrade pip
+          pip install -e .
+          python setup.py build_ext --inplace
+          pip install -r tests/requirements.txt
+          # pyclawd is installed ONLY for its golden pytest plugin (markers live
+          # in pytest.ini). REQUIRES pyclawd on PyPI — until then this step fails,
+          # intentionally: a golden run without the plugin silently no-ops, which
+          # is the exact bug being fixed. The pyclawd CLI is not used in CI (it
+          # targets a conda env); CI drives plain pytest + ruff/mypy + uvx.
+          pip install pyclawd pytest-xdist pytest-xvfb ruff mypy
+      - name: Compiled extensions present
+        run: python -c "from pymoo.functions import is_compiled; print('compiled:', is_compiled())"
+      - name: Lint + format + typecheck
+        run: |
+          ruff check pymoo
+          ruff format --check pymoo
+          mypy pymoo || true   # advisory until P-4 restores a strict config
+      - name: Full unit suite (incl. long convergence tests)
+        run: pytest -n auto -m "not examples and not docs and not golden"
+      - name: Golden behavior-regression (pyclawd plugin compares baselines)
+        run: pytest -m golden
+      - name: Examples (headless via xvfb)
+        run: pytest -n auto -m examples
+      - name: Restore docs execution cache
+        uses: actions/cache@v4
+        with:
+          path: docs/.jupyter_cache
+          key: jupyter-cache-${{ hashFiles('docs/source/**/*.md', 'pymoo/**/*.py') }}
+          restore-keys: jupyter-cache-
+      - name: Docs build (only pages changed vs main)
+        run: uvx --from ./docs pymoo-docs build --changed

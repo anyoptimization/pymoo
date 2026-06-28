@@ -5,7 +5,9 @@ on:
         types: [opened, synchronize, reopened, labeled]
     push:
         branches: [deploy]
-        tags: ["*"]
+        # Only semver-shaped tags (e.g. 0.6.3, 0.6.3.dev1) can trigger a publish —
+        # a stray tag like `latest` or a typo no longer reaches PyPI. (P-2)
+        tags: ["*.*.*"]
     workflow_dispatch:
 
 
@@ -122,10 +124,58 @@ jobs:
                   repository-url: https://test.pypi.org/legacy/
                   skip-existing: true
 
+    verify_version:
+        name: Tag matches version.py
+        # Guard against tag/version drift before anything is published. (P-2)
+        if: startsWith(github.ref, 'refs/tags/')
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: '3.12'
+            - name: Assert git tag == pymoo.version.__version__
+              run: |
+                  TAG="${GITHUB_REF_NAME}"
+                  # read version.py in isolation (no full-package import / compiled ext)
+                  VER=$(python -c "import runpy; print(runpy.run_path('pymoo/version.py')['__version__'])")
+                  echo "tag=$TAG  version.py=$VER"
+                  if [ "$TAG" != "$VER" ]; then
+                    echo "::error::Tag '$TAG' != version.py '$VER' — bump version.py or fix the tag before publishing."
+                    exit 1
+                  fi
+
+    release_gate:
+        name: Release smoke (fast tests + golden)
+        # A quick correctness gate on the tagged commit before publishing. The full
+        # OS×Python matrix runs in nightly.yml; this is the cheap pre-publish check.
+        if: startsWith(github.ref, 'refs/tags/')
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: '3.12'
+                  cache: pip
+            - name: Install pymoo (compiled) + deps
+              run: |
+                  pip install --upgrade pip
+                  pip install -e .
+                  python setup.py build_ext --inplace
+                  pip install -r tests/requirements.txt
+                  pip install pyclawd pytest-xdist
+            - name: Compiled extensions present
+              run: python -c "from pymoo.functions import is_compiled; import sys; print('compiled:', is_compiled()); sys.exit(0 if is_compiled() else 1)"
+            - name: Fast unit tier + golden
+              run: |
+                  pytest -n auto -m "not long and not slow and not examples and not docs and not golden"
+                  pytest -m golden
+
     publish_pypi:
         name: Publish to PyPI
-        # Real release only — runs when a version tag (e.g. 0.6.2) is pushed.
-        needs: merge
+        # Real release only — runs when a version tag (e.g. 0.6.2) is pushed,
+        # AND the tag matches version.py AND the release smoke gate passed.
+        needs: [merge, verify_version, release_gate]
         runs-on: ubuntu-latest
         if: startsWith(github.ref, 'refs/tags/')
         environment:
