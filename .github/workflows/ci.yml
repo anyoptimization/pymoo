@@ -47,7 +47,7 @@ jobs:
         run: |
           ruff check pymoo
           ruff format --check pymoo
-          mypy pymoo || true   # advisory until P-4 restores a strict config
+          mypy pymoo   # enforcing (P-4): name-defined on, attr-defined/arg-type staged
       - name: Full unit suite (incl. long convergence tests)
         run: pytest -n auto -m "not examples and not docs and not golden"
       - name: Golden behavior-regression (pyclawd plugin compares baselines)

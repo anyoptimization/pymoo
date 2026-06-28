@@ -19,8 +19,8 @@ class Result:
         super().__init__()
 
         self.opt: Population | None = None
-        self.success = None
-        self.message = None
+        self.success: bool | None = None
+        self.message: str | None = None
 
         # ! other attributes to be set as well
 
