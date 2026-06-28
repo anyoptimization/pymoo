@@ -1,0 +1,109 @@
+name: Docs Deploy
+
+# Build the documentation and deploy it to S3 + CloudFront (pymoo.org and
+# archive.pymoo.org/<version>). This automates the previously-manual release
+# step (and the source of the empty-pages incident) with the output guardrail
+# baked in so a blank render can NEVER reach production.
+#
+#   - on a version tag  → deploy to live AND archive/<version>
+#   - manual dispatch    → refresh live docs only (between-release prose fixes)
+#
+# Auth is GitHub OIDC → a scoped IAM role (no static keys). All infra values
+# (role ARN, bucket, CloudFront IDs) are `docs`-environment secrets, so this
+# public workflow stays clean. The `docs` environment also carries a required-
+# reviewer gate: every deploy waits for a manual approval.
+on:
+  push:
+    tags: ["*.*.*"]
+  workflow_dispatch:
+
+concurrency:
+  group: docs-deploy
+  cancel-in-progress: false   # never interrupt a half-finished S3 sync
+
+permissions:
+  id-token: write   # mint the OIDC token for AWS
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: docs   # required-reviewer approval gate + scoped AWS secrets
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: astral-sh/setup-uv@v7
+      - name: System deps (docs render + headless examples)
+        run: sudo apt-get update && sudo apt-get install -y pandoc xvfb
+
+      - name: Install pymoo (compiled) + docs toolchain
+        run: |
+          pip install --upgrade pip
+          pip install -e .
+          python setup.py build_ext --inplace
+          pip install -r tests/requirements.txt
+          # The output guardrail (`pyclawd docs build`/`validate`) needs the
+          # pyclawd release that introduced it. Bump this pin once published.
+          pip install "pyclawd>=0.1.1"
+
+      - name: Restore docs execution cache
+        uses: actions/cache@v4
+        with:
+          path: docs/.jupyter_cache
+          key: jupyter-cache-${{ hashFiles('docs/source/**/*.md', 'pymoo/**/*.py') }}
+          restore-keys: jupyter-cache-
+
+      - name: Build docs (executes notebooks; guardrail fails on blank pages)
+        run: pyclawd docs build
+
+      - name: Guardrail gate (explicit, immediately before deploy)
+        run: pyclawd docs validate
+
+      - name: Resolve released version
+        id: ver
+        run: |
+          V=$(python -c "import runpy; print(runpy.run_path('pymoo/version.py')['__version__'])")
+          echo "v=$V" >> "$GITHUB_OUTPUT"
+          echo "pymoo version: $V"
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Back up current live → archive/<live-version>
+        run: |
+          BASE="${{ secrets.DOCS_S3_BASE }}"
+          LIVE=$(aws s3 cp "$BASE/html/_static/documentation_options.js" - 2>/dev/null \
+                 | grep -o "VERSION: '[^']*'" | sed "s/VERSION: '//;s/'//") || true
+          if [ -n "$LIVE" ]; then
+            echo "Backing up live docs ($LIVE) before overwrite"
+            aws s3 sync "$BASE/html/" "$BASE/archive/$LIVE/" --only-show-errors
+          else
+            echo "No live version detected — skipping backup"
+          fi
+
+      - name: Deploy → live (pymoo.org)
+        run: aws s3 sync docs/build/html/ "${{ secrets.DOCS_S3_BASE }}/html/" --delete --only-show-errors
+
+      - name: Archive this version (tag releases only)
+        if: github.ref_type == 'tag'
+        run: aws s3 sync docs/build/html/ "${{ secrets.DOCS_S3_BASE }}/archive/${{ steps.ver.outputs.v }}/" --delete --only-show-errors
+
+      - name: Invalidate CloudFront (live + archive)
+        run: |
+          aws cloudfront create-invalidation --distribution-id "${{ secrets.CF_DIST_LIVE }}" --paths "/*"
+          aws cloudfront create-invalidation --distribution-id "${{ secrets.CF_DIST_ARCHIVE }}" --paths "/*"
+
+      - name: Summary
+        run: |
+          echo "### Docs deployed 🚀" >> "$GITHUB_STEP_SUMMARY"
+          echo "- version: ${{ steps.ver.outputs.v }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- live: pymoo.org" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            echo "- archive: archive.pymoo.org/${{ steps.ver.outputs.v }}/" >> "$GITHUB_STEP_SUMMARY"
+          fi
