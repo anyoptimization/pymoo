@@ -13,6 +13,16 @@ jupytext:
 .. _nb_brkga:
 ```
 
+.. meta::
+   :description: An implementation of BRKGA (Biased Random Key Genetic Algorithm), a genetic algorithm that encodes solutions as random keys and biases mating toward elite solutions for single-objective optimization.
+
++++
+
+.. meta::
+   :keywords: BRKGA, Biased Random Key Genetic Algorithm, Random Keys, Single-objective Optimization, Genetic Algorithm, Python
+
++++
+
 # BRKGA: Biased Random Key Genetic Algorithm
 
 

@@ -13,6 +13,16 @@ jupytext:
 .. _nb_cmaes:
 ```
 
+.. meta::
+   :description: An implementation of CMA-ES (Covariance Matrix Adaptation Evolution Strategy), a state-of-the-art stochastic optimizer for difficult non-linear, non-convex single-objective continuous problems.
+
++++
+
+.. meta::
+   :keywords: CMA-ES, CMAES, Covariance Matrix Adaptation, Evolution Strategy, Single-objective Optimization, Python
+
++++
+
 # CMA-ES
 
 

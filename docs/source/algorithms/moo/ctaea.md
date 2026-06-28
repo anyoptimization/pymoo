@@ -13,6 +13,16 @@ jupytext:
 .. _nb_ctaea:
 ```
 
+.. meta::
+   :description: An implementation of C-TAEA (Constrained Two-Archive Evolutionary Algorithm), a multi-objective optimization algorithm that maintains a convergence-oriented and a diversity-oriented archive to solve constrained multi-objective problems.
+
++++
+
+.. meta::
+   :keywords: C-TAEA, CTAEA, Constrained Two-Archive Evolutionary Algorithm, Constrained Multi-objective Optimization, Multi-objective Optimization, Python
+
++++
+
 # C-TAEA
 
 

@@ -13,6 +13,16 @@ jupytext:
 .. _nb_ga:
 ```
 
+.. meta::
+   :description: An implementation of a genetic algorithm (GA), a classic population-based evolutionary algorithm using selection, crossover, and mutation to solve single-objective optimization problems.
+
++++
+
+.. meta::
+   :keywords: GA, Genetic Algorithm, Evolutionary Algorithm, Single-objective Optimization, Python
+
++++
+
 # GA: Genetic Algorithm
 
 This class represents a basic ($\mu+\lambda$) genetic algorithm for single-objective problems. The figure below shows the flow of a genetic algorithm in general. In the following, it is explained how *pymoo* can be customized.

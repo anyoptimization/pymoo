@@ -14,6 +14,11 @@ jupytext:
 ```
 
 .. meta::
+   :description: An implementation of AGE-MOEA2 (Adaptive Geometry Estimation based Multi-objective Evolutionary Algorithm 2), which estimates the geometry of the non-dominated front to compute survival scores for multi-objective optimization.
+
++++
+
+.. meta::
    :keywords: AGEMOEA2, NSGA-II, Non-Dominated Sorting, Multi-objective Optimization, Python
 
 +++

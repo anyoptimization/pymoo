@@ -13,6 +13,16 @@ jupytext:
 .. _nb_rnsga2:
 ```
 
+.. meta::
+   :description: An implementation of R-NSGA-II, a reference-point-based variant of NSGA-II that guides the search toward regions of the Pareto front preferred by the user.
+
++++
+
+.. meta::
+   :keywords: R-NSGA-II, RNSGA2, Reference Point, Preference-based Optimization, Multi-objective Optimization, Python
+
++++
+
 # R-NSGA-II
 
 +++

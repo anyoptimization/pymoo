@@ -13,6 +13,16 @@ jupytext:
 .. _nb_g3pcx:
 ```
 
+.. meta::
+   :description: An implementation of G3PCX (Generalized Generation Gap with Parent-Centric Recombination), a computationally efficient real-parameter evolutionary algorithm for single-objective optimization.
+
++++
+
+.. meta::
+   :keywords: G3PCX, Generalized Generation Gap, Parent-Centric Recombination, Real-Parameter Optimization, Single-objective Optimization, Python
+
++++
+
 # G3PCX: A Computationally Efficient Evolutionary Algorithm for Real-Parameter Optimization
 
 +++

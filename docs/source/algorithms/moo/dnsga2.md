@@ -17,6 +17,16 @@ kernelspec:
 .. _nb_dnsga2:
 ```
 
+.. meta::
+   :description: An implementation of D-NSGA-II (Dynamic NSGA-II), a modified NSGA-II for dynamic multi-objective optimization problems whose objectives or constraints change over time.
+
++++
+
+.. meta::
+   :keywords: D-NSGA-II, DNSGA2, Dynamic NSGA-II, Dynamic Multi-objective Optimization, Multi-objective Optimization, Python
+
++++
+
 # D-NSGA-II: Dynamic Multi-Objective Optimization Using Modified NSGA-II
 
 +++

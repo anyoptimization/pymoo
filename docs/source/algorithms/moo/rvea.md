@@ -13,6 +13,16 @@ jupytext:
 .. _nb_rvea:
 ```
 
+.. meta::
+   :description: An implementation of RVEA (Reference Vector Guided Evolutionary Algorithm), which uses reference vectors and an angle-penalized distance to balance convergence and diversity in many-objective optimization.
+
++++
+
+.. meta::
+   :keywords: RVEA, Reference Vector Guided Evolutionary Algorithm, Many-objective Optimization, Reference Vectors, Multi-objective Optimization, Python
+
++++
+
 # RVEA: Reference Vector Guided Evolutionary Algorithm
 
 +++

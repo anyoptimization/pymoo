@@ -21,6 +21,16 @@ slideshow:
 .. _nb_nrbo:
 ```
 
+.. meta::
+   :description: An implementation of NRBO (Newton-Raphson-Based Optimizer), a population-based metaheuristic for continuous single-objective optimization inspired by the Newton-Raphson method.
+
++++
+
+.. meta::
+   :keywords: NRBO, Newton-Raphson-based Optimizer, Metaheuristic, Single-objective Optimization, Python
+
++++
+
 # NRBO: Newton-Raphson-based Optimizer
 
 The Newton-Raphson-based Optimizer (NRBO) is a population-based metaheuristic algorithm for continuous optimization problems. It is inspired by the Newton-Raphson method used in numerical analysis for finding roots of real-valued functions. The algorithm combines the exploration capabilities of population-based methods with the exploitation power of gradient-based approaches.

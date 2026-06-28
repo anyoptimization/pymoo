@@ -13,6 +13,16 @@ jupytext:
 .. _nb_nelder_mead:
 ```
 
+.. meta::
+   :description: An implementation of the Nelder-Mead simplex algorithm, a derivative-free direct-search method for single-objective continuous optimization, extended here with a boundary check.
+
++++
+
+.. meta::
+   :keywords: Nelder-Mead, Nelder Mead, Simplex, Derivative-free Optimization, Single-objective Optimization, Python
+
++++
+
 # Nelder Mead
 
 

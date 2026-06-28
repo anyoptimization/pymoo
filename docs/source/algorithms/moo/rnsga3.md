@@ -13,6 +13,16 @@ jupytext:
 .. _nb_rnsga3:
 ```
 
+.. meta::
+   :description: An implementation of R-NSGA-III, a reference-point-based variant of NSGA-III that focuses the search on user-preferred regions of the Pareto front.
+
++++
+
+.. meta::
+   :keywords: R-NSGA-III, RNSGA3, Reference Point, Preference-based Optimization, Multi-objective Optimization, Python
+
++++
+
 # R-NSGA-III
 
 

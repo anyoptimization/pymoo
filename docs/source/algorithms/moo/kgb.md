@@ -17,6 +17,16 @@ kernelspec:
 .. _nb_kgb:
 ```
 
+.. meta::
+   :description: An implementation of KGB-DMOEA (Knowledge-Guided Bayesian Dynamic Multi-Objective Evolutionary Algorithm), a dynamic multi-objective optimizer that reuses past knowledge with a Bayesian classifier to respond to changing environments.
+
++++
+
+.. meta::
+   :keywords: KGB-DMOEA, KGB, Knowledge-Guided Bayesian, Dynamic Multi-objective Optimization, Multi-objective Optimization, Python
+
++++
+
 # KGB-DMOEA: Knowledge-Guided Bayesian Dynamic Multi-Objective Evolutionary Algorithm
 
 +++

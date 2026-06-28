@@ -13,6 +13,16 @@ jupytext:
 .. _nb_pattern_search:
 ```
 
+.. meta::
+   :description: An implementation of Pattern Search (Hooke and Jeeves), a derivative-free direct-search method that explores along coordinate patterns to solve single-objective optimization problems.
+
++++
+
+.. meta::
+   :keywords: Pattern Search, Hooke and Jeeves, Direct Search, Derivative-free Optimization, Single-objective Optimization, Python
+
++++
+
 # Pattern Search
 
 +++

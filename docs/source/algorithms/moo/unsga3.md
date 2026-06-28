@@ -13,6 +13,16 @@ jupytext:
 .. _nb_unsga3:
 ```
 
+.. meta::
+   :description: An implementation of U-NSGA-III (Unified NSGA-III), a unified version of NSGA-III with niching-based tournament selection that performs well on single-, multi-, and many-objective problems.
+
++++
+
+.. meta::
+   :keywords: U-NSGA-III, UNSGA3, Unified NSGA-III, Many-objective Optimization, Multi-objective Optimization, Python
+
++++
+
 # U-NSGA-III
 
 
