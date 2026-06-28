@@ -36,12 +36,11 @@ jobs:
           pip install -e .
           python setup.py build_ext --inplace
           pip install -r tests/requirements.txt
-          # pyclawd is installed ONLY for its golden pytest plugin (markers live
-          # in pytest.ini). REQUIRES pyclawd on PyPI — until then this step fails,
-          # intentionally: a golden run without the plugin silently no-ops, which
-          # is the exact bug being fixed. The pyclawd CLI is not used in CI (it
-          # targets a conda env); CI drives plain pytest + ruff/mypy + uvx.
-          pip install pyclawd pytest-xdist pytest-xvfb ruff mypy
+          # pyclawd provides the golden pytest plugin (compares baselines) AND
+          # the docs build with its output guardrail. It runs under the CI Python
+          # (sys.executable — conda_env in config is advisory only). >=0.1.1 is
+          # the release carrying `pyclawd docs validate`.
+          pip install "pyclawd>=0.1.1" pytest-xdist pytest-xvfb ruff mypy
       - name: Compiled extensions present
         run: python -c "from pymoo.functions import is_compiled; print('compiled:', is_compiled())"
       - name: Lint + format + typecheck
@@ -61,5 +60,7 @@ jobs:
           path: docs/.jupyter_cache
           key: jupyter-cache-${{ hashFiles('docs/source/**/*.md', 'pymoo/**/*.py') }}
           restore-keys: jupyter-cache-
-      - name: Docs build (only pages changed vs main)
-        run: uvx --from ./docs pymoo-docs build --changed
+      - name: Docs build (guardrailed; only pages changed vs main)
+        # `pyclawd docs build` runs the output guardrail — fails if an executed
+        # page rendered blank (the empty-docs failure mode).
+        run: pyclawd docs build --changed

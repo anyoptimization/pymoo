@@ -55,7 +55,7 @@ jobs:
           pip install -e .
           python setup.py build_ext --inplace
           pip install -r tests/requirements.txt
-          pip install pyclawd pytest-xdist
+          pip install "pyclawd>=0.1.1" pytest-xdist
       - name: Compiled extensions present
         run: python -c "from pymoo.functions import is_compiled; print('compiled:', is_compiled())"
       - name: Full unit suite (incl. long convergence tests)
@@ -83,7 +83,7 @@ jobs:
           pip install -e .
           python setup.py build_ext --inplace
           pip install -r tests/requirements.txt
-          pip install pyclawd pytest-xdist pytest-xvfb
+          pip install "pyclawd>=0.1.1" pytest-xdist pytest-xvfb
       - name: Examples (headless via xvfb)
         run: pytest -n auto -m examples
       - name: Restore docs execution cache
@@ -92,5 +92,7 @@ jobs:
           path: docs/.jupyter_cache
           key: jupyter-cache-${{ hashFiles('docs/source/**/*.md', 'pymoo/**/*.py') }}
           restore-keys: jupyter-cache-
-      - name: Full docs build (all notebooks execute + HTML renders)
-        run: uvx --from ./docs pymoo-docs build
+      - name: Full docs build (guardrailed; all notebooks execute + HTML renders)
+        # `pyclawd docs build` runs the output guardrail — fails if an executed
+        # page rendered blank (the empty-docs failure mode).
+        run: pyclawd docs build
