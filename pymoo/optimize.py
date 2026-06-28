@@ -1,10 +1,6 @@
 """Convenience function for minimization using optimization algorithms."""
 
 import copy
-import warnings
-
-# warn at most once per process that an unseeded run isn't reproducible (NB-4)
-_warned_no_seed = False
 
 
 def minimize(
@@ -34,17 +30,6 @@ def minimize(
     Returns:
         The optimization result represented as an object.
     """
-    # one-time reproducibility nudge: an unseeded run draws OS entropy and is not
-    # reproducible. Warn once per process (seeded runs never warn).
-    global _warned_no_seed
-    if kwargs.get("seed") is None and not _warned_no_seed:
-        _warned_no_seed = True
-        warnings.warn(
-            "minimize() was called without a seed — results will not be "
-            "reproducible. Pass seed=<int> for a reproducible run.",
-            stacklevel=2,
-        )
-
     # create a copy of the algorithm object to ensure no side effects
     if copy_algorithm:
         algorithm = copy.deepcopy(algorithm)
