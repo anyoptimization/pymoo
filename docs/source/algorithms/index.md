@@ -54,6 +54,7 @@ kernelspec:
    moo/rvea
    moo/sms
    moo/spea2
+   moo/omni
    moo/dnsga2
    moo/kgb
    moo/pinsga2

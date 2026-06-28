@@ -175,15 +175,8 @@ The Newton-Raphson-based Optimizer (NRBO) was proposed in <cite data-cite="Sowmy
 
 +++ {"editable": true, "slideshow": {"slide_type": ""}}
 
-### Acknowledgments
+### Acknowledgement
 
-```{raw-cell}
----
-raw_mimetype: text/restructuredtext
-editable: true
-slideshow:
-  slide_type: ''
----
-.. note::
-   We would like to thank `@Zcaic <https://github.com/Zcaic>`_ for contributing the NRBO implementation to pymoo.
-```
+The NRBO implementation in pymoo was contributed by [Zcaic](https://github.com/Zcaic).
+
+*Thank you for the contribution — pymoo grows through community contributions like this one.*

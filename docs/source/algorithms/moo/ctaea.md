@@ -71,4 +71,8 @@ Scatter().add(res.F, facecolor="none", edgecolor="red").show()
     :noindex:
 ```
 
-Python implementation by [cyrilpic](https://github.com/cyrilpic) based on the [original C code](https://web.archive.org/web/20200916105021/https://cola-laboratory.github.io/docs/publications).
+## Acknowledgement
+
+The C-TAEA implementation in pymoo was contributed by [cyrilpic](https://github.com/cyrilpic), based on the [original C code](https://web.archive.org/web/20200916105021/https://cola-laboratory.github.io/docs/publications).
+
+*Thank you for the contribution — pymoo grows through community contributions like this one.*

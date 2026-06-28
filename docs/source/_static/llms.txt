@@ -97,7 +97,6 @@ This setup ensures that `pymoo` documentation is accessible and usable for both 
 - [pymoo - NSGA-II: Non-dominated Sorting Genetic Algorithm](https://pymoo.org/algorithms/moo/nsga2.md): An implementation of the famous NSGA-II (also known as NSGA2) algorithm to solve multi-objective optimization problems. The non-dominated rank and crowding distance is used to introduce diversity in the objective space in each generation.
 - [pymoo - R-NSGA-II](https://pymoo.org/algorithms/moo/rnsga2.md)
 - [pymoo - NSGA-III](https://pymoo.org/algorithms/moo/nsga3.md): NSGA-III (also known as NSGA3) has been proposed for many-objective optimization to address the shortcomings of its predecessor NSGA-II. Using reference directions, the algorithm scales to many objectives and achieves a diverse set of non-dominated solutions.
-- [Best ai agent for test generation](https://keploy.io): Generate unit, api, integration tests for backend using AI coding agent, keploy
 - [pymoo - U-NSGA-III](https://pymoo.org/algorithms/moo/unsga3.md)
 - [pymoo - R-NSGA-III](https://pymoo.org/algorithms/moo/rnsga3.md)
 - [pymoo - MOEA/D](https://pymoo.org/algorithms/moo/moead.md)
@@ -108,6 +107,11 @@ This setup ensures that `pymoo` documentation is accessible and usable for both 
 - [pymoo - SMS-EMOA: Multiobjective selection based on dominated hypervolume](https://pymoo.org/algorithms/moo/sms.md)
 - [pymoo - D-NSGA-II: Dynamic Multi-Objective Optimization Using Modified NSGA-II](https://pymoo.org/algorithms/moo/dnsga2.md)
 - [pymoo - KGB-DMOEA: Knowledge-Guided Bayesian Dynamic Multi-Objective Evolutionary Algorithm](https://pymoo.org/algorithms/moo/kgb.md)
+- [pymoo - SPEA2: Strength Pareto Evolutionary Algorithm 2](https://pymoo.org/algorithms/moo/spea2.md)
+- [pymoo - Omni-Optimizer: A generic NSGA-II based algorithm for multi-modal multi-objective optimization](https://pymoo.org/algorithms/moo/omni.md)
+- [pymoo - GDE3: Generalized Differential Evolution 3](https://pymoo.org/algorithms/moo/gde3.md)
+- [pymoo - NSDE: Non-dominated Sorting Differential Evolution](https://pymoo.org/algorithms/moo/nsde.md)
+- [pymoo - NSDE-R: Reference-direction based Differential Evolution](https://pymoo.org/algorithms/moo/nsder.md)
 - [pymoo - Constraint Handling](https://pymoo.org/constraints/index.md)
 - [pymoo - Constrained Problem](https://pymoo.org/constraints/problem.md)
 - [pymoo - Feasibility First (Parameter-less Approach)](https://pymoo.org/constraints/feas_first.md)

@@ -39,6 +39,10 @@ kernelspec:
 
 #### 0.6.2
 
+**Algorithms**
+
+- Added the **Omni-Optimizer** (Deb & Tiwari, 2008) — a generic NSGA-II based algorithm that niches in both objective and variable space to find multiple equivalent Pareto-optimal solutions
+
 **Bug fixes**
 
 - Fixed GDE3 (and its MNN/2NN/PCD variants) to be fully deterministic for a fixed seed — its survival step previously fell back to an unseeded random state, so repeated runs with the same seed could differ
@@ -47,7 +51,7 @@ kernelspec:
 **Documentation**
 
 - Reworked the algorithm overview so it now lists every available algorithm and is consistent between the homepage and the algorithm table
-- Added documentation pages for SPEA2, GDE3, NSDE, and NSDE-R
+- Added documentation pages for SPEA2, Omni-Optimizer, GDE3, NSDE, and NSDE-R
 - Added the previously undocumented PSO, G3PCX, AGE-MOEA2, D-NSGA-II, KGB, and C-TAEA to the algorithm listing
 - Refreshed the news section and the "new" feature highlights
 

@@ -22,6 +22,7 @@
    :ref:`C-TAEA <nb_ctaea>`, CTAEA, many, x, An algorithm with a more sophisticated constraint-handling for many-objective optimization algoritms.
    :ref:`SMS-EMOA <nb_sms>`, SMSEMOA, many, x, An algorithm that uses hypervolume during the environmental survival.
    :ref:`SPEA2 <nb_spea2>`, SPEA2, multi, x, Strength Pareto evolutionary algorithm using a strength-based fitness with a k-th nearest neighbor density estimate and an archive truncation operator for diversity.
+   :ref:`Omni-Optimizer <nb_omni>`, OmniOptimizer, multi, x, A generic NSGA-II based algorithm using a dynamic epsilon-dominance and crowding in objective and variable space to find multiple equivalent Pareto-optimal solutions.
    :ref:`RVEA <nb_rvea>`, RVEA, many, , A reference direction based algorithm used an angle-penalized metric.
    :ref:`CMOPSO <nb_cmopso>`, CMOPSO, multi, x, A competitive mechanism based multi-objective particle swarm optimizer with fast convergence using binary tournament selection on elites.
    :ref:`MOPSO-CD <nb_mopso_cd>`, MOPSO_CD, multi, x, Multi-objective particle swarm optimization with crowding distance mechanism for leader selection and archive management.

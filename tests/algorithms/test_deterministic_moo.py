@@ -12,6 +12,7 @@ from pymoo.algorithms.moo.moead import MOEAD
 from pymoo.algorithms.moo.moead import ParallelMOEAD
 from pymoo.algorithms.moo.mopso_cd import MOPSO_CD
 from pymoo.algorithms.moo.nsde import NSDE
+from pymoo.algorithms.moo.omni import OmniOptimizer
 from pymoo.algorithms.moo.nsder import NSDER
 
 # Multi-objective algorithms
@@ -111,6 +112,7 @@ MULTI_OBJECTIVE_ALGORITHM_CLASSES = [
     GDE3,
     NSDE,
     NSDER,
+    OmniOptimizer,
 ]
 
 # Test problem

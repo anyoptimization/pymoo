@@ -68,3 +68,11 @@ res = minimize(problem,
 ```{raw-cell}
 Yulong Ye, Lingjie Li, Qiuzhen Lin, Ka-Chun Wong, Jianqiang Li, Zhong Ming. “A knowledge guided Bayesian classification for dynamic multi-objective optimization”. Knowledge-Based Systems, Volume 251, 2022.
 ```
+
++++
+
+### Acknowledgement
+
+The KGB-DMOEA implementation in pymoo was contributed by [Charles David Mupende](https://github.com/bandundu).
+
+*Thank you for the contribution — pymoo grows through community contributions like this one.*

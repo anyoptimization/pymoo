@@ -140,6 +140,8 @@ Scatter().add(res.F, facecolor="none", edgecolor="blue").show()
 
 +++
 
-### Implementation
+### Acknowledgement
 
-This algorithm has been implemented by [Gideon Oludeyi](https://github.com/gideonoludeyi) and is based on the original paper by Zhang et al. (2018). The implementation follows the competitive learning strategy with binary tournament selection on elites to maintain diversity and convergence in multi-objective optimization problems. 
+The CMOPSO implementation in pymoo was contributed by [Gideon Oludeyi](https://github.com/gideonoludeyi), based on the original paper by Zhang et al. (2018), following the competitive-learning strategy with binary tournament selection on elites.
+
+*Thank you for the contribution — pymoo grows through community contributions like this one.*

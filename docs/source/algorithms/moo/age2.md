@@ -54,3 +54,11 @@ plot.show()
 .. autoclass:: pymoo.algorithms.moo.age2.AGEMOEA2
     :noindex:
 ```
+
++++
+
+### Acknowledgement
+
+The AGE-MOEA2 implementation in pymoo was contributed by [Annibale Panichella](https://github.com/apanichella).
+
+*Thank you for the contribution — pymoo grows through community contributions like this one.*
