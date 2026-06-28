@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 from abc import abstractmethod
 
 import numpy as np
@@ -140,6 +141,28 @@ class Problem:
                     self.xu = np.ones(n_var) * xu
                 self.xu = self.xu.astype(float)
 
+            # validate bounds once at construction so a common mistake surfaces
+            # here with a clear message instead of as a cryptic error deep in an
+            # operator. Warn now; this becomes a hard ValueError in 0.7.0.
+            if self.xl is not None and self.xu is not None:
+                if self.xl.shape != (n_var,) or self.xu.shape != (n_var,):
+                    warnings.warn(
+                        f"Problem bounds have the wrong length: xl/xu should each have "
+                        f"n_var={n_var} entries, got xl{self.xl.shape}, xu{self.xu.shape}.",
+                        UserWarning,
+                        stacklevel=2,
+                    )
+                else:
+                    bad = np.where(self.xl > self.xu)[0]
+                    if len(bad) > 0:
+                        warnings.warn(
+                            f"Problem bounds invalid: xl > xu at variable index "
+                            f"{bad.tolist()} (xl={self.xl[bad]}, xu={self.xu[bad]}). "
+                            f"Did you swap the lower and upper bounds?",
+                            UserWarning,
+                            stacklevel=2,
+                        )
+
         # this defines if NaN values should be replaced or not
         self.replace_nan_values_by = replace_nan_values_by
 
@@ -268,7 +291,10 @@ class Problem:
                         v = v.reshape(shape[name])
                     except Exception as e:
                         raise Exception(
-                            f"Problem Error: {name} can not be set, expected shape {shape[name]} but provided {v.shape}",
+                            f"Problem Error: {name} can not be set, expected shape "
+                            f"{shape[name]} but provided {v.shape}. Check that n_obj / "
+                            f"n_ieq_constr / n_eq_constr match what _evaluate sets for "
+                            f"'{name}'.",
                             e,
                         )
 
@@ -278,6 +304,15 @@ class Problem:
         for name in return_values_of:
             if name not in ret:
                 s = shape.get(name, N)
+                # the objective values are always required — silently returning inf
+                # hides a misdefined _evaluate, so flag it (once).
+                if name == "F":
+                    warnings.warn(
+                        "Problem._evaluate did not set out['F'] (the objective values); "
+                        "returning inf. Make sure _evaluate assigns out['F'].",
+                        UserWarning,
+                        stacklevel=2,
+                    )
                 ret[name] = np.full(s, np.inf)
 
         return ret
@@ -384,8 +419,6 @@ def __getattr__(name):
     This class was moved from pymoo.core.problem to pymoo.parallelization.
     """
     if name == "StarmapParallelization":
-        import warnings
-
         warnings.warn(
             "Importing 'StarmapParallelization' from 'pymoo.core.problem' is deprecated. "
             "Please use 'from pymoo.parallelization import StarmapParallelization' instead. "
