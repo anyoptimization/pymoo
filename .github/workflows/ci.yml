@@ -32,7 +32,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y pandoc xvfb
       - name: Install pymoo (compiled) + deps
         run: |
-          pip install --upgrade pip
+          pip install --upgrade pip "setuptools>=77" "Cython>=0.29" "numpy>=2.0.0"
           pip install -e .
           python setup.py build_ext --inplace
           pip install -r tests/requirements.txt
