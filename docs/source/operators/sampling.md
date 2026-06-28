@@ -13,6 +13,17 @@ jupytext:
 .. _nb_sampling:
 ```
 
+.. meta::
+   :description: In the beginning, initial points need to be sampled
+
++++
+
+.. meta::
+   :keywords: Sampling, genetic operator, evolutionary algorithm, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Sampling
 
 +++

@@ -17,6 +17,17 @@ kernelspec:
 .. _nb_heat:
 ```
 
+.. meta::
+   :description: For getting an idea of the distribution of values, heatmaps can be used
+
++++
+
+.. meta::
+   :keywords: Heatmap, visualization, plot, high-dimensional data, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Heatmap
 
 +++

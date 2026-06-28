@@ -13,6 +13,17 @@ jupytext:
 .. _nb_wfg:
 ```
 
+.. meta::
+   :description: WFG1 to WFG9 are available
+
++++
+
+.. meta::
+   :keywords: WFG, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 # WFG
 
 WFG1 to WFG9 are available.

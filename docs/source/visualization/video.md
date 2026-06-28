@@ -18,6 +18,17 @@ raw_mimetype: text/restructuredtext
 .. _nb_video:
 ```
 
+.. meta::
+   :description: Images are fantastic, but since optimization happens over time, videos can often capture the optimization process itself in a better way
+
++++
+
+.. meta::
+   :keywords: Video, visualization, plot, high-dimensional data, multi-objective optimization, pymoo, Python
+
++++
+
+
 +++ {"pycharm": {"name": "#%% md\n"}}
 
 ## Video

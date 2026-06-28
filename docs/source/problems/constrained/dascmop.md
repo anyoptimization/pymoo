@@ -18,6 +18,17 @@ raw_mimetype: text/restructuredtext
 .. _nb_dascmop:
 ```
 
+.. meta::
+   :description: DAS-CMOP is a constrained multi-objective test suite with tunable constraints 
+
++++
+
+.. meta::
+   :keywords: DAS-CMOP, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 +++ {"pycharm": {"name": "#%% md\n"}}
 
 ## DAS-CMOP

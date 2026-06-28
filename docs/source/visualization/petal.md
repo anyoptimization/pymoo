@@ -13,6 +13,17 @@ jupytext:
 .. _nb_petal:
 ```
 
+.. meta::
+   :description: Also, it might be interesting to compare one solution with another
+
++++
+
+.. meta::
+   :keywords: Petal Diagram, visualization, plot, high-dimensional data, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Petal Diagram
 
 +++

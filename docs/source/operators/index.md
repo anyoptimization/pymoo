@@ -13,6 +13,17 @@ jupytext:
 .. _nb_operators:
 ```
 
+.. meta::
+   :description: Operators are the key to customize genetic algorithms
+
++++
+
+.. meta::
+   :keywords: Operators, genetic operator, evolutionary algorithm, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Operators
 
 ```{raw-cell}

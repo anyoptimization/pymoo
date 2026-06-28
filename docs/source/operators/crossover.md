@@ -13,6 +13,17 @@ jupytext:
 .. _nb_crossover:
 ```
 
+.. meta::
+   :description: Details about the crossover can be found in 
+
++++
+
+.. meta::
+   :keywords: Crossover, genetic operator, evolutionary algorithm, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Crossover
 
 ```{raw-cell}

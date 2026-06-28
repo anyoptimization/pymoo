@@ -13,6 +13,17 @@ jupytext:
 .. _nb_zdt:
 ```
 
+.. meta::
+   :description: The ZDT  problem suite is based on the construction process
+
++++
+
+.. meta::
+   :keywords: ZDT, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## ZDT
 
 The ZDT <cite data-cite="zdt"></cite> problem suite is based on the construction process

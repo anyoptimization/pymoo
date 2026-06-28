@@ -13,6 +13,17 @@ jupytext:
 .. _nb_radar:
 ```
 
+.. meta::
+   :description: Let us start by generating some data:
+
++++
+
+.. meta::
+   :keywords: Radar Plot, visualization, plot, high-dimensional data, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Radar Plot
 
 

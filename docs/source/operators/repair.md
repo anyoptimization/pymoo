@@ -13,6 +13,16 @@ jupytext:
 
 +++
 
+.. meta::
+   :description: Repair operators in pymoo — fix solutions that violate problem constraints during the search.
+
++++
+
+.. meta::
+   :keywords: Repair, genetic operator, constraint handling, evolutionary algorithm, pymoo, Python
+
++++
+
 # Repair
 
 The repair operator is mostly problem-dependent. Most commonly, it is used to make sure the algorithm is only searching in the feasible space. It is applied after the offspring have been reproduced. In the following, we are using the knapsack problem to demonstrate the repair operator in *pymoo*.

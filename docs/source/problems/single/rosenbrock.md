@@ -13,6 +13,17 @@ jupytext:
 .. _nb_rosenbrock:
 ```
 
+.. meta::
+   :description: The definition can be found in 
+
++++
+
+.. meta::
+   :keywords: Rosenbrock, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Rosenbrock
 
 The definition can be found in <cite data-cite="rosenbrock"></cite>. It is a non-convex function, introduced by Howard H. Rosenbrock in 1960 and also known as Rosenbrock's valley or Rosenbrock's banana function. 

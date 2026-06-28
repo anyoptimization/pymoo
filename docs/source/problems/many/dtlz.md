@@ -13,6 +13,17 @@ jupytext:
 .. _nb_dtlz:
 ```
 
+.. meta::
+   :description: The only difficulty provided by this problem is the convergence to the
+
++++
+
+.. meta::
+   :keywords: DTLZ, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## DTLZ
 
 

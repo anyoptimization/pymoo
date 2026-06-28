@@ -17,6 +17,17 @@ kernelspec:
 .. _nb_test_problems:
 ```
 
+.. meta::
+   :description: single/griewank.ipynb
+
++++
+
+.. meta::
+   :keywords: Test Problems, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 # Test Problems
 
 ```{raw-cell}

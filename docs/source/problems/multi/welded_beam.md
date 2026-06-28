@@ -13,6 +13,17 @@ jupytext:
 .. _nb_welded_beam:
 ```
 
+.. meta::
+   :description: from pymoo.problems import getproblem
+
++++
+
+.. meta::
+   :keywords: Welded Beam, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 # Welded Beam
 
 ```{code-cell} ipython3

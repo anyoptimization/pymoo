@@ -13,6 +13,17 @@ jupytext:
 .. _nb_rastrigin:
 ```
 
+.. meta::
+   :description: The Rastrigin function has several local minima
+
++++
+
+.. meta::
+   :keywords: Rastrigin, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Rastrigin
 
 The Rastrigin function has several local minima. It is highly multimodal, but locations of the minima are regularly distributed. It is shown in the plot above in its two-dimensional form. 

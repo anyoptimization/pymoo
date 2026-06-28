@@ -13,6 +13,17 @@ jupytext:
 .. _nb_griewank:
 ```
 
+.. meta::
+   :description: The Griewank function has many widespread local minima, which are regularly distributed
+
++++
+
+.. meta::
+   :keywords: Griewank, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Griewank
 
 The Griewank function has many widespread local minima, which are regularly distributed. The complexity is shown in the zoomed-in plots. 

@@ -13,6 +13,17 @@ jupytext:
 .. _nb_mw:
 ```
 
+.. meta::
+   :description: MW  is a constrained multi-objective test suite constructed in a similar fashion to CTP or WFG with 3 different distance functions and 3 local adjustment methods
+
++++
+
+.. meta::
+   :keywords: MW, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## MW
 
 MW <cite data-cite="mw"></cite> is a constrained multi-objective test suite constructed in a similar fashion to CTP or WFG with 3 different distance functions and 3 local adjustment methods. Most problems are biobjective problems, except MW4, MW8 and MW14 which are scalable ($m \geq 3$).

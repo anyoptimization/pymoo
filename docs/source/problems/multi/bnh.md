@@ -13,6 +13,17 @@ jupytext:
 .. _nb_bnh:
 ```
 
+.. meta::
+   :description: Binh and Korn defined the following test problem in  with 2 objectives and 2 constraints:
+
++++
+
+.. meta::
+   :keywords: BNH, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## BNH
 
 Binh and Korn defined the following test problem in <cite data-cite="bnh"></cite> with 2 objectives and 2 constraints:

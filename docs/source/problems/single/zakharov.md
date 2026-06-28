@@ -13,6 +13,17 @@ jupytext:
 .. _nb_zakharov:
 ```
 
+.. meta::
+   :description: The Zakharov function has no local minima except the global one
+
++++
+
+.. meta::
+   :keywords: Zakharov, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Zakharov
 
 The Zakharov function has no local minima except the global one. It is shown here in its two-dimensional form.

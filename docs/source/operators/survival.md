@@ -15,6 +15,17 @@ kernelspec:
 .. _nb_survival:
 ```
 
+.. meta::
+   :description: The original survival strategy proposed in [NSGA-II](../algorithms/moo/nsga2.ipynb)  ranks solutions in fronts by dominance criterion and uses a diversity metric denoted crowding distances to sort individuals in each front
+
++++
+
+.. meta::
+   :keywords: Survival, genetic operator, evolutionary algorithm, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Survival
 
 +++

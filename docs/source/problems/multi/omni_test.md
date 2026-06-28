@@ -7,6 +7,18 @@ jupytext:
     jupytext_version: 1.17.1
 ---
 
++++
+
+.. meta::
+   :description: The Omni-test multi-modal multi-objective optimization problem in pymoo.
+
++++
+
+.. meta::
+   :keywords: Omni-test, multi-modal multi-objective optimization, test problem, benchmark problem, pymoo, Python
+
++++
+
 # Omni-test
 The Omni-test problem is a multi-modal multi-objective optimization problem proposed by Deb in <cite data-cite="omni_test"></cite>. It has two objective
 functions. Suppose that the dimension of the decision space is $D$, then it has $3^D$ Pareto subsets in the decision

@@ -13,6 +13,17 @@ jupytext:
 .. _nb_mutation:
 ```
 
+.. meta::
+   :description: Details about the mutation can be found in 
+
++++
+
+.. meta::
+   :keywords: Mutation, genetic operator, evolutionary algorithm, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Mutation
 
 ```{raw-cell}

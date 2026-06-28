@@ -13,6 +13,17 @@ jupytext:
 .. _nb_star:
 ```
 
+.. meta::
+   :description: A Star Coordinate Plot maps a higher dimensional space with a non-linear function to two dimensions
+
++++
+
+.. meta::
+   :keywords: Star Coordinate Plot, visualization, plot, high-dimensional data, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Star Coordinate Plot
 
 +++

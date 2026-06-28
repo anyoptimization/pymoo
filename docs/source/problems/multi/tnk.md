@@ -13,6 +13,17 @@ jupytext:
 .. _nb_tnk:
 ```
 
+.. meta::
+   :description: Tanaka suggested the following two-variable problem:
+
++++
+
+.. meta::
+   :keywords: TNK, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## TNK
 
 Tanaka suggested the following two-variable problem:

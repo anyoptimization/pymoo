@@ -13,6 +13,17 @@ jupytext:
 .. _nb_problem_definition:
 ```
 
+.. meta::
+   :description: Problems have to be defined, and some information has to be provided
+
++++
+
+.. meta::
+   :keywords: Definition, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 # Definition
 
 +++

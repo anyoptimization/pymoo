@@ -13,6 +13,17 @@ jupytext:
 .. _nb_radviz:
 ```
 
+.. meta::
+   :description: Radviz maps a higher-dimensional space with a non-linear function to two dimensions
+
++++
+
+.. meta::
+   :keywords: Radviz, visualization, plot, high-dimensional data, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Radviz
 
 +++

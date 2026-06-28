@@ -13,6 +13,17 @@ jupytext:
 .. _nb_problem:
 ```
 
+.. meta::
+   :description: This part of the documentation describes everything related to defining and making use of optimization problems
+
++++
+
+.. meta::
+   :keywords: Problems, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Problems
 
 ```{raw-cell}

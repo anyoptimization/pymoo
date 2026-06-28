@@ -13,6 +13,17 @@ jupytext:
 .. _nb_osy:
 ```
 
+.. meta::
+   :description: Osyczka and Kundu used the following six-variable
+
++++
+
+.. meta::
+   :keywords: OSY, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## OSY
 
 Osyczka and Kundu used the following six-variable

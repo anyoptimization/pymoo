@@ -17,6 +17,17 @@ kernelspec:
 .. _nb_scatter:
 ```
 
+.. meta::
+   :description: The traditional scatter plot is mostly used for lower dimensional objective spaces
+
++++
+
+.. meta::
+   :keywords: Scatter Plot, visualization, plot, high-dimensional data, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Scatter Plot
 
 +++

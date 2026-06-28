@@ -17,6 +17,17 @@ kernelspec:
 .. _nb_pcp:
 ```
 
+.. meta::
+   :description: For higher-dimensional data, Parallel Coordinate Plots are a powerful technique to analyze how dense solutions are distributed in different ranges regarding each coordinate
+
++++
+
+.. meta::
+   :keywords: Parallel Coordinate Plots, visualization, plot, high-dimensional data, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Parallel Coordinate Plots
 
 +++

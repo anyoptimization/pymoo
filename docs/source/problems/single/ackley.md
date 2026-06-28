@@ -13,6 +13,17 @@ jupytext:
 .. _nb_ackley:
 ```
 
+.. meta::
+   :description: The Ackley function is widely used for testing optimization algorithms
+
++++
+
+.. meta::
+   :keywords: Ackley, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 ## Ackley
 
 The Ackley function is widely used for testing optimization algorithms. In its two-dimensional form, as shown in the plot above, it is characterized by a nearly flat outer region, and a large hole at the centre. The function poses a risk for optimization algorithms, particularly hillclimbing algorithms, to be trapped in one of its many local minima. 

@@ -18,6 +18,17 @@ raw_mimetype: text/restructuredtext
 .. _nb_modact:
 ```
 
+.. meta::
+   :description: MODAct (multi-objective design of actuators) is a real-world benchmark test-suite  for constrained multi-objective optimization
+
++++
+
+.. meta::
+   :keywords: MODAct, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 +++ {"pycharm": {"name": "#%% md\n"}}
 
 # MODAct

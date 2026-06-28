@@ -7,6 +7,18 @@ jupytext:
     jupytext_version: 1.17.1
 ---
 
++++
+
+.. meta::
+   :description: The SYM-PART multi-modal multi-objective optimization benchmark suite in pymoo.
+
++++
+
+.. meta::
+   :keywords: SYM-PART, multi-modal multi-objective optimization, test problem, benchmark problem, pymoo, Python
+
++++
+
 # SYM-PART
 
 The SYM-PART <cite data-cite="sym_part"></cite> problem suite is a multi-modal multi-objective optimization problem (MMOP).

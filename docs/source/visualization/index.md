@@ -17,6 +17,17 @@ kernelspec:
 .. _nb_visualization:
 ```
 
+.. meta::
+   :description: Different visualization techniques are available
+
++++
+
+.. meta::
+   :keywords: Visualization, visualization, plot, high-dimensional data, multi-objective optimization, pymoo, Python
+
++++
+
+
 # Visualization
 
 ```{raw-cell}

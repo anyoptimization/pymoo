@@ -13,6 +13,17 @@ jupytext:
 .. _nb_truss2d:
 ```
 
+.. meta::
+   :description: The problem was proposed in  for the purpose of investigating rules on the Pareto-front
+
++++
+
+.. meta::
+   :keywords: Truss2D, test problem, benchmark problem, optimization problem, multi-objective optimization, pymoo, Python
+
++++
+
+
 # Truss2D
 
 The problem was proposed in <cite data-cite="truss2d"></cite> for the purpose of investigating rules on the Pareto-front.

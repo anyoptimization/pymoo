@@ -13,6 +13,17 @@ jupytext:
 .. _nb_df:
 ```
 
+.. meta::
+   :description: The DF benchmark suite for dynamic multi-objective optimization (CEC2018 competition) in pymoo.
+
++++
+
+.. meta::
+   :keywords: DF, dynamic multi-objective optimization, CEC2018, benchmark problem, test problem, pymoo, Python
+
++++
+
+
 ## DF: Benchmark Problems for CEC2018 Competition on Dynamic Multiobjective Optimisation
 
 +++
