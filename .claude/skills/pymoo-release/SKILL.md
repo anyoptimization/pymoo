@@ -242,3 +242,13 @@ pure-python fallback).
 - **Wheels ~19% bigger than needed** → they ship the Cython `.pyx`/`.cpp` sources
   (only the `.so` is used at runtime). Harmless; optional cleanup to exclude them
   from wheels while keeping `.pyx`/`.pxd` in the sdist.
+- **Deployed pages show empty code cells (no plots/output)** → the HTML render ran
+  before the slowest notebooks finished hydrating their `.ipynb`, so nbsphinx
+  (`execute='never'`) rendered blank cells. Tends to hit the heaviest pages
+  (cmopso, ctaea, age, hyperparameters, kktpm, …). `pyclawd docs run` is a cache
+  **no-op** here (cache hit, no re-hydrate) — fix with **`pyclawd docs exec <page>`**
+  (uncached, single-notebook) per affected page, then `pyclawd docs render`. Verify
+  **before deploy** with `grep -c "_images/.*\.png" docs/build/html/<page>.html` (a
+  plot-bearing page returning 0 is the smell; text-only pages like brkga/joblib/
+  hyperparameters legitimately have only stream output, and video/versions/
+  installation produce none).

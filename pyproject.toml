@@ -101,12 +101,18 @@ parallelization = [
 others = [
     "optuna",
 ]
+visualization = [
+    # matplotlib (static plots) is already a core dependency; this extra adds the
+    # optional animation / video / live-streaming visualization backend.
+    "pyrecorder",
+]
 full = [
     "numba",
     "scikit-learn",
     "pandas",
     "pymoo[parallelization]",
     "pymoo[others]",
+    "pymoo[visualization]",
 ]
 
 

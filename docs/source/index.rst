@@ -48,8 +48,8 @@ more features related to multi-objective optimization such as visualization and 
 
 
 Please note that some modules can be compiled to speed up computations (optional). The command
-above attempts is made to compile the modules; however, if unsuccessful, the
-pure python version is installed. More information are available in our 
+above attempts to compile the modules; however, if unsuccessful, the
+pure python version is installed. More information is available in our
 :ref:`Installation Guide <installation>`.
 
 
