@@ -35,7 +35,10 @@ dependencies = [
 ]
 
 [build-system]
-requires = ["setuptools>=77", "numpy", "Cython>=0.29"]
+# Build against numpy>=2.0: its C-ABI is backward-compatible, so a single wheel
+# loads on runtime numpy >=1.19 AND 2.x. An unpinned build numpy could compile
+# against 2.x while a 1.x runtime silently falls back to slow pure-Python.
+requires = ["setuptools>=77", "numpy>=2.0.0", "Cython>=0.29"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]

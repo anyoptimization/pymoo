@@ -11,7 +11,7 @@ class MyProblem(ElementwiseProblem):
     def __init__(self):
         super().__init__(n_var=2,
                          n_obj=2,
-                         n_constr=2,
+                         n_ieq_constr=2,
                          xl=np.array([-2, -2]),
                          xu=np.array([2, 2]))
 

@@ -1,6 +1,7 @@
 """Function package for pymoo with compiled and standard implementations."""
 
 import importlib
+import warnings
 
 from pymoo.config import Config
 
@@ -90,12 +91,15 @@ class FunctionLoader:
         self.mode = "auto"
 
         if Config.warnings["not_compiled"] and not self.is_compiled:
-            print("\nCompiled modules for significant speedup can not be used!")
-            print("https://pymoo.org/installation.html#installation")
-            print()
-            print("To disable this warning:")
-            print("from pymoo.config import Config")
-            print("Config.warnings['not_compiled'] = False\n")
+            # a filterable warning (stderr), not a bare print to stdout, so it can
+            # be silenced with the warnings module and doesn't pollute script output.
+            warnings.warn(
+                "pymoo: compiled modules are not available — falling back to the "
+                "slower pure-Python implementation. See "
+                "https://pymoo.org/installation.html#installation to compile them. "
+                "Silence with: Config.warnings['not_compiled'] = False.",
+                stacklevel=2,
+            )
 
     def load(self, func_name=None, mode=None):
         if mode is None:

@@ -81,11 +81,17 @@ class Problem:
         self.n_obj = n_obj
 
         # number of inequality constraints
-        self.n_ieq_constr = (
-            n_ieq_constr
-            if "n_constr" not in kwargs
-            else max(n_ieq_constr, kwargs["n_constr"])
-        )
+        if "n_constr" in kwargs:
+            warnings.warn(
+                "Problem(n_constr=...) is deprecated — use n_ieq_constr (inequality) "
+                "or n_eq_constr (equality) constraints. 'n_constr' is mapped to "
+                "n_ieq_constr for now and will be removed in 0.7.0.",
+                FutureWarning,
+                stacklevel=2,
+            )
+            self.n_ieq_constr = max(n_ieq_constr, kwargs["n_constr"])
+        else:
+            self.n_ieq_constr = n_ieq_constr
 
         # number of equality constraints
         self.n_eq_constr = n_eq_constr
