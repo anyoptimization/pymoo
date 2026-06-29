@@ -1,6 +1,5 @@
 """Fit linear and polynomial value functions to ranked solutions (the preference model behind PINSGA2)."""
 
-import math
 import sys
 
 import matplotlib.pyplot as plt
@@ -345,9 +344,7 @@ def _build_ineq_constr_poly(P, vf, ranks, delta):
     return ineq_func
 
 
-def _eq_constr_poly(x):
-
-    M = math.floor(math.sqrt(6))
+def _eq_constr_poly(x, M):
 
     if len(x.shape) == 1:
         result = []
@@ -376,7 +373,9 @@ def _build_constr_poly(P, vf, ranks, delta):
 
     ineq_constr_func = _build_ineq_constr_poly(P, vf, ranks, delta)
 
-    return lambda x: np.append(ineq_constr_func(x), _eq_constr_poly(x))
+    M = P.shape[1]
+
+    return lambda x: np.append(ineq_constr_func(x), _eq_constr_poly(x, M))
 
 
 def _ineq_constr_2D_poly(x, P, vf, ranks, delta):
@@ -723,7 +722,7 @@ class OptimizePolyVF(Problem):
         out["G"] = ineq_func(x)
 
         ## Equality constraint that keeps sum of x under 1
-        out["H"] = _eq_constr_poly(x)
+        out["H"] = _eq_constr_poly(x, self.P.shape[1])
 
 
 class vfResults:

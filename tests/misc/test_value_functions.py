@@ -232,7 +232,7 @@ test_eq_constr_poly_io = [
 @pytest.mark.parametrize('x, expected_eq_con', test_eq_constr_poly_io)
 def test_eq_constr_poly(x, expected_eq_con):
 
-    constraints =  mvf._eq_constr_poly(x)
+    constraints =  mvf._eq_constr_poly(x, 2)
 
     assert np.all(np.isclose(expected_eq_con, constraints))
 
