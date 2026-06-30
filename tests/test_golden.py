@@ -19,6 +19,10 @@ suites so this golden portfolio stays in sync with them automatically.
 and run as a separate behavior gate.
 """
 
+import json
+import platform
+from pathlib import Path
+
 import pytest
 
 from pymoo.optimize import minimize
@@ -34,6 +38,24 @@ SEED = 42
 N_GEN = 10
 SOO_PROBLEM = Sphere(n_var=2)
 MOO_PROBLEM = ZDT1()
+
+BASELINE_PATH = Path(__file__).parent / "golden" / "test_golden.json"
+
+# These baselines snapshot the *exact* ``res.F`` of a full optimization run. That
+# value is only bit-reproducible on the platform it was recorded on: population
+# EAs amplify the last-bit differences between platform math libraries (e.g. the
+# transcendental ``pow`` in SBX/PM crossover-mutation differs between glibc and
+# Apple's libm) into a completely different — but equally valid — Pareto front
+# within a single generation. No tolerance bridges that gap, so the golden tier
+# is pinned to the platform the baselines live on (linux-x86_64, which CI runs)
+# and *skips* elsewhere rather than reporting spurious failures. Contributors on
+# other platforms get the golden gate via CI; see GoldenConfig in .pyclawd/config.py.
+BASELINE_PLATFORM = ("Linux", "x86_64")
+pytestmark = pytest.mark.skipif(
+    (platform.system(), platform.machine()) != BASELINE_PLATFORM,
+    reason=f"golden res.F baselines are recorded on {BASELINE_PLATFORM}; "
+    "res.F is platform-chaotic for population EAs — run this tier via CI",
+)
 
 
 @pytest.mark.golden
@@ -61,3 +83,34 @@ def test_golden_moo(algorithm_class):
     algorithm = create_algorithm_instance(algorithm_class)
     res = minimize(MOO_PROBLEM, algorithm, ("n_gen", N_GEN), seed=SEED, verbose=False)
     return res.F
+
+
+def test_golden_coverage():
+    """Every parametrized algorithm must own a committed golden baseline.
+
+    A regular (non-``golden``) unit test so it gates every PR: it guards the gate
+    itself. Adding an algorithm to ``ALL_SINGLE_OBJECTIVE_ALGORITHMS`` /
+    ``MULTI_OBJECTIVE_ALGORITHM_CLASSES`` without blessing a baseline (``pyclawd
+    golden update``) fails here — so a new algorithm can never silently ship with no
+    behavior-regression net. Also flags orphaned baselines (a removed/renamed
+    algorithm leaving a stale key behind).
+    """
+    assert BASELINE_PATH.exists(), (
+        f"golden baseline file is missing ({BASELINE_PATH}); record it with "
+        f"`pyclawd golden update`"
+    )
+    recorded = set(json.loads(BASELINE_PATH.read_text()).keys())
+
+    expected = {f"test_golden_soo[{a.__name__}]" for a in ALL_SINGLE_OBJECTIVE_ALGORITHMS}
+    expected |= {f"test_golden_moo[{a.__name__}]" for a in MULTI_OBJECTIVE_ALGORITHM_CLASSES}
+
+    missing = sorted(expected - recorded)
+    orphaned = sorted(recorded - expected)
+    assert not missing, (
+        f"algorithms without a committed golden baseline: {missing}. "
+        f"Bless them with `pyclawd golden update`."
+    )
+    assert not orphaned, (
+        f"stale golden baselines with no matching algorithm: {orphaned}. "
+        f"Remove them (e.g. re-record with `pyclawd golden update`)."
+    )

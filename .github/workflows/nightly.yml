@@ -62,6 +62,11 @@ jobs:
       - name: Full unit suite (incl. long convergence tests)
         run: pytest -n auto -m "not examples and not docs and not golden"
       - name: Golden behavior-regression
+        # res.F baselines are bit-reproducible only on the platform they were
+        # recorded on (linux-x86_64); population EAs amplify platform libm
+        # differences into a different front. Run the golden tier on Linux only;
+        # the test module itself skips on other platforms (tests/test_golden.py).
+        if: runner.os == 'Linux'
         run: pytest -m golden
 
   docs-examples:
