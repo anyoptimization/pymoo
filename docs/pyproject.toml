@@ -70,7 +70,7 @@ dependencies = [
     "cython>=3.0",
     "pygments",
     "beautifulsoup4",
-    "moocore>=0.1.7",
+    "moocore>=0.3.1",
     # problems/constrained/modact — GitHub-only, installs cleanly via git URL
     "modact @ git+https://github.com/epfl-lamd/modact",
     
