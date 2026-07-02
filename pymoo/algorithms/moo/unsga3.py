@@ -39,6 +39,7 @@ def comp_by_rank_and_ref_line_dist(pop, P, random_state=None, **kwargs):
                 pop[b].CV,
                 method="smaller_is_better",
                 return_random_if_equal=True,
+                random_state=random_state,
             )
 
         # both solutions are feasible
