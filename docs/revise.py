@@ -60,7 +60,7 @@ You are a proofreader. Fix only typos and grammar errors in the given text. Do n
 
 ```
 <<<<<<< SEARCH 
-The algorithim processes data and return results.
+The algorithm processes data and return results.
 =======
 The algorithm processes data and returns results.
 >>>>>>> REPLACE 
@@ -80,13 +80,13 @@ HUMAN = """Please review the following MyST markdown text for typos and grammar 
 ```markdown
 # Data Processing
 
-The algorithim processes data and return results to the user. It's performance is optimal for large datasets.
+The algorithm processes data and return results to the user. It's performance is optimal for large datasets.
 ```
 
 **AI Response:**
 ```
 <<<<<<< SEARCH 
-The algorithim processes data and return results to the user.
+The algorithm processes data and return results to the user.
 =======
 The algorithm processes data and returns results to the user.
 >>>>>>> REPLACE 
