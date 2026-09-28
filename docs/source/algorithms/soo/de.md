@@ -50,6 +50,8 @@ where $\pi$ is a random permutation with 3 entries. The difference is taken betw
 
 Then, a second crossover between an individual and the so-called donor vector $v$ is performed. The second crossover can be simply binomial/uniform or exponential.
 
+In addition, pymoo's `DE` applies a polynomial mutation (`eta=20`, at least one variable) to each trial vector with probability `prob_mut` (default `0.1`). Pass `prob_mut=0.0` for the classical DE without it.
+
 
 
 A great tutorial and more detailed information can be found [here](https://web.archive.org/web/20190928024126/http://www1.icsi.berkeley.edu/~storn/code.html). The following guideline is copied from the description there (variable names are modified):
@@ -80,7 +82,6 @@ algorithm = DE(
     sampling=LHS(),
     variant="DE/rand/1/bin",
     CR=0.3,
-    dither="vector",
     jitter=False
 )
 

@@ -9,7 +9,6 @@ algorithm = DE(
     pop_size=100,
     variant="DE/rand/1/bin",
     CR=0.3,
-    dither="vector",
     jitter=True
 )
 
