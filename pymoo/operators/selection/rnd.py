@@ -50,7 +50,8 @@ def fast_fill_random(X, N, columns=None, Xp=None, n_max_attempts=10, random_stat
             else:
                 X[rem, col] = random_state.permutation(N)[: len(rem)]
 
-            rem = np.where((X[rem, col][:, None] == D[rem]).any(axis=1))[0]
+            # keep the row numbers (not the positions within `rem`) of the rows still in conflict
+            rem = rem[np.where((X[rem, col][:, None] == D[rem]).any(axis=1))[0]]
 
             if len(rem) == 0:
                 break
