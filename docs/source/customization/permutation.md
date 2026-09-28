@@ -46,7 +46,7 @@ class StartFromZeroRepair(Repair):
         return X
 ```
 
-For permutations, the corresponding operators need to be supplied to the `GA` constructor. Here, we choose random permutations, edge recombination crossover, and inversion mutation. Also, the repair defined above is provided.
+For permutations, the corresponding operators need to be supplied to the `GA` constructor. Here, we choose random permutations, order crossover, and inversion mutation. Also, the repair defined above is provided.
 The termination is defined to consider the improvement of the last 200 generations. If the improvement is above a tolerance value (default: `f_tol=1e-6`), the algorithm is considered as terminated.
 
 ```{code-cell} ipython3

@@ -19,7 +19,7 @@ Mostly, *pymoo* was made for continuous problems, but of course, other variable 
 
 +++
 
-In the following, the classical knapsack problem is considered. A single-objective genetic algorithm with a random initial population, half uniform binary crossover and a bitflip mutation is initialized.
+In the following, the classical knapsack problem is considered. A single-objective genetic algorithm with a random initial population, two-point crossover and a bitflip mutation is initialized.
 
 ```{code-cell} ipython3
 from pymoo.algorithms.soo.nonconvex.ga import GA
