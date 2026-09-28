@@ -51,6 +51,16 @@ def test_single_objective_deterministic(algorithm_class):
                                   err_msg=f"Algorithm {algorithm_class.__name__} is not deterministic")
 
 
+@pytest.mark.parametrize('algorithm_class', [CMAES, SimpleCMAES, BIPOPCMAES])
+def test_cmaes_deterministic_with_seed_zero(algorithm_class):
+    """pycma reads a seed of 0 as "seed from the clock"; seed 0 must still repeat a run."""
+    res1 = minimize(SINGLE_OBJECTIVE_PROBLEM, algorithm_class(), ('n_gen', 10), seed=0, verbose=False)
+    res2 = minimize(SINGLE_OBJECTIVE_PROBLEM, algorithm_class(), ('n_gen', 10), seed=0, verbose=False)
+
+    np.testing.assert_allclose(res1.X, res2.X, rtol=1e-6, atol=1e-6,
+                               err_msg=f"Algorithm {algorithm_class.__name__} is not deterministic with seed 0")
+
+
 def test_different_seeds_produce_different_results():
     """Test that different seeds produce different results."""
     algorithm = DE()

@@ -164,8 +164,9 @@ class CMAES(LocalSearch):
             self.norm = NoNormalization()
             self.options["bounds"] = [xl, xu]
 
+        # pycma seeds itself from the clock when its seed is 0: then my_fmin derives one from random_state instead
         seed = kwargs.get("seed", self.seed)
-        self.options["seed"] = seed
+        self.options["seed"] = None if seed == 0 else seed
 
         if isinstance(self.termination, MaximumGenerationTermination):
             self.options["maxiter"] = self.termination.n_max_gen
@@ -270,7 +271,8 @@ class SimpleCMAES(LocalSearch):
         else:
             self.norm = NoNormalization()
             self.opts["bounds"] = [xl, xu]
-        self.opts["seed"] = self.seed
+        # pycma seeds itself from the clock when its seed is 0: derive another one from random_state
+        self.opts["seed"] = int(self.random_state.integers(1, 2**31)) if self.seed == 0 else self.seed
 
     def _initialize_advance(self, infills=None, **kwargs):
         super()._initialize_advance(infills, **kwargs)

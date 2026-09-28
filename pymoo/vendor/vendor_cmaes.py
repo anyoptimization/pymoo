@@ -129,7 +129,7 @@ def my_fmin(x0,
                 # Set seed from random_state for deterministic behavior
                 if 'seed' not in opts or opts['seed'] is None:
                     # Generate a seed from the random_state for CMA-ES
-                    opts['seed'] = random_state.integers(0, 2**31)
+                    opts['seed'] = random_state.integers(1, 2**31)  # not 0, which pycma reads as "from the clock"
                 
                 if irun and eval(str(fmin_options['restart_from_best'])):
                     utils.print_warning('CAVE: restart_from_best is often not useful',
