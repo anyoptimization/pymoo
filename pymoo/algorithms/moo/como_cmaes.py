@@ -19,7 +19,8 @@ class COMOCMAES(Algorithm):
     bi-objective performance — the CMA-ES family that is competitive with the
     documented bbob-biobj winners, which plain MO-CMA-ES is not at small budgets.
 
-    Requires ``comocma`` (``pip install comocma``) and is **bi-objective only**.
+    Requires ``comocma`` (``pip install comocma``) and supports only **unconstrained
+    bi-objective** problems.
     The search runs in a normalized ``[0, 1]`` decision space.
 
     Anytime behaviour: like CMA-ES-based multi-objective methods generally, it is a
@@ -61,6 +62,8 @@ class COMOCMAES(Algorithm):
     def _setup(self, problem, **kwargs):
         if problem.n_obj != 2:
             raise ValueError("COMO-CMA-ES (comocma) supports only bi-objective problems.")
+        if problem.has_constraints():
+            raise ValueError("COMO-CMA-ES (comocma) does not support constrained problems.")
         self.norm = ZeroToOneNormalization(problem.xl, problem.xu)
 
     def _initialize_infill(self):
