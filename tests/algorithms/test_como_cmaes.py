@@ -48,6 +48,16 @@ def test_como_cmaes_default_reference_point_without_known_front():
     ref = res.algorithm.moes.reference_point
     assert ref[0] == ref[1] and ref[0] >= 1e6
 
+
+def test_como_cmaes_reports_kernels_when_none_dominates_reference_point():
+    # no kernel can dominate [-1, -1]; the result must still come from the kernels,
+    # not from the initial sample
+    problem = get_problem("zdt1", n_var=5)
+    res = minimize(problem, COMOCMAES(pop_size=10, reference_point=[-1.0, -1.0]), ("n_gen", 20), seed=1, verbose=False)
+    kernel_F = np.array([k.objective_values for k in res.algorithm.moes if k.objective_values is not None])
+    for f in res.F:
+        assert np.any(np.all(np.isclose(kernel_F, f), axis=1))
+
 def test_como_cmaes_requires_biobjective():
     problem = get_problem("dtlz2", n_var=7, n_obj=3)
     with pytest.raises(ValueError, match="bi-objective"):

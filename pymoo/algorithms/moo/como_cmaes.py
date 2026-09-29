@@ -136,6 +136,13 @@ class COMOCMAES(Algorithm):
         # the cut set and front can momentarily desync in length when kernels go
         # inactive — only update the population when they align.
         m = min(len(Fp), len(Xp))
+        if m == 0:
+            # no kernel dominates the reference point yet: report the kernels'
+            # incumbents rather than keeping the initial sample as the result
+            told = [k for k in self.moes if k.objective_values is not None]
+            Xp = np.array([k.incumbent for k in told], dtype=float)
+            Fp = np.array([k.objective_values for k in told], dtype=float)
+            m = len(told)
         if m > 0:
             self.pop = Population.new(X=self.norm.backward(Xp[:m]), F=Fp[:m])
 
