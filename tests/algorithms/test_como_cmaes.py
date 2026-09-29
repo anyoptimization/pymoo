@@ -26,6 +26,14 @@ def test_como_cmaes_requires_biobjective():
         minimize(problem, COMOCMAES(pop_size=10), ("n_gen", 2), seed=1, verbose=False)
 
 
+def test_como_cmaes_rejects_constrained_problems():
+    # comocma only sees F, so constraints would be silently ignored and the
+    # returned solutions reported with CV = 0
+    problem = get_problem("tnk")
+    with pytest.raises(ValueError, match="constrained"):
+        minimize(problem, COMOCMAES(pop_size=10), ("n_gen", 2), seed=1, verbose=False)
+
+
 def test_como_cmaes_deterministic():
     problem = get_problem("zdt1", n_var=5)
     r1 = minimize(problem, COMOCMAES(pop_size=20, reference_point=[1.1, 1.1]),
