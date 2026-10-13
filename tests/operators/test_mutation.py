@@ -41,3 +41,26 @@ def test_inversion_mutation():
     end = 3
     mut = inversion_mutation(y, seq=(start, end))
     np.testing.assert_allclose(mut, np.array([1, 4, 3, 2, 5]))
+
+
+def test_bitflip_mutation_expectation():
+    """Regression test: default BitflipMutation(prob=1.0) flips ~1 bit per chromosome.
+
+    Uses a fixed random state to ensure the test is deterministic in CI.
+    For n_var=100 and 400 individuals, the CLT gives a 99.9% confidence
+    interval well within [0.75, 1.25].
+    """
+    from pymoo.core.problem import Problem
+    from pymoo.core.population import Population
+
+    class DummyBinaryProblem(Problem):
+        def __init__(self, n_var=100):
+            super().__init__(n_var=n_var, n_obj=1, xl=0, xu=1, vtype=bool)
+
+    problem = DummyBinaryProblem(n_var=100)
+    mut = BitflipMutation(prob=1.0)
+    pop = Population.new("X", np.zeros((400, 100), dtype=bool))
+    rng = np.random.default_rng(seed=42)
+    mutated = mut.do(problem, pop, random_state=rng).get("X")
+    mean_flips = np.mean(np.sum(mutated, axis=1))
+    assert 0.75 <= mean_flips <= 1.25
