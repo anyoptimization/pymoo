@@ -41,3 +41,19 @@ def test_inversion_mutation():
     end = 3
     mut = inversion_mutation(y, seq=(start, end))
     np.testing.assert_allclose(mut, np.array([1, 4, 3, 2, 5]))
+
+
+def test_bitflip_mutation_expectation():
+    from pymoo.core.problem import Problem
+    from pymoo.core.population import Population
+
+    class DummyBinaryProblem(Problem):
+        def __init__(self, n_var=100):
+            super().__init__(n_var=n_var, n_obj=1, xl=0, xu=1, vtype=bool)
+
+    problem = DummyBinaryProblem(n_var=100)
+    mut = BitflipMutation(prob=1.0)
+    pop = Population.new("X", np.zeros((400, 100), dtype=bool))
+    mutated = mut.do(problem, pop).get("X")
+    mean_flips = np.mean(np.sum(mutated, axis=1))
+    assert 0.75 <= mean_flips <= 1.25
