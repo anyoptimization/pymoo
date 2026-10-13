@@ -26,13 +26,15 @@ class BitflipMutation(Mutation):
 
         .. code-block:: python
 
-            # WRONG: Effective per-bit rate degrades to (1/n) * (1/n) = 1/n^2!
+            # WRONG: Effective per-bit rate degrades to
+            #   prob * min(0.5, 1/n_var) = (1/n_var) * min(0.5, 1/n_var)
+            # For n_var >= 2 this equals 1/n_var^2, which is near-zero.
             mutation = BitflipMutation(1.0 / n_var)
 
             # CORRECT: Evaluates every offspring with an independent 1/n per-bit rate:
             mutation = BitflipMutation(prob=1.0, prob_var=1.0 / n_var)
 
-            # ALSO CORRECT (relies on PyMoo's default prob_var = 1/n_var):
+            # ALSO CORRECT (relies on PyMoo's default prob_var = min(0.5, 1/n_var)):
             mutation = BitflipMutation(prob=1.0)
 
     Parameters
@@ -43,7 +45,8 @@ class BitflipMutation(Mutation):
         is subject to per-locus flipping.
     prob_var : float, optional (default=None)
         Probability of flipping each individual bit. If ``None``, defaults to
-        ``min(0.5, 1.0 / problem.n_var)``, which satisfies the theoretical expectation of
+        ``min(0.5, 1.0 / problem.n_var)``.
+        For ``n_var >= 2`` this equals ``1 / n_var``, satisfying the theoretical expectation
         :math:`\\mathbb{E}[\\text{flips}] = 1.0` bit per individual.
 
     Examples
